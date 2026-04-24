@@ -126,10 +126,22 @@ function Compute(text, caret)
     local prefix = STR_Utf8SubString(text, wordStart + 1, caret - wordStart)
     if prefix == '' then return nil end
 
+    -- Allow `@nick` shorthand: strip the leading `@` for matching but keep
+    -- it in every candidate so the inserted text is still `@Jip`. Command
+    -- param resolvers strip a leading `@` symmetrically (see
+    -- ChatCommandTypes), so `/whisper @Jip` works the same as `/whisper Jip`.
+    local atSign = ''
+    local matchPrefix = prefix
+    if string.sub(prefix, 1, 1) == '@' then
+        atSign = '@'
+        matchPrefix = string.sub(prefix, 2)
+        if matchPrefix == '' then return nil end
+    end
+
     local candidates = {}
     for _, name in ipairs(CollectNicknames()) do
-        if StartsWithCI(name, prefix) then
-            table.insert(candidates, name)
+        if StartsWithCI(name, matchPrefix) then
+            table.insert(candidates, atSign .. name)
         end
     end
     local n = table.getn(candidates)

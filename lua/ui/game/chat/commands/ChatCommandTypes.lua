@@ -11,6 +11,11 @@
 
 --- Looks up an army by nickname or by numeric army ID. Civilian armies are
 --- excluded to match the behaviour of the recipient picker.
+---
+--- A leading `@` is stripped before matching so `@Jip` and `Jip` are
+--- equivalent — this lets the chat-edit `@nick` autocomplete (see
+--- ChatCompletion) feed straight into commands like `/whisper @Jip` without
+--- the user having to delete the `@` first.
 ---@param token string
 ---@return boolean ok
 ---@return number | string armyIDOrError
@@ -18,6 +23,11 @@ local function ResolveArmy(token)
     local armies = GetArmiesTable()
     if not armies or not armies.armiesTable then
         return false, "no army table available."
+    end
+
+    -- do not include '@' of '@nick' when matching against army nicknames or IDs; this allows the user to quickly find usernames
+    if string.sub(token, 1, 1) == '@' then
+        token = string.sub(token, 2)
     end
 
     local asNum = tonumber(token)
