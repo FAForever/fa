@@ -82,15 +82,6 @@ WinAlphaSliderRange = { Min = 20, Max = 100, Inc = 1 }
 ---@type UIChatConfigModel | nil
 local ModelInstance = nil
 
---- Returns the model singleton, creating it if it does not exist yet.
----@return UIChatConfigModel
-function GetSingleton()
-    if not ModelInstance then
-        SetupSingleton()
-    end
-    return ModelInstance
-end
-
 --- Creates and initializes the model singleton from the player profile.
 --- Mutes are deliberately per-game: any `muted` payload read from prefs is
 --- discarded, and `Apply` strips it before saving.
@@ -106,6 +97,21 @@ function SetupSingleton()
     }
 
     return ModelInstance
+end
+
+--- Returns the model singleton, creating it if it does not exist yet.
+---@return UIChatConfigModel
+function GetSingleton()
+    return ModelInstance or SetupSingleton()
+end
+
+--- Shorthand for `GetSingleton().Committed()` — the current, applied
+--- options snapshot. Use it for one-shot reads at the point of use; views
+--- that need to react to changes should still subscribe via
+--- `LazyVarDerive(GetSingleton().Committed, ...)`.
+---@return UIChatOptions
+function GetOptions()
+    return GetSingleton().Committed()
 end
 
 --- Returns a fresh copy of the built-in defaults.

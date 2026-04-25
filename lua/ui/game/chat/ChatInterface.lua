@@ -380,7 +380,7 @@ local ChatInterface = ClassUI(Window) {
         local container = self.LinesContainer
         -- Read the live size straight from the config model so the pool
         -- always tracks the current option without a cached copy on `self`.
-        local fontSize = ChatConfigModel.GetSingleton().Committed().font_size or 14
+        local fontSize = ChatConfigModel.GetOptions().font_size or 14
 
         -- Need one line to establish the row height. The row's Height is a
         -- lazy function of the name-text font (see ChatLineInterface).
@@ -515,7 +515,7 @@ local ChatInterface = ClassUI(Window) {
     ---@return boolean
     IsValidEntry = function(self, entry)
         if entry == nil then return false end
-        local muted = ChatConfigModel.GetSingleton().Committed().muted
+        local muted = ChatConfigModel.GetOptions().muted
         if muted and entry.ArmyID and muted[entry.ArmyID] then
             return false
         end

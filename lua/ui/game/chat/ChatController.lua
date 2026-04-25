@@ -512,7 +512,7 @@ function ActivateChat(modifiers)
     -- the toggle above — writing to `Recipient` before `ToggleWindow` runs
     -- gets clobbered by its own `ApplyDefaultRecipient` call.
     if not wasVisible and type(model.Recipient()) ~= 'number' then
-        local sendType = ChatConfigModel.GetSingleton().Committed().send_type or false
+        local sendType = ChatConfigModel.GetOptions().send_type or false
         local shift = modifiers and modifiers.Shift or false
         if (not shift) == sendType then
             model.Recipient:Set(ChatModel.RecipientAllies)
