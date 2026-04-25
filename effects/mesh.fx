@@ -3740,6 +3740,51 @@ float shieldWaterAbsorption(float depth) {
     return factor;
 }
 
+float4 ShieldLegacyPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
+{
+    if ( 1 == mirrored ) clip(vertex.depth);
+
+    float4 colorMask = tex2D( albedoSampler, vertex.texcoord0.xy);
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.zw);
+    float3 normal = tex2D( secondarySampler, vertex.texcoord1.xy ).gaa * 2 - 1;
+    normal.z = sqrt( 1 - normal.x*normal.x - normal.y*normal.y );
+    float3 specular = tex2D( specularSampler, vertex.texcoord1.zw );
+
+    // Combine albedo and normal sampler for a final color
+    float4 color = float4( mul( albedo.rgr, normal.rgb ) + float3( 0, 0, 0.25), 1.0);
+
+    // Using the specular sampler, with 3 layers of noise in color chanels modulate the
+    // alpha channel for the current pixel
+    if( specular.g <= albedo.r )
+    {
+        if( specular.b >= albedo.g )
+            color.a = ( color.b >= normal.b ) ? 0.12 : lerp( 0.05, 0, sin(frac( 0.01 * time) * 3.14) );
+        else
+            color.a = ( normal.b >= albedo.r ) ? 0.2 : lerp( 0.01, 0.1, sin(frac( 0.01 * time) * 3.14) );
+    }
+    else
+    {
+        if( specular.r >= albedo.r )
+            color.a = ( specular.b >= albedo.r ) ? 0.025 : 0.1;
+        else
+            color.a = ( specular.g >= albedo.g ) ? 0.02 : lerp( 0.37, 0.46, sin(frac( 0.01 * time) * 3.14) );
+    }
+
+    color.rgb += float3( 0, 0, 0.15 );
+
+    // Adjust color of shield based on its health percentage
+    float4 colorMod1 = lerp(float4( 0.5, 0.0, 0.0, 0.05 ), color, 0.5);
+    colorMod1 = lerp( color, colorMod1 + color, sin(frac( 0.06 * time) * 3.14) );
+    color = lerp( colorMod1, color, vertex.material.y );
+    color += (colorMask.b * 0.95);
+
+    // Add in our alpha channel to mask UV pinching at the top of the sphere
+    color.a *= colorMask.a;// * 0.75;
+    color.a *= shieldWaterAbsorption(vertex.depth.x);
+
+    return color;
+}
+
 /// ShieldPS
 ///
 ///
@@ -3858,6 +3903,53 @@ float4 ShieldCybranPS( EFFECT_NORMALMAPPED_VERTEX vertex, uniform float alpha ) 
     return float4(color, alpha);
 }
 
+float4 ShieldCybranLegacyPS( EFFECT_NORMALMAPPED_VERTEX vertex, uniform float alpha ) : COLOR
+{
+    if ( 1 == mirrored ) clip(vertex.depth);
+
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy );
+    float4 albedo2 = tex2D( albedoSampler, vertex.texcoord0.zw );
+    float3 specular = tex2D( specularSampler, vertex.texcoord1.xy );
+    float3 specular2 = tex2D( specularSampler, vertex.texcoord1.zw );
+
+    // Color wackiness
+    float3 color2 = (albedo2.b * specular2.g * 3 );
+    float3 color3 = specular2.g * albedo.a;
+    float3 color4 = ((albedo2.g - specular2.b ) * specular.b) * albedo.a;
+    float3 finalColor = float3( 0.05, 0.0, 0.3 ) + color4 - color2 * color3;
+
+    // Adjust color of shield based on its health percentage
+    float3 colorMod1 = lerp(float3( 0.2, 0, 0.0 ), finalColor, 0.5);
+    colorMod1 = lerp( finalColor, (colorMod1 - finalColor) + (color4 + colorMod1), sin(frac( 0.06 * vertex.material.x) * 3.14) );
+    finalColor = lerp( colorMod1, finalColor, vertex.material.y);
+
+    finalColor += (albedo.r + albedo2.r) * 0.1;
+    finalColor -= (1 - albedo.a);
+
+    float clradd = (finalColor.r + finalColor.g + finalColor.b);
+
+    if (clradd < 0.1)
+    {
+        finalColor = float3( 0.15, 0.15, 0.3 );
+    }
+    else
+    {
+        if (clradd > 0.1)
+        {
+            if (clradd < 0.2)
+                finalColor = specular.b;
+        }
+    }
+
+    finalColor += ((albedo.r + albedo2.r) * float3( 0.0, 0.0, 0.3 ));
+
+    // Alpha
+    alpha += (albedo.r + albedo2.r) * 0.2;
+    alpha *= shieldWaterAbsorption(vertex.depth.x);
+
+    return float4(finalColor, alpha);
+}
+
 float4 ShieldCybranLoFiPS( LOFIEFFECT_VERTEX vertex, uniform float alpha ) : COLOR
 {
     if ( 1 == mirrored ) clip(vertex.depth);
@@ -3873,6 +3965,42 @@ float4 ShieldCybranLoFiPS( LOFIEFFECT_VERTEX vertex, uniform float alpha ) : COL
     return float4(color, alpha );
 }
 
+float4 ShieldAeonLegacyPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
+{
+    if ( 1 == mirrored ) clip(vertex.depth);
+
+    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
+
+    // Texture samplers
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy );
+    float3 specular = tex2D( specularSampler, vertex.texcoord0.zw );
+    float3 specular2 = tex2D( specularSampler, vertex.texcoord1.xy );
+    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord1.zw * 4, rotationMatrix);
+
+    float dotLightNormal = dot(sunDirection,normal);
+    float phongAmount = saturate( dot( reflect( -vertex.viewDirection, normal), vertex.viewDirection)) * 0.6;
+    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+
+    // Magic
+    float3 terrainBand = albedo.b * 0.5;
+    float3 color1 = phongAmount + environment - albedo.ggg;
+    float3 color2 = (specular.rrr) * lerp( 0.6, 1.3, sin(frac( 0.015 * time) * 3.14));
+    float3 color3 = (specular2.rrr) * lerp( 2.0, 2.2, sin(frac( 0.0045 * time) * 3.14));
+
+    float3 finalColor = (color1 * color2) * color3;
+    float3 color4 = (finalColor * normal.rgb) * 0.65 + finalColor;
+    finalColor = color4 * environment * albedo.a;
+
+    // Adjust color of shield based on its health percentage
+    float3 colorMod1 = lerp(float3( 0.7, 0.3, 0.3 ), finalColor, 0.9 );
+    float3 colorMod2 = lerp( finalColor, colorMod1, sin(frac( 0.05 * vertex.material.x) * 3.14) );
+    finalColor = lerp( colorMod1, finalColor, vertex.material.y);
+
+    float alpha = 0.707 * ((environment.r + environment.g + environment.b) * 0.25) + terrainBand.r;
+    alpha *= shieldWaterAbsorption(vertex.depth.x);
+
+    return float4( lerp( colorMod1, finalColor, vertex.material.y), alpha);
+}
 
 /// ShieldAeonPS
 ///
@@ -3922,6 +4050,53 @@ float4 ShieldAeonLoFiPS( LOFIEFFECT_VERTEX vertex, uniform float alpha ) : COLOR
     float3 finalColor = (dot(albedo.rgb * alpha, float3(.6,.6,.6)) + (albedo.rgb * alpha)) * ((specular.rrr * 1.45) + (specular2.rrr * 2.2));
 
     return float4( finalColor, 0.33 * alpha * albedo.a );
+}
+
+float4 ShieldSeraphimLegacyPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
+{
+    if ( 1 == mirrored )
+        clip(vertex.depth);
+
+    float4 normal_pixel = tex2D( normalsSampler, vertex.texcoord1.zw );
+    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal );
+    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord1.zw, rotationMatrix );
+    float4 uvaddress = tex2D( normalsSampler, vertex.texcoord1.xy );
+    float2 texcoord = vertex.texcoord0.xy + (uvaddress.rb * 0.1);
+    float4 specular = tex2D( specularSampler, texcoord );
+
+    float m = abs( normal_pixel.g - 0.5 );
+    const float max_brightness = 0.453;
+    float dp = abs( cos(dot( float4(0,1,0,0), normal )) );
+    float channel_color = max_brightness - clamp((1.0 - dp), 0, max_brightness );
+    float t = abs(dot(float4(0,1,0,0), normalize(vertex.normal)));
+    float time_cutoff = 0.753;
+    float dp2 = abs(dot(vertex.viewDirection,normal));
+
+    ///If we are not close enough to the top of the shield dome...
+    if( t < time_cutoff )
+    {
+        m = 1.0;	/// This alpha multiple won't change alpha (So we are not fading to near transparency yet).
+    }
+    else
+    {
+        // NOTE: From right to left in the equation.
+        // Get a percentage multiple of how close we are to the top of the dome from the
+        // point where we want to start an alpha gradient to (close to) transparency. Using that
+        // we mutliply by 0.7 in order to get a percentage of a percentage multiple that is less than one.
+        // Then that is all subtracted from one, the closer we are to the top of the dome, the more we
+        // are subtracting 0.7 from 1.0 and the closer our final percentage multiple is to 0.4, where the
+        // final percentage multiple ('m') starts out at one. 0.7 is used to ensure that we do not go to complete
+        // transparency and retain some feeling of a sphere around the top area of the dome.
+        m = 1.0 - 0.7 * (t - time_cutoff) / (1.0 - time_cutoff);
+    }
+
+    ///Compute the final translucency value.
+    float alpha = m *( dp2 * 0.3 + channel_color )*1.75;
+    alpha *= shieldWaterAbsorption(vertex.depth.x);
+
+    // Multiples(0.425,0.76274,1.0) are to give a blue tint. The dot product of the normal and the world up vector is squared
+    // so that the blue and whitish color fade off in an exponential gradient.
+    return  float4( 0.425 * dp * dp * specular.r, 0.76274 * dp * dp * specular.g, 1.0 * dp * dp * specular.b, alpha );
 }
 
 /// ShieldSeraphimPS
@@ -7501,6 +7676,27 @@ technique PhaseShield_LowFidelity
 /// UEF Shield
 ///
 ///
+technique ShieldUEF_Legacy_MedFidelity
+<
+    string abstractTechnique = "ShieldUEFLegacy";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicShield";
+    int renderStage = STAGE_POSTWATER + STAGE_POSTEFFECT;
+    int parameter = PARAM_FRACTIONHEALTH;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_None )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+
+        VertexShader = compile vs_1_1 ShieldNormalVS( 1, 3, 32, 6, 0, 0, 0.0003, 0.005, -0.001, -0.005, -0.0003, -0.0008 );
+        PixelShader = compile ps_2_0 ShieldLegacyPS();
+    }
+}
+
 technique ShieldUEF_MedFidelity
 <
     string abstractTechnique = "ShieldUEF";
@@ -7576,6 +7772,36 @@ technique ShieldCybran_MedFidelity
     }
 }
 
+technique ShieldCybran_Legacy_MedFidelity
+<
+    string abstractTechnique = "ShieldCybranLegacy";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicShield";
+    int renderStage = STAGE_POSTWATER + STAGE_POSTEFFECT;
+    int parameter = PARAM_FRACTIONHEALTH;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_None )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+
+        VertexShader = compile vs_1_1 ShieldNormalVS( 1,1,2,1, -0.01,0, -0.002,0, 0,0.0012, 0.001,-0.0015 );
+        PixelShader = compile ps_2_0 ShieldCybranLegacyPS(0.17);
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+        RasterizerState( Rasterizer_Cull_None )
+
+        VertexShader = compile vs_1_1 ShieldPositionNormalOffsetVS( 0.01, 1,1,4,1, 0.01,0, -0.002,0, 0,0.0012, 0.001,-0.003 );
+        PixelShader = compile ps_2_0 ShieldCybranLegacyPS(0.17);
+    }
+}
+
 technique ShieldCybran_LowFidelity
 <
     string abstractTechnique = "ShieldCybran";
@@ -7599,6 +7825,27 @@ technique ShieldCybran_LowFidelity
 /// Aeon Shield
 ///
 ///
+technique ShieldAeon_Legacy_MedFidelity
+<
+    string abstractTechnique = "ShieldAeonLegacy";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicShield";
+    int renderStage = STAGE_REFLECTION + STAGE_POSTWATER + STAGE_POSTEFFECT;
+    int parameter = PARAM_FRACTIONHEALTH;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_None )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+
+        VertexShader = compile vs_1_1 ShieldNormalVS( 1,12,8,3, 0,0, 0,0.032, 0.012,-0.032, 0,0.0012 );
+        PixelShader = compile ps_2_0 ShieldAeonLegacyPS();
+    }
+}
+
 technique ShieldAeon_MedFidelity
 <
     string abstractTechnique = "ShieldAeon";
@@ -7644,6 +7891,30 @@ technique ShieldAeon_LowFidelity
 /// Seraphim Shield
 ///
 ///
+technique ShieldSeraphim_Legacy_MedFidelity
+<
+    string abstractTechnique = "ShieldSeraphimLegacy";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicShield";
+    int renderStage = STAGE_REFLECTION + STAGE_POSTWATER + STAGE_POSTEFFECT;
+    int parameter = PARAM_FRACTIONHEALTH;
+
+    string environment = "<seraphim>";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_One_Write_RGB )
+
+        RasterizerState( Rasterizer_Cull_None )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+
+        VertexShader = compile vs_1_1 ShieldNormalVS(5,1,1,11, -0.00153,-0.0159, 0,0, 0.003,-0.0045, -0.005,-0.045 );
+        PixelShader = compile ps_2_0 ShieldSeraphimLegacyPS();
+    }
+}
+
 technique ShieldSeraphim_MedFidelity
 <
     string abstractTechnique = "ShieldSeraphim";
