@@ -294,15 +294,18 @@ local ChatInterface = ClassUI(Window) {
         -- Committed chat options → window-level concerns only. Pool sizing,
         -- font, and filter changes are owned by the lines panel; we just
         -- handle `win_alpha` here. `SetAlpha(_, true)` cascades so chrome,
-        -- edit, and scrollbar all dim uniformly.
+        -- edit, and scrollbar all dim uniformly. The chat-line *text* is
+        -- then forced back to full opacity by re-cascading from `Pool`
+        -- (which only contains the line rows) — the scrollbar is a sibling
+        -- of `Pool` on `ChatLinesInterface`, not a child, so this reset
+        -- doesn't touch it. Net effect: text stays crisp at low alpha,
+        -- everything else still fades.
         self.OptionsObserver = self.Trash:Add(
             LazyVarDerive(
                 ChatConfigModel.GetSingleton().Committed,
                 function(lv)
                     self:SetAlpha(lv().win_alpha or 1.0, true)
-
-                    -- do not dim chat lines
-                    self.ChatLinesInterface:SetAlpha(1.0, true)
+                    self.ChatLinesInterface.Pool:SetAlpha(1.0, true)
                 end
             )
         )

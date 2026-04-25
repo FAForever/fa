@@ -19,7 +19,7 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 --- Flip to `true` to overlay a semi-transparent coloured bitmap over the
 --- control so its bounds are visible at runtime. Each chat interface uses a
 --- distinct colour so overlapping controls can be told apart at a glance.
-local Debug = true
+local Debug = false
 
 -- Reserve space on the right of the wrapper for the scrollbar widget.
 -- Anything wider than the scrollbar bitmap (~17px) works; 20px gives a tiny
@@ -160,6 +160,7 @@ ChatLinesInterface = ClassUI(Group) {
         -- forwarding stubs in `__init`. Anchoring the scrollbar is also
         -- reactive (it tracks `Pool.Right`), so this is safe pre-layout.
         self.Scrollbar = UIUtil.CreateVertScrollbarFor(self.Pool)
+        self.Scrollbar:SetParent(self)
 
         if Debug then
             self.DebugBG = Bitmap(self)

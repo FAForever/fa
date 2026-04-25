@@ -17,7 +17,7 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 --- Flip to `true` to overlay a semi-transparent coloured bitmap over the
 --- control so its bounds are visible at runtime. Each chat interface uses a
 --- distinct colour so overlapping controls can be told apart at a glance.
-local Debug = true
+local Debug = false
 
 --- Cap on how many feed rows are visible at once. Older rows above this
 --- are dropped immediately when a new row pushes in — feed mode is for
@@ -28,6 +28,12 @@ local MaxFeedRows = 8
 --- seconds. Capped to half the configured `fade_time` so very short
 --- timeouts still get a visible fade rather than a hard pop.
 local FadeOutDuration = 2
+
+--- Base alpha (0..1) of the per-row readability strip when the
+--- `feed_background` option is on. Multiplied per-frame by `win_alpha`
+--- and the row's fade progress, so the BG dims with the window opacity
+--- and disappears together with the line as the row ages out.
+local FeedBackgroundAlpha = 0.5
 
 -------------------------------------------------------------------------------
 -- A separate "feed" view of the chat history that surfaces messages while
@@ -45,6 +51,7 @@ local FadeOutDuration = 2
 
 ---@class UIChatFeedRow
 ---@field Line  UIChatLineInterface   # exactly one wrapped chunk: header on the entry's first row, continuation on the rest
+---@field BG    Bitmap                # solid-colour readability strip behind `Line`; only paints when `feed_background` is on
 ---@field Entry UIChatEntry           # the source message this line belongs to
 ---@field Time  number                # seconds since this row was added; each row ages and expires independently
 
@@ -206,7 +213,20 @@ ChatFeedInterface = ClassUI(Group) {
                 line:SetContinuation(entry, chunk)
             end
             line:SetAlpha(1.0, true)
-            table.insert(self.Rows, { Line = line, Entry = entry, Time = 0 })
+
+            -- Readability strip behind the row. Solid-black at full alpha;
+            -- per-frame `SetAlpha` modulates the actual opacity by the
+            -- window's `win_alpha`, the row's fade progress, and the
+            -- `feed_background` toggle (off → alpha 0). Lives on the feed
+            -- group (not the line) so we can drive its alpha independently
+            -- and skip the line's text/icon depth ordering.
+            local bg = Bitmap(self)
+            bg:SetSolidColor('ff000000')
+            bg:DisableHitTest()
+            Layouter(bg):Fill(line):End()
+            LayoutHelpers.DepthUnderParent(bg, line, 1)
+
+            table.insert(self.Rows, { Line = line, BG = bg, Entry = entry, Time = 0 })
         end
 
         self:LayoutRows()
@@ -249,6 +269,7 @@ ChatFeedInterface = ClassUI(Group) {
         local oldest = self.Rows[1]
         if oldest then
             oldest.Line:Destroy()
+            oldest.BG:Destroy()
             table.remove(self.Rows, 1)
         end
     end,
@@ -259,6 +280,7 @@ ChatFeedInterface = ClassUI(Group) {
     ClearAll = function(self)
         for _, row in ipairs(self.Rows) do
             row.Line:Destroy()
+            row.BG:Destroy()
         end
         self.Rows = {}
     end,
@@ -283,9 +305,12 @@ ChatFeedInterface = ClassUI(Group) {
         end
     end,
 
-    --- Per-frame timer pass. Walks each row, advances its `Time`, fades
-    --- out the last `FadeOutDuration` seconds of life, and destroys the
-    --- row once past `fade_time`. Each row ages independently — wrapped
+    --- Per-frame timer pass. Walks each row, advances its `Time`, applies
+    --- alpha (per-row fade only for the line so the text stays crisp and
+    --- readable regardless of the window's opacity setting; window-
+    --- opacity × per-row fade × base intensity for the BG strip so the
+    --- backdrop dims with the user's preference), and destroys the row
+    --- once past `fade_time`. Each row ages independently — wrapped
     --- entries arrive at the same instant so their chunks usually expire
     --- together by virtue of starting from the same `Time = 0`, but the
     --- cap or a future selective drop can take individual rows without
@@ -294,9 +319,12 @@ ChatFeedInterface = ClassUI(Group) {
     ---@param self UIChatFeedInterface
     ---@param delta number   # seconds since the last frame
     OnFrame = function(self, delta)
-        local fadeTime = ChatConfigModel.GetOptions().fade_time or 15
-        local fadeOut = math.min(FadeOutDuration, fadeTime / 2)
+        local options  = ChatConfigModel.GetOptions()
+        local fadeTime = options.fade_time or 15
+        local winAlpha = options.win_alpha or 1.0
+        local fadeOut  = math.min(FadeOutDuration, fadeTime / 2)
         local fadeStart = fadeTime - fadeOut
+        local bgAlpha = options.feed_background and FeedBackgroundAlpha or 0
 
         local i = 1
         while i <= table.getn(self.Rows) do
@@ -304,12 +332,15 @@ ChatFeedInterface = ClassUI(Group) {
             row.Time = row.Time + delta
             if row.Time >= fadeTime then
                 row.Line:Destroy()
+                row.BG:Destroy()
                 table.remove(self.Rows, i)
             else
+                local fade = 1.0
                 if row.Time > fadeStart then
-                    local alpha = 1.0 - (row.Time - fadeStart) / fadeOut
-                    row.Line:SetAlpha(alpha, true)
+                    fade = 1.0 - (row.Time - fadeStart) / fadeOut
                 end
+                row.Line:SetAlpha(fade, true)
+                row.BG:SetAlpha(winAlpha * fade * bgAlpha, true)
                 i = i + 1
             end
         end
