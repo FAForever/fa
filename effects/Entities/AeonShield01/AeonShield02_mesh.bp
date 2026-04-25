@@ -1,0 +1,15 @@
+MeshBlueprint{
+    IconFadeInZoom = 4,
+    LODs = {
+        {
+            LODCutoff = 1000,
+            ShaderName = "ShieldAeonLegacy",
+            MeshName = "/effects/Entities/Sphere01/Sphere01_lod0.scm",
+            AlbedoName = "AeonShield01_Albedo.dds",
+            NormalsName = "AeonShield01_Normals.dds",
+            SpecularName = "AeonShield01_Specular.dds",
+        },
+    },
+    SortOrder = 1000,
+    StraddleWater = true,
+}

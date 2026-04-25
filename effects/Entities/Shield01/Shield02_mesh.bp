@@ -1,0 +1,15 @@
+MeshBlueprint{
+    IconFadeInZoom = 4,
+    LODs = {
+        {
+            LODCutoff = 1000,
+            SecondaryName = "/effects/Entities/Shield01/Shield01_Secondary.dds",
+            ShaderName = "ShieldUEFLegacy",
+            MeshName = "/effects/Entities/Sphere01/Sphere01_lod0.scm",
+            AlbedoName = "Shield01_Albedo.dds",
+            SpecularName = "Shield01_Specular.dds",
+        },
+    },
+    SortOrder = 1000,
+    StraddleWater = true,
+}

@@ -3740,6 +3740,54 @@ float shieldWaterAbsorption(float depth) {
     return factor;
 }
 
+float4 ShieldLegacyPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
+{
+    if ( 1 == mirrored ) clip(vertex.depth);
+
+    float4 colorMask = tex2D( albedoSampler, vertex.texcoord0.xy);
+    float terrainBand = colorMask.b * 0.95;
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.zw);
+    float3 secondary = tex2D( secondarySampler, vertex.texcoord1.xy ).gaa * 2 - 1;
+    secondary.z = sqrt(1 - secondary.x * secondary.x - secondary.y * secondary.y);
+    float3 specular = tex2D( specularSampler, vertex.texcoord1.zw );
+
+    // Combine albedo and secondary sampler for a final color
+    float3 color = mul(albedo.rgr, secondary.rgb) + float3( 0, 0, 0.25);
+
+    // Using the specular sampler, with 3 layers of noise in color chanels modulate the
+    // alpha channel for the current pixel
+    float alpha;
+    if( specular.g <= albedo.r ) {
+        if( specular.b >= albedo.g )
+            alpha = ( color.b >= secondary.b ) ? 0.12 : lerp( 0.05, 0, sin(frac( 0.01 * time) * 3.14) );
+        else
+            alpha = ( secondary.b >= albedo.r ) ? 0.2 : lerp( 0.01, 0.1, sin(frac( 0.01 * time) * 3.14) );
+    } else {
+        if( specular.r >= albedo.r )
+            alpha = ( specular.b >= albedo.r ) ? 0.025 : 0.1;
+        else
+            alpha = ( specular.g >= albedo.g ) ? 0.02 : lerp( 0.37, 0.46, sin(frac( 0.01 * time) * 3.14) );
+    }
+
+    color += float3(0, 0, 0.15);
+
+    float4 output = float4(color, alpha);
+
+    // Adjust color of shield based on its health percentage
+    float4 colorMod = float4(0.25, 0.0, 0.0, 0.025) + output * 1.5;
+    colorMod = lerp(output, colorMod, sin(frac( 0.06 * time) * 3.14));
+    output = lerp(colorMod, output, vertex.material.y);
+
+    output += terrainBand;
+
+    // Mask UV pinching at the top of the sphere
+    output.a *= colorMask.a;
+
+    output.a *= shieldWaterAbsorption(vertex.depth.x);
+
+    return output;
+}
+
 /// ShieldPS
 ///
 ///
@@ -3858,6 +3906,48 @@ float4 ShieldCybranPS( EFFECT_NORMALMAPPED_VERTEX vertex, uniform float alpha ) 
     return float4(color, alpha);
 }
 
+float4 ShieldCybranLegacyPS( EFFECT_NORMALMAPPED_VERTEX vertex, uniform float alpha ) : COLOR
+{
+    if ( 1 == mirrored ) clip(vertex.depth);
+
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy );
+    float4 albedo2 = tex2D( albedoSampler, vertex.texcoord0.zw );
+    float3 specular = tex2D( specularSampler, vertex.texcoord1.xy );
+    float3 specular2 = tex2D( specularSampler, vertex.texcoord1.zw );
+
+    float3 color1 = albedo2.b * specular2.g * 3 * specular2.g * albedo.a;
+    float3 color2 = (albedo2.g - specular2.b) * specular.b * albedo.a;
+    float3 color = float3( 0.05, 0.0, 0.3 ) + color2 - color1;
+
+    // Adjust color of shield based on its health percentage
+    float3 colorMod1 = lerp(float3( 0.2, 0, 0.0 ), color, 0.5);
+    colorMod1 = lerp( color, (colorMod1 - color) + (color2 + colorMod1), sin(frac( 0.06 * vertex.material.x) * 3.14) );
+    color = lerp( colorMod1, color, vertex.material.y);
+
+    color += (albedo.r + albedo2.r) * 0.1;
+    color -= (1 - albedo.a);
+
+    float colorMask = (color.r + color.g + color.b);
+    if (colorMask < 0.1) {
+        // Add base color
+        color = float3( 0.15, 0.15, 0.3 );
+    } else {
+        if (colorMask > 0.1) {
+            if (colorMask < 0.2)
+                // Add outlines to islands
+                color = specular.b;
+        }
+    }
+
+    color += ((albedo.r + albedo2.r) * float3( 0.0, 0.0, 0.3 ));
+
+    // Alpha
+    alpha += (albedo.r + albedo2.r) * 0.2;
+    alpha *= shieldWaterAbsorption(vertex.depth.x);
+
+    return float4(color, alpha);
+}
+
 float4 ShieldCybranLoFiPS( LOFIEFFECT_VERTEX vertex, uniform float alpha ) : COLOR
 {
     if ( 1 == mirrored ) clip(vertex.depth);
@@ -3873,6 +3963,39 @@ float4 ShieldCybranLoFiPS( LOFIEFFECT_VERTEX vertex, uniform float alpha ) : COL
     return float4(color, alpha );
 }
 
+float4 ShieldAeonLegacyPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
+{
+    if ( 1 == mirrored ) clip(vertex.depth);
+
+    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
+
+    // Texture samplers
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy );
+    float3 specular = tex2D( specularSampler, vertex.texcoord0.zw );
+    float3 specular2 = tex2D( specularSampler, vertex.texcoord1.xy );
+    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord1.zw * 4, rotationMatrix);
+
+    float phongAmount = saturate( dot( reflect( -vertex.viewDirection, normal), vertex.viewDirection)) * 0.6;
+    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+
+    float3 terrainBand = albedo.b * 0.5;
+    float3 color1 = phongAmount + environment - albedo.ggg;
+    float factor1 = specular.r * lerp( 0.6, 1.3, sin(frac( 0.015 * time) * 3.14));
+    float factor2 = specular2.r * lerp( 2.0, 2.2, sin(frac( 0.0045 * time) * 3.14));
+
+    float3 color = color1 * factor1 * factor2 * (normal.rgb * 0.65 + 1) * environment * albedo.a;
+
+    // Adjust color of shield based on its health percentage
+    float3 colorMod1 = lerp(float3( 0.7, 0.3, 0.3 ), color, 0.9 );
+    float3 colorMod2 = lerp( color, colorMod1, sin(frac( 0.05 * vertex.material.x) * 3.14) );
+    color = lerp( colorMod1, color, vertex.material.y);
+    color = lerp( colorMod1, color, vertex.material.y);
+
+    float alpha = 0.707 * ((environment.r + environment.g + environment.b) * 0.25) + terrainBand.r;
+    alpha *= shieldWaterAbsorption(vertex.depth.x);
+
+    return float4(color, alpha);
+}
 
 /// ShieldAeonPS
 ///
@@ -3921,6 +4044,39 @@ float4 ShieldAeonLoFiPS( LOFIEFFECT_VERTEX vertex, uniform float alpha ) : COLOR
     float3 finalColor = (dot(albedo.rgb * alpha, float3(.6,.6,.6)) + (albedo.rgb * alpha)) * ((specular.rrr * 1.45) + (specular2.rrr * 2.2));
 
     return float4( finalColor, 0.33 * alpha * albedo.a );
+}
+
+float4 ShieldSeraphimLegacyPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
+{
+    if ( 1 == mirrored ) clip(vertex.depth);
+
+    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal );
+    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord1.zw, rotationMatrix );
+    float4 uvaddress = tex2D( normalsSampler, vertex.texcoord1.xy );
+    float2 texcoord = vertex.texcoord0.xy + (uvaddress.rb * 0.1);
+    float4 specular = tex2D( specularSampler, texcoord );
+
+    float relative_height = abs(dot(float4(0,1,0,0), normalize(vertex.normal)));
+    float height_cutoff = 0.753;
+    float opacity;
+    if( relative_height < height_cutoff ){
+        opacity = 1.0;
+    } else {
+        // Decrease the factor linearly to 0.3 at the top
+        opacity = 1.0 - 0.7 * (relative_height - height_cutoff) / (1.0 - height_cutoff);
+    }
+
+    const float max_brightness = 0.453;
+    float dp = abs(cos(dot(float4(0,1,0,0), normal)));
+    float clamped_dp = max_brightness - clamp((1.0 - dp), 0, max_brightness);
+    float ndotv = abs(dot(vertex.viewDirection,normal));
+
+    float alpha = opacity * 1.75 * (ndotv * 0.3 + clamped_dp);
+    alpha *= shieldWaterAbsorption(vertex.depth.x);
+
+    float3 color = float3(0.425, 0.76274, 1.0) * dp * dp * specular.rgb;
+
+    return float4(color, alpha);
 }
 
 /// ShieldSeraphimPS
@@ -7498,6 +7654,27 @@ technique PhaseShield_LowFidelity
 /// UEF Shield
 ///
 ///
+technique ShieldUEF_Legacy_MedFidelity
+<
+    string abstractTechnique = "ShieldUEFLegacy";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicShield";
+    int renderStage = STAGE_POSTWATER + STAGE_POSTEFFECT;
+    int parameter = PARAM_FRACTIONHEALTH;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_None )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+
+        VertexShader = compile vs_1_1 ShieldNormalVS( 1, 3, 32, 6, 0, 0, 0.0003, 0.005, -0.001, -0.005, -0.0003, -0.0008 );
+        PixelShader = compile ps_2_0 ShieldLegacyPS();
+    }
+}
+
 technique ShieldUEF_MedFidelity
 <
     string abstractTechnique = "ShieldUEF";
@@ -7573,6 +7750,36 @@ technique ShieldCybran_MedFidelity
     }
 }
 
+technique ShieldCybran_Legacy_MedFidelity
+<
+    string abstractTechnique = "ShieldCybranLegacy";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicShield";
+    int renderStage = STAGE_POSTWATER + STAGE_POSTEFFECT;
+    int parameter = PARAM_FRACTIONHEALTH;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_None )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+
+        VertexShader = compile vs_1_1 ShieldNormalVS( 1,1,2,1, -0.01,0, -0.002,0, 0,0.0012, 0.001,-0.0015 );
+        PixelShader = compile ps_2_0 ShieldCybranLegacyPS(0.17);
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+        RasterizerState( Rasterizer_Cull_None )
+
+        VertexShader = compile vs_1_1 ShieldPositionNormalOffsetVS( 0.01, 1,1,4,1, 0.01,0, -0.002,0, 0,0.0012, 0.001,-0.003 );
+        PixelShader = compile ps_2_0 ShieldCybranLegacyPS(0.17);
+    }
+}
+
 technique ShieldCybran_LowFidelity
 <
     string abstractTechnique = "ShieldCybran";
@@ -7596,6 +7803,27 @@ technique ShieldCybran_LowFidelity
 /// Aeon Shield
 ///
 ///
+technique ShieldAeon_Legacy_MedFidelity
+<
+    string abstractTechnique = "ShieldAeonLegacy";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicShield";
+    int renderStage = STAGE_REFLECTION + STAGE_POSTWATER + STAGE_POSTEFFECT;
+    int parameter = PARAM_FRACTIONHEALTH;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_None )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+
+        VertexShader = compile vs_1_1 ShieldNormalVS( 1,12,8,3, 0,0, 0,0.032, 0.012,-0.032, 0,0.0012 );
+        PixelShader = compile ps_2_0 ShieldAeonLegacyPS();
+    }
+}
+
 technique ShieldAeon_MedFidelity
 <
     string abstractTechnique = "ShieldAeon";
@@ -7641,6 +7869,30 @@ technique ShieldAeon_LowFidelity
 /// Seraphim Shield
 ///
 ///
+technique ShieldSeraphim_Legacy_MedFidelity
+<
+    string abstractTechnique = "ShieldSeraphimLegacy";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicShield";
+    int renderStage = STAGE_REFLECTION + STAGE_POSTWATER + STAGE_POSTEFFECT;
+    int parameter = PARAM_FRACTIONHEALTH;
+
+    string environment = "<seraphim>";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_One_Write_RGB )
+
+        RasterizerState( Rasterizer_Cull_None )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+
+        VertexShader = compile vs_1_1 ShieldNormalVS(5,1,1,11, -0.00153,-0.0159, 0,0, 0.003,-0.0045, -0.005,-0.045 );
+        PixelShader = compile ps_2_0 ShieldSeraphimLegacyPS();
+    }
+}
+
 technique ShieldSeraphim_MedFidelity
 <
     string abstractTechnique = "ShieldSeraphim";
