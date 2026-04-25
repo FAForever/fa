@@ -217,11 +217,13 @@ Window = ClassUI(Group) {
         self.window_m.Bottom:Set(self.window_bm.Top)
 
         self.TitleGroup = Group(self, 'window title group')
-        self.TitleGroup.Top:Set(self.tm.Top)
-        self.TitleGroup.Left:Set(self.tl.Left)
-        self.TitleGroup.Right:Set(self.tr.Right)
-        self.TitleGroup.Height:Set(30)
-        self.TitleGroup.Depth:Set(function() return self._windowGroup.Depth() + 2 end)
+        LayoutHelpers.LayoutFor(self.TitleGroup)
+            :Top(self.tm.Top)
+            :Left(self.tl.Left)
+            :Right(self.tr.Right)
+            :Height(30)
+            :Over(self._windowGroup, 2)
+            :End()
 
         if icon then
             self._titleIcon = Bitmap(self.TitleGroup, icon)
@@ -285,11 +287,10 @@ Window = ClassUI(Group) {
         LayoutHelpers.Layouter(self.ClientGroup)
             :Top(self.TitleGroup.Bottom)
             :Left(self.ml.Right)
-            :Height(function() return self.bm.Top() - self.TitleGroup.Bottom() end)
-            :Width(function() return self.mr.Left() - self.ml.Right() end)
             :Right(self.mr.Left)
             :Bottom(self.bm.Top)
             :Over(self.window_m)
+            :End()
 
         self.StartSizing = function(event, xControl, yControl)
             local drag = Dragger()
