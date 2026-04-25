@@ -7,6 +7,7 @@ local Button = import("/lua/maui/button.lua").Button
 
 local ChatLinesInterface = import("/lua/ui/game/chat/ChatLinesInterface.lua").ChatLinesInterface
 local ChatEditInterface = import("/lua/ui/game/chat/ChatEditInterface.lua").ChatEditInterface
+local ChatFeedInterface = import("/lua/ui/game/chat/ChatFeedInterface.lua").ChatFeedInterface
 
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
 local ChatController = import("/lua/ui/game/chat/ChatController.lua")
@@ -79,6 +80,7 @@ local DefaultRect = { Left = 8, Top = 460, Right = 430, Bottom = 720 }
 ---@field ResetPositionBtn      Button                        # titlebar button that restores DefaultRect
 ---@field WindowVisibleObserver LazyVar<boolean>              # derived from ChatModel.WindowVisible
 ---@field OptionsObserver       LazyVar<UIChatOptions>        # derived from ChatConfigModel.Committed (window-level options only)
+---@field ChatFeedInterface     UIChatFeedInterface           # sibling feed view; visible while the window is hidden
 ---@field DebugBG?              Bitmap                        # semi-transparent overlay shown when `Debug` is true
 local ChatInterface = ClassUI(Window) {
 
@@ -100,6 +102,12 @@ local ChatInterface = ClassUI(Window) {
         -- once the client area has a real size to anchor against.
         self.ChatLinesInterface = ChatLinesInterface(self)
         self.ChatEditInterface = ChatEditInterface(self)
+
+        -- Feed view: a sibling control on the same parent frame so our own
+        -- `Show`/`Hide` cascade can't reach it. Pinned via LazyVars to our
+        -- line-area rect, so dragging or resizing the window carries the
+        -- feed along automatically. Destroyed in our `OnDestroy`.
+        self.ChatFeedInterface = ChatFeedInterface(parent, self)
 
         -- Override the lines panel's name-click hook to set the chat
         -- recipient and re-focus the edit box. `OnCameraClicked` keeps the
@@ -378,9 +386,15 @@ local ChatInterface = ClassUI(Window) {
         import("/lua/ui/game/chat/config/ChatConfigInterface.lua").Toggle()
     end,
 
-    --- Empties our trash bag so every derived observer we allocated is
-    --- destroyed — no `OnDirty` can fire into a torn-down `self`.
+    --- Tears down the sibling feed view (it lives outside our control tree
+    --- so `Hide`/`Destroy` cascades don't reach it) and empties our trash
+    --- bag — destroying every derived observer so no `OnDirty` can fire
+    --- into a torn-down `self`.
     OnDestroy = function(self)
+        if self.ChatFeedInterface then
+            self.ChatFeedInterface:Destroy()
+            self.ChatFeedInterface = nil
+        end
         self.Trash:Destroy()
     end,
 }

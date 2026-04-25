@@ -10,8 +10,8 @@ local ChatLineInterface = import("/lua/ui/game/chat/ChatLineInterface.lua").Chat
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
 local ChatController = import("/lua/ui/game/chat/ChatController.lua")
 local ChatConfigModel = import("/lua/ui/game/chat/config/ChatConfigModel.lua")
+local ChatUtils = import("/lua/ui/game/chat/ChatUtils.lua")
 
-local MauiWrapText = import("/lua/maui/text.lua").WrapText
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
@@ -19,7 +19,7 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 --- Flip to `true` to overlay a semi-transparent coloured bitmap over the
 --- control so its bounds are visible at runtime. Each chat interface uses a
 --- distinct colour so overlapping controls can be told apart at a glance.
-local Debug = false
+local Debug = true
 
 -- Reserve space on the right of the wrapper for the scrollbar widget.
 -- Anything wider than the scrollbar bitmap (~17px) works; 20px gives a tiny
@@ -193,10 +193,15 @@ ChatLinesInterface = ClassUI(Group) {
     -- Pool sizing
     ---------------------------------------------------------------------------
 
-    --- Rebuilds the line pool to fit the current Pool height. Adds rows at
-    --- the bottom when we grow, destroys the tail when we shrink. Safe to
-    --- call repeatedly; callers are expected to follow up with `CalcVisible`
-    --- (and `RewrapAll` on a true resize).
+    --- Rebuilds the line pool to fit the current Pool height. Lines stack
+    --- bottom-up: `ChatLineInterfaces[1]` pins to the pool's bottom and
+    --- holds the newest visible message; subsequent slots stack above. When
+    --- there are fewer messages than slots, the empty (and `Hide()`-flagged)
+    --- slots sit at the top of the pool, so the chat reads bottom-anchored
+    --- like Discord / Slack — and matches the feed's stacking direction so
+    --- close ↔ open transitions look continuous. Safe to call repeatedly;
+    --- callers are expected to follow up with `CalcVisible` (and `RewrapAll`
+    --- on a true resize).
     ---@param self UIChatLinesInterface
     RebuildPool = function(self)
         local pool = self.Pool
@@ -212,7 +217,7 @@ ChatLinesInterface = ClassUI(Group) {
             self.ChatLineInterfaces[1].OnNameClicked   = self.LineNameClicked
             self.ChatLineInterfaces[1].OnCameraClicked = self.LineCameraClicked
             Layouter(self.ChatLineInterfaces[1])
-                :AtLeftTopIn(pool)
+                :AtLeftBottomIn(pool)
                 :Right(pool.Right)
                 :End()
         end
@@ -223,14 +228,14 @@ ChatLinesInterface = ClassUI(Group) {
         local neededLines = math.max(1, math.floor(pool.Height() / rowHeight))
         local currentCount = table.getn(self.ChatLineInterfaces)
 
-        -- Grow: append rows below the previous one.
+        -- Grow: stack each new row above the previous one.
         for i = currentCount + 1, neededLines do
             self.ChatLineInterfaces[i] = ChatLineInterface(pool)
             self.ChatLineInterfaces[i]:SetFontSize(fontSize)
             self.ChatLineInterfaces[i].OnNameClicked   = self.LineNameClicked
             self.ChatLineInterfaces[i].OnCameraClicked = self.LineCameraClicked
             Layouter(self.ChatLineInterfaces[i])
-                :Below(self.ChatLineInterfaces[i - 1])
+                :Above(self.ChatLineInterfaces[i - 1])
                 :AtLeftIn(pool)
                 :Right(pool.Right)
                 :End()
@@ -276,36 +281,15 @@ ChatLinesInterface = ClassUI(Group) {
     -- Text wrapping
     ---------------------------------------------------------------------------
 
-    --- Wraps a single entry's text to fit the current row width. Results are
-    --- cached on the entry itself as `entry.WrappedText`. The first wrapped
-    --- line reserves space for the name prefix; continuation lines span the
-    --- wider area to the right of the team-colour column.
+    --- Wraps a single entry's text to fit the current row width, caching
+    --- the result on the entry itself. Delegates to `ChatUtils.WrapEntry`
+    --- so the feed view can wrap the same entries with the same logic
+    --- (and same width — both panels share row metrics) without reaching
+    --- back into us.
     ---@param self UIChatLinesInterface
     ---@param entry UIChatEntry
     WrapEntry = function(self, entry)
-        local measureLine = self.ChatLineInterfaces[1]
-        if not measureLine then
-            entry.WrappedText = { entry.Text or '' }
-            return
-        end
-
-        local name = entry.Name or ''
-        local lines = MauiWrapText(entry.Text or '',
-            function(lineIndex)
-                if lineIndex == 1 then
-                    return measureLine.Right()
-                        - (measureLine.Name.Left() + measureLine.Name:GetStringAdvance(name) + 4)
-                else
-                    return measureLine.Right()
-                        - (measureLine.Name.Left() + 4)
-                end
-            end,
-            function(textChunk)
-                return measureLine.Text:GetStringAdvance(textChunk)
-            end)
-
-        if table.empty(lines) then lines = { '' } end
-        entry.WrappedText = lines
+        ChatUtils.WrapEntry(entry, self.ChatLineInterfaces[1])
     end,
 
     --- Re-wraps every entry in the history. Used on resize (width change)
@@ -420,9 +404,13 @@ ChatLinesInterface = ClassUI(Group) {
     -- Visibility mapping
     ---------------------------------------------------------------------------
 
-    --- Projects `[ScrollTop, ScrollTop + poolSize)` in virtual space onto the
-    --- line pool. Skips over filtered-out entries, uses `SetHeader` for the
-    --- first wrapped line of an entry and `SetContinuation` for the rest.
+    --- Projects the visible virtual range onto the bottom-anchored line
+    --- pool. `ChatLineInterfaces[1]` (bottom of the pool) shows the newest
+    --- visible entry / wrapped chunk; subsequent slots walk back through
+    --- history toward older content, matching the `Above`-stacked layout
+    --- from `RebuildPool`. Skips filtered-out entries in either direction.
+    --- When fewer entries fit than the pool can hold, the surplus slots
+    --- (at the top of the pool) are cleared and hidden.
     ---@param self UIChatLinesInterface
     CalcVisible = function(self)
         if not self.ChatLineInterfaces[1] then return end
@@ -432,7 +420,15 @@ ChatLinesInterface = ClassUI(Group) {
         local poolSize = table.getn(self.ChatLineInterfaces)
         local scrollTop = self.ScrollTop
 
-        -- Walk to the entry + wrapped-line that covers virtual position `scrollTop`.
+        -- The bottommost visible virtual position is the newest entry the
+        -- user can currently see; pool[1] (the bottom row) renders it.
+        -- `VirtualSize` reflects the post-filter count, so this stays
+        -- correct when muted senders are hidden mid-feed.
+        local visibleBottom = math.min(scrollTop + poolSize - 1, self.VirtualSize)
+
+        -- Walk forward through history to find the entry + wrappedIdx that
+        -- covers `visibleBottom`. Same scan as the legacy loop but anchored
+        -- to the bottom of the visible window instead of its top.
         local entryIdx = 1
         local wrappedIdx = 1
         local virtualPos = 0
@@ -444,8 +440,8 @@ ChatLinesInterface = ClassUI(Group) {
         while entryIdx <= historyCount do
             local entry = history[entryIdx]
             local wrapCount = (entry.WrappedText and table.getn(entry.WrappedText)) or 1
-            if virtualPos + wrapCount >= scrollTop then
-                wrappedIdx = scrollTop - virtualPos
+            if virtualPos + wrapCount >= visibleBottom then
+                wrappedIdx = visibleBottom - virtualPos
                 if wrappedIdx < 1 then wrappedIdx = 1 end
                 break
             end
@@ -456,11 +452,17 @@ ChatLinesInterface = ClassUI(Group) {
             end
         end
 
-        -- Fill each pool row; advance the cursor through wrapped lines and
-        -- skip filtered entries as we go.
+        -- Fill the pool from bottom (poolIdx 1) upward. Each step decrements
+        -- the wrapped-line cursor; when a continuation chunk runs out, we
+        -- hop back to the previous valid entry (walking past filtered ones).
+        local currentVirtualPos = visibleBottom
         for poolIdx = 1, poolSize do
             local line = self.ChatLineInterfaces[poolIdx]
-            if entryIdx > historyCount then
+            local outOfRange = entryIdx < 1
+                or entryIdx > historyCount
+                or currentVirtualPos < scrollTop
+                or currentVirtualPos < 1
+            if outOfRange then
                 line:Clear()
                 line:Hide()
             else
@@ -475,14 +477,17 @@ ChatLinesInterface = ClassUI(Group) {
                 end
                 line:Show()
 
-                local wrapCount = (wrapped and table.getn(wrapped)) or 1
-                if wrappedIdx < wrapCount then
-                    wrappedIdx = wrappedIdx + 1
+                currentVirtualPos = currentVirtualPos - 1
+                if wrappedIdx > 1 then
+                    wrappedIdx = wrappedIdx - 1
                 else
-                    wrappedIdx = 1
-                    entryIdx = entryIdx + 1
-                    while entryIdx <= historyCount and not self:IsValidEntry(history[entryIdx]) do
-                        entryIdx = entryIdx + 1
+                    entryIdx = entryIdx - 1
+                    while entryIdx >= 1 and not self:IsValidEntry(history[entryIdx]) do
+                        entryIdx = entryIdx - 1
+                    end
+                    if entryIdx >= 1 then
+                        local prevEntry = history[entryIdx]
+                        wrappedIdx = (prevEntry.WrappedText and table.getn(prevEntry.WrappedText)) or 1
                     end
                 end
             end
@@ -507,6 +512,12 @@ ChatLinesInterface = ClassUI(Group) {
         self:RefreshVirtualSize(history)
         if self.ChatLineInterfaces[1] then
             self:ScrollToBottom()
+        end
+
+        -- make sure chat messages stay hidden if window is hidden
+        local windowVisible = ChatModel.GetSingleton().WindowVisible()
+        if not windowVisible then
+            self:Hide()
         end
     end,
 
