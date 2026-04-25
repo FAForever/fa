@@ -308,15 +308,24 @@ ChatLinesInterface = ClassUI(Group) {
     ---------------------------------------------------------------------------
 
     --- Whether an entry counts toward the virtual scroll size and should
-    --- appear in `CalcVisible`. Currently gates on the per-army mute map
-    --- from `ChatConfigModel.Committed`; camera-link filtering is still TODO.
+    --- appear in `CalcVisible`. Gates on:
+    ---   * per-army mute map (`muted[ArmyID]` → drop) — per-game, set
+    ---     via the config dialog or `/mute` / `/unmute`.
+    ---   * `links` option (`Camera` or `Location` set + `links == false`
+    ---     → drop) — mirrors the legacy filter at chat.legacy.lua:304-310.
+    ---     Both `Camera` (full snapshot) and `Location` (sim-side point
+    ---     or area hint) surface the camera-link affordance on the row,
+    ---     so either field qualifies as a "link" message.
     ---@param self UIChatLinesInterface
     ---@param entry UIChatEntry
     ---@return boolean
     IsValidEntry = function(self, entry)
         if entry == nil then return false end
-        local muted = ChatConfigModel.GetOptions().muted
-        if muted and entry.ArmyID and muted[entry.ArmyID] then
+        local options = ChatConfigModel.GetOptions()
+        if options.muted and entry.ArmyID and options.muted[entry.ArmyID] then
+            return false
+        end
+        if (entry.Camera or entry.Location) and options.links == false then
             return false
         end
         return true

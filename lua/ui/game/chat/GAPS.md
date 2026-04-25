@@ -16,9 +16,8 @@ The bones of feed mode are in place — [`ChatFeedInterface`](ChatFeedInterface.
 
 ## Message filtering
 
-[`ChatLinesInterface.IsValidEntry`](ChatLinesInterface.lua) gates on the per-army `muted` map only. Two parts of the legacy filter are still missing:
+[`ChatLinesInterface.IsValidEntry`](ChatLinesInterface.lua) gates on the per-army `muted` map and the `links` option. One part of the legacy filter is still missing:
 
-- **`links` option** — `ChatConfigModel` defines the key, but `IsValidEntry` doesn't check it. Camera-link entries are always shown regardless of the user's preference. Legacy: [chat.legacy.lua:304-310](../chat.legacy.lua).
 - **Self-echo / observer rules on receive** — [`ChatController.OnReceive`](ChatController.lua) doesn't filter incoming messages by sender / observer-mode. Legacy had a small set of receive-time rules that prevented self-echo loops and gated certain messages by observer state. Audit needed against [chat.legacy.lua:304-310](../chat.legacy.lua).
 
 ## Color palette not wired
@@ -82,3 +81,4 @@ Closed in the most recent rounds of work:
 - **`OnMoveSet` focus grab** — [`ChatInterface.OnMoveSet`](ChatInterface.lua) re-acquires edit focus after a drag.
 - **`font_size` reactive** — [`ChatLinesInterface.ApplyOptions`](ChatLinesInterface.lua) reapplies on every `Committed` change.
 - **Bottom-anchored line layout** — [`ChatLinesInterface.RebuildPool` / `CalcVisible`](ChatLinesInterface.lua) stack newest-at-bottom so chat and feed share the same vertical rhythm and open ↔ close transitions stay continuous.
+- **`links` option** — [`ChatLinesInterface.IsValidEntry`](ChatLinesInterface.lua) drops entries with `Camera` or `Location` when `options.links == false`, mirroring the legacy filter. `Location` (sim-side point/area hint) is treated as a link too since it surfaces the same camera-icon affordance on the row.
