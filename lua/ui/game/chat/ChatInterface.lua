@@ -237,6 +237,7 @@ local ChatInterface = ClassUI(Window) {
             self.Right:Set(scaled(DefaultRect.Right))
             self.Bottom:Set(scaled(DefaultRect.Bottom))
             self:SaveWindowLocation()
+            self:OnResizeSet()
         end
 
         Layouter(self.ResetPositionBtn)
