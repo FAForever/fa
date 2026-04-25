@@ -27,17 +27,24 @@ ChatInterface (Window)
 │
 └── client (Window's inner group)
     │
-    ├── LinesContainer (Group)
+    ├── Lines (ChatLinesInterface, Group)
     │   │   Left   = client.Left + pad(S)
-    │   │   Right  = client.Right - 36(S)
+    │   │   Right  = client.Right - pad(S)
     │   │   Top    = client.Top + pad(S)
     │   │   Bottom = Edit.Top - 12(S)              ← anchored to Edit's top
     │   │
-    │   ├── Lines[1..N]   ChatLineInterface pool
-    │   │      Height = Name.Height(S) + 2(S)
-    │   │      pool size = floor(container.Height / row.Height)
+    │   ├── Pool (Group)
+    │   │   │   Left   = ChatLinesInterface.Left
+    │   │   │   Right  = ChatLinesInterface.Right - 20(S)   ← scrollbar reserve
+    │   │   │   Top    = ChatLinesInterface.Top
+    │   │   │   Bottom = ChatLinesInterface.Bottom
+    │   │   │
+    │   │   └── Lines[1..N]   ChatLineInterface pool
+    │   │          Height = Name.Height(S) + 2(S)
+    │   │          pool size = floor(Pool.Height / row.Height)
     │   │
-    │   └── Scrollbar     CreateVertScrollbarFor(LinesContainer)
+    │   └── Scrollbar     CreateVertScrollbarFor(Pool)
+    │                     anchored to Pool's right edge
     │
     └── Edit (ChatEditInterface)
         │   Left   = client.Left
@@ -249,8 +256,9 @@ bitmap children.
 
 | Concern                            | File                                                                      |
 |------------------------------------|---------------------------------------------------------------------------|
-| `DefaultRect`, drag handles, scrollbar, line pool | [`ChatInterface.lua`](ChatInterface.lua)             |
-| `LinesContainer` ↔ `Edit` anchoring | [`ChatInterface.lua` `__post_init`](ChatInterface.lua)                   |
+| `DefaultRect`, drag handles, window chrome | [`ChatInterface.lua`](ChatInterface.lua)                          |
+| `Lines` ↔ `Edit` anchoring (window-level) | [`ChatInterface.lua` `__post_init`](ChatInterface.lua)             |
+| Pool / Scrollbar layout, scroll state, wrapping, filtering | [`ChatLinesInterface.lua`](ChatLinesInterface.lua) |
 | `ChatBubble` / `RecipientLabel` / `EditBox` / `CamCheckbox` layout | [`ChatEditInterface.lua` `__post_init`](ChatEditInterface.lua) |
 | Row geometry (`TeamColor`, `Name`, `CamIcon`, `Text`) | [`ChatLineInterface.lua` `__post_init`](ChatLineInterface.lua) |
 | Hint popup width / height / row positioning | [`ChatCommandHintInterface.lua`](ChatCommandHintInterface.lua) |

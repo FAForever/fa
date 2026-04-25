@@ -49,7 +49,7 @@ ChatListInterface = ClassUI(Group) {
 
         -- Popups must sit above the chat window's inner content (line rows,
         -- edit area) to receive hover and click events. A plain +1 offset
-        -- ties with the line rows, which default to LinesContainer+1 —
+        -- ties with the line rows, which default to ChatLinesInterface+1 —
         -- matching the list's default depth. +100 gives unambiguous headroom.
         LayoutHelpers.DepthOverParent(self, parent, 100)
 

@@ -19,7 +19,7 @@ The most conspicuous missing chunk. None of the "auto-fading feed of recent chat
 
 ## Message filtering
 
-[`ChatInterface.IsValidEntry`](ChatInterface.lua) is a stub returning `true`. The legacy filter gated on three things ([chat.lua:304-310](../chat.lua)):
+[`ChatLinesInterface.IsValidEntry`](ChatLinesInterface.lua) is a stub returning `true`. The legacy filter gated on three things ([chat.lua:304-310](../chat.lua)):
 
 - `ChatOptions.links` — hides camera-link messages.
 - `ChatOptions[armyID]` — per-sender on/off checkboxes.
@@ -29,7 +29,7 @@ Per-army filter UI needs re-adding to [`ChatConfigInterface`](config/ChatConfigI
 
 ## Config options not reaching the view
 
-[`ChatConfigModel`](config/ChatConfigModel.lua) defines every key correctly, but only `font_size` is subscribed by the view (see [`ChatInterface.ApplyOptions`](ChatInterface.lua)). Not yet wired:
+[`ChatConfigModel`](config/ChatConfigModel.lua) defines every key correctly, but only `font_size` and `win_alpha` are subscribed by the view (see [`ChatLinesInterface.ApplyOptions`](ChatLinesInterface.lua) and [`ChatInterface` `__post_init`](ChatInterface.lua)). Not yet wired:
 
 - `all_color` / `allies_color` / `priv_color` / `link_color` / `notify_color` — the per-recipient text-colour palette ([chat.lua:63, 446-450](../chat.lua)).
 - `fade_time`, `win_alpha`, `feed_background`, `feed_persist` — feed-mode options (blocked on the feed-mode port above).
