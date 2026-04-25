@@ -4,6 +4,7 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Window = import("/lua/maui/window.lua").Window
 local BitmapCombo = import("/lua/ui/controls/combo.lua").BitmapCombo
 local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 
 local ChatConfigModel = import("/lua/ui/game/chat/config/ChatConfigModel.lua")
 local ChatConfigController = import("/lua/ui/game/chat/config/ChatConfigController.lua")
@@ -11,6 +12,11 @@ local ChatConfigController = import("/lua/ui/game/chat/config/ChatConfigControll
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
+
+--- Flip to `true` to overlay a semi-transparent coloured bitmap over the
+--- control so its bounds are visible at runtime. Each chat interface uses a
+--- distinct colour so overlapping controls can be told apart at a glance.
+local Debug = false
 
 -- 8 ARGB solid colors selectable as message color swatches.
 local Colors = { 'ffffffff', 'ffff4242', 'ffefff42', 'ff4fff42', 'ff42fff8', 'ff424fff', 'ffff42eb', 'ffff9f42' }
@@ -61,6 +67,7 @@ local CheckboxDefs = {
 ---@field BtnOk          Button
 ---@field BtnCancel      Button
 ---@field PendingObserver LazyVar<UIChatOptions>  # derived from ChatConfigModel.Pending
+---@field DebugBG?       Bitmap                  # semi-transparent overlay shown when `Debug` is true
 local ChatConfigInterface = ClassUI(Window) {
 
     ---@param self UIChatConfigInterface
@@ -332,6 +339,13 @@ local ChatConfigInterface = ClassUI(Window) {
         -- so a Width/Right mismatch is invisible until the first drag).
         local bottomPadScaled = LayoutHelpers.ScaleNumber(16)
         self.Bottom:Set(function() return self.BtnCancel.Bottom() + bottomPadScaled end)
+
+        if Debug then
+            self.DebugBG = Bitmap(self)
+            self.DebugBG:SetSolidColor('40ff8040')
+            self.DebugBG:DisableHitTest()
+            Layouter(self.DebugBG):Fill(self):Over(self, 100):End()
+        end
     end,
 
     --- Syncs every control to reflect the given options table.

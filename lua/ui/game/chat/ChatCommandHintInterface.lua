@@ -10,6 +10,11 @@ local Registry = import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua")
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
+--- Flip to `true` to overlay a semi-transparent coloured bitmap over the
+--- control so its bounds are visible at runtime. Each chat interface uses a
+--- distinct colour so overlapping controls can be told apart at a glance.
+local Debug = false
+
 local RowFontSize = 12
 local RowFontName = 'Arial'
 local HorizontalPadding = 12
@@ -78,6 +83,7 @@ end
 ---@field RBG  Bitmap
 ---@field TBG  Bitmap
 ---@field BBG  Bitmap
+---@field DebugBG? Bitmap                 # semi-transparent overlay shown when `Debug` is true
 ChatCommandHintInterface = ClassUI(Group) {
 
     ---@param self UIChatCommandHintInterface
@@ -216,6 +222,13 @@ ChatCommandHintInterface = ClassUI(Group) {
         end
         self.VisibleCount.OnDirty = function() syncScrollbarVisibility() end
         syncScrollbarVisibility()
+
+        if Debug then
+            self.DebugBG = Bitmap(self)
+            self.DebugBG:SetSolidColor('4040ffff')
+            self.DebugBG:DisableHitTest()
+            Layouter(self.DebugBG):Fill(self):Over(self, 100):End()
+        end
     end,
 
     --- Builds a reusable row (text + highlight bitmap + hover handler).

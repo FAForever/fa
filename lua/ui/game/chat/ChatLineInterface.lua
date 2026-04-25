@@ -9,6 +9,11 @@ local Factions = import("/lua/factions.lua").Factions
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
+--- Flip to `true` to overlay a semi-transparent coloured bitmap over the
+--- control so its bounds are visible at runtime. Each chat interface uses a
+--- distinct colour so overlapping controls can be told apart at a glance.
+local Debug = false
+
 -- Collect faction icons up-front; append an observer icon as the final entry
 -- so non-player senders can be represented too.
 local FactionIcons = {}
@@ -34,6 +39,7 @@ local CamIconTexture = '/game/camera-btn/pinned_btn_up.dds'
 ---@field CamIcon     Bitmap                # camera-link affordance, hidden unless entry.Camera is set
 ---@field Text        Text
 ---@field Entry       UIChatEntry | nil
+---@field DebugBG?    Bitmap                # semi-transparent overlay shown when `Debug` is true
 ChatLineInterface = ClassUI(Group) {
 
     ---@param self UIChatLineInterface
@@ -130,6 +136,13 @@ ChatLineInterface = ClassUI(Group) {
             :AtVerticalCenterIn(self.TeamColor)
             :Over(self, 10)
             :End()
+
+        if Debug then
+            self.DebugBG = Bitmap(self)
+            self.DebugBG:SetSolidColor('404040ff')
+            self.DebugBG:DisableHitTest()
+            Layouter(self.DebugBG):Fill(self):Over(self, 100):End()
+        end
     end,
 
     --- Populates the row as the FIRST wrapped line of an entry: shows the

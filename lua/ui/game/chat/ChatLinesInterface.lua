@@ -3,6 +3,7 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 
 local ChatLineInterface = import("/lua/ui/game/chat/ChatLineInterface.lua").ChatLineInterface
 
@@ -13,6 +14,11 @@ local MauiWrapText = import("/lua/maui/text.lua").WrapText
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
+
+--- Flip to `true` to overlay a semi-transparent coloured bitmap over the
+--- control so its bounds are visible at runtime. Each chat interface uses a
+--- distinct colour so overlapping controls can be told apart at a glance.
+local Debug = false
 
 -- Reserve space on the right of the wrapper for the scrollbar widget.
 -- Anything wider than the scrollbar bitmap (~17px) works; 20px gives a tiny
@@ -59,6 +65,7 @@ local ScrollbarReserve = 20
 ---@field LineCameraClicked fun(line: UIChatLineInterface, entry: UIChatEntry)   # shared cam-icon click handler; captures `self` for the same reason
 ---@field OnNameClicked     fun(entry: UIChatEntry)                              # overridable: replace to react to a sender-name click
 ---@field OnCameraClicked   fun(entry: UIChatEntry)                              # overridable: replace to override camera-link behaviour
+---@field DebugBG?          Bitmap                                              # semi-transparent overlay shown when `Debug` is true
 ChatLinesInterface = ClassUI(Group) {
 
     ---@param self UIChatLinesInterface
@@ -137,7 +144,10 @@ ChatLinesInterface = ClassUI(Group) {
     __post_init = function(self, parent)
         -- Pool fills the wrapper but stops `ScrollbarReserve` short of the
         -- right edge so the scrollbar (which the engine anchors to Pool's
-        -- right) lands inside our footprint.
+        -- right) lands inside our footprint. These bindings are reactive —
+        -- they don't evaluate to concrete pixels until the parent has laid
+        -- us out, which is why pool / wrap / scroll work happens in
+        -- `Initialize` below rather than here.
         Layouter(self.Pool)
             :AtLeftTopIn(self)
             :AtRightIn(self, ScrollbarReserve)
@@ -146,17 +156,30 @@ ChatLinesInterface = ClassUI(Group) {
 
         -- `CreateVertScrollbarFor` calls `Scrollbar:SetScrollable(attachto)`
         -- so the scrollable methods have to live on `Pool` — see the
-        -- forwarding stubs in `__init`.
+        -- forwarding stubs in `__init`. Anchoring the scrollbar is also
+        -- reactive (it tracks `Pool.Right`), so this is safe pre-layout.
         self.Scrollbar = UIUtil.CreateVertScrollbarFor(self.Pool)
 
+        if Debug then
+            self.DebugBG = Bitmap(self)
+            self.DebugBG:SetSolidColor('4040ff40')
+            self.DebugBG:DisableHitTest()
+            Layouter(self.DebugBG):Fill(self):Over(self, 100):End()
+        end
+    end,
+
+    --- Called by the parent once it has laid out the lines panel. The
+    --- initial `RebuildPool` reads `Pool.Height()` — which evaluates to
+    --- zero until our outer rect is bound to something concrete — so the
+    --- pool / rewrap / scroll work has to wait until the parent positions
+    --- us. Wiring `OptionsObserver` here defers its initial fire (which
+    --- calls `ApplyOptions → RebuildPool`) for the same reason.
+    ---@param self UIChatLinesInterface
+    Initialize = function(self)
         self:RebuildPool()
         self:RewrapAll()
         self:ScrollToBottom()
 
-        -- Committed chat options → font size, muted filter, etc. Wired
-        -- here rather than in `__init` so the initial fire runs against a
-        -- fully laid-out pool — `RebuildPool` reads `self.Lines[1].Height`
-        -- and would hit a circular dependency if the layout isn't ready.
         self.OptionsObserver = self.Trash:Add(
             LazyVarDerive(
                 ChatConfigModel.GetSingleton().Committed,

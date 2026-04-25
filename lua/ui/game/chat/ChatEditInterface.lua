@@ -6,6 +6,7 @@ local Group = import("/lua/maui/group.lua").Group
 local Edit = import("/lua/maui/edit.lua").Edit
 local Button = import("/lua/maui/button.lua").Button
 local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
 local ChatController = import("/lua/ui/game/chat/ChatController.lua")
@@ -16,6 +17,11 @@ local ChatCommandHintInterface = import("/lua/ui/game/chat/ChatCommandHintInterf
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
+
+--- Flip to `true` to overlay a semi-transparent coloured bitmap over the
+--- control so its bounds are visible at runtime. Each chat interface uses a
+--- distinct colour so overlapping controls can be told apart at a glance.
+local Debug = false
 
 local MaxChars = 200
 
@@ -35,6 +41,7 @@ local MaxChars = 200
 ---@field RecipientObserver LazyVar<UIChatRecipient>          # derived from ChatModel.Recipient
 ---@field Completion        UIChatCompletion | nil            # active Tab-cycle record, reset on text change
 ---@field SuppressCompletionReset boolean                     # true while our own SetText is running
+---@field DebugBG?          Bitmap                            # semi-transparent overlay shown when `Debug` is true
 ChatEditInterface = ClassUI(Group) {
 
     ---@param self UIChatEditInterface
@@ -216,6 +223,13 @@ ChatEditInterface = ClassUI(Group) {
         Layouter(self)
             :Height(function() return self.EditBox.Height() + heightPadScaled end)
             :End()
+
+        if Debug then
+            self.DebugBG = Bitmap(self)
+            self.DebugBG:SetSolidColor('40ff40ff')
+            self.DebugBG:DisableHitTest()
+            Layouter(self.DebugBG):Fill(self):Over(self, 100):End()
+        end
     end,
 
     --- Entry point for the Tab key. When the command hint is open, Tab

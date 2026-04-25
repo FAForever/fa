@@ -79,6 +79,7 @@ local DefaultRect = { Left = 8, Top = 460, Right = 430, Bottom = 720 }
 ---@field ResetPositionBtn      Button                        # titlebar button that restores DefaultRect
 ---@field WindowVisibleObserver LazyVar<boolean>              # derived from ChatModel.WindowVisible
 ---@field OptionsObserver       LazyVar<UIChatOptions>        # derived from ChatConfigModel.Committed (window-level options only)
+---@field DebugBG?              Bitmap                        # semi-transparent overlay shown when `Debug` is true
 local ChatInterface = ClassUI(Window) {
 
     ---@param self UIChatInterface
@@ -270,6 +271,11 @@ local ChatInterface = ClassUI(Window) {
             :AnchorToTop(self.Edit, 12)
             :End()
 
+        -- Now that the lines panel has a real rect, let it build its pool
+        -- and wire its options observer (the initial fire reads the laid-
+        -- out `Pool.Height()`).
+        self.Lines:Initialize()
+
         -- Committed chat options → window-level concerns only. Pool sizing,
         -- font, and filter changes are owned by the lines panel; we just
         -- handle `win_alpha` here. `SetAlpha(_, true)` cascades so chrome,
@@ -282,6 +288,13 @@ local ChatInterface = ClassUI(Window) {
                 end
             )
         )
+
+        if Debug then
+            self.DebugBG = Bitmap(self)
+            self.DebugBG:SetSolidColor('40ff4040')
+            self.DebugBG:DisableHitTest()
+            Layouter(self.DebugBG):Fill(self):Over(self, 100):End()
+        end
     end,
 
     ---------------------------------------------------------------------------

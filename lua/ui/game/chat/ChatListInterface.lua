@@ -14,6 +14,11 @@ local ChatController = import("/lua/ui/game/chat/ChatController.lua")
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
+--- Flip to `true` to overlay a semi-transparent coloured bitmap over the
+--- control so its bounds are visible at runtime. Each chat interface uses a
+--- distinct colour so overlapping controls can be told apart at a glance.
+local Debug = false
+
 ---@class UIChatListEntry
 ---@field Text   Text
 ---@field BG     Bitmap
@@ -39,6 +44,7 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 ---@field RBG     Bitmap
 ---@field TBG     Bitmap
 ---@field BBG     Bitmap
+---@field DebugBG? Bitmap                # semi-transparent overlay shown when `Debug` is true
 ChatListInterface = ClassUI(Group) {
 
     ---@param self UIChatListInterface
@@ -194,6 +200,13 @@ ChatListInterface = ClassUI(Group) {
         end
 
         self:LayoutBorder()
+
+        if Debug then
+            self.DebugBG = Bitmap(self)
+            self.DebugBG:SetSolidColor('40ffff40')
+            self.DebugBG:DisableHitTest()
+            Layouter(self.DebugBG):Fill(self):Over(self, 100):End()
+        end
     end,
 
     --- Lays out one row: the text anchored above `below` (or at the bottom
