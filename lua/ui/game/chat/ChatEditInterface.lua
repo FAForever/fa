@@ -196,15 +196,15 @@ ChatEditInterface = ClassUI(Group) {
             :End()
 
         Layouter(self.RecipientLabel)
-            :AnchorToRight(self.ChatBubble, 10)
+            :AnchorToRight(self.ChatBubble, 6)
             :AtVerticalCenterIn(self)
             :End()
 
         -- Camera-attach toggle pinned to the right edge so the edit box can
         -- claim the remaining width.
         Layouter(self.CamCheckbox)
-            :AtRightIn(self, 8)
-            :AtVerticalCenterIn(self)
+            :AtRightIn(self, 12)
+            :AtVerticalCenterIn(self, -2)
             :End()
 
         Layouter(self.EditBox)
@@ -212,16 +212,6 @@ ChatEditInterface = ClassUI(Group) {
             :AnchorToLeft(self.CamCheckbox, 4)
             :AtVerticalCenterIn(self)
             :Height(function() return self.EditBox:GetFontHeight() end)
-            :End()
-
-        -- The group sizes itself to the edit's font height plus a scaled
-        -- padding so the bitmap-sized children (chat bubble, camera button)
-        -- have visual breathing room around the text. Without the pad, at
-        -- higher UI scales `self.Height == EditBox.Height` and the buttons
-        -- end up flush against the edit baseline, looking shifted down.
-        local heightPadScaled = LayoutHelpers.ScaleNumber(6)
-        Layouter(self)
-            :Height(function() return self.EditBox.Height() + heightPadScaled end)
             :End()
 
         if Debug then

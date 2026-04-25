@@ -85,13 +85,11 @@ local ChatInterface = ClassUI(Window) {
     ---@param self UIChatInterface
     ---@param parent Control
     __init = function(self, parent)
-        Window.__init(self, parent, "", false, true, true, false, false, "chat_window_v2", DefaultRect, WindowTextures)
+        Window.__init(self, parent, "Chat dialog", false, true, true, false, false, "chat_window_v2", DefaultRect, WindowTextures)
         self:SetMinimumResize(400, 160)
 
         self:SetupDragHandles()
         self:SetupResetPositionButton()
-
-        local client = self:GetClientGroup()
 
         -- Single trash bag for everything we allocate that needs explicit
         -- destruction — currently just the derived observer LazyVars.
@@ -100,7 +98,7 @@ local ChatInterface = ClassUI(Window) {
 
         -- The lines panel and edit area. Both are laid out in `__post_init`
         -- once the client area has a real size to anchor against.
-        self.ChatLinesInterface = ChatLinesInterface(client)
+        self.ChatLinesInterface = ChatLinesInterface(self)
         self.ChatEditInterface = ChatEditInterface(self)
 
         -- Override the lines panel's name-click hook to set the chat
@@ -264,12 +262,13 @@ local ChatInterface = ClassUI(Window) {
         -- box. The scrollbar is its own concern — `ChatLinesInterface`
         -- reserves the space inside its right edge for the scrollbar
         -- widget, so the parent only has to allocate a single rect.
-        local uniformPadding = 4
+        local paddingHorizontal = 8
+        local paddingVertical = 2
         Layouter(self.ChatLinesInterface)
-            :Below(self.TitleGroup, 9 + uniformPadding)
-            :AtLeftIn(self, 6 + uniformPadding)
-            :AtRightIn(self, 8 + uniformPadding)
-            :AtBottomIn(self, 32 + uniformPadding)
+            :AtTopIn(client, paddingVertical)
+            :AtLeftIn(client, paddingHorizontal)
+            :AtRightIn(client, paddingHorizontal)
+            :AnchorToTop(self.ChatEditInterface, 4)
             :End()
 
         -- Now that the lines panel has a real rect, let it build its pool
