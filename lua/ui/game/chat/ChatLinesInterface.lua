@@ -18,7 +18,7 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 --- Flip to `true` to overlay a semi-transparent coloured bitmap over the
 --- control so its bounds are visible at runtime. Each chat interface uses a
 --- distinct colour so overlapping controls can be told apart at a glance.
-local Debug = false
+local Debug = true
 
 -- Reserve space on the right of the wrapper for the scrollbar widget.
 -- Anything wider than the scrollbar bitmap (~17px) works; 20px gives a tiny

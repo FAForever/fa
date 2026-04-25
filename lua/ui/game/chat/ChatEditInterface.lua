@@ -21,7 +21,7 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 --- Flip to `true` to overlay a semi-transparent coloured bitmap over the
 --- control so its bounds are visible at runtime. Each chat interface uses a
 --- distinct colour so overlapping controls can be told apart at a glance.
-local Debug = false
+local Debug = true
 
 local MaxChars = 200
 
@@ -191,19 +191,19 @@ ChatEditInterface = ClassUI(Group) {
     ---@param parent Control
     __post_init = function(self, parent)
         Layouter(self.ChatBubble)
-            :AtLeftIn(self, 3)
+            :AtLeftIn(self, 6)
             :AtVerticalCenterIn(self)
             :End()
 
         Layouter(self.RecipientLabel)
-            :AnchorToRight(self.ChatBubble, 2)
+            :AnchorToRight(self.ChatBubble, 10)
             :AtVerticalCenterIn(self)
             :End()
 
         -- Camera-attach toggle pinned to the right edge so the edit box can
         -- claim the remaining width.
         Layouter(self.CamCheckbox)
-            :AtRightIn(self, 4)
+            :AtRightIn(self, 8)
             :AtVerticalCenterIn(self)
             :End()
 

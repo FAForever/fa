@@ -101,7 +101,7 @@ local ChatInterface = ClassUI(Window) {
         -- The lines panel and edit area. Both are laid out in `__post_init`
         -- once the client area has a real size to anchor against.
         self.Lines = ChatLinesInterface(client)
-        self.Edit = ChatEditInterface(client)
+        self.Edit = ChatEditInterface(self)
 
         -- Override the lines panel's name-click hook to set the chat
         -- recipient and re-focus the edit box. `OnCameraClicked` keeps the
@@ -253,10 +253,10 @@ local ChatInterface = ClassUI(Window) {
         -- Full width, flush with the bottom of the client area. The edit
         -- group derives its own height (see ChatEditInterface.__post_init).
         Layouter(self.Edit)
-            :AtLeftIn(client)
-            :AtRightIn(client)
-            :AtBottomIn(client)
-            :Height(22)
+            :AtLeftIn(self)
+            :AtRightIn(self)
+            :AtBottomIn(self, 6)
+            :Height(19)
             :Over(client)
             :End()
 
