@@ -248,7 +248,6 @@ local ChatInterface = ClassUI(Window) {
     ---@param parent Control
     __post_init = function(self, parent)
         local client = self:GetClientGroup()
-        local pad = 4
 
         -- Full width, flush with the bottom of the client area. The edit
         -- group derives its own height (see ChatEditInterface.__post_init).
@@ -264,11 +263,12 @@ local ChatInterface = ClassUI(Window) {
         -- box. The scrollbar is its own concern — `ChatLinesInterface`
         -- reserves the space inside its right edge for the scrollbar
         -- widget, so the parent only has to allocate a single rect.
+        local uniformPadding = 4
         Layouter(self.Lines)
-            :AtLeftIn(client, pad)
-            :AtRightIn(client, pad)
-            :AtTopIn(client, pad)
-            :AnchorToTop(self.Edit, 12)
+            :Below(self.TitleGroup, 9 + uniformPadding)
+            :AtLeftIn(self, 6 + uniformPadding)
+            :AtRightIn(self, 8 + uniformPadding)
+            :AtBottomIn(self, 32 + uniformPadding)
             :End()
 
         -- Now that the lines panel has a real rect, let it build its pool

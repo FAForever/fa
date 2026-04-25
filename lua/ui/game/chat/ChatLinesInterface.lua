@@ -23,7 +23,7 @@ local Debug = true
 -- Reserve space on the right of the wrapper for the scrollbar widget.
 -- Anything wider than the scrollbar bitmap (~17px) works; 20px gives a tiny
 -- breathing margin between the line text and the scrollbar.
-local ScrollbarReserve = 20
+local ScrollbarReserve = 32
 
 -------------------------------------------------------------------------------
 -- A self-contained chat-lines panel: outer wrapper, inner pool of line rows,
