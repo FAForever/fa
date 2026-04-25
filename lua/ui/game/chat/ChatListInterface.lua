@@ -231,14 +231,18 @@ ChatListInterface = ClassUI(Group) {
         -- The highlight bar spans the full row (including the badge area)
         -- and sits behind everything in the depth order. Direct LazyVar
         -- `:SetFunction` calls match the original `chat.lua` pattern and
-        -- avoid Layouter's reused-state quirks.
+        -- avoid Layouter's reused-state quirks. The pixel offsets need
+        -- explicit scaling — the closures bypass Layouter's auto-scale.
         local text = entry.Text
+        local bgInsetLeft = LayoutHelpers.ScaleNumber(6)
+        local bgInsetWidth = LayoutHelpers.ScaleNumber(8)
+        local onePxScaled = LayoutHelpers.ScaleNumber(1)
         ---@diagnostic disable: undefined-field
         entry.BG.Depth:SetFunction(function() return text.Depth() - 1 end)
-        entry.BG.Left:SetFunction(function() return self.Left() - 6 end)
-        entry.BG.Top:SetFunction(function() return text.Top() - 1 end)
-        entry.BG.Width:SetFunction(function() return self.Width() + 8 end)
-        entry.BG.Bottom:SetFunction(function() return text.Bottom() + 1 end)
+        entry.BG.Left:SetFunction(function() return self.Left() - bgInsetLeft end)
+        entry.BG.Top:SetFunction(function() return text.Top() - onePxScaled end)
+        entry.BG.Width:SetFunction(function() return self.Width() + bgInsetWidth end)
+        entry.BG.Bottom:SetFunction(function() return text.Bottom() + onePxScaled end)
         ---@diagnostic enable: undefined-field
     end,
 

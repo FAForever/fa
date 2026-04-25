@@ -107,7 +107,10 @@ ChatCommandHintInterface = ClassUI(Group) {
         ---@diagnostic disable-next-line: param-type-mismatch
         local probe = UIUtil.CreateText(self, '/sample', RowFontSize, RowFontName)
         ---@diagnostic disable-next-line: undefined-field
-        self.RowHeight = Create(probe.Height() + VerticalPadding)
+        -- `probe.Height()` is already in scaled pixels (Layouter stores
+        -- everything scaled); the padding constant has to be scaled by hand
+        -- so it tracks the user's UI scale setting.
+        self.RowHeight = Create(probe.Height() + LayoutHelpers.ScaleNumber(VerticalPadding))
         probe:Destroy()
 
         -- Decorative borders (same skin as ChatListInterface).
@@ -157,8 +160,14 @@ ChatCommandHintInterface = ClassUI(Group) {
 
         -- Reserve scrollbar width unconditionally so the popup doesn't
         -- reflow when the scrollbar appears / disappears with match count.
+        --
+        -- `textWidth` is already in scaled pixels (read off a laid-out probe),
+        -- so we can't pass the sum to `:Width(number)` — Layouter would call
+        -- `ScaleNumber` on the whole expression and double-scale the text
+        -- portion. Use a function form and scale only the raw constants.
+        local extraScaled = LayoutHelpers.ScaleNumber(HorizontalPadding * 2 + ScrollbarWidth)
         Layouter(self)
-            :Width(textWidth + HorizontalPadding * 2 + ScrollbarWidth)
+            :Width(function() return textWidth + extraScaled end)
             :End()
 
         ---@diagnostic disable: undefined-field
@@ -416,7 +425,8 @@ ChatCommandHintInterface = ClassUI(Group) {
         self.Rows[idx] = row
 
         ---@diagnostic disable: undefined-field
-        row.Text.Left:SetFunction(function() return self.Left() + HorizontalPadding end)
+        local horizontalPaddingScaled = LayoutHelpers.ScaleNumber(HorizontalPadding)
+        row.Text.Left:SetFunction(function() return self.Left() + horizontalPaddingScaled end)
         row.Text.Bottom:SetFunction(function()
             local ord = row.Ordinal()
             if ord <= 0 then return self.Top() end
@@ -439,10 +449,11 @@ ChatCommandHintInterface = ClassUI(Group) {
     ---@param row UIChatHintRow
     LayoutRowBackground = function(self, row)
         ---@diagnostic disable: undefined-field
+        local onePixelScaled = LayoutHelpers.ScaleNumber(1)
         row.BG.Left:SetFunction(function()   return self.Left() end)
         row.BG.Right:SetFunction(function()  return self.Right() end)
-        row.BG.Top:SetFunction(function()    return row.Text.Top() - 1 end)
-        row.BG.Bottom:SetFunction(function() return row.Text.Bottom() + 1 end)
+        row.BG.Top:SetFunction(function()    return row.Text.Top() - onePixelScaled end)
+        row.BG.Bottom:SetFunction(function() return row.Text.Bottom() + onePixelScaled end)
         row.BG.Depth:SetFunction(function()  return row.Text.Depth() - 1 end)
         ---@diagnostic enable: undefined-field
     end,

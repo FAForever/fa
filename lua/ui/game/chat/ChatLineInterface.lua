@@ -85,10 +85,16 @@ ChatLineInterface = ClassUI(Group) {
     ---@param self UIChatLineInterface
     ---@param parent Control
     __post_init = function(self, parent)
+        -- `Layouter:Height(number)` would auto-scale a literal, but the
+        -- closures below need to track upstream LazyVars reactively, and
+        -- raw constants inside a SetFunction body don't get scaled. Pre-scale
+        -- the 2px row padding once so it follows the user's UI scale.
+        local twoPxScaled = LayoutHelpers.ScaleNumber(2)
+
         -- Derive the row's height from the name font so pool sizing and
         -- scroll positions scale automatically with `ChatOptions.font_size`.
         Layouter(self)
-            :Height(function() return self.Name.Height() + 2 end)
+            :Height(function() return self.Name.Height() + twoPxScaled end)
             :End()
 
         Layouter(self.TeamColor)
@@ -119,7 +125,7 @@ ChatLineInterface = ClassUI(Group) {
         -- Text Left jumps over the icon when present; SetHeader rebinds this
         -- when the entry's camera state changes.
         Layouter(self.Text)
-            :Left(function() return self.Name.Right() + 2 end)
+            :Left(function() return self.Name.Right() + twoPxScaled end)
             :Right(self.Right)
             :AtVerticalCenterIn(self.TeamColor)
             :Over(self, 10)

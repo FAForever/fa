@@ -321,11 +321,14 @@ ChatEditInterface = ClassUI(Group) {
             :Height(function() return self.EditBox:GetFontHeight() end)
             :End()
 
-        -- The group sizes itself to the edit's font height; the parent
-        -- positions it (Left/Right/Bottom) and leaves Height alone. This
-        -- mirrors the original `group.Height:Set(function() return group.edit.Height() end)`.
+        -- The group sizes itself to the edit's font height plus a scaled
+        -- padding so the bitmap-sized children (chat bubble, camera button)
+        -- have visual breathing room around the text. Without the pad, at
+        -- higher UI scales `self.Height == EditBox.Height` and the buttons
+        -- end up flush against the edit baseline, looking shifted down.
+        local heightPadScaled = LayoutHelpers.ScaleNumber(6)
         Layouter(self)
-            :Height(function() return self.EditBox.Height() end)
+            :Height(function() return self.EditBox.Height() + heightPadScaled end)
             :End()
     end,
 

@@ -330,7 +330,8 @@ local ChatConfigInterface = ClassUI(Window) {
         -- drag handler's Right:Set(Left + Width) will snap the window to
         -- whatever Width was pinned to (the textures render against Right,
         -- so a Width/Right mismatch is invisible until the first drag).
-        self.Bottom:Set(function() return self.BtnCancel.Bottom() + 16 end)
+        local bottomPadScaled = LayoutHelpers.ScaleNumber(16)
+        self.Bottom:Set(function() return self.BtnCancel.Bottom() + bottomPadScaled end)
     end,
 
     --- Syncs every control to reflect the given options table.

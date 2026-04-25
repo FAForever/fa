@@ -327,6 +327,7 @@ local ChatInterface = ClassUI(Window) {
             :AtLeftIn(client)
             :AtRightIn(client)
             :AtBottomIn(client)
+            :Height(22)
             :Over(client)
             :End()
 
