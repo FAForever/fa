@@ -14,9 +14,7 @@ The bones of feed mode are in place — [`ChatFeedInterface`](ChatFeedInterface.
 
 ## Message filtering
 
-[`ChatLinesInterface.IsValidEntry`](ChatLinesInterface.lua) gates on the per-army `muted` map and the `links` option. One part of the legacy filter is still missing:
-
-- **Self-echo / observer rules on receive** — [`ChatController.OnReceive`](ChatController.lua) doesn't filter incoming messages by sender / observer-mode. Legacy had a small set of receive-time rules that prevented self-echo loops and gated certain messages by observer state. Audit needed against [chat.legacy.lua:304-310](../chat.legacy.lua).
+[`ChatLinesInterface.IsValidEntry`](ChatLinesInterface.lua) gates on the per-army `muted` map and the `links` option, mirroring the legacy filter pair.
 
 ## Color palette not wired
 
@@ -81,4 +79,5 @@ Closed in the most recent rounds of work:
 - **Bottom-anchored line layout** — [`ChatLinesInterface.RebuildPool` / `CalcVisible`](ChatLinesInterface.lua) stack newest-at-bottom so chat and feed share the same vertical rhythm and open ↔ close transitions stay continuous.
 - **`links` option** — [`ChatLinesInterface.IsValidEntry`](ChatLinesInterface.lua) drops entries with `Camera` or `Location` when `options.links == false`, mirroring the legacy filter. `Location` (sim-side point/area hint) is treated as a link too since it surfaces the same camera-icon affordance on the row.
 - **Translucent feed background** — [`ChatFeedInterface`](ChatFeedInterface.lua) gives each feed row a per-line readability strip (Bitmap on the feed group, depth-pinned under the line, edges via `Layouter:Fill(line)`). Visibility is gated on `feed_background`; the alpha composes window opacity (`win_alpha`) × per-row fade × `FeedBackgroundAlpha = 0.5`. The chat-window line pool is unaffected — the BG lives on the feed only, so the regular history view stays bare.
-- **Receive-side defensive guards** — [`ChatController.OnReceive`](ChatController.lua) coerces non-string senders, drops non-table messages, requires `msg.text` to be a string, and rejects bodies longer than `ChatUtils.MaxMessageLength` (the same cap the edit box enforces on send). The length constant lives in `ChatUtils` so input and validation read from the same source.
+- **Receive-side defensive guards** — [`ChatController.OnReceive`](ChatController.lua) coerces non-string senders, then runs everything else through a pure-shape validator (`IsValidIncomingMessage`) that checks: table-shaped, `Chat` flag set, `text` is a string, `text` length ≤ `ChatUtils.MaxMessageLength` (the same cap the edit box enforces on send), `to` is one of `RecipientAll` / `RecipientAllies` / `'notify'` / a number, and the optional `camera` / `location` payloads are tables when present. The dispatch loop then drops messages whose `Observer` flag contradicts the sender's army resolution (genuine observers have no army; an inconsistent combination implies tampering or a bug, not something to silently "repair"). Malformed input is dropped, never fixed.
+- **Observer-source filter** — the existing `if not armyData and GetFocusArmy() ~= -1 and not SessionIsReplay() then return end` in [`ChatController.OnReceive`](ChatController.lua) already implements the legacy "players don't see observer chatter" rule (observers have no army → `armyData` nil → drop, unless the local viewer is also an observer or in a replay).

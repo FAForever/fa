@@ -280,14 +280,63 @@ end
 -------------------------------------------------------------------------------
 -- Receiving (network)
 
---- Handler registered with `gamemain.RegisterChatFunc`. Normalises the
+--- Pure shape validator for an incoming chat payload. Returns `true` only
+--- when every required field is present with the expected type and every
+--- optional field, when present, has the engine-API shape it must have for
+--- downstream rendering / camera-jump code to treat it safely.
+---
+--- Each rule is its own `return false` — malformed input is dropped, never
+--- coerced or "repaired". A peer that ships an inconsistent shape is
+--- either modded, buggy, or hostile; in any of those cases letting the
+--- message through would let manipulated traffic render somewhere it
+--- shouldn't. The receive path is reachable from any
+--- `gamemain.RegisterChatFunc` caller, including external mods, so the
+--- shape can't be trusted.
+---
+--- Sender / observer-mode consistency lives in `OnReceive` rather than
+--- here — those rules need session context (army data, focus army, replay
+--- state) that this pure validator can't see.
+---@param msg any
+---@return boolean
+local function IsValidIncomingMessage(msg)
+    -- Required: table-shaped, chat-flagged, with a string body.
+    if type(msg) ~= 'table' then return false end
+    if not msg.Chat then return false end
+    if type(msg.text) ~= 'string' then return false end
+
+    -- Length cap — matches the edit box's `SetMaxChars(MaxMessageLength)`
+    -- on the send side, so a peer that bypassed the input cap can't push
+    -- us into laying out arbitrarily long lines. UTF-8 length mirrors the
+    -- input enforcement exactly.
+    if STR_Utf8Len(msg.text) > ChatUtils.MaxMessageLength then return false end
+
+    -- Recipient must be one of the supported shapes. Without this guard,
+    -- a bare string like 'admin' or a non-string truthy value would fall
+    -- through to the `descriptor = ToStrings[to] or ToStrings.private`
+    -- fallback in `OnReceive`, letting a peer fake a "to you:" header on
+    -- what is actually a broadcast.
+    if msg.to ~= ChatModel.RecipientAll
+        and msg.to ~= ChatModel.RecipientAllies
+        and msg.to ~= 'notify'
+        and type(msg.to) ~= 'number' then
+        return false
+    end
+
+    -- Optional payloads must match the shapes the engine APIs expect.
+    -- `msg.camera` is consumed by `WorldCamera:RestoreSettings`, which
+    -- requires a `SaveSettings`-shaped table; `msg.location` is dispatched
+    -- against `Position` / `Area` keys in `OnCameraClicked`. Anything that
+    -- isn't a table would crash those handlers when the user clicks the
+    -- cam icon, so reject up front rather than crashing on click.
+    if msg.camera   ~= nil and type(msg.camera)   ~= 'table' then return false end
+    if msg.location ~= nil and type(msg.location) ~= 'table' then return false end
+
+    return true
+end
+
+--- Handler registered with `gamemain.RegisterChatFunc`. Validates the
 --- message, delegates Notify-subsystem messages, resolves the sender's army
 --- data, and appends a chat line.
----
---- Defensive against malformed input: messages that aren't tables, that
---- lack the `Chat` flag, or whose `text` isn't a string are dropped early.
---- The receive path is reachable from any gamemain `RegisterChatFunc`
---- caller — including external mods — so we can't trust the shape.
 ---@param sender string
 ---@param msg table
 function OnReceive(sender, msg)
@@ -299,17 +348,10 @@ function OnReceive(sender, msg)
         sender = 'nil sender'
     end
 
-    -- Hard shape guards: anything that isn't a populated chat-shaped
-    -- table never reaches the formatting / model writes below.
-    if type(msg) ~= 'table' then return end
-    if not msg.Chat then return end
-    if type(msg.text) ~= 'string' then return end
-
-    -- Length cap: matches the edit box's `SetMaxChars(MaxMessageLength)`
-    -- on the send side, so a peer that bypassed the input cap (mod, bug,
-    -- or hostile client) can't push us into laying out arbitrary-length
-    -- lines. UTF-8 length to mirror the input enforcement exactly.
-    if STR_Utf8Len(msg.text) > ChatUtils.MaxMessageLength then return end
+    -- Pure-shape validation: every type / length / payload-shape rule
+    -- lives in `IsValidIncomingMessage` so the dispatch logic below stays
+    -- focused on routing and rendering.
+    if not IsValidIncomingMessage(msg) then return end
 
     -- Notify routing: the Notify subsystem tags messages with `to='notify'`
     -- and owns the display decision. Only fall through to rendering a chat
@@ -322,6 +364,16 @@ function OnReceive(sender, msg)
     if not armyData and GetFocusArmy() ~= -1 and not SessionIsReplay() then
         return
     end
+
+    -- Observer-flag consistency: `msg.Observer` is set on the send side
+    -- only when the sender's `GetFocusArmy()` is -1, which means they
+    -- have no army entry in the session. A peer that ships
+    -- `Observer = true` while also resolving to a real army is malformed
+    -- — drop the message entirely. The two states are mutually exclusive
+    -- on a well-formed sender, so the inconsistency implies tampering or
+    -- a bug; "fixing" it by stripping the flag would let manipulated
+    -- traffic still render, just under a different label.
+    if msg.Observer and armyData then return end
 
     local to = msg.to
     local descriptor = ToStrings[to] or ToStrings.private
