@@ -22,6 +22,22 @@ function ToggleWindow()
 end
 
 -------------------------------------------------------------------------------
+-- Activity heartbeat
+--
+-- Every UI surface that wants to count as "user is engaged with chat" calls
+-- this — keystrokes, scrolling, recipient-picker hovers, etc. The chat
+-- window observes `model.LastActivity` to drive its idle / fade timeout, but
+-- any future subscriber (a feed-mode line fader, an away-status indicator)
+-- can read the same field without rewiring the call sites.
+
+--- Records a user / system activity event by stamping `LastActivity` with the
+--- current system time. Cheap and idempotent — call freely from anywhere
+--- that detects engagement with the chat UI.
+function NotifyActivity()
+    ChatModel.GetSingleton().LastActivity:Set(GetSystemTimeSeconds())
+end
+
+-------------------------------------------------------------------------------
 -- Recipient
 
 --- Sets the current send target.
@@ -34,13 +50,16 @@ end
 -- Messages
 
 --- Appends an entry to the history log. Called by the receive path as well as
---- by locally-echoed outgoing messages.
+--- by locally-echoed outgoing messages. Doubles as an activity heartbeat —
+--- every new line counts as engagement, so a burst of incoming chat keeps
+--- the window from auto-fading mid-conversation.
 ---@param entry UIChatEntry
 function AppendEntry(entry)
     local model = ChatModel.GetSingleton()
     local history = table.copy(model.History())
     table.insert(history, entry)
     model.History:Set(history)
+    NotifyActivity()
 end
 
 --- Appends a synthetic, local-only system line to the history. Used by the

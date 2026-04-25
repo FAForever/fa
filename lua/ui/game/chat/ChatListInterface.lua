@@ -138,6 +138,7 @@ ChatListInterface = ClassUI(Group) {
         -- Capture target in a local so each entry closes over its own value.
         local target = def.Target
         entry.BG.HandleEvent = function(bg, event)
+            ChatController.NotifyActivity()
             if event.Type == 'MouseEnter' then
                 bg:SetSolidColor('ff666666')
             elseif event.Type == 'MouseExit' then

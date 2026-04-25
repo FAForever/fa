@@ -119,7 +119,11 @@ local ChatInterface = ClassUI(Window) {
         -- CLAUDE.md for the pattern).
         local model = ChatModel.GetSingleton()
 
-        -- Window visibility → show / hide the frame.
+        -- Window visibility → show / hide the frame, gate the idle timer.
+        -- `SetNeedsFrameUpdate(true)` is what makes `OnFrame` actually fire;
+        -- toggling it with visibility avoids ticking while hidden. Showing
+        -- the window stamps `LastActivity` so the user gets a fresh full
+        -- `fade_time` window before auto-close kicks in.
         self.WindowVisibleObserver = self.Trash:Add(
             LazyVarDerive(
                 model.WindowVisible,
@@ -127,7 +131,10 @@ local ChatInterface = ClassUI(Window) {
                     if lv() then
                         self:Show()
                         self.ChatEditInterface:AcquireFocus()
+                        ChatController.NotifyActivity()
+                        self:SetNeedsFrameUpdate(true)
                     else
+                        self:SetNeedsFrameUpdate(false)
                         self.ChatEditInterface:AbandonFocus()
                         self:Hide()
                     end
@@ -301,12 +308,34 @@ local ChatInterface = ClassUI(Window) {
     end,
 
     ---------------------------------------------------------------------------
+    -- Idle / fade timer
+    ---------------------------------------------------------------------------
+
+    --- Engine-driven frame tick. Only fires while `SetNeedsFrameUpdate(true)`
+    --- is set; the visibility observer toggles that with the window so we
+    --- don't tick while hidden. The timer is fully model-driven: any caller
+    --- that wants to count as activity calls `ChatController.NotifyActivity()`
+    --- to stamp `model.LastActivity`. Once the elapsed time since that stamp
+    --- crosses `fade_time`, ask the controller to close — closing flips
+    --- `model.WindowVisible`, which in turn disables further frame ticks.
+    ---@param self UIChatInterface
+    ---@param delta number   # seconds since the last frame, unused (we read absolute time)
+    OnFrame = function(self, delta)
+        local fadeTime = ChatConfigModel.GetOptions().fade_time or 15
+        local elapsed = GetSystemTimeSeconds() - ChatModel.GetSingleton().LastActivity()
+        if elapsed >= fadeTime then
+            ChatController.CloseWindow()
+        end
+    end,
+
+    ---------------------------------------------------------------------------
     -- Window event hooks
     ---------------------------------------------------------------------------
 
     --- Fired continuously during a resize drag. Keep it cheap: just resize
     --- the pool and re-render against existing wraps.
     OnResize = function(self, width, height, firstFrame)
+        ChatController.NotifyActivity()
         self.ChatLinesInterface:OnResizeLive()
     end,
 
@@ -315,6 +344,7 @@ local ChatInterface = ClassUI(Window) {
     --- grips back to their `up` texture — the RolloverHandler leaves them
     --- on `down` when StartSizing took over.
     OnResizeSet = function(self)
+        ChatController.NotifyActivity()
         self.ChatLinesInterface:OnResizeFinished()
         self.DragTL:SetTexture(self.DragTL.textures.up)
         self.DragTR:SetTexture(self.DragTR.textures.up)
@@ -326,12 +356,14 @@ local ChatInterface = ClassUI(Window) {
     --- handler steals focus mid-move, so re-acquire it so the user can keep
     --- typing without a second click on the edit box.
     OnMoveSet = function(self)
+        ChatController.NotifyActivity()
         self.ChatEditInterface:AcquireFocus()
     end,
 
     --- Mouse wheel over the window scrolls the chat. `rotation` is in wheel
     --- units (usually ±120 per notch); one notch ≈ one line.
     OnMouseWheel = function(self, rotation)
+        ChatController.NotifyActivity()
         self.ChatLinesInterface:ScrollLines(nil, -math.floor(rotation / 100))
     end,
 

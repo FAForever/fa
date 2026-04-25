@@ -44,6 +44,7 @@ RecipientAllies = 'allies'
 ---@field History       LazyVar<UIChatEntry[]>     # append-only message log (set a new table ref to trigger dirty)
 ---@field Recipient     LazyVar<UIChatRecipient>   # current send target
 ---@field WindowVisible LazyVar<boolean>           # whether the chat window is open
+---@field LastActivity  LazyVar<number>            # `GetSystemTimeSeconds()` of the most recent user / receive activity; observed by the chat window's idle / fade timer
 
 ---@type UIChatModel | nil
 local ModelInstance = nil
@@ -55,6 +56,7 @@ function SetupSingleton()
         History       = Create({}),
         Recipient     = Create(RecipientAll),
         WindowVisible = Create(false),
+        LastActivity  = Create(GetSystemTimeSeconds()),
     }
     return ModelInstance
 end
@@ -78,6 +80,7 @@ function __moduleinfo.OnReload(newModule)
         handle.History:Set(ModelInstance.History())
         handle.Recipient:Set(ModelInstance.Recipient())
         handle.WindowVisible:Set(ModelInstance.WindowVisible())
+        handle.LastActivity:Set(ModelInstance.LastActivity())
     end
 end
 

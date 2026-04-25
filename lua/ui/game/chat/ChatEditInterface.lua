@@ -112,6 +112,7 @@ ChatEditInterface = ClassUI(Group) {
         -- the legacy `chat.lua` shortcut where Enter serves as both "send"
         -- and "dismiss" depending on whether there's anything to send.
         self.EditBox.OnEnterPressed = function(edit, text)
+            ChatController.NotifyActivity()
             if text and text ~= '' then
                 ChatController.Send(text, self.CamCheckbox:IsChecked())
                 edit:SetText('')
@@ -125,6 +126,7 @@ ChatEditInterface = ClassUI(Group) {
         -- any in-flight Tab-completion cycle whenever the text changes from
         -- something other than our own `ApplyCompletion` call.
         self.EditBox.OnTextChanged = function(_, newText, _)
+            ChatController.NotifyActivity()
             self:RefreshCommandHint(newText or '')
             if not self.SuppressCompletionReset then
                 self.Completion = nil
@@ -166,6 +168,7 @@ ChatEditInterface = ClassUI(Group) {
         -- Lazy import of ChatInterface avoids the import cycle: ChatInterface
         -- imports this module at load time, so the reverse edge has to defer.
         self.EditBox.OnNonTextKeyPressed = function(_, keycode, modifiers)
+            ChatController.NotifyActivity()
             local step = modifiers and modifiers.Shift and 1 or 10
             if keycode == UIUtil.VK_PRIOR then
                 import("/lua/ui/game/chat/ChatInterface.lua").ScrollLines(-step)

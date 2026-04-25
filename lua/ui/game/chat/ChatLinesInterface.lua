@@ -8,6 +8,7 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local ChatLineInterface = import("/lua/ui/game/chat/ChatLineInterface.lua").ChatLineInterface
 
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
+local ChatController = import("/lua/ui/game/chat/ChatController.lua")
 local ChatConfigModel = import("/lua/ui/game/chat/config/ChatConfigModel.lua")
 
 local MauiWrapText = import("/lua/maui/text.lua").WrapText
@@ -387,6 +388,7 @@ ChatLinesInterface = ClassUI(Group) {
     ---@param axis string
     ---@param top number
     ScrollSetTop = function(self, axis, top)
+        ChatController.NotifyActivity()
         top = math.floor(top or 1)
         local poolSize = table.getn(self.ChatLineInterfaces)
         local maxTop = math.max(1, self.VirtualSize - poolSize + 1)
