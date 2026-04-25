@@ -79,7 +79,6 @@ local DefaultRect = { Left = 8, Top = 460, Right = 430, Bottom = 720 }
 ---@field Scrollbar      Scrollbar
 ---@field ScrollTop      number    # 1-based virtual position of the top visible row
 ---@field VirtualSize    number    # total wrapped lines across valid entries
----@field FontSize              number                       # current font size (from ChatOptions.font_size)
 ---@field DragTL                Bitmap                        # top-left corner resize grip
 ---@field DragTR                Bitmap                        # top-right corner resize grip
 ---@field DragBL                Bitmap                        # bottom-left corner resize grip
@@ -116,7 +115,6 @@ local ChatInterface = ClassUI(Window) {
         self.Lines       = {}
         self.ScrollTop   = 1
         self.VirtualSize = 0
-        self.FontSize    = ChatConfigModel.GetSingleton().Committed().font_size or 14
 
         -- Expose the scrollable interface on the container so
         -- `UIUtil.CreateVertScrollbarFor(LinesContainer)` binds correctly.
@@ -174,7 +172,6 @@ local ChatInterface = ClassUI(Window) {
         -- our handler can never stomp another subscriber's (see the chat
         -- CLAUDE.md for the pattern).
         local model = ChatModel.GetSingleton()
-        local configModel = ChatConfigModel.GetSingleton()
 
         -- History → wrap new entries, refresh size, stick to bottom. The
         -- initial firing happens before __post_init so the wrap call has
@@ -190,18 +187,10 @@ local ChatInterface = ClassUI(Window) {
             )
         )
 
-        -- Committed chat options → apply font size, rebuild the pool (line
-        -- height tracks the font), rewrap all entries (wrap widths depend
-        -- on font metrics), and re-render.
-        self.OptionsObserver = self.Trash:Add(
-            LazyVarDerive(
-                configModel.Committed,
-                function(lv)
-                    self:ApplyOptions(lv()
-                    )
-                end
-            )
-        )
+        -- `OptionsObserver` is wired up in `__post_init`, not here — its
+        -- initial fire triggers `ApplyOptions → RebuildPool`, which reads
+        -- `self.Lines[1].Height()` and so requires the container layout to
+        -- already be in place.
 
         -- Window visibility → show / hide the frame.
         self.WindowVisibleObserver = self.Trash:Add(
@@ -361,6 +350,21 @@ local ChatInterface = ClassUI(Window) {
         self:RebuildPool()
         self:RewrapAll()
         self:ScrollToBottom()
+
+        -- Committed chat options → apply font size, rebuild the pool (line
+        -- height tracks the font), rewrap all entries (wrap widths depend
+        -- on font metrics), and re-render. Wired here rather than in
+        -- `__init` so the initial fire of `LazyVarDerive` runs against a
+        -- fully laid-out window — `RebuildPool` reads `self.Lines[1].Height`
+        -- and gets a circular dependency error if the layout isn't ready.
+        self.OptionsObserver = self.Trash:Add(
+            LazyVarDerive(
+                ChatConfigModel.GetSingleton().Committed,
+                function(lv)
+                    self:ApplyOptions(lv())
+                end
+            )
+        )
     end,
 
     ---------------------------------------------------------------------------
@@ -374,12 +378,15 @@ local ChatInterface = ClassUI(Window) {
     ---@param self UIChatInterface
     RebuildPool = function(self)
         local container = self.LinesContainer
+        -- Read the live size straight from the config model so the pool
+        -- always tracks the current option without a cached copy on `self`.
+        local fontSize = ChatConfigModel.GetSingleton().Committed().font_size or 14
 
         -- Need one line to establish the row height. The row's Height is a
         -- lazy function of the name-text font (see ChatLineInterface).
         if not self.Lines[1] then
             self.Lines[1] = ChatLineInterface(container)
-            self.Lines[1]:SetFontSize(self.FontSize)
+            self.Lines[1]:SetFontSize(fontSize)
             self.Lines[1].OnNameClicked = self.OnLineNameClicked
             self.Lines[1].OnCameraClicked = self.OnLineCameraClicked
             Layouter(self.Lines[1])
@@ -397,7 +404,7 @@ local ChatInterface = ClassUI(Window) {
         -- Grow: append rows below the previous one.
         for i = currentCount + 1, neededLines do
             self.Lines[i] = ChatLineInterface(container)
-            self.Lines[i]:SetFontSize(self.FontSize)
+            self.Lines[i]:SetFontSize(fontSize)
             self.Lines[i].OnNameClicked = self.OnLineNameClicked
             self.Lines[i].OnCameraClicked = self.OnLineCameraClicked
             Layouter(self.Lines[i])
@@ -418,27 +425,33 @@ local ChatInterface = ClassUI(Window) {
     -- Options application
     ---------------------------------------------------------------------------
 
-    --- Applies a `UIChatOptions` snapshot to the window. Currently handles
-    --- `font_size`; future options (colours, alpha, feed-mode flags) will
+    --- Applies a `UIChatOptions` snapshot to the window. Handles `font_size`
+    --- and `win_alpha` today; future options (colours, feed-mode flags) will
     --- extend this method.
+    ---
+    --- The model is the source of truth — we don't cache any of these values
+    --- on `self`. `ApplyOptions` only fires when the user commits a config
+    --- change (or once on startup when the observer first reads), so doing
+    --- the work unconditionally is fine even if some values didn't move.
     ---@param self UIChatInterface
     ---@param options UIChatOptions
     ApplyOptions = function(self, options)
         local size = options.font_size or 14
-        if size ~= self.FontSize then
-            self.FontSize = size
-            for _, line in ipairs(self.Lines) do
-                line:SetFontSize(size)
-            end
-            -- Row height tracks the font, so the pool may need resizing;
-            -- wrap widths depend on font metrics, so rewrap all entries.
-            self:RebuildPool()
-            self:RewrapAll()
+        for _, line in ipairs(self.Lines) do
+            line:SetFontSize(size)
         end
+        -- Row height tracks the font, so the pool may need resizing;
+        -- wrap widths depend on font metrics, so rewrap all entries.
+        self:RebuildPool()
+        self:RewrapAll()
 
-        -- Filter-affecting options (muted, links) may have changed without
-        -- touching the font. Recompute what's visible so entries newly
-        -- excluded by `IsValidEntry` drop out of the feed immediately.
+        -- Window opacity. `SetAlpha(_, true)` cascades to every descendant
+        -- so chrome, lines, edit, and scrollbar all dim uniformly.
+        self:SetAlpha(options.win_alpha or 1.0, true)
+
+        -- Filter-affecting options (muted, links) may have changed too.
+        -- Recompute what's visible so entries newly excluded by
+        -- `IsValidEntry` drop out of the feed immediately.
         self:RefreshVirtualSize()
         self:CalcVisible()
     end,
