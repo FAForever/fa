@@ -18,7 +18,7 @@ This keeps the controller focused on displayable messages and preserves the old 
 
 Legacy `ChatPageDown(mod)` had a quirk: pressing it when the feed was already scrolled to the bottom (or the window was hidden) would toggle the window. The new [`ChatInterface.OpenAndScrollLines`](ChatInterface.lua) keybind entry-point opens-then-scrolls; `PgDn` on an already-open, already-bottom window now does nothing.
 
-Closing is still reachable via the close button, the `Escape` key on an empty edit box, and the `chat_window` keybind.
+Closing is still reachable via the close button, the `Escape` key on an empty edit box, and the `debug_chat_window` keybind.
 
 ---
 
