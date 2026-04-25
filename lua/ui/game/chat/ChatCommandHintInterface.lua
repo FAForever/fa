@@ -13,7 +13,17 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 local RowFontSize = 12
 local RowFontName = 'Arial'
 local HorizontalPadding = 12
-local VerticalPadding  = 2
+local VerticalPadding   = 2
+
+--- Cap the popup height: at most this many command rows are visible at
+--- once; anything beyond scrolls. Chosen to match the point where the
+--- popup becomes visually overwhelming on a 1080p screen.
+local MaxVisibleRows = 6
+
+--- Width reserved on the right of the popup for the scrollbar. Reserved
+--- unconditionally so the layout doesn't reflow when the scrollbar shows
+--- / hides with the match count.
+local ScrollbarWidth = 24
 
 --- Renders a command the same way `/help` does: name, params, aliases, description.
 ---@param cmd UIChatCommand
@@ -54,9 +64,11 @@ end
 ---@field OnSelect?    fun(cmd: UIChatCommand)
 ---@field Rows         UIChatHintRow[]        # reusable pool, indexed by ordinal
 ---@field Background   Bitmap                 # solid backdrop covering the whole popup
+---@field Scrollbar    Scrollbar              # vertical scrollbar shown when VisibleCount > MaxVisibleRows
 ---@field RowHeight    LazyVar<number>
 ---@field VisibleCount LazyVar<number>
 ---@field Selected     LazyVar<number>        # 0 = no selection, 1..VisibleCount = row ordinal
+---@field ScrollBottom LazyVar<number>        # 1-based ordinal at the bottom visible slot
 ---@field LastText     string
 ---@field LTBG Bitmap
 ---@field RTBG Bitmap
@@ -81,6 +93,7 @@ ChatCommandHintInterface = ClassUI(Group) {
         self.LastText = ''
         self.VisibleCount = Create(0)
         self.Selected = Create(0)
+        self.ScrollBottom = Create(1)
 
         -- Solid backdrop so the tiny per-row highlight bitmaps (which only
         -- span Text.Top-1..Text.Bottom+1) don't leave visible gaps between
@@ -118,6 +131,10 @@ ChatCommandHintInterface = ClassUI(Group) {
         -- Repaint highlighted rows when the selection moves. We own `Selected`
         -- so binding its OnDirty directly is safe (see CLAUDE.md §LazyVar).
         self.Selected.OnDirty = function() self:RepaintRows() end
+
+        -- Scroll changes: re-hide/show rows so only the current window is
+        -- visible. We own `ScrollBottom`, so direct OnDirty is safe.
+        self.ScrollBottom.OnDirty = function() self:UpdateRowVisibility() end
     end,
 
     ---@param self UIChatCommandHintInterface
@@ -138,13 +155,16 @@ ChatCommandHintInterface = ClassUI(Group) {
         local textWidth = probe.Width()
         probe:Destroy()
 
+        -- Reserve scrollbar width unconditionally so the popup doesn't
+        -- reflow when the scrollbar appears / disappears with match count.
         Layouter(self)
-            :Width(textWidth + HorizontalPadding * 2)
+            :Width(textWidth + HorizontalPadding * 2 + ScrollbarWidth)
             :End()
 
         ---@diagnostic disable: undefined-field
         self.Height:SetFunction(function()
-            return self.VisibleCount() * self.RowHeight()
+            local rows = math.min(self.VisibleCount(), MaxVisibleRows)
+            return rows * self.RowHeight()
         end)
 
         -- Unified backdrop covers the entire popup. Rows are transparent by
@@ -166,6 +186,27 @@ ChatCommandHintInterface = ClassUI(Group) {
         Layouter(self.TBG):Left(self.Left):Right(self.Right):Bottom(self.Top):End()
         Layouter(self.BBG):Left(self.Left):Right(self.Right):Top(self.Bottom):End()
         ---@diagnostic enable: undefined-field
+
+        -- Vertical scrollbar along the right edge. `CreateVertScrollbarFor`
+        -- calls `scrollbar:SetScrollable(self)`, which drives dispatch into
+        -- `self:GetScrollValues` / `ScrollLines` / `ScrollPages` /
+        -- `ScrollSetTop` / `IsScrollable` (see below). A negative
+        -- `offset_right` pulls the bar inside the popup bounds instead of
+        -- overlapping the right border art.
+        self.Scrollbar = UIUtil.CreateVertScrollbarFor(self, -ScrollbarWidth)
+
+        -- Toggle the scrollbar visibility with match count. `Hide()` here is
+        -- safe — the hint popup is created fresh each time the user types
+        -- `/`, so the Show() cascade on the outer chat window can't undo it.
+        local function syncScrollbarVisibility()
+            if self.VisibleCount() > MaxVisibleRows then
+                self.Scrollbar:Show()
+            else
+                self.Scrollbar:Hide()
+            end
+        end
+        self.VisibleCount.OnDirty = function() syncScrollbarVisibility() end
+        syncScrollbarVisibility()
     end,
 
     --- Builds a reusable row (text + highlight bitmap + hover handler).
@@ -224,24 +265,132 @@ ChatCommandHintInterface = ClassUI(Group) {
         end
     end,
 
+    --- Shows rows whose ordinal falls inside the current scroll window and
+    --- hides the rest. Rebound on `ScrollBottom` changes and called from
+    --- Refresh after the row set has been updated.
+    ---@param self UIChatCommandHintInterface
+    UpdateRowVisibility = function(self)
+        local scrollBottom = self.ScrollBottom()
+        for ord, row in pairs(self.Rows) do
+            local inWindow = row.Ordinal() > 0
+                and ord >= scrollBottom
+                and ord < scrollBottom + MaxVisibleRows
+            if inWindow then
+                row.Text:Show()
+                row.BG:Show()
+            else
+                row.Text:Hide()
+                row.BG:Hide()
+            end
+        end
+    end,
+
+    --- Scrolls so `ordinal` falls inside the visible window. Called from
+    --- `SelectNext` / `SelectPrev` so keyboard navigation drags the scroll
+    --- along with the highlight.
+    ---@param self UIChatCommandHintInterface
+    ---@param ordinal number
+    EnsureOrdinalVisible = function(self, ordinal)
+        if ordinal <= 0 then return end
+        local scrollBottom = self.ScrollBottom()
+        if ordinal < scrollBottom then
+            self.ScrollBottom:Set(ordinal)
+        elseif ordinal >= scrollBottom + MaxVisibleRows then
+            self.ScrollBottom:Set(ordinal - MaxVisibleRows + 1)
+        end
+    end,
+
+    -------------------------------------------------------------------------
+    -- Scrollable interface — wired to by the MAUI `Scrollbar` control.
+    --
+    -- The scrollbar thinks top-down (thumb at top = top of content), but our
+    -- ordinals grow bottom-up (ord 1 at the bottom of the popup, ord N at
+    -- the top). We convert at the boundary so the thumb tracks visually:
+    -- thumb at top → highest ordinals visible at top of popup.
+    --
+    --   topdown_top = n - ScrollBottom - MaxVisibleRows + 2
+    --   ScrollBottom = n - topdown_top - MaxVisibleRows + 2   (inverse)
+    -------------------------------------------------------------------------
+
+    ---@param self UIChatCommandHintInterface
+    ---@param axis string
+    GetScrollValues = function(self, axis)
+        local n = self.VisibleCount()
+        if n <= 0 then return 1, 1, 1, 1 end
+        local top = n - self.ScrollBottom() - MaxVisibleRows + 2
+        if top < 1 then top = 1 end
+        return 1, n, top, math.min(top + MaxVisibleRows - 1, n)
+    end,
+
+    ---@param self UIChatCommandHintInterface
+    ---@param axis string
+    ---@param delta number
+    ScrollLines = function(self, axis, delta)
+        local _, _, top, _ = self:GetScrollValues(axis)
+        self:ScrollSetTop(axis, top + math.floor(delta))
+    end,
+
+    ---@param self UIChatCommandHintInterface
+    ---@param axis string
+    ---@param delta number
+    ScrollPages = function(self, axis, delta)
+        local _, _, top, _ = self:GetScrollValues(axis)
+        self:ScrollSetTop(axis, top + math.floor(delta) * MaxVisibleRows)
+    end,
+
+    ---@param self UIChatCommandHintInterface
+    ---@param axis string
+    ---@param top number   # in scrollbar (top-down) coordinates
+    ScrollSetTop = function(self, axis, top)
+        local n = self.VisibleCount()
+        if n <= 0 then return end
+        local maxTop = math.max(1, n - MaxVisibleRows + 1)
+        top = math.max(1, math.min(maxTop, math.floor(top or 1)))
+        local newScrollBottom = n - top - MaxVisibleRows + 2
+        newScrollBottom = math.max(1, math.min(maxTop, newScrollBottom))
+        if newScrollBottom ~= self.ScrollBottom() then
+            self.ScrollBottom:Set(newScrollBottom)
+        end
+    end,
+
+    ---@param self UIChatCommandHintInterface
+    ---@param axis string
+    IsScrollable = function(self, axis)
+        return self.VisibleCount() > MaxVisibleRows
+    end,
+
+    --- Mouse wheel over the popup scrolls the visible window. One notch
+    --- (~120 wheel units) moves one row.
+    ---@param self UIChatCommandHintInterface
+    ---@param rotation number
+    OnMouseWheel = function(self, rotation)
+        self:ScrollLines(nil, -math.floor(rotation / 100))
+    end,
+
     --- Wraps `Selected` to the next visible dynamic row. No-op when there
-    --- are no matches.
+    --- are no matches. Scrolls the view so the new selection stays on
+    --- screen, matching keyboard-nav expectations.
     ---@param self UIChatCommandHintInterface
     SelectNext = function(self)
         local n = self.VisibleCount()
         if n <= 0 then return end
         local cur = self.Selected()
-        self.Selected:Set(cur >= n and 1 or cur + 1)
+        local next = cur >= n and 1 or cur + 1
+        self.Selected:Set(next)
+        self:EnsureOrdinalVisible(next)
     end,
 
     --- Wraps `Selected` to the previous visible dynamic row. No-op when
-    --- there are no matches.
+    --- there are no matches. Scrolls the view so the new selection stays
+    --- on screen.
     ---@param self UIChatCommandHintInterface
     SelectPrev = function(self)
         local n = self.VisibleCount()
         if n <= 0 then return end
         local cur = self.Selected()
-        self.Selected:Set(cur <= 1 and n or cur - 1)
+        local prev = cur <= 1 and n or cur - 1
+        self.Selected:Set(prev)
+        self:EnsureOrdinalVisible(prev)
     end,
 
     --- Returns the currently-selected command, or nil when nothing matches.
@@ -271,7 +420,12 @@ ChatCommandHintInterface = ClassUI(Group) {
         row.Text.Bottom:SetFunction(function()
             local ord = row.Ordinal()
             if ord <= 0 then return self.Top() end
-            return self.Bottom() - (ord - 1) * self.RowHeight()
+            -- `slot` = 1 at the bottom visible row, MaxVisibleRows at the
+            -- top. Rows outside the window get positioned at `self.Top()`
+            -- and hidden by `UpdateRowVisibility`.
+            local slot = ord - self.ScrollBottom() + 1
+            if slot < 1 or slot > MaxVisibleRows then return self.Top() end
+            return self.Bottom() - (slot - 1) * self.RowHeight()
         end)
         ---@diagnostic enable: undefined-field
 
@@ -316,19 +470,20 @@ ChatCommandHintInterface = ClassUI(Group) {
             local row = self:GetOrCreateRow(i)
             row.Target = cmd
             row.Text:SetText(FormatCommand(cmd))
-            row.Text:Show()
-            row.BG:Show()
             row.Ordinal:Set(i)
         end
         for i = table.getn(matches) + 1, table.getn(self.Rows) do
             local row = self.Rows[i]
             row.Target = nil
-            row.Text:Hide()
-            row.BG:Hide()
             row.Ordinal:Set(0)
         end
 
         self.VisibleCount:Set(table.getn(matches))
+
+        -- Any time the match set changes, start the scroll window at the
+        -- bottom. `UpdateRowVisibility` below applies Show/Hide using the
+        -- fresh window.
+        self.ScrollBottom:Set(1)
 
         -- Keep the previously-selected ordinal when possible; otherwise land
         -- on the first match (or clear the selection when nothing matches).
@@ -343,6 +498,8 @@ ChatCommandHintInterface = ClassUI(Group) {
             -- force a repaint so colors match the new row assignments.
             self:RepaintRows()
         end
+
+        self:UpdateRowVisibility()
         ---@diagnostic enable: undefined-field
     end,
 
