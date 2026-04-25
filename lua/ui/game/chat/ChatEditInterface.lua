@@ -180,6 +180,44 @@ ChatEditInterface = ClassUI(Group) {
         end))
     end,
 
+    ---@param self UIChatEditInterface
+    ---@param parent Control
+    __post_init = function(self, parent)
+        Layouter(self.ChatBubble)
+            :AtLeftIn(self, 3)
+            :AtVerticalCenterIn(self)
+            :End()
+
+        Layouter(self.RecipientLabel)
+            :AnchorToRight(self.ChatBubble, 2)
+            :AtVerticalCenterIn(self)
+            :End()
+
+        -- Camera-attach toggle pinned to the right edge so the edit box can
+        -- claim the remaining width.
+        Layouter(self.CamCheckbox)
+            :AtRightIn(self, 4)
+            :AtVerticalCenterIn(self)
+            :End()
+
+        Layouter(self.EditBox)
+            :AnchorToRight(self.RecipientLabel, 4)
+            :AnchorToLeft(self.CamCheckbox, 4)
+            :AtVerticalCenterIn(self)
+            :Height(function() return self.EditBox:GetFontHeight() end)
+            :End()
+
+        -- The group sizes itself to the edit's font height plus a scaled
+        -- padding so the bitmap-sized children (chat bubble, camera button)
+        -- have visual breathing room around the text. Without the pad, at
+        -- higher UI scales `self.Height == EditBox.Height` and the buttons
+        -- end up flush against the edit baseline, looking shifted down.
+        local heightPadScaled = LayoutHelpers.ScaleNumber(6)
+        Layouter(self)
+            :Height(function() return self.EditBox.Height() + heightPadScaled end)
+            :End()
+    end,
+
     --- Entry point for the Tab key. When the command hint is open, Tab
     --- commits the currently-selected command into the edit box (mirroring
     --- a click on the hint row). Otherwise it runs the in-box completion
@@ -292,44 +330,6 @@ ChatEditInterface = ClassUI(Group) {
         local hint = self.CommandHint --[[@as UIChatCommandHintInterface]]
         self.CommandHint = nil
         hint:Destroy()
-    end,
-
-    ---@param self UIChatEditInterface
-    ---@param parent Control
-    __post_init = function(self, parent)
-        Layouter(self.ChatBubble)
-            :AtLeftIn(self, 3)
-            :AtVerticalCenterIn(self)
-            :End()
-
-        Layouter(self.RecipientLabel)
-            :AnchorToRight(self.ChatBubble, 2)
-            :AtVerticalCenterIn(self)
-            :End()
-
-        -- Camera-attach toggle pinned to the right edge so the edit box can
-        -- claim the remaining width.
-        Layouter(self.CamCheckbox)
-            :AtRightIn(self, 4)
-            :AtVerticalCenterIn(self)
-            :End()
-
-        Layouter(self.EditBox)
-            :AnchorToRight(self.RecipientLabel, 4)
-            :AnchorToLeft(self.CamCheckbox, 4)
-            :AtVerticalCenterIn(self)
-            :Height(function() return self.EditBox:GetFontHeight() end)
-            :End()
-
-        -- The group sizes itself to the edit's font height plus a scaled
-        -- padding so the bitmap-sized children (chat bubble, camera button)
-        -- have visual breathing room around the text. Without the pad, at
-        -- higher UI scales `self.Height == EditBox.Height` and the buttons
-        -- end up flush against the edit baseline, looking shifted down.
-        local heightPadScaled = LayoutHelpers.ScaleNumber(6)
-        Layouter(self)
-            :Height(function() return self.EditBox.Height() + heightPadScaled end)
-            :End()
     end,
 
     --- Opens the recipient picker popup, or closes it if it is already open.
