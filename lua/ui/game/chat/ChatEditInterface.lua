@@ -36,8 +36,8 @@ local MaxChars = 200
 ---@field RecipientLabel    Text
 ---@field EditBox           Edit
 ---@field CamCheckbox       Checkbox                          # toggle: attach world-camera state to the next message
----@field ChatList          UIChatListInterface | nil
----@field CommandHint       UIChatCommandHintInterface | nil
+---@field ChatListInterface UIChatListInterface | nil
+---@field ChatCommandHintInterface UIChatCommandHintInterface | nil
 ---@field RecipientObserver LazyVar<UIChatRecipient>          # derived from ChatModel.Recipient
 ---@field Completion        UIChatCompletion | nil            # active Tab-cycle record, reset on text change
 ---@field SuppressCompletionReset boolean                     # true while our own SetText is running
@@ -149,7 +149,7 @@ ChatEditInterface = ClassUI(Group) {
         -- Escape priorities: (1) close an open command hint, (2) clear any
         -- text, (3) close the chat window.
         self.EditBox.OnEscPressed = function(_, text)
-            if self.CommandHint then
+            if self.ChatCommandHintInterface then
                 self:CloseCommandHint()
                 return true
             end
@@ -171,10 +171,10 @@ ChatEditInterface = ClassUI(Group) {
                 import("/lua/ui/game/chat/ChatInterface.lua").ScrollLines(-step)
             elseif keycode == UIUtil.VK_NEXT then
                 import("/lua/ui/game/chat/ChatInterface.lua").ScrollLines(step)
-            elseif keycode == UIUtil.VK_UP and self.CommandHint then
-                self.CommandHint:SelectNext()
-            elseif keycode == UIUtil.VK_DOWN and self.CommandHint then
-                self.CommandHint:SelectPrev()
+            elseif keycode == UIUtil.VK_UP and self.ChatCommandHintInterface then
+                self.ChatCommandHintInterface:SelectNext()
+            elseif keycode == UIUtil.VK_DOWN and self.ChatCommandHintInterface then
+                self.ChatCommandHintInterface:SelectPrev()
             end
         end
 
@@ -239,8 +239,8 @@ ChatEditInterface = ClassUI(Group) {
     --- complete so the user isn't left wondering whether the key was handled.
     ---@param self UIChatEditInterface
     HandleTabCompletion = function(self)
-        if self.CommandHint then
-            local hint = self.CommandHint --[[@as UIChatCommandHintInterface]]
+        if self.ChatCommandHintInterface then
+            local hint = self.ChatCommandHintInterface --[[@as UIChatCommandHintInterface]]
             local cmd = hint:GetSelected()
             if cmd then
                 self.EditBox:SetText('/' .. cmd.Name .. ' ')
@@ -305,29 +305,29 @@ ChatEditInterface = ClassUI(Group) {
     ---@param self UIChatEditInterface
     ---@param text string
     RefreshCommandHint = function(self, text)
-        if self.CommandHint then
+        if self.ChatCommandHintInterface then
             if string.sub(text, 1, 1) == '/' then
-                self.CommandHint:Refresh(text)
+                self.ChatCommandHintInterface:Refresh(text)
             else
                 self:CloseCommandHint()
             end
         elseif text == '/' then
             self:OpenCommandHint()
-            self.CommandHint:Refresh(text)
+            self.ChatCommandHintInterface:Refresh(text)
         end
     end,
 
     --- Creates the hint popup and anchors it directly above the edit box.
     ---@param self UIChatEditInterface
     OpenCommandHint = function(self)
-        if self.CommandHint then return end
+        if self.ChatCommandHintInterface then return end
 
         -- Ensure the built-ins exist before the hint queries the registry;
         -- otherwise we'd only see the footer fallback on the first open.
         ChatController.RegisterBuiltinCommands()
 
         local hint = ChatCommandHintInterface(self, self.EditBox)
-        self.CommandHint = hint
+        self.ChatCommandHintInterface = hint
         LayoutHelpers.Above(hint, self.EditBox, 14)
         LayoutHelpers.AtLeftIn(hint, self.EditBox)
         hint:SetOnSelect(function(cmd)
@@ -340,29 +340,29 @@ ChatEditInterface = ClassUI(Group) {
     --- message, clears the prefix, or otherwise leaves command-entry mode.
     ---@param self UIChatEditInterface
     CloseCommandHint = function(self)
-        if not self.CommandHint then return end
-        local hint = self.CommandHint --[[@as UIChatCommandHintInterface]]
-        self.CommandHint = nil
+        if not self.ChatCommandHintInterface then return end
+        local hint = self.ChatCommandHintInterface --[[@as UIChatCommandHintInterface]]
+        self.ChatCommandHintInterface = nil
         hint:Destroy()
     end,
 
     --- Opens the recipient picker popup, or closes it if it is already open.
     ---@param self UIChatEditInterface
     ToggleList = function(self)
-        if self.ChatList then
-            local list = self.ChatList --[[@as UIChatListInterface]]
-            self.ChatList = nil
+        if self.ChatListInterface then
+            local list = self.ChatListInterface --[[@as UIChatListInterface]]
+            self.ChatListInterface = nil
             list:Destroy()
             self:AcquireFocus()
         else
             local list = ChatListInterface(self)
-            self.ChatList = list
+            self.ChatListInterface = list
             -- Position the popup above-left of the chat-bubble button.
             -- Depth is handled by the list itself (see ChatListInterface.__init).
             LayoutHelpers.Above(list, self.ChatBubble, 15)
             LayoutHelpers.AtLeftIn(list, self.ChatBubble, 15)
             list:SetOnClosed(function()
-                self.ChatList = nil
+                self.ChatListInterface = nil
                 self:AcquireFocus()
             end)
         end

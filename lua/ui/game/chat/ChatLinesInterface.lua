@@ -56,7 +56,7 @@ local ScrollbarReserve = 32
 ---@field Trash             TrashBag                            # owns every subscription-LazyVar we create
 ---@field Pool              Group                               # inner group hosting the line rows
 ---@field Scrollbar         Scrollbar
----@field Lines             UIChatLineInterface[]
+---@field ChatLineInterfaces UIChatLineInterface[]
 ---@field ScrollTop         number    # 1-based virtual position of the top visible row
 ---@field VirtualSize       number    # total wrapped lines across valid entries
 ---@field HistoryObserver   LazyVar<UIChatEntry[]>
@@ -74,7 +74,7 @@ ChatLinesInterface = ClassUI(Group) {
         Group.__init(self, parent, "ChatLinesInterface")
 
         self.Trash = TrashBag()
-        self.Lines = {}
+        self.ChatLineInterfaces = {}
         self.ScrollTop = 1
         self.VirtualSize = 0
 
@@ -135,7 +135,7 @@ ChatLinesInterface = ClassUI(Group) {
 
         -- `OptionsObserver` is wired in `__post_init`, not here — its
         -- initial fire triggers `ApplyOptions → RebuildPool`, which reads
-        -- `self.Lines[1].Height()` and so requires the pool layout to
+        -- `self.ChatLineInterfaces[1].Height()` and so requires the pool layout to
         -- already be in place.
     end,
 
@@ -205,31 +205,31 @@ ChatLinesInterface = ClassUI(Group) {
 
         -- Need one line to establish the row height. The row's `Height` is
         -- a lazy function of the name-text font (see `ChatLineInterface`).
-        if not self.Lines[1] then
-            self.Lines[1] = ChatLineInterface(pool)
-            self.Lines[1]:SetFontSize(fontSize)
-            self.Lines[1].OnNameClicked   = self.LineNameClicked
-            self.Lines[1].OnCameraClicked = self.LineCameraClicked
-            Layouter(self.Lines[1])
+        if not self.ChatLineInterfaces[1] then
+            self.ChatLineInterfaces[1] = ChatLineInterface(pool)
+            self.ChatLineInterfaces[1]:SetFontSize(fontSize)
+            self.ChatLineInterfaces[1].OnNameClicked   = self.LineNameClicked
+            self.ChatLineInterfaces[1].OnCameraClicked = self.LineCameraClicked
+            Layouter(self.ChatLineInterfaces[1])
                 :AtLeftTopIn(pool)
                 :Right(pool.Right)
                 :End()
         end
 
-        local rowHeight = self.Lines[1].Height()
+        local rowHeight = self.ChatLineInterfaces[1].Height()
         if rowHeight < 1 then rowHeight = 18 end -- safety fallback
 
         local neededLines = math.max(1, math.floor(pool.Height() / rowHeight))
-        local currentCount = table.getn(self.Lines)
+        local currentCount = table.getn(self.ChatLineInterfaces)
 
         -- Grow: append rows below the previous one.
         for i = currentCount + 1, neededLines do
-            self.Lines[i] = ChatLineInterface(pool)
-            self.Lines[i]:SetFontSize(fontSize)
-            self.Lines[i].OnNameClicked   = self.LineNameClicked
-            self.Lines[i].OnCameraClicked = self.LineCameraClicked
-            Layouter(self.Lines[i])
-                :Below(self.Lines[i - 1])
+            self.ChatLineInterfaces[i] = ChatLineInterface(pool)
+            self.ChatLineInterfaces[i]:SetFontSize(fontSize)
+            self.ChatLineInterfaces[i].OnNameClicked   = self.LineNameClicked
+            self.ChatLineInterfaces[i].OnCameraClicked = self.LineCameraClicked
+            Layouter(self.ChatLineInterfaces[i])
+                :Below(self.ChatLineInterfaces[i - 1])
                 :AtLeftIn(pool)
                 :Right(pool.Right)
                 :End()
@@ -237,8 +237,8 @@ ChatLinesInterface = ClassUI(Group) {
 
         -- Shrink: destroy the surplus tail.
         for i = currentCount, neededLines + 1, -1 do
-            self.Lines[i]:Destroy()
-            self.Lines[i] = nil
+            self.ChatLineInterfaces[i]:Destroy()
+            self.ChatLineInterfaces[i] = nil
         end
     end,
 
@@ -256,7 +256,7 @@ ChatLinesInterface = ClassUI(Group) {
     ---@param options UIChatOptions
     ApplyOptions = function(self, options)
         local size = options.font_size or 14
-        for _, line in ipairs(self.Lines) do
+        for _, line in ipairs(self.ChatLineInterfaces) do
             line:SetFontSize(size)
         end
         -- Row height tracks the font, so the pool may need resizing;
@@ -282,7 +282,7 @@ ChatLinesInterface = ClassUI(Group) {
     ---@param self UIChatLinesInterface
     ---@param entry UIChatEntry
     WrapEntry = function(self, entry)
-        local measureLine = self.Lines[1]
+        local measureLine = self.ChatLineInterfaces[1]
         if not measureLine then
             entry.WrappedText = { entry.Text or '' }
             return
@@ -359,7 +359,7 @@ ChatLinesInterface = ClassUI(Group) {
     ---@param self UIChatLinesInterface
     ---@param axis string  # "Vert" or "Horz"
     GetScrollValues = function(self, axis)
-        local poolSize = table.getn(self.Lines)
+        local poolSize = table.getn(self.ChatLineInterfaces)
         local top = self.ScrollTop
         return 1, self.VirtualSize, top, math.min(top + poolSize, self.VirtualSize)
     end,
@@ -377,7 +377,7 @@ ChatLinesInterface = ClassUI(Group) {
     ---@param axis string
     ---@param delta number
     ScrollPages = function(self, axis, delta)
-        self:ScrollSetTop(axis, self.ScrollTop + math.floor(delta) * table.getn(self.Lines))
+        self:ScrollSetTop(axis, self.ScrollTop + math.floor(delta) * table.getn(self.ChatLineInterfaces))
     end,
 
     --- Jumps to an absolute virtual position, clamped to the valid range.
@@ -388,7 +388,7 @@ ChatLinesInterface = ClassUI(Group) {
     ---@param top number
     ScrollSetTop = function(self, axis, top)
         top = math.floor(top or 1)
-        local poolSize = table.getn(self.Lines)
+        local poolSize = table.getn(self.ChatLineInterfaces)
         local maxTop = math.max(1, self.VirtualSize - poolSize + 1)
         local clamped = math.max(1, math.min(maxTop, top))
         if clamped == self.ScrollTop then return end
@@ -423,11 +423,11 @@ ChatLinesInterface = ClassUI(Group) {
     --- first wrapped line of an entry and `SetContinuation` for the rest.
     ---@param self UIChatLinesInterface
     CalcVisible = function(self)
-        if not self.Lines[1] then return end
+        if not self.ChatLineInterfaces[1] then return end
 
         local history = ChatModel.GetSingleton().History()
         local historyCount = table.getn(history)
-        local poolSize = table.getn(self.Lines)
+        local poolSize = table.getn(self.ChatLineInterfaces)
         local scrollTop = self.ScrollTop
 
         -- Walk to the entry + wrapped-line that covers virtual position `scrollTop`.
@@ -457,7 +457,7 @@ ChatLinesInterface = ClassUI(Group) {
         -- Fill each pool row; advance the cursor through wrapped lines and
         -- skip filtered entries as we go.
         for poolIdx = 1, poolSize do
-            local line = self.Lines[poolIdx]
+            local line = self.ChatLineInterfaces[poolIdx]
             if entryIdx > historyCount then
                 line:Clear()
                 line:Hide()
@@ -503,7 +503,7 @@ ChatLinesInterface = ClassUI(Group) {
             end
         end
         self:RefreshVirtualSize(history)
-        if self.Lines[1] then
+        if self.ChatLineInterfaces[1] then
             self:ScrollToBottom()
         end
     end,

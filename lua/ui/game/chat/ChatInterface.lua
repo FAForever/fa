@@ -69,8 +69,8 @@ local DefaultRect = { Left = 8, Top = 460, Right = 430, Bottom = 720 }
 
 ---@class UIChatInterface : Window
 ---@field Trash                 TrashBag                      # owns every subscription-LazyVar we create
----@field Lines                 UIChatLinesInterface          # the wrapped panel containing line rows + scrollbar
----@field Edit                  UIChatEditInterface
+---@field ChatLinesInterface    UIChatLinesInterface          # the wrapped panel containing line rows + scrollbar
+---@field ChatEditInterface     UIChatEditInterface
 ---@field DragTL                Bitmap                        # top-left corner resize grip
 ---@field DragTR                Bitmap                        # top-right corner resize grip
 ---@field DragBL                Bitmap                        # bottom-left corner resize grip
@@ -100,18 +100,18 @@ local ChatInterface = ClassUI(Window) {
 
         -- The lines panel and edit area. Both are laid out in `__post_init`
         -- once the client area has a real size to anchor against.
-        self.Lines = ChatLinesInterface(client)
-        self.Edit = ChatEditInterface(self)
+        self.ChatLinesInterface = ChatLinesInterface(client)
+        self.ChatEditInterface = ChatEditInterface(self)
 
         -- Override the lines panel's name-click hook to set the chat
         -- recipient and re-focus the edit box. `OnCameraClicked` keeps the
         -- panel's default behaviour (jump the world camera). Ignore clicks
         -- on your own name — whispering yourself is pointless and the
         -- picker would still route it as a private message.
-        self.Lines.OnNameClicked = function(entry)
+        self.ChatLinesInterface.OnNameClicked = function(entry)
             if entry.ArmyID and entry.ArmyID ~= GetFocusArmy() then
                 ChatController.SetRecipient(entry.ArmyID)
-                self.Edit:AcquireFocus()
+                self.ChatEditInterface:AcquireFocus()
             end
         end
 
@@ -128,9 +128,9 @@ local ChatInterface = ClassUI(Window) {
                 function(lv)
                     if lv() then
                         self:Show()
-                        self.Edit:AcquireFocus()
+                        self.ChatEditInterface:AcquireFocus()
                     else
-                        self.Edit:AbandonFocus()
+                        self.ChatEditInterface:AbandonFocus()
                         self:Hide()
                     end
                 end
@@ -251,7 +251,7 @@ local ChatInterface = ClassUI(Window) {
 
         -- Full width, flush with the bottom of the client area. The edit
         -- group derives its own height (see ChatEditInterface.__post_init).
-        Layouter(self.Edit)
+        Layouter(self.ChatEditInterface)
             :AtLeftIn(self)
             :AtRightIn(self)
             :AtBottomIn(self, 6)
@@ -264,7 +264,7 @@ local ChatInterface = ClassUI(Window) {
         -- reserves the space inside its right edge for the scrollbar
         -- widget, so the parent only has to allocate a single rect.
         local uniformPadding = 4
-        Layouter(self.Lines)
+        Layouter(self.ChatLinesInterface)
             :Below(self.TitleGroup, 9 + uniformPadding)
             :AtLeftIn(self, 6 + uniformPadding)
             :AtRightIn(self, 8 + uniformPadding)
@@ -274,7 +274,7 @@ local ChatInterface = ClassUI(Window) {
         -- Now that the lines panel has a real rect, let it build its pool
         -- and wire its options observer (the initial fire reads the laid-
         -- out `Pool.Height()`).
-        self.Lines:Initialize()
+        self.ChatLinesInterface:Initialize()
 
         -- Committed chat options → window-level concerns only. Pool sizing,
         -- font, and filter changes are owned by the lines panel; we just
@@ -304,7 +304,7 @@ local ChatInterface = ClassUI(Window) {
     --- Fired continuously during a resize drag. Keep it cheap: just resize
     --- the pool and re-render against existing wraps.
     OnResize = function(self, width, height, firstFrame)
-        self.Lines:OnResizeLive()
+        self.ChatLinesInterface:OnResizeLive()
     end,
 
     --- Fired when a resize drag ends. Rewrapping is expensive, so it only
@@ -312,7 +312,7 @@ local ChatInterface = ClassUI(Window) {
     --- grips back to their `up` texture — the RolloverHandler leaves them
     --- on `down` when StartSizing took over.
     OnResizeSet = function(self)
-        self.Lines:OnResizeFinished()
+        self.ChatLinesInterface:OnResizeFinished()
         self.DragTL:SetTexture(self.DragTL.textures.up)
         self.DragTR:SetTexture(self.DragTR.textures.up)
         self.DragBL:SetTexture(self.DragBL.textures.up)
@@ -323,13 +323,13 @@ local ChatInterface = ClassUI(Window) {
     --- handler steals focus mid-move, so re-acquire it so the user can keep
     --- typing without a second click on the edit box.
     OnMoveSet = function(self)
-        self.Edit:AcquireFocus()
+        self.ChatEditInterface:AcquireFocus()
     end,
 
     --- Mouse wheel over the window scrolls the chat. `rotation` is in wheel
     --- units (usually ±120 per notch); one notch ≈ one line.
     OnMouseWheel = function(self, rotation)
-        self.Lines:ScrollLines(nil, -math.floor(rotation / 100))
+        self.ChatLinesInterface:ScrollLines(nil, -math.floor(rotation / 100))
     end,
 
     --- Engine-invoked when the user clicks the close button on the window frame.
@@ -382,7 +382,7 @@ end
 ---@param delta number
 function ScrollLines(delta)
     if Instance then
-        Instance.Lines:ScrollLines(nil, delta)
+        Instance.ChatLinesInterface:ScrollLines(nil, delta)
     end
 end
 
@@ -391,7 +391,7 @@ end
 ---@param delta number
 function ScrollPages(delta)
     if Instance then
-        Instance.Lines:ScrollPages(nil, delta)
+        Instance.ChatLinesInterface:ScrollPages(nil, delta)
     end
 end
 
