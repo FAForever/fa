@@ -14,7 +14,6 @@ local ProfileKey = "chatoptions"
 ---@field fade_time      number   # seconds, 5-30
 ---@field win_alpha      number   # 0.0-1.0
 ---@field feed_background boolean
----@field feed_persist   boolean
 ---@field send_type      boolean  # false = all, true = allies
 ---@field links          boolean  # show camera-link messages
 ---@field muted          table<number, boolean>   # armyID -> true when muted; absent = not muted
@@ -30,7 +29,6 @@ local DefaultOptions = {
     fade_time       = 15,
     win_alpha       = 1.0,
     feed_background = false,
-    feed_persist    = true,
     send_type       = false,
     links           = true,
     muted           = {},
@@ -51,7 +49,6 @@ KeyFontSize       = 'font_size'
 KeyFadeTime       = 'fade_time'
 KeyWinAlpha       = 'win_alpha'
 KeyFeedBackground = 'feed_background'
-KeyFeedPersist    = 'feed_persist'
 KeySendType       = 'send_type'
 KeyLinks          = 'links'
 KeyMuted          = 'muted'

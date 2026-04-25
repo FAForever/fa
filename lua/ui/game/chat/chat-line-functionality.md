@@ -69,7 +69,6 @@ Projects the history onto the line pool:
 - Each visible line gets an `OnFrame` that increments `curHistory.time`; once `time > fade_time`, the line hides itself.
 - Continuation lines of a wrapped entry don't tick their own timer — they wait on the first wrapped line's timer (special-cased).
 - `feed_background` option controls the `lineStickybg`'s visibility per line.
-- `feed_persist` option: when the window is manually closed, decides whether still-visible feed lines fade out naturally or get force-expired.
 - `ToggleChat` un-hides every line and hides every `lineStickybg` when opening the window; does the inverse on close.
 
 ---
@@ -109,5 +108,4 @@ Every display option from the config dialog hits a chat-line property somewhere:
 - `fade_time` → feed-mode timeout comparator.
 - Colour indices (`*_color`) → text colour per line.
 - `feed_background` → per-line `lineStickybg` visibility.
-- `feed_persist` → feed-mode close behaviour.
 - `links` + per-army filters → inclusion/exclusion from `IsValidEntry`.

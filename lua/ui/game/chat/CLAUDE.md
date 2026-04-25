@@ -329,7 +329,6 @@ Each chat line (`GUI.chatLines[i]`) contains:
 | `fade_time` | 15 | Seconds before feed/window auto-hides |
 | `win_alpha` | 1.0 | Window opacity (stored 0–100, normalized on use) |
 | `feed_background` | false | Semi-transparent bg behind feed lines |
-| `feed_persist` | true | Keep feed lines until individually timed out |
 | `send_type` | false | Default recipient: false = all, true = allies |
 | `links` | true | Show camera-link messages |
 | `[armyID]` | true | Per-army message filter |

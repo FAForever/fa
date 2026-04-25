@@ -159,7 +159,6 @@ The `chatContainer` implements the standard MAUI scrollable interface (`GetScrol
 When `GUI.bg` is hidden, the most recent lines are shown directly over the game world without the window frame. Each line:
 - Shows until `curHistory.time >= ChatOptions.fade_time`, then hides itself via `OnFrame`.
 - Optionally shows `lineStickybg` for readability (controlled by `ChatOptions.feed_background`).
-- `ChatOptions.feed_persist` controls whether lines are force-expired when the window is manually closed.
 
 ### 5.5 Text Wrapping
 
@@ -237,7 +236,6 @@ Registered in `keymap/keyactions.lua`:
 | `fade_time` | 5–30 | 15 | Seconds before feed lines/window auto-hide |
 | `win_alpha` | 0.2–1.0 | 1 | Window opacity (stored as 0–100, normalized on use) |
 | `feed_background` | bool | false | Show semi-transparent bg behind feed lines |
-| `feed_persist` | bool | true | Keep feed lines visible until they individually time out |
 | `send_type` | bool | false | Default recipient: false = all, true = allies |
 | `links` | bool | true | Show camera-link messages |
 | `[armyID]` | bool | true | Per-army message filter (one key per army, set at game start) |

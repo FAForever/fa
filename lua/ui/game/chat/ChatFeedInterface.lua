@@ -46,8 +46,8 @@ local FeedBackgroundAlpha = 0.5
 --   * `ChatModel.History` — incoming entries are appended as feed rows.
 --   * `ChatModel.WindowVisible` — feed visible iff window hidden + we have rows.
 -- Each row carries its own age timer ticked by `OnFrame`; rows past
--- `fade_time` destroy themselves. There is no shared timer / pinning yet —
--- those land in later steps along with `feed_persist` and `feed_background`.
+-- `fade_time` destroy themselves. Pin (chrome-side toggle that suspends
+-- the per-row fade) is the remaining piece that hasn't been wired yet.
 
 ---@class UIChatFeedRow
 ---@field Line  UIChatLineInterface   # exactly one wrapped chunk: header on the entry's first row, continuation on the rest

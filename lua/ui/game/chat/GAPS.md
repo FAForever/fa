@@ -10,7 +10,6 @@ Accepted & intentional differences live in [CHANGES.md](CHANGES.md); this file o
 
 The bones of feed mode are in place — [`ChatFeedInterface`](ChatFeedInterface.lua) renders, fades, and clears in line with legacy expectations. What's still missing is the *configurable* layer:
 
-- **`feed_persist`** — option has no effect. Today we always `ClearAll()` on window-open and always gate `OnHistoryChanged` on `not WindowVisible()`. To support persist=true, both branches need to flip: don't clear on open, and queue rows even while window is visible (paused timer until reveal). Two-mode logic.
 - **Pin button / pin toggle** — no pin button on the chat window. Pin should suspend both the window auto-close (`OnFrame` skips advancing toward `fade_time` while pinned) and the feed fade (per-row timers don't tick). Legacy: [chat.legacy.lua:1177-1187](../chat.legacy.lua).
 
 ## Message filtering

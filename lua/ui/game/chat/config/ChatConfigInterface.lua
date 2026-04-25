@@ -32,7 +32,6 @@ local ColorDefs = {
 local CheckboxDefs = {
     { Key = ChatConfigModel.KeySendType,       Text = "Default recipient: allies" },
     { Key = ChatConfigModel.KeyFeedBackground, Text = "Show feed background" },
-    { Key = ChatConfigModel.KeyFeedPersist,    Text = "Persist feed timeout" },
     { Key = ChatConfigModel.KeyLinks,          Text = "Show camera links" },
 }
 
