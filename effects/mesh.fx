@@ -3740,6 +3740,102 @@ float shieldWaterAbsorption(float depth) {
     return factor;
 }
 
+float2 PBR2(
+    float3 v,
+    float depth,
+    float roughness,
+    float3 n,
+    // Common material specular values:
+    // water: .02
+    // plastic: .03-.05
+    // most materials: .04
+    // diamond: .17
+    float facingSpecular = .04,
+    float ao = 1
+) : COLOR0
+{
+    // specular reflections of dielectrics mostly disappear underwater
+    if (depth < 0) {
+        facingSpecular = facingSpecular * 0.05;
+    }
+    float3 F0 = float3(facingSpecular, facingSpecular, facingSpecular);
+    float3 l = sunDirection;
+    float3 h = normalize(v + l);
+    float nDotL = max(dot(n, l), 0.0);
+    // Normal maps can cause an angle > 90° between n and v which would
+    // cause artifacts if we don't take some countermeasures
+    float nDotV = abs(dot(n, v)) + 0.001;
+
+    // Cook-Torrance BRDF
+    float3 F = FresnelSchlick(max(dot(h, v), 0.0), F0);
+    float NDF = NormalDistribution(n, h, roughness);
+    float G = GeometrySmith(n, nDotV, l, roughness);
+
+    // For point lights we need to multiply with Pi
+    float3 numerator = PI * NDF * G * F;
+    // add 0.0001 to avoid division by zero
+    float denominator = 4.0 * nDotV * nDotL + 0.0001;
+    float sunReflectionFactor = numerator / denominator;
+
+    float3 kS = FresnelSchlickRoughness(nDotV, F0, roughness);
+    float2 envBRDFlookuptexture = tex2D(anisotropicSampler, float2(dot(n, v), 1 - roughness)).rg;
+    float envReflectionFactor = kS * envBRDFlookuptexture.r + envBRDFlookuptexture.g;
+
+    return float2(envReflectionFactor, sunReflectionFactor);
+}
+
+float4 EnvironmentPS( NORMALMAPPED_VERTEX vertex ) : COLOR
+{
+    float facingSpecular = 0.04;
+    float roughness = 0.2;
+    float3 n = normalize(vertex.normal);
+    float3 v = normalize(vertex.viewDirection);
+
+    float4 color = float4(1,1,1,1);
+    float2 reflectionFactor = PBR2(v, vertex.depth, roughness, n);
+    color.a = reflectionFactor.x;
+
+    // We can't use texCUBElod so we need to use a workaround
+    float lod = roughness * 10;
+    float scale = exp2(lod);
+    float3 reflection = reflect(-v, n);
+//    reflection.y = abs(reflection.y);
+    // We are cheating a bit here because some env maps have an ugly horizon
+    reflection.y = (reflection.y + 1) * 0.5;
+    float3 envReflection = texCUBEgrad(environmentSampler, reflection, float3(scale/256, 0, 0), float3(0, scale/256, 0));
+
+    // We need to do this to stay consistent with ComputeLight()
+    float nDotL = max(dot(n, sunDirection), 0.0);
+    float3 shadowColor = (1 - (sunDiffuse * nDotL + sunAmbient)) * shadowFill;
+    float3 ambient = sunAmbient * lightMultiplier + shadowColor;
+    float shadowCorrection = saturate((ambient.r + ambient.g + ambient.b) / 3);
+    shadowCorrection = lerp(shadowCorrection, 1, nDotL);
+    envReflection *= shadowCorrection;
+    envReflection += ambient * 0.15;
+
+    color.rgb = envReflection;
+
+    float3 irradiance = sunDiffuse * lightMultiplier * nDotL;
+    color.a += reflectionFactor.y;
+
+    // Equals color = sunReflectionFactor * irradiance + envReflectionFactor * env_reflection with alpha = 1
+    // but we want to store the reflectionfactors in alpha so the dome doesn't look weird in the distance fog
+    color.rgb += (irradiance - envReflection) * reflectionFactor.y / (reflectionFactor.x + reflectionFactor.y);
+
+
+    float3 tint = float3(0.5, 0.6, 1);
+    float opacity = 0.9;
+    //Tint according to shield color
+    //color.rgb = lerp(color.rgb, tint * color.rgb, 0.6);
+    // Maybe we should keep it simple:
+//    color.a = reflectionFactor.y * 0.5;
+//    color.rgb = tint * opacity;
+
+//color.a *= 0;
+//color.rgb *= 0.1;
+    return color;
+}
+
 float4 ShieldLegacyPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
 {
     if ( 1 == mirrored ) clip(vertex.depth);
@@ -7692,6 +7788,15 @@ technique ShieldUEF_MedFidelity
 {
     pass P0
     {
+        AlphaState( AlphaBlend_SrcAlpha_One_Write_RGB )
+        RasterizerState( Rasterizer_Cull_None )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a EnvironmentPS();
+    }
+    pass P1
+    {
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
         RasterizerState( Rasterizer_Cull_None )
         DepthState( Depth_Enable_LessEqual_Write_None )
@@ -7737,6 +7842,15 @@ technique ShieldCybran_MedFidelity
 {
     pass P0
     {
+        AlphaState( AlphaBlend_SrcAlpha_One_Write_RGB )
+        RasterizerState( Rasterizer_Cull_None )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a EnvironmentPS();
+    }
+    pass P1
+    {
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
         RasterizerState( Rasterizer_Cull_None )
         DepthState( Depth_Enable_LessEqual_Write_None )
@@ -7744,7 +7858,7 @@ technique ShieldCybran_MedFidelity
         VertexShader = compile vs_1_1 ShieldNormalVS( 1,1,2,1, -0.01,0, -0.002,0, 0,0.0012, 0.001,-0.0015 );
         PixelShader = compile ps_2_0 ShieldCybranPS(0.17);
     }
-    pass P1
+    pass P2
     {
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
         DepthState( Depth_Enable_LessEqual_Write_None )
@@ -7841,6 +7955,15 @@ technique ShieldAeon_MedFidelity
 {
     pass P0
     {
+        AlphaState( AlphaBlend_SrcAlpha_One_Write_RGB )
+        RasterizerState( Rasterizer_Cull_None )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a EnvironmentPS();
+    }
+    pass P1
+    {
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
         RasterizerState( Rasterizer_Cull_None )
         DepthState( Depth_Enable_LessEqual_Write_None )
@@ -7911,6 +8034,15 @@ technique ShieldSeraphim_MedFidelity
 >
 {
     pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_One_Write_RGB )
+        RasterizerState( Rasterizer_Cull_None )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a EnvironmentPS();
+    }
+    pass P1
     {
         AlphaState( AlphaBlend_SrcAlpha_One_Write_RGB )
 
