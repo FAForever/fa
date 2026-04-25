@@ -3784,15 +3784,15 @@ float2 PBR2(
     return float2(envReflectionFactor, sunReflectionFactor);
 }
 
-float4 EnvironmentPS( NORMALMAPPED_VERTEX vertex ) : COLOR
+float4 EnvironmentPS( NORMALMAPPED_VERTEX vertex, uniform float roughness = 0.2, uniform float attune = 0.8 ) : COLOR
 {
     float facingSpecular = 0.04;
-    float roughness = 0.2;
     float3 n = normalize(vertex.normal);
     float3 v = normalize(vertex.viewDirection);
 
     float4 color = float4(1,1,1,1);
     float2 reflectionFactor = PBR2(v, vertex.depth, roughness, n);
+    reflectionFactor.x *= attune;
     color.a = reflectionFactor.x;
 
     // We can't use texCUBElod so we need to use a workaround
@@ -3816,23 +3816,30 @@ float4 EnvironmentPS( NORMALMAPPED_VERTEX vertex ) : COLOR
     color.rgb = envReflection;
 
     float3 irradiance = sunDiffuse * lightMultiplier * nDotL;
-    color.a += reflectionFactor.y;
+//    color.a += reflectionFactor.y;
 
     // Equals color = sunReflectionFactor * irradiance + envReflectionFactor * env_reflection with alpha = 1
     // but we want to store the reflectionfactors in alpha so the dome doesn't look weird in the distance fog
-    color.rgb += (irradiance - envReflection) * reflectionFactor.y / (reflectionFactor.x + reflectionFactor.y);
+//    color.rgb += (irradiance - envReflection) * reflectionFactor.y / (reflectionFactor.x + reflectionFactor.y);
 
-
-    float3 tint = float3(0.5, 0.6, 1);
-    float opacity = 0.9;
-    //Tint according to shield color
-    //color.rgb = lerp(color.rgb, tint * color.rgb, 0.6);
-    // Maybe we should keep it simple:
-//    color.a = reflectionFactor.y * 0.5;
-//    color.rgb = tint * opacity;
 
 //color.a *= 0;
 //color.rgb *= 0.1;
+    return color;
+}
+
+float4 RingPS( NORMALMAPPED_VERTEX vertex, uniform float3 tint ) : COLOR
+{
+    float4 color;
+    color.rgb = tint * 0.2;
+
+    float roughness = 0.2;
+    float3 n = normalize(vertex.normal);
+    float3 v = normalize(vertex.viewDirection);
+    float2 reflectionFactor = PBR2(v, vertex.depth, roughness, n);
+    color.a = reflectionFactor.x * 0.48;
+
+//    color.a = 0;
     return color;
 }
 
@@ -3972,9 +3979,9 @@ float3 ComputeShieldIslands(float4 albedo, float3 specular, float3 specular2, fl
     float3 color = float3( 0.05, 0.0, 0.3 ) + factor2 - factor1;
 
     // Adjust color of shield based on its health percentage
-    float3 colorMod1 = float3( 0.2, 0, 0 ) + factor2;
-    colorMod1 = lerp( color, colorMod1, sin(frac( 0.06 * time) * 3.14) );
-    color = lerp( colorMod1, color, health);
+    float3 colorMod = float3( 0.2, 0, 0 ) + factor2;
+    colorMod = lerp( color, colorMod, sin(frac( 0.06 * time) * 3.14) );
+    color = lerp( colorMod, color, health);
 
     color += terrainBand;
     color -= (1 - albedo.a);
@@ -3993,7 +4000,7 @@ float3 ComputeShieldIslands(float4 albedo, float3 specular, float3 specular2, fl
     return color;
 }
 
-float4 ShieldCybranPS( EFFECT_NORMALMAPPED_VERTEX vertex, uniform float alpha ) : COLOR
+float4 ShieldCybranPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
 {
     if ( 1 == mirrored ) clip(vertex.depth);
 
@@ -4011,8 +4018,8 @@ float4 ShieldCybranPS( EFFECT_NORMALMAPPED_VERTEX vertex, uniform float alpha ) 
 
     color += terrainBand * 3 * float3( 0, 0, 1);
 
-    // Alpha
-    alpha += terrainBand * 2;
+    float alpha = 0.42;
+//    alpha += terrainBand * 2;
 
     return float4(color, alpha);
 }
@@ -7857,21 +7864,30 @@ technique ShieldCybran_MedFidelity
 {
     pass P0
     {
-        AlphaState( AlphaBlend_SrcAlpha_One_Write_RGB )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
         RasterizerState( Rasterizer_Cull_None )
         DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a EnvironmentPS();
+        PixelShader = compile ps_2_a EnvironmentPS(0.02, 0.6);
     }
     pass P1
     {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        AlphaState( AlphaBlend_SrcAlpha_One_Write_RGB )
         RasterizerState( Rasterizer_Cull_None )
         DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 ShieldNormalVS( 4,1,2,1, 0,0.0012, -0.002,0, 0,0.0012, 0.001,-0.0015 );
-        PixelShader = compile ps_2_0 ShieldCybranPS(0.17);
+        PixelShader = compile ps_2_a ShieldCybranPS();
+    }
+    pass P2
+    {
+        AlphaState( AlphaBlend_SrcAlpha_One_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_None )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a RingPS(float3(0.4, 0.3, 1));
     }
 }
 
