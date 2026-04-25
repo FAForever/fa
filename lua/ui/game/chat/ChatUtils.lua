@@ -8,6 +8,12 @@ local MauiWrapText = import("/lua/maui/text.lua").WrapText
 -- `ChatFeedInterface` (or future views) can reuse without coupling them
 -- to each other lives here.
 
+--- Maximum allowed UTF-8 character length for a chat message body. The
+--- edit box enforces this on input via `Edit:SetMaxChars`; the receive
+--- path uses it as a hard validator so a peer with a tampered or buggy
+--- sender can't push us into laying out arbitrarily long lines.
+MaxMessageLength = 200
+
 --- Wraps an entry's body text against `measureLine`'s row width and stores
 --- the result as `entry.WrappedText`. The first wrapped chunk reserves
 --- horizontal space for the entry's name prefix (so the body starts

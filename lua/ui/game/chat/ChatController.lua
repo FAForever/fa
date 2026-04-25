@@ -1,6 +1,7 @@
 
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
 local ChatConfigModel = import("/lua/ui/game/chat/config/ChatConfigModel.lua")
+local ChatUtils = import("/lua/ui/game/chat/ChatUtils.lua")
 
 -------------------------------------------------------------------------------
 -- Window visibility
@@ -282,12 +283,33 @@ end
 --- Handler registered with `gamemain.RegisterChatFunc`. Normalises the
 --- message, delegates Notify-subsystem messages, resolves the sender's army
 --- data, and appends a chat line.
+---
+--- Defensive against malformed input: messages that aren't tables, that
+--- lack the `Chat` flag, or whose `text` isn't a string are dropped early.
+--- The receive path is reachable from any gamemain `RegisterChatFunc`
+--- caller — including external mods — so we can't trust the shape.
 ---@param sender string
 ---@param msg table
 function OnReceive(sender, msg)
-    sender = sender or "nil sender"
+    -- Coerce sender to a non-empty string so the formatting concatenations
+    -- below can't blow up on a number, table, or nil. The guard is wider
+    -- than `or "nil sender"` because that left non-string truthy values
+    -- (e.g. a number sender from a misbehaving caller) flowing through.
+    if type(sender) ~= 'string' or sender == '' then
+        sender = 'nil sender'
+    end
 
+    -- Hard shape guards: anything that isn't a populated chat-shaped
+    -- table never reaches the formatting / model writes below.
+    if type(msg) ~= 'table' then return end
     if not msg.Chat then return end
+    if type(msg.text) ~= 'string' then return end
+
+    -- Length cap: matches the edit box's `SetMaxChars(MaxMessageLength)`
+    -- on the send side, so a peer that bypassed the input cap (mod, bug,
+    -- or hostile client) can't push us into laying out arbitrary-length
+    -- lines. UTF-8 length to mirror the input enforcement exactly.
+    if STR_Utf8Len(msg.text) > ChatUtils.MaxMessageLength then return end
 
     -- Notify routing: the Notify subsystem tags messages with `to='notify'`
     -- and owns the display decision. Only fall through to rendering a chat

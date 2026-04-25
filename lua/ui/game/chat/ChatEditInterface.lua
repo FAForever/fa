@@ -11,6 +11,7 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
 local ChatController = import("/lua/ui/game/chat/ChatController.lua")
 local ChatCompletion = import("/lua/ui/game/chat/ChatCompletion.lua")
+local ChatUtils = import("/lua/ui/game/chat/ChatUtils.lua")
 local ChatListInterface = import("/lua/ui/game/chat/ChatListInterface.lua").ChatListInterface
 local ChatCommandHintInterface = import("/lua/ui/game/chat/ChatCommandHintInterface.lua").ChatCommandHintInterface
 
@@ -22,8 +23,6 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 --- control so its bounds are visible at runtime. Each chat interface uses a
 --- distinct colour so overlapping controls can be told apart at a glance.
 local Debug = false
-
-local MaxChars = 200
 
 -------------------------------------------------------------------------------
 -- The chat input area: a chat-bubble button, a recipient label, and an edit
@@ -103,7 +102,7 @@ ChatEditInterface = ClassUI(Group) {
 
         UIUtil.SetupEditStd(self.EditBox,
             "ff00ff00", nil, "ffffffff",
-            UIUtil.highlightColor, UIUtil.bodyFont, 14, MaxChars)
+            UIUtil.highlightColor, UIUtil.bodyFont, 14, ChatUtils.MaxMessageLength)
         self.EditBox:SetDropShadow(true)
         self.EditBox:ShowBackground(false)
         self.EditBox:SetText('')
