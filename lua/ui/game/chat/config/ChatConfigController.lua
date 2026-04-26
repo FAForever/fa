@@ -1,13 +1,13 @@
 
 local Prefs = import("/lua/user/prefs.lua")
 
+--- Convenience accessor for the config model singleton.
 local function Model()
     return import("/lua/ui/game/chat/config/ChatConfigModel.lua").GetSingleton()
 end
 
---- Commits the pending options: marks them active for this session and
---- persists everything except `muted`. Mutes are intentionally per-game so
---- they don't follow the player into the next match.
+--- Marks pending options active and persists everything except `muted`,
+--- which is intentionally per-game.
 function Apply()
     local model = Model()
     local options = table.copy(model.Pending())
@@ -21,20 +21,19 @@ function Apply()
     )
 end
 
---- Resets the pending options back to the built-in defaults.
+--- Reverts the draft (Pending) to factory defaults; does not commit until Apply.
 function Reset()
     Model().Pending:Set(
         import("/lua/ui/game/chat/config/ChatConfigModel.lua").GetDefaults()
     )
 end
 
---- Discards all pending edits, reverting to the last committed options.
+--- Discards the draft and re-syncs Pending from Committed.
 function Cancel()
     local model = Model()
     model.Pending:Set(table.copy(model.Committed()))
 end
 
---- Updates a single field in the pending options.
 --- Creates a new table copy to ensure the Pending LazyVar goes dirty.
 ---@param key string
 ---@param value any
@@ -45,9 +44,8 @@ function SetOption(key, value)
     model.Pending:Set(draft)
 end
 
---- Toggles the muted flag for a specific army on the pending options.
---- Absent entries are treated as "not muted"; setting `muted = false` clears
---- the key so the table stays compact.
+--- Setting `muted = false` clears the key so the table stays compact;
+--- absent keys read as "not muted".
 ---@param armyID number
 ---@param muted  boolean
 function SetMuted(armyID, muted)
@@ -63,11 +61,9 @@ function SetMuted(armyID, muted)
     model.Pending:Set(draft)
 end
 
---- Applies a mute state directly to `Committed` so slash-command usage
---- (`/mute`, `/unmute`) takes effect immediately without going through the
---- full Apply/Cancel dance. Pending is left alone — if the config dialog is
---- open it keeps its draft, and the next open re-syncs Pending from
---- Committed via `SetupSingleton`/`Cancel`.
+--- Writes directly to `Committed` so `/mute` and `/unmute` take effect
+--- immediately. Pending is left alone — an open config dialog keeps its
+--- draft, and the next open re-syncs Pending from Committed.
 ---@param armyID number
 ---@param muted  boolean
 function SetMutedLive(armyID, muted)
@@ -86,7 +82,7 @@ end
 -------------------------------------------------------------------------------
 --#region Debugging
 
---- Called by the module manager when this module becomes dirty.
+--- Hot-reload hook: re-imports this module on save.
 function __moduleinfo.OnDirty()
     import(__moduleinfo.name)
 end

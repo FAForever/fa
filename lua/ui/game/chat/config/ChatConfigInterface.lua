@@ -15,16 +15,10 @@ local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
---- Flip to `true` to overlay a semi-transparent coloured bitmap over the
---- control so its bounds are visible at runtime. Each chat interface uses a
---- distinct colour so overlapping controls can be told apart at a glance.
 local Debug = false
 
---- Skin textures for the config window frame. Mirrors the legacy chat-options
---- dialog, which used the generic `panel_brd_*` chrome rather than the chat
---- window's bespoke `chat_brd_*` art (the two windows are different sizes).
---- `SkinnableFile` returns a callable that re-resolves against the active
---- skin, so the border bitmaps follow the user's skin choice.
+--- Generic `panel_brd_*` chrome rather than the chat window's bespoke
+--- art — the two dialogs are different sizes.
 ---@diagnostic disable: param-type-mismatch
 local WindowTextures = {
     tl          = UIUtil.SkinnableFile('/game/panel/panel_brd_ul.dds'),
@@ -40,9 +34,8 @@ local WindowTextures = {
 }
 ---@diagnostic enable: param-type-mismatch
 
--- Each colour combo points at the same `chat_color` tooltip — legacy did the
--- same; the per-row label already tells the user *which* recipient the swatch
--- is for, so the tooltip's job is just to explain the control.
+-- Same `chat_color` tooltip on every colour combo — the per-row label
+-- already names the recipient, so the tooltip just explains the control.
 local ColorDefs = {
     { Key = ChatConfigModel.KeyAllColor,    Text = "All",     Tooltip = 'chat_color' },
     { Key = ChatConfigModel.KeyAlliesColor, Text = "Allies",  Tooltip = 'chat_color' },
@@ -60,15 +53,18 @@ local CheckboxDefs = {
 -------------------------------------------------------------------------------
 --  Window class
 
+--- One label-plus-bitmap-combo row in the colour section; `Key` is the option this row writes.
 ---@class UIChatConfigColorRow
 ---@field Label Text
 ---@field Combo BitmapCombo
 ---@field Key   string
 
+--- One per-player mute row; the checkbox writes the `muted[ArmyID]` entry on the Pending options.
 ---@class UIChatConfigMuteRow
 ---@field Checkbox Checkbox
 ---@field ArmyID   number
 
+--- Chat options dialog: edits a draft (`Pending`) and commits via Apply; nothing here writes the model directly.
 ---@class UIChatConfigInterface : Window
 ---@field Trash          TrashBag                          # owns every derived subscription-LazyVar
 ---@field LabelColors    Text
@@ -102,9 +98,6 @@ local ChatConfigInterface = ClassUI(Window) {
             Left = 200, Top = 200, Right = 500, Bottom = 640,
         }, WindowTextures)
 
-        -- Single trash bag for everything we allocate that needs explicit
-        -- destruction — currently just the derived observer LazyVars.
-        -- Emptied in `OnDestroy`.
         self.Trash = TrashBag()
 
         local client = self:GetClientGroup()
@@ -123,8 +116,7 @@ local ChatConfigInterface = ClassUI(Window) {
             row.Combo.OnClick = function(_, index)
                 ChatConfigController.SetOption(key, index)
             end
-            -- Tooltip on both label and combo so the user gets the same
-            -- explanation no matter which side of the row they hover.
+            -- Tooltip on both label and combo so either hover works.
             Tooltip.AddControlTooltip(row.Label, def.Tooltip)
             Tooltip.AddControlTooltip(row.Combo, def.Tooltip)
             self.ColorRows[i] = row
@@ -199,8 +191,7 @@ local ChatConfigInterface = ClassUI(Window) {
 
         -- ---- Muted players ----
         -- One checkbox per non-civilian army other than the local player.
-        -- The list is captured at dialog-open time; closing and reopening the
-        -- dialog rebuilds against fresh session state.
+        -- Captured at dialog-open; closing and reopening rebuilds state.
         self.LabelMuted = UIUtil.CreateText(client, "Muted players", 12, UIUtil.titleFont)
 
         self.MuteRows = {}
@@ -220,9 +211,8 @@ local ChatConfigInterface = ClassUI(Window) {
         end
 
         -- ---- Buttons ----
-        -- Apply also pops the chat window open. The user just spent time
-        -- tuning options against it, so showing the result immediately —
-        -- even if the window was hidden before — is what they expect.
+        -- Apply also opens the chat window so the user immediately sees
+        -- the result of the tuning they just did.
         self.BtnApply = UIUtil.CreateButtonStd(client, '/widgets02/small', "Apply", 14)
         self.BtnApply.OnClick = function()
             ChatConfigController.Apply()
@@ -245,11 +235,8 @@ local ChatConfigInterface = ClassUI(Window) {
         end
 
         -- ---- Decorative corner grips ----
-        -- Bitmaps overhanging the four corners, mirroring the chat window's
-        -- chrome so the config dialog visually belongs to the same family.
-        -- Hit-test stays off — `lockSize` is true on this window, so the grips
-        -- are pure decoration; routing clicks through them would only confuse
-        -- the underlying Title-bar drag handler.
+        -- Pure decoration — `lockSize` is true on this window, so routing
+        -- clicks through them would only confuse the title-bar drag.
         self.DragTL = Bitmap(self, UIUtil.SkinnableFile('/game/drag-handle/drag-handle-ul_btn_up.dds'))
         self.DragTR = Bitmap(self, UIUtil.SkinnableFile('/game/drag-handle/drag-handle-ur_btn_up.dds'))
         self.DragBL = Bitmap(self, UIUtil.SkinnableFile('/game/drag-handle/drag-handle-ll_btn_up.dds'))
@@ -258,9 +245,7 @@ local ChatConfigInterface = ClassUI(Window) {
             grip:DisableHitTest()
         end
 
-        -- ---- Reactive: sync all controls whenever pending options change ----
-        -- `LazyVarDerive` gives us a fresh per-subscriber LazyVar so we don't
-        -- stomp other subscribers on Pending (see the chat CLAUDE.md).
+        -- ---- Reactive: sync controls when pending options change ----
         local model = ChatConfigModel.GetSingleton()
         self.PendingObserver = self.Trash:Add(
             LazyVarDerive(
@@ -279,12 +264,10 @@ local ChatConfigInterface = ClassUI(Window) {
         local client = self:GetClientGroup()
         local pad = 8
 
-        -- Colors section header
         Layouter(self.LabelColors)
             :AtLeftTopIn(client, pad, pad)
             :End()
 
-        -- Color rows: label left, combo to its right
         ---@type Control
         local prev = self.LabelColors
         for _, row in ipairs(self.ColorRows) do
@@ -302,7 +285,6 @@ local ChatConfigInterface = ClassUI(Window) {
             prev = row.Label
         end
 
-        -- Sliders
         Layouter(self.LabelFontSize)
             :Below(prev, 12)
             :AtLeftIn(client, pad)
@@ -336,13 +318,11 @@ local ChatConfigInterface = ClassUI(Window) {
             :Width(200)
             :End()
 
-        -- Behavior section header
         Layouter(self.LabelBehavior)
             :Below(self.SliderWinAlpha, 12)
             :AtLeftIn(client, pad)
             :End()
 
-        -- Checkboxes
         prev = self.LabelBehavior
         for _, cb in ipairs(self.Checkboxes) do
             Layouter(cb)
@@ -352,7 +332,6 @@ local ChatConfigInterface = ClassUI(Window) {
             prev = cb
         end
 
-        -- Muted players section
         Layouter(self.LabelMuted)
             :Below(prev, 12)
             :AtLeftIn(client, pad)
@@ -367,7 +346,7 @@ local ChatConfigInterface = ClassUI(Window) {
             prev = row.Checkbox
         end
 
-        -- Buttons: Apply | Reset on one row, OK | Cancel on the next
+        -- Apply | Reset on one row, OK | Cancel on the next.
         Layouter(self.BtnApply)
             :Below(prev, 12)
             :AtLeftIn(client, pad)
@@ -388,17 +367,12 @@ local ChatConfigInterface = ClassUI(Window) {
             :AtVerticalCenterIn(self.BtnOk)
             :End()
 
-        -- Fit the window height to its content. Width stays driven by
-        -- Left/Right from the default rect — don't pin Width here, or the
-        -- drag handler's Right:Set(Left + Width) will snap the window to
-        -- whatever Width was pinned to (the textures render against Right,
-        -- so a Width/Right mismatch is invisible until the first drag).
+        -- Don't pin Width here — the drag handler's Right:Set(Left + Width)
+        -- would snap to whatever Width got pinned to. Width stays driven
+        -- by Left/Right from the default rect.
         local bottomPadScaled = LayoutHelpers.ScaleNumber(16)
         self.Bottom:Set(function() return self.BtnCancel.Bottom() + bottomPadScaled end)
 
-        -- Corner grips overhang the window edge. Offsets mirror the chat
-        -- window's grips so the visual reads identically across the two
-        -- dialogs. `Over(self, 5)` keeps them above the window chrome.
         Layouter(self.DragTL):AtLeftTopIn(self, -26, -8):Over(self, 5):End()
         Layouter(self.DragTR):AtRightTopIn(self, -22, -8):Over(self, 5):End()
         Layouter(self.DragBL):AtLeftBottomIn(self, -26, -8):Over(self, 5):End()
@@ -412,7 +386,7 @@ local ChatConfigInterface = ClassUI(Window) {
         end
     end,
 
-    --- Syncs every control to reflect the given options table.
+    --- Syncs every control to the supplied options snapshot. Driven by the Pending observer.
     ---@param self UIChatConfigInterface
     ---@param options UIChatOptions
     RefreshFromOptions = function(self, options)
@@ -440,12 +414,12 @@ local ChatConfigInterface = ClassUI(Window) {
         end
     end,
 
+    --- Title-bar close button. Closes the dialog without applying.
     OnClose = function(self)
         import("/lua/ui/game/chat/config/ChatConfigInterface.lua").Close()
     end,
 
-    --- Empties our trash bag so every derived observer we allocated is
-    --- destroyed — no `OnDirty` can fire into a torn-down `self`.
+    --- Destroys derived observers so dangling OnDirty callbacks don't fire into a dead self.
     ---@param self UIChatConfigInterface
     OnDestroy = function(self)
         self.Trash:Destroy()
@@ -455,37 +429,33 @@ local ChatConfigInterface = ClassUI(Window) {
 -------------------------------------------------------------------------------
 --  Module-level singleton and standalone entry points
 
+--- Singleton handle; nil until `Open` builds the dialog for the first time.
 ---@type UIChatConfigInterface | nil
 local Instance = nil
 
---- Opens the config dialog, creating it if it does not exist yet.
+--- Standalone entry point: shows the config dialog, building it on first open.
 function Open()
     if Instance then
         Instance:Show()
         return
     end
 
-    -- Mirror the legacy chat-options behaviour: dismiss any open map dialog
-    -- (build/order popup, etc.) before opening, then pin our depth above
-    -- everything else so a later popup can't slide on top of us. Without
-    -- this the config dialog can end up sandwiched behind another popup
-    -- and look stuck.
+    -- Dismiss any open map dialog (build/order popup, etc.) and pin our
+    -- depth above everything so a later popup can't slide on top of us.
     import("/lua/ui/game/multifunction.lua").CloseMapDialog()
     Instance = ChatConfigInterface(GetFrame(0))
     Instance.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
 end
 
---- Closes and destroys the config dialog.
+--- Standalone entry point: tears down the dialog if it exists.
 function Close()
     if Instance then
-        -- `OnDestroy` empties the trash bag, which in turn destroys every
-        -- derived observer — no more `OnDirty` fires into a dead `self`.
         Instance:Destroy()
         Instance = nil
     end
 end
 
---- Toggles the config dialog open or closed.
+--- Standalone entry point: flips visibility, building the dialog if needed.
 function Toggle()
     if Instance then
         Close()
@@ -497,7 +467,7 @@ end
 -------------------------------------------------------------------------------
 --#region Debugging
 
---- Called by the module manager when this module is reloaded.
+--- Hot-reload hook: reopens the dialog on the freshly loaded module if it was open.
 ---@param newModule any
 function __moduleinfo.OnReload(newModule)
     if Instance then
@@ -505,7 +475,7 @@ function __moduleinfo.OnReload(newModule)
     end
 end
 
---- Called by the module manager when this module becomes dirty.
+--- Hot-reload hook: tears down the old instance and re-imports this module.
 function __moduleinfo.OnDirty()
     if Instance then
         Instance:Destroy()
