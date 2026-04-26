@@ -753,6 +753,63 @@ function GiveUnitsToPlayer(data, units)
         end
 
         TransferUnitsOwnership(units, toArmy)
+
+        -- Whisper from giver → receiver, with an `Area` location so the
+        -- receiver can click the cam-icon to jump to where the units are.
+        -- The bounding box is computed from the units' positions before
+        -- they scatter; padded slightly so a single-unit gift gives the
+        -- camera region a non-degenerate framing rectangle.
+        ---@cast units Unit[]
+        local count = table.getn(units)
+        if count > 0 then
+            local init = units[1]:GetPosition()
+            local x0, x1, z0, z1 = init[1], init[1], init[3], init[3]
+            for _, unit in units do
+                local pos = unit:GetPosition()
+                if pos[1] < x0 then x0 = pos[1] end
+                if pos[1] > x1 then x1 = pos[1] end
+                if pos[3] < z0 then z0 = pos[3] end
+                if pos[3] > z1 then z1 = pos[3] end
+            end
+            local pad = 5
+            local area = { x0 = x0 - pad, x1 = x1 + pad, y0 = z0 - pad, y1 = z1 + pad }
+            local fromBrain = ArmyBrains[owner]
+            local fromName = fromBrain.Nickname or tostring(owner)
+
+            -- Specialize the wording when every shared unit is an engineer
+            -- — "shared 5 engineers" reads more naturally than "shared 5
+            -- units" when the transfer is e.g. a builder pool. Mixed
+            -- transfers fall through to the generic noun.
+            local allEngineers = true
+            for _, unit in units do
+                if not EntityCategoryContains(categories.ENGINEER, unit) then
+                    allEngineers = false
+                    break
+                end
+            end
+
+            local locKey, fallback
+            if allEngineers then
+                if count == 1 then
+                    locKey, fallback = 'chat_engineers_received_one', '%s shared an engineer with you.'
+                else
+                    locKey, fallback = 'chat_engineers_received_many', '%s shared %d engineers with you.'
+                end
+            else
+                if count == 1 then
+                    locKey, fallback = 'chat_units_received_one', '%s shared a unit with you.'
+                else
+                    locKey, fallback = 'chat_units_received_many', '%s shared %d units with you.'
+                end
+            end
+
+            local args = count == 1 and { fromName } or { fromName, count }
+            fromBrain:SendChatToPlayer(toArmy,
+                '<LOC ' .. locKey .. '>' .. fallback,
+                args,
+                { Area = area }
+            )
+        end
     end
 end
 
