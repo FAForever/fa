@@ -410,6 +410,15 @@ local ChatInterface = ClassUI(Window) {
         self.DragBR:SetTexture(self.DragBR.textures.up)
     end,
 
+    --- Engine-invoked continuously while the user drags the window by its
+    --- title bar. Mirrors `OnResize`: a long drag must not let the auto-close
+    --- timer expire mid-move, so every frame counts as activity. The engine
+    --- passes `(x, y, firstFrame)` after `self`, but we don't need them —
+    --- Lua silently drops trailing args.
+    OnMove = function(self)
+        ChatController.NotifyActivity()
+    end,
+
     --- Engine-invoked when the user finishes dragging the window. The drag
     --- handler steals focus mid-move, so re-acquire it so the user can keep
     --- typing without a second click on the edit box.
