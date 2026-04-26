@@ -1,15 +1,12 @@
 
 -------------------------------------------------------------------------------
--- Helpers wired to the `debug_chat_*` hotkeys in
--- `/lua/keymap/debugKeyActions.lua`. Each function exercises a distinct
--- chat path so the rendering / scrolling / camera / recipient flows can be
--- inspected without needing a second client to actually send messages.
+-- Helpers for the `debug_chat_*` hotkeys in
+-- `/lua/keymap/debugKeyActions.lua`.
 
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
 local ChatController = import("/lua/ui/game/chat/ChatController.lua")
 
---- A sample paragraph long enough to force the chat line wrapper to span
---- multiple rows at every supported font size.
+--- Long enough to force wrapping at every supported font size.
 local LongText =
     "The quick brown fox jumps over the lazy dog and then doubles back, " ..
     "dodges a passing T2 mobile artillery shell, ramps off a discarded " ..
@@ -17,10 +14,9 @@ local LongText =
     "bark — at which point the dog wakes up and demands to know who " ..
     "authorised the construction of the ramp in the first place."
 
---- Synthesises a chat entry stamped with the local focus army's metadata so
---- the rendering colour and faction icon match a real outgoing message. The
---- entry carries a fresh `Id` so the dedupe in `OnSyncChatMessages` doesn't
---- swallow it later.
+--- Stamps the entry with the local focus army's metadata so the colour
+--- and faction icon match a real outgoing message. Fresh `Id` so the
+--- `OnSyncChatMessages` dedupe doesn't swallow it later.
 ---@param overrides table   # fields merged on top of the synth defaults
 ---@return UIChatEntry
 local function SynthEntry(overrides)
@@ -46,13 +42,12 @@ end
 -- Window & dialog toggles
 -------------------------------------------------------------------------------
 
---- Toggles the chat window. Thin wrapper so the hotkey action string can
---- live alongside the rest of the chat-debug helpers.
+--- Debug hotkey: flips the chat window's visibility.
 function ToggleWindow()
     import("/lua/ui/game/chat/ChatInterface.lua").Toggle()
 end
 
---- Toggles the chat config dialog.
+--- Debug hotkey: flips the chat options dialog's visibility.
 function ToggleConfig()
     import("/lua/ui/game/chat/config/ChatConfigInterface.lua").Toggle()
 end
@@ -61,30 +56,26 @@ end
 -- Synthetic message injection
 -------------------------------------------------------------------------------
 
---- Appends a local-only system line. Exercises
---- `ChatController.AppendLocalSystemMessage` and the system-style colour.
+--- Debug hotkey: appends a synthetic system message.
 function AppendSystemMessage()
     ChatController.AppendLocalSystemMessage(
         '[debug] system message at ' .. tostring(GetSystemTimeSeconds())
     )
 end
 
---- Appends a single short synthetic chat entry. Exercises the basic
---- model→view path and the auto-scroll-to-bottom on history change.
+--- Debug hotkey: appends a one-line synthetic message from the local player.
 function AppendShortMessage()
     ChatController.AppendEntry(SynthEntry({}))
 end
 
---- Appends a synthetic entry whose body is long enough to wrap onto several
---- rows at every supported font size. Exercises `ChatLinesInterface.WrapEntry`
---- and the continuation-row layout.
+--- Body wraps onto several rows at every supported font size — exercises
+--- the continuation-row layout.
 function AppendLongMessage()
     ChatController.AppendEntry(SynthEntry({ Text = LongText }))
 end
 
---- Appends ten short entries in a single batch. Exercises pool sizing
---- (the visible window grows past the line cap), virtual-size accounting,
---- and the snap-to-bottom behaviour on rapid arrivals.
+--- Ten entries in one batch — exercises pool sizing past the line cap and
+--- snap-to-bottom on rapid arrivals.
 function AppendBurst()
     for i = 1, 10 do
         ChatController.AppendEntry(SynthEntry({
@@ -93,11 +84,8 @@ function AppendBurst()
     end
 end
 
---- Appends an entry with a `Location` hint pointing at the current world
---- camera focus. Exercises the camera-icon toggle on the row and the
---- `Camera:MoveTo` jump on click. The point is captured at hotkey time, so
---- pressing the key, panning the camera, and clicking the icon should
---- bounce the camera back to the original spot.
+--- Captures the camera focus at hotkey time so panning and clicking the
+--- camera icon should bounce back to the original spot.
 function AppendCameraMessage()
     local cam = GetCamera('WorldCamera')
     local settings = cam:SaveSettings()
@@ -111,13 +99,12 @@ end
 -- Recipient state
 -------------------------------------------------------------------------------
 
---- Forces the current send target to "all". Exercises the recipient-label
---- LazyVar binding in the edit row.
+--- Debug hotkey: forces the recipient back to "All".
 function SetRecipientAll()
     ChatController.SetRecipient(ChatModel.RecipientAll)
 end
 
---- Forces the current send target to "allies".
+--- Debug hotkey: forces the recipient back to "Allies".
 function SetRecipientAllies()
     ChatController.SetRecipient(ChatModel.RecipientAllies)
 end
@@ -126,8 +113,7 @@ end
 -- History reset
 -------------------------------------------------------------------------------
 
---- Wipes the history log. Exercises the empty-pool branch in
---- `ChatLinesInterface.CalcVisible` and the model-side dirty propagation.
+--- Debug hotkey: wipes the entire history log.
 function ClearHistory()
     ChatModel.GetSingleton().History:Set({})
 end
@@ -135,6 +121,7 @@ end
 -------------------------------------------------------------------------------
 --#region Debugging
 
+--- Hot-reload hook: re-imports this module on save.
 function __moduleinfo.OnDirty()
     import(__moduleinfo.name)
 end
