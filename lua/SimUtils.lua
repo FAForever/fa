@@ -752,19 +752,18 @@ function GiveUnitsToPlayer(data, units)
             end
         end
 
-        TransferUnitsOwnership(units, toArmy)
+        local transferredUnits = TransferUnitsOwnership(units, toArmy)
 
         -- Whisper from giver → receiver, with an `Area` location so the
         -- receiver can click the cam-icon to jump to where the units are.
         -- The bounding box is computed from the units' positions before
         -- they scatter; padded slightly so a single-unit gift gives the
         -- camera region a non-degenerate framing rectangle.
-        ---@cast units Unit[]
-        local count = table.getn(units)
-        if count > 0 then
-            local init = units[1]:GetPosition()
+        local count = transferredUnits and table.getn(transferredUnits) or 0
+        if transferredUnits and count > 0 then
+            local init = transferredUnits[1]:GetPosition()
             local x0, x1, z0, z1 = init[1], init[1], init[3], init[3]
-            for _, unit in units do
+            for _, unit in transferredUnits do
                 local pos = unit:GetPosition()
                 if pos[1] < x0 then x0 = pos[1] end
                 if pos[1] > x1 then x1 = pos[1] end
@@ -781,7 +780,7 @@ function GiveUnitsToPlayer(data, units)
             -- units" when the transfer is e.g. a builder pool. Mixed
             -- transfers fall through to the generic noun.
             local allEngineers = true
-            for _, unit in units do
+            for _, unit in transferredUnits do
                 if not EntityCategoryContains(categories.ENGINEER, unit) then
                     allEngineers = false
                     break
