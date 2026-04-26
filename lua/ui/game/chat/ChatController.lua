@@ -1,6 +1,7 @@
 
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
 local ChatConfigModel = import("/lua/ui/game/chat/config/ChatConfigModel.lua")
+local ChatUtils = import("/lua/ui/game/chat/ChatUtils.lua")
 local ChatPayload = import("/lua/shared/ChatPayload.lua")
 
 -------------------------------------------------------------------------------
@@ -243,21 +244,10 @@ local function GetArmyData(army)
     end
 end
 
--------------------------------------------------------------------------------
--- Recipient label formatting
---
--- Keyed by recipient value so both `RecipientAll` ('all') and
--- `RecipientAllies` ('allies') index directly, with 'private'/'notify'/'to'
--- as named fallbacks. Loc keys mirror the legacy `chat.lua` table so the
--- rendered prefix reads identically.
-
-local ToStrings = {
-    [ChatModel.RecipientAll]    = { text = '<LOC chat_0004>to all:',    caps = '<LOC chat_0005>To All:',    colorkey = 'all_color'    },
-    [ChatModel.RecipientAllies] = { text = '<LOC chat_0002>to allies:', caps = '<LOC chat_0003>To Allies:', colorkey = 'allies_color' },
-    private                     = { text = '<LOC chat_0006>to you:',    caps = '<LOC chat_0007>To You:',    colorkey = 'priv_color'   },
-    notify                      = { text = '<LOC chat_0002>to allies:', caps = '<LOC chat_0003>To Allies:', colorkey = 'notify_color' },
-    to                          = { text = '<LOC chat_0000>to',         caps = '<LOC chat_0001>To',         colorkey = 'all_color'    },
-}
+-- Recipient-label / chat-line-prefix descriptors. Lives in `ChatUtils` so
+-- the controller, the edit interface, and any future view can share one
+-- copy of the strings — see `ChatUtils.ToStrings` for the table shape.
+local ToStrings = ChatUtils.ToStrings
 
 -------------------------------------------------------------------------------
 -- Chat line construction
@@ -357,7 +347,7 @@ function OnReceive(sender, msg)
     -- Notify routing: the Notify subsystem tags messages with `to='notify'`
     -- and owns the display decision. Only fall through to rendering a chat
     -- line if Notify declines (returns false).
-    if msg.to == 'notify' and not import("/lua/ui/notify/notify.lua").processIncomingMessage(sender, msg) then
+    if msg.to == ChatModel.RecipientNotify and not import("/lua/ui/notify/notify.lua").processIncomingMessage(sender, msg) then
         return
     end
 

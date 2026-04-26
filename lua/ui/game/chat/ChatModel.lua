@@ -10,6 +10,12 @@ RecipientAll = 'all'
 --- Broadcast to allied players (or all observers when observing).
 RecipientAllies = 'allies'
 
+--- UI subsystem channel — used by the Notify system (and any future
+--- internal chat producer) to flag traffic that isn't user-driven.
+--- Not part of `UIChatRecipient` because users can't send to this
+--- channel; it appears only on incoming messages.
+RecipientNotify = 'notify'
+
 ---@alias UIChatRecipient 'all' | 'allies' | number  # number = army ID for a private message
 
 -------------------------------------------------------------------------------

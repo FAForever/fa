@@ -478,19 +478,21 @@ ChatEditInterface = ClassUI(Group) {
         end
     end,
 
-    --- Updates the label from the current recipient value.
+    --- Updates the label from the current recipient value. Strings come
+    --- from `ChatUtils.ToStrings` so the label respects the viewer's locale
+    --- and stays in lockstep with the chat-line prefixes rendered by
+    --- `ChatController`.
     ---@param self UIChatEditInterface
     ---@param recipient UIChatRecipient
     RefreshRecipient = function(self, recipient)
-        if recipient == ChatModel.RecipientAll then
-            self.RecipientLabel:SetText("To All:")
-        elseif recipient == ChatModel.RecipientAllies then
-            self.RecipientLabel:SetText("To Allies:")
+        local descriptor = ChatUtils.ToStrings[recipient]
+        if descriptor then
+            self.RecipientLabel:SetText(LOC(descriptor.caps) --[[@as string]])
         elseif type(recipient) == 'number' then
             local armies = GetArmiesTable()
             local army = armies and armies.armiesTable and armies.armiesTable[recipient]
             local name = army and army.nickname or tostring(recipient)
-            self.RecipientLabel:SetText("To " .. name .. ":")
+            self.RecipientLabel:SetText(string.format("%s %s:", LOC(ChatUtils.ToStrings.to.caps), name))
         end
     end,
 
