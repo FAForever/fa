@@ -38,6 +38,20 @@ function NotifyActivity()
     ChatModel.GetSingleton().LastActivity:Set(GetSystemTimeSeconds())
 end
 
+--- Sets the title-bar pin state. While pinned, [`ChatInterface.OnFrame`]
+--- skips the idle / `fade_time` auto-close check, so the chat window
+--- stays open through arbitrary inactivity. Toggling pin off also stamps
+--- a fresh `LastActivity` so the user gets a full `fade_time` window
+--- after unpinning instead of being auto-closed immediately because the
+--- timer kept counting against a stale activity stamp.
+---@param pinned boolean
+function SetPinned(pinned)
+    ChatModel.GetSingleton().Pinned:Set(pinned and true or false)
+    if not pinned then
+        NotifyActivity()
+    end
+end
+
 -------------------------------------------------------------------------------
 -- Recipient
 
@@ -72,6 +86,7 @@ function AppendLocalSystemMessage(text)
         Name      = "System:",
         Text      = text,
         Color     = 'ffff6666',
+        BodyColor = 'ffff6666',
         ArmyID    = 0,
         Recipient = ChatModel.RecipientAll,
     }
@@ -264,10 +279,25 @@ local function AppendChatLine(args)
     -- `ChatLineInterface.FactionIcons` (observer). Real factions are 0..N-1
     -- in engine data; the view expects 1-based indices.
     local faction = not args.IsObserver and armyData.faction or nil
+
+    -- Pick the palette key for the body text. Observers always use the
+    -- link palette so observer chatter stands out; everyone else inherits
+    -- the channel descriptor's `colorkey`. Falls back to `'priv_color'`
+    -- for unrecognised recipients (matches the `ToStrings.private`
+    -- descriptor fallback used elsewhere in `OnReceive`).
+    local colorKey
+    if args.IsObserver then
+        colorKey = ChatConfigModel.KeyLinkColor
+    else
+        local descriptor = ToStrings[args.Recipient] or ToStrings.private
+        colorKey = descriptor.colorkey
+    end
+
     AppendEntry {
         Name      = args.Name,
         Text      = args.Text or '',
         Color     = armyData.color or 'ffffffff',
+        ColorKey  = colorKey,
         ArmyID    = armyData.ArmyID or 1,
         Faction   = (faction or 4) + 1,
         Recipient = args.Recipient,

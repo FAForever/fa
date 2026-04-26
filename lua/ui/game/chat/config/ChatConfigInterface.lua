@@ -8,6 +8,7 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 
 local ChatConfigModel = import("/lua/ui/game/chat/config/ChatConfigModel.lua")
 local ChatConfigController = import("/lua/ui/game/chat/config/ChatConfigController.lua")
+local ChatUtils = import("/lua/ui/game/chat/ChatUtils.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
@@ -17,9 +18,6 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 --- control so its bounds are visible at runtime. Each chat interface uses a
 --- distinct colour so overlapping controls can be told apart at a glance.
 local Debug = false
-
--- 8 ARGB solid colors selectable as message color swatches.
-local Colors = { 'ffffffff', 'ffff4242', 'ffefff42', 'ff4fff42', 'ff42fff8', 'ff424fff', 'ffff42eb', 'ffff9f42' }
 
 local ColorDefs = {
     { Key = ChatConfigModel.KeyAllColor,    Text = "All" },
@@ -90,7 +88,7 @@ local ChatConfigInterface = ClassUI(Window) {
         for i, def in ipairs(ColorDefs) do
             local row = {
                 Label = UIUtil.CreateText(client, def.Text, 10, UIUtil.bodyFont),
-                Combo = BitmapCombo(client, Colors, 1, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01"),
+                Combo = BitmapCombo(client, ChatUtils.ColorPalette, 1, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01"),
                 Key   = def.Key,
             }
             local key = def.Key

@@ -329,14 +329,28 @@ local ChatInterface = ClassUI(Window) {
     --- to stamp `model.LastActivity`. Once the elapsed time since that stamp
     --- crosses `fade_time`, ask the controller to close — closing flips
     --- `model.WindowVisible`, which in turn disables further frame ticks.
+    --- Pinning the title-bar checkbox short-circuits the check entirely so
+    --- the user can keep the window up through long stretches of silence.
     ---@param self UIChatInterface
     ---@param delta number   # seconds since the last frame, unused (we read absolute time)
     OnFrame = function(self, delta)
+        local model = ChatModel.GetSingleton()
+        if model.Pinned() then return end
         local fadeTime = ChatConfigModel.GetOptions().fade_time or 15
-        local elapsed = GetSystemTimeSeconds() - ChatModel.GetSingleton().LastActivity()
+        local elapsed = GetSystemTimeSeconds() - model.LastActivity()
         if elapsed >= fadeTime then
             ChatController.CloseWindow()
         end
+    end,
+
+    --- Engine-invoked when the user toggles the title-bar pin checkbox.
+    --- Forwards to the controller, which writes `model.Pinned`. Refocuses
+    --- the edit box because clicking the checkbox steals focus.
+    ---@param self UIChatInterface
+    ---@param checked boolean
+    OnPinCheck = function(self, checked)
+        ChatController.SetPinned(checked)
+        self.ChatEditInterface:AcquireFocus()
     end,
 
     ---------------------------------------------------------------------------

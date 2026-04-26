@@ -14,6 +14,23 @@ local MauiWrapText = import("/lua/maui/text.lua").WrapText
 --- sender can't push us into laying out arbitrarily long lines.
 MaxMessageLength = 200
 
+--- 8-colour swatch palette indexed by `ChatConfigModel` colour keys
+--- (`all_color`, `allies_color`, `priv_color`, `link_color`,
+--- `notify_color`). The config dialog renders these as `BitmapCombo`
+--- choices; `ChatLineInterface.SetHeader` looks them up at render time
+--- via `entry.ColorKey` so palette changes take effect on the next
+--- `CalcVisible` pass without a full rebuild.
+ColorPalette = {
+    'ffffffff', -- 1: white
+    'ffff4242', -- 2: red
+    'ffefff42', -- 3: yellow
+    'ff4fff42', -- 4: green
+    'ff42fff8', -- 5: cyan
+    'ff424fff', -- 6: blue
+    'ffff42eb', -- 7: magenta
+    'ffff9f42', -- 8: orange
+}
+
 --- Wraps an entry's body text against `measureLine`'s row width and stores
 --- the result as `entry.WrappedText`. The first wrapped chunk reserves
 --- horizontal space for the entry's name prefix (so the body starts

@@ -7,7 +7,16 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 
 local Factions = import("/lua/factions.lua").Factions
 
+local ChatConfigModel = import("/lua/ui/game/chat/config/ChatConfigModel.lua")
+local ChatUtils = import("/lua/ui/game/chat/ChatUtils.lua")
+
 local Layouter = LayoutHelpers.ReusedLayoutFor
+
+--- Body-text colour used when an entry has neither a `BodyColor` override
+--- nor a `ColorKey` palette lookup that resolves. Matches the legacy chat
+--- panel's previous hardcoded body colour so unrecognised / pre-palette
+--- entries still render close to their old appearance.
+local DefaultBodyColor = 'ffc2f6ff'
 
 --- Flip to `true` to overlay a semi-transparent coloured bitmap over the
 --- control so its bounds are visible at runtime. Each chat interface uses a
@@ -23,6 +32,25 @@ end
 table.insert(FactionIcons, '/widgets/faction-icons-alpha_bmp/observer_ico.dds')
 
 local CamIconTexture = '/game/camera-btn/pinned_btn_up.dds'
+
+--- Resolves the body-text colour for `entry`. Priority:
+---   1. `entry.BodyColor` — explicit override (system / synthetic lines).
+---   2. `entry.ColorKey` — palette lookup against `ChatConfigModel.GetOptions()`.
+---   3. `DefaultBodyColor` — fallback for entries from before the palette was wired.
+--- Lives at module scope so both `SetHeader` and `SetContinuation` can call it
+--- without each having to repeat the lookup.
+---@param entry UIChatEntry
+---@return string
+local function ResolveBodyColor(entry)
+    if entry.BodyColor then return entry.BodyColor end
+    if entry.ColorKey then
+        local idx = ChatConfigModel.GetOptions()[entry.ColorKey]
+        if idx and ChatUtils.ColorPalette[idx] then
+            return ChatUtils.ColorPalette[idx]
+        end
+    end
+    return DefaultBodyColor
+end
 
 -------------------------------------------------------------------------------
 -- A single chat row: team-coloured faction icon, sender name and message text.
@@ -155,6 +183,7 @@ ChatLineInterface = ClassUI(Group) {
         self.Entry = entry
         self.Name:SetText(entry.Name or '')
         self.Text:SetText(wrappedText or entry.Text or '')
+        self.Text:SetColor(ResolveBodyColor(entry))
         self.TeamColor:SetSolidColor(entry.Color or '00000000')
 
         local iconIndex = entry.Faction or table.getn(FactionIcons)
@@ -192,6 +221,7 @@ ChatLineInterface = ClassUI(Group) {
         self.Entry = entry
         self.Name:SetText('')
         self.Text:SetText(wrappedText or '')
+        self.Text:SetColor(ResolveBodyColor(entry))
         self.TeamColor:SetSolidColor('00000000')
         self.FactionIcon:SetSolidColor('00000000')
         self.CamIcon:SetSolidColor('00000000')

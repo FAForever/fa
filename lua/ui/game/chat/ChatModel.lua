@@ -29,6 +29,8 @@ RecipientAllies = 'allies'
 ---@field Name        string             # formatted prefix, e.g. "Sender to allies:"
 ---@field Text        string             # raw message body
 ---@field Color       string             # ARGB hex of the sender's team color
+---@field BodyColor?  string             # explicit ARGB hex for the body text; bypasses the palette lookup (used by system / synthetic lines that always render the same colour)
+---@field ColorKey?   string             # palette key (e.g. `'all_color'`, `'priv_color'`, `'link_color'`) resolved against `ChatConfigModel.GetOptions()` at render time; ignored when `BodyColor` is set
 ---@field ArmyID      number             # sender's army index
 ---@field Faction     number             # faction icon index (1-based)
 ---@field Recipient   UIChatRecipient    # the target this message was directed to
@@ -45,6 +47,7 @@ RecipientAllies = 'allies'
 ---@field Recipient     LazyVar<UIChatRecipient>   # current send target
 ---@field WindowVisible LazyVar<boolean>           # whether the chat window is open
 ---@field LastActivity  LazyVar<number>            # `GetSystemTimeSeconds()` of the most recent user / receive activity; observed by the chat window's idle / fade timer
+---@field Pinned        LazyVar<boolean>           # title-bar pin checkbox; while true the chat window's idle auto-close is suspended
 
 ---@type UIChatModel | nil
 local ModelInstance = nil
@@ -57,6 +60,7 @@ function SetupSingleton()
         Recipient     = Create(RecipientAll),
         WindowVisible = Create(false),
         LastActivity  = Create(GetSystemTimeSeconds()),
+        Pinned        = Create(false),
     }
     return ModelInstance
 end
@@ -81,6 +85,7 @@ function __moduleinfo.OnReload(newModule)
         handle.Recipient:Set(ModelInstance.Recipient())
         handle.WindowVisible:Set(ModelInstance.WindowVisible())
         handle.LastActivity:Set(ModelInstance.LastActivity())
+        handle.Pinned:Set(ModelInstance.Pinned())
     end
 end
 
