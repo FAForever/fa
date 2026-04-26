@@ -6,13 +6,6 @@ Accepted & intentional differences live in [CHANGES.md](CHANGES.md); this file o
 
 ---
 
-## Command history recall (↑ / ↓)
-
-Legacy kept a `commandHistory` ring and recalled it on `VK_UP` / `VK_DOWN` ([chat.legacy.lua:681-701](../chat.legacy.lua)). Not ported. The new [`ChatEditInterface.OnNonTextKeyPressed`](ChatEditInterface.lua) maps Up / Down to `CommandHint:SelectNext` / `SelectPrev` while the hint is open; outside of an open hint, Up / Down do nothing.
-
-Both can co-exist: keep the hint behaviour while it's open, and fall through to history recall when `self.ChatCommandHintInterface == nil`.
-
----
 
 ## Already closed (do not re-list)
 
@@ -42,6 +35,7 @@ Closed in the most recent rounds of work:
 - **Wheel-forward when hidden / feed non-interactability** — two complementary fixes covering the same intent (input passes through to the worldview when chat isn't focused). [`ChatInterface.__init`](ChatInterface.lua) captures `Window.HandleEvent` as `OldHandleEvent` and wraps it: a wheel rotation while `IsHidden()` forwards to `worldview.ForwardMouseWheelInput` and returns true; everything else falls through to the original. [`ChatLineInterface.DisableInteraction`](ChatLineInterface.lua) disables hit-testing on every visible part of the row (group, `TeamColor`, `FactionIcon`, `Name`, `CamIcon`, `Text`); [`ChatFeedInterface.AppendRow`](ChatFeedInterface.lua) calls it after the `SetHeader` / `SetContinuation` pass (which itself toggles `CamIcon:EnableHitTest` based on the entry payload), so feed rows never swallow a click or wheel event meant for the world. The chat-window line pool is unaffected — `RebuildPool` allocates its own rows, so feed lines never migrate back into the interactive view.
 - **Legacy public API shim** — [`/lua/ui/game/chat.lua`](../chat.lua) is now a thin compatibility layer that re-exports every legacy global mods used to import (`ReceiveChat`, `ReceiveChatFromSim`, `SetupChatLayout`, `OnNISBegin`, `ChatPageUp` / `ChatPageDown`, `CloseChat`, `CloseChatConfig`, `AddChatOptionSetCallback`, `SetLayout`, `GetArmyData`, `GUI`, `ChatLines`). Every entry point logs a one-shot `WARN` deprecation message the first time it's touched and forwards to the equivalent new API where one exists; `GUI` and `ChatLines` are metatable-proxied so any field read or assignment surfaces a clear warning instead of crashing on a missing field. Once the warnings stop appearing in users' logs, the shim and `chat.legacy.lua` can both be deleted.
 - **Notify-command bridge** — [`ChatCommandRegistry.Dispatch`](commands/ChatCommandRegistry.lua) now falls through to [`/lua/ui/notify/commands.lua`](../../notify/commands.lua)'s `RunChatCommand` when no built-in command matches, mirroring the legacy fan-out. Builds the `args` shape it expects (lowercased command name in slot 1, lowercased remaining tokens after) and `pcall`s the call so a third-party command throwing doesn't propagate up through the chat send path. Only surfaces the "Invalid command — type /help" error if Notify also declines. Keeps `/enablenotify`, `/disablenotify`, `/enablenotifyoverlay`, `/disablenotifyoverlay`, and any future `AddChatCommand` registration alive without us having to re-register them in our own registry.
+- **Command history recall (↑ / ↓)** — [`ChatEditInterface`](ChatEditInterface.lua) keeps a `CommandHistory` ring (capped at `MaxCommandHistorySize = 32`, oldest first) populated by `PushHistory` from `OnEnterPressed` after a successful send. `OnNonTextKeyPressed` routes `↑` / `↓` to `RecallPrevious` / `RecallNext` when the command hint is closed and continues to drive the hint cycle when it's open. Walking past the newest entry blanks the edit, mirroring the legacy "down clears the line" behaviour.
 
 ---
 

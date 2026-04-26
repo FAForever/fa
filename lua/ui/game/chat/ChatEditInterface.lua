@@ -25,6 +25,12 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 --- distinct colour so overlapping controls can be told apart at a glance.
 local Debug = false
 
+--- Cap on the command-history ring (newest at the tail). Older entries
+--- are dropped when the buffer overflows. 32 is comfortably more than the
+--- handful a typical session generates while staying small enough that
+--- linear walks stay free.
+local MaxCommandHistorySize = 32
+
 -------------------------------------------------------------------------------
 -- The chat input area: a chat-bubble button, a recipient label, and an edit
 -- box. Pressing Enter dispatches the text to the controller. Clicking the
@@ -41,6 +47,8 @@ local Debug = false
 ---@field RecipientObserver LazyVar<UIChatRecipient>          # derived from ChatModel.Recipient
 ---@field Completion        UIChatCompletion | nil            # active Tab-cycle record, reset on text change
 ---@field SuppressCompletionReset boolean                     # true while our own SetText is running
+---@field CommandHistory    string[]                          # ring of previously-sent message texts (oldest first); recalled via Up / Down when the hint is closed
+---@field RecallEntry       number | nil                      # cursor into `CommandHistory` for the active recall walk; nil when no walk is in progress
 ---@field DebugBG?          Bitmap                            # semi-transparent overlay shown when `Debug` is true
 ChatEditInterface = ClassUI(Group) {
 
@@ -56,6 +64,8 @@ ChatEditInterface = ClassUI(Group) {
 
         self.Completion = nil
         self.SuppressCompletionReset = false
+        self.CommandHistory = {}
+        self.RecallEntry = nil
 
         self.ChatBubble = Button(self,
             UIUtil.UIFile('/game/chat-box_btn/radio_btn_up.dds'),
@@ -112,11 +122,13 @@ ChatEditInterface = ClassUI(Group) {
         -- Pressing Enter on an empty edit box closes the window — matches
         -- the legacy `chat.lua` shortcut where Enter serves as both "send"
         -- and "dismiss" depending on whether there's anything to send.
-        self.EditBox.OnEnterPressed = function(edit, text)
+        -- Successful sends are appended to the command-history ring so
+        -- Up / Down can recall them when the hint isn't open.
+        self.EditBox.OnEnterPressed = function(_, text)
             ChatController.NotifyActivity()
             if text and text ~= '' then
                 ChatController.Send(text, self.CamCheckbox:IsChecked())
-                edit:SetText('')
+                self:PushHistory(text)
             else
                 ChatController.CloseWindow()
             end
@@ -196,10 +208,20 @@ ChatEditInterface = ClassUI(Group) {
                 else
                     chatInterface.ScrollLines(step)
                 end
-            elseif keycode == UIUtil.VK_UP and self.ChatCommandHintInterface then
-                self.ChatCommandHintInterface:SelectNext()
-            elseif keycode == UIUtil.VK_DOWN and self.ChatCommandHintInterface then
-                self.ChatCommandHintInterface:SelectPrev()
+            elseif keycode == UIUtil.VK_UP then
+                -- Hint open → cycle the selection; closed → walk back
+                -- through the command-history ring, oldest first.
+                if self.ChatCommandHintInterface then
+                    self.ChatCommandHintInterface:SelectNext()
+                else
+                    self:RecallPrevious()
+                end
+            elseif keycode == UIUtil.VK_DOWN then
+                if self.ChatCommandHintInterface then
+                    self.ChatCommandHintInterface:SelectPrev()
+                else
+                    self:RecallNext()
+                end
             end
         end
 
@@ -310,6 +332,70 @@ ChatEditInterface = ClassUI(Group) {
         -- Advance the consumed span to match what we just wrote so the next
         -- cycle overwrites exactly this candidate, not the original word.
         c.Consume = replacementLen
+    end,
+
+    ---------------------------------------------------------------------------
+    -- Command history recall
+
+    --- Appends a successfully-sent message to the command-history ring and
+    --- resets any active recall walk so the next Up press starts at the
+    --- newest entry. Trims the ring to `MaxCommandHistorySize`.
+    ---@param self UIChatEditInterface
+    ---@param text string
+    PushHistory = function(self, text)
+        table.insert(self.CommandHistory, text)
+        while table.getn(self.CommandHistory) > MaxCommandHistorySize do
+            table.remove(self.CommandHistory, 1)
+        end
+        self.RecallEntry = nil
+    end,
+
+    --- Walks back toward older entries. Empty history is a no-op; the first
+    --- press lands on the newest entry, subsequent presses move one step
+    --- earlier each time and clamp at the oldest.
+    ---@param self UIChatEditInterface
+    RecallPrevious = function(self)
+        local count = table.getn(self.CommandHistory)
+        if count == 0 then return end
+        if self.RecallEntry then
+            self.RecallEntry = math.max(self.RecallEntry - 1, 1)
+        else
+            self.RecallEntry = count
+        end
+        self:ApplyRecall()
+    end,
+
+    --- Walks forward toward newer entries. After the newest, `RecallEntry`
+    --- resets to nil so the next Down press blanks the edit (matching the
+    --- legacy "step past the end clears the line" feel). Empty history
+    --- with no active recall is a no-op; with no active recall but a
+    --- non-empty history, blanks the edit so users have a quick "wipe what
+    --- I'm typing" gesture.
+    ---@param self UIChatEditInterface
+    RecallNext = function(self)
+        local count = table.getn(self.CommandHistory)
+        if count == 0 then return end
+        if self.RecallEntry then
+            self.RecallEntry = math.min(self.RecallEntry + 1, count)
+            self:ApplyRecall()
+            if self.RecallEntry == count then
+                self.RecallEntry = nil
+            end
+        else
+            self.EditBox:SetText('')
+        end
+    end,
+
+    --- Writes the entry at `RecallEntry` into the edit box and parks the
+    --- caret at the end. No-op if `RecallEntry` doesn't reference a real
+    --- entry — guards against being called between a destructive history
+    --- mutation and the next nav keystroke.
+    ---@param self UIChatEditInterface
+    ApplyRecall = function(self)
+        local entry = self.CommandHistory[self.RecallEntry or 0]
+        if not entry then return end
+        self.EditBox:SetText(entry)
+        self.EditBox:SetCaretPosition(STR_Utf8Len(entry))
     end,
 
     --- Shows or hides the command hint based on the current edit-box text.
