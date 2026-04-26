@@ -47,6 +47,12 @@ FloatText = ClassUI(Group) {
         self.Text:DisableHitTest()
 
         self:DisableHitTest()
+
+        -- Pin above everything else currently on the frame so the toast
+        -- isn't occluded by windows / popups / map dialogs that sit at a
+        -- higher depth than the toast's own parent. Same trick as the
+        -- chat config dialog uses on Open.
+        self.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
     end,
 
     ---@param self UIFloatText
@@ -89,7 +95,7 @@ FloatText = ClassUI(Group) {
                 return
             end
             control.Top:Set(startTop - scaledDistance * t)
-            control:SetAlpha(1 - t, true)
+            control:SetAlpha(math.sqrt(1 - t), true)
         end
     end,
 }
