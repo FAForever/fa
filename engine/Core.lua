@@ -66,9 +66,10 @@ end
 function Basename(fullPath, stripExtension)
 end
 
---- likely used for debugging, but the use is unknown
----@unknown
-function BeginLoggingStats()
+--- Begins the SupComMark performance benchmark.
+---@see EndLoggingStats # End the benchmark and save results to disk.
+---@param filename string # The name (with extension) for the resulting timestamped benchmark filename.
+function BeginLoggingStats(filename)
 end
 
 --- called during blueprint loading to update the loading animation
@@ -111,8 +112,9 @@ end
 function DiskToLocal(SysOrLocalPath)
 end
 
---- stops logging stats and optionally exits the application
----@param exit boolean
+--- Ends the SupComMark performance benchmark and saves the results to disk.
+---@see BeginLoggingStats # Begin the benchmark
+---@param exit boolean? # Exits the application iff `false`.
 function EndLoggingStats(exit)
 end
 
