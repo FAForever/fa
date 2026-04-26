@@ -477,18 +477,25 @@ Window = ClassUI(Group) {
                     self.Left:Set(math.max(math.min(location.right, parent.Right()) - oldWidth), parent.Left())
                 end
             -- new version in preference file that does support UI scaling
-            else 
-                local top = location.top 
-                local left = location.left 
-                local width = location.width 
-                local height = location.height 
+            else
+                local top = location.top
+                local left = location.left
+                -- width/height are stored inverse-scaled so the saved size
+                -- survives a ui_scale change; rescale them now.
+                local width = LayoutHelpers.ScaleNumber(location.width)
+                local height = LayoutHelpers.ScaleNumber(location.height)
+
+                -- Clamp into the parent rect so a saved position can't put
+                -- the window off-screen after a resolution change shrinks
+                -- the parent. Mirrors the old-prefs branch above and the
+                -- title-bar drag clamp in `TitleGroup.HandleEvent`.
+                left = math.max(parent.Left(), math.min(left, parent.Right() - width))
+                top = math.max(parent.Top(), math.min(top, parent.Bottom() - height))
 
                 self.Left:Set(left)
                 self.Top:Set(top)
-
-                -- we can scale these accordingly as we applied the inverse on saving
-                self.Right:Set(LayoutHelpers.ScaleNumber(width) + left)
-                self.Bottom:Set(LayoutHelpers.ScaleNumber(height) + top)
+                self.Right:Set(left + width)
+                self.Bottom:Set(top + height)
             end
         elseif defaultPosition then
             -- Scale only if it's a number, else it's already scaled lazyvar
