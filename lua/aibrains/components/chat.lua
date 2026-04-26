@@ -33,18 +33,20 @@ AIBrainChatComponent = ClassSimple {
     --- Broadcasts a message to every connected UI as an "all" chat line.
     ---@param self AIBrainChatComponent
     ---@param text string
+    ---@param args? any[]                   # optional `string.format` arguments; UI applies `LOCF(text, unpack(args))` on receive
     ---@param location? AIBrainChatLocation
-    SendChatToAll = function(self, text, location)
-        self:SendChatTo('all', text, location)
+    SendChatToAll = function(self, text, args, location)
+        self:SendChatTo('all', text, args, location)
     end,
 
     --- Broadcasts a message to the AI's allies. `Sync.ChatMessages` reaches
     --- every UI, so the non-ally filter is applied client-side on display.
     ---@param self AIBrainChatComponent
     ---@param text string
+    ---@param args? any[]
     ---@param location? AIBrainChatLocation
-    SendChatToAllies = function(self, text, location)
-        self:SendChatTo('allies', text, location)
+    SendChatToAllies = function(self, text, args, location)
+        self:SendChatTo('allies', text, args, location)
     end,
 
     --- Whispers a message to a specific army. No ally constraint — the AI is
@@ -53,20 +55,23 @@ AIBrainChatComponent = ClassSimple {
     ---@param self AIBrainChatComponent
     ---@param army integer
     ---@param text string
+    ---@param args? any[]
     ---@param location? AIBrainChatLocation
-    SendChatToPlayer = function(self, army, text, location)
-        self:SendChatTo(army, text, location)
+    SendChatToPlayer = function(self, army, text, args, location)
+        self:SendChatTo(army, text, args, location)
     end,
 
     --- Addresses a message back at this brain's own army. Useful for
-    --- debug-style output and campaign hints that should only reach whoever
-    --- is watching this AI's perspective (typically just observers with
-    --- full vision, or a human controller in campaign setups).
+    --- debug-style output, campaign hints, and sim-event announcements
+    --- that should only reach the army the event happened to (resource
+    --- gifts received, ACU under attack, etc.) — `IsLocalRecipient`
+    --- ensures only that army's UI renders the line.
     ---@param self AIBrainChatComponent | AIBrain
     ---@param text string
+    ---@param args? any[]
     ---@param location? AIBrainChatLocation
-    SendChatToSelf = function(self, text, location)
-        self:SendChatTo(self:GetArmyIndex(), text, location)
+    SendChatToSelf = function(self, text, args, location)
+        self:SendChatTo(self:GetArmyIndex(), text, args, location)
     end,
 
     --- Shared implementation: builds the message, stamps it with the
@@ -77,22 +82,30 @@ AIBrainChatComponent = ClassSimple {
     --- double-posting if the same message arrives more than once (see
     --- `ChatController.OnSyncChatMessages`).
     ---
-    --- `location`, if provided, rides on the message as `msg.location` and
-    --- is surfaced to the UI as `entry.Location` — the click handler in
-    --- `ChatInterface` translates it to a `MoveTo`/`MoveToRegion` call at
-    --- click time, so there is no need to synthesise a camera snapshot
-    --- sim-side.
+    --- `args`, if provided, rides on the message as `msg.Args` and is
+    --- consumed by the UI's receive path: `LOCF(msg.text, unpack(msg.Args))`
+    --- runs once per recipient against their own locale, so callers can
+    --- pass a `<LOC ...>` format-string template plus raw values (army
+    --- nicknames, resource amounts, …) instead of pre-formatting and
+    --- losing localisation.
+    ---
+    --- `location`, if provided, rides as `msg.location` and is surfaced to
+    --- the UI as `entry.Location` — the click handler in `ChatInterface`
+    --- translates it to a `MoveTo`/`MoveToRegion` call at click time, so
+    --- there is no need to synthesise a camera snapshot sim-side.
     ---@param self AIBrainChatComponent | AIBrain
     ---@param to AIBrainChatRecipient
     ---@param text string
+    ---@param args? any[]
     ---@param location? AIBrainChatLocation
-    SendChatTo = function(self, to, text, location)
+    SendChatTo = function(self, to, text, args, location)
         if type(text) ~= 'string' or text == '' then return end
 
         local msg = {
             Chat     = true,
             to       = to,
             text     = text,
+            Args     = args,
             From     = self:GetArmyIndex(),
             location = location,
         }

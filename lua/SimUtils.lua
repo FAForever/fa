@@ -1479,8 +1479,42 @@ function GiveResourcesToPlayer(data)
     local massTaken = fromBrain:TakeResource('MASS', data.Mass * fromBrain:GetEconomyStored('MASS'))
     local energyTaken = fromBrain:TakeResource('ENERGY', data.Energy * fromBrain:GetEconomyStored('ENERGY'))
 
+    -- `GiveResource` silently caps at the receiver's max storage, and
+    -- storage stats only update next tick, so derive what actually lands
+    -- up front from `MaxStorage - Stored`.
+    local massCapacity = toBrain:GetArmyStat('Economy_MaxStorage_Mass', 0).Value
+        - toBrain:GetEconomyStored('MASS')
+    local energyCapacity = toBrain:GetArmyStat('Economy_MaxStorage_Energy', 0).Value
+        - toBrain:GetEconomyStored('ENERGY')
+    local massGiven = math.min(massTaken, massCapacity)
+    local energyGiven = math.min(energyTaken, energyCapacity)
+
     toBrain:GiveResource('MASS', massTaken)
     toBrain:GiveResource('ENERGY', energyTaken)
+
+    -- Whisper from giver → receiver so the line reads with the giver's
+    -- attribution. Three LOC keys rather than one templated string so each
+    -- locale gets a clean sentence per case.
+    local mass = math.floor(massGiven)
+    local energy = math.floor(energyGiven)
+    local toArmy = data.To --[[@as integer]]
+    local fromName = fromBrain.Nickname or tostring(data.From)
+    if mass > 0 and energy > 0 then
+        fromBrain:SendChatToPlayer(toArmy,
+            "<LOC chat_resources_received_both>%s sent you %d mass and %d energy.",
+            { fromName, mass, energy }
+        )
+    elseif mass > 0 then
+        fromBrain:SendChatToPlayer(toArmy,
+            "<LOC chat_resources_received_mass>%s sent you %d mass.",
+            { fromName, mass }
+        )
+    elseif energy > 0 then
+        fromBrain:SendChatToPlayer(toArmy,
+            "<LOC chat_resources_received_energy>%s sent you %d energy.",
+            { fromName, energy }
+        )
+    end
 end
 
 ---@param data {From: Army, To: Army}

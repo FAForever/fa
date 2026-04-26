@@ -369,6 +369,12 @@ local function IsValidIncomingMessage(msg)
     if msg.camera   ~= nil and type(msg.camera)   ~= 'table' then return false end
     if msg.location ~= nil and type(msg.location) ~= 'table' then return false end
 
+    -- Optional `Args` payload for `LOCF`-style format-on-receive. When
+    -- present it must be a table; `OnReceive` unpacks it into `LOCF` along
+    -- with `msg.text` so the rendering happens UI-side and respects the
+    -- viewer's locale.
+    if msg.Args ~= nil and type(msg.Args) ~= 'table' then return false end
+
     return true
 end
 
@@ -390,6 +396,18 @@ function OnReceive(sender, msg)
     -- lives in `IsValidIncomingMessage` so the dispatch logic below stays
     -- focused on routing and rendering.
     if not IsValidIncomingMessage(msg) then return end
+
+    -- LOCF-style format-on-receive. When the sender ships `Args` alongside
+    -- the message text, the text is treated as a `string.format` template
+    -- (typically a `<LOC ...>` tag with `%s` / `%d` placeholders) and
+    -- formatted UI-side so the result respects the viewer's locale. The
+    -- formatted text replaces `msg.text` for every downstream consumer
+    -- (length-cap notwithstanding — the cap was already applied to the
+    -- pre-format template, so `LOCF` can legitimately exceed it; that's
+    -- by design for system events where the args are trusted sim values).
+    if msg.Args then
+        msg.text = LOCF(msg.text, unpack(msg.Args))
+    end
 
     -- Notify routing: the Notify subsystem tags messages with `to='notify'`
     -- and owns the display decision. Only fall through to rendering a chat
@@ -453,6 +471,7 @@ end
 --- handler is the *only* source of chat in a replay.
 ---@param msgs table[]
 function OnSyncChatMessages(msgs)
+    reprsl(msgs)
     if type(msgs) ~= 'table' then return end
 
     local history = ChatModel.GetSingleton().History()
