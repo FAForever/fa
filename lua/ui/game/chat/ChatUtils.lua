@@ -1,5 +1,6 @@
 
 local MauiWrapText = import("/lua/maui/text.lua").WrapText
+local ChatPayload = import("/lua/shared/ChatPayload.lua")
 
 -------------------------------------------------------------------------------
 -- Shared, view-agnostic helpers for the chat tree. Each function operates
@@ -8,11 +9,12 @@ local MauiWrapText = import("/lua/maui/text.lua").WrapText
 -- `ChatFeedInterface` (or future views) can reuse without coupling them
 -- to each other lives here.
 
---- Maximum allowed UTF-8 character length for a chat message body. The
---- edit box enforces this on input via `Edit:SetMaxChars`; the receive
---- path uses it as a hard validator so a peer with a tampered or buggy
---- sender can't push us into laying out arbitrarily long lines.
-MaxMessageLength = 200
+--- Re-export of the chat-message length cap; the single source of truth
+--- lives in `/lua/shared/ChatPayload.lua` so the sim relay and the UI
+--- receive path can't drift on the bound. Call sites that already
+--- reference `ChatUtils.MaxMessageLength` (the edit box's `SetMaxChars`,
+--- the receive validator) keep working without learning a new path.
+MaxMessageLength = ChatPayload.MaxMessageLength
 
 --- 8-colour swatch palette indexed by `ChatConfigModel` colour keys
 --- (`all_color`, `allies_color`, `priv_color`, `link_color`,

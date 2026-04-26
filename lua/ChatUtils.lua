@@ -9,6 +9,7 @@
 -- trusted message should stay on the UI side.
 
 local SimUtils = import("/lua/simutils.lua")
+local ChatPayload = import("/lua/shared/ChatPayload.lua")
 
 --- Per-client recipient filter. The sim runs deterministically on every
 --- client, but `Sync` is per-client and `GetFocusArmy()` reads the local
@@ -24,7 +25,7 @@ local SimUtils = import("/lua/simutils.lua")
 ---   the sender.
 --- * Numeric `to` is a private whisper — only the sender and the named
 ---   recipient pass.
----@param msg {From: integer, to: 'all' | 'allies' | integer}
+---@param msg ChatPayload
 ---@return boolean
 function IsLocalRecipient(msg)
     local focus = GetFocusArmy()
@@ -48,7 +49,7 @@ end
 --- `AIBrainChatComponent` for AI-emitted lines, and any future sim system
 --- that wants to drop a line into the chat feed) so the recipient policy
 --- is enforced sim-side in exactly one place.
----@param msg table
+---@param msg ChatPayload
 function RelayChatMessage(msg)
     if IsLocalRecipient(msg) then
         Sync.ChatMessages = Sync.ChatMessages or {}
@@ -94,12 +95,21 @@ end
 --- line to appear in every UI's chat feed can call `SendChatMessage` with a
 --- synthesised `Msg` table (remember to set `Chat = true` and a non-empty
 --- `text`, and leave `From` alone — we overwrite it).
----@param data {Msg: table}
+---@param data {Msg: ChatPayload}
 function SendChatMessage(data)
-    if type(data) ~= 'table' or type(data.Msg) ~= 'table' then return end
+    if type(data) ~= 'table' then return end
     local msg = data.Msg
-    if msg.Chat ~= true then return end
-    if type(msg.text) ~= 'string' or msg.text == '' then return end
+
+    -- Pure shape validation — type, length, recipient shape, optional
+    -- payload table-types. Bouncing here saves the `Sync.ChatMessages`
+    -- round-trip on every other client when the UI receive path would
+    -- have dropped the message anyway.
+    if not ChatPayload.IsValidPayload(msg) then return end
+
+    -- `'notify'` is a UI subsystem channel — players reach this relay path
+    -- only with broadcast or whisper recipients, so reject the shared
+    -- validator's broader allow-list here.
+    if msg.to == 'notify' then return end
 
     -- Trusted sender stamp; ignore whatever the client put in `msg.From`.
     local from = SimUtils.GetCurrentCommandSourceArmy()
@@ -107,7 +117,7 @@ function SendChatMessage(data)
 
     -- Private-message guard: a numeric `to` is an army ID the sender is
     -- whispering to. Cross-alliance whispers are rejected.
-    if type(msg.to) == 'number' and not IsAlly(from, msg.to) then
+    if type(msg.to) == 'number' and not IsAlly(from, msg.to --[[@as integer]]) then
         return
     end
 

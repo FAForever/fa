@@ -1,7 +1,7 @@
 
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
 local ChatConfigModel = import("/lua/ui/game/chat/config/ChatConfigModel.lua")
-local ChatUtils = import("/lua/ui/game/chat/ChatUtils.lua")
+local ChatPayload = import("/lua/shared/ChatPayload.lua")
 
 -------------------------------------------------------------------------------
 -- Window visibility
@@ -318,71 +318,11 @@ end
 -------------------------------------------------------------------------------
 -- Receiving (network)
 
---- Pure shape validator for an incoming chat payload. Returns `true` only
---- when every required field is present with the expected type and every
---- optional field, when present, has the engine-API shape it must have for
---- downstream rendering / camera-jump code to treat it safely.
----
---- Each rule is its own `return false` — malformed input is dropped, never
---- coerced or "repaired". A peer that ships an inconsistent shape is
---- either modded, buggy, or hostile; in any of those cases letting the
---- message through would let manipulated traffic render somewhere it
---- shouldn't. The receive path is reachable from any
---- `gamemain.RegisterChatFunc` caller, including external mods, so the
---- shape can't be trusted.
----
---- Sender / observer-mode consistency lives in `OnReceive` rather than
---- here — those rules need session context (army data, focus army, replay
---- state) that this pure validator can't see.
----@param msg any
----@return boolean
-local function IsValidIncomingMessage(msg)
-    -- Required: table-shaped, chat-flagged, with a string body.
-    if type(msg) ~= 'table' then return false end
-    if not msg.Chat then return false end
-    if type(msg.text) ~= 'string' then return false end
-
-    -- Length cap — matches the edit box's `SetMaxChars(MaxMessageLength)`
-    -- on the send side, so a peer that bypassed the input cap can't push
-    -- us into laying out arbitrarily long lines. UTF-8 length mirrors the
-    -- input enforcement exactly.
-    if STR_Utf8Len(msg.text) > ChatUtils.MaxMessageLength then return false end
-
-    -- Recipient must be one of the supported shapes. Without this guard,
-    -- a bare string like 'admin' or a non-string truthy value would fall
-    -- through to the `descriptor = ToStrings[to] or ToStrings.private`
-    -- fallback in `OnReceive`, letting a peer fake a "to you:" header on
-    -- what is actually a broadcast.
-    if msg.to ~= ChatModel.RecipientAll
-        and msg.to ~= ChatModel.RecipientAllies
-        and msg.to ~= 'notify'
-        and type(msg.to) ~= 'number' then
-        return false
-    end
-
-    -- Optional payloads must match the shapes the engine APIs expect.
-    -- `msg.camera` is consumed by `WorldCamera:RestoreSettings`, which
-    -- requires a `SaveSettings`-shaped table; `msg.location` is dispatched
-    -- against `Position` / `Area` keys in `OnCameraClicked`. Anything that
-    -- isn't a table would crash those handlers when the user clicks the
-    -- cam icon, so reject up front rather than crashing on click.
-    if msg.camera   ~= nil and type(msg.camera)   ~= 'table' then return false end
-    if msg.location ~= nil and type(msg.location) ~= 'table' then return false end
-
-    -- Optional `Args` payload for `LOCF`-style format-on-receive. When
-    -- present it must be a table; `OnReceive` unpacks it into `LOCF` along
-    -- with `msg.text` so the rendering happens UI-side and respects the
-    -- viewer's locale.
-    if msg.Args ~= nil and type(msg.Args) ~= 'table' then return false end
-
-    return true
-end
-
 --- Handler registered with `gamemain.RegisterChatFunc`. Validates the
 --- message, delegates Notify-subsystem messages, resolves the sender's army
 --- data, and appends a chat line.
 ---@param sender string
----@param msg table
+---@param msg ChatPayload
 function OnReceive(sender, msg)
     -- Coerce sender to a non-empty string so the formatting concatenations
     -- below can't blow up on a number, table, or nil. The guard is wider
@@ -393,9 +333,14 @@ function OnReceive(sender, msg)
     end
 
     -- Pure-shape validation: every type / length / payload-shape rule
-    -- lives in `IsValidIncomingMessage` so the dispatch logic below stays
-    -- focused on routing and rendering.
-    if not IsValidIncomingMessage(msg) then return end
+    -- lives in `ChatPayload.IsValidPayload` (shared with the sim relay) so
+    -- the dispatch logic below stays focused on routing and rendering. The
+    -- receive path is reachable from any `gamemain.RegisterChatFunc`
+    -- caller, including external mods, so the shape can't be trusted.
+    -- Sender / observer-mode consistency stays here in `OnReceive` since
+    -- those rules need session context (army data, focus army, replay
+    -- state) the shared validator can't see.
+    if not ChatPayload.IsValidPayload(msg) then return end
 
     -- LOCF-style format-on-receive. When the sender ships `Args` alongside
     -- the message text, the text is treated as a `string.format` template
@@ -469,7 +414,7 @@ end
 ---
 --- Replays are the case where `SessionSendChatMessage` never fires: this
 --- handler is the *only* source of chat in a replay.
----@param msgs table[]
+---@param msgs ChatPayload[]
 function OnSyncChatMessages(msgs)
     if type(msgs) ~= 'table' then return end
 
@@ -502,7 +447,7 @@ end
 --- just sent. Called only from `Send`; not registered with gamemain.
 ---@param senderData table        # local player's army data
 ---@param recipientData table     # target of the private message
----@param msg table               # outgoing message (uses `text`, `to`, `camera`)
+---@param msg ChatPayload         # outgoing message (uses `text`, `to`, `camera`)
 local function OnEcho(senderData, recipientData, msg)
     local name = string.format("%s %s:", LOC(ToStrings.to.caps), recipientData.nickname)
     AppendChatLine {
