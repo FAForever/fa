@@ -771,7 +771,7 @@ function GiveUnitsToPlayer(data, units)
                 if pos[3] < z0 then z0 = pos[3] end
                 if pos[3] > z1 then z1 = pos[3] end
             end
-            local pad = 5
+            local pad = 30
             local area = { x0 = x0 - pad, x1 = x1 + pad, y0 = z0 - pad, y1 = z1 + pad }
             local fromBrain = ArmyBrains[owner]
             local fromName = fromBrain.Nickname or tostring(owner)
