@@ -280,13 +280,21 @@ local function AppendChatLine(args)
     -- in engine data; the view expects 1-based indices.
     local faction = not args.IsObserver and armyData.faction or nil
 
-    -- Pick the palette key for the body text. Observers always use the
-    -- link palette so observer chatter stands out; everyone else inherits
-    -- the channel descriptor's `colorkey`. Falls back to `'priv_color'`
-    -- for unrecognised recipients (matches the `ToStrings.private`
-    -- descriptor fallback used elsewhere in `OnReceive`).
+    -- Pick the palette key for the body text:
+    --   * Camera-link messages (the sender attached a `Camera` snapshot or
+    --     a sim-side `Location` hint) always use the link palette so the
+    --     "click to jump" affordance is visually consistent regardless of
+    --     channel — matches the legacy override at chat.legacy.lua:443-446.
+    --   * Observer broadcasts also use the link palette so observer chatter
+    --     stands out from player traffic.
+    --   * Everyone else inherits the channel descriptor's `colorkey`.
+    -- Falls back to `'priv_color'` for unrecognised recipients (matches
+    -- the `ToStrings.private` descriptor fallback used elsewhere in
+    -- `OnReceive`).
     local colorKey
-    if args.IsObserver then
+    if args.Camera or args.Location then
+        colorKey = ChatConfigModel.KeyLinkColor
+    elseif args.IsObserver then
         colorKey = ChatConfigModel.KeyLinkColor
     else
         local descriptor = ToStrings[args.Recipient] or ToStrings.private
