@@ -262,6 +262,7 @@ ChatLinesInterface = ClassUI(Group) {
     ---@param self UIChatLinesInterface
     ---@param options UIChatOptions
     ApplyOptions = function(self, options)
+        local oldPoolSize = table.getn(self.ChatLineInterfaces)
         local size = options.font_size or 14
         for _, line in ipairs(self.ChatLineInterfaces) do
             line:SetFontSize(size)
@@ -275,6 +276,7 @@ ChatLinesInterface = ClassUI(Group) {
         -- Recompute what's visible so entries newly excluded by
         -- `IsValidEntry` drop out of the feed immediately.
         self:RefreshVirtualSize()
+        self:RecomputeScrollTopForPoolChange(oldPoolSize)
         self:CalcVisible()
     end,
 
@@ -399,6 +401,28 @@ ChatLinesInterface = ClassUI(Group) {
     ---@return boolean
     IsScrollable = function(self, axis)
         return true
+    end,
+
+    --- Adjusts `ScrollTop` to compensate for a change in pool size (window
+    --- resize, font-size change). Keeps the bottom of the visible window —
+    --- the entry currently rendered at `pool[1]` — pinned across the change:
+    --- when the pool grows, the new slots above reveal *older* entries
+    --- instead of staying blank, and an at-bottom view stays at the bottom.
+    --- Caller is responsible for following up with `CalcVisible`.
+    ---
+    --- Without this step, growing the pool past the previous `visibleBottom`
+    --- range leaves the new top slots stuck on the `currentVirtualPos < scrollTop`
+    --- branch in `CalcVisible` — they Clear+Hide instead of being filled with
+    --- older history. Scrolling later "fixes" it because `ScrollSetTop` writes
+    --- a fresh `ScrollTop` that lets `CalcVisible` walk further back.
+    ---@param self UIChatLinesInterface
+    ---@param oldPoolSize number   # pool length before the resize / RebuildPool call
+    RecomputeScrollTopForPoolChange = function(self, oldPoolSize)
+        local oldVisibleBottom = math.min(self.ScrollTop + oldPoolSize - 1, self.VirtualSize)
+        local newPoolSize = table.getn(self.ChatLineInterfaces)
+        local newMaxTop = math.max(1, self.VirtualSize - newPoolSize + 1)
+        local newScrollTop = math.max(1, oldVisibleBottom - newPoolSize + 1)
+        self.ScrollTop = math.max(1, math.min(newMaxTop, newScrollTop))
     end,
 
     --- Snaps to the bottom of the virtual list.
@@ -553,7 +577,9 @@ ChatLinesInterface = ClassUI(Group) {
     --- every drag frame is too expensive — see `OnResizeFinished`.
     ---@param self UIChatLinesInterface
     OnResizeLive = function(self)
+        local oldPoolSize = table.getn(self.ChatLineInterfaces)
         self:RebuildPool()
+        self:RecomputeScrollTopForPoolChange(oldPoolSize)
         self:CalcVisible()
     end,
 
@@ -561,8 +587,10 @@ ChatLinesInterface = ClassUI(Group) {
     --- the user finishes a resize drag.
     ---@param self UIChatLinesInterface
     OnResizeFinished = function(self)
+        local oldPoolSize = table.getn(self.ChatLineInterfaces)
         self:RebuildPool()
         self:RewrapAll()
+        self:RecomputeScrollTopForPoolChange(oldPoolSize)
         self:CalcVisible()
     end,
 
