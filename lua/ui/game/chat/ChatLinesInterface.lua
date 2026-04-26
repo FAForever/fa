@@ -410,6 +410,19 @@ ChatLinesInterface = ClassUI(Group) {
         self:CalcVisible()
     end,
 
+    --- True when `ScrollTop` is already pinned at the maximum legal value
+    --- — i.e. the newest entry is in the bottom-most pool slot and no
+    --- amount of "scroll down" would change anything. Useful for callers
+    --- that want a "if already at bottom, do something else" two-stage
+    --- behaviour (e.g. dismissing the window on a second jump-to-bottom).
+    ---@param self UIChatLinesInterface
+    ---@return boolean
+    IsAtBottom = function(self)
+        local poolSize = table.getn(self.ChatLineInterfaces)
+        local maxTop = math.max(1, self.VirtualSize - poolSize + 1)
+        return self.ScrollTop >= maxTop
+    end,
+
     ---------------------------------------------------------------------------
     -- Visibility mapping
     ---------------------------------------------------------------------------

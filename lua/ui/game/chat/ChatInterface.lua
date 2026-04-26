@@ -481,6 +481,33 @@ function ScrollPages(delta)
     end
 end
 
+--- Snaps the chat feed to the oldest visible entry. No-op if the window
+--- has never been opened. Not bound to a default key — the Edit control
+--- consumes Home for caret navigation before `OnNonTextKeyPressed` fires
+--- — but exposed for keymap entries (`UI_Lua import("/lua/ui/game/chat/ChatInterface.lua").ScrollToTop()`)
+--- and for mods that want a programmatic jump-to-top.
+function ScrollToTop()
+    if Instance then
+        Instance.ChatLinesInterface:ScrollSetTop(nil, 1)
+    end
+end
+
+--- Two-stage "jump to bottom" handler. If the chat is already pinned to
+--- the newest entry, collapses the window — same intent as the legacy
+--- "press End again to dismiss" feel without sneaking in a separate
+--- toggle. Otherwise snaps to the bottom. No-op if the window has never
+--- been opened. Not bound to a default key (see `ScrollToTop` for the
+--- reason); exposed for keymap entries and mods.
+function ScrollToBottomOrClose()
+    if not Instance then return end
+    local lines = Instance.ChatLinesInterface
+    if lines:IsAtBottom() then
+        ChatController.CloseWindow()
+    else
+        lines:ScrollToBottom()
+    end
+end
+
 --- Opens the chat window (creating it on first call) and scrolls the feed
 --- by `delta` rows. Entry point for the global PgUp / PgDn key bindings —
 --- so pressing PgUp with the window hidden both reveals it and starts

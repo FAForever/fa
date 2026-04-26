@@ -161,18 +161,39 @@ ChatEditInterface = ClassUI(Group) {
             return true
         end
 
-        -- Page Up / Page Down scroll the chat feed. Shift narrows to one row.
-        -- Matches the legacy chat.lua binding so muscle memory carries over.
+        -- Page Up / Page Down scroll the chat feed. Three modes per key:
+        --   * no modifier → 10 rows (page-ish)
+        --   * Shift       → 1 row (fine grain)
+        --   * Ctrl        → jump to the extreme; `Ctrl+PgDn` while already
+        --                   at the bottom collapses the window.
+        -- Matches the legacy chat.lua page-key binding so muscle memory
+        -- carries over, with `Ctrl` covering the jump-to-extreme case that
+        -- Home / End would normally serve — those are consumed by the Edit
+        -- control for caret navigation before they reach this handler, so
+        -- `OnNonTextKeyPressed` never sees them.
         -- Up / Down cycle the command-hint selection while the hint is open.
         -- Lazy import of ChatInterface avoids the import cycle: ChatInterface
         -- imports this module at load time, so the reverse edge has to defer.
-        self.EditBox.OnNonTextKeyPressed = function(_, keycode, modifiers)
+        ---@param keycode number     # OS-level VK_* code; compare against `UIUtil.VK_*`
+        ---@param event KeyEvent     # full input-event payload; modifiers live at `event.Modifiers`
+        self.EditBox.OnNonTextKeyPressed = function(_, keycode, event)
             ChatController.NotifyActivity()
-            local step = modifiers and modifiers.Shift and 1 or 10
+            local chatInterface = import("/lua/ui/game/chat/ChatInterface.lua")
+            local mods = event and event.Modifiers
+            local ctrl = mods and mods.Ctrl
+            local step = (mods and mods.Shift) and 1 or 10
             if keycode == UIUtil.VK_PRIOR then
-                import("/lua/ui/game/chat/ChatInterface.lua").ScrollLines(-step)
+                if ctrl then
+                    chatInterface.ScrollToTop()
+                else
+                    chatInterface.ScrollLines(-step)
+                end
             elseif keycode == UIUtil.VK_NEXT then
-                import("/lua/ui/game/chat/ChatInterface.lua").ScrollLines(step)
+                if ctrl then
+                    chatInterface.ScrollToBottomOrClose()
+                else
+                    chatInterface.ScrollLines(step)
+                end
             elseif keycode == UIUtil.VK_UP and self.ChatCommandHintInterface then
                 self.ChatCommandHintInterface:SelectNext()
             elseif keycode == UIUtil.VK_DOWN and self.ChatCommandHintInterface then
