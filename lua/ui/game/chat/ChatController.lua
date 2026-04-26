@@ -471,7 +471,6 @@ end
 --- handler is the *only* source of chat in a replay.
 ---@param msgs table[]
 function OnSyncChatMessages(msgs)
-    reprsl(msgs)
     if type(msgs) ~= 'table' then return end
 
     local history = ChatModel.GetSingleton().History()
