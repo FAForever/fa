@@ -10,9 +10,6 @@ local Registry = import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua")
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
---- Flip to `true` to overlay a semi-transparent coloured bitmap over the
---- control so its bounds are visible at runtime. Each chat interface uses a
---- distinct colour so overlapping controls can be told apart at a glance.
 local Debug = false
 
 local RowFontSize = 12
@@ -20,17 +17,13 @@ local RowFontName = 'Arial'
 local HorizontalPadding = 12
 local VerticalPadding   = 2
 
---- Cap the popup height: at most this many command rows are visible at
---- once; anything beyond scrolls. Chosen to match the point where the
---- popup becomes visually overwhelming on a 1080p screen.
 local MaxVisibleRows = 6
 
---- Width reserved on the right of the popup for the scrollbar. Reserved
---- unconditionally so the layout doesn't reflow when the scrollbar shows
---- / hides with the match count.
+--- Reserved unconditionally so the layout doesn't reflow when the
+--- scrollbar shows / hides with the match count.
 local ScrollbarWidth = 24
 
---- Renders a command the same way `/help` does: name, params, aliases, description.
+--- Renders a command the same way `/help` does.
 ---@param cmd UIChatCommand
 ---@return string
 local function FormatCommand(cmd)
@@ -51,11 +44,11 @@ local function FormatCommand(cmd)
 end
 
 -------------------------------------------------------------------------------
--- Command-hint popup. Shows commands whose name or aliases prefix-match the
--- user's input. Reuses a pool of row controls across refreshes — entries are
--- shown/hidden and re-positioned via a per-row `ordinal` LazyVar rather than
--- rebuilt from scratch.
+-- Command-hint popup. Shows commands whose name or aliases prefix-match.
+-- Reuses a pool of row controls across refreshes — rows are
+-- shown/hidden and re-positioned via a per-row `ordinal` LazyVar.
 
+--- One pooled hint row; ordinal 0 means hidden, otherwise it's the row's position from the bottom.
 ---@class UIChatHintRow
 ---@field Text    Text
 ---@field BG      Bitmap
@@ -64,6 +57,7 @@ end
 ---@field Hovered boolean
 ---@field Paint   fun()                       # re-applies BG solid-colour from Hovered + owner.Selected
 
+--- Slash-command auto-suggest popup anchored above the edit box; reuses a row pool across refreshes.
 ---@class UIChatCommandHintInterface : Group
 ---@field Edit         Edit
 ---@field OnSelect?    fun(cmd: UIChatCommand)
@@ -99,27 +93,24 @@ ChatCommandHintInterface = ClassUI(Group) {
         self.LastText = ''
         self.VisibleCount = Create(0)
         self.Selected = Create(0)
+        self.Selected.OnDirty = function() self:RepaintRows() end
         self.ScrollBottom = Create(1)
+        self.ScrollBottom.OnDirty = function() self:UpdateRowVisibility() end
 
-        -- Solid backdrop so the tiny per-row highlight bitmaps (which only
-        -- span Text.Top-1..Text.Bottom+1) don't leave visible gaps between
-        -- rows. The row BGs now sit transparent on top of this for hover /
-        -- selection highlighting.
+        -- Backdrop fills the gaps between the per-row highlight strips
+        -- (which only span Text.Top-1..Text.Bottom+1).
         self.Background = Bitmap(self)
         self.Background:SetSolidColor('ff000000')
         self.Background:DisableHitTest()
 
-        -- Sample the row height from a throwaway Text.
+        -- `probe.Height()` is already in scaled pixels; the padding
+        -- constant has to be scaled by hand to track UI scale.
         ---@diagnostic disable-next-line: param-type-mismatch
         local probe = UIUtil.CreateText(self, '/sample', RowFontSize, RowFontName)
         ---@diagnostic disable-next-line: undefined-field
-        -- `probe.Height()` is already in scaled pixels (Layouter stores
-        -- everything scaled); the padding constant has to be scaled by hand
-        -- so it tracks the user's UI scale setting.
         self.RowHeight = Create(probe.Height() + LayoutHelpers.ScaleNumber(VerticalPadding))
         probe:Destroy()
 
-        -- Decorative borders (same skin as ChatListInterface).
         self.LTBG = Bitmap(self, UIUtil.UIFile('/game/chat_brd/drop-box_brd_ul.dds'))
         self.LTBG:DisableHitTest()
         self.RTBG = Bitmap(self, UIUtil.UIFile('/game/chat_brd/drop-box_brd_ur.dds'))
@@ -136,21 +127,13 @@ ChatCommandHintInterface = ClassUI(Group) {
         self.TBG:DisableHitTest()
         self.BBG = Bitmap(self, UIUtil.UIFile('/game/chat_brd/drop-box_brd_lm.dds'))
         self.BBG:DisableHitTest()
-
-        -- Repaint highlighted rows when the selection moves. We own `Selected`
-        -- so binding its OnDirty directly is safe (see CLAUDE.md §LazyVar).
-        self.Selected.OnDirty = function() self:RepaintRows() end
-
-        -- Scroll changes: re-hide/show rows so only the current window is
-        -- visible. We own `ScrollBottom`, so direct OnDirty is safe.
-        self.ScrollBottom.OnDirty = function() self:UpdateRowVisibility() end
     end,
 
     ---@param self UIChatCommandHintInterface
     ---@param parent Control
     __post_init = function(self, parent)
-        -- Width: fit the widest fully-formatted row (/name <params> (aka …) — desc)
-        -- so the popup doesn't reflow horizontally as rows change.
+        -- Width fits the widest fully-formatted row so the popup doesn't
+        -- reflow horizontally as rows change.
         local probeText = '/help'
         for _, cmd in ipairs(Registry.GetAll()) do
             local candidate = FormatCommand(cmd)
@@ -164,13 +147,6 @@ ChatCommandHintInterface = ClassUI(Group) {
         local textWidth = probe.Width()
         probe:Destroy()
 
-        -- Reserve scrollbar width unconditionally so the popup doesn't
-        -- reflow when the scrollbar appears / disappears with match count.
-        --
-        -- `textWidth` is already in scaled pixels (read off a laid-out probe),
-        -- so we can't pass the sum to `:Width(number)` — Layouter would call
-        -- `ScaleNumber` on the whole expression and double-scale the text
-        -- portion. Use a function form and scale only the raw constants.
         local extraScaled = LayoutHelpers.ScaleNumber(HorizontalPadding * 2 + ScrollbarWidth)
         Layouter(self)
             :Width(function() return textWidth + extraScaled end)
@@ -182,16 +158,12 @@ ChatCommandHintInterface = ClassUI(Group) {
             return rows * self.RowHeight()
         end)
 
-        -- Unified backdrop covers the entire popup. Rows are transparent by
-        -- default and only paint when hovered or selected, so the backdrop
-        -- fills the slivers between row highlight strips.
         self.Background.Left:SetFunction(function()   return self.Left() end)
         self.Background.Right:SetFunction(function()  return self.Right() end)
         self.Background.Top:SetFunction(function()    return self.Top() end)
         self.Background.Bottom:SetFunction(function() return self.Bottom() end)
         self.Background.Depth:SetFunction(function()  return self.Depth() end)
 
-        -- Borders hug the outside of self on all eight sides.
         Layouter(self.LTBG):Right(self.Left):Bottom(self.Top):End()
         Layouter(self.RTBG):Left(self.Right):Bottom(self.Top):End()
         Layouter(self.RBBG):Left(self.Right):Top(self.Bottom):End()
@@ -202,17 +174,10 @@ ChatCommandHintInterface = ClassUI(Group) {
         Layouter(self.BBG):Left(self.Left):Right(self.Right):Top(self.Bottom):End()
         ---@diagnostic enable: undefined-field
 
-        -- Vertical scrollbar along the right edge. `CreateVertScrollbarFor`
-        -- calls `scrollbar:SetScrollable(self)`, which drives dispatch into
-        -- `self:GetScrollValues` / `ScrollLines` / `ScrollPages` /
-        -- `ScrollSetTop` / `IsScrollable` (see below). A negative
-        -- `offset_right` pulls the bar inside the popup bounds instead of
-        -- overlapping the right border art.
+        -- Negative offset_right pulls the bar inside the popup bounds
+        -- instead of overlapping the right border art.
         self.Scrollbar = UIUtil.CreateVertScrollbarFor(self, -ScrollbarWidth)
 
-        -- Toggle the scrollbar visibility with match count. `Hide()` here is
-        -- safe — the hint popup is created fresh each time the user types
-        -- `/`, so the Show() cascade on the outer chat window can't undo it.
         local function syncScrollbarVisibility()
             if self.VisibleCount() > MaxVisibleRows then
                 self.Scrollbar:Show()
@@ -231,8 +196,8 @@ ChatCommandHintInterface = ClassUI(Group) {
         end
     end,
 
-    --- Builds a reusable row (text + highlight bitmap + hover handler).
-    --- The row is laid out lazily by `LayoutRow` / `LayoutRowBackground`.
+    --- Reusable row (text + highlight + hover handler). Layout deferred
+    --- to `GetOrCreateRow` / `LayoutRowBackground`.
     ---@param self UIChatCommandHintInterface
     ---@return UIChatHintRow
     BuildRow = function(self)
@@ -278,8 +243,7 @@ ChatCommandHintInterface = ClassUI(Group) {
         return row
     end,
 
-    --- Repaints every row to reflect the current `Selected` ordinal. Called
-    --- from the Selected observer and whenever Refresh rebuilds the list.
+    --- Re-runs each row's paint to sync hover and selection highlights.
     ---@param self UIChatCommandHintInterface
     RepaintRows = function(self)
         for _, row in pairs(self.Rows) do
@@ -287,9 +251,7 @@ ChatCommandHintInterface = ClassUI(Group) {
         end
     end,
 
-    --- Shows rows whose ordinal falls inside the current scroll window and
-    --- hides the rest. Rebound on `ScrollBottom` changes and called from
-    --- Refresh after the row set has been updated.
+    --- Shows or hides each row based on the current scroll window.
     ---@param self UIChatCommandHintInterface
     UpdateRowVisibility = function(self)
         local scrollBottom = self.ScrollBottom()
@@ -307,9 +269,7 @@ ChatCommandHintInterface = ClassUI(Group) {
         end
     end,
 
-    --- Scrolls so `ordinal` falls inside the visible window. Called from
-    --- `SelectNext` / `SelectPrev` so keyboard navigation drags the scroll
-    --- along with the highlight.
+    --- Scrolls the visible window so `ordinal` is on screen.
     ---@param self UIChatCommandHintInterface
     ---@param ordinal number
     EnsureOrdinalVisible = function(self, ordinal)
@@ -323,17 +283,14 @@ ChatCommandHintInterface = ClassUI(Group) {
     end,
 
     -------------------------------------------------------------------------
-    -- Scrollable interface — wired to by the MAUI `Scrollbar` control.
-    --
-    -- The scrollbar thinks top-down (thumb at top = top of content), but our
-    -- ordinals grow bottom-up (ord 1 at the bottom of the popup, ord N at
-    -- the top). We convert at the boundary so the thumb tracks visually:
-    -- thumb at top → highest ordinals visible at top of popup.
-    --
+    -- Scrollable interface for the MAUI `Scrollbar`. The scrollbar thinks
+    -- top-down but our ordinals grow bottom-up; convert at the boundary
+    -- so the thumb tracks visually.
     --   topdown_top = n - ScrollBottom - MaxVisibleRows + 2
-    --   ScrollBottom = n - topdown_top - MaxVisibleRows + 2   (inverse)
+    --   ScrollBottom = n - topdown_top - MaxVisibleRows + 2  (inverse)
     -------------------------------------------------------------------------
 
+    --- Scrollbar contract: returns `(min, max, top, bottom)` in top-down coordinates.
     ---@param self UIChatCommandHintInterface
     ---@param axis string
     GetScrollValues = function(self, axis)
@@ -344,6 +301,7 @@ ChatCommandHintInterface = ClassUI(Group) {
         return 1, n, top, math.min(top + MaxVisibleRows - 1, n)
     end,
 
+    --- Scrolls by a line count.
     ---@param self UIChatCommandHintInterface
     ---@param axis string
     ---@param delta number
@@ -352,6 +310,7 @@ ChatCommandHintInterface = ClassUI(Group) {
         self:ScrollSetTop(axis, top + math.floor(delta))
     end,
 
+    --- Scrolls by full visible-window pages.
     ---@param self UIChatCommandHintInterface
     ---@param axis string
     ---@param delta number
@@ -360,6 +319,7 @@ ChatCommandHintInterface = ClassUI(Group) {
         self:ScrollSetTop(axis, top + math.floor(delta) * MaxVisibleRows)
     end,
 
+    --- Jumps to an absolute top-down position; flips it back to bottom-up `ScrollBottom`.
     ---@param self UIChatCommandHintInterface
     ---@param axis string
     ---@param top number   # in scrollbar (top-down) coordinates
@@ -375,23 +335,21 @@ ChatCommandHintInterface = ClassUI(Group) {
         end
     end,
 
+    --- Whether there are more matches than fit in the visible window.
     ---@param self UIChatCommandHintInterface
     ---@param axis string
     IsScrollable = function(self, axis)
         return self.VisibleCount() > MaxVisibleRows
     end,
 
-    --- Mouse wheel over the popup scrolls the visible window. One notch
-    --- (~120 wheel units) moves one row.
+    --- Wheel scroll handler.
     ---@param self UIChatCommandHintInterface
     ---@param rotation number
     OnMouseWheel = function(self, rotation)
         self:ScrollLines(nil, -math.floor(rotation / 100))
     end,
 
-    --- Wraps `Selected` to the next visible dynamic row. No-op when there
-    --- are no matches. Scrolls the view so the new selection stays on
-    --- screen, matching keyboard-nav expectations.
+    --- Advances the selection one row down (wraps to the top).
     ---@param self UIChatCommandHintInterface
     SelectNext = function(self)
         local n = self.VisibleCount()
@@ -402,9 +360,7 @@ ChatCommandHintInterface = ClassUI(Group) {
         self:EnsureOrdinalVisible(next)
     end,
 
-    --- Wraps `Selected` to the previous visible dynamic row. No-op when
-    --- there are no matches. Scrolls the view so the new selection stays
-    --- on screen.
+    --- Moves the selection one row up (wraps to the bottom).
     ---@param self UIChatCommandHintInterface
     SelectPrev = function(self)
         local n = self.VisibleCount()
@@ -415,7 +371,7 @@ ChatCommandHintInterface = ClassUI(Group) {
         self:EnsureOrdinalVisible(prev)
     end,
 
-    --- Returns the currently-selected command, or nil when nothing matches.
+    --- Returns the currently highlighted command, or nil if none.
     ---@param self UIChatCommandHintInterface
     ---@return UIChatCommand?
     GetSelected = function(self)
@@ -425,8 +381,7 @@ ChatCommandHintInterface = ClassUI(Group) {
         return row and row.Target or nil
     end,
 
-    --- Lazily pulls a dynamic row out of the pool, creating it if needed and
-    --- wiring its position binding to its own ordinal LazyVar.
+    --- Returns the row at `idx`, building one on demand the first time.
     ---@param self UIChatCommandHintInterface
     ---@param idx number
     ---@return UIChatHintRow
@@ -443,9 +398,7 @@ ChatCommandHintInterface = ClassUI(Group) {
         row.Text.Bottom:SetFunction(function()
             local ord = row.Ordinal()
             if ord <= 0 then return self.Top() end
-            -- `slot` = 1 at the bottom visible row, MaxVisibleRows at the
-            -- top. Rows outside the window get positioned at `self.Top()`
-            -- and hidden by `UpdateRowVisibility`.
+            -- slot 1 = bottom visible row, MaxVisibleRows = top.
             local slot = ord - self.ScrollBottom() + 1
             if slot < 1 or slot > MaxVisibleRows then return self.Top() end
             return self.Bottom() - (slot - 1) * self.RowHeight()
@@ -456,8 +409,8 @@ ChatCommandHintInterface = ClassUI(Group) {
         return row
     end,
 
-    --- Binds the row's highlight bitmap to span the popup width at the row's
-    --- vertical position, one depth below the text so clicks hit the bitmap.
+    --- Spans popup width at the row's vertical position; one depth below
+    --- the text so clicks hit the bitmap.
     ---@param self UIChatCommandHintInterface
     ---@param row UIChatHintRow
     LayoutRowBackground = function(self, row)
@@ -471,16 +424,14 @@ ChatCommandHintInterface = ClassUI(Group) {
         ---@diagnostic enable: undefined-field
     end,
 
-    --- Updates the popup to reflect the current edit-box text. Reuses existing
-    --- rows: each matching command is assigned to the row at its ordinal, and
-    --- rows beyond the match count are hidden (ordinal = 0).
+    --- Reuses existing rows: each match is assigned to the row at its
+    --- ordinal, rows beyond the match count get ordinal = 0 (hidden).
     ---@param self UIChatCommandHintInterface
     ---@param text string
     Refresh = function(self, text)
         local matches = {}
         if text and string.sub(text, 1, 1) == '/' then
             local prefix = string.sub(text, 2)
-            -- Only the first word is the command name.
             local space = string.find(prefix, '%s')
             if space then prefix = string.sub(prefix, 1, space - 1) end
 
@@ -504,13 +455,10 @@ ChatCommandHintInterface = ClassUI(Group) {
 
         self.VisibleCount:Set(table.getn(matches))
 
-        -- Any time the match set changes, start the scroll window at the
-        -- bottom. `UpdateRowVisibility` below applies Show/Hide using the
-        -- fresh window.
+        -- Reset scroll to bottom on every match-set change.
         self.ScrollBottom:Set(1)
 
-        -- Keep the previously-selected ordinal when possible; otherwise land
-        -- on the first match (or clear the selection when nothing matches).
+        -- Keep the previously-selected ordinal when possible.
         local n = table.getn(matches)
         local cur = self.Selected()
         if n == 0 then
@@ -518,8 +466,8 @@ ChatCommandHintInterface = ClassUI(Group) {
         elseif cur < 1 or cur > n then
             self.Selected:Set(1)
         else
-            -- Ordinal is unchanged but the target underneath probably isn't —
-            -- force a repaint so colors match the new row assignments.
+            -- Ordinal unchanged but the target underneath isn't —
+            -- repaint so colours match the new row assignments.
             self:RepaintRows()
         end
 
@@ -527,7 +475,7 @@ ChatCommandHintInterface = ClassUI(Group) {
         ---@diagnostic enable: undefined-field
     end,
 
-    --- Registers the callback invoked when the user clicks a hint row.
+    --- Registers a callback to fire when a row is committed (Tab or click).
     ---@param self UIChatCommandHintInterface
     ---@param callback fun(cmd: UIChatCommand)
     SetOnSelect = function(self, callback)

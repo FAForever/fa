@@ -8,13 +8,12 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local ObserverIcon = '/widgets/faction-icons-alpha_bmp/observer_ico.dds'
 
 -------------------------------------------------------------------------------
--- A small badge showing a player's faction icon over their team colour, used
--- to identify players in the chat recipient picker and anywhere else in the
--- chat UI that wants to surface who a message is from or going to. Matches
--- the visual style used by the score panel (see `score.lua`). Consumers can
--- override the default 14x14 size via `LayoutHelpers.SetDimensions` or a
--- Layouter chain, and update the contents via `SetFaction` / `SetColor`.
+-- Faction icon over team-colour tile, used in the recipient picker and
+-- elsewhere in the chat UI. Default 14x14; consumers can override via
+-- `LayoutHelpers.SetDimensions` or Layouter and update via
+-- `SetFaction` / `SetColor`.
 
+--- Faction icon over a team-colour tile; reused in the recipient picker and on every chat row.
 ---@class ChatFactionBadge : Group
 ---@field Color Bitmap  # team-colour tile behind the icon
 ---@field Icon  Bitmap  # faction icon on top of the colour tile
@@ -35,7 +34,6 @@ ChatFactionBadge = ClassUI(Group) {
         self.Icon:DisableHitTest()
         self:SetFaction(factionIndex)
 
-        -- Default square size; consumers can override via Layouter / SetDimensions.
         LayoutHelpers.SetDimensions(self, 14, 14)
     end,
 
@@ -45,13 +43,11 @@ ChatFactionBadge = ClassUI(Group) {
         LayoutHelpers.FillParent(self.Color, self)
         LayoutHelpers.FillParent(self.Icon, self)
 
-        -- Icon renders on top of the colour tile; the tile shows through the
-        -- icon's transparent pixels.
         LayoutHelpers.DepthOverParent(self.Color, self, 1)
         LayoutHelpers.DepthOverParent(self.Icon, self, 2)
     end,
 
-    --- Updates the faction icon. Pass `nil` to show the observer icon.
+    --- `nil` factionIndex shows the observer icon.
     ---@param self ChatFactionBadge
     ---@param factionIndex? number   0-based faction index
     SetFaction = function(self, factionIndex)
@@ -62,7 +58,7 @@ ChatFactionBadge = ClassUI(Group) {
         end
     end,
 
-    --- Updates the team colour tile.
+    --- Updates the team-colour tile behind the icon.
     ---@param self ChatFactionBadge
     ---@param color string   ARGB hex, e.g. 'ffff4242'
     SetColor = function(self, color)

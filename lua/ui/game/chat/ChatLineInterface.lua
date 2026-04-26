@@ -12,19 +12,14 @@ local ChatUtils = import("/lua/ui/game/chat/ChatUtils.lua")
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
---- Body-text colour used when an entry has neither a `BodyColor` override
---- nor a `ColorKey` palette lookup that resolves. Matches the legacy chat
---- panel's previous hardcoded body colour so unrecognised / pre-palette
---- entries still render close to their old appearance.
+--- Fallback body-text colour for entries without a `BodyColor` or a
+--- resolvable `ColorKey`. Matches the legacy hardcoded body colour.
 local DefaultBodyColor = 'ffc2f6ff'
 
---- Flip to `true` to overlay a semi-transparent coloured bitmap over the
---- control so its bounds are visible at runtime. Each chat interface uses a
---- distinct colour so overlapping controls can be told apart at a glance.
 local Debug = false
 
--- Collect faction icons up-front; append an observer icon as the final entry
--- so non-player senders can be represented too.
+-- Faction icons with the observer icon appended as a tail for non-player
+-- senders.
 local FactionIcons = {}
 for _, data in Factions do
     table.insert(FactionIcons, data.Icon)
@@ -33,12 +28,8 @@ table.insert(FactionIcons, '/widgets/faction-icons-alpha_bmp/observer_ico.dds')
 
 local CamIconTexture = '/game/camera-btn/pinned_btn_up.dds'
 
---- Resolves the body-text colour for `entry`. Priority:
----   1. `entry.BodyColor` — explicit override (system / synthetic lines).
----   2. `entry.ColorKey` — palette lookup against `ChatConfigModel.GetOptions()`.
----   3. `DefaultBodyColor` — fallback for entries from before the palette was wired.
---- Lives at module scope so both `SetHeader` and `SetContinuation` can call it
---- without each having to repeat the lookup.
+--- Body-text colour for `entry`. Priority: `BodyColor` override, then
+--- `ColorKey` palette lookup, then `DefaultBodyColor`.
 ---@param entry UIChatEntry
 ---@return string
 local function ResolveBodyColor(entry)
@@ -54,12 +45,8 @@ end
 
 -------------------------------------------------------------------------------
 -- A single chat row: team-coloured faction icon, sender name and message text.
---
--- The semi-transparent "feed mode" background (shown when the window chrome
--- is hidden) will be added back together with the feed-mode implementation —
--- having it here while `line:Show()` cascades to children caused it to double
--- up over the chat-window background.
 
+--- One row of the chat-line pool: faction badge, clickable name, clickable text. Pooled and reused.
 ---@class UIChatLineInterface : Group
 ---@field TeamColor   Bitmap
 ---@field FactionIcon Bitmap
@@ -84,18 +71,17 @@ ChatLineInterface = ClassUI(Group) {
         self.Name = UIUtil.CreateText(self, '', 14, 'Arial Bold')
         self.Name:SetColor('ffffffff')
         self.Name:SetDropShadow(true)
-        -- Empty-name continuation lines have zero width here, so the hit
-        -- rect collapses with them — no need to gate dispatch on row role.
+        -- Continuation lines set Name to '' so the hit rect collapses with
+        -- it — no need to gate dispatch on row role.
         self.Name.HandleEvent = function(_, event)
             if event.Type == 'ButtonPress' and self.Entry then
                 self:OnNameClicked(self.Entry)
             end
         end
 
-        -- Camera-link icon. Kept "invisible" when unused by clearing to a
-        -- transparent solid colour and disabling hit-test — calling `Hide()`
-        -- here would be undone when the window's `Show()` cascades to
-        -- descendants (same reason `FactionIcon` cycles via SolidColor).
+        -- Camera-link icon. Hidden via transparent SolidColor + disabled
+        -- hit-test rather than `Hide()` — the window's `Show()` cascade
+        -- would otherwise undo `Hide()` (same reason FactionIcon does it).
         self.CamIcon = Bitmap(self)
         self.CamIcon:SetSolidColor('00000000')
         self.CamIcon:DisableHitTest()
@@ -119,14 +105,12 @@ ChatLineInterface = ClassUI(Group) {
     ---@param self UIChatLineInterface
     ---@param parent Control
     __post_init = function(self, parent)
-        -- `Layouter:Height(number)` would auto-scale a literal, but the
-        -- closures below need to track upstream LazyVars reactively, and
-        -- raw constants inside a SetFunction body don't get scaled. Pre-scale
-        -- the 2px row padding once so it follows the user's UI scale.
+        -- Raw constants in SetFunction bodies don't auto-scale (only
+        -- Layouter `:Height(number)` does); pre-scale once.
         local twoPxScaled = LayoutHelpers.ScaleNumber(2)
 
-        -- Derive the row's height from the name font so pool sizing and
-        -- scroll positions scale automatically with `ChatOptions.font_size`.
+        -- Derive row height from the name font so pool sizing scales
+        -- automatically with `ChatOptions.font_size`.
         Layouter(self)
             :Height(function() return self.Name.Height() + twoPxScaled end)
             :End()
@@ -146,8 +130,7 @@ ChatLineInterface = ClassUI(Group) {
             :Over(self, 10)
             :End()
 
-        -- Cam icon sits between the name and text on header rows. Fixed
-        -- 20x16 footprint matching the legacy `pinned_btn_up.dds` art.
+        -- 20x16 footprint matches the `pinned_btn_up.dds` art.
         Layouter(self.CamIcon)
             :RightOf(self.Name, 4)
             :AtVerticalCenterIn(self.TeamColor)
@@ -156,8 +139,7 @@ ChatLineInterface = ClassUI(Group) {
             :Over(self, 10)
             :End()
 
-        -- Text Left jumps over the icon when present; SetHeader rebinds this
-        -- when the entry's camera state changes.
+        -- SetHeader rebinds Text.Left when the entry's camera state changes.
         Layouter(self.Text)
             :Left(function() return self.Name.Right() + twoPxScaled end)
             :Right(self.Right)
@@ -173,9 +155,7 @@ ChatLineInterface = ClassUI(Group) {
         end
     end,
 
-    --- Populates the row as the FIRST wrapped line of an entry: shows the
-    --- team-colour square, faction icon, the name prefix, and the first
-    --- wrapped chunk of message text.
+    --- Populates the row as the FIRST wrapped line of an entry.
     ---@param self UIChatLineInterface
     ---@param entry UIChatEntry
     ---@param wrappedText string    # the first wrapped chunk of `entry.Text`
@@ -186,11 +166,8 @@ ChatLineInterface = ClassUI(Group) {
         self.Text:SetColor(ResolveBodyColor(entry))
         self.TeamColor:SetSolidColor(entry.Color or '00000000')
 
-        -- Grey the sender label on our own outgoing messages so the user
-        -- can pick out their own lines at a glance. Re-applied on every
-        -- `SetHeader` because pool slots get reused across entries from
-        -- different armies — the previous occupant's enable/disable state
-        -- would otherwise stick around.
+        -- Grey our own outgoing names. Re-applied every SetHeader because
+        -- pool slots get reused across entries from different armies.
         if entry.ArmyID == GetFocusArmy() then
             self.Name:Disable()
         else
@@ -200,12 +177,10 @@ ChatLineInterface = ClassUI(Group) {
         local iconIndex = entry.Faction or table.getn(FactionIcons)
         self.FactionIcon:SetTexture(UIUtil.UIFile(FactionIcons[iconIndex]))
 
-        -- Camera affordance: switch between textured (hit-testable) and
-        -- transparent SolidColor (inert) rather than Show/Hide, so the
-        -- window-wide `Show()` cascade can't reveal stale icons. Re-applying
-        -- `RightOf` replaces the previous Left binding (no leak). Shown for
-        -- both full `Camera` snapshots (player attached their view) and
-        -- `Location` hints (AI tagged a point or region).
+        -- SolidColor swap rather than Show/Hide so the window's Show()
+        -- cascade can't reveal stale icons. Re-applying `RightOf` replaces
+        -- the previous Left binding. Shown for both `Camera` snapshots and
+        -- `Location` hints.
         if entry.Camera or entry.Location then
             self.CamIcon:SetTexture(UIUtil.UIFile(CamIconTexture))
             self.CamIcon:EnableHitTest()
@@ -217,14 +192,10 @@ ChatLineInterface = ClassUI(Group) {
         end
     end,
 
-    --- Populates the row as a CONTINUATION of a wrapped entry: the name slot
-    --- and team-colour square stay empty, only the wrapped text is shown.
-    --- The text control remains anchored to `Name.Right + 2`; with an empty
-    --- name that resolves to the left of the row, so continuation lines
-    --- naturally line up under the first wrapped chunk.
-    ---
-    --- The entry is still tracked so body clicks on wrapped lines dispatch
-    --- against the same message the header belongs to.
+    --- Populates the row as a CONTINUATION of a wrapped entry. Name and
+    --- team-colour stay empty; Text anchors to `Name.Right + 2`, which with
+    --- an empty name resolves to the row's left edge. Tracks the entry so
+    --- body clicks on wrapped lines still dispatch against the right message.
     ---@param self UIChatLineInterface
     ---@param entry UIChatEntry
     ---@param wrappedText string
@@ -240,7 +211,7 @@ ChatLineInterface = ClassUI(Group) {
         LayoutHelpers.RightOf(self.Text, self.Name, 2)
     end,
 
-    --- Clears all content so the row can stand empty.
+    --- Resets the row to its empty state, ready for the next pool reuse.
     ---@param self UIChatLineInterface
     Clear = function(self)
         self.Entry = nil
@@ -253,31 +224,24 @@ ChatLineInterface = ClassUI(Group) {
         LayoutHelpers.RightOf(self.Text, self.Name, 2)
     end,
 
-    --- Overridable: fires on a click on the sender name. Continuation
-    --- lines have an empty name control so the hit rect collapses — this
-    --- only runs on header rows in practice. Default is a no-op; replace
-    --- the field on an instance to subscribe.
+    --- Overridable; default no-op. Continuation rows have empty Name so
+    --- their hit rect collapses — only header rows fire in practice.
     ---@param self UIChatLineInterface
     ---@param entry UIChatEntry
     OnNameClicked = function(self, entry) end,
 
-    --- Overridable: fires on a click on the message body. Runs for both
-    --- header and continuation rows — they share the same entry — so a
-    --- click anywhere on a wrapped message resolves to the right sender.
-    --- Default is a no-op; replace the field on an instance to subscribe.
+    --- Overridable; default no-op. Fires for both header and continuation
+    --- rows — they share the entry so the click resolves to the right sender.
     ---@param self UIChatLineInterface
     ---@param entry UIChatEntry
     OnBodyClicked = function(self, entry) end,
 
-    --- Overridable: fires on a click on the camera icon. Only header rows
-    --- show the icon (continuation rows hide it), so this only runs there.
-    --- Default is a no-op; replace the field on an instance to subscribe.
+    --- Overridable; default no-op. Only header rows show the icon.
     ---@param self UIChatLineInterface
     ---@param entry UIChatEntry
     OnCameraClicked = function(self, entry) end,
 
-    --- Updates the font size for both name and body text. The row's `Height`
-    --- LazyVar is derived from `Name.Height`, so the row resizes automatically.
+    --- Updates the name and body fonts. Row height tracks the name font.
     ---@param self UIChatLineInterface
     ---@param size number   # point size
     SetFontSize = function(self, size)

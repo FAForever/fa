@@ -14,11 +14,9 @@ local ChatController = import("/lua/ui/game/chat/ChatController.lua")
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
---- Flip to `true` to overlay a semi-transparent coloured bitmap over the
---- control so its bounds are visible at runtime. Each chat interface uses a
---- distinct colour so overlapping controls can be told apart at a glance.
 local Debug = false
 
+--- One picker row: label, hover backdrop, optional faction badge for player rows, and the recipient it sets.
 ---@class UIChatListEntry
 ---@field Text   Text
 ---@field BG     Bitmap
@@ -26,14 +24,11 @@ local Debug = false
 ---@field Target UIChatRecipient
 
 -------------------------------------------------------------------------------
--- A popup recipient picker. Lists "All", "Allies", and one entry per
--- connected non-local human player (sourced from `GetSessionClients`, so
--- bots and disconnected players are excluded). Player rows show a small
--- faction + team-colour badge next to the name so the right recipient is
--- easy to spot. Clicking an entry calls `ChatController.SetRecipient` and
--- destroys the popup. Clicking anywhere outside also destroys the popup —
--- every open of the list rebuilds from fresh session state.
+-- Popup recipient picker. Lists "All", "Allies", and one entry per
+-- connected non-local human player (`GetSessionClients` excludes bots and
+-- disconnected players). Each open rebuilds from fresh session state.
 
+--- Recipient-picker popup; rebuilt from session state on every open so disconnects drop out.
 ---@class UIChatListInterface : Group
 ---@field Entries UIChatListEntry[]
 ---@field LTBG    Bitmap
@@ -53,10 +48,8 @@ ChatListInterface = ClassUI(Group) {
         Group.__init(self, parent, "ChatListInterface")
         self:DisableHitTest()
 
-        -- Popups must sit above the chat window's inner content (line rows,
-        -- edit area) to receive hover and click events. A plain +1 offset
-        -- ties with the line rows, which default to ChatLinesInterface+1 —
-        -- matching the list's default depth. +100 gives unambiguous headroom.
+        -- +100 keeps us above the line rows' default ChatLinesInterface+1
+        -- depth so hover and click events reach us first.
         LayoutHelpers.DepthOverParent(self, parent, 100)
 
         self.Entries = {}
@@ -66,7 +59,6 @@ ChatListInterface = ClassUI(Group) {
 
         self:CreateBorder()
 
-        -- Close on any mouse click outside the popup.
         local function onOutsideClick() self:Destroy() end
         UIMain.AddOnMouseClickedFunc(onOutsideClick)
 
@@ -80,12 +72,9 @@ ChatListInterface = ClassUI(Group) {
         end
     end,
 
-    --- Builds the list of selectable targets: All, Allies, then one entry
-    --- per connected human player. `GetSessionClients` naturally excludes
-    --- bots (they are not session clients); we additionally skip the local
-    --- client (you can't privately message yourself) and any disconnected
-    --- player. A client's army is found by matching nickname — the target
-    --- stays an army ID so the send path continues to work unchanged.
+    --- Targets: All, Allies, then one entry per connected non-local human
+    --- player. Client matched to army by nickname; target stays an army ID
+    --- so the send path is unchanged.
     ---@param self UIChatListInterface
     ---@return table[]
     BuildTargetDefs = function(self)
@@ -114,9 +103,7 @@ ChatListInterface = ClassUI(Group) {
         return defs
     end,
 
-    --- Creates a single row: text, highlight bitmap, optional faction badge,
-    --- and a hover/click handler that dispatches to `ChatController` and
-    --- closes the popup. Player rows carry a badge; All / Allies rows don't.
+    --- Builds one row from a target def, including the faction badge for player rows.
     ---@param self UIChatListInterface
     ---@param def table
     ---@return UIChatListEntry
@@ -135,7 +122,6 @@ ChatListInterface = ClassUI(Group) {
             entry.Badge = ChatFactionBadge(self, def.Faction, def.Color)
         end
 
-        -- Capture target in a local so each entry closes over its own value.
         local target = def.Target
         entry.BG.HandleEvent = function(bg, event)
             ChatController.NotifyActivity()
@@ -152,8 +138,7 @@ ChatListInterface = ClassUI(Group) {
         return entry
     end,
 
-    --- Creates the eight decorative border bitmaps that hug the outside of
-    --- the popup. Layout is applied in `LayoutBorder` from `__post_init`.
+    --- Eight decorative border bitmaps. Layout applied in `LayoutBorder`.
     ---@param self UIChatListInterface
     CreateBorder = function(self)
         local function makeBitmap(file)
@@ -175,7 +160,6 @@ ChatListInterface = ClassUI(Group) {
     ---@param self UIChatListInterface
     ---@param parent Control
     __post_init = function(self, parent)
-        -- Size self to fit the widest row and the stacked heights.
         local maxWidth = 0
         local totalHeight = 0
         for _, entry in ipairs(self.Entries) do
@@ -189,12 +173,9 @@ ChatListInterface = ClassUI(Group) {
             :Height(totalHeight)
             :End()
 
-        -- Left indent reserves room for the faction badge on player rows
-        -- and keeps All / Allies text aligned with the player names.
+        -- Left indent reserves room for the faction badge on player rows.
         local textIndent = 20
 
-        -- Stack entries bottom-up: first at the bottom, each subsequent
-        -- entry above the previous.
         for i, entry in ipairs(self.Entries) do
             local below = i > 1 and self.Entries[i - 1] or nil
             self:LayoutEntry(entry, below, textIndent)
@@ -210,9 +191,7 @@ ChatListInterface = ClassUI(Group) {
         end
     end,
 
-    --- Lays out one row: the text anchored above `below` (or at the bottom
-    --- if `below` is nil), an optional faction badge in the indent column,
-    --- and a highlight bitmap whose bounds track the text row.
+    --- Lays out one row above the previous one (or pinned to the bottom for the first).
     ---@param self UIChatListInterface
     ---@param entry UIChatListEntry
     ---@param below UIChatListEntry | nil
@@ -232,8 +211,6 @@ ChatListInterface = ClassUI(Group) {
                 :End()
         end
 
-        -- Badge (player rows only) sits in the reserved indent, centred
-        -- vertically on the text row.
         if entry.Badge then
             Layouter(entry.Badge)
                 :AtLeftIn(self, 3)
@@ -242,11 +219,9 @@ ChatListInterface = ClassUI(Group) {
                 :End()
         end
 
-        -- The highlight bar spans the full row (including the badge area)
-        -- and sits behind everything in the depth order. Direct LazyVar
-        -- `:SetFunction` calls match the original `chat.lua` pattern and
-        -- avoid Layouter's reused-state quirks. The pixel offsets need
-        -- explicit scaling — the closures bypass Layouter's auto-scale.
+        -- Direct `:SetFunction` calls bypass Layouter's reused-state
+        -- pool and skip its auto-scale, so pixel offsets need
+        -- `ScaleNumber` by hand.
         local text = entry.Text
         local bgInsetLeft = LayoutHelpers.ScaleNumber(6)
         local bgInsetWidth = LayoutHelpers.ScaleNumber(8)
@@ -260,7 +235,7 @@ ChatListInterface = ClassUI(Group) {
         ---@diagnostic enable: undefined-field
     end,
 
-    --- Pins the eight decorative border bitmaps to the outside of self.
+    --- Pins the eight border bitmaps around our rect.
     ---@param self UIChatListInterface
     LayoutBorder = function(self)
         Layouter(self.LTBG):Right(self.Left):Bottom(self.Top):End()
@@ -273,7 +248,7 @@ ChatListInterface = ClassUI(Group) {
         Layouter(self.BBG):Left(self.Left):Right(self.Right):Top(self.Bottom):End()
     end,
 
-    --- Registers a callback that fires when the popup closes for any reason.
+    --- Registers a callback to fire when this popup is destroyed (e.g. on outside click).
     ---@param self UIChatListInterface
     ---@param callback function
     SetOnClosed = function(self, callback)

@@ -14,47 +14,33 @@ local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
---- Flip to `true` to overlay a semi-transparent coloured bitmap over the
---- control so its bounds are visible at runtime. Each chat interface uses a
---- distinct colour so overlapping controls can be told apart at a glance.
 local Debug = false
 
---- Cap on how many feed rows are visible at once. Older rows above this
---- are dropped immediately when a new row pushes in — feed mode is for
---- glanceable awareness, not full scrollback.
 local MaxFeedRows = 8
 
---- Length of the alpha fade-out near the end of a row's lifetime, in
---- seconds. Capped to half the configured `fade_time` so very short
---- timeouts still get a visible fade rather than a hard pop.
+--- Capped to half `fade_time` so very short timeouts still fade rather
+--- than pop.
 local FadeOutDuration = 2
 
---- Base alpha (0..1) of the per-row readability strip when the
---- `feed_background` option is on. Multiplied per-frame by `win_alpha`
---- and the row's fade progress, so the BG dims with the window opacity
---- and disappears together with the line as the row ages out.
+--- Base alpha for the readability strip when `feed_background` is on;
+--- multiplied per-frame by `win_alpha` and the row's fade progress.
 local FeedBackgroundAlpha = 0.5
 
 -------------------------------------------------------------------------------
--- A separate "feed" view of the chat history that surfaces messages while
--- the main chat window is hidden. Mounted as a sibling of the chat window
--- (so the window's `Show`/`Hide` cascade can't reach us), but pinned to the
--- window's line area via LazyVar bindings — drag/resize the chat window and
--- the feed tracks for free.
---
--- The feed is fully model-driven:
---   * `ChatModel.History` — incoming entries are appended as feed rows.
---   * `ChatModel.WindowVisible` — feed visible iff window hidden + we have rows.
--- Each row carries its own age timer ticked by `OnFrame`; rows past
--- `fade_time` destroy themselves. Pin (chrome-side toggle that suspends
--- the per-row fade) is the remaining piece that hasn't been wired yet.
+-- Feed view of the chat history shown while the main chat window is hidden.
+-- Mounted as a sibling of the chat window (so its `Show`/`Hide` cascade
+-- can't reach us), but pinned to the window's line area via LazyVars.
+-- Each row carries its own age timer; rows past `fade_time` destroy
+-- themselves.
 
+--- One feed entry: a wrapped line, its readability strip, the source entry, and an independent age timer.
 ---@class UIChatFeedRow
 ---@field Line  UIChatLineInterface   # exactly one wrapped chunk: header on the entry's first row, continuation on the rest
 ---@field BG    Bitmap                # solid-colour readability strip behind `Line`; only paints when `feed_background` is on
 ---@field Entry UIChatEntry           # the source message this line belongs to
 ---@field Time  number                # seconds since this row was added; each row ages and expires independently
 
+--- Sibling-of-the-window feed shown while the chat window is hidden; lines fade and self-destruct on age.
 ---@class UIChatFeedInterface : Group
 ---@field Trash                 TrashBag                            # owns every subscription-LazyVar we create
 ---@field Window                UIChatInterface | nil               # chat window we anchor to; nil for standalone debug
@@ -78,17 +64,14 @@ ChatFeedInterface = ClassUI(Group) {
 
         local model = ChatModel.GetSingleton()
 
-        -- Seed the high-water mark to whatever's already in history so the
-        -- initial fire of `HistoryObserver` doesn't replay every existing
-        -- entry as a fresh feed line.
+        -- Seed so the initial `HistoryObserver` fire doesn't replay every
+        -- existing entry as a fresh feed line.
         self.LastHistoryLength = table.getn(model.History())
 
-        -- Window visibility flips us in / out of feed mode. Opening the
-        -- window throws away every active feed row — anything the user
-        -- wanted to read is now in the main view, and a stale fade
-        -- countdown lingering across an open/close cycle would just clutter
-        -- the feed with content the user already saw. `UpdateVisibility`
-        -- then hides us (rows == 0) and stops the frame ticker.
+        -- Opening the window discards active feed rows: anything worth
+        -- reading is now in the main view, and a stale fade countdown
+        -- across an open/close cycle would clutter content the user
+        -- already saw.
         self.WindowVisibleObserver = self.Trash:Add(
             LazyVarDerive(model.WindowVisible, function(lv)
                 if lv() then
@@ -98,10 +81,8 @@ ChatFeedInterface = ClassUI(Group) {
             end)
         )
 
-        -- New entries → push to the feed only while the window is hidden.
-        -- Entries received with the window open are the user's to read in
-        -- the main view; we still bump `LastHistoryLength` either way so
-        -- they aren't replayed when the window later closes.
+        -- Push to feed only while the window is hidden; bump
+        -- `LastHistoryLength` either way so we don't replay later.
         self.HistoryObserver = self.Trash:Add(
             LazyVarDerive(model.History, function(lv)
                 self:OnHistoryChanged(lv())
@@ -114,10 +95,8 @@ ChatFeedInterface = ClassUI(Group) {
     ---@param window UIChatInterface | nil
     __post_init = function(self, parent, window)
         if self.Window then
-            -- One-way LazyVar bind to the chat window's line area. Drag /
-            -- resize the chat window with the feed visible (during a
-            -- transition, etc.) and the feed tracks for free; no observer
-            -- glue, no model write — the dependency graph does it.
+            -- One-way LazyVar bind to the chat window's line area; drag /
+            -- resize tracks for free through the dependency graph.
             ---@diagnostic disable-next-line: param-type-mismatch
             Layouter(self)
                 :Left(self.Window.ChatLinesInterface.Left)
@@ -126,8 +105,7 @@ ChatFeedInterface = ClassUI(Group) {
                 :Bottom(self.Window.ChatLinesInterface.Bottom)
                 :End()
         else
-            -- Standalone debug fallback: anchor near the bottom-left of the
-            -- frame so `Toggle()` from a dev hotkey still shows somewhere.
+            -- Standalone debug fallback for dev-hotkey `Toggle()`.
             Layouter(self)
                 :AtLeftBottomIn(parent, 8, 60)
                 :Width(420)
@@ -135,8 +113,6 @@ ChatFeedInterface = ClassUI(Group) {
                 :End()
         end
 
-        -- Start hidden — `UpdateVisibility` reveals us when both conditions
-        -- (window hidden + rows > 0) are met.
         self:Hide()
         self:UpdateVisibility()
 
@@ -152,12 +128,7 @@ ChatFeedInterface = ClassUI(Group) {
     -- History handling
     ---------------------------------------------------------------------------
 
-    --- Called whenever `ChatModel.History` fires dirty. Pushes entries that
-    --- arrived since the last call onto the feed — but only while the chat
-    --- window is hidden. Entries received while the window is open are the
-    --- user's to read in the main view, not surfaced again on next close.
-    --- We still bump `LastHistoryLength` either way so we never replay
-    --- already-seen entries when the window later closes.
+    --- Reacts to history mutations: feeds in new entries while the chat window is hidden.
     ---@param self UIChatFeedInterface
     ---@param history UIChatEntry[]
     OnHistoryChanged = function(self, history)
@@ -170,18 +141,15 @@ ChatFeedInterface = ClassUI(Group) {
         self.LastHistoryLength = newCount
     end,
 
-    --- Appends one feed row per wrapped chunk in `entry`. Each row carries
-    --- its own `Time`, so capping and expiry act on individual lines
-    --- rather than entry-blocks — when the cap kicks in mid-stream, only
-    --- the single oldest row drops out instead of the entire block of
-    --- chunks belonging to one wrapped entry.
+    --- Appends one feed row per wrapped chunk. Per-row `Time` means
+    --- capping drops only the single oldest row, not an entry's whole
+    --- block of continuations.
     ---
-    --- We force the wrap before reading `entry.WrappedText`. Both views
-    --- observe the same `model.History` LazyVar, but `used_by` iteration
-    --- order is unspecified — if we fire before the chat-lines observer
-    --- the cache is empty and we'd degenerate to a single-line fallback.
-    --- We borrow the chat panel's measure-line because it shares our row
-    --- width exactly (LazyVar bind), so the wrap is valid here.
+    --- Forces the wrap before reading `entry.WrappedText` because both
+    --- views observe `model.History` and `used_by` iteration order is
+    --- unspecified — if we fire before the chat-lines observer the cache
+    --- is empty. We borrow the chat panel's measure-line because it
+    --- shares our row width by LazyVar bind.
     ---@param self UIChatFeedInterface
     ---@param entry UIChatEntry
     AppendRow = function(self, entry)
@@ -199,8 +167,6 @@ ChatFeedInterface = ClassUI(Group) {
         local fontSize = ChatConfigModel.GetOptions().font_size or 14
 
         for i, chunk in ipairs(wrapped) do
-            -- Per-chunk cap: a wrapped message pushes one row in for one
-            -- row out, keeping the visible total at exactly `MaxFeedRows`.
             if table.getn(self.Rows) >= MaxFeedRows then
                 self:RemoveOldest()
             end
@@ -212,20 +178,15 @@ ChatFeedInterface = ClassUI(Group) {
             else
                 line:SetContinuation(entry, chunk)
             end
-            -- After the header/continuation pass, because `SetHeader` toggles
-            -- `CamIcon:EnableHitTest()` based on whether the entry has a
-            -- camera/location attachment — calling `DisableInteraction` last
-            -- guarantees nothing on the row can swallow a click or wheel
-            -- event meant for the worldview underneath.
+            -- `SetHeader` calls `EnableHitTest` on the cam icon when the
+            -- entry has a camera/location; disable hit-test last so
+            -- nothing on the row swallows clicks meant for worldview.
             line:DisableHitTest(true)
             line:SetAlpha(1.0, true)
 
-            -- Readability strip behind the row. Solid-black at full alpha;
-            -- per-frame `SetAlpha` modulates the actual opacity by the
-            -- window's `win_alpha`, the row's fade progress, and the
-            -- `feed_background` toggle (off → alpha 0). Lives on the feed
-            -- group (not the line) so we can drive its alpha independently
-            -- and skip the line's text/icon depth ordering.
+            -- Readability strip behind the row. Lives on the feed group
+            -- (not the line) so we can drive its alpha independently of
+            -- the line's text/icon depth ordering.
             local bg = Bitmap(self)
             bg:SetSolidColor('ff000000')
             bg:DisableHitTest()
@@ -239,11 +200,9 @@ ChatFeedInterface = ClassUI(Group) {
         self:UpdateVisibility()
     end,
 
-    --- Pins each row from the bottom up. The bottom-most row anchors to
-    --- `AtBottomIn(self)`; every other row stacks `Above` the row that
-    --- comes after it in `Rows`. Because `AppendRow` inserts an entry's
-    --- chunks in reading order (header first, continuations after), the
-    --- header still sits at the top of its block and continuations below.
+    --- Pins each row from the bottom up. Header rows naturally end up at
+    --- the top of their wrapped block because AppendRow inserts in
+    --- reading order.
     ---@param self UIChatFeedInterface
     LayoutRows = function(self)
         local count = table.getn(self.Rows)
@@ -265,11 +224,7 @@ ChatFeedInterface = ClassUI(Group) {
         end
     end,
 
-    --- Removes the single oldest row from the head of `Rows`. With each
-    --- row tracking its own `Time`, capping no longer cascades through a
-    --- wrapped entry's chunks — a header at the head of the queue gets
-    --- popped on its own, and its continuations stay until they age out
-    --- on their own timers.
+    --- Drops the oldest row to make room for a new one.
     ---@param self UIChatFeedInterface
     RemoveOldest = function(self)
         local oldest = self.Rows[1]
@@ -280,8 +235,7 @@ ChatFeedInterface = ClassUI(Group) {
         end
     end,
 
-    --- Tears down every active row. Called when the user opens the chat
-    --- window (non-persist semantics) and from `OnDestroy`.
+    --- Destroys every active feed row.
     ---@param self UIChatFeedInterface
     ClearAll = function(self)
         for _, row in ipairs(self.Rows) do
@@ -295,10 +249,8 @@ ChatFeedInterface = ClassUI(Group) {
     -- Visibility / lifecycle
     ---------------------------------------------------------------------------
 
-    --- Computes whether we should currently be on screen and ticking.
-    --- Feed visible iff: chat window is hidden AND we have at least one
-    --- active row. `SetNeedsFrameUpdate` toggles in lockstep so we don't
-    --- waste frame ticks while idle.
+    --- Visible iff window hidden AND we have at least one row.
+    --- `SetNeedsFrameUpdate` toggles in lockstep so we don't tick idle.
     ---@param self UIChatFeedInterface
     UpdateVisibility = function(self)
         local windowVisible = ChatModel.GetSingleton().WindowVisible()
@@ -311,19 +263,12 @@ ChatFeedInterface = ClassUI(Group) {
         end
     end,
 
-    --- Per-frame timer pass. Walks each row, advances its `Time`, applies
-    --- alpha (per-row fade only for the line so the text stays crisp and
-    --- readable regardless of the window's opacity setting; window-
-    --- opacity × per-row fade × base intensity for the BG strip so the
-    --- backdrop dims with the user's preference), and destroys the row
-    --- once past `fade_time`. Each row ages independently — wrapped
-    --- entries arrive at the same instant so their chunks usually expire
-    --- together by virtue of starting from the same `Time = 0`, but the
-    --- cap or a future selective drop can take individual rows without
-    --- disturbing siblings. Re-evaluates visibility so the feed self-
-    --- hides when the last row expires.
+    --- Per-frame: ages each row, fades the line text (full per-row fade
+    --- only — text stays crisp regardless of `win_alpha`) and the BG
+    --- strip (modulated by `win_alpha` × fade × base intensity), and
+    --- destroys rows past `fade_time`.
     ---@param self UIChatFeedInterface
-    ---@param delta number   # seconds since the last frame
+    ---@param delta number
     OnFrame = function(self, delta)
         local options  = ChatConfigModel.GetOptions()
         local fadeTime = options.fade_time or 15
@@ -354,8 +299,7 @@ ChatFeedInterface = ClassUI(Group) {
         self:UpdateVisibility()
     end,
 
-    --- Empties our trash bag (destroying every derived observer) and
-    --- destroys any remaining feed rows.
+    --- Destroys every row plus the derived observers.
     ---@param self UIChatFeedInterface
     OnDestroy = function(self)
         self:ClearAll()
@@ -366,8 +310,8 @@ ChatFeedInterface = ClassUI(Group) {
 -------------------------------------------------------------------------------
 --#region Debugging
 
---- Owned and rebuilt by `ChatInterface`; touching the chat module after a
---- save here triggers the full chat-tree rebuild that picks up our changes.
+--- Owned by `ChatInterface`; re-importing the chat module triggers the
+--- full chat-tree rebuild.
 function __moduleinfo.OnDirty()
     import(__moduleinfo.name)
 end

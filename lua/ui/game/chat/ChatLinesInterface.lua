@@ -16,43 +16,20 @@ local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
---- Flip to `true` to overlay a semi-transparent coloured bitmap over the
---- control so its bounds are visible at runtime. Each chat interface uses a
---- distinct colour so overlapping controls can be told apart at a glance.
 local Debug = false
 
 -- Reserve space on the right of the wrapper for the scrollbar widget.
--- Anything wider than the scrollbar bitmap (~17px) works; 20px gives a tiny
--- breathing margin between the line text and the scrollbar.
 local ScrollbarReserve = 32
 
 -------------------------------------------------------------------------------
 -- A self-contained chat-lines panel: outer wrapper, inner pool of line rows,
--- and the vertical scrollbar — packaged so a parent can drop it in and size
--- it as one unit. Lifted out of `ChatInterface.lua` so the chat window only
--- has to lay this out alongside the edit area.
---
--- This class owns four related concerns that used to live on the window:
---
---   1. Pool sizing       (`RebuildPool`)            — line count follows
---                                                     the container height.
---   2. Text wrapping     (`WrapEntry` / `RewrapAll`) — wraps message text to
---                                                     the current row width;
---                                                     results cached on the
---                                                     entry itself.
---   3. Scroll container  (`GetScrollValues`, …)     — virtual size = total
---                                                     wrapped-line count
---                                                     across *valid* entries.
---   4. Visibility mapping (`CalcVisible`)            — projects the scroll
---                                                     position onto the pool.
---
--- Filtering currently gates on `ChatConfigModel.GetOptions().muted`;
--- camera-link filtering is still TODO.
+-- and the vertical scrollbar.
 --
 -- Click hooks (`OnNameClicked`, `OnCameraClicked`) are overridable instance
--- fields with sensible defaults — name click is a no-op (window-level
--- concern), camera click jumps the world camera to the entry's hint.
+-- fields. Default `OnNameClicked` is a no-op (window-level concern); default
+-- `OnCameraClicked` jumps the world camera to the entry's hint.
 
+--- Wrapped chat panel: line-row pool, scrollbar, history/options observers. Owns wrap and scroll state.
 ---@class UIChatLinesInterface : Group
 ---@field Trash             TrashBag                            # owns every subscription-LazyVar we create
 ---@field Pool              Group                               # inner group hosting the line rows
@@ -79,23 +56,16 @@ ChatLinesInterface = ClassUI(Group) {
         self.ScrollTop = 1
         self.VirtualSize = 0
 
-        -- Pool holds the actual line rows. Sized in `__post_init` to stop
-        -- short of our right edge so the scrollbar (anchored to Pool's
-        -- right) sits inside our footprint.
         self.Pool = Group(self, "ChatLinesPool")
 
-        -- Forward the scrollable interface from the Pool (which the
-        -- scrollbar binds to via `Scrollbar:SetScrollable`) up to `self`,
-        -- where the state lives.
+        -- `Scrollbar:SetScrollable` binds to Pool, but the state lives on
+        -- self — forward each method up.
         self.Pool.GetScrollValues = function(_, axis) return self:GetScrollValues(axis) end
         self.Pool.ScrollLines     = function(_, axis, delta) self:ScrollLines(axis, delta) end
         self.Pool.ScrollPages     = function(_, axis, delta) self:ScrollPages(axis, delta) end
         self.Pool.ScrollSetTop    = function(_, axis, top) self:ScrollSetTop(axis, top) end
         self.Pool.IsScrollable    = function(_, axis) return self:IsScrollable(axis) end
 
-        -- Default click hooks. Replaced on the instance by callers that
-        -- want different behaviour (e.g. the chat window re-points
-        -- `OnNameClicked` to set the recipient + re-focus the edit box).
         self.OnNameClicked = function(entry) end
         self.OnCameraClicked = function(entry)
             local cam = GetCamera('WorldCamera')
@@ -112,18 +82,12 @@ ChatLinesInterface = ClassUI(Group) {
             end
         end
 
-        -- Built once per panel so every pool line can point its
-        -- `OnNameClicked` / `OnCameraClicked` at the same reference — pool
-        -- growth never allocates a per-row closure. Each forwarder reads
-        -- `self.OnNameClicked` (etc.) on every invocation, so callers can
-        -- replace the public hook at any time without re-wiring the rows.
+        -- Built once so pool growth never allocates a per-row closure.
+        -- Each forwarder reads `self.OnNameClicked` on every call, so
+        -- replacing the hook later doesn't require re-wiring the rows.
         self.LineNameClicked   = function(_, entry) self.OnNameClicked(entry) end
         self.LineCameraClicked = function(_, entry) self.OnCameraClicked(entry) end
 
-        -- History → wrap new entries, refresh size, stick to bottom. The
-        -- initial firing happens before `__post_init` so the wrap call has
-        -- no pool to measure against; that's fine — `RewrapAll` runs once
-        -- the pool exists.
         local model = ChatModel.GetSingleton()
         self.HistoryObserver = self.Trash:Add(
             LazyVarDerive(
@@ -134,31 +98,20 @@ ChatLinesInterface = ClassUI(Group) {
             )
         )
 
-        -- `OptionsObserver` is wired in `__post_init`, not here — its
-        -- initial fire triggers `ApplyOptions → RebuildPool`, which reads
-        -- `self.ChatLineInterfaces[1].Height()` and so requires the pool layout to
-        -- already be in place.
+        -- `OptionsObserver` is wired in `Initialize`, not here — its
+        -- initial fire calls `ApplyOptions → RebuildPool`, which reads
+        -- `Pool.Height()` and so requires layout to be in place.
     end,
 
     ---@param self UIChatLinesInterface
     ---@param parent Control
     __post_init = function(self, parent)
-        -- Pool fills the wrapper but stops `ScrollbarReserve` short of the
-        -- right edge so the scrollbar (which the engine anchors to Pool's
-        -- right) lands inside our footprint. These bindings are reactive —
-        -- they don't evaluate to concrete pixels until the parent has laid
-        -- us out, which is why pool / wrap / scroll work happens in
-        -- `Initialize` below rather than here.
         Layouter(self.Pool)
             :AtLeftTopIn(self)
             :AtRightIn(self, ScrollbarReserve)
             :AtBottomIn(self)
             :End()
 
-        -- `CreateVertScrollbarFor` calls `Scrollbar:SetScrollable(attachto)`
-        -- so the scrollable methods have to live on `Pool` — see the
-        -- forwarding stubs in `__init`. Anchoring the scrollbar is also
-        -- reactive (it tracks `Pool.Right`), so this is safe pre-layout.
         self.Scrollbar = UIUtil.CreateVertScrollbarFor(self.Pool)
         self.Scrollbar:SetParent(self)
 
@@ -170,12 +123,10 @@ ChatLinesInterface = ClassUI(Group) {
         end
     end,
 
-    --- Called by the parent once it has laid out the lines panel. The
-    --- initial `RebuildPool` reads `Pool.Height()` — which evaluates to
-    --- zero until our outer rect is bound to something concrete — so the
-    --- pool / rewrap / scroll work has to wait until the parent positions
-    --- us. Wiring `OptionsObserver` here defers its initial fire (which
-    --- calls `ApplyOptions → RebuildPool`) for the same reason.
+    --- Called by the parent once it has laid out the lines panel.
+    --- `RebuildPool` reads `Pool.Height()`, which is zero until our outer
+    --- rect is bound, so pool / rewrap / scroll work has to wait until
+    --- the parent positions us.
     ---@param self UIChatLinesInterface
     Initialize = function(self)
         self:RebuildPool()
@@ -194,24 +145,18 @@ ChatLinesInterface = ClassUI(Group) {
     -- Pool sizing
     ---------------------------------------------------------------------------
 
-    --- Rebuilds the line pool to fit the current Pool height. Lines stack
-    --- bottom-up: `ChatLineInterfaces[1]` pins to the pool's bottom and
-    --- holds the newest visible message; subsequent slots stack above. When
-    --- there are fewer messages than slots, the empty (and `Hide()`-flagged)
-    --- slots sit at the top of the pool, so the chat reads bottom-anchored
-    --- like Discord / Slack — and matches the feed's stacking direction so
-    --- close ↔ open transitions look continuous. Safe to call repeatedly;
-    --- callers are expected to follow up with `CalcVisible` (and `RewrapAll`
-    --- on a true resize).
+    --- Rebuilds the line pool to fit Pool height. Lines stack bottom-up:
+    --- `ChatLineInterfaces[1]` pins to the pool's bottom and holds the
+    --- newest visible message. Empty slots sit at the top so the feed
+    --- reads bottom-anchored. Safe to call repeatedly; callers follow up
+    --- with `CalcVisible` (and `RewrapAll` on a true resize).
     ---@param self UIChatLinesInterface
     RebuildPool = function(self)
         local pool = self.Pool
-        -- Read the live size straight from the config model so the pool
-        -- always tracks the current option without a cached copy on `self`.
         local fontSize = ChatConfigModel.GetOptions().font_size or 14
 
-        -- Need one line to establish the row height. The row's `Height` is
-        -- a lazy function of the name-text font (see `ChatLineInterface`).
+        -- Need one line to establish the row height (a lazy function of
+        -- the name-text font in `ChatLineInterface`).
         if not self.ChatLineInterfaces[1] then
             self.ChatLineInterfaces[1] = ChatLineInterface(pool)
             self.ChatLineInterfaces[1]:SetFontSize(fontSize)
@@ -224,12 +169,11 @@ ChatLinesInterface = ClassUI(Group) {
         end
 
         local rowHeight = self.ChatLineInterfaces[1].Height()
-        if rowHeight < 1 then rowHeight = 18 end -- safety fallback
+        if rowHeight < 1 then rowHeight = 18 end
 
         local neededLines = math.max(1, math.floor(pool.Height() / rowHeight))
         local currentCount = table.getn(self.ChatLineInterfaces)
 
-        -- Grow: stack each new row above the previous one.
         for i = currentCount + 1, neededLines do
             self.ChatLineInterfaces[i] = ChatLineInterface(pool)
             self.ChatLineInterfaces[i]:SetFontSize(fontSize)
@@ -242,7 +186,6 @@ ChatLinesInterface = ClassUI(Group) {
                 :End()
         end
 
-        -- Shrink: destroy the surplus tail.
         for i = currentCount, neededLines + 1, -1 do
             self.ChatLineInterfaces[i]:Destroy()
             self.ChatLineInterfaces[i] = nil
@@ -253,12 +196,8 @@ ChatLinesInterface = ClassUI(Group) {
     -- Options application
     ---------------------------------------------------------------------------
 
-    --- Applies a `UIChatOptions` snapshot. Handles `font_size` and the
-    --- `muted` filter today; future options that affect line rendering
-    --- (colours, link visibility) extend this method.
-    ---
-    --- Window-level options (`win_alpha`, default recipient, …) are the
-    --- parent's responsibility — we deliberately don't touch them here.
+    --- Applies a `UIChatOptions` snapshot. Window-level options
+    --- (`win_alpha`, default recipient, …) are the parent's responsibility.
     ---@param self UIChatLinesInterface
     ---@param options UIChatOptions
     ApplyOptions = function(self, options)
@@ -268,13 +207,10 @@ ChatLinesInterface = ClassUI(Group) {
             line:SetFontSize(size)
         end
         -- Row height tracks the font, so the pool may need resizing;
-        -- wrap widths depend on font metrics, so rewrap all entries.
+        -- wrap widths depend on font metrics, so rewrap.
         self:RebuildPool()
         self:RewrapAll()
 
-        -- Filter-affecting options (muted, links) may have changed too.
-        -- Recompute what's visible so entries newly excluded by
-        -- `IsValidEntry` drop out of the feed immediately.
         self:RefreshVirtualSize()
         self:RecomputeScrollTopForPoolChange(oldPoolSize)
         self:CalcVisible()
@@ -284,19 +220,14 @@ ChatLinesInterface = ClassUI(Group) {
     -- Text wrapping
     ---------------------------------------------------------------------------
 
-    --- Wraps a single entry's text to fit the current row width, caching
-    --- the result on the entry itself. Delegates to `ChatUtils.WrapEntry`
-    --- so the feed view can wrap the same entries with the same logic
-    --- (and same width — both panels share row metrics) without reaching
-    --- back into us.
+    --- Wraps an entry's text using the first pool line as the measurement source.
     ---@param self UIChatLinesInterface
     ---@param entry UIChatEntry
     WrapEntry = function(self, entry)
         ChatUtils.WrapEntry(entry, self.ChatLineInterfaces[1])
     end,
 
-    --- Re-wraps every entry in the history. Used on resize (width change)
-    --- and on option changes that affect the measuring font.
+    --- Re-wraps every history entry. Called after a font, width, or font-metric change.
     ---@param self UIChatLinesInterface
     RewrapAll = function(self)
         local history = ChatModel.GetSingleton().History()
@@ -310,15 +241,10 @@ ChatLinesInterface = ClassUI(Group) {
     -- Filtering
     ---------------------------------------------------------------------------
 
-    --- Whether an entry counts toward the virtual scroll size and should
-    --- appear in `CalcVisible`. Gates on:
-    ---   * per-army mute map (`muted[ArmyID]` → drop) — per-game, set
-    ---     via the config dialog or `/mute` / `/unmute`.
-    ---   * `links` option (`Camera` or `Location` set + `links == false`
-    ---     → drop) — mirrors the legacy filter at chat.legacy.lua:304-310.
-    ---     Both `Camera` (full snapshot) and `Location` (sim-side point
-    ---     or area hint) surface the camera-link affordance on the row,
-    ---     so either field qualifies as a "link" message.
+    --- Whether an entry counts toward the virtual scroll size. Gates on
+    --- the per-army mute map and the `links` option (Camera or Location
+    --- both qualify as "link" messages — either surfaces the camera-link
+    --- affordance on the row).
     ---@param self UIChatLinesInterface
     ---@param entry UIChatEntry
     ---@return boolean
@@ -338,7 +264,7 @@ ChatLinesInterface = ClassUI(Group) {
     -- Scroll container
     ---------------------------------------------------------------------------
 
-    --- Recomputes `VirtualSize` = total wrapped lines across all valid entries.
+    --- Recounts wrapped lines across non-filtered entries and stores the total in `VirtualSize`.
     ---@param self UIChatLinesInterface
     ---@param history? UIChatEntry[]
     RefreshVirtualSize = function(self, history)
@@ -352,7 +278,7 @@ ChatLinesInterface = ClassUI(Group) {
         self.VirtualSize = size
     end,
 
-    --- Standard MAUI scrollable interface: returns (rangeMin, rangeMax, visibleMin, visibleMax).
+    --- Scrollbar contract: returns `(min, max, top, bottom)` of the visible range.
     ---@param self UIChatLinesInterface
     ---@param axis string  # "Vert" or "Horz"
     GetScrollValues = function(self, axis)
@@ -361,25 +287,25 @@ ChatLinesInterface = ClassUI(Group) {
         return 1, self.VirtualSize, top, math.min(top + poolSize, self.VirtualSize)
     end,
 
-    --- Scrolls by a number of rows (negative = toward older messages).
+    --- Scrolls by a line count (negative = older).
     ---@param self UIChatLinesInterface
     ---@param axis string
-    ---@param delta number
+    ---@param delta number   # negative = toward older messages
     ScrollLines = function(self, axis, delta)
         self:ScrollSetTop(axis, self.ScrollTop + math.floor(delta))
     end,
 
-    --- Scrolls by a page (pool-size worth of rows).
+    --- Scrolls by `delta` pool-sized pages (negative = older).
     ---@param self UIChatLinesInterface
     ---@param axis string
-    ---@param delta number
+    ---@param delta number   # in pool-size pages
     ScrollPages = function(self, axis, delta)
         self:ScrollSetTop(axis, self.ScrollTop + math.floor(delta) * table.getn(self.ChatLineInterfaces))
     end,
 
-    --- Jumps to an absolute virtual position, clamped to the valid range.
-    --- Name and signature match the engine's `ScrollSetTop(axis, top)` contract
-    --- so `Scrollbar:SetScrollable` can call it directly.
+    --- Jumps to an absolute virtual position, clamped. Signature matches
+    --- the engine's `ScrollSetTop(axis, top)` contract so the scrollbar
+    --- can call it directly.
     ---@param self UIChatLinesInterface
     ---@param axis string
     ---@param top number
@@ -394,8 +320,7 @@ ChatLinesInterface = ClassUI(Group) {
         self:CalcVisible()
     end,
 
-    --- Standard MAUI scrollable interface: whether scrolling is possible on
-    --- the given axis.
+    --- Scrollbar contract: chat is always scrollable on the requested axis.
     ---@param self UIChatLinesInterface
     ---@param axis string
     ---@return boolean
@@ -403,18 +328,11 @@ ChatLinesInterface = ClassUI(Group) {
         return true
     end,
 
-    --- Adjusts `ScrollTop` to compensate for a change in pool size (window
-    --- resize, font-size change). Keeps the bottom of the visible window —
-    --- the entry currently rendered at `pool[1]` — pinned across the change:
-    --- when the pool grows, the new slots above reveal *older* entries
-    --- instead of staying blank, and an at-bottom view stays at the bottom.
-    --- Caller is responsible for following up with `CalcVisible`.
-    ---
-    --- Without this step, growing the pool past the previous `visibleBottom`
-    --- range leaves the new top slots stuck on the `currentVirtualPos < scrollTop`
-    --- branch in `CalcVisible` — they Clear+Hide instead of being filled with
-    --- older history. Scrolling later "fixes" it because `ScrollSetTop` writes
-    --- a fresh `ScrollTop` that lets `CalcVisible` walk further back.
+    --- Adjusts `ScrollTop` to keep the entry at `pool[1]` pinned across a
+    --- pool-size change. Without this, growing the pool past the previous
+    --- `visibleBottom` leaves the new top slots stuck on Clear+Hide
+    --- instead of revealing older history; the user has to scroll to
+    --- "fix" it. Caller follows up with `CalcVisible`.
     ---@param self UIChatLinesInterface
     ---@param oldPoolSize number   # pool length before the resize / RebuildPool call
     RecomputeScrollTopForPoolChange = function(self, oldPoolSize)
@@ -425,20 +343,16 @@ ChatLinesInterface = ClassUI(Group) {
         self.ScrollTop = math.max(1, math.min(newMaxTop, newScrollTop))
     end,
 
-    --- Snaps to the bottom of the virtual list.
+    --- Scrolls to the newest entry and forces a render pass.
     ---@param self UIChatLinesInterface
     ScrollToBottom = function(self)
         self:ScrollSetTop(nil, self.VirtualSize)
-        -- ScrollSetTop short-circuits when the position doesn't change, but
-        -- the pool still needs a render pass after a rebuild / rewrap.
+        -- ScrollSetTop short-circuits when the position doesn't change,
+        -- but the pool still needs a render pass after rebuild / rewrap.
         self:CalcVisible()
     end,
 
-    --- True when `ScrollTop` is already pinned at the maximum legal value
-    --- — i.e. the newest entry is in the bottom-most pool slot and no
-    --- amount of "scroll down" would change anything. Useful for callers
-    --- that want a "if already at bottom, do something else" two-stage
-    --- behaviour (e.g. dismissing the window on a second jump-to-bottom).
+    --- Whether the newest entry is currently visible.
     ---@param self UIChatLinesInterface
     ---@return boolean
     IsAtBottom = function(self)
@@ -452,12 +366,9 @@ ChatLinesInterface = ClassUI(Group) {
     ---------------------------------------------------------------------------
 
     --- Projects the visible virtual range onto the bottom-anchored line
-    --- pool. `ChatLineInterfaces[1]` (bottom of the pool) shows the newest
-    --- visible entry / wrapped chunk; subsequent slots walk back through
-    --- history toward older content, matching the `Above`-stacked layout
-    --- from `RebuildPool`. Skips filtered-out entries in either direction.
-    --- When fewer entries fit than the pool can hold, the surplus slots
-    --- (at the top of the pool) are cleared and hidden.
+    --- pool. `ChatLineInterfaces[1]` shows the newest visible chunk;
+    --- subsequent slots walk back through history. Surplus slots at the
+    --- top are cleared and hidden.
     ---@param self UIChatLinesInterface
     CalcVisible = function(self)
         if not self.ChatLineInterfaces[1] then return end
@@ -467,15 +378,11 @@ ChatLinesInterface = ClassUI(Group) {
         local poolSize = table.getn(self.ChatLineInterfaces)
         local scrollTop = self.ScrollTop
 
-        -- The bottommost visible virtual position is the newest entry the
-        -- user can currently see; pool[1] (the bottom row) renders it.
-        -- `VirtualSize` reflects the post-filter count, so this stays
-        -- correct when muted senders are hidden mid-feed.
+        -- pool[1] (bottom row) renders `visibleBottom`. `VirtualSize` is
+        -- post-filter so this stays correct mid-feed.
         local visibleBottom = math.min(scrollTop + poolSize - 1, self.VirtualSize)
 
-        -- Walk forward through history to find the entry + wrappedIdx that
-        -- covers `visibleBottom`. Same scan as the legacy loop but anchored
-        -- to the bottom of the visible window instead of its top.
+        -- Walk forward to find the entry + wrappedIdx covering visibleBottom.
         local entryIdx = 1
         local wrappedIdx = 1
         local virtualPos = 0
@@ -499,9 +406,8 @@ ChatLinesInterface = ClassUI(Group) {
             end
         end
 
-        -- Fill the pool from bottom (poolIdx 1) upward. Each step decrements
-        -- the wrapped-line cursor; when a continuation chunk runs out, we
-        -- hop back to the previous valid entry (walking past filtered ones).
+        -- Fill the pool bottom-up; on continuation exhaustion, hop back to
+        -- the previous valid entry (skipping filtered ones).
         local currentVirtualPos = visibleBottom
         for poolIdx = 1, poolSize do
             local line = self.ChatLineInterfaces[poolIdx]
@@ -545,9 +451,7 @@ ChatLinesInterface = ClassUI(Group) {
     -- Model reactions
     ---------------------------------------------------------------------------
 
-    --- Called whenever `model.History` fires dirty. Wraps entries we haven't
-    --- wrapped yet (new arrivals), refreshes the virtual size, and snaps to
-    --- the bottom so the new line is visible.
+    --- Wraps new arrivals, refreshes virtual size, snaps to bottom.
     ---@param self UIChatLinesInterface
     ---@param history UIChatEntry[]
     OnHistoryChanged = function(self, history)
@@ -561,7 +465,6 @@ ChatLinesInterface = ClassUI(Group) {
             self:ScrollToBottom()
         end
 
-        -- make sure chat messages stay hidden if window is hidden
         local windowVisible = ChatModel.GetSingleton().WindowVisible()
         if not windowVisible then
             self:Hide()
@@ -572,6 +475,7 @@ ChatLinesInterface = ClassUI(Group) {
     -- Resize hooks (driven by the parent window's resize events)
     ---------------------------------------------------------------------------
 
+    --- Per-frame during a window resize: rebuilds the pool and rewraps in real time.
     ---@param self UIChatLinesInterface
     OnResizeLive = function(self)
         local oldPoolSize = table.getn(self.ChatLineInterfaces)
@@ -581,6 +485,7 @@ ChatLinesInterface = ClassUI(Group) {
         self:CalcVisible()
     end,
 
+    --- Final pass after a window resize: rebuilds the pool and rewraps once more.
     ---@param self UIChatLinesInterface
     OnResizeFinished = function(self)
         local oldPoolSize = table.getn(self.ChatLineInterfaces)
@@ -590,8 +495,7 @@ ChatLinesInterface = ClassUI(Group) {
         self:CalcVisible()
     end,
 
-    --- Empties our trash bag so every derived observer we allocated is
-    --- destroyed — no `OnDirty` can fire into a torn-down `self`.
+    --- Destroys derived observers so dangling OnDirty callbacks don't fire into a dead self.
     ---@param self UIChatLinesInterface
     OnDestroy = function(self)
         self.Trash:Destroy()
@@ -601,6 +505,7 @@ ChatLinesInterface = ClassUI(Group) {
 -------------------------------------------------------------------------------
 --#region Debugging
 
+--- Hot-reload hook: re-imports this module on save.
 function __moduleinfo.OnDirty()
     import(__moduleinfo.name)
 end

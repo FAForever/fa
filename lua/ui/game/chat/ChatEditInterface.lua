@@ -20,15 +20,8 @@ local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
---- Flip to `true` to overlay a semi-transparent coloured bitmap over the
---- control so its bounds are visible at runtime. Each chat interface uses a
---- distinct colour so overlapping controls can be told apart at a glance.
 local Debug = false
 
---- Cap on the command-history ring (newest at the tail). Older entries
---- are dropped when the buffer overflows. 32 is comfortably more than the
---- handful a typical session generates while staying small enough that
---- linear walks stay free.
 local MaxCommandHistorySize = 32
 
 -------------------------------------------------------------------------------
@@ -36,6 +29,7 @@ local MaxCommandHistorySize = 32
 -- box. Pressing Enter dispatches the text to the controller. Clicking the
 -- chat-bubble button or the label opens the recipient picker (ChatListInterface).
 
+--- Chat input area: edit box, recipient label, recipient picker, camera toggle, command hint, recall ring.
 ---@class UIChatEditInterface : Group
 ---@field Trash             TrashBag                          # owns every derived subscription-LazyVar
 ---@field ChatBubble        Button
@@ -57,9 +51,6 @@ ChatEditInterface = ClassUI(Group) {
     __init = function(self, parent)
         Group.__init(self, parent, "ChatEditInterface")
 
-        -- Single trash bag for everything we allocate that needs explicit
-        -- destruction — currently just the derived observer LazyVars.
-        -- Emptied in `OnDestroy`.
         self.Trash = TrashBag()
 
         self.Completion = nil
@@ -79,16 +70,12 @@ ChatEditInterface = ClassUI(Group) {
         self.RecipientLabel = UIUtil.CreateText(self, "To All:", 14, 'Arial')
         self.RecipientLabel:SetDropShadow(true)
 
-        -- Clicking the label also opens the recipient picker.
         self.RecipientLabel.HandleEvent = function(_, event)
             if event.Type == 'ButtonPress' then
                 self:ToggleList()
             end
         end
 
-        -- Camera-attach toggle. When checked, the next Send call snapshots
-        -- the world camera and ships it on the message; recipients can click
-        -- the resulting cam-icon on their chat line to jump to the view.
         self.CamCheckbox = Checkbox(self,
             UIUtil.SkinnableFile('/game/camera-btn/pinned_btn_up.dds'),
             UIUtil.SkinnableFile('/game/camera-btn/pinned_btn_down.dds'),
@@ -100,11 +87,9 @@ ChatEditInterface = ClassUI(Group) {
 
         self.EditBox = Edit(self)
 
-        -- Placeholder bounds so that `SetupEditStd` below, which internally
-        -- calls `SetFont` and reads the control's Left/Right, can evaluate
-        -- the layout without tripping the default circular Left/Right/Width
-        -- chain set up by `Control.ResetLayout`. `__post_init` replaces these
-        -- with the real layout.
+        -- `SetupEditStd` below reads the control's bounds before
+        -- `__post_init` runs, so seed placeholder values to avoid tripping
+        -- the default circular Left/Right/Width chain.
         Layouter(self.EditBox)
             :Left(0)
             :Top(0)
@@ -119,11 +104,8 @@ ChatEditInterface = ClassUI(Group) {
         self.EditBox:ShowBackground(false)
         self.EditBox:SetText('')
 
-        -- Pressing Enter on an empty edit box closes the window — matches
-        -- the legacy `chat.lua` shortcut where Enter serves as both "send"
-        -- and "dismiss" depending on whether there's anything to send.
-        -- Successful sends are appended to the command-history ring so
-        -- Up / Down can recall them when the hint isn't open.
+        -- Enter on an empty box closes the window; otherwise sends and
+        -- pushes onto the command-history ring for Up/Down recall.
         self.EditBox.OnEnterPressed = function(_, text)
             ChatController.NotifyActivity()
             if text and text ~= '' then
@@ -135,9 +117,8 @@ ChatEditInterface = ClassUI(Group) {
             self:CloseCommandHint()
         end
 
-        -- Drive the command-hint popup from the edit-box contents, and drop
-        -- any in-flight Tab-completion cycle whenever the text changes from
-        -- something other than our own `ApplyCompletion` call.
+        -- Drop any in-flight Tab-completion cycle whenever the text changes
+        -- from something other than our own `ApplyCompletion`.
         self.EditBox.OnTextChanged = function(_, newText, _)
             ChatController.NotifyActivity()
             self:RefreshCommandHint(newText or '')
@@ -146,11 +127,8 @@ ChatEditInterface = ClassUI(Group) {
             end
         end
 
-        -- Tab runs completion (commands when text starts with '/' and the
-        -- caret is in the first token, player nicknames otherwise). Repeat
-        -- presses cycle through candidates; any other keystroke resets the
-        -- cycle via `OnTextChanged`. `OnCharPressed` fires before insertion,
-        -- so the `>=` beep catches the keystroke the cap is about to reject.
+        -- `OnCharPressed` fires before insertion, so `>=` catches the
+        -- keystroke the cap is about to reject.
         self.EditBox.OnCharPressed = function(edit, charcode)
             if charcode == UIUtil.VK_TAB then
                 self:HandleTabCompletion()
@@ -175,21 +153,14 @@ ChatEditInterface = ClassUI(Group) {
             return true
         end
 
-        -- Page Up / Page Down scroll the chat feed. Three modes per key:
-        --   * no modifier → 10 rows (page-ish)
-        --   * Shift       → 1 row (fine grain)
-        --   * Ctrl        → jump to the extreme; `Ctrl+PgDn` while already
-        --                   at the bottom collapses the window.
-        -- Matches the legacy chat.lua page-key binding so muscle memory
-        -- carries over, with `Ctrl` covering the jump-to-extreme case that
-        -- Home / End would normally serve — those are consumed by the Edit
-        -- control for caret navigation before they reach this handler, so
-        -- `OnNonTextKeyPressed` never sees them.
-        -- Up / Down cycle the command-hint selection while the hint is open.
-        -- Lazy import of ChatInterface avoids the import cycle: ChatInterface
-        -- imports this module at load time, so the reverse edge has to defer.
-        ---@param keycode number     # OS-level VK_* code; compare against `UIUtil.VK_*`
-        ---@param event KeyEvent     # full input-event payload; modifiers live at `event.Modifiers`
+        -- Page Up/Down: no mod = 10 rows, Shift = 1 row, Ctrl = jump to
+        -- the extreme (Ctrl+PgDn at bottom collapses the window). Home/End
+        -- are consumed by Edit for caret nav before they reach here.
+        -- Up/Down cycle the command-hint when open, otherwise walk
+        -- command history. Lazy import of ChatInterface breaks an import
+        -- cycle.
+        ---@param keycode number     # OS-level VK_* code
+        ---@param event KeyEvent
         self.EditBox.OnNonTextKeyPressed = function(_, keycode, event)
             ChatController.NotifyActivity()
             local chatInterface = import("/lua/ui/game/chat/ChatInterface.lua")
@@ -209,8 +180,6 @@ ChatEditInterface = ClassUI(Group) {
                     chatInterface.ScrollLines(step)
                 end
             elseif keycode == UIUtil.VK_UP then
-                -- Hint open → cycle the selection; closed → walk back
-                -- through the command-history ring, oldest first.
                 if self.ChatCommandHintInterface then
                     self.ChatCommandHintInterface:SelectNext()
                 else
@@ -225,9 +194,6 @@ ChatEditInterface = ClassUI(Group) {
             end
         end
 
-        -- Keep the label in sync with the model. `LazyVarDerive` gives us a
-        -- fresh per-subscriber LazyVar so we don't stomp any other observer
-        -- of `model.Recipient` (see the chat CLAUDE.md for the pattern).
         local model = ChatModel.GetSingleton()
         self.RecipientObserver = self.Trash:Add(LazyVarDerive(model.Recipient, function(lv)
             self:RefreshRecipient(lv())
@@ -247,26 +213,21 @@ ChatEditInterface = ClassUI(Group) {
             :AtVerticalCenterIn(self)
             :End()
 
-        -- Camera-attach toggle pinned to the right edge so the edit box can
-        -- claim the remaining width.
         Layouter(self.CamCheckbox)
             :AtRightIn(self, 12)
             :AtVerticalCenterIn(self, -2)
             :End()
 
-        -- Width must be re-derived from the now-anchored Left/Right.
-        -- Without this it stays pinned at the literal `:Width(200)` placeholder
-        -- set in `__init` (needed there so `SetupEditStd` can read the layout
-        -- without tripping the default circular `Width = Right - Left` chain),
-        -- and the visible typing area gets capped at 200 px regardless of
-        -- where `Right` actually anchors — so the text box visibly fails to
-        -- extend out toward the camera checkbox at higher UI scales or wider
-        -- windows.
+        -- `ResetWidth` drops the `:Width(200)` placeholder set in `__init`
+        -- (needed there so `SetupEditStd` could read the layout without
+        -- tripping the default circular Width chain). Without this reset,
+        -- the typing area stays capped at 200 px regardless of where Right
+        -- anchors.
         Layouter(self.EditBox)
             :AnchorToRight(self.RecipientLabel, 4)
             :AnchorToLeft(self.CamCheckbox, 4)
             :AtVerticalCenterIn(self)
-            :ResetWidth()  -- drop the `:Width(200)` from `__init`
+            :ResetWidth()
             :Height(function() return self.EditBox:GetFontHeight() end)
             :End()
 
@@ -278,11 +239,9 @@ ChatEditInterface = ClassUI(Group) {
         end
     end,
 
-    --- Entry point for the Tab key. When the command hint is open, Tab
-    --- commits the currently-selected command into the edit box (mirroring
-    --- a click on the hint row). Otherwise it runs the in-box completion
-    --- cycle for nicknames. Plays the error cue when there is nothing to
-    --- complete so the user isn't left wondering whether the key was handled.
+    --- Tab key. With the hint open, commits the selected command;
+    --- otherwise runs the in-box nickname completion cycle. Plays the
+    --- error cue when there is nothing to complete.
     ---@param self UIChatEditInterface
     HandleTabCompletion = function(self)
         if self.ChatCommandHintInterface then
@@ -313,10 +272,9 @@ ChatEditInterface = ClassUI(Group) {
         self:ApplyCompletion()
     end,
 
-    --- Writes the current candidate into the edit box at the recorded anchor,
-    --- overwriting the consumed word. `SuppressCompletionReset` guards the
-    --- `OnTextChanged` branch that would otherwise clear the cycle state as
-    --- a side-effect of our own edit.
+    --- Writes the current candidate at the recorded anchor.
+    --- `SuppressCompletionReset` keeps the `OnTextChanged` branch from
+    --- clearing the cycle state as a side-effect of our own edit.
     ---@param self UIChatEditInterface
     ApplyCompletion = function(self)
         if not self.Completion then return end
@@ -338,17 +296,16 @@ ChatEditInterface = ClassUI(Group) {
         self.EditBox:SetCaretPosition(c.Anchor + replacementLen)
         self.SuppressCompletionReset = false
 
-        -- Advance the consumed span to match what we just wrote so the next
-        -- cycle overwrites exactly this candidate, not the original word.
+        -- Advance the consumed span so the next cycle overwrites this
+        -- candidate, not the original word.
         c.Consume = replacementLen
     end,
 
     ---------------------------------------------------------------------------
     -- Command history recall
 
-    --- Appends a successfully-sent message to the command-history ring and
-    --- resets any active recall walk so the next Up press starts at the
-    --- newest entry. Trims the ring to `MaxCommandHistorySize`.
+    --- Pushes a sent message onto the recall ring, dropping the oldest if the
+    --- ring is full. Resets any in-progress recall walk.
     ---@param self UIChatEditInterface
     ---@param text string
     PushHistory = function(self, text)
@@ -359,9 +316,8 @@ ChatEditInterface = ClassUI(Group) {
         self.RecallEntry = nil
     end,
 
-    --- Walks back toward older entries. Empty history is a no-op; the first
-    --- press lands on the newest entry, subsequent presses move one step
-    --- earlier each time and clamp at the oldest.
+    --- Walks toward older entries; first press lands on the newest, then
+    --- moves one step earlier per press and clamps at the oldest.
     ---@param self UIChatEditInterface
     RecallPrevious = function(self)
         local count = table.getn(self.CommandHistory)
@@ -374,12 +330,8 @@ ChatEditInterface = ClassUI(Group) {
         self:ApplyRecall()
     end,
 
-    --- Walks forward toward newer entries. After the newest, `RecallEntry`
-    --- resets to nil so the next Down press blanks the edit (matching the
-    --- legacy "step past the end clears the line" feel). Empty history
-    --- with no active recall is a no-op; with no active recall but a
-    --- non-empty history, blanks the edit so users have a quick "wipe what
-    --- I'm typing" gesture.
+    --- Walks toward newer entries. Past the newest, `RecallEntry` resets
+    --- to nil and the next Down blanks the edit ("wipe what I'm typing").
     ---@param self UIChatEditInterface
     RecallNext = function(self)
         local count = table.getn(self.CommandHistory)
@@ -396,9 +348,8 @@ ChatEditInterface = ClassUI(Group) {
     end,
 
     --- Writes the entry at `RecallEntry` into the edit box and parks the
-    --- caret at the end. No-op if `RecallEntry` doesn't reference a real
-    --- entry — guards against being called between a destructive history
-    --- mutation and the next nav keystroke.
+    --- caret at the end. Guarded against `RecallEntry` going stale between
+    --- a destructive history mutation and the next nav keystroke.
     ---@param self UIChatEditInterface
     ApplyRecall = function(self)
         local entry = self.CommandHistory[self.RecallEntry or 0]
@@ -407,11 +358,8 @@ ChatEditInterface = ClassUI(Group) {
         self.EditBox:SetCaretPosition(STR_Utf8Len(entry))
     end,
 
-    --- Shows or hides the command hint based on the current edit-box text.
-    --- Only opens when the text transitions to exactly `/` — so closing the
-    --- hint via Escape leaves it closed while the user keeps typing past the
-    --- slash. An already-open hint keeps refreshing as long as text starts
-    --- with `/`.
+    --- Only opens when the text transitions to exactly `/` — so closing
+    --- the hint via Escape leaves it closed while the user keeps typing.
     ---@param self UIChatEditInterface
     ---@param text string
     RefreshCommandHint = function(self, text)
@@ -427,13 +375,12 @@ ChatEditInterface = ClassUI(Group) {
         end
     end,
 
-    --- Creates the hint popup and anchors it directly above the edit box.
+    --- Mounts the slash-command hint popup above the edit box. No-op if open.
     ---@param self UIChatEditInterface
     OpenCommandHint = function(self)
         if self.ChatCommandHintInterface then return end
 
-        -- Ensure the built-ins exist before the hint queries the registry;
-        -- otherwise we'd only see the footer fallback on the first open.
+        -- Ensure the built-ins exist before the hint queries the registry.
         ChatController.RegisterBuiltinCommands()
 
         local hint = ChatCommandHintInterface(self, self.EditBox)
@@ -446,8 +393,7 @@ ChatEditInterface = ClassUI(Group) {
         end)
     end,
 
-    --- Tears down the hint popup if it exists. Called when the user sends a
-    --- message, clears the prefix, or otherwise leaves command-entry mode.
+    --- Tears down the slash-command hint popup if it is open.
     ---@param self UIChatEditInterface
     CloseCommandHint = function(self)
         if not self.ChatCommandHintInterface then return end
@@ -456,7 +402,7 @@ ChatEditInterface = ClassUI(Group) {
         hint:Destroy()
     end,
 
-    --- Opens the recipient picker popup, or closes it if it is already open.
+    --- Opens or closes the recipient picker popup, returning focus to the edit box.
     ---@param self UIChatEditInterface
     ToggleList = function(self)
         if self.ChatListInterface then
@@ -467,8 +413,6 @@ ChatEditInterface = ClassUI(Group) {
         else
             local list = ChatListInterface(self)
             self.ChatListInterface = list
-            -- Position the popup above-left of the chat-bubble button.
-            -- Depth is handled by the list itself (see ChatListInterface.__init).
             LayoutHelpers.Above(list, self.ChatBubble, 15)
             LayoutHelpers.AtLeftIn(list, self.ChatBubble, 15)
             list:SetOnClosed(function()
@@ -478,10 +422,7 @@ ChatEditInterface = ClassUI(Group) {
         end
     end,
 
-    --- Updates the label from the current recipient value. Strings come
-    --- from `ChatUtils.ToStrings` so the label respects the viewer's locale
-    --- and stays in lockstep with the chat-line prefixes rendered by
-    --- `ChatController`.
+    --- Updates the recipient label to match the current send target.
     ---@param self UIChatEditInterface
     ---@param recipient UIChatRecipient
     RefreshRecipient = function(self, recipient)
@@ -496,20 +437,19 @@ ChatEditInterface = ClassUI(Group) {
         end
     end,
 
-    --- Moves keyboard focus into the edit box.
+    --- Gives keyboard focus to the edit box.
     ---@param self UIChatEditInterface
     AcquireFocus = function(self)
         self.EditBox:AcquireFocus()
     end,
 
-    --- Moves keyboard focus out of the edit box.
+    --- Releases keyboard focus from the edit box.
     ---@param self UIChatEditInterface
     AbandonFocus = function(self)
         self.EditBox:AbandonFocus()
     end,
 
-    --- Empties our trash bag so every derived observer we allocated is
-    --- destroyed — no `OnDirty` can fire into a torn-down `self`.
+    --- Destroys derived observers so dangling OnDirty callbacks don't fire into a dead self.
     ---@param self UIChatEditInterface
     OnDestroy = function(self)
         self.Trash:Destroy()

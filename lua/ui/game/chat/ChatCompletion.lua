@@ -2,21 +2,15 @@
 local CommandRegistry = import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua")
 
 -------------------------------------------------------------------------------
--- Pure tab-completion helper for the chat edit box.
+-- Pure tab-completion for the chat edit box.
 --
 --   Compute(text, caret)  →  UIChatCompletion | nil
 --
--- The caller (ChatEditInterface) owns the cycle state; this module only
--- produces a fresh record. Positions are codepoint offsets (0-indexed) so
--- they line up with Edit:GetCaretPosition / SetCaretPosition and remain
--- stable across UTF-8 input.
---
--- Branches:
---   1. Command — text starts with '/' AND the caret sits inside the first
---      token. Candidates come from the registry.
---   2. Name    — otherwise, complete the current word against non-civilian
---      army nicknames.
+-- The caller owns the cycle state. Positions are 0-indexed codepoint
+-- offsets so they line up with Edit:GetCaretPosition / SetCaretPosition
+-- and stay stable across UTF-8 input.
 
+--- One Tab-cycle's state: candidates plus where in the source they replace; caller owns the cycle position.
 ---@class UIChatCompletion
 ---@field Anchor     number    # codepoint offset (0-indexed) where the replaced word begins
 ---@field Consume    number    # codepoint count of the original word consumed from `Anchor`
@@ -25,8 +19,7 @@ local CommandRegistry = import("/lua/ui/game/chat/commands/ChatCommandRegistry.l
 ---@field Index      number    # 1-based index of the currently applied candidate
 ---@field Suffix     string    # text appended after the candidate (' ' when unambiguous)
 
---- Returns the codepoint of the last space at or before `caret`, or 0 if none.
---- Space is ASCII so a codepoint-by-codepoint walk is safe.
+--- Codepoint of the last space at or before `caret`, or 0 if none.
 ---@param text  string
 ---@param caret number
 ---@return number
@@ -41,8 +34,8 @@ local function LastSpaceBefore(text, caret)
     return 0
 end
 
---- Returns the codepoint position of the next space at or after `caret + 1`,
---- or the total codepoint length when the word runs to end-of-text.
+--- Codepoint position of the next space at or after `caret + 1`, or
+--- `textLen` if the word runs to end-of-text.
 ---@param text    string
 ---@param caret   number
 ---@param textLen number
@@ -59,9 +52,8 @@ local function NextSpaceAfter(text, caret, textLen)
 end
 
 --- Non-civilian nicknames from the armies table, minus the local player.
---- `focusArmy` is the local player's army ID; it's 0 for observers (so the
---- comparison below is a no-op in observer mode, which is the behaviour we
---- want — observers have no nickname to complete anyway).
+--- `focusArmy` is 0 for observers, making the comparison a no-op — fine,
+--- observers have no nickname to complete anyway.
 ---@return string[]
 local function CollectNicknames()
     local out = {}
@@ -83,9 +75,9 @@ local function StartsWithCI(s, prefix)
     return string.lower(string.sub(s, 1, string.len(prefix))) == string.lower(prefix)
 end
 
---- Computes a completion record for the caret position in `text`, or nil if
---- nothing matches. The returned record's `Consume` covers the full word
---- under the caret (so completing mid-word overwrites the tail too).
+--- Returns a completion record for the caret position, or nil if nothing
+--- matches. `Consume` covers the full word under the caret so mid-word
+--- completion overwrites the tail too.
 ---@param text  string
 ---@param caret number
 ---@return UIChatCompletion?
@@ -100,8 +92,8 @@ function Compute(text, caret)
     local isCommand = (wordStart == 0) and (STR_Utf8SubString(text, 1, 1) == '/')
 
     -- Only append a trailing space when the completion is unambiguous AND
-    -- the word runs to end-of-text; adding one before an existing space would
-    -- double up.
+    -- the word runs to end-of-text — otherwise we'd double up an existing
+    -- separator.
     local atEnd = wordEnd == textLen
 
     if isCommand then
@@ -126,10 +118,9 @@ function Compute(text, caret)
     local prefix = STR_Utf8SubString(text, wordStart + 1, caret - wordStart)
     if prefix == '' then return nil end
 
-    -- Allow `@nick` shorthand: strip the leading `@` for matching but keep
-    -- it in every candidate so the inserted text is still `@Jip`. Command
-    -- param resolvers strip a leading `@` symmetrically (see
-    -- ChatCommandTypes), so `/whisper @Jip` works the same as `/whisper Jip`.
+    -- `@nick` shorthand: strip the `@` for matching but keep it in
+    -- candidates so `/whisper @Jip` still works. ChatCommandTypes
+    -- strips `@` symmetrically on the resolver side.
     local atSign = ''
     local matchPrefix = prefix
     if string.sub(prefix, 1, 1) == '@' then

@@ -18,16 +18,11 @@ local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
---- Flip to `true` to overlay a semi-transparent coloured bitmap over the
---- control so its bounds are visible at runtime. Each chat interface uses a
---- distinct colour so overlapping controls can be told apart at a glance.
 local Debug = false
 
---- Skin textures for the chat window frame. `SkinnableFile` returns a
---- callable that resolves the path against the current skin every time
---- it's read — so the border bitmaps automatically pick up the user's
---- skin choice when bound through MAUI's LazyVar machinery, instead of
---- being frozen at module-load time the way `UIFile` would freeze them.
+--- Skin textures for the chat window frame. `SkinnableFile` resolves
+--- against the current skin on each read, so the bitmaps follow skin
+--- changes — unlike `UIFile`, which freezes the path at module-load time.
 local WindowTextures = {
     tl          = UIUtil.SkinnableFile('/game/chat_brd/chat_brd_ul.dds'),
     tr          = UIUtil.SkinnableFile('/game/chat_brd/chat_brd_ur.dds'),
@@ -41,15 +36,11 @@ local WindowTextures = {
     borderColor = 'ff415055',
 }
 
---- Corner grip textures for the four resize handles sticking out of the
---- window corners. Each handle carries `up` / `over` / `down` states that
---- the `RolloverHandler` swaps through during hover-and-resize.
---- `SkinnableFile` again so the grips follow the active skin.
+--- Corner grip textures for the four resize handles. Each handle carries
+--- `up`/`over`/`down` states the `RolloverHandler` swaps through.
 ---
 --- The concatenated path strings widen to `string` rather than the
---- language server's `FileName` alias, which `SkinnableFile`'s parameter
---- annotation requires; suppress the resulting noise rather than littering
---- each line with a cast.
+--- language server's `FileName` alias that `SkinnableFile` annotates.
 ---@diagnostic disable: param-type-mismatch
 local function DragHandleTextures(corner)
     return {
@@ -60,25 +51,16 @@ local function DragHandleTextures(corner)
 end
 ---@diagnostic enable: param-type-mismatch
 
---- Default window rect, kept as a module local so `ResetPosition` can
---- restore it after the user has moved the window around.
 local DefaultRect = { Left = 8, Top = 460, Right = 430, Bottom = 720 }
 
 -------------------------------------------------------------------------------
 -- The main chat window: a draggable, resizable frame hosting a
 -- `ChatLinesInterface` (line pool + scrollbar) and a `ChatEditInterface`
--- (input area).
---
--- The window owns three concerns; the rest is delegated:
---
---   1. Window chrome       — drag handles, reset-position button, close /
---                            config buttons, resize bookkeeping.
---   2. Visibility          — observes `model.WindowVisible` to show/hide.
---   3. Window-level options — `win_alpha` (cascades to descendants).
---
--- Pool sizing, text wrapping, scrolling, filtering, and the per-row click
--- forwarding all live on `ChatLinesInterface` — see that file.
+-- (input area). The window owns chrome, visibility, and window-level
+-- options (`win_alpha`); pool sizing, wrapping, scrolling, and filtering
+-- live on `ChatLinesInterface`.
 
+--- Main chat window: chrome, drag/resize handles, idle-fade timer, sibling feed; hosts lines + edit panels.
 ---@class UIChatInterface : Window
 ---@field Trash                 TrashBag                      # owns every subscription-LazyVar we create
 ---@field ChatLinesInterface    UIChatLinesInterface          # the wrapped panel containing line rows + scrollbar
@@ -105,27 +87,17 @@ local ChatInterface = ClassUI(Window) {
         self:SetupDragHandles()
         self:SetupResetPositionButton()
 
-        -- Single trash bag for everything we allocate that needs explicit
-        -- destruction — currently just the derived observer LazyVars.
-        -- Emptied in `OnDestroy`.
         self.Trash = TrashBag()
 
-        -- The lines panel and edit area. Both are laid out in `__post_init`
-        -- once the client area has a real size to anchor against.
         self.ChatLinesInterface = ChatLinesInterface(self)
         self.ChatEditInterface = ChatEditInterface(self)
 
-        -- Feed view: a sibling control on the same parent frame so our own
-        -- `Show`/`Hide` cascade can't reach it. Pinned via LazyVars to our
-        -- line-area rect, so dragging or resizing the window carries the
-        -- feed along automatically. Destroyed in our `OnDestroy`.
+        -- Feed view: sibling on the parent frame so our `Show`/`Hide`
+        -- cascade can't reach it. Pinned to our line-area rect via LazyVars
+        -- so drag / resize carries it along.
         self.ChatFeedInterface = ChatFeedInterface(parent, self)
 
-        -- Override the lines panel's name-click hook to set the chat
-        -- recipient and re-focus the edit box. `OnCameraClicked` keeps the
-        -- panel's default behaviour (jump the world camera). Ignore clicks
-        -- on your own name — whispering yourself is pointless and the
-        -- picker would still route it as a private message.
+        -- Whispering yourself is pointless; ignore clicks on your own name.
         self.ChatLinesInterface.OnNameClicked = function(entry)
             if entry.ArmyID and entry.ArmyID ~= GetFocusArmy() then
                 ChatController.SetRecipient(entry.ArmyID)
@@ -133,17 +105,11 @@ local ChatInterface = ClassUI(Window) {
             end
         end
 
-        -- Reactive subscriptions use `LazyVarDerive` so each observer is a
-        -- fresh LazyVar that reads from an upstream model field — setting
-        -- our handler can never stomp another subscriber's (see the chat
-        -- CLAUDE.md for the pattern).
         local model = ChatModel.GetSingleton()
 
-        -- Window visibility → show / hide the frame, gate the idle timer.
-        -- `SetNeedsFrameUpdate(true)` is what makes `OnFrame` actually fire;
-        -- toggling it with visibility avoids ticking while hidden. Showing
-        -- the window stamps `LastActivity` so the user gets a fresh full
-        -- `fade_time` window before auto-close kicks in.
+        -- `SetNeedsFrameUpdate` toggles in lockstep with visibility so we
+        -- don't tick while hidden. Showing stamps `LastActivity` so the
+        -- user gets a full `fade_time` window before auto-close fires.
         self.WindowVisibleObserver = self.Trash:Add(
             LazyVarDerive(
                 model.WindowVisible,
@@ -162,12 +128,9 @@ local ChatInterface = ClassUI(Window) {
             )
         )
 
-        -- Title-bar button tooltips. The pin tooltip swaps between
-        -- `chat_pin` (autohide enabled, click to disable) and `chat_pinned`
-        -- (autohide disabled, click to enable) reactively from the model so
-        -- the wording matches the next click's effect. The `_closeBtn` /
-        -- `_configBtn` / `_pinBtn` fields are owned by `Window` but not in
-        -- its declared class fields, so the language server can't see them.
+        -- Pin tooltip wording swaps reactively so it matches the next
+        -- click's effect. `_closeBtn` / `_configBtn` / `_pinBtn` are owned
+        -- by `Window` but not in its declared class fields.
         ---@diagnostic disable: undefined-field
         Tooltip.AddButtonTooltip(self._closeBtn, 'chat_close')
         Tooltip.AddButtonTooltip(self._configBtn, 'chat_config')
@@ -182,10 +145,9 @@ local ChatInterface = ClassUI(Window) {
         ---@diagnostic enable: undefined-field
     end,
 
-    --- Creates the four corner resize grips, wires the window's
-    --- `RolloverHandler` to swap their textures on hover / press, and lays
-    --- them out overhanging the window corners. Hit-test is disabled on the
-    --- grips so resize events still reach the Window's own resize bitmaps.
+    --- Creates the four corner resize grips and wires `RolloverHandler` to
+    --- swap their textures on hover/press. Grips disable hit-test so
+    --- resize events still reach the Window's own resize bitmaps.
     ---@param self UIChatInterface
     SetupDragHandles = function(self)
         self.DragTL = Bitmap(self)
@@ -198,10 +160,9 @@ local ChatInterface = ClassUI(Window) {
         self.DragBL.textures = DragHandleTextures('ll')
         self.DragBR.textures = DragHandleTextures('lr')
 
-        -- Seed each grip with its `up` skinnable texture rather than a frozen
-        -- `UIFile` path. Otherwise the bitmaps display whichever skin was
-        -- active at module-load time (typically UEF) until the first
-        -- hover-exit hands `SetTexture` the live skinnable value.
+        -- Seed with the skinnable texture, not a frozen `UIFile` path —
+        -- otherwise the bitmaps stay on the module-load skin until the
+        -- first hover-exit hands `SetTexture` the live value.
         for _, grip in { self.DragTL, self.DragTR, self.DragBL, self.DragBR } do
             grip:DisableHitTest()
             grip:SetTexture(grip.textures.up)
@@ -212,9 +173,7 @@ local ChatInterface = ClassUI(Window) {
         Layouter(self.DragBL):AtLeftBottomIn(self, -26, -8):Over(self, 5):End()
         Layouter(self.DragBR):AtRightBottomIn(self, -22, -8):Over(self, 5):End()
 
-        -- Each `controlID` the Window delivers maps to the grip(s) that
-        -- visually represent that edge: side edges light both adjacent
-        -- corners.
+        -- Side edges light both adjacent corners.
         self.DragHandleControlMap = {
             tl = { self.DragTL },
             tr = { self.DragTR },
@@ -226,20 +185,17 @@ local ChatInterface = ClassUI(Window) {
             bm = { self.DragBL, self.DragBR },
         }
 
-        -- Window calls the instance field `self.RolloverHandler(control, ...)`
-        -- as a plain function (no method syntax) — install a thin forwarder
-        -- here that binds `self` and dispatches to `OnRollover`. The class
-        -- method deliberately uses a different name: sharing `RolloverHandler`
-        -- would let the instance field shadow the class method, so
-        -- `self:RolloverHandler(...)` from within the forwarder would recurse.
+        -- Window calls `self.RolloverHandler(control, ...)` as a plain
+        -- function (no method syntax). The class method is named differently
+        -- (`OnRollover`) — sharing the name would shadow the class method
+        -- and recurse.
         self.RolloverHandler = function(_, event, xControl, yControl, cursor, controlID)
             self:OnRollover(event, xControl, yControl, cursor, controlID)
         end
     end,
 
-    --- Handles a rollover / press event delivered through the Window's
-    --- resize bitmaps (tl / tm / tr / ml / mr / bl / bm / br). Lights the
-    --- matching corner grip(s) and hands off to `StartSizing` on press.
+    --- Handles a rollover/press from the Window's resize bitmaps. Lights
+    --- the matching corner grip(s) and hands off to `StartSizing` on press.
     ---@param self UIChatInterface
     ---@param event KeyEvent
     ---@param xControl? LazyVar<number>  # Left or Right LazyVar to drive on drag
@@ -268,9 +224,8 @@ local ChatInterface = ClassUI(Window) {
         end
     end,
 
-    --- Creates the reset-position button on the title strip (immediately to
-    --- the left of the Window's built-in `_configBtn`). Clicking it snaps
-    --- every rect edge back to `DefaultRect` and persists the location.
+    --- Creates the reset-position button left of `_configBtn`. Clicking
+    --- snaps every rect edge to `DefaultRect` and persists the location.
     ---@param self UIChatInterface
     SetupResetPositionButton = function(self)
         self.ResetPositionBtn = Button(self,
@@ -301,8 +256,6 @@ local ChatInterface = ClassUI(Window) {
     __post_init = function(self, parent)
         local client = self:GetClientGroup()
 
-        -- Full width, flush with the bottom of the client area. The edit
-        -- group derives its own height (see ChatEditInterface.__post_init).
         Layouter(self.ChatEditInterface)
             :AtLeftIn(self)
             :AtRightIn(self)
@@ -311,10 +264,6 @@ local ChatInterface = ClassUI(Window) {
             :Over(client)
             :End()
 
-        -- The lines panel fills the rest of the client area above the edit
-        -- box. The scrollbar is its own concern — `ChatLinesInterface`
-        -- reserves the space inside its right edge for the scrollbar
-        -- widget, so the parent only has to allocate a single rect.
         local paddingHorizontal = 8
         local paddingVertical = 2
         Layouter(self.ChatLinesInterface)
@@ -324,20 +273,14 @@ local ChatInterface = ClassUI(Window) {
             :AnchorToTop(self.ChatEditInterface, 4)
             :End()
 
-        -- Now that the lines panel has a real rect, let it build its pool
-        -- and wire its options observer (the initial fire reads the laid-
-        -- out `Pool.Height()`).
+        -- Build the pool now that we have a real rect — `Initialize` reads
+        -- `Pool.Height()` for fixed-count sizing.
         self.ChatLinesInterface:Initialize()
 
-        -- Committed chat options → window-level concerns only. Pool sizing,
-        -- font, and filter changes are owned by the lines panel; we just
-        -- handle `win_alpha` here. `SetAlpha(_, true)` cascades so chrome,
-        -- edit, and scrollbar all dim uniformly. The chat-line *text* is
-        -- then forced back to full opacity by re-cascading from `Pool`
-        -- (which only contains the line rows) — the scrollbar is a sibling
-        -- of `Pool` on `ChatLinesInterface`, not a child, so this reset
-        -- doesn't touch it. Net effect: text stays crisp at low alpha,
-        -- everything else still fades.
+        -- Window-level options only (`win_alpha`). `SetAlpha(_, true)`
+        -- cascades to chrome / edit / scrollbar; re-cascading 1.0 from
+        -- `Pool` keeps the line text crisp. `Pool` doesn't contain the
+        -- scrollbar (it's a sibling), so the reset stays scoped.
         self.OptionsObserver = self.Trash:Add(
             LazyVarDerive(
                 ChatConfigModel.GetSingleton().Committed,
@@ -360,17 +303,11 @@ local ChatInterface = ClassUI(Window) {
     -- Idle / fade timer
     ---------------------------------------------------------------------------
 
-    --- Engine-driven frame tick. Only fires while `SetNeedsFrameUpdate(true)`
-    --- is set; the visibility observer toggles that with the window so we
-    --- don't tick while hidden. The timer is fully model-driven: any caller
-    --- that wants to count as activity calls `ChatController.NotifyActivity()`
-    --- to stamp `model.LastActivity`. Once the elapsed time since that stamp
-    --- crosses `fade_time`, ask the controller to close — closing flips
-    --- `model.WindowVisible`, which in turn disables further frame ticks.
-    --- Pinning the title-bar checkbox short-circuits the check entirely so
-    --- the user can keep the window up through long stretches of silence.
+    --- Idle-fade timer. Only fires while `SetNeedsFrameUpdate(true)` is
+    --- set; the visibility observer toggles that with the window. Pinning
+    --- short-circuits the check.
     ---@param self UIChatInterface
-    ---@param delta number   # seconds since the last frame, unused (we read absolute time)
+    ---@param delta number   # unused — we read absolute time
     OnFrame = function(self, delta)
         local model = ChatModel.GetSingleton()
         if model.Pinned() then return end
@@ -381,9 +318,8 @@ local ChatInterface = ClassUI(Window) {
         end
     end,
 
-    --- Engine-invoked when the user toggles the title-bar pin checkbox.
-    --- Forwards to the controller, which writes `model.Pinned`. Refocuses
-    --- the edit box because clicking the checkbox steals focus.
+    --- Title-bar pin checkbox. Refocuses the edit box because clicking
+    --- the checkbox steals focus.
     ---@param self UIChatInterface
     ---@param checked boolean
     OnPinCheck = function(self, checked)
@@ -395,17 +331,15 @@ local ChatInterface = ClassUI(Window) {
     -- Window event hooks
     ---------------------------------------------------------------------------
 
-    --- Fired continuously during a resize drag. Keep it cheap: just resize
-    --- the pool and re-render against existing wraps.
+    --- Per-frame during a resize drag. Resizes the pool only — rewrap
+    --- happens once on `OnResizeSet`.
     OnResize = function(self, width, height, firstFrame)
         ChatController.NotifyActivity()
         self.ChatLinesInterface:OnResizeLive()
     end,
 
-    --- Fired when a resize drag ends. Rewrapping is expensive, so it only
-    --- happens here rather than on every drag frame. Also snaps the corner
-    --- grips back to their `up` texture — the RolloverHandler leaves them
-    --- on `down` when StartSizing took over.
+    --- Resize finished. Snaps grips back to `up` — `StartSizing` takes
+    --- over from RolloverHandler so they'd otherwise stay on `down`.
     OnResizeSet = function(self)
         ChatController.NotifyActivity()
         self.ChatLinesInterface:OnResizeFinished()
@@ -415,45 +349,37 @@ local ChatInterface = ClassUI(Window) {
         self.DragBR:SetTexture(self.DragBR.textures.up)
     end,
 
-    --- Engine-invoked continuously while the user drags the window by its
-    --- title bar. Mirrors `OnResize`: a long drag must not let the auto-close
-    --- timer expire mid-move, so every frame counts as activity. The engine
-    --- passes `(x, y, firstFrame)` after `self`, but we don't need them —
-    --- Lua silently drops trailing args.
+    --- Per-frame during a title-bar drag. Stamps activity so a long drag
+    --- can't trip the idle auto-close.
     OnMove = function(self)
         ChatController.NotifyActivity()
     end,
 
-    --- Engine-invoked when the user finishes dragging the window. The drag
-    --- handler steals focus mid-move, so re-acquire it so the user can keep
-    --- typing without a second click on the edit box.
+    --- Drag finished. Re-acquires edit-box focus that the drag handler stole.
     OnMoveSet = function(self)
         ChatController.NotifyActivity()
         self.ChatEditInterface:AcquireFocus()
     end,
 
-    --- Mouse wheel over the window scrolls the chat. `rotation` is in wheel
-    --- units (usually ±120 per notch); one notch ≈ one line.
+    --- `rotation` is in wheel units (usually ±120 per notch).
     OnMouseWheel = function(self, rotation)
         ChatController.NotifyActivity()
         self.ChatLinesInterface:ScrollLines(nil, -math.floor(rotation / 100))
     end,
 
-    --- Engine-invoked when the user clicks the close button on the window frame.
+    --- Title-bar close button. Routes through the controller so the model is
+    --- the source of truth for visibility.
     OnClose = function(self)
         ChatController.CloseWindow()
     end,
 
-    --- Engine-invoked when the user clicks the config button on the window
-    --- frame. Opens (or closes, if already open) the chat options dialog.
+    --- Title-bar config button. Toggles the chat options dialog.
     OnConfigClick = function(self)
         import("/lua/ui/game/chat/config/ChatConfigInterface.lua").Toggle()
     end,
 
-    --- Tears down the sibling feed view (it lives outside our control tree
-    --- so `Hide`/`Destroy` cascades don't reach it) and empties our trash
-    --- bag — destroying every derived observer so no `OnDirty` can fire
-    --- into a torn-down `self`.
+    --- Tears down the sibling feed (it lives outside our control tree, so
+    --- a Destroy cascade doesn't reach it) and empties the trash bag.
     OnDestroy = function(self)
         if self.ChatFeedInterface then
             self.ChatFeedInterface:Destroy()
@@ -466,75 +392,64 @@ local ChatInterface = ClassUI(Window) {
 -------------------------------------------------------------------------------
 --  Module-level singleton and standalone entry points.
 
+--- Singleton handle; nil until `EnsureInstance` builds the window for the first time.
 ---@type UIChatInterface | nil
 local Instance = nil
 
---- Builds the chat window (and its sibling feed view) if they don't
---- already exist. Doesn't change visibility — `model.WindowVisible`
---- starts `false`, so the chat stays hidden until something flips it.
----
+--- Builds the chat window and its sibling feed if they don't already
+--- exist. Doesn't change visibility — `model.WindowVisible` starts false.
 --- `ChatController.Init` calls this at game start so the feed is alive
---- in time to surface messages that arrive before the user first opens
---- the chat dialog. Open / Toggle also call it as a safety net for
---- entry points that bypass `Init` (mods, debug helpers).
+--- before the user opens the dialog.
 function EnsureInstance()
     if not Instance then
         Instance = ChatInterface(GetFrame(0))
     end
 end
 
---- Shows the chat window, creating it on first call.
+--- Standalone entry point: ensures the window exists and shows it.
 function Open()
     EnsureInstance()
     ChatController.OpenWindow()
 end
 
---- Hides the chat window (the instance is kept around).
+--- Standalone entry point: hides the chat window if it exists.
 function Close()
     ChatController.CloseWindow()
 end
 
---- Toggles the chat window, creating it on first call.
+--- Standalone entry point: ensures the window exists and flips its visibility.
 function Toggle()
     EnsureInstance()
     ChatController.ToggleWindow()
 end
 
---- Scrolls the chat feed by `delta` rows (negative = toward older messages).
---- No-op if the window has never been opened.
----@param delta number
+--- Scrolls the line pool by `delta` rows; no-op if the window hasn't been built yet.
+---@param delta number   # negative = toward older messages
 function ScrollLines(delta)
     if Instance then
         Instance.ChatLinesInterface:ScrollLines(nil, delta)
     end
 end
 
---- Scrolls the chat feed by `delta` pages (negative = toward older messages).
---- No-op if the window has never been opened.
----@param delta number
+--- Scrolls the line pool by `delta` pages; no-op if the window hasn't been built yet.
+---@param delta number   # negative = toward older messages
 function ScrollPages(delta)
     if Instance then
         Instance.ChatLinesInterface:ScrollPages(nil, delta)
     end
 end
 
---- Snaps the chat feed to the oldest visible entry. No-op if the window
---- has never been opened. Not bound to a default key — the Edit control
---- consumes Home for caret navigation before `OnNonTextKeyPressed` fires
---- — but exposed for keymap entries (`UI_Lua import("/lua/ui/game/chat/ChatInterface.lua").ScrollToTop()`)
---- and for mods that want a programmatic jump-to-top.
+--- Jumps to the oldest visible entry. Not bound to a default key because
+--- Edit consumes Home for caret nav before `OnNonTextKeyPressed` fires;
+--- exposed for keymap entries and mods.
 function ScrollToTop()
     if Instance then
         Instance.ChatLinesInterface:ScrollSetTop(nil, 1)
     end
 end
 
---- Two-stage "jump to bottom" handler. If the chat is already pinned to
---- the newest entry, collapses the window — same intent as the legacy
---- "press End again to dismiss" feel without sneaking in a separate
---- toggle. Otherwise snaps to the bottom. No-op if the window has never
---- been opened. Not bound to a default key (see `ScrollToTop` for the
---- reason); exposed for keymap entries and mods.
+--- Two-stage jump: snaps to bottom, or closes the window if already there.
+--- Mirrors the legacy "press End again to dismiss" feel.
 function ScrollToBottomOrClose()
     if not Instance then return end
     local lines = Instance.ChatLinesInterface
@@ -545,10 +460,8 @@ function ScrollToBottomOrClose()
     end
 end
 
---- Opens the chat window (creating it on first call) and scrolls the feed
---- by `delta` rows. Entry point for the global PgUp / PgDn key bindings —
---- so pressing PgUp with the window hidden both reveals it and starts
---- scrolling toward older messages.
+--- Entry point for global PgUp / PgDn bindings: opens the window if needed
+--- and scrolls in one step.
 ---@param delta number
 function OpenAndScrollLines(delta)
     Open()
@@ -558,17 +471,15 @@ end
 -------------------------------------------------------------------------------
 --#region Debugging
 
---- Called by the module manager when this module is reloaded.
+--- Hot-reload hook: reopens the window on the freshly loaded module.
 ---@param newModule any
 function __moduleinfo.OnReload(newModule)
     newModule.Open()
 end
 
---- Called by the module manager when this module becomes dirty.
+--- Hot-reload hook: tears down the old instance and re-imports this module.
 function __moduleinfo.OnDirty()
     if Instance then
-        -- `OnDestroy` empties the trash bag, which in turn destroys every
-        -- derived observer — no more `OnDirty` fires into a dead `self`.
         Instance:Destroy()
         Instance = nil
     end
