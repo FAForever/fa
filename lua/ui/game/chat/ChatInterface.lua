@@ -422,11 +422,23 @@ local ChatInterface = ClassUI(Window) {
 ---@type UIChatInterface | nil
 local Instance = nil
 
---- Shows the chat window, creating it on first call.
-function Open()
+--- Builds the chat window (and its sibling feed view) if they don't
+--- already exist. Doesn't change visibility — `model.WindowVisible`
+--- starts `false`, so the chat stays hidden until something flips it.
+---
+--- `ChatController.Init` calls this at game start so the feed is alive
+--- in time to surface messages that arrive before the user first opens
+--- the chat dialog. Open / Toggle also call it as a safety net for
+--- entry points that bypass `Init` (mods, debug helpers).
+function EnsureInstance()
     if not Instance then
         Instance = ChatInterface(GetFrame(0))
     end
+end
+
+--- Shows the chat window, creating it on first call.
+function Open()
+    EnsureInstance()
     ChatController.OpenWindow()
 end
 
@@ -437,9 +449,7 @@ end
 
 --- Toggles the chat window, creating it on first call.
 function Toggle()
-    if not Instance then
-        Instance = ChatInterface(GetFrame(0))
-    end
+    EnsureInstance()
     ChatController.ToggleWindow()
 end
 

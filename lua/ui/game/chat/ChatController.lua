@@ -662,6 +662,13 @@ function Init()
     import("/lua/ui/game/gamemain.lua").RegisterChatFunc(OnReceive, 'Chat')
     AddOnSyncHashedCallback(OnSyncChatMessages, 'ChatMessages', 'Chat')
     RegisterBuiltinCommands()
+
+    -- Build the chat tree eagerly so the sibling feed view is mounted in
+    -- time to surface messages that arrive before the user has ever opened
+    -- the dialog. The window itself starts hidden (`model.WindowVisible`
+    -- defaults to false), so nothing renders until visibility flips — but
+    -- the feed's history observer is now subscribed and ready.
+    import("/lua/ui/game/chat/ChatInterface.lua").EnsureInstance()
 end
 
 -------------------------------------------------------------------------------
