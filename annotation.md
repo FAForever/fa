@@ -103,3 +103,50 @@ BaseManager = ClassSimple {
 ```
 
 Two examples of annotating a class. Note that fields need to be added manually, specifically those that are populated in the instance of a class.
+
+## Class fields
+
+Every field assigned to `self` inside a constructor or initialization function (`__init`, `__post_init`, `Create`, `OnCreate`, etc.) must have a matching `---@field` annotation on the class definition. This gives the language server full type information across the whole file and makes the class self-documenting at a glance.
+
+### Rule
+
+Annotate the class immediately above the class declaration. List every field in the order it appears in the constructor. For fields whose type is an array of a named struct, define that struct as its own `---@class` above the main class.
+
+### Example
+
+```lua
+---@class UIChatConfigColorRow
+---@field label Text
+---@field combo BitmapCombo
+---@field key   string
+
+---@class UIChatConfigInterface : Window
+---@field LabelColors    Text
+---@field ColorRows      UIChatConfigColorRow[]
+---@field LabelFontSize  Text
+---@field SliderFontSize IntegerSlider
+---@field LabelBehavior  Text
+---@field Checkboxes     Checkbox[]
+---@field BtnApply       Button
+---@field BtnOk          Button
+local ChatConfigInterface = ClassUI(Window) {
+    __init = function(self, parent, ...)
+        self.LabelColors    = UIUtil.CreateText(...)
+        self.ColorRows      = {}
+        self.LabelFontSize  = UIUtil.CreateText(...)
+        self.SliderFontSize = IntegerSlider(...)
+        self.LabelBehavior  = UIUtil.CreateText(...)
+        self.Checkboxes     = {}
+        self.BtnApply       = UIUtil.CreateButtonStd(...)
+        self.BtnOk          = UIUtil.CreateButtonStd(...)
+    end,
+}
+```
+
+### What counts as a field
+
+- Every `self.Foo` written in any constructor or init function (`__init`, `__post_init`, `Create`, `OnCreate`, etc.).
+- Fields inherited from the parent class do **not** need repeating — the `: Parent` in the `---@class` declaration inherits them.
+- Methods defined inside the class table (`Foo = function(self, ...) end` entries) do **not** need `---@field` — the language server picks them up from the function signature.
+- Temporary locals inside a method are not fields and need no annotation.
+- Optional fields (assigned only on some code paths) should be marked with `?`, e.g. `---@field DebugBG? Bitmap`.
