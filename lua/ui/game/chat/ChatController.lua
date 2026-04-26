@@ -576,14 +576,12 @@ function Send(text, attachCamera)
         msg.camera = GetCamera('WorldCamera'):SaveSettings()
     end
 
-    -- Stamp a near-unique id on the message *before* it leaves this function.
-    -- The same `msg` table travels through two parallel delivery paths — the
-    -- live `SessionSendChatMessage` broadcast and the sim-routed
-    -- `SendChatMessage`→`Sync.ChatMessages` path — and the receiver-side
-    -- dedupe uses this id to tell the two apart. `tostring(msg)` yields the
-    -- table's address, which collides only if the same address is reused for
-    -- another chat message within the dedupe window — vanishingly rare.
-    msg.Id = tostring(msg)
+    -- Stamp an id used by `OnSyncChatMessages` to dedupe between the live
+    -- `SessionSendChatMessage` path and the sim-routed `Sync.ChatMessages`
+    -- path. The `seen` set spans the whole history, so the id must survive
+    -- table-address recycling — the tick suffix means a collision needs
+    -- both a recycled address *and* the same tick.
+    msg.Id = string.format("%d %s", GameTick(), tostring(msg))
 
     -- Replay-parser backwards compat: external replay tools scrape chat out
     -- of recorded `GiveResourcesToPlayer` callback args. We fire one zero-
