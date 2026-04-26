@@ -1,6 +1,7 @@
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local Edit = import("/lua/maui/edit.lua").Edit
@@ -85,6 +86,7 @@ ChatEditInterface = ClassUI(Group) {
             UIUtil.SkinnableFile('/game/camera-btn/pinned_btn_over.dds'),
             UIUtil.SkinnableFile('/game/camera-btn/pinned_btn_dis.dds'),
             UIUtil.SkinnableFile('/game/camera-btn/pinned_btn_dis.dds'))
+        Tooltip.AddCheckboxTooltip(self.CamCheckbox, 'chat_camera')
 
         self.EditBox = Edit(self)
 
@@ -138,6 +140,7 @@ ChatEditInterface = ClassUI(Group) {
         -- cycle via `OnTextChanged`. `OnCharPressed` fires before insertion,
         -- so the `>=` beep catches the keystroke the cap is about to reject.
         self.EditBox.OnCharPressed = function(edit, charcode)
+            LOG(charcode)
             if charcode == UIUtil.VK_TAB then
                 self:HandleTabCompletion()
                 return true
@@ -177,6 +180,7 @@ ChatEditInterface = ClassUI(Group) {
         ---@param keycode number     # OS-level VK_* code; compare against `UIUtil.VK_*`
         ---@param event KeyEvent     # full input-event payload; modifiers live at `event.Modifiers`
         self.EditBox.OnNonTextKeyPressed = function(_, keycode, event)
+            LOG(keycode)
             ChatController.NotifyActivity()
             local chatInterface = import("/lua/ui/game/chat/ChatInterface.lua")
             local mods = event and event.Modifiers

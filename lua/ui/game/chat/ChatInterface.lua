@@ -1,5 +1,6 @@
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 
 local Window = import("/lua/maui/window.lua").Window
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
@@ -89,6 +90,7 @@ local DefaultRect = { Left = 8, Top = 460, Right = 430, Bottom = 720 }
 ---@field DragHandleControlMap  table<string, Bitmap[]>       # resize-bitmap id → grips to highlight
 ---@field ResetPositionBtn      Button                        # titlebar button that restores DefaultRect
 ---@field WindowVisibleObserver LazyVar<boolean>              # derived from ChatModel.WindowVisible
+---@field PinnedObserver        LazyVar<boolean>              # derived from ChatModel.Pinned; swaps the pin tooltip
 ---@field OptionsObserver       LazyVar<UIChatOptions>        # derived from ChatConfigModel.Committed (window-level options only)
 ---@field ChatFeedInterface     UIChatFeedInterface           # sibling feed view; visible while the window is hidden
 ---@field DebugBG?              Bitmap                        # semi-transparent overlay shown when `Debug` is true
@@ -159,6 +161,25 @@ local ChatInterface = ClassUI(Window) {
                 end
             )
         )
+
+        -- Title-bar button tooltips. The pin tooltip swaps between
+        -- `chat_pin` (autohide enabled, click to disable) and `chat_pinned`
+        -- (autohide disabled, click to enable) reactively from the model so
+        -- the wording matches the next click's effect. The `_closeBtn` /
+        -- `_configBtn` / `_pinBtn` fields are owned by `Window` but not in
+        -- its declared class fields, so the language server can't see them.
+        ---@diagnostic disable: undefined-field
+        Tooltip.AddButtonTooltip(self._closeBtn, 'chat_close')
+        Tooltip.AddButtonTooltip(self._configBtn, 'chat_config')
+        self.PinnedObserver = self.Trash:Add(
+            LazyVarDerive(
+                model.Pinned,
+                function(lv)
+                    Tooltip.AddCheckboxTooltip(self._pinBtn, lv() and 'chat_pinned' or 'chat_pin')
+                end
+            )
+        )
+        ---@diagnostic enable: undefined-field
     end,
 
     --- Creates the four corner resize grips, wires the window's
@@ -266,6 +287,8 @@ local ChatInterface = ClassUI(Window) {
         Layouter(self.ResetPositionBtn)
             :LeftOf(self._configBtn)
             :End()
+
+        Tooltip.AddButtonTooltip(self.ResetPositionBtn, 'chat_reset')
     end,
 
     ---@param self UIChatInterface
