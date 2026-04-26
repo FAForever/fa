@@ -6,6 +6,17 @@ Accepted & intentional differences live in [CHANGES.md](CHANGES.md); this file o
 
 ---
 
+## Config-dialog polish
+
+The behavioural parity is essentially complete — what remains is finish on the options dialog itself. None of these break anything; they make the new dialog feel less unfinished than the legacy one.
+
+- **Per-option tooltips** — legacy [`CreateConfigWindow`](../chat.legacy.lua) attached a tooltip to every control: `chat_color` on each of the five colour combos (`all_color`, `allies_color`, `priv_color`, `link_color`, `notify_color`), `chat_fontsize` on the font-size slider, `chat_fadetime` on the fade-time slider, `chat_alpha` on the window-alpha slider, `chat_filter` on the `links` checkbox, `chat_send_type` on "Default recipient: allies", and `chat_feed_background` on "Show feed background". Tooltip strings are already in [`/lua/ui/help/tooltips.lua`](../../help/tooltips.lua) — this is purely a wiring pass in [`ChatConfigInterface`](config/ChatConfigInterface.lua) using `Tooltip.AddControlTooltip` / `AddCheckboxTooltip` / `AddComboTooltip`.
+
+- **Skinned chrome and corner drag handles** — legacy's config window built its own [`/game/panel/panel_brd_*`](../chat.legacy.lua) border textures plus four corner drag-handle bitmaps mirroring the chat window's chrome. [`ChatConfigInterface`](config/ChatConfigInterface.lua) uses the bare `Window` default styling; functional (still draggable via the title bar) but visually inconsistent with the chat window. Cosmetic — lowest priority.
+
+- **Z-order against other dialogs** — legacy [`CreateConfigWindow`](../chat.legacy.lua) called `multifunction.CloseMapDialog()` before opening and pinned `GUI.config.Depth` to `GetFrame(0):GetTopmostDepth() + 1` so the dialog couldn't end up behind another popup. [`ChatConfigInterface.Open`](config/ChatConfigInterface.lua) does neither. Conflict surface is small (you'd have to deliberately stack the chat config on top of another dialog), but it's a one-liner of defensive code.
+
+---
 
 ## Already closed (do not re-list)
 
