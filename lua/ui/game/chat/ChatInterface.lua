@@ -188,18 +188,23 @@ local ChatInterface = ClassUI(Window) {
     --- grips so resize events still reach the Window's own resize bitmaps.
     ---@param self UIChatInterface
     SetupDragHandles = function(self)
-        self.DragTL = Bitmap(self, UIUtil.UIFile('/game/drag-handle/drag-handle-ul_btn_up.dds'))
-        self.DragTR = Bitmap(self, UIUtil.UIFile('/game/drag-handle/drag-handle-ur_btn_up.dds'))
-        self.DragBL = Bitmap(self, UIUtil.UIFile('/game/drag-handle/drag-handle-ll_btn_up.dds'))
-        self.DragBR = Bitmap(self, UIUtil.UIFile('/game/drag-handle/drag-handle-lr_btn_up.dds'))
+        self.DragTL = Bitmap(self)
+        self.DragTR = Bitmap(self)
+        self.DragBL = Bitmap(self)
+        self.DragBR = Bitmap(self)
 
         self.DragTL.textures = DragHandleTextures('ul')
         self.DragTR.textures = DragHandleTextures('ur')
         self.DragBL.textures = DragHandleTextures('ll')
         self.DragBR.textures = DragHandleTextures('lr')
 
+        -- Seed each grip with its `up` skinnable texture rather than a frozen
+        -- `UIFile` path. Otherwise the bitmaps display whichever skin was
+        -- active at module-load time (typically UEF) until the first
+        -- hover-exit hands `SetTexture` the live skinnable value.
         for _, grip in { self.DragTL, self.DragTR, self.DragBL, self.DragBR } do
             grip:DisableHitTest()
+            grip:SetTexture(grip.textures.up)
         end
 
         Layouter(self.DragTL):AtLeftTopIn(self, -26, -8):Over(self, 5):End()
