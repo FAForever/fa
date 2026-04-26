@@ -108,9 +108,16 @@ function AddChatOptionSetCallback(callback, _)
     )
 end
 
---- @deprecated no replacement; chat layout is no longer skin-themed (see [CHANGES.md](chat/CHANGES.md))
+--- @deprecated no caller-driven equivalent. The legacy `SetLayout` was the
+--- *layout* hook (HUD-arrangement preset: `bottom` / `left` / `right`),
+--- not the *skin* hook — it called `import(UIUtil.GetLayoutFilename('chat')).SetLayout()`
+--- to apply layout-specific positions. The new chat uses a single rect
+--- regardless of layout (see [CHANGES.md](chat/CHANGES.md)), so there is
+--- nothing to re-apply. Skin-driven theming is independent and is
+--- handled reactively via `UIUtil.SkinnableFile` (border, drag handles,
+--- scrollbar, buttons all follow the active skin without an explicit call).
 function SetLayout(_)
-    _deprecate('SetLayout', 'no replacement (single layout)')
+    _deprecate('SetLayout', 'no replacement (chat is single-layout; skin theming auto-updates via SkinnableFile)')
 end
 
 --- @deprecated multiple `GetArmyData`-style helpers exist elsewhere; the new chat tree uses a private one in `ChatController`

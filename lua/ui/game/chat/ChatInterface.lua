@@ -22,32 +22,42 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 --- distinct colour so overlapping controls can be told apart at a glance.
 local Debug = false
 
---- Skin textures for the chat window frame. Mirrors the layout that
---- `/lua/ui/game/layouts/chat_layout.lua` applies to the legacy chat Window
---- so the new window matches the original visual style.
+--- Skin textures for the chat window frame. `SkinnableFile` returns a
+--- callable that resolves the path against the current skin every time
+--- it's read — so the border bitmaps automatically pick up the user's
+--- skin choice when bound through MAUI's LazyVar machinery, instead of
+--- being frozen at module-load time the way `UIFile` would freeze them.
 local WindowTextures = {
-    tl          = UIUtil.UIFile('/game/chat_brd/chat_brd_ul.dds'),
-    tr          = UIUtil.UIFile('/game/chat_brd/chat_brd_ur.dds'),
-    tm          = UIUtil.UIFile('/game/chat_brd/chat_brd_horz_um.dds'),
-    ml          = UIUtil.UIFile('/game/chat_brd/chat_brd_vert_l.dds'),
-    m           = UIUtil.UIFile('/game/chat_brd/chat_brd_m.dds'),
-    mr          = UIUtil.UIFile('/game/chat_brd/chat_brd_vert_r.dds'),
-    bl          = UIUtil.UIFile('/game/chat_brd/chat_brd_ll.dds'),
-    bm          = UIUtil.UIFile('/game/chat_brd/chat_brd_lm.dds'),
-    br          = UIUtil.UIFile('/game/chat_brd/chat_brd_lr.dds'),
+    tl          = UIUtil.SkinnableFile('/game/chat_brd/chat_brd_ul.dds'),
+    tr          = UIUtil.SkinnableFile('/game/chat_brd/chat_brd_ur.dds'),
+    tm          = UIUtil.SkinnableFile('/game/chat_brd/chat_brd_horz_um.dds'),
+    ml          = UIUtil.SkinnableFile('/game/chat_brd/chat_brd_vert_l.dds'),
+    m           = UIUtil.SkinnableFile('/game/chat_brd/chat_brd_m.dds'),
+    mr          = UIUtil.SkinnableFile('/game/chat_brd/chat_brd_vert_r.dds'),
+    bl          = UIUtil.SkinnableFile('/game/chat_brd/chat_brd_ll.dds'),
+    bm          = UIUtil.SkinnableFile('/game/chat_brd/chat_brd_lm.dds'),
+    br          = UIUtil.SkinnableFile('/game/chat_brd/chat_brd_lr.dds'),
     borderColor = 'ff415055',
 }
 
 --- Corner grip textures for the four resize handles sticking out of the
 --- window corners. Each handle carries `up` / `over` / `down` states that
 --- the `RolloverHandler` swaps through during hover-and-resize.
+--- `SkinnableFile` again so the grips follow the active skin.
+---
+--- The concatenated path strings widen to `string` rather than the
+--- language server's `FileName` alias, which `SkinnableFile`'s parameter
+--- annotation requires; suppress the resulting noise rather than littering
+--- each line with a cast.
+---@diagnostic disable: param-type-mismatch
 local function DragHandleTextures(corner)
     return {
-        up   = UIUtil.UIFile('/game/drag-handle/drag-handle-' .. corner .. '_btn_up.dds'),
-        over = UIUtil.UIFile('/game/drag-handle/drag-handle-' .. corner .. '_btn_over.dds'),
-        down = UIUtil.UIFile('/game/drag-handle/drag-handle-' .. corner .. '_btn_down.dds'),
+        up   = UIUtil.SkinnableFile('/game/drag-handle/drag-handle-' .. corner .. '_btn_up.dds'),
+        over = UIUtil.SkinnableFile('/game/drag-handle/drag-handle-' .. corner .. '_btn_over.dds'),
+        down = UIUtil.SkinnableFile('/game/drag-handle/drag-handle-' .. corner .. '_btn_down.dds'),
     }
 end
+---@diagnostic enable: param-type-mismatch
 
 --- Default window rect, kept as a module local so `ResetPosition` can
 --- restore it after the user has moved the window around.

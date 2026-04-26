@@ -51,3 +51,11 @@ Closed in the most recent rounds of work:
 - **Pin button** — [`ChatModel`](ChatModel.lua) carries a `Pinned: LazyVar<boolean>`; [`ChatController.SetPinned`](ChatController.lua) writes it (and stamps a fresh `LastActivity` on unpin so the user gets a full `fade_time` window after toggling off). [`ChatInterface.OnPinCheck`](ChatInterface.lua) wires the existing title-bar checkbox to the controller; [`ChatInterface.OnFrame`](ChatInterface.lua) short-circuits the auto-close check while pinned, so the window stays open through arbitrary inactivity.
 - **Eager chat bootstrap** — [`ChatController.Init`](ChatController.lua) calls `ChatInterface.EnsureInstance()` at game start so the chat tree (and its sibling feed) exists before any messages arrive. The window itself stays hidden by default; only the feed observers are needed up front, and they're now subscribed in time to surface chat the user receives before first opening the dialog.
 - **Legacy public API shim** — [`/lua/ui/game/chat.lua`](../chat.lua) is now a thin compatibility layer that re-exports every legacy global mods used to import (`ReceiveChat`, `ReceiveChatFromSim`, `SetupChatLayout`, `OnNISBegin`, `ChatPageUp` / `ChatPageDown`, `CloseChat`, `CloseChatConfig`, `AddChatOptionSetCallback`, `SetLayout`, `GetArmyData`, `GUI`, `ChatLines`). Every entry point logs a one-shot `WARN` deprecation message the first time it's touched and forwards to the equivalent new API where one exists; `GUI` and `ChatLines` are metatable-proxied so any field read or assignment surfaces a clear warning instead of crashing on a missing field. Once the warnings stop appearing in users' logs, the shim and `chat.legacy.lua` can both be deleted.
+
+---
+
+## Won't fix (decisions, not gaps)
+
+These look like missing pieces but are deliberate omissions; documenting here so they don't get re-opened later. See [CHANGES.md](CHANGES.md) for the rationale.
+
+- **Layout-specific chat positioning** — the chat is intentionally absent from [`gamemain.SetLayout`](../gamemain.lua)'s fan-out. The new chat is user-positioned (saved under prefs key `chat_window_v2`, recoverable via the title-bar Reset-position button), and switching HUD layouts no longer repositions it. The `chat.lua` `SetLayout` shim is therefore a true no-op rather than a forwarder.
