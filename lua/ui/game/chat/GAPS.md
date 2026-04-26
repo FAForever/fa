@@ -6,23 +6,15 @@ Accepted & intentional differences live in [CHANGES.md](CHANGES.md); this file o
 
 ---
 
-## Config-dialog polish
-
-The behavioural parity is essentially complete — what remains is finish on the options dialog itself. None of these break anything; they make the new dialog feel less unfinished than the legacy one.
-
-- **Per-option tooltips** — legacy [`CreateConfigWindow`](../chat.legacy.lua) attached a tooltip to every control: `chat_color` on each of the five colour combos (`all_color`, `allies_color`, `priv_color`, `link_color`, `notify_color`), `chat_fontsize` on the font-size slider, `chat_fadetime` on the fade-time slider, `chat_alpha` on the window-alpha slider, `chat_filter` on the `links` checkbox, `chat_send_type` on "Default recipient: allies", and `chat_feed_background` on "Show feed background". Tooltip strings are already in [`/lua/ui/help/tooltips.lua`](../../help/tooltips.lua) — this is purely a wiring pass in [`ChatConfigInterface`](config/ChatConfigInterface.lua) using `Tooltip.AddControlTooltip` / `AddCheckboxTooltip` / `AddComboTooltip`.
-
-- **Skinned chrome and corner drag handles** — legacy's config window built its own [`/game/panel/panel_brd_*`](../chat.legacy.lua) border textures plus four corner drag-handle bitmaps mirroring the chat window's chrome. [`ChatConfigInterface`](config/ChatConfigInterface.lua) uses the bare `Window` default styling; functional (still draggable via the title bar) but visually inconsistent with the chat window. Cosmetic — lowest priority.
-
-- **Z-order against other dialogs** — legacy [`CreateConfigWindow`](../chat.legacy.lua) called `multifunction.CloseMapDialog()` before opening and pinned `GUI.config.Depth` to `GetFrame(0):GetTopmostDepth() + 1` so the dialog couldn't end up behind another popup. [`ChatConfigInterface.Open`](config/ChatConfigInterface.lua) does neither. Conflict surface is small (you'd have to deliberately stack the chat config on top of another dialog), but it's a one-liner of defensive code.
-
----
-
 ## Already closed (do not re-list)
 
 Send path, receive path, `FindClients`, controller `Init`, external importers, skin-layout orphan, `ConsoleOutput` sim-side logging, empty-text Enter, `ActivateChat` (Enter-key hook with Shift → allies), `chat.lua` renamed to `chat.legacy.lua`.
 
 Closed in the most recent rounds of work:
+
+- **Config-dialog tooltips** — every interactive control in [`ChatConfigInterface`](config/ChatConfigInterface.lua) carries the legacy tooltip key it had before: `chat_color` on each colour combo and its label, `chat_fontsize` / `chat_fadetime` / `chat_alpha` on each slider and its label, and `chat_filter` / `chat_send_type` / `chat_feed_background` on the three behaviour checkboxes via `Tooltip.AddControlTooltip` / `AddCheckboxTooltip`. Tooltip strings come from [`/lua/ui/help/tooltips.lua`](../../help/tooltips.lua) without modification.
+- **Config-dialog skinned chrome** — [`ChatConfigInterface`](config/ChatConfigInterface.lua) now passes a `WindowTextures` table built from `panel_brd_*` `SkinnableFile`s into `Window.__init`, matching the legacy chat-options dialog (the chat window itself uses the bespoke `chat_brd_*` set; the two are intentionally different sizes). Four decorative corner grips (`drag-handle-{ul,ur,ll,lr}_btn_up.dds`) are added in `__init` with hit-test disabled and laid out overhanging the corners — purely cosmetic since `lockSize` is `true`.
+- **Config-dialog Z-order** — [`ChatConfigInterface.Open`](config/ChatConfigInterface.lua) calls `multifunction.CloseMapDialog()` before constructing the window and pins `Instance.Depth` to `GetFrame(0):GetTopmostDepth() + 1` so a later popup can't slide on top of the chat options.
 
 - **Camera links** — outgoing (`CamCheckbox`), incoming render (`CamIcon` on the line), click-to-jump (`OnCameraClicked` with both `Camera` and `Location` paths).
 - **Private reply by clicking a name** — `OnNameClicked` overridable on [`ChatLinesInterface`](ChatLinesInterface.lua); the chat window installs a handler that sets `Recipient` and re-acquires edit focus. Self-name clicks are filtered.

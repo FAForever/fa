@@ -1,5 +1,6 @@
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 
 local Window = import("/lua/maui/window.lua").Window
 local BitmapCombo = import("/lua/ui/controls/combo.lua").BitmapCombo
@@ -19,18 +20,41 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 --- distinct colour so overlapping controls can be told apart at a glance.
 local Debug = false
 
+--- Skin textures for the config window frame. Mirrors the legacy chat-options
+--- dialog, which used the generic `panel_brd_*` chrome rather than the chat
+--- window's bespoke `chat_brd_*` art (the two windows are different sizes).
+--- `SkinnableFile` returns a callable that re-resolves against the active
+--- skin, so the border bitmaps follow the user's skin choice.
+---@diagnostic disable: param-type-mismatch
+local WindowTextures = {
+    tl          = UIUtil.SkinnableFile('/game/panel/panel_brd_ul.dds'),
+    tr          = UIUtil.SkinnableFile('/game/panel/panel_brd_ur.dds'),
+    tm          = UIUtil.SkinnableFile('/game/panel/panel_brd_horz_um.dds'),
+    ml          = UIUtil.SkinnableFile('/game/panel/panel_brd_vert_l.dds'),
+    m           = UIUtil.SkinnableFile('/game/panel/panel_brd_m.dds'),
+    mr          = UIUtil.SkinnableFile('/game/panel/panel_brd_vert_r.dds'),
+    bl          = UIUtil.SkinnableFile('/game/panel/panel_brd_ll.dds'),
+    bm          = UIUtil.SkinnableFile('/game/panel/panel_brd_lm.dds'),
+    br          = UIUtil.SkinnableFile('/game/panel/panel_brd_lr.dds'),
+    borderColor = 'ff415055',
+}
+---@diagnostic enable: param-type-mismatch
+
+-- Each colour combo points at the same `chat_color` tooltip — legacy did the
+-- same; the per-row label already tells the user *which* recipient the swatch
+-- is for, so the tooltip's job is just to explain the control.
 local ColorDefs = {
-    { Key = ChatConfigModel.KeyAllColor,    Text = "All" },
-    { Key = ChatConfigModel.KeyAlliesColor, Text = "Allies" },
-    { Key = ChatConfigModel.KeyPrivColor,   Text = "Private" },
-    { Key = ChatConfigModel.KeyLinkColor,   Text = "Links" },
-    { Key = ChatConfigModel.KeyNotifyColor, Text = "Notify" },
+    { Key = ChatConfigModel.KeyAllColor,    Text = "All",     Tooltip = 'chat_color' },
+    { Key = ChatConfigModel.KeyAlliesColor, Text = "Allies",  Tooltip = 'chat_color' },
+    { Key = ChatConfigModel.KeyPrivColor,   Text = "Private", Tooltip = 'chat_color' },
+    { Key = ChatConfigModel.KeyLinkColor,   Text = "Links",   Tooltip = 'chat_color' },
+    { Key = ChatConfigModel.KeyNotifyColor, Text = "Notify",  Tooltip = 'chat_color' },
 }
 
 local CheckboxDefs = {
-    { Key = ChatConfigModel.KeySendType,       Text = "Default recipient: allies" },
-    { Key = ChatConfigModel.KeyFeedBackground, Text = "Show feed background" },
-    { Key = ChatConfigModel.KeyLinks,          Text = "Show camera links" },
+    { Key = ChatConfigModel.KeySendType,       Text = "Default recipient: allies", Tooltip = 'chat_send_type' },
+    { Key = ChatConfigModel.KeyFeedBackground, Text = "Show feed background",      Tooltip = 'chat_feed_background' },
+    { Key = ChatConfigModel.KeyLinks,          Text = "Show camera links",         Tooltip = 'chat_filter' },
 }
 
 -------------------------------------------------------------------------------
@@ -63,6 +87,10 @@ local CheckboxDefs = {
 ---@field BtnReset       Button
 ---@field BtnOk          Button
 ---@field BtnCancel      Button
+---@field DragTL         Bitmap                  # decorative top-left corner grip
+---@field DragTR         Bitmap                  # decorative top-right corner grip
+---@field DragBL         Bitmap                  # decorative bottom-left corner grip
+---@field DragBR         Bitmap                  # decorative bottom-right corner grip
 ---@field PendingObserver LazyVar<UIChatOptions>  # derived from ChatConfigModel.Pending
 ---@field DebugBG?       Bitmap                  # semi-transparent overlay shown when `Debug` is true
 local ChatConfigInterface = ClassUI(Window) {
@@ -72,7 +100,7 @@ local ChatConfigInterface = ClassUI(Window) {
     __init = function(self, parent)
         Window.__init(self, parent, "Chat Configuration", false, false, false, true, false, "chat_config_v7", {
             Left = 200, Top = 200, Right = 500, Bottom = 640,
-        })
+        }, WindowTextures)
 
         -- Single trash bag for everything we allocate that needs explicit
         -- destruction — currently just the derived observer LazyVars.
@@ -95,6 +123,10 @@ local ChatConfigInterface = ClassUI(Window) {
             row.Combo.OnClick = function(_, index)
                 ChatConfigController.SetOption(key, index)
             end
+            -- Tooltip on both label and combo so the user gets the same
+            -- explanation no matter which side of the row they hover.
+            Tooltip.AddControlTooltip(row.Label, def.Tooltip)
+            Tooltip.AddControlTooltip(row.Combo, def.Tooltip)
             self.ColorRows[i] = row
         end
 
@@ -118,6 +150,8 @@ local ChatConfigInterface = ClassUI(Window) {
         self.SliderFontSize.OnValueChanged = function(_, value)
             self.LabelFontSize:SetText(string.format("Font Size: %d", value))
         end
+        Tooltip.AddControlTooltip(self.LabelFontSize, 'chat_fontsize')
+        Tooltip.AddControlTooltip(self.SliderFontSize, 'chat_fontsize')
 
         self.LabelFadeTime = UIUtil.CreateText(client, "Fade Time: 15s", 10, UIUtil.bodyFont)
         self.SliderFadeTime = IntegerSlider(client, false,
@@ -131,6 +165,8 @@ local ChatConfigInterface = ClassUI(Window) {
         self.SliderFadeTime.OnValueChanged = function(_, value)
             self.LabelFadeTime:SetText(string.format("Fade Time: %ds", value))
         end
+        Tooltip.AddControlTooltip(self.LabelFadeTime, 'chat_fadetime')
+        Tooltip.AddControlTooltip(self.SliderFadeTime, 'chat_fadetime')
 
         self.LabelWinAlpha = UIUtil.CreateText(client, "Window Alpha: 100%", 10, UIUtil.bodyFont)
         self.SliderWinAlpha = IntegerSlider(client, false,
@@ -144,6 +180,8 @@ local ChatConfigInterface = ClassUI(Window) {
         self.SliderWinAlpha.OnValueChanged = function(_, value)
             self.LabelWinAlpha:SetText(string.format("Window Alpha: %d%%", value))
         end
+        Tooltip.AddControlTooltip(self.LabelWinAlpha, 'chat_alpha')
+        Tooltip.AddControlTooltip(self.SliderWinAlpha, 'chat_alpha')
 
         -- ---- Checkboxes ----
         self.LabelBehavior = UIUtil.CreateText(client, "Behavior", 12, UIUtil.titleFont)
@@ -155,6 +193,7 @@ local ChatConfigInterface = ClassUI(Window) {
             cb.OnCheck = function(_, checked)
                 ChatConfigController.SetOption(key, checked)
             end
+            Tooltip.AddCheckboxTooltip(cb, def.Tooltip)
             self.Checkboxes[i] = cb
         end
 
@@ -181,8 +220,14 @@ local ChatConfigInterface = ClassUI(Window) {
         end
 
         -- ---- Buttons ----
+        -- Apply also pops the chat window open. The user just spent time
+        -- tuning options against it, so showing the result immediately —
+        -- even if the window was hidden before — is what they expect.
         self.BtnApply = UIUtil.CreateButtonStd(client, '/widgets02/small', "Apply", 14)
-        self.BtnApply.OnClick = function() ChatConfigController.Apply() end
+        self.BtnApply.OnClick = function()
+            ChatConfigController.Apply()
+            import("/lua/ui/game/chat/ChatInterface.lua").Open()
+        end
 
         self.BtnReset = UIUtil.CreateButtonStd(client, '/widgets02/small', "Reset", 14)
         self.BtnReset.OnClick = function() ChatConfigController.Reset() end
@@ -199,6 +244,20 @@ local ChatConfigInterface = ClassUI(Window) {
             import("/lua/ui/game/chat/config/ChatConfigInterface.lua").Close()
         end
 
+        -- ---- Decorative corner grips ----
+        -- Bitmaps overhanging the four corners, mirroring the chat window's
+        -- chrome so the config dialog visually belongs to the same family.
+        -- Hit-test stays off — `lockSize` is true on this window, so the grips
+        -- are pure decoration; routing clicks through them would only confuse
+        -- the underlying Title-bar drag handler.
+        self.DragTL = Bitmap(self, UIUtil.SkinnableFile('/game/drag-handle/drag-handle-ul_btn_up.dds'))
+        self.DragTR = Bitmap(self, UIUtil.SkinnableFile('/game/drag-handle/drag-handle-ur_btn_up.dds'))
+        self.DragBL = Bitmap(self, UIUtil.SkinnableFile('/game/drag-handle/drag-handle-ll_btn_up.dds'))
+        self.DragBR = Bitmap(self, UIUtil.SkinnableFile('/game/drag-handle/drag-handle-lr_btn_up.dds'))
+        for _, grip in { self.DragTL, self.DragTR, self.DragBL, self.DragBR } do
+            grip:DisableHitTest()
+        end
+
         -- ---- Reactive: sync all controls whenever pending options change ----
         -- `LazyVarDerive` gives us a fresh per-subscriber LazyVar so we don't
         -- stomp other subscribers on Pending (see the chat CLAUDE.md).
@@ -206,9 +265,9 @@ local ChatConfigInterface = ClassUI(Window) {
         self.PendingObserver = self.Trash:Add(
             LazyVarDerive(
                 model.Pending,
-                function(lv)
-                    self:RefreshFromOptions(lv()
-                    )
+                function(pendingLazy)
+                    local pending = pendingLazy()
+                    self:RefreshFromOptions(pending)
                 end
             )
         )
@@ -337,6 +396,14 @@ local ChatConfigInterface = ClassUI(Window) {
         local bottomPadScaled = LayoutHelpers.ScaleNumber(16)
         self.Bottom:Set(function() return self.BtnCancel.Bottom() + bottomPadScaled end)
 
+        -- Corner grips overhang the window edge. Offsets mirror the chat
+        -- window's grips so the visual reads identically across the two
+        -- dialogs. `Over(self, 5)` keeps them above the window chrome.
+        Layouter(self.DragTL):AtLeftTopIn(self, -26, -8):Over(self, 5):End()
+        Layouter(self.DragTR):AtRightTopIn(self, -22, -8):Over(self, 5):End()
+        Layouter(self.DragBL):AtLeftBottomIn(self, -26, -8):Over(self, 5):End()
+        Layouter(self.DragBR):AtRightBottomIn(self, -22, -8):Over(self, 5):End()
+
         if Debug then
             self.DebugBG = Bitmap(self)
             self.DebugBG:SetSolidColor('40ff8040')
@@ -398,7 +465,14 @@ function Open()
         return
     end
 
+    -- Mirror the legacy chat-options behaviour: dismiss any open map dialog
+    -- (build/order popup, etc.) before opening, then pin our depth above
+    -- everything else so a later popup can't slide on top of us. Without
+    -- this the config dialog can end up sandwiched behind another popup
+    -- and look stuck.
+    import("/lua/ui/game/multifunction.lua").CloseMapDialog()
     Instance = ChatConfigInterface(GetFrame(0))
+    Instance.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
 end
 
 --- Closes and destroys the config dialog.
