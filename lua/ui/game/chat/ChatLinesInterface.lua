@@ -572,19 +572,15 @@ ChatLinesInterface = ClassUI(Group) {
     -- Resize hooks (driven by the parent window's resize events)
     ---------------------------------------------------------------------------
 
-    --- Cheap resize pass: rebuild the pool to the new height and re-render
-    --- against existing wraps. Wrap widths are width-dependent but rewrapping
-    --- every drag frame is too expensive — see `OnResizeFinished`.
     ---@param self UIChatLinesInterface
     OnResizeLive = function(self)
         local oldPoolSize = table.getn(self.ChatLineInterfaces)
         self:RebuildPool()
+        self:RewrapAll()
         self:RecomputeScrollTopForPoolChange(oldPoolSize)
         self:CalcVisible()
     end,
 
-    --- Expensive resize pass: rebuild + rewrap + re-render. Call once when
-    --- the user finishes a resize drag.
     ---@param self UIChatLinesInterface
     OnResizeFinished = function(self)
         local oldPoolSize = table.getn(self.ChatLineInterfaces)
