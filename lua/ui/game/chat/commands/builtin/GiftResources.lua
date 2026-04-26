@@ -1,15 +1,7 @@
 
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
 
--------------------------------------------------------------------------------
--- /gift-resources <percent> <type> [target] — gift a fraction of your mass
--- or energy to an ally. Percent is an integer 1-100; type is "mass" or
--- "energy". When no target is given, the current chat recipient is used,
--- but only if it's a specific player.
---
--- The sim-side handler (`GiveResourcesToPlayer`) takes fractions (0-1), so
--- a user-friendly 1-100 is divided here before the callback.
-
+--- Normalises a resource-kind token to 'mass' or 'energy'; returns nil on no match.
 local function NormalizeType(token)
     local lower = string.lower(token or '')
     if lower == 'mass' or lower == 'm' then
@@ -20,6 +12,7 @@ local function NormalizeType(token)
     return nil
 end
 
+--- /gift-resources <percent> <type> [target] — gift a fraction of mass or energy to an ally.
 ---@type UIChatCommand
 Command = {
     Name = 'gift-resources',
@@ -75,3 +68,22 @@ Command = {
         })
     end,
 }
+
+-------------------------------------------------------------------------------
+--#region Debugging
+
+--- Hot-reload hook: re-registers this command so saved edits take effect.
+---@param newModule any
+function __moduleinfo.OnReload(newModule)
+    import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua").Register(newModule.Command)
+end
+
+--- Hot-reload hook: schedules the re-import so `OnReload` fires with the freshly-loaded module.
+function __moduleinfo.OnDirty()
+    ForkThread(function()
+        WaitFrames(1)
+        import(__moduleinfo.name)
+    end)
+end
+
+--#endregion

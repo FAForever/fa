@@ -1,10 +1,5 @@
 
--------------------------------------------------------------------------------
--- /debug-wind <tick> — fast-forward the simulation to `tick` at maximum
--- speed, then pause. Maxes out `WLD_GameSpeed` first so the sim runs as
--- fast as the engine allows, then hands off to `wld_RunWithTheWind` which
--- halts on its own when the target tick is reached.
-
+--- /to-tick <tick> — fast-forward to `tick` and pause; only registered with `/debug`.
 ---@type UIChatCommand
 Command = {
     Name = 'to-tick',
@@ -30,7 +25,6 @@ Command = {
     Execute = function(args)
         ConExecute("wld_RunWithTheWind 1")
 
-        -- wait till we get there and pause
         ForkThread(
             function()
                 while GetGameTick() < args.tick - 5 do
@@ -46,8 +40,18 @@ Command = {
 -------------------------------------------------------------------------------
 --#region Debugging
 
+--- Hot-reload hook: re-registers this command so saved edits take effect.
+---@param newModule any
+function __moduleinfo.OnReload(newModule)
+    import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua").Register(newModule.Command)
+end
+
+--- Hot-reload hook: schedules the re-import so `OnReload` fires with the freshly-loaded module.
 function __moduleinfo.OnDirty()
-    import(__moduleinfo.name)
+    ForkThread(function()
+        WaitFrames(1)
+        import(__moduleinfo.name)
+    end)
 end
 
 --#endregion

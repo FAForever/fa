@@ -1,12 +1,5 @@
 
--------------------------------------------------------------------------------
--- /save [name] — quick-save the current session. Without a name, uses the
--- localised default ("QuickSave" in English) so repeated saves overwrite the
--- same slot — matching the quick-save hotkey in `keyactions.lua`.
---
--- Accepts `Rest` so a multi-word name goes through as-is: `/save before boss`
--- saves to "before boss".
-
+--- /save [name] — quick-save; default name matches the quick-save hotkey so repeats overwrite the slot.
 ---@type UIChatCommand
 Command = {
     Name = 'save',
@@ -26,8 +19,18 @@ Command = {
 -------------------------------------------------------------------------------
 --#region Debugging
 
+--- Hot-reload hook: re-registers this command so saved edits take effect.
+---@param newModule any
+function __moduleinfo.OnReload(newModule)
+    import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua").Register(newModule.Command)
+end
+
+--- Hot-reload hook: schedules the re-import so `OnReload` fires with the freshly-loaded module.
 function __moduleinfo.OnDirty()
-    import(__moduleinfo.name)
+    ForkThread(function()
+        WaitFrames(1)
+        import(__moduleinfo.name)
+    end)
 end
 
 --#endregion

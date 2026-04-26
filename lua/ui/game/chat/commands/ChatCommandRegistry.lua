@@ -1,22 +1,21 @@
 local Types = import("/lua/ui/game/chat/commands/ChatCommandTypes.lua")
 
 -------------------------------------------------------------------------------
--- Registry + parser + dispatcher for chat slash-commands.
---
--- See design.md for the full shape. The short version:
---   Register(cmd)  adds a UIChatCommand to the registry
---   Dispatch(text) parses and runs a "/…" line, returning (handled, errorText)
+-- Registry + parser + dispatcher for chat slash-commands. See design.md.
 
+--- One declared parameter slot in a command's signature; resolver is picked by `Type`.
 ---@class UIChatCommandParam
 ---@field Name     string
 ---@field Type     UIChatCommandParamType
 ---@field Optional boolean?
 
+--- Per-invocation context handed to `Accept` and `Execute`; holds model + controller + raw input.
 ---@class UIChatCommandContext
 ---@field Model      UIChatModel
 ---@field Controller table
 ---@field SourceText string
 
+--- A registered slash-command — name, optional aliases/params/gates, and the dispatcher's hooks.
 ---@class UIChatCommand
 ---@field Name        string
 ---@field Aliases?    string[]
@@ -26,16 +25,18 @@ local Types = import("/lua/ui/game/chat/commands/ChatCommandTypes.lua")
 ---@field Accept?     fun(args: table, ctx: UIChatCommandContext): boolean, string?
 ---@field Execute     fun(args: table, ctx: UIChatCommandContext)
 
+--- Registered commands by lower-cased canonical name.
 ---@type table<string, UIChatCommand>
 local Commands = {}
 
+--- Lower-cased alias → canonical command name; merged into lookup so `/w` resolves to `/whisper`.
 ---@type table<string, string>
 local Aliases = {}
 
 -------------------------------------------------------------------------------
 -- Registration
 
---- Removes a command and its aliases.
+--- Removes a command and its aliases from the registry.
 ---@param name string
 function Unregister(name)
     local key = string.lower(name)
@@ -49,20 +50,14 @@ function Unregister(name)
     Commands[key] = nil
 end
 
---- Registers a command. Overwrites any previous registration with the same
---- canonical name; aliases from the previous registration are cleared first.
----
---- A command can opt out of registration entirely by returning `false` from
---- its optional `ShouldRegister` hook — used for session-conditional commands
---- (observer-only, replay-only, single-player-only, etc.). We still call
---- `Unregister` first so a reload that newly disqualifies a command can't
---- leave its previous entry in the registry.
+--- Overwrites any previous registration with the same canonical name;
+--- aliases from the previous registration are cleared first. A
+--- `ShouldRegister` returning false drops the command for this session.
 ---@param cmd UIChatCommand
 function Register(cmd)
     assert(cmd and cmd.Name, "Chat command requires a name.")
     assert(cmd.Execute, "Chat command requires an execute function.")
 
-    -- some commands are game state specific
     if cmd.ShouldRegister and not cmd.ShouldRegister() then
         return
     end
@@ -84,13 +79,9 @@ function Register(cmd)
     end
 end
 
---- Defensive wrapper around `Register`: takes a module path, loads it, and
---- registers its `Command` export — all inside pcalls so one broken file
---- can't take down the entire registration pass (and with it the chat
---- system + anything that depends on `ChatController.Init`).
----
---- Every failure — missing file, import error, missing or malformed
---- `Command` export, Register throwing — is logged and swallowed.
+--- Loads a command file and registers its `Command` export inside
+--- pcalls so one broken file can't take down the registration pass.
+--- Every failure is logged and swallowed.
 ---@param path string
 function RegisterFromPath(path)
     if not DiskGetFileInfo(path) then
@@ -131,7 +122,7 @@ function RegisterFromPath(path)
     end
 end
 
---- Returns a flat list of every registered command (canonical entries only).
+--- Canonical entries only.
 ---@return UIChatCommand[]
 function GetAll()
     local result = {}
@@ -141,7 +132,7 @@ function GetAll()
     return result
 end
 
---- Looks up a command by name or alias. Case-insensitive.
+--- Returns the command matching `name` (canonical or alias), case-insensitive.
 ---@param name string
 ---@return UIChatCommand?
 function Lookup(name)
@@ -153,9 +144,8 @@ function Lookup(name)
     return nil
 end
 
---- Returns every registered command whose canonical name or any alias begins
---- with the given prefix (case-insensitive). Each command appears at most
---- once even if multiple of its aliases match. Results are sorted by name.
+--- Commands whose canonical name or any alias begins with `prefix`
+--- (case-insensitive, deduped, sorted by name).
 ---@param prefix string
 ---@return UIChatCommand[]
 function FindMatching(prefix)
@@ -188,7 +178,6 @@ end
 -------------------------------------------------------------------------------
 -- Parsing
 
---- Splits the body of a slash-command into (name, remainingTokens).
 --- "whisper Jip hello" → "whisper", {"Jip", "hello"}
 ---@param body string
 ---@return string?, string[]
@@ -204,8 +193,6 @@ local function Tokenize(body)
     return name, tokens
 end
 
---- Walks a command's declared parameters, pulling tokens and invoking the
---- matching resolver. Returns the populated args table or a user-facing error.
 ---@param cmd UIChatCommand
 ---@param tokens string[]
 ---@return table?, string?
@@ -258,25 +245,14 @@ end
 -------------------------------------------------------------------------------
 -- Dispatch
 
---- Last-chance fallback for slash commands that don't match anything in our
---- own registry. Hands off to the legacy [`RunChatCommand`](/lua/ui/notify/commands.lua)
---- entry point, which the [Notify](/lua/ui/notify/notify.lua) module
---- populates via `AddChatCommand` (`/enablenotify`, `/disablenotify`,
---- `/enablenotifyoverlay`, `/disablenotifyoverlay`, …). Mirrors the
---- legacy chat dispatcher's fall-through so those commands keep working
---- through the new chat without us having to re-register them.
+--- Fall-through to legacy `RunChatCommand` for pre-MVC commands
+--- registered via Notify's `AddChatCommand` (`/enablenotify`, etc.).
+--- New commands should live under `commands/builtin/`.
 ---
---- Named "Legacy" deliberately — anything that goes through here is
---- pre-MVC tech. New commands should be defined under
---- [`commands/builtin/`](commands/builtin/) and registered through
---- `Register` / `RegisterFromPath`; this path exists purely to avoid
---- breaking external callers that already use `AddChatCommand`.
----
---- The args shape matches what the legacy dispatcher passed: the
---- lowercased command name in slot 1, lowercased remaining tokens after.
---- Wrapped in `pcall` for the same reason `cmd.Accept` / `cmd.Execute`
---- are — a third-party command throwing shouldn't leak up through the
---- chat send path.
+--- Args shape matches the legacy dispatcher: lowercased name in slot 1,
+--- lowercased remaining tokens after. Wrapped in pcall for the same
+--- reason as Accept/Execute — third-party commands throwing must not
+--- leak up through the chat send path.
 ---@param name string         # the slash-stripped command word, original case
 ---@param tokens string[]     # remaining tokens (after the command word)
 ---@return boolean handled
@@ -318,8 +294,6 @@ function Dispatch(text)
 
     local cmd = Lookup(name)
     if not cmd then
-        -- Try the legacy `RunChatCommand` registry before giving up so
-        -- pre-MVC commands (e.g. Notify's `/enablenotify`) still run.
         if DispatchLegacy(name, tokens) then
             return true, nil
         end
@@ -340,10 +314,8 @@ function Dispatch(text)
     }
 
     if cmd.Accept then
-        -- Accept is user code — a crash here is a bug, not a rejection. Treat
-        -- it as a soft failure so the chat send path doesn't propagate the
-        -- throw up through the edit box's event handler. The full stack goes
-        -- to the log; chat only gets the "check the log" hint.
+        -- Accept is user code; treat a throw as a soft failure so it
+        -- doesn't propagate up through the edit-box event handler.
         local pcallOk, ok, reason = pcall(cmd.Accept, args, ctx)
         if not pcallOk then
             WARN(string.format("/%s: Accept threw (%s).", cmd.Name, tostring(ok)))
@@ -356,8 +328,8 @@ function Dispatch(text)
         end
     end
 
-    -- Same pcall treatment for Execute. Side effects that ran before the
-    -- throw aren't rolled back — this just keeps the chat input usable.
+    -- Same pcall as Accept. Side effects before the throw aren't rolled
+    -- back; this just keeps the chat input usable.
     local executeOk, err = pcall(cmd.Execute, args, ctx)
     if not executeOk then
         WARN(string.format("/%s: Execute threw (%s).", cmd.Name, tostring(err)))

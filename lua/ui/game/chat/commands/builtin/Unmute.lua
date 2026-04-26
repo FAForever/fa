@@ -1,11 +1,7 @@
 
 local ChatConfigController = import("/lua/ui/game/chat/config/ChatConfigController.lua")
 
--------------------------------------------------------------------------------
--- /unmute <target> — reverse of `/mute`. Clears the mute flag for the given
--- player so their messages start showing again (both new arrivals and any
--- that landed in the history while they were muted).
-
+--- /unmute <target> — reverse of `/mute`; re-shows new arrivals and history that landed while muted.
 ---@type UIChatCommand
 Command = {
     Name = 'unmute',
@@ -17,3 +13,22 @@ Command = {
         ChatConfigController.SetMutedLive(args.target, false)
     end,
 }
+
+-------------------------------------------------------------------------------
+--#region Debugging
+
+--- Hot-reload hook: re-registers this command so saved edits take effect.
+---@param newModule any
+function __moduleinfo.OnReload(newModule)
+    import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua").Register(newModule.Command)
+end
+
+--- Hot-reload hook: schedules the re-import so `OnReload` fires with the freshly-loaded module.
+function __moduleinfo.OnDirty()
+    ForkThread(function()
+        WaitFrames(1)
+        import(__moduleinfo.name)
+    end)
+end
+
+--#endregion

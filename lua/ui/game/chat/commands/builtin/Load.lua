@@ -1,15 +1,7 @@
 
 local Prefs = import("/lua/user/prefs.lua")
 
--------------------------------------------------------------------------------
--- /load [name] — load a save by name (default: the quick-save slot). The
--- path is built the same way `QuickSave` does in `gamemain.lua`, so an
--- omitted name lines up exactly with the slot `/save` writes to.
---
--- Load errors surface as the engine's standard failure dialog via
--- `LoadSavedGame`'s return values; the command stays silent on success
--- because the game is already transitioning out.
-
+--- /load [name] — load a save; default is the quick-save slot, matching `QuickSave`'s path.
 ---@type UIChatCommand
 Command = {
     Name = 'load',
@@ -38,8 +30,18 @@ Command = {
 -------------------------------------------------------------------------------
 --#region Debugging
 
+--- Hot-reload hook: re-registers this command so saved edits take effect.
+---@param newModule any
+function __moduleinfo.OnReload(newModule)
+    import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua").Register(newModule.Command)
+end
+
+--- Hot-reload hook: schedules the re-import so `OnReload` fires with the freshly-loaded module.
 function __moduleinfo.OnDirty()
-    import(__moduleinfo.name)
+    ForkThread(function()
+        WaitFrames(1)
+        import(__moduleinfo.name)
+    end)
 end
 
 --#endregion

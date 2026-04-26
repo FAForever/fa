@@ -1,21 +1,12 @@
 
 -------------------------------------------------------------------------------
--- Parameter-type resolvers for chat commands. Each resolver takes a raw token
--- (string) and returns (ok, value_or_error):
---   true,  value       → successfully coerced/validated
---   false, errorString → rejected; errorString is user-facing
---
--- Resolvers are intentionally pure: they read from the session (armies table)
--- but never write state. Adding a new type means adding one function to the
--- `Resolvers` table.
+-- Parameter-type resolvers for chat commands. Each resolver takes a raw
+-- token and returns (ok, value_or_error). Resolvers are pure (read from
+-- the session but don't write).
 
---- Looks up an army by nickname or by numeric army ID. Civilian armies are
---- excluded to match the behaviour of the recipient picker.
----
---- A leading `@` is stripped before matching so `@Jip` and `Jip` are
---- equivalent — this lets the chat-edit `@nick` autocomplete (see
---- ChatCompletion) feed straight into commands like `/whisper @Jip` without
---- the user having to delete the `@` first.
+--- Looks up an army by nickname or numeric ID. Civilian armies excluded
+--- to match the recipient picker. A leading `@` is stripped so `@Jip`
+--- works the same as `Jip`, mirroring the `@nick` autocomplete.
 ---@param token string
 ---@return boolean ok
 ---@return number | string armyIDOrError
@@ -25,7 +16,6 @@ local function ResolveArmy(token)
         return false, "no army table available."
     end
 
-    -- do not include '@' of '@nick' when matching against army nicknames or IDs; this allows the user to quickly find usernames
     if string.sub(token, 1, 1) == '@' then
         token = string.sub(token, 2)
     end
@@ -47,13 +37,14 @@ local function ResolveArmy(token)
     return false, string.format("no player named '%s'.", token)
 end
 
+--- Tag identifying which `Resolvers` entry parses a parameter token; one tag per supported type.
 ---@alias UIChatCommandParamType 'Recipient' | 'Player' | 'Int' | 'String' | 'Rest'
 
+--- Param-type → resolver table; each resolver returns `(true, value)` on success or `(false, errMsg)`.
 ---@type table<UIChatCommandParamType, fun(token: string): boolean, any>
 Resolvers = {}
 
---- Accepts "all", "allies"/"team", a nickname, or an army ID.
---- Resolves to a `UIChatRecipient` (the same type the model stores).
+--- "all", "allies"/"team", nickname, or army ID → `UIChatRecipient`.
 Resolvers.Recipient = function(token)
     local lower = string.lower(token)
     if lower == 'all' then
@@ -64,13 +55,12 @@ Resolvers.Recipient = function(token)
     return ResolveArmy(token)
 end
 
---- Accepts a nickname or army ID. Rejects "all"/"allies".
---- Resolves to a numeric army ID.
+--- Nickname or army ID → numeric army ID. Rejects "all"/"allies".
 Resolvers.Player = function(token)
     return ResolveArmy(token)
 end
 
---- Integer literal.
+--- Parses a token as an integer; rejects fractional or non-numeric input.
 Resolvers.Int = function(token)
     local n = tonumber(token)
     if not n or math.floor(n) ~= n then
@@ -79,7 +69,7 @@ Resolvers.Int = function(token)
     return true, n
 end
 
---- Single whitespace-delimited token.
+--- Passthrough: accepts any token as a string.
 Resolvers.String = function(token)
     return true, token
 end

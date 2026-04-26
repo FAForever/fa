@@ -1,10 +1,5 @@
 
--------------------------------------------------------------------------------
--- /end-mission — forfeits the current session and opens the score screen.
--- Delegates to the same `EndGame` function the escape-menu button uses, so
--- campaign vs. skirmish branching stays consistent. Available in
--- single-player and replay.
-
+--- /end-mission — forfeit the current session and open the score screen.
 ---@type UIChatCommand
 Command = {
     Name = 'end-mission',
@@ -20,8 +15,18 @@ Command = {
 -------------------------------------------------------------------------------
 --#region Debugging
 
+--- Hot-reload hook: re-registers this command so saved edits take effect.
+---@param newModule any
+function __moduleinfo.OnReload(newModule)
+    import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua").Register(newModule.Command)
+end
+
+--- Hot-reload hook: schedules the re-import so `OnReload` fires with the freshly-loaded module.
 function __moduleinfo.OnDirty()
-    import(__moduleinfo.name)
+    ForkThread(function()
+        WaitFrames(1)
+        import(__moduleinfo.name)
+    end)
 end
 
 --#endregion

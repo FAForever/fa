@@ -1,8 +1,5 @@
 
--------------------------------------------------------------------------------
--- /debugger — opens the Lua debugger attached to the running session.
--- Only registered when the game was launched with `/debug`.
-
+--- /debugger — open the Lua debugger; only registered with `/debug`.
 ---@type UIChatCommand
 Command = {
     Name = 'debugger',
@@ -18,8 +15,18 @@ Command = {
 -------------------------------------------------------------------------------
 --#region Debugging
 
+--- Hot-reload hook: re-registers this command so saved edits take effect.
+---@param newModule any
+function __moduleinfo.OnReload(newModule)
+    import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua").Register(newModule.Command)
+end
+
+--- Hot-reload hook: schedules the re-import so `OnReload` fires with the freshly-loaded module.
 function __moduleinfo.OnDirty()
-    import(__moduleinfo.name)
+    ForkThread(function()
+        WaitFrames(1)
+        import(__moduleinfo.name)
+    end)
 end
 
 --#endregion

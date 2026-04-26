@@ -1,9 +1,5 @@
 
--------------------------------------------------------------------------------
--- /debug-statistics — runs the engine's `ShowStats` console command, which
--- cycles the overlay that reports frame time, memory, etc. Only registered
--- when the game was launched with `/debug`.
-
+--- /debug-statistics — cycle the engine's `ShowStats` overlay; only registered with `/debug`.
 ---@type UIChatCommand
 Command = {
     Name = 'debug-statistics',
@@ -19,8 +15,18 @@ Command = {
 -------------------------------------------------------------------------------
 --#region Debugging
 
+--- Hot-reload hook: re-registers this command so saved edits take effect.
+---@param newModule any
+function __moduleinfo.OnReload(newModule)
+    import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua").Register(newModule.Command)
+end
+
+--- Hot-reload hook: schedules the re-import so `OnReload` fires with the freshly-loaded module.
 function __moduleinfo.OnDirty()
-    import(__moduleinfo.name)
+    ForkThread(function()
+        WaitFrames(1)
+        import(__moduleinfo.name)
+    end)
 end
 
 --#endregion

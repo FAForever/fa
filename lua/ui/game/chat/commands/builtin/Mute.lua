@@ -1,12 +1,7 @@
 
 local ChatConfigController = import("/lua/ui/game/chat/config/ChatConfigController.lua")
 
--------------------------------------------------------------------------------
--- /mute <target> — hide future messages from a specific player for this
--- game. Goes straight to `Committed` via `SetMutedLive` so the filter picks
--- up the change immediately; `Pending` is untouched so an open config dialog
--- keeps its draft.
-
+--- /mute <target> — hide messages from a player for the rest of this game.
 ---@type UIChatCommand
 Command = {
     Name = 'mute',
@@ -25,3 +20,22 @@ Command = {
         ChatConfigController.SetMutedLive(args.target, true)
     end,
 }
+
+-------------------------------------------------------------------------------
+--#region Debugging
+
+--- Hot-reload hook: re-registers this command so saved edits take effect.
+---@param newModule any
+function __moduleinfo.OnReload(newModule)
+    import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua").Register(newModule.Command)
+end
+
+--- Hot-reload hook: schedules the re-import so `OnReload` fires with the freshly-loaded module.
+function __moduleinfo.OnDirty()
+    ForkThread(function()
+        WaitFrames(1)
+        import(__moduleinfo.name)
+    end)
+end
+
+--#endregion

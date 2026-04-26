@@ -1,12 +1,5 @@
 
--------------------------------------------------------------------------------
--- /taunt <index> — broadcast a numbered taunt from the `taunts` table in
--- `/lua/ui/game/taunt.lua`. Same entry point as the legacy `/N` shortcut,
--- exposed here under a discoverable name so the command-hint popup lists it.
---
--- Out-of-range indices are still sent on the wire; receivers silently ignore
--- unknown entries in `taunt.RecieveTaunt`, matching the legacy behaviour.
-
+--- /taunt <index> — broadcast a numbered taunt; receivers silently ignore out-of-range indices.
 ---@type UIChatCommand
 Command = {
     Name = 'taunt',
@@ -31,8 +24,18 @@ Command = {
 -------------------------------------------------------------------------------
 --#region Debugging
 
+--- Hot-reload hook: re-registers this command so saved edits take effect.
+---@param newModule any
+function __moduleinfo.OnReload(newModule)
+    import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua").Register(newModule.Command)
+end
+
+--- Hot-reload hook: schedules the re-import so `OnReload` fires with the freshly-loaded module.
 function __moduleinfo.OnDirty()
-    import(__moduleinfo.name)
+    ForkThread(function()
+        WaitFrames(1)
+        import(__moduleinfo.name)
+    end)
 end
 
 --#endregion

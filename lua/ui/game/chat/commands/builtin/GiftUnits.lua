@@ -1,10 +1,5 @@
 
--------------------------------------------------------------------------------
--- /gift-units <target> — transfer the current selection to an allied player.
--- Mirrors the Shift-click gift on the score panel: observers can't gift,
--- a lone ACU can't be gifted, and the sim side still re-checks alliance
--- and `ManualUnitShare` before transferring ownership.
-
+--- /gift-units <target> — transfer current selection to an ally; sim re-checks alliance and `ManualUnitShare`.
 ---@type UIChatCommand
 Command = {
     Name = 'gift-units',
@@ -18,9 +13,8 @@ Command = {
             return false, "/gift-units: observers can't gift units."
         end
 
-        -- Fall back to the unit currently under the cursor. `armyIndex` on
-        -- the rollover is zero-based, so bump it to match the armies-table
-        -- convention the rest of the command uses.
+        -- Fall back to the unit under the cursor. `armyIndex` is 0-based;
+        -- the armies table is 1-based.
         if args.target == nil then
             local info = GetRolloverInfo()
             if not info or not info.armyIndex then
@@ -47,11 +41,30 @@ Command = {
         return true
     end,
     Execute = function(args)
-        -- `true` as the second arg tells the engine to pass the current
-        -- selection through to the sim handler as `units`.
+        -- `true` second arg passes the current selection to the sim
+        -- handler as `units`.
         SimCallback({
             Func = "GiveUnitsToPlayer",
             Args = { From = GetFocusArmy(), To = args.target },
         }, true)
     end,
 }
+
+-------------------------------------------------------------------------------
+--#region Debugging
+
+--- Hot-reload hook: re-registers this command so saved edits take effect.
+---@param newModule any
+function __moduleinfo.OnReload(newModule)
+    import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua").Register(newModule.Command)
+end
+
+--- Hot-reload hook: schedules the re-import so `OnReload` fires with the freshly-loaded module.
+function __moduleinfo.OnDirty()
+    ForkThread(function()
+        WaitFrames(1)
+        import(__moduleinfo.name)
+    end)
+end
+
+--#endregion

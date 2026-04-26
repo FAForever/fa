@@ -1,13 +1,5 @@
 
--------------------------------------------------------------------------------
--- /speed <n> — set the simulation speed multiplier via the `WLD_GameSpeed`
--- console var. Range is engine-side (typically -10..+10); invalid values
--- are ignored by the engine rather than throwing.
---
--- Available in single-player and replay. Multiplayer speed changes go
--- through a vote/request flow on the host, not a direct console write, so
--- the command is unregistered there.
-
+--- /speed <n> — set sim speed via `WLD_GameSpeed`; not registered in multiplayer (host vote/request flow).
 ---@type UIChatCommand
 Command = {
     Name = 'speed',
@@ -26,8 +18,18 @@ Command = {
 -------------------------------------------------------------------------------
 --#region Debugging
 
+--- Hot-reload hook: re-registers this command so saved edits take effect.
+---@param newModule any
+function __moduleinfo.OnReload(newModule)
+    import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua").Register(newModule.Command)
+end
+
+--- Hot-reload hook: schedules the re-import so `OnReload` fires with the freshly-loaded module.
 function __moduleinfo.OnDirty()
-    import(__moduleinfo.name)
+    ForkThread(function()
+        WaitFrames(1)
+        import(__moduleinfo.name)
+    end)
 end
 
 --#endregion
