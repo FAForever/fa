@@ -4,6 +4,7 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local FloatText = import("/lua/ui/controls/floattext.lua").FloatText
 
 local ChatLineInterface = import("/lua/ui/game/chat/ChatLineInterface.lua").ChatLineInterface
 
@@ -25,9 +26,11 @@ local ScrollbarReserve = 32
 -- A self-contained chat-lines panel: outer wrapper, inner pool of line rows,
 -- and the vertical scrollbar.
 --
--- Click hooks (`OnNameClicked`, `OnCameraClicked`) are overridable instance
--- fields. Default `OnNameClicked` is a no-op (window-level concern); default
--- `OnCameraClicked` jumps the world camera to the entry's hint.
+-- Click hooks (`OnNameClicked`, `OnBodyClicked`, `OnCameraClicked`) are
+-- overridable instance fields. Default `OnNameClicked` is a no-op
+-- (window-level concern); default `OnBodyClicked` copies the entry text to
+-- the clipboard on Ctrl+click; default `OnCameraClicked` jumps the world
+-- camera to the entry's hint.
 
 --- Wrapped chat panel: line-row pool, scrollbar, history/options observers. Owns wrap and scroll state.
 ---@class UIChatLinesInterface : Group
@@ -39,10 +42,12 @@ local ScrollbarReserve = 32
 ---@field VirtualSize       number    # total wrapped lines across valid entries
 ---@field HistoryObserver   LazyVar<UIChatEntry[]>
 ---@field OptionsObserver   LazyVar<UIChatOptions>
----@field LineNameClicked   fun(line: UIChatLineInterface, entry: UIChatEntry)   # shared row-name click handler; captures `self` so pool lines don't allocate per-row closures
----@field LineCameraClicked fun(line: UIChatLineInterface, entry: UIChatEntry)   # shared cam-icon click handler; captures `self` for the same reason
----@field OnNameClicked     fun(entry: UIChatEntry)                              # overridable: replace to react to a sender-name click
----@field OnCameraClicked   fun(entry: UIChatEntry)                              # overridable: replace to override camera-link behaviour
+---@field LineNameClicked   fun(line: UIChatLineInterface, entry: UIChatEntry, event: KeyEvent)  # shared row-name click handler; captures `self` so pool lines don't allocate per-row closures
+---@field LineBodyClicked   fun(line: UIChatLineInterface, entry: UIChatEntry, event: KeyEvent)  # shared body click handler; captures `self` for the same reason
+---@field LineCameraClicked fun(line: UIChatLineInterface, entry: UIChatEntry, event: KeyEvent)  # shared cam-icon click handler; captures `self` for the same reason
+---@field OnNameClicked     fun(entry: UIChatEntry, event: KeyEvent)                             # overridable: replace to react to a sender-name click
+---@field OnBodyClicked     fun(entry: UIChatEntry, event: KeyEvent)                             # overridable: replace to react to a body click (default copies on Ctrl+click)
+---@field OnCameraClicked   fun(entry: UIChatEntry, event: KeyEvent)                             # overridable: replace to override camera-link behaviour
 ---@field DebugBG?          Bitmap                                              # semi-transparent overlay shown when `Debug` is true
 ChatLinesInterface = ClassUI(Group) {
 
@@ -66,8 +71,27 @@ ChatLinesInterface = ClassUI(Group) {
         self.Pool.ScrollSetTop    = function(_, axis, top) self:ScrollSetTop(axis, top) end
         self.Pool.IsScrollable    = function(_, axis) return self:IsScrollable(axis) end
 
-        self.OnNameClicked = function(entry) end
-        self.OnCameraClicked = function(entry)
+        self.OnNameClicked = function(entry, event) end
+        self.OnBodyClicked = function(entry, event)
+            if event.Modifiers and event.Modifiers.Ctrl then
+                if CopyToClipboard(entry.Text or '') then
+                    -- Parent to the engine frame so the `event.MouseX/Y`
+                    -- screen coords map straight to Left/Top without going
+                    -- through the Layouter's `pixelScaleFactor` scaling.
+                    -- `event.MouseX/Y` carry the actual click position;
+                    -- `GetMouseScreenPos()` would freeze at the last
+                    -- pre-UI-occlusion position.
+                    local mouseX, mouseY = event.MouseX, event.MouseY
+                    local toast = FloatText(GetFrame(0), "Copied to clipboard!")
+                    -- Center horizontally on the cursor; the Width LazyVar
+                    -- settles after the inner Text is measured.
+                    toast.Left:SetFunction(function() return mouseX - toast.Width() / 2 end)
+                    toast.Top:Set(mouseY - LayoutHelpers.ScaleNumber(30))
+                    toast:Float()
+                end
+            end
+        end
+        self.OnCameraClicked = function(entry, event)
             local cam = GetCamera('WorldCamera')
             if entry.Location then
                 if entry.Location.Area then
@@ -83,10 +107,11 @@ ChatLinesInterface = ClassUI(Group) {
         end
 
         -- Built once so pool growth never allocates a per-row closure.
-        -- Each forwarder reads `self.OnNameClicked` on every call, so
+        -- Each forwarder reads `self.OnXxxClicked` on every call, so
         -- replacing the hook later doesn't require re-wiring the rows.
-        self.LineNameClicked   = function(_, entry) self.OnNameClicked(entry) end
-        self.LineCameraClicked = function(_, entry) self.OnCameraClicked(entry) end
+        self.LineNameClicked   = function(_, entry, event) self.OnNameClicked(entry, event) end
+        self.LineBodyClicked   = function(_, entry, event) self.OnBodyClicked(entry, event) end
+        self.LineCameraClicked = function(_, entry, event) self.OnCameraClicked(entry, event) end
 
         local model = ChatModel.GetSingleton()
         self.HistoryObserver = self.Trash:Add(
@@ -161,6 +186,7 @@ ChatLinesInterface = ClassUI(Group) {
             self.ChatLineInterfaces[1] = ChatLineInterface(pool)
             self.ChatLineInterfaces[1]:SetFontSize(fontSize)
             self.ChatLineInterfaces[1].OnNameClicked   = self.LineNameClicked
+            self.ChatLineInterfaces[1].OnBodyClicked   = self.LineBodyClicked
             self.ChatLineInterfaces[1].OnCameraClicked = self.LineCameraClicked
             Layouter(self.ChatLineInterfaces[1])
                 :AtLeftBottomIn(pool)
@@ -178,6 +204,7 @@ ChatLinesInterface = ClassUI(Group) {
             self.ChatLineInterfaces[i] = ChatLineInterface(pool)
             self.ChatLineInterfaces[i]:SetFontSize(fontSize)
             self.ChatLineInterfaces[i].OnNameClicked   = self.LineNameClicked
+            self.ChatLineInterfaces[i].OnBodyClicked   = self.LineBodyClicked
             self.ChatLineInterfaces[i].OnCameraClicked = self.LineCameraClicked
             Layouter(self.ChatLineInterfaces[i])
                 :Above(self.ChatLineInterfaces[i - 1])

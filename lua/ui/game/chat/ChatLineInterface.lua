@@ -75,7 +75,7 @@ ChatLineInterface = ClassUI(Group) {
         -- it — no need to gate dispatch on row role.
         self.Name.HandleEvent = function(_, event)
             if event.Type == 'ButtonPress' and self.Entry then
-                self:OnNameClicked(self.Entry)
+                self:OnNameClicked(self.Entry, event)
             end
         end
 
@@ -87,7 +87,7 @@ ChatLineInterface = ClassUI(Group) {
         self.CamIcon:DisableHitTest()
         self.CamIcon.HandleEvent = function(_, event)
             if event.Type == 'ButtonPress' and self.Entry then
-                self:OnCameraClicked(self.Entry)
+                self:OnCameraClicked(self.Entry, event)
             end
         end
 
@@ -97,7 +97,7 @@ ChatLineInterface = ClassUI(Group) {
         self.Text:SetClipToWidth(true)
         self.Text.HandleEvent = function(_, event)
             if event.Type == 'ButtonPress' and self.Entry then
-                self:OnBodyClicked(self.Entry)
+                self:OnBodyClicked(self.Entry, event)
             end
         end
     end,
@@ -228,18 +228,21 @@ ChatLineInterface = ClassUI(Group) {
     --- their hit rect collapses — only header rows fire in practice.
     ---@param self UIChatLineInterface
     ---@param entry UIChatEntry
-    OnNameClicked = function(self, entry) end,
+    ---@param event KeyEvent
+    OnNameClicked = function(self, entry, event) end,
 
     --- Overridable; default no-op. Fires for both header and continuation
     --- rows — they share the entry so the click resolves to the right sender.
     ---@param self UIChatLineInterface
     ---@param entry UIChatEntry
-    OnBodyClicked = function(self, entry) end,
+    ---@param event KeyEvent
+    OnBodyClicked = function(self, entry, event) end,
 
     --- Overridable; default no-op. Only header rows show the icon.
     ---@param self UIChatLineInterface
     ---@param entry UIChatEntry
-    OnCameraClicked = function(self, entry) end,
+    ---@param event KeyEvent
+    OnCameraClicked = function(self, entry, event) end,
 
     --- Updates the name and body fonts. Row height tracks the name font.
     ---@param self UIChatLineInterface
