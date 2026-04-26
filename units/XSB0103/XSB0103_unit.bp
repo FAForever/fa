@@ -26,7 +26,7 @@ UnitBlueprint{
         "CONSTRUCTION",
         "DRAGBUILD",
         "FACTORY",
-        "NAVAL", 
+        "NAVAL",
         "PRODUCTFA",
         "RALLYPOINT",
         "RECLAIMABLE",

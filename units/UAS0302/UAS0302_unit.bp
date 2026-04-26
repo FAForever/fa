@@ -153,7 +153,7 @@ UnitBlueprint{
         MotionType = "RULEUMT_Water",
         TurnRadius = 25,
         TurnRate = 40,
-    },    
+    },
     SelectionSizeX = 1.8,
     SelectionSizeZ = 8.9,
     SelectionThickness = 0.2,

@@ -16,7 +16,6 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'XSB',            Cue = 'XSB0303_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Factory',    LodCutoff = 'UnitMove_LodCutoff' },
     },
-    AverageDensity = 14000,
     BuildIconSortPriority = 61,
     Categories = {
         "BUILTBYTIER2SUPPORTFACTORY",

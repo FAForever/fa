@@ -17,7 +17,6 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'UEB',        Cue = 'UEB0203_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Factory',         LodCutoff = 'UnitMove_LodCutoff' },
     },
-    AverageDensity = 8000,
     BuildIconSortPriority = 71,
     Categories = {
         "BUILTBYTIER1FACTORY",
@@ -53,7 +52,6 @@ UnitBlueprint{
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
         AnimationUpgrade = "/units/zeb9503/zeb9503_aupgrade.sca",
         BlinkingLights = {
-
             { BLBone = "Dock_Cover", BLOffsetX = 0.5,   BLOffsetY = 0.9,     BLOffsetZ = 0,     BLScale = 2 },
             { BLBone = "Dock_Cover", BLOffsetX = 0.9,   BLOffsetY = 0.9,     BLOffsetZ = 0,     BLScale = 2 },
         },

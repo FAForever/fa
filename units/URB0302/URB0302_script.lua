@@ -5,11 +5,11 @@
 --**
 --**  Summary  :  Cybran Tier 3 Air Unit Factory Script
 --**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local CAirFactoryUnit = import("/lua/cybranunits.lua").CAirFactoryUnit
 
 ---@class URB0302 : CAirFactoryUnit
-URB0302 = Class(CAirFactoryUnit) {}
+URB0302 = Class(CAirFactoryUnit) { }
 
 TypeClass = URB0302

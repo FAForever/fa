@@ -17,7 +17,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'UAB',        Cue = 'UAB0201_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Factory',        LodCutoff = 'UnitMove_LodCutoff' },
     },
-    AverageDensity = 6600,
+    AverageDensity = 6400,
     BuildIconSortPriority = 50,
     Categories = {
         "AEON",
@@ -73,9 +73,9 @@ UnitBlueprint{
                 {
                     LODCutoff = 500,
                     ShaderName = "Aeon",
-                    AlbedoName = "/units/uab0101/uab0101_lod1_albedo.dds",
-                    NormalsName = "/units/uab0101/uab0101_lod1_normalsts.dds",
-                    SpecularName = "/units/uab0101/uab0101_lod1_specteam.dds",
+                    AlbedoName = "/units/uab0101/UAB0101_lod1_Albedo.dds",
+                    NormalsName = "/units/uab0101/UAB0101_lod1_NormalsTS.dds",
+                    SpecularName = "/units/uab0101/UAB0101_lod1_SpecTeam.dds",
                 },
             },
         },

@@ -56,3 +56,4 @@ XSB0303 = ClassUnit(SSeaFactoryUnit) {
 }
 
 TypeClass = XSB0303
+

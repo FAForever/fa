@@ -1,6 +1,6 @@
 -- File     :  /units/XSB0302/XSB0302_script.lua
 -- Summary  :  Seraphim T3 Air FactoryScript
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------
 local SAirFactoryUnit = import("/lua/seraphimunits.lua").SAirFactoryUnit
 ---@class XSB0302 : SAirFactoryUnit

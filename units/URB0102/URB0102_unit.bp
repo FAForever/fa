@@ -49,7 +49,7 @@ UnitBlueprint{
     },
     Display = {
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
-        AnimationBuild = "/units/urb0102/urb0102_abuild.sca",			
+        AnimationBuild = "/units/urb0102/urb0102_abuild.sca",
         AnimationFinishBuildLand = "/units/urb0102/urb0102_aplatform.sca",
         AnimationUpgrade = "/units/urb0102/urb0102_aupgrade.sca",
         AnimationUpgradeTable = {
