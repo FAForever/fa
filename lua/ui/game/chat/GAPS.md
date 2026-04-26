@@ -6,12 +6,6 @@ Accepted & intentional differences live in [CHANGES.md](CHANGES.md); this file o
 
 ---
 
-## Notify-command bridge
-
-Slash commands in the legacy dispatcher fell through to [`RunChatCommand`](../../notify/commands.lua) ([chat.legacy.lua:729](../chat.legacy.lua)) so `/enablenotify`, `/disablenotify`, `/enablenotifyoverlay`, `/disablenotifyoverlay` worked from chat. The new [`ChatCommandRegistry`](commands/ChatCommandRegistry.lua) dispatcher does not, so those commands are dead.
-
-Easy fix: an "unknown command" fallback in the dispatcher that hands off to `RunChatCommand` before reporting an error to the user.
-
 ## Command history recall (↑ / ↓)
 
 Legacy kept a `commandHistory` ring and recalled it on `VK_UP` / `VK_DOWN` ([chat.legacy.lua:681-701](../chat.legacy.lua)). Not ported. The new [`ChatEditInterface.OnNonTextKeyPressed`](ChatEditInterface.lua) maps Up / Down to `CommandHint:SelectNext` / `SelectPrev` while the hint is open; outside of an open hint, Up / Down do nothing.
@@ -51,6 +45,7 @@ Closed in the most recent rounds of work:
 - **Eager chat bootstrap** — [`ChatController.Init`](ChatController.lua) calls `ChatInterface.EnsureInstance()` at game start so the chat tree (and its sibling feed) exists before any messages arrive. The window itself stays hidden by default; only the feed observers are needed up front, and they're now subscribed in time to surface chat the user receives before first opening the dialog.
 - **Button tooltips** — `chat_close` / `chat_config` on the title-bar buttons via `Tooltip.AddButtonTooltip` in [`ChatInterface.__init`](ChatInterface.lua); `chat_reset` on the reset-position button in [`SetupResetPositionButton`](ChatInterface.lua); `chat_pin` ↔ `chat_pinned` on `_pinBtn` driven reactively by a `model.Pinned` derived observer (`PinnedObserver`) so the wording matches the next click's effect; `chat_camera` on the edit-row checkbox in [`ChatEditInterface.__init`](ChatEditInterface.lua).
 - **Legacy public API shim** — [`/lua/ui/game/chat.lua`](../chat.lua) is now a thin compatibility layer that re-exports every legacy global mods used to import (`ReceiveChat`, `ReceiveChatFromSim`, `SetupChatLayout`, `OnNISBegin`, `ChatPageUp` / `ChatPageDown`, `CloseChat`, `CloseChatConfig`, `AddChatOptionSetCallback`, `SetLayout`, `GetArmyData`, `GUI`, `ChatLines`). Every entry point logs a one-shot `WARN` deprecation message the first time it's touched and forwards to the equivalent new API where one exists; `GUI` and `ChatLines` are metatable-proxied so any field read or assignment surfaces a clear warning instead of crashing on a missing field. Once the warnings stop appearing in users' logs, the shim and `chat.legacy.lua` can both be deleted.
+- **Notify-command bridge** — [`ChatCommandRegistry.Dispatch`](commands/ChatCommandRegistry.lua) now falls through to [`/lua/ui/notify/commands.lua`](../../notify/commands.lua)'s `RunChatCommand` when no built-in command matches, mirroring the legacy fan-out. Builds the `args` shape it expects (lowercased command name in slot 1, lowercased remaining tokens after) and `pcall`s the call so a third-party command throwing doesn't propagate up through the chat send path. Only surfaces the "Invalid command — type /help" error if Notify also declines. Keeps `/enablenotify`, `/disablenotify`, `/enablenotifyoverlay`, `/disablenotifyoverlay`, and any future `AddChatCommand` registration alive without us having to re-register them in our own registry.
 
 ---
 

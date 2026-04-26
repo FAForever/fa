@@ -1,4 +1,3 @@
-
 local Types = import("/lua/ui/game/chat/commands/ChatCommandTypes.lua")
 
 -------------------------------------------------------------------------------
@@ -259,6 +258,45 @@ end
 -------------------------------------------------------------------------------
 -- Dispatch
 
+--- Last-chance fallback for slash commands that don't match anything in our
+--- own registry. Hands off to the legacy [`RunChatCommand`](/lua/ui/notify/commands.lua)
+--- entry point, which the [Notify](/lua/ui/notify/notify.lua) module
+--- populates via `AddChatCommand` (`/enablenotify`, `/disablenotify`,
+--- `/enablenotifyoverlay`, `/disablenotifyoverlay`, …). Mirrors the
+--- legacy chat dispatcher's fall-through so those commands keep working
+--- through the new chat without us having to re-register them.
+---
+--- Named "Legacy" deliberately — anything that goes through here is
+--- pre-MVC tech. New commands should be defined under
+--- [`commands/builtin/`](commands/builtin/) and registered through
+--- `Register` / `RegisterFromPath`; this path exists purely to avoid
+--- breaking external callers that already use `AddChatCommand`.
+---
+--- The args shape matches what the legacy dispatcher passed: the
+--- lowercased command name in slot 1, lowercased remaining tokens after.
+--- Wrapped in `pcall` for the same reason `cmd.Accept` / `cmd.Execute`
+--- are — a third-party command throwing shouldn't leak up through the
+--- chat send path.
+---@param name string         # the slash-stripped command word, original case
+---@param tokens string[]     # remaining tokens (after the command word)
+---@return boolean handled
+local function DispatchLegacy(name, tokens)
+    local args = { string.lower(name) }
+    for _, tok in ipairs(tokens) do
+        table.insert(args, string.lower(tok))
+    end
+    local pcallOk, handled = pcall(
+        import("/lua/ui/notify/commands.lua").RunChatCommand,
+        args)
+    if not pcallOk then
+        WARN(string.format(
+            "/%s: legacy command fallback errored (%s).",
+            name, tostring(handled)))
+        return false
+    end
+    return handled and true or false
+end
+
 --- Parses a chat line that starts with '/' and invokes the matching command.
 --- Return values:
 ---   (true,  nil)     → command ran (or was accept-rejected and already reported)
@@ -280,6 +318,11 @@ function Dispatch(text)
 
     local cmd = Lookup(name)
     if not cmd then
+        -- Try the legacy `RunChatCommand` registry before giving up so
+        -- pre-MVC commands (e.g. Notify's `/enablenotify`) still run.
+        if DispatchLegacy(name, tokens) then
+            return true, nil
+        end
         return false, string.format("Invalid command: /%s. Type /help for a list.", name)
     end
 
