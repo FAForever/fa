@@ -186,6 +186,17 @@ ChatLineInterface = ClassUI(Group) {
         self.Text:SetColor(ResolveBodyColor(entry))
         self.TeamColor:SetSolidColor(entry.Color or '00000000')
 
+        -- Grey the sender label on our own outgoing messages so the user
+        -- can pick out their own lines at a glance. Re-applied on every
+        -- `SetHeader` because pool slots get reused across entries from
+        -- different armies — the previous occupant's enable/disable state
+        -- would otherwise stick around.
+        if entry.ArmyID == GetFocusArmy() then
+            self.Name:Disable()
+        else
+            self.Name:Enable()
+        end
+
         local iconIndex = entry.Faction or table.getn(FactionIcons)
         self.FactionIcon:SetTexture(UIUtil.UIFile(FactionIcons[iconIndex]))
 
