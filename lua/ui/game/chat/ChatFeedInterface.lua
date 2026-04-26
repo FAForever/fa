@@ -212,6 +212,12 @@ ChatFeedInterface = ClassUI(Group) {
             else
                 line:SetContinuation(entry, chunk)
             end
+            -- After the header/continuation pass, because `SetHeader` toggles
+            -- `CamIcon:EnableHitTest()` based on whether the entry has a
+            -- camera/location attachment — calling `DisableInteraction` last
+            -- guarantees nothing on the row can swallow a click or wheel
+            -- event meant for the worldview underneath.
+            line:DisableHitTest(true)
             line:SetAlpha(1.0, true)
 
             -- Readability strip behind the row. Solid-black at full alpha;
