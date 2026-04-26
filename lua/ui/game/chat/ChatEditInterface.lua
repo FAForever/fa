@@ -254,10 +254,19 @@ ChatEditInterface = ClassUI(Group) {
             :AtVerticalCenterIn(self, -2)
             :End()
 
+        -- Width must be re-derived from the now-anchored Left/Right.
+        -- Without this it stays pinned at the literal `:Width(200)` placeholder
+        -- set in `__init` (needed there so `SetupEditStd` can read the layout
+        -- without tripping the default circular `Width = Right - Left` chain),
+        -- and the visible typing area gets capped at 200 px regardless of
+        -- where `Right` actually anchors — so the text box visibly fails to
+        -- extend out toward the camera checkbox at higher UI scales or wider
+        -- windows.
         Layouter(self.EditBox)
             :AnchorToRight(self.RecipientLabel, 4)
             :AnchorToLeft(self.CamCheckbox, 4)
             :AtVerticalCenterIn(self)
+            :ResetWidth()  -- drop the `:Width(200)` from `__init`
             :Height(function() return self.EditBox:GetFontHeight() end)
             :End()
 
