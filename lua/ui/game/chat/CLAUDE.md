@@ -1,6 +1,8 @@
 # Chat — Refactoring Guide
 
-This directory contains the refactored in-game chat system. The goal is to replace the monolithic `chat.lua` with a clean MVC structure where the **model** is reactive (LazyVar-based), the **view** is dumb (reads from the model, never writes), and the **controller** is the only place that sends or receives messages.
+This directory contains the refactored in-game chat. The goal is to replace the monolithic legacy `/lua/ui/game/chat.lua` with a clean MVC structure where the **model** is reactive (LazyVar-based), the **view** is dumb (reads from the model, never writes), and the **controller** is the only place that sends or receives messages.
+
+> **Read first:** [`/lua/ui/CLAUDE.md`](/lua/ui/CLAUDE.md) covers project-wide UI patterns — `__init` vs `__post_init`, LazyVars and `Derive`, `TrashBag`, layout, skinning, debug overlays, hot-reload. This doc is chat-specific and assumes those rules. Class field annotation conventions live in [`annotation.md`](annotation.md).
 
 ---
 
@@ -12,283 +14,194 @@ Controller  ──writes──►  Model (LazyVars)  ──OnDirty──►  Vie
     └──────────────────── user input ──────────────────────┘
 ```
 
-- **Model** — a flat set of `LazyVar` instances. No UI, no networking. The single source of truth.
-- **View** — UI controls that subscribe to model LazyVars via `OnDirty`. They never touch each other or call back into the controller.
-- **Controller** — receives network messages and user input, validates them, and writes to the model.
+- **Model** — flat sets of `LazyVar` instances in `ChatModel.lua` (chat state) and `config/ChatConfigModel.lua` (options). No UI, no networking. The single source of truth.
+- **View** — a tree of `*Interface` Groups and Windows that subscribe to model LazyVars via `Derive`. Views never touch each other or write to the model.
+- **Controller** — `ChatController.lua` (chat) and `config/ChatConfigController.lua` (options). The only files allowed to send network messages, register receive handlers, or write to the model.
 
 ---
 
-## Reactive State — How LazyVar Works
+## File Map
 
-`LazyVar` (`/lua/lazyvar.lua`) is the reactive primitive in this codebase.
+The chat tree splits one feature into many small files so each `*Interface` is responsible for a single concern. When adding a feature, this table tells you which file to open.
 
-```lua
-local Create = import("/lua/lazyvar.lua").Create
+### Top-level
 
--- A LazyVar holding a plain value
-local recipient = Create('all')   -- initial value
+| File | Responsibility |
+|------|----------------|
+| [ChatModel.lua](ChatModel.lua) | `UIChatModel` singleton + `UIChatEntry` / `UIChatEntryLocation` shapes; recipient + history + window-visible + last-activity + pin LazyVars |
+| [ChatController.lua](ChatController.lua) | Send / receive pipelines, slash-command dispatch, activity heartbeat, recipient routing — the only file allowed to call `SessionSendChatMessage` or write to the model |
+| [ChatInterface.lua](ChatInterface.lua) | `UIChatInterface : Window` — main draggable, resizable chat window; owns drag handles, idle/fade `OnFrame` timer, `win_alpha` cascade, standalone-invocation entry points |
+| [ChatLinesInterface.lua](ChatLinesInterface.lua) | `UIChatLinesInterface : Group` — line pool, scrollbar, wrap/rebuild on resize, observes `model.History` + `ChatConfigModel.Committed` |
+| [ChatLineInterface.lua](ChatLineInterface.lua) | `UIChatLineInterface : Group` — single message row: faction badge, sender name (clickable), body text (clickable when camera/location-tagged) |
+| [ChatEditInterface.lua](ChatEditInterface.lua) | `UIChatEditInterface : Group` — edit box, recipient label, recipient-picker dropdown, camera-attach checkbox, command-hint popup, command history ring, Tab completion |
+| [ChatFeedInterface.lua](ChatFeedInterface.lua) | `UIChatFeedInterface : Group` — sibling feed shown while the window is closed; per-row age timer fades old lines |
+| [ChatListInterface.lua](ChatListInterface.lua) | `UIChatListInterface : Group` — popup recipient picker (all / allies / per-player) |
+| [ChatCommandHintInterface.lua](ChatCommandHintInterface.lua) | `UIChatCommandHintInterface : Group` — slash-command auto-suggest popup anchored to the edit box |
+| [ChatFactionBadge.lua](ChatFactionBadge.lua) | `ChatFactionBadge : Group` — faction icon with tooltip; rendered on every line |
+| [ChatCompletion.lua](ChatCompletion.lua) | Tab-completion cycle state (no UI; consumed by `ChatEditInterface`) |
+| [ChatUtils.lua](ChatUtils.lua) | Module-level helpers (max message length, etc.) |
+| [ChatDebug.lua](ChatDebug.lua) | Debug helpers — not part of the production tree |
 
--- Read the value by calling it
-print(recipient())                -- 'all'
+### `config/`
 
--- Write a new value
-recipient:Set('allies')           -- triggers OnDirty on recipient and dependents
+| File | Responsibility |
+|------|----------------|
+| [config/ChatConfigModel.lua](config/ChatConfigModel.lua) | `UIChatConfigModel` singleton + `UIChatOptions` schema + slider ranges; `Committed` (active) and `Pending` (draft) options LazyVars |
+| [config/ChatConfigController.lua](config/ChatConfigController.lua) | Apply / Reset / Cancel / SetOption — the only writer to `ChatConfigModel` |
+| [config/ChatConfigInterface.lua](config/ChatConfigInterface.lua) | `UIChatConfigInterface : Window` — options dialog; observes `Pending` to sync controls |
 
--- React to changes
-recipient.OnDirty = function(self)
-    toText:SetText(self())        -- view pulls the new value
-end
+### `commands/`
 
--- A LazyVar that derives from another LazyVar (computed)
-local label = Create()
-label:Set(function()
-    return 'Sending to: ' .. recipient()   -- re-evaluates whenever recipient changes
-end)
-label.OnDirty = function(self)
-    someText:SetText(self())
-end
-```
+| File | Responsibility |
+|------|----------------|
+| [commands/ChatCommandRegistry.lua](commands/ChatCommandRegistry.lua) | Registry, tokenizer, dispatcher; legacy fallback to `/lua/ui/notify/commands.lua` |
+| [commands/ChatCommandTypes.lua](commands/ChatCommandTypes.lua) | Parameter resolvers: `Recipient`, `Player`, `Int`, `String`, `Rest` |
+| [commands/builtin/*.lua](commands/builtin/) | One file per built-in command (`/all`, `/allies`, `/whisper`, `/help`, …); each exports a `Command` table |
+| [commands/design.md](commands/design.md) | Slash-command system design — read before adding a command |
 
-### Rules
-
-1. **Never cache a LazyVar's value in a local.** Always call it (`lv()`) at the moment you need it so the dependency graph stays correct.
-2. **`OnDirty` is a pull notification, not a push.** It tells you the value *may* have changed; you call `self()` inside `OnDirty` to get the new value.
-3. **Never assign `OnDirty` directly on a LazyVar you don't own.** Direct assignment overwrites whatever handler was there before — silently breaking unrelated code. *Always* derive a fresh LazyVar, hang your handler on **that**, and read the upstream LazyVar from its compute. The first read registers your observer in the upstream's `used_by` table, so future changes propagate to your handler without ever touching the upstream's `OnDirty` slot.
-
-Use `Derive(source, onDirty)` from `/lua/lazyvar.lua` — it bundles the three-step dance (create, set OnDirty, `Set` a reader) into one call:
-
-```lua
--- DON'T — clobbers any other subscriber:
-model.History.OnDirty = function(lv) self:OnHistoryChanged(lv()) end
-
--- DO — derive a per-subscriber LazyVar:
-self.HistoryObserver = Derive(model.History, function(lv)
-    self:OnHistoryChanged(lv())
-end)
-
--- And on teardown:
-self.HistoryObserver:Destroy()
-```
-
-**`Create` vs `Derive`** — `Create(value)` makes a LazyVar holding a static initial value. If you pass a function or another LazyVar, it is stored *verbatim* as the cached value — not interpreted as a dependency. `Derive(source, onDirty)` makes a LazyVar that tracks `source` and fires `onDirty` whenever it changes. When you want to observe an existing LazyVar, you want `Derive`; `Create` won't wire up the dependency edge.
-
-This rule applies to every LazyVar in the system — including ones in our own `Model` files. Treat `Foo.OnDirty` as private to whoever creates `Foo`.
-4. **Never write to the model inside an `OnDirty`.** That is controller logic; keep views read-only.
-5. **Destroy LazyVars when the owning control is destroyed** to avoid dangling `OnDirty` callbacks. The standard pattern is a `TrashBag` (see `/lua/system/trashbag.lua`): allocate `self.Trash = TrashBag()` in `__init`, hand every derived observer to it via `self.Trash:Add(...)`, and destroy the bag in `OnDestroy`:
-
-    ```lua
-    __init = function(self, ...)
-        self.Trash = TrashBag()
-        self.HistoryObserver = self.Trash:Add(Derive(model.History, function(lv)
-            self:OnHistoryChanged(lv())
-        end))
-    end,
-    OnDestroy = function(self)
-        self.Trash:Destroy()
-    end,
-    ```
-
-    `Trash:Add` returns what you pass it, so the assignment stays a one-liner.
-
-### What the autolobby got wrong
-
-The autolobby passed `State` tables down through constructors and method calls (prop drilling). When state changed, the controller had to know which child controls needed updating and call them explicitly. This is brittle — adding a new view element means touching the controller. With LazyVars, the view self-subscribes; the controller stays ignorant of the view entirely.
+To add a slash command, follow the [`add-chat-command`](../../../../.claude/skills/add-chat-command/SKILL.md) skill.
 
 ---
 
 ## Model
 
-Defined in `ChatModel.lua`. All fields are LazyVars. No UI imports allowed in this file.
+### `UIChatModel` ([ChatModel.lua](ChatModel.lua))
 
 ```lua
 ---@class UIChatModel
----@field recipient      LazyVar<'all'|'allies'|number>   # current send target
----@field history        LazyVar<UIChatEntry[]>           # append-only; Set a new table ref to trigger dirty
----@field options        LazyVar<UIChatOptions>           # persisted chat preferences
----@field windowVisible  LazyVar<boolean>                 # whether the chat window is open
+---@field History       LazyVar<UIChatEntry[]>     # append-only log; Set a new table ref to trigger dirty
+---@field Recipient     LazyVar<UIChatRecipient>   # current send target
+---@field WindowVisible LazyVar<boolean>           # whether the chat window is open
+---@field LastActivity  LazyVar<number>            # GetSystemTimeSeconds() of the most recent engagement; drives the fade timer
+---@field Pinned        LazyVar<boolean>           # title-bar pin checkbox; suspends auto-close while true
 ```
 
-`UIChatEntry` (plain table, not a LazyVar itself):
+`UIChatRecipient` is `'all' | 'allies' | number` — the engine-level target. The two string constants are exported as `ChatModel.RecipientAll` / `ChatModel.RecipientAllies` so nothing hardcodes the strings.
+
+### `UIChatEntry`
 
 ```lua
 ---@class UIChatEntry
----@field name         string      # formatted "Sender to allies:"
----@field text         string      # raw message body
----@field tokey        string      # ChatOptions key for color lookup
----@field color        string      # ARGB hex team color
----@field armyID       number      # for per-army filter
----@field faction      number      # faction icon index
----@field camera?      table       # WorldCamera settings if this is a ping link
+---@field Name        string             # formatted prefix, e.g. "Sender to allies:"
+---@field Text        string             # raw message body
+---@field Color       string             # ARGB hex of the sender's team colour
+---@field BodyColor?  string             # explicit body ARGB; bypasses palette lookup (system / synthetic lines)
+---@field ColorKey?   string             # palette key resolved against `ChatConfigModel.GetOptions()` at render time
+---@field ArmyID      number             # sender's army index
+---@field Faction     number             # 1-based faction icon index
+---@field Recipient   UIChatRecipient    # original target of the message
+---@field Camera?     table              # SaveSettings snapshot when the sender attached their view
+---@field Location?   UIChatEntryLocation # lightweight {Position?, Area?} hint from sim-side senders
+---@field Id?         string             # near-unique sender-stamped id; dedupes the Sync.ChatMessages path against SessionSendChatMessage
+---@field WrappedText? string[]          # view-side wrap cache; populated by ChatLinesInterface
 ```
 
-Display-lifecycle state (`time`, `new`) belongs to the **view**, not to entries.
+Display-lifecycle state (per-row `time` / `visible` flags, fade alpha) lives on the **view**, not on entries. `WrappedText` is the one exception — the wrap cache attaches to the entry because it depends on the entry's text and the current row width, and avoids re-wrapping every frame.
+
+### `UIChatConfigModel` ([config/ChatConfigModel.lua](config/ChatConfigModel.lua))
+
+```lua
+---@class UIChatConfigModel
+---@field Committed LazyVar<UIChatOptions>   # the active, persisted options observed by the chat tree
+---@field Pending   LazyVar<UIChatOptions>   # the draft being edited in the config dialog
+```
+
+The two LazyVars exist so the config dialog can preview changes (`Pending`) without affecting live UI (`Committed`) until the user clicks Apply. Views observing chat options always read `Committed`.
+
+`UIChatOptions` is a plain table; option keys are exported as module globals (`ChatConfigModel.KeyFontSize`, etc.) so call sites don't repeat magic strings. Slider bounds (`FontSizeRange`, `FadeTimeRange`, `WinAlphaSliderRange`) live in the same module.
+
+| Key | Default | Meaning |
+|-----|---------|---------|
+| `all_color` | 1 | Palette index (1–8) for "all" messages |
+| `allies_color` | 2 | Palette index for ally messages |
+| `priv_color` | 3 | Palette index for private messages |
+| `link_color` | 4 | Palette index for camera/location-link messages and observer chatter |
+| `notify_color` | 8 | Palette index for Notify subsystem messages |
+| `font_size` | 14 | Chat font size (12–18) |
+| `fade_time` | 15 | Seconds before idle window/feed auto-hides (5–30) |
+| `win_alpha` | 1.0 | Window opacity (0.0–1.0; edited via 20–100% slider) |
+| `feed_background` | false | Semi-transparent backdrop behind feed lines |
+| `send_type` | false | Default recipient: false = all, true = allies |
+| `links` | true | Show camera-link messages |
+| `muted` | `{}` | Per-army mute filter (`armyID → true` when muted) |
 
 ---
 
 ## Controller
 
-Defined in `ChatController.lua`. The only file allowed to call `SessionSendChatMessage`, write to the model, or register with `gamemain.RegisterChatFunc`.
-
 ### Receiving
 
 ```
-gamemain.ReceiveChat(sender, data)          [engine callback]
-    └── chatFuncs['Chat'](sender, data)     [registered by controller on init]
-        └── ChatController:OnReceive(sender, msg)
-            ├── validate (drop non-Chat, unknown senders)
-            ├── handle notify subsystem
-            └── model.history:Set(appendedTable)
+gamemain.ReceiveChat(sender, data)              [engine callback]
+    └── chatFuncs['Chat'](sender, data)         [registered by ChatController.Init]
+        └── ChatController.OnReceive(sender, msg)
+            ├── shape-validate the payload (drop malformed, modded, or hostile)
+            ├── route Notify subsystem messages through their handlers
+            └── ChatModel.AppendEntry(entry)     # writes model.History + stamps LastActivity
 ```
+
+`OnSyncChatMessages` is the parallel path for sim-originated and replay messages — it goes through the same `OnReceive` once it has unpacked the sync payload, so live and replay paths converge.
 
 ### Sending
 
 ```
-ChatController:Send(text)
-    ├── slash-command check  →  commands.RunChatCommand
-    ├── taunt check          →  taunt.CheckForAndHandleTaunt
-    ├── build msg table      {to, Chat, text, camera?}
-    ├── resolve client list  →  FindClients / FindClients(id)
+ChatController.Send(text, attachCamera?)
+    ├── slash-command check  →  ChatCommandRegistry.Dispatch
+    ├── taunt check          →  /lua/ui/notify/taunt
+    ├── package message      {to, Chat, text, Camera?, Id, Sender}
+    ├── resolve clients      →  FindClients[AsObserver|AsPlayer]
     └── SessionSendChatMessage(clients?, msg)
-         + echo locally for private messages
+         + SimCallback('SendChatMessage') for the sim/replay path
+         + locally echo private messages (engine doesn't bounce them back)
 ```
+
+Every public function on `ChatController` either reads input, writes the model, or speaks to the engine — there is no UI-side state on the controller. Anything in `/lua/ui/game/chat` that wants to mutate chat state goes through one of these:
+
+| Function | What it does |
+|----------|--------------|
+| `OpenWindow` / `CloseWindow` / `ToggleWindow` | Flip `model.WindowVisible` |
+| `NotifyActivity` | Stamp `model.LastActivity` — the activity heartbeat read by the fade timer |
+| `SetPinned(bool)` | Flip `model.Pinned` (and re-stamp activity on unpin) |
+| `SetRecipient(target)` | Write `model.Recipient` |
+| `AppendEntry(entry)` | Append to `model.History` + stamp activity |
+| `AppendLocalSystemMessage(text)` | Synthesize a local-only system line (used by command errors) |
+| `Send(text, attachCamera?)` | Slash dispatch / taunt / network send pipeline |
+| `ActivateChat(modifiers?)` | Engine hotkey entry: open window with default recipient layered with Shift |
+| `RegisterBuiltinCommands` | Re-runs the registry population; idempotent and safe under hot reload |
+| `Init` | Registers `OnReceive` with gamemain, populates the registry, ensures the chat tree is mounted |
 
 ### Init
 
-```lua
-function ChatController:Init(mapGroup)
-    -- build the model
-    -- build the view, passing the model
-    -- register with gamemain
-    import("/lua/ui/game/gamemain.lua").RegisterChatFunc(
-        function(sender, data) self:OnReceive(sender, data) end,
-        'Chat'
-    )
-end
-```
+`ChatController.Init` is called once from `gamemain.lua` during UI setup. Hot reload re-runs `Init` via the `__moduleinfo.OnReload` hook so the gamemain registration rebinds to the freshly imported `OnReceive` closure — without that, edits to the controller leave stale code receiving messages.
 
 ---
 
-## Standalone Invocation
+## Views
 
-Every complete UI component in this system (chat window, config dialog, edit view) **must be callable directly from a hotkey** with no prior context. This serves two purposes:
+Every `*Interface` file follows the rules in [`/lua/ui/CLAUDE.md`](../../CLAUDE.md) — `__init` for state and children, `__post_init` for layout, observers via `Derive`, cleanup via `TrashBag`. The chat-specific bits are which model fields each interface observes and which controller calls it makes.
 
-1. **Debugging** — any component can be opened in isolation without launching the full game flow.
-2. **Separation of concerns** — if a component requires another component to exist before it can be opened, that is a design smell indicating hidden coupling.
-
-### How hotkeys work in this codebase
-
-`keyactions.lua` defines an action table. Each entry's `action` string is evaluated by the engine:
-
-```lua
--- keyactions.lua
-local keyActionsChat = {
-    ['chat_toggle'] = {
-        action = 'UI_Lua import("/lua/ui/game/chat/ChatView.lua").Toggle()',
-        category = 'chat',
-    },
-    ['chat_config'] = {
-        action = 'UI_Lua import("/lua/ui/game/chat/ChatConfigView.lua").Toggle()',
-        category = 'chat',
-    },
-}
-```
-
-`keydescriptions.lua` provides the display name shown in the key-binding settings UI:
-
-```lua
-['chat_toggle'] = '<LOC key_desc_chat_0001>Toggle chat window',
-['chat_config'] = '<LOC key_desc_chat_0002>Toggle chat options',
-```
-
-### Convention for every view module
-
-Each view file must export a `Toggle()` function (and optionally `Open()` / `Close()`) at module level. The function must be safe to call at any time:
-
-```lua
--- ChatConfigView.lua
-
-local instance = nil
-
-function Toggle()
-    if instance then
-        instance:Destroy()
-        instance = nil
-    else
-        Open()
-    end
-end
-
-function Open()
-    if instance then return end
-    -- obtain or create the model singleton, then build the view
-    local model = import("/lua/ui/game/chat/ChatModel.lua").GetSingleton()
-    instance = CreateConfigWindow(GetFrame(0), model)
-end
-
-function Close()
-    if instance then
-        instance:Destroy()
-        instance = nil
-    end
-end
-```
-
-`GetFrame(0)` is always available in a UI context, so no parent reference needs to be threaded in. A component that cannot be opened this way is not truly standalone.
-
-### No default key bindings required
-
-You do not need to assign a default key to every component — the binding table entry is enough to make it available in the key-binding UI and invocable from the console during development:
-
-```
-UI_Lua import("/lua/ui/game/chat/ChatConfigView.lua").Toggle()
-```
-
----
-
-## View
-
-Defined in `ChatView.lua` (window + feed) and `ChatEditView.lua` (input area). Views receive the model at construction and subscribe via `OnDirty`. They never import the controller.
-
-### ChatView
-
-Observes:
-- `model.history.OnDirty` → re-render visible lines
-- `model.windowVisible.OnDirty` → show/hide `GUI.bg`
-- `model.options.OnDirty` → apply font size, colors, alpha, rewrap text
-
-Owns internally:
-- `chatHistory` display-side shadow: a parallel array of `{time, visible}` per entry — **not** stored on the entries themselves
-- The line pool (`GUI.chatLines[]`) and scroll container
-- The fade timer (`OnFrame` on `GUI.bg`)
-
-### ChatEditView
-
-Observes:
-- `model.recipient.OnDirty` → update the "To Allies:" label
-
-Calls directly:
-- `ChatController.Send(text, cameraState?)` — user pressed Enter
-- `ChatController.SetRecipient(target)` — user picked from the dropdown or clicked a name in the feed
-
-### ChatConfigView
-
-Observes:
-- `model.Pending.OnDirty` → sync control states
-
-Calls directly:
-- `ChatConfigController.SetOption(key, value)` — user changed a control
-- `ChatConfigController.Apply / Reset / Cancel` — user clicked the corresponding button
+| Interface | Observes | Calls into controller |
+|-----------|----------|-----------------------|
+| `UIChatInterface` ([ChatInterface.lua](ChatInterface.lua)) | `model.WindowVisible`, `model.Pinned`, `ChatConfigModel.Committed.win_alpha` | `CloseWindow`, `SetPinned`, `NotifyActivity` |
+| `UIChatLinesInterface` ([ChatLinesInterface.lua](ChatLinesInterface.lua)) | `model.History`, `ChatConfigModel.Committed` (font, palette, mute, links) | (read-only; click forwarders handed in by parent) |
+| `UIChatLineInterface` ([ChatLineInterface.lua](ChatLineInterface.lua)) | (per-row; populated by `ChatLinesInterface`) | row click → `SetRecipient`, camera click → `WorldCamera:RestoreSettings` |
+| `UIChatEditInterface` ([ChatEditInterface.lua](ChatEditInterface.lua)) | `model.Recipient` | `Send`, `SetRecipient`, `NotifyActivity`, `CloseWindow` |
+| `UIChatFeedInterface` ([ChatFeedInterface.lua](ChatFeedInterface.lua)) | `model.History`, `ChatConfigModel.Committed` (palette, fade, feed_background) | (read-only) |
+| `UIChatListInterface` ([ChatListInterface.lua](ChatListInterface.lua)) | (driven by edit dropdown) | `SetRecipient` |
+| `UIChatCommandHintInterface` ([ChatCommandHintInterface.lua](ChatCommandHintInterface.lua)) | (driven by edit text) | (no controller calls; hint UI only) |
+| `UIChatConfigInterface` ([config/ChatConfigInterface.lua](config/ChatConfigInterface.lua)) | `ChatConfigModel.Pending` | `ChatConfigController.SetOption` / `Apply` / `Reset` / `Cancel` |
 
 ### Imports vs callbacks
 
-Views import the model and controller modules directly at the top of the file rather than receiving callback tables in their constructor:
+Views import models and controllers directly at the top of the file rather than receiving them through constructors:
 
 ```lua
+local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
+local ChatController = import("/lua/ui/game/chat/ChatController.lua")
 local ChatConfigModel = import("/lua/ui/game/chat/config/ChatConfigModel.lua")
-local ChatConfigController = import("/lua/ui/game/chat/config/ChatConfigController.lua")
 ```
 
-This keeps dependencies visible at the top of the file and avoids the boilerplate of threading callback tables through constructors. The MVC discipline is preserved by convention: views still only **read** from the model and **call** the controller — they never write to the model directly.
+This keeps dependencies visible at the top of the file and avoids the autolobby's "prop drilling" pattern, where state was threaded through every constructor and every change required touching the controller. The MVC discipline is preserved by convention: views still only **read** from the model and **call** the controller — they never write to the model directly.
 
 ---
 
@@ -296,95 +209,36 @@ This keeps dependencies visible at the top of the file and avoids the boilerplat
 
 | Element | File | Parent |
 |---------|------|--------|
-| Chat window (`GUI.bg`) | `ChatView.lua` | `GetFrame(0)` |
-| Scroll container + line pool | `ChatView.lua` | `GUI.bg` client area |
-| Feed lines (hidden-window mode) | `ChatView.lua` | same line pool |
-| Input edit box | `ChatEditView.lua` | `GUI.bg` client area |
-| Recipient label ("To Allies:") | `ChatEditView.lua` | edit group |
-| Chat-bubble dropdown | `ChatEditView.lua` | edit group |
-| Camera-attach checkbox | `ChatEditView.lua` | edit group |
-| Options config window | `ChatConfigView.lua` | `GetFrame(0)` |
-
-Each chat line (`GUI.chatLines[i]`) contains:
-- `teamColor` — solid-colour bitmap (team colour)
-- `factionIcon` — faction logo
-- `name` — clickable text; click → `onRecipientChange(armyID)`
-- `text` — message body; click (if `entry.camera`) → `WorldCamera:RestoreSettings`
-- `lineStickybg` — feed-mode readability background
+| Chat window (title bar + drag handles) | [ChatInterface.lua](ChatInterface.lua) | `GetFrame(0)` |
+| Line pool + scrollbar | [ChatLinesInterface.lua](ChatLinesInterface.lua) | chat window's client area |
+| Single message row | [ChatLineInterface.lua](ChatLineInterface.lua) | line pool |
+| Sibling feed (window-hidden mode) | [ChatFeedInterface.lua](ChatFeedInterface.lua) | `GetFrame(0)` (anchored to chat window's lines rect) |
+| Edit box, recipient label, recipient picker, camera checkbox | [ChatEditInterface.lua](ChatEditInterface.lua) | chat window's client area |
+| Recipient-picker popup | [ChatListInterface.lua](ChatListInterface.lua) | edit interface |
+| Slash-command hint popup | [ChatCommandHintInterface.lua](ChatCommandHintInterface.lua) | edit interface |
+| Faction icon (per row) | [ChatFactionBadge.lua](ChatFactionBadge.lua) | line interface |
+| Options dialog | [config/ChatConfigInterface.lua](config/ChatConfigInterface.lua) | `GetFrame(0)` |
 
 ---
 
-## Options
+## Standalone Invocation
 
-`UIChatOptions` is a plain table loaded from and saved to the player profile. The model holds one LazyVar for the whole options table. A new table reference must be `Set` to trigger dirty (do not mutate in place).
+Every complete UI component in this system (chat window, options dialog, edit area) **must be callable directly from a hotkey** with no prior context. This serves two purposes:
 
-| Key | Default | Meaning |
-|-----|---------|---------|
-| `all_color` | 1 | Color index (1–8) for "all" messages |
-| `allies_color` | 2 | Color index for ally messages |
-| `priv_color` | 3 | Color index for private messages |
-| `link_color` | 4 | Color index for camera-link messages |
-| `notify_color` | 8 | Color index for Notify messages |
-| `font_size` | 14 | Chat font size (12–18) |
-| `fade_time` | 15 | Seconds before feed/window auto-hides |
-| `win_alpha` | 1.0 | Window opacity (stored 0–100, normalized on use) |
-| `feed_background` | false | Semi-transparent bg behind feed lines |
-| `send_type` | false | Default recipient: false = all, true = allies |
-| `links` | true | Show camera-link messages |
-| `[armyID]` | true | Per-army message filter |
+1. **Debugging** — any component can be opened in isolation without launching the full game flow.
+2. **Separation of concerns** — if a component requires another component to exist before it can be opened, that is a design smell indicating hidden coupling.
+
+Each top-level view module exports module-level `Toggle()` / `Open()` / `Close()` and an `Instance` local. Bind `chat_toggle` and `chat_config` actions in `keyactions.lua` to `UI_Lua import("/lua/ui/game/chat/ChatInterface.lua").Toggle()` and the corresponding config call. The same `Toggle()` is also what the hot-reload `__moduleinfo.OnReload` block reopens after a save — see [`/lua/ui/CLAUDE.md § 7.2`](../../CLAUDE.md).
+
+> This convention is currently chat-specific but is a candidate to lift into [`/lua/ui/CLAUDE.md`](../../CLAUDE.md). Until it does, treat this as the reference for any other top-level UI module.
 
 ---
 
-## Class Field Annotations
+## Don'ts
 
-Every field assigned to `self` inside `__init` must have a matching `---@field` annotation on the class definition. This gives the language server full type information across the whole file and makes the class self-documenting at a glance.
-
-### Rule
-
-Annotate the class immediately above the `ClassUI(...)` call. List every `self.X` field in the order it appears in `__init`. For fields whose type is an array of a named struct, define that struct as its own `---@class` above the main class.
-
-### Example
-
-```lua
----@class UIChatConfigColorRow
----@field label Text
----@field combo BitmapCombo
----@field key   string
-
----@class UIChatConfigInterface : Window
----@field LabelColors    Text
----@field ColorRows      UIChatConfigColorRow[]
----@field LabelFontSize  Text
----@field SliderFontSize IntegerSlider
----@field LabelBehavior  Text
----@field Checkboxes     Checkbox[]
----@field BtnApply       Button
----@field BtnOk          Button
-local ChatConfigInterface = ClassUI(Window) {
-    __init = function(self, parent, ...)
-        self.LabelColors    = UIUtil.CreateText(...)
-        self.ColorRows      = {}
-        self.LabelFontSize  = UIUtil.CreateText(...)
-        self.SliderFontSize = IntegerSlider(...)
-        self.LabelBehavior  = UIUtil.CreateText(...)
-        self.Checkboxes     = {}
-        self.BtnApply       = UIUtil.CreateButtonStd(...)
-        self.BtnOk          = UIUtil.CreateButtonStd(...)
-    end,
-}
-```
-
-### What counts as a field
-
-- Every `self.Foo` written in `__init` or `__post_init`.
-- Fields inherited from the parent class (e.g. `Window`) do **not** need repeating — the `: Window` in the class declaration inherits them.
-- Temporary locals inside a method are not fields and need no annotation.
-
----
-
-## What Not To Do
-
-- **Do not store UI references in the model.** The model must be constructable with no UI present.
-- **Do not write to the model from a view.** Views call into the controller; the controller writes.
-- **Do not mutate a LazyVar's held table in place.** Create a new table and `Set` it; otherwise dependents never go dirty.
-- **Do not replicate the autolobby's drilling pattern.** State is on the model; views subscribe — no parent needs to push updates into children.
+- **Don't store UI references in the model.** The model must be constructable with no UI present (and is — see the model singleton's hot-reload hook, which rebuilds without touching the view tree).
+- **Don't write to the model from a view.** Views call into the controller; the controller writes.
+- **Don't call `SessionSendChatMessage` or `gamemain.RegisterChatFunc` from anywhere but `ChatController`.** Network and sim-side traffic is funnelled through that file precisely so legacy/notify/script paths don't fork.
+- **Don't mutate `model.History` (or any LazyVar's table) in place.** Build a new table and `Set` it; otherwise dependents never go dirty. See [`/lua/ui/CLAUDE.md § 2 Reactivity rules`](../../CLAUDE.md).
+- **Don't replicate the autolobby's drilling pattern.** State is on the model; views import and subscribe — no parent needs to push updates into children.
+- **Don't add a slash command by editing the registry directly.** Drop a file in [`commands/builtin/`](commands/builtin/) and add one `Registry.RegisterFromPath` line in `ChatController.RegisterBuiltinCommands` — see the [`add-chat-command`](../../../../.claude/skills/add-chat-command/SKILL.md) skill.
