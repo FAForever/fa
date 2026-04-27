@@ -260,9 +260,24 @@ end
 -------------------------------------------------------------------------------
 -- Receiving (network)
 
+--- Returns true when `msg.Id` matches an entry already in history. The same
+--- chat message arrives via both delivery paths in live play (engine
+--- `SessionSendChatMessage` and sim `Sync.ChatMessages`), so whichever lands
+--- first seeds the entry and the second is dropped here.
+---@param msg ChatPayload
+---@return boolean
+local function IsDuplicateMessage(msg)
+    if not msg.Id then return false end
+    local history = ChatModel.GetSingleton().History()
+    for _, entry in history do
+        if entry.Id == msg.Id then return true end
+    end
+    return false
+end
+
 --- Handler registered with `gamemain.RegisterChatFunc`. Validates the
---- message, delegates Notify-subsystem messages, resolves the sender's army
---- data, and appends a chat line.
+--- message, dedupes against history, delegates Notify-subsystem messages,
+--- resolves the sender's army data, and appends a chat line.
 ---@param sender string
 ---@param msg ChatPayload
 function OnReceive(sender, msg)
@@ -275,6 +290,7 @@ function OnReceive(sender, msg)
     -- payload can't be trusted. Sender / observer consistency below needs
     -- session context the shared validator can't see.
     if not ChatPayload.IsValidPayload(msg) then return end
+    if IsDuplicateMessage(msg) then return end
 
     -- LOCF-style format-on-receive: when the sender ships `Args`, treat
     -- `msg.text` as a `string.format` template (typically a `<LOC ...>` tag)
@@ -329,27 +345,16 @@ end
 
 --- Handler for the `Sync.ChatMessages` category, populated by the sim-side
 --- `SendChatMessage` callback. In live play the same message also arrives
---- via `SessionSendChatMessage` (`OnReceive`); whichever path lands first
---- seeds the entry's `Id` and this handler skips duplicates by id. In a
---- replay this is the *only* source of chat — `SessionSendChatMessage`
---- never fires.
+--- via `SessionSendChatMessage` (`OnReceive`); `OnReceive` dedupes by
+--- `Id` so this handler can fan out unconditionally. In a replay this is
+--- the *only* source of chat — `SessionSendChatMessage` never fires.
 ---@param msgs ChatPayload[]
 function OnSyncChatMessages(msgs)
     if type(msgs) ~= 'table' then return end
-
-    local history = ChatModel.GetSingleton().History()
-    local seen = {}
-    for _, entry in history do
-        if entry.Id then seen[entry.Id] = true end
-    end
-
     for _, msg in msgs do
-        if not (msg.Id and seen[msg.Id]) then
-            local armyData = GetArmyData(msg.From)
-            local nickname = armyData and armyData.nickname or tostring(msg.From or 'Unknown')
-            OnReceive(nickname, msg)
-            if msg.Id then seen[msg.Id] = true end
-        end
+        local armyData = GetArmyData(msg.From)
+        local nickname = armyData and armyData.nickname or tostring(msg.From or 'Unknown')
+        OnReceive(nickname, msg)
     end
 end
 
