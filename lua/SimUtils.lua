@@ -1544,8 +1544,8 @@ function GiveResourcesToPlayer(data)
     local massGiven = math.min(massTaken, massCapacity)
     local energyGiven = math.min(energyTaken, energyCapacity)
 
-    toBrain:GiveResource('MASS', massTaken)
-    toBrain:GiveResource('ENERGY', energyTaken)
+    toBrain:GiveResource('MASS', massGiven)
+    toBrain:GiveResource('ENERGY', energyGiven)
 
     -- Whisper from giver → receiver so the line reads with the giver's
     -- attribution. Three LOC keys rather than one templated string so each
