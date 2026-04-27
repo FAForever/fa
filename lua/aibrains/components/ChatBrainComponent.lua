@@ -23,28 +23,28 @@ local ChatUtils = import("/lua/chatutils.lua")
 --- point (viewer's pitch/heading/zoom preserved) or `MoveToRegion` for an
 --- area (framing computed automatically). Only one of the two is used; if
 --- both are present `Area` wins.
----@class AIBrainChatLocation
+---@class AIChatLocation
 ---@field Position? Vector         # world-space focus point
 ---@field Area?     Rectangle      # world-space rectangle to frame
 
----@class AIBrainChatComponent
-AIBrainChatComponent = ClassSimple {
+---@class AIChatBrainComponent
+AIChatBrainComponent = ClassSimple {
 
     --- Broadcasts a message to every connected UI as an "all" chat line.
-    ---@param self AIBrainChatComponent
+    ---@param self AIChatBrainComponent
     ---@param text string
     ---@param args? any[]                   # optional `string.format` arguments; UI applies `LOCF(text, unpack(args))` on receive
-    ---@param location? AIBrainChatLocation
+    ---@param location? AIChatLocation
     SendChatToAll = function(self, text, args, location)
         self:SendChatTo('all', text, args, location)
     end,
 
     --- Broadcasts a message to the AI's allies. `Sync.ChatMessages` reaches
     --- every UI, so the non-ally filter is applied client-side on display.
-    ---@param self AIBrainChatComponent
+    ---@param self AIChatBrainComponent
     ---@param text string
     ---@param args? any[]
-    ---@param location? AIBrainChatLocation
+    ---@param location? AIChatLocation
     SendChatToAllies = function(self, text, args, location)
         self:SendChatTo('allies', text, args, location)
     end,
@@ -52,11 +52,11 @@ AIBrainChatComponent = ClassSimple {
     --- Whispers a message to a specific army. No ally constraint — the AI is
     --- trusted sim code and may legitimately taunt an enemy or message a
     --- neutral party.
-    ---@param self AIBrainChatComponent
+    ---@param self AIChatBrainComponent
     ---@param army integer
     ---@param text string
     ---@param args? any[]
-    ---@param location? AIBrainChatLocation
+    ---@param location? AIChatLocation
     SendChatToPlayer = function(self, army, text, args, location)
         self:SendChatTo(army, text, args, location)
     end,
@@ -66,10 +66,10 @@ AIBrainChatComponent = ClassSimple {
     --- that should only reach the army the event happened to (resource
     --- gifts received, ACU under attack, etc.) — `IsLocalRecipient`
     --- ensures only that army's UI renders the line.
-    ---@param self AIBrainChatComponent | AIBrain
+    ---@param self AIChatBrainComponent | AIBrain
     ---@param text string
     ---@param args? any[]
-    ---@param location? AIBrainChatLocation
+    ---@param location? AIChatLocation
     SendChatToSelf = function(self, text, args, location)
         self:SendChatTo(self:GetArmyIndex(), text, args, location)
     end,
@@ -93,11 +93,11 @@ AIBrainChatComponent = ClassSimple {
     --- the UI as `entry.Location` — the click handler in `ChatInterface`
     --- translates it to a `MoveTo`/`MoveToRegion` call at click time, so
     --- there is no need to synthesise a camera snapshot sim-side.
-    ---@param self AIBrainChatComponent | AIBrain
+    ---@param self AIChatBrainComponent | AIBrain
     ---@param to AIBrainChatRecipient
     ---@param text string
     ---@param args? any[]
-    ---@param location? AIBrainChatLocation
+    ---@param location? AIChatLocation
     SendChatTo = function(self, to, text, args, location)
         if type(text) ~= 'string' or text == '' then return end
 

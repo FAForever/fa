@@ -46,7 +46,7 @@ end
 --- Writes `msg` onto `Sync.ChatMessages` only if the local client is a
 --- legitimate recipient. Shared entry point for every sim-originated
 --- chat emitter (the `SendChatMessage` callback for UI-sent messages, the
---- `AIBrainChatComponent` for AI-emitted lines, and any future sim system
+--- `AIChatBrainComponent` for AI-emitted lines, and any future sim system
 --- that wants to drop a line into the chat feed) so the recipient policy
 --- is enforced sim-side in exactly one place.
 ---@param msg ChatPayload
