@@ -3,7 +3,7 @@
 ---@type UIChatCommand
 Command = {
     Name = 'debug-dump-controls',
-    Description = 'Toggle the Alt+click army-switch debug shortcut.',
+    Description = 'Dump the UI control hierarchy under the cursor to the log.',
     ShouldRegister = function()
         return HasCommandLineArg('/debug')
     end,
