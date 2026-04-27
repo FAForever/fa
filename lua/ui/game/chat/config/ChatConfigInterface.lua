@@ -414,8 +414,10 @@ local ChatConfigInterface = ClassUI(Window) {
         end
     end,
 
-    --- Title-bar close button. Closes the dialog without applying.
+    --- Title-bar close button. Mirrors the Cancel button: discards any
+    --- Pending draft (re-syncs from Committed) and tears down the dialog.
     OnClose = function(self)
+        ChatConfigController.Cancel()
         import("/lua/ui/game/chat/config/ChatConfigInterface.lua").Close()
     end,
 
@@ -434,7 +436,13 @@ local ChatConfigInterface = ClassUI(Window) {
 local Instance = nil
 
 --- Standalone entry point: shows the config dialog, building it on first open.
+--- Always re-syncs `Pending` from `Committed` first so a reopen reflects the
+--- current committed state (including any `SetMutedLive` writes that landed
+--- while the dialog was hidden) instead of a stale draft from a previous
+--- session.
 function Open()
+    local Controller = import("/lua/ui/game/chat/config/ChatConfigController.lua")
+    Controller.Cancel()
     if Instance then
         Instance:Show()
         return
