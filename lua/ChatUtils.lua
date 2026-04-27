@@ -57,21 +57,6 @@ function RelayChatMessage(msg)
     end
 end
 
---- Legacy replay hook kept for external callers that may still reference it.
---- The refactored chat path no longer uses this — chat is now relayed through
---- `Sync.ChatMessages` (see `SendChatMessage`) and external replay parsers
---- read the `Sender`/`Msg` fields off the recorded `GiveResourcesToPlayer`
---- callback args, which the UI sender emits once per outgoing message.
----@param data {Sender: integer, Msg: string}
-function SendChatToReplay(data)
-    if data.Sender and data.Msg then
-        if not Sync.UnitData.Chat then
-            Sync.UnitData.Chat = {}
-        end
-        table.insert(Sync.UnitData.Chat, { sender = data.Sender, msg = data.Msg })
-    end
-end
-
 --- Relays a chat message from a UI client back to every UI client via
 --- `Sync.ChatMessages`. The sender field is taken from the command source
 --- and written into `Msg.From` so clients can't spoof the originating army.

@@ -1506,7 +1506,6 @@ function SetOfferDraw(data)
 end
 
 -- Chat-relay helpers moved to `/lua/ChatUtils.lua`:
---   * `SendChatToReplay` — legacy `Sync.UnitData.Chat` writer, kept for mods.
 --   * `SendChatMessage`  — trusted sim relay that feeds `Sync.ChatMessages`.
 
 ---@param data {From: Army, To: Army, Mass: number, Energy: number, Sender?: string, Msg?: table}
