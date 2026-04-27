@@ -9,6 +9,17 @@ module Jekyll
     def render(context)
       name = super.strip
 
+      page = context.registers[:page]
+
+      is_post = page["collection"] == "posts"
+      is_fafbeta = File.basename(page["path"]) == "fafbeta.md"
+      is_fafdevelop = File.basename(page["path"]) == "fafdevelop.md"
+
+      apply = is_post || is_fafbeta || is_fafdevelop
+      unless apply
+        return "{% unit #{@unit_id} %}\n#{name}\n{% endunit %}"
+      end
+
       icon_name =
         if @unit_id.start_with?("enhancements")
           "#{@unit_id}.png"

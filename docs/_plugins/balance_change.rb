@@ -1,9 +1,13 @@
-#module Jekyll
-#  class BalanceChangeBlock < Jekyll::Hooks
-#  end
-#end
-
 Jekyll::Hooks.register [:pages, :documents], :post_render do |doc|
+
+  apply =
+    # Everything in _posts
+    (doc.respond_to?(:collection) && doc.collection.label == "posts") ||
+    # Generated changelogs
+    doc.respond_to?(:path) && File.basename(doc.path) == "fafbeta.md" ||
+    doc.respond_to?(:path) && File.basename(doc.path) == "fafdevelop.md"
+
+  next unless apply
 
   # Use https://regex101.com/ to debug regex.
   doc.output.gsub!(
