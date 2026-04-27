@@ -18,41 +18,32 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+
+# This workflow compiles the changelog snippets into a single new Markdown file.
+
 name: Documentation - Generate changelog
 
 on:
   workflow_dispatch:
-    inputs:
-      reference:
-        required: true
-        type: choice
-        description: The reference (branch or tag) to use to compile the changelog snippets from
-        options:
-          - develop
-          - deploy/fafbeta
-          - deploy/fafdevelop
 
   workflow_call:
     inputs:
-      reference:
+      branch:
         required: true
         type: string
-        description: The reference (branch or tag) to use to compile the changelog snippets from
+        description: The branch to use to compile the changelog snippets from
 
   pull_request:
     paths:
       - "changelog/snippets/*.md"
+
   push:
     branches:
       - deploy/fafdevelop
 
 jobs:
-
-  # By verifying the snippets we ensure that they're compatible with the bundling
-  # process. In the future we can also add spell checking and/or checks for foul words.
-
-  verify:
-    name: Verify snippets
+  generate-changelog:
+    name: Generate changelog
     runs-on: ubuntu-latest
     steps:
 
@@ -68,68 +59,39 @@ jobs:
       - name: Checkout snippets
         uses: actions/checkout@v4
         with:
+          # We need to check out the fork repo when the PR branch is on a fork.
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
           path: fa
-          ref: ${{ inputs.reference }}
+          # Make sure that we run from the correct branch when triggered in a pull request.
+          ref: ${{ inputs.branch || github.head_ref || github.ref_name }}
           sparse-checkout: |
             changelog/snippets
 
       - name: Update environment path
         run: |
-          ls
           echo "${{ github.workspace }}/scripts/.github/workflows/scripts/bash" >> $GITHUB_PATH
 
+      # By verifying the snippets we ensure that they're compatible with the bundling
+      # process. In the future we can also add spell checking and/or checks for foul words.
       - name: Verify the changelog snippets
         working-directory: fa/changelog/snippets # script assumes it is in this directory
         run: |
           changelog-verify.sh
 
-  # During the bundling process we combine the templates, the sections and the snippets
-  # into a single changelog.
-
-  bundle:
-    name: Bundle snippets
-    runs-on: ubuntu-latest
-    needs: [verify]
-    steps:
-
-      # We check out the scripts separate because the branch that we use to
-      # generate the changelog may not contain the scripts that we want to work with.
-      - name: Checkout scripts
-        uses: actions/checkout@v4
-        with:
-          path: scripts
-          sparse-checkout: |
-            .github/workflows/scripts/bash
-
-      - name: Checkout snippets
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.reference }}
-          path: fa
-          sparse-checkout: |
-            changelog/snippets
-
-      - name: Update environment path
-        run: |
-          echo "${{ github.workspace }}/scripts/.github/workflows/scripts/bash" >> $GITHUB_PATH
-
-      # We need to do this to remove `deploy/` from the reference. Specifically the `/` is problematic
-      - name: Update reference
-        run: |
-          REFERENCE="${{ inputs.reference }}"
-          NAME="${REFERENCE#deploy/}"
-          echo "NAME=$NAME" >> $GITHUB_ENV
-
-      - name: Create the changelog
+      - name: Create the changelog file
         working-directory: fa/changelog/snippets # script assumes it is in this directory
+        env:
+          REFERENCE: ${{ inputs.branch || github.head_ref || github.ref_name }}
+        # We need to remove the `/` any anything in front of it from the branch name.
+        # Specifically the `/` is problematic in a file name.
         run: |
-          echo $NAME
-          echo ${{ env.NAME }}
-          changelog-combine.sh ${{ env.NAME }}
+          NAME="changelog-${REFERENCE##*/}"
+          echo "NAME=$NAME" >> $GITHUB_ENV
+          changelog-combine.sh "$NAME"
 
       - name: Add the changelog as an artifact
         uses: actions/upload-artifact@v4
         with:
-          name: changelog-${{ env.NAME }}
+          name: ${{ env.NAME }}
           path: |
             fa/changelog/snippets/${{ env.NAME }}.md
