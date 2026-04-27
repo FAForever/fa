@@ -44,39 +44,46 @@ function SetOption(key, value)
     model.Pending:Set(draft)
 end
 
---- Setting `muted = false` clears the key so the table stays compact;
---- absent keys read as "not muted".
+--- Returns a deep-enough copy of `options` with `muted[armyID]` flipped
+--- to the requested state. `muted = false` clears the key so the table
+--- stays compact (absent keys read as "not muted"). Always returns a
+--- fresh `options` and a fresh `muted` map so the LazyVar dirty check
+--- fires in the caller's `:Set`.
+---@param options UIChatOptions
+---@param armyID  number
+---@param muted   boolean
+---@return UIChatOptions
+local function WithMuteChange(options, armyID, muted)
+    local copy = table.copy(options)
+    local map = table.copy(copy.muted or {})
+    if muted then
+        map[armyID] = true
+    else
+        map[armyID] = nil
+    end
+    copy.muted = map
+    return copy
+end
+
+--- Updates the dialog's draft `Pending` mute map.
 ---@param armyID number
 ---@param muted  boolean
 function SetMuted(armyID, muted)
     local model = Model()
-    local draft = table.copy(model.Pending())
-    local map = table.copy(draft.muted or {})
-    if muted then
-        map[armyID] = true
-    else
-        map[armyID] = nil
-    end
-    draft.muted = map
-    model.Pending:Set(draft)
+    model.Pending:Set(WithMuteChange(model.Pending(), armyID, muted))
 end
 
---- Writes directly to `Committed` so `/mute` and `/unmute` take effect
---- immediately. Pending is left alone — an open config dialog keeps its
---- draft, and the next open re-syncs Pending from Committed.
+--- Writes a mute change to both `Committed` (so `/mute` and `/unmute`
+--- take effect immediately) and `Pending` (so an open config dialog's
+--- draft doesn't overwrite the live change on Apply). Only the entry
+--- for `armyID` is touched, so other in-flight Pending edits are
+--- preserved.
 ---@param armyID number
 ---@param muted  boolean
 function SetMutedLive(armyID, muted)
     local model = Model()
-    local options = table.copy(model.Committed())
-    local map = table.copy(options.muted or {})
-    if muted then
-        map[armyID] = true
-    else
-        map[armyID] = nil
-    end
-    options.muted = map
-    model.Committed:Set(options)
+    model.Committed:Set(WithMuteChange(model.Committed(), armyID, muted))
+    model.Pending:Set(WithMuteChange(model.Pending(), armyID, muted))
 end
 
 -------------------------------------------------------------------------------
