@@ -10,7 +10,7 @@ local ChatPayload = import("/lua/shared/ChatPayload.lua")
 MaxMessageLength = ChatPayload.MaxMessageLength
 
 --- Recipient-label / chat-line-prefix descriptors. Keys are localization
---- categories, not recipient constants — receiver indexes by `msg.to` and
+--- categories, not recipient constants. Receiver indexes by `msg.to` and
 --- falls back to `private` for whispers. Each entry has a `text`
 --- (lowercase), a `caps` (titlecase), and a `colorkey` resolved at render
 --- time.
@@ -36,14 +36,16 @@ ColorPalette = {
     'ffff9f42', -- 8: orange
 }
 
---- Wraps an entry's body text and caches it as `entry.WrappedText`. The
---- first chunk reserves space for the name prefix; subsequent chunks span
---- the full body width. Always overwrites — callers gate on the cache.
---- `measureLine == nil` degrades to a single-chunk wrap so callers without
---- a measurement source still get something renderable.
+--- Wraps `entry.Text` to the row width and caches it as `entry.WrappedText`.
+--- Pass `measureLine = nil` to skip wrapping and store the raw text as a
+--- single chunk.
 ---@param entry UIChatEntry
 ---@param measureLine UIChatLineInterface | nil
 function WrapEntry(entry, measureLine)
+    -- Always overwrites WrappedText, callers gate on the cache to avoid
+    -- a re-wrap. The first chunk reserves space for the name prefix so
+    -- the body starts after Name.Right + 4. Subsequent chunks span the
+    -- full body width.
     if not measureLine then
         entry.WrappedText = { entry.Text or '' }
         return

@@ -1,5 +1,5 @@
 
---- /speed <n> — set sim speed via `WLD_GameSpeed`; not registered in multiplayer (host vote/request flow).
+--- /speed <n>: set sim speed via `WLD_GameSpeed`. Not registered in multiplayer (host vote/request flow).
 ---@type UIChatCommand
 Command = {
     Name = 'speed',

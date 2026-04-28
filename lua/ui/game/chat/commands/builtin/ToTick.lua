@@ -1,5 +1,5 @@
 
---- /to-tick <tick> — fast-forward to `tick` and pause; only registered with `/debug`.
+--- /to-tick <tick>: fast-forward to `tick` and pause. Only registered with `/debug`.
 ---@type UIChatCommand
 Command = {
     Name = 'to-tick',

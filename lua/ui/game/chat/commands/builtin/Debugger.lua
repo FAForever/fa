@@ -1,5 +1,5 @@
 
---- /debugger — open the Lua debugger; only registered with `/debug`.
+--- /debugger: open the Lua debugger. Only registered with `/debug`.
 ---@type UIChatCommand
 Command = {
     Name = 'debugger',

@@ -19,6 +19,65 @@ And a few specifics:
 - A comment should not end with a dot (.), but it can be used between sentences
 - Varargs `...` should be documented as: `@param ... <type> <description>`, it shouldn't use `@vararg`
 
+## Comment style
+
+Comments explain intent and engine behavior. Anything readable straight from the code does not need a comment.
+
+### Rules
+
+1. Every `@class`, `@type`, `@alias`, and other top-level annotation has a `---` description directly above it.
+2. Every function has a `---` description. The description tells a consumer what the function does and anything they need to know before calling it. Implementation details and rationale go inside the function body, at the very top, before any logic.
+3. Comments are succinct and declarative. Short sentences. State the fact, not the reasoning around the fact.
+4. Do not use em-dashes (`—`) or similar joining punctuation. Split into separate sentences, or use a colon, a comma, or parentheses.
+
+### Why the function-level vs. body split
+
+The `---` block is what the language server shows on hover. It is the public face of the function and should read as a contract. Implementation rationale belongs with the implementation, where future maintainers will read it.
+
+### Good
+
+```lua
+--- Returns the army index that authored the current command, or nil
+--- outside a command-source context.
+---@return integer?
+function GetCurrentCommandSourceArmy()
+    -- The engine clears the source between command dispatches, so nil
+    -- is normal during idle ticks.
+    ...
+end
+```
+
+```lua
+--- Wire-format chat payload. Travels through both the live engine
+--- broadcast and the sim-routed sync stream.
+---@class ChatPayload
+```
+
+```lua
+--- A known channel constant, or an army index for a private whisper.
+---@alias UIChatRecipient 'all' | 'allies' | number
+```
+
+### Not good
+
+The rationale leaks into the consumer-facing doc, and an em-dash joins what should be two sentences:
+
+```lua
+--- Returns the army index that authored the current command — the engine
+--- clears the source between command dispatches so a nil is normal during
+--- idle ticks. Returns nil if there is no source.
+---@return integer?
+function GetCurrentCommandSourceArmy()
+    ...
+end
+```
+
+The class is annotated but has no description, so the hover tooltip is empty:
+
+```lua
+---@class ChatPayload
+```
+
 ## Examples
 
 In general, all annotated code in the repository is a good example. Some was written before these guidelines were written. Therefore we'll include some good examples for you to look at.

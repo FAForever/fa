@@ -1,5 +1,5 @@
 
---- /taunt <index> — broadcast a numbered taunt; receivers silently ignore out-of-range indices.
+--- /taunt <index>: broadcast a numbered taunt. Receivers silently ignore out-of-range indices.
 ---@type UIChatCommand
 Command = {
     Name = 'taunt',

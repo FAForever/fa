@@ -18,7 +18,7 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 local Debug = false
 
 --- Generic `panel_brd_*` chrome rather than the chat window's bespoke
---- art — the two dialogs are different sizes.
+--- art (the two dialogs are different sizes).
 ---@diagnostic disable: param-type-mismatch
 local WindowTextures = {
     tl          = UIUtil.SkinnableFile('/game/panel/panel_brd_ul.dds'),
@@ -34,7 +34,7 @@ local WindowTextures = {
 }
 ---@diagnostic enable: param-type-mismatch
 
--- Same `chat_color` tooltip on every colour combo — the per-row label
+-- Same `chat_color` tooltip on every colour combo. The per-row label
 -- already names the recipient, so the tooltip just explains the control.
 local ColorDefs = {
     { Key = ChatConfigModel.KeyAllColor,    Text = "All",     Tooltip = 'chat_color' },
@@ -235,7 +235,7 @@ local ChatConfigInterface = ClassUI(Window) {
         end
 
         -- ---- Decorative corner grips ----
-        -- Pure decoration — `lockSize` is true on this window, so routing
+        -- Pure decoration. `lockSize` is true on this window, so routing
         -- clicks through them would only confuse the title-bar drag.
         self.DragTL = Bitmap(self, UIUtil.SkinnableFile('/game/drag-handle/drag-handle-ul_btn_up.dds'))
         self.DragTR = Bitmap(self, UIUtil.SkinnableFile('/game/drag-handle/drag-handle-ur_btn_up.dds'))
@@ -367,7 +367,7 @@ local ChatConfigInterface = ClassUI(Window) {
             :AtVerticalCenterIn(self.BtnOk)
             :End()
 
-        -- Don't pin Width here — the drag handler's Right:Set(Left + Width)
+        -- Don't pin Width here. The drag handler's Right:Set(Left + Width)
         -- would snap to whatever Width got pinned to. Width stays driven
         -- by Left/Right from the default rect.
         local bottomPadScaled = LayoutHelpers.ScaleNumber(16)
@@ -414,9 +414,10 @@ local ChatConfigInterface = ClassUI(Window) {
         end
     end,
 
-    --- Title-bar close button. Mirrors the Cancel button: discards any
-    --- Pending draft (re-syncs from Committed) and tears down the dialog.
+    --- Title-bar close button. Mirrors the Cancel button.
     OnClose = function(self)
+        -- Discards any Pending draft (re-syncs from Committed) and tears
+        -- down the dialog.
         ChatConfigController.Cancel()
         import("/lua/ui/game/chat/config/ChatConfigInterface.lua").Close()
     end,
@@ -436,11 +437,11 @@ local ChatConfigInterface = ClassUI(Window) {
 local Instance = nil
 
 --- Standalone entry point: shows the config dialog, building it on first open.
---- Always re-syncs `Pending` from `Committed` first so a reopen reflects the
---- current committed state (including any `SetMutedLive` writes that landed
---- while the dialog was hidden) instead of a stale draft from a previous
---- session.
 function Open()
+    -- Always re-syncs `Pending` from `Committed` first so a reopen
+    -- reflects the current committed state (including any `SetMutedLive`
+    -- writes that landed while the dialog was hidden) instead of a stale
+    -- draft from a previous session.
     local Controller = import("/lua/ui/game/chat/config/ChatConfigController.lua")
     Controller.Cancel()
     if Instance then

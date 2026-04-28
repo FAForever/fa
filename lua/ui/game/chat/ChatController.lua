@@ -26,16 +26,13 @@ end
 -------------------------------------------------------------------------------
 -- Activity heartbeat
 
---- Stamps `LastActivity` with the current system time. The chat window's
---- idle / fade timer subscribes to this; call from any UI surface that
---- counts as engagement.
+--- Stamps `LastActivity` with the current system time. Call from any
+--- UI surface that counts as engagement.
 function NotifyActivity()
     ChatModel.GetSingleton().LastActivity:Set(GetSystemTimeSeconds())
 end
 
---- While pinned, `ChatInterface.OnFrame` skips the idle auto-close check.
---- Unpinning re-stamps `LastActivity` so the user gets a full `fade_time`
---- window instead of being auto-closed against the stale stamp.
+--- Sets the pinned flag.
 ---@param pinned boolean
 function SetPinned(pinned)
     ChatModel.GetSingleton().Pinned:Set(pinned and true or false)
@@ -84,9 +81,7 @@ end
 -------------------------------------------------------------------------------
 -- Slash commands
 
---- (Re-)registers every built-in chat command with the registry. Idempotent
---- and called on every slash-entry path so a hot-reload of the registry
---- doesn't leave us with an empty command set.
+--- (Re-)registers every built-in chat command with the registry. Idempotent.
 function RegisterBuiltinCommands()
     local Registry = import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua")
 
@@ -143,6 +138,10 @@ local function FindClientsAsObserver(armiesTable)
     return result
 end
 
+--- * Calling with an `armyID`: clients authorised for that specific army
+---   (private messages).
+--- * Calling with no `armyID`: clients authorised for any focus-army ally
+---   (`allies` broadcasts).
 ---@param armiesTable table
 ---@param focus number
 ---@param armyID? number
@@ -181,9 +180,9 @@ end
 ---
 --- * Observing (focus == -1): every connected observer client, plus any
 ---   disconnected-but-recognised human player.
---- * Playing with an `armyID`: clients authorised for that specific army
+--- * Calling with an `armyID`: clients authorised for that specific army
 ---   (private messages).
---- * Playing with no `armyID`: clients authorised for any focus-army ally
+--- * Calling with no `armyID`: clients authorised for any focus-army ally
 ---   (`allies` broadcasts).
 ---@param armyID? number
 ---@return number[]
@@ -225,14 +224,15 @@ local ToStrings = ChatUtils.ToStrings
 ---@param args { Name: string, Text?: string, ArmyData?: table, IsObserver?: boolean, Recipient: UIChatRecipient, Camera?: table, Location?: UIChatEntryLocation, Id?: string }
 local function AppendChatLine(args)
     local armyData = args.ArmyData or {}
-    -- Observers have no `faction`; fall through to the tail icon in
-    -- `ChatLineInterface.FactionIcons`. Engine factions are 0..N-1; the view
-    -- expects 1-based indices.
+    -- Observers have no `faction`, fall through to the tail icon in
+    -- `ChatLineInterface.FactionIcons`. Engine factions are 0..N-1.
+    -- The view expects 1-based indices.
     local faction = not args.IsObserver and armyData.faction or nil
 
-    -- Camera-link messages and observer broadcasts both use the link palette;
-    -- everyone else inherits the channel descriptor's `colorkey`. Unrecognised
-    -- recipients fall back to `priv_color` via the `ToStrings.private` entry.
+    -- Camera-link messages and observer broadcasts both use the link
+    -- palette. Everyone else inherits the channel descriptor's `colorkey`.
+    -- Unrecognised recipients fall back to `priv_color` via the
+    -- `ToStrings.private` entry.
     local colorKey
     if args.Camera or args.Location then
         colorKey = ChatConfigModel.KeyLinkColor
@@ -285,23 +285,16 @@ function OnReceive(sender, msg)
         sender = 'nil sender'
     end
 
-    -- Shape validation lives in `ChatPayload.IsValidPayload` (shared with the
-    -- sim relay). The receive path is reachable from external mods, so the
-    -- payload can't be trusted. Sender / observer consistency below needs
-    -- session context the shared validator can't see.
     if not ChatPayload.IsValidPayload(msg) then return end
     if IsDuplicateMessage(msg) then return end
 
-    -- LOCF-style format-on-receive: when the sender ships `Args`, treat
-    -- `msg.text` as a `string.format` template (typically a `<LOC ...>` tag)
-    -- so the result respects the viewer's locale. The cap was applied to the
-    -- pre-format template, so `LOCF` can legitimately exceed it.
+    -- only apply LOCf when Args are present, otherwise players can randomly send localized messages by including format specifiers in their text.
     if msg.Args then
         msg.text = LOCF(msg.text, unpack(msg.Args))
     end
 
-    -- Notify owns the display decision for `to='notify'`; only fall through
-    -- to rendering a chat line if it returns false.
+    -- Notify owns the display decision for `to='notify'`. Only fall
+    -- through to rendering a chat line if it returns false.
     if msg.to == ChatModel.RecipientNotify and not import("/lua/ui/notify/notify.lua").processIncomingMessage(sender, msg) then
         return
     end
@@ -311,10 +304,10 @@ function OnReceive(sender, msg)
         return
     end
 
-    -- `msg.Observer` is only set when the sender has no army entry. A peer
-    -- claiming Observer while resolving to a real army is malformed — drop
-    -- the message entirely rather than stripping the flag, which would let
-    -- manipulated traffic render under a different label.
+    -- `msg.Observer` is only set when the sender has no army entry. A
+    -- peer claiming Observer while resolving to a real army is malformed.
+    -- Drop the message entirely rather than stripping the flag, which
+    -- would let manipulated traffic render under a different label.
     if msg.Observer and armyData then return end
 
     local to = msg.to
@@ -323,8 +316,8 @@ function OnReceive(sender, msg)
 
     local name
     if type(to) == 'number' and SessionIsReplay() then
-        -- In a replay, private messages need the full routing so spectators
-        -- can attribute the conversation.
+        -- In a replay, private messages need the full routing so
+        -- spectators can attribute the conversation.
         name = string.format("%s %s %s:", sender, LOC(ToStrings.to.text),
             (GetArmyData(to) or {}).nickname or tostring(to))
     else
@@ -344,12 +337,14 @@ function OnReceive(sender, msg)
 end
 
 --- Handler for the `Sync.ChatMessages` category, populated by the sim-side
---- `SendChatMessage` callback. In live play the same message also arrives
---- via `SessionSendChatMessage` (`OnReceive`); `OnReceive` dedupes by
---- `Id` so this handler can fan out unconditionally. In a replay this is
---- the *only* source of chat — `SessionSendChatMessage` never fires.
+--- `SendChatMessage` callback.
 ---@param msgs ChatPayload[]
 function OnSyncChatMessages(msgs)
+    -- In live play the same message also arrives via
+    -- `SessionSendChatMessage` (`OnReceive`). `OnReceive` dedupes by
+    -- `Id` so this handler can fan out unconditionally. In a replay
+    -- this is the *only* source of chat. `SessionSendChatMessage` never
+    -- fires.
     if type(msgs) ~= 'table' then return end
     for _, msg in msgs do
         local armyData = GetArmyData(msg.From)
@@ -420,26 +415,29 @@ function Send(text, attachCamera)
         text       = text,
     }
 
-    -- Observers can't target a private recipient. Bail before stamping an id
-    -- or firing sim callbacks for a message the engine would refuse anyway.
+    -- Observers can't target a private recipient. Bail before stamping
+    -- an id or firing sim callbacks for a message the engine would
+    -- refuse anyway.
     if focusArmy == -1 and type(recipient) == 'number' then return end
 
-    -- Flag observer broadcasts so receivers render "to observers:". Both
-    -- delivery paths need to see this, so set it before either fires.
+    -- Flag observer broadcasts so receivers render "to observers:".
+    -- Both delivery paths need to see this, so set it before either
+    -- fires.
     if focusArmy == -1 then msg.Observer = true end
 
     if attachCamera then
         msg.camera = GetCamera('WorldCamera'):SaveSettings()
     end
 
-    -- Stamp an id for `OnSyncChatMessages` to dedupe the live and sim-routed
-    -- delivery paths. Tick suffix guards against table-address recycling.
+    -- Stamp an id for `OnSyncChatMessages` to dedupe the live and
+    -- sim-routed delivery paths. Tick suffix guards against
+    -- table-address recycling.
     msg.Id = string.format("%d %s", GameTick(), tostring(msg))
 
-    -- Replay-parser backwards compat: external replay tools scrape chat out
-    -- of recorded `GiveResourcesToPlayer` callback args. Fire one zero-
-    -- resource callback per outgoing message so they keep working. Observers
-    -- skip it — no army to ship.
+    -- Replay-parser backwards compat: external replay tools scrape chat
+    -- out of recorded `GiveResourcesToPlayer` callback args. Fire one
+    -- zero-resource callback per outgoing message so they keep working.
+    -- Observers skip it (no army to ship).
     if focusArmy ~= -1 then
         local senderData = GetArmyData(focusArmy)
         SimCallback({
@@ -452,9 +450,10 @@ function Send(text, attachCamera)
         }, false)
     end
 
-    -- Sim-routed path: the sim re-broadcasts via `Sync.ChatMessages`. In
-    -- live play it runs alongside `SessionSendChatMessage` and id-based
-    -- dedupe prevents double-posting; in replays it is the *only* path.
+    -- Sim-routed path: the sim re-broadcasts via `Sync.ChatMessages`.
+    -- In live play it runs alongside `SessionSendChatMessage` and
+    -- id-based dedupe prevents double-posting. In replays it is the
+    -- *only* path.
     SimCallback({ Func = 'SendChatMessage', Args = { Msg = msg } }, false)
 
     if recipient == ChatModel.RecipientAllies then
@@ -481,26 +480,18 @@ end
 -- Engine hotkey entry point
 
 --- Opens the chat window with the recipient forced to `allies` or `all`
---- based on `send_type` and the Shift modifier. The engine calls this via
---- a top-level `ActivateChat` shim in `gamemain.lua` when the user presses
---- Enter outside the edit box.
----
---- Truth table (`send_type` reads as "default to allies"):
---- * `send_type=false`, no Shift → `all`
---- * `send_type=false`, Shift    → `allies`
---- * `send_type=true`,  no Shift → `allies`
---- * `send_type=true`,  Shift    → `all`
----
---- A specific-army recipient (mid-private) is left alone.
----@param modifiers? table  # engine-supplied modifier state ({Shift, Ctrl, ...})
+--- based on `send_type` and the Shift modifier. A specific-army recipient
+--- (mid-private) is left alone.---@param modifiers? table  # engine-supplied modifier state ({Shift, Ctrl, ...})
 function ActivateChat(modifiers)
+    -- The engine calls this via a top-level `ActivateChat` shim in
+    -- `gamemain.lua` when the user presses Enter outside the edit box.
     local model = ChatModel.GetSingleton()
     local wasVisible = model.WindowVisible()
 
     import("/lua/ui/game/chat/ChatInterface.lua").Toggle()
 
-    -- Layer Shift on top of the default. Must run AFTER the toggle —
-    -- writing `Recipient` first gets clobbered by `ApplyDefaultRecipient`.
+    -- Layer Shift on top of the default. Must run AFTER the toggle.
+    -- Writing `Recipient` first gets clobbered by `ApplyDefaultRecipient`.
     if not wasVisible and type(model.Recipient()) ~= 'number' then
         local sendType = ChatConfigModel.GetOptions().send_type or false
         local shift = modifiers and modifiers.Shift or false
@@ -516,28 +507,31 @@ end
 -- Lifecycle
 
 --- Registers the receive handler with gamemain, populates the slash-command
---- registry, and mounts the chat tree. Called from `gamemain.lua` during UI
---- setup — kept out of module-load so mods can override the controller
---- before any wiring happens. Idempotent: `RegisterChatFunc` overwrites,
---- so re-running `Init` just rebinds the handlers.
+--- registry, and mounts the chat tree. Idempotent.
 function Init()
+    -- Called from `gamemain.lua` during UI setup. Kept out of module-load
+    -- so mods can override the controller before any wiring happens.
+    -- `RegisterChatFunc` overwrites, so re-running `Init` just rebinds
+    -- the handlers.
     import("/lua/ui/game/gamemain.lua").RegisterChatFunc(OnReceive, 'Chat')
     AddOnSyncHashedCallback(OnSyncChatMessages, 'ChatMessages', 'Chat')
     RegisterBuiltinCommands()
 
-    -- Build the chat tree eagerly so the sibling feed is mounted in time to
-    -- surface messages that arrive before the user opens the dialog.
+    -- Build the chat tree eagerly so the sibling feed is mounted in
+    -- time to surface messages that arrive before the user opens the
+    -- dialog.
     import("/lua/ui/game/chat/ChatInterface.lua").EnsureInstance()
 end
 
 -------------------------------------------------------------------------------
 --#region Debugging
 
---- Hot-reload hook: re-runs `Init()` on the new module so the gamemain
---- registration rebinds to the fresh `OnReceive` closure and the registry
---- repopulates. Without this, edits leave stale code receiving messages.
---- The fork-with-delay lets cascading reloads settle first.
+--- Hot-reload hook: re-runs `Init()` on the new module.
 function __moduleinfo.OnReload(newModule)
+    -- The gamemain registration rebinds to the fresh `OnReceive` closure
+    -- and the registry repopulates. Without this, edits leave stale code
+    -- receiving messages. The fork-with-delay lets cascading reloads
+    -- settle first.
     ForkThread(function()
         WaitFrames(1)
         newModule.Init()

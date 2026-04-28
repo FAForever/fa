@@ -71,8 +71,8 @@ ChatLineInterface = ClassUI(Group) {
         self.Name = UIUtil.CreateText(self, '', 14, 'Arial Bold')
         self.Name:SetColor('ffffffff')
         self.Name:SetDropShadow(true)
-        -- Continuation lines set Name to '' so the hit rect collapses with
-        -- it — no need to gate dispatch on row role.
+        -- Continuation lines set Name to '' so the hit rect collapses
+        -- with it. No need to gate dispatch on row role.
         self.Name.HandleEvent = function(_, event)
             if event.Type == 'ButtonPress' and self.Entry then
                 self:OnNameClicked(self.Entry, event)
@@ -80,8 +80,9 @@ ChatLineInterface = ClassUI(Group) {
         end
 
         -- Camera-link icon. Hidden via transparent SolidColor + disabled
-        -- hit-test rather than `Hide()` — the window's `Show()` cascade
-        -- would otherwise undo `Hide()` (same reason FactionIcon does it).
+        -- hit-test rather than `Hide()`. The window's `Show()` cascade
+        -- would otherwise undo `Hide()` (same reason FactionIcon does
+        -- it).
         self.CamIcon = Bitmap(self)
         self.CamIcon:SetSolidColor('00000000')
         self.CamIcon:DisableHitTest()
@@ -106,7 +107,7 @@ ChatLineInterface = ClassUI(Group) {
     ---@param parent Control
     __post_init = function(self, parent)
         -- Raw constants in SetFunction bodies don't auto-scale (only
-        -- Layouter `:Height(number)` does); pre-scale once.
+        -- Layouter `:Height(number)` does), so pre-scale once.
         local twoPxScaled = LayoutHelpers.ScaleNumber(2)
 
         -- Derive row height from the name font so pool sizing scales
@@ -178,9 +179,9 @@ ChatLineInterface = ClassUI(Group) {
         self.FactionIcon:SetTexture(UIUtil.UIFile(FactionIcons[iconIndex]))
 
         -- SolidColor swap rather than Show/Hide so the window's Show()
-        -- cascade can't reveal stale icons. Re-applying `RightOf` replaces
-        -- the previous Left binding. Shown for both `Camera` snapshots and
-        -- `Location` hints.
+        -- cascade can't reveal stale icons. Re-applying `RightOf`
+        -- replaces the previous Left binding. Shown for both `Camera`
+        -- snapshots and `Location` hints.
         if entry.Camera or entry.Location then
             self.CamIcon:SetTexture(UIUtil.UIFile(CamIconTexture))
             self.CamIcon:EnableHitTest()
@@ -192,14 +193,15 @@ ChatLineInterface = ClassUI(Group) {
         end
     end,
 
-    --- Populates the row as a CONTINUATION of a wrapped entry. Name and
-    --- team-colour stay empty; Text anchors to `Name.Right + 2`, which with
-    --- an empty name resolves to the row's left edge. Tracks the entry so
-    --- body clicks on wrapped lines still dispatch against the right message.
+    --- Populates the row as a CONTINUATION of a wrapped entry.
     ---@param self UIChatLineInterface
     ---@param entry UIChatEntry
     ---@param wrappedText string
     SetContinuation = function(self, entry, wrappedText)
+        -- Name and team-colour stay empty. Text anchors to `Name.Right
+        -- + 2`, which with an empty name resolves to the row's left edge.
+        -- Tracks the entry so body clicks on wrapped lines still dispatch
+        -- against the right message.
         self.Entry = entry
         self.Name:SetText('')
         self.Text:SetText(wrappedText or '')
@@ -224,15 +226,14 @@ ChatLineInterface = ClassUI(Group) {
         LayoutHelpers.RightOf(self.Text, self.Name, 2)
     end,
 
-    --- Overridable; default no-op. Continuation rows have empty Name so
-    --- their hit rect collapses — only header rows fire in practice.
+    --- Overridable; default no-op. Fires when the sender's name is clicked.
     ---@param self UIChatLineInterface
     ---@param entry UIChatEntry
     ---@param event KeyEvent
     OnNameClicked = function(self, entry, event) end,
 
-    --- Overridable; default no-op. Fires for both header and continuation
-    --- rows — they share the entry so the click resolves to the right sender.
+    --- Overridable; default no-op. Fires when the body text is clicked.
+    --- Both header and continuation rows fire (they share the entry).
     ---@param self UIChatLineInterface
     ---@param entry UIChatEntry
     ---@param event KeyEvent

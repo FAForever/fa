@@ -8,7 +8,7 @@ RecipientAll = 'all'
 
 RecipientAllies = 'allies'
 
---- UI subsystem channel for the Notify system. Receive-only — not part of
+--- UI subsystem channel for the Notify system. Receive-only, not part of
 --- `UIChatRecipient` because users can't send to this channel.
 RecipientNotify = 'notify'
 
@@ -20,8 +20,8 @@ RecipientNotify = 'notify'
 
 --- Location hint carried by a sim-originated message (AI brains, system
 --- messages). The UI translates this to a camera move on click without
---- forcing the viewer's pitch/heading to match the sender's — unlike
---- `Camera`, which restores a full snapshot.
+--- forcing the viewer's pitch/heading to match the sender's (unlike
+--- `Camera`, which restores a full snapshot).
 ---@class UIChatEntryLocation
 ---@field Position? Vector         # world-space focus point
 ---@field Area?     Rectangle      # world-space rectangle to frame
@@ -41,7 +41,7 @@ RecipientNotify = 'notify'
 ---@field Id?         string             # near-unique sender-stamped id (`tostring(msg)`); used to dedupe the `Sync.ChatMessages` replay/sim path against the live `SessionSendChatMessage` path
 ---@field WrappedText? string[]          # view-side cache: text wrapped to the current row width (populated by ChatInterface)
 
---- Reactive chat-state singleton — the single source of truth shared by every chat view.
+--- Reactive chat-state singleton: the single source of truth shared by every chat view.
 ---@class UIChatModel
 ---@field History       LazyVar<UIChatEntry[]>     # append-only message log (set a new table ref to trigger dirty)
 ---@field Recipient     LazyVar<UIChatRecipient>   # current send target

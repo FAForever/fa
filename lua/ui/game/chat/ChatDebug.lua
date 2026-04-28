@@ -11,15 +11,17 @@ local LongText =
     "The quick brown fox jumps over the lazy dog and then doubles back, " ..
     "dodges a passing T2 mobile artillery shell, ramps off a discarded " ..
     "engineer drone, and lands neatly on the scoreboard with a triumphant " ..
-    "bark — at which point the dog wakes up and demands to know who " ..
+    "bark, at which point the dog wakes up and demands to know who " ..
     "authorised the construction of the ramp in the first place."
 
---- Stamps the entry with the local focus army's metadata so the colour
---- and faction icon match a real outgoing message. Fresh `Id` so the
---- `OnSyncChatMessages` dedupe doesn't swallow it later.
+--- Builds a synthetic `UIChatEntry` for debug injection, optionally
+--- overriding fields from the defaults.
 ---@param overrides table   # fields merged on top of the synth defaults
 ---@return UIChatEntry
 local function SynthEntry(overrides)
+    -- Stamps the entry with the local focus army's metadata so the colour
+    -- and faction icon match a real outgoing message. Fresh `Id` so the
+    -- `OnSyncChatMessages` dedupe doesn't swallow it later.
     local focus = GetFocusArmy()
     local armies = GetArmiesTable().armiesTable
     local data = (focus and focus > 0) and armies[focus] or {}
@@ -68,15 +70,16 @@ function AppendShortMessage()
     ChatController.AppendEntry(SynthEntry({}))
 end
 
---- Body wraps onto several rows at every supported font size — exercises
---- the continuation-row layout.
+--- Appends a long synthetic message that exercises the continuation-row layout.
 function AppendLongMessage()
+    -- Body wraps onto several rows at every supported font size.
     ChatController.AppendEntry(SynthEntry({ Text = LongText }))
 end
 
---- Ten entries in one batch — exercises pool sizing past the line cap and
---- snap-to-bottom on rapid arrivals.
+--- Appends ten synthetic entries in one batch.
 function AppendBurst()
+    -- Exercises pool sizing past the line cap and snap-to-bottom on
+    -- rapid arrivals.
     for i = 1, 10 do
         ChatController.AppendEntry(SynthEntry({
             Text = string.format('[debug] burst %d / 10', i),
@@ -84,9 +87,10 @@ function AppendBurst()
     end
 end
 
---- Captures the camera focus at hotkey time so panning and clicking the
---- camera icon should bounce back to the original spot.
+--- Appends a synthetic message tagged with the current camera focus.
 function AppendCameraMessage()
+    -- Captures the camera focus at hotkey time so panning and clicking
+    -- the camera icon should bounce back to the original spot.
     local cam = GetCamera('WorldCamera')
     local settings = cam:SaveSettings()
     ChatController.AppendEntry(SynthEntry({

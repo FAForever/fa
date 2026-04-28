@@ -1,7 +1,7 @@
 
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
 
---- /allies — switch send target to allies only.
+--- /allies: switch send target to allies only.
 ---@type UIChatCommand
 Command = {
     Name = 'allies',

@@ -1,7 +1,7 @@
 
 local ChatConfigController = import("/lua/ui/game/chat/config/ChatConfigController.lua")
 
---- /unmute <target> — reverse of `/mute`; re-shows new arrivals and history that landed while muted.
+--- /unmute <target>: reverse of `/mute`. Re-shows new arrivals and history that landed while muted.
 ---@type UIChatCommand
 Command = {
     Name = 'unmute',

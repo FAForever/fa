@@ -1,5 +1,5 @@
 
---- /whisper <target> — private-message a specific player.
+--- /whisper <target>: private-message a specific player.
 ---@type UIChatCommand
 Command = {
     Name = 'whisper',

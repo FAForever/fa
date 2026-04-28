@@ -1,5 +1,5 @@
 
---- /pause — pause the local simulation; not registered in multiplayer (vote/request hotkey owns that).
+--- /pause: pause the local simulation. Not registered in multiplayer (vote/request hotkey owns that).
 ---@type UIChatCommand
 Command = {
     Name = 'pause',

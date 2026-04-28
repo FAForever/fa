@@ -1,5 +1,5 @@
 
---- /end-mission — forfeit the current session and open the score screen.
+--- /end-mission: forfeit the current session and open the score screen.
 ---@type UIChatCommand
 Command = {
     Name = 'end-mission',

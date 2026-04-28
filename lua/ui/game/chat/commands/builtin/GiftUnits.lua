@@ -1,5 +1,5 @@
 
---- /gift-units <target> — transfer current selection to an ally; sim re-checks alliance and `ManualUnitShare`.
+--- /gift-units <target>: transfer current selection to an ally. Sim re-checks alliance and `ManualUnitShare`.
 ---@type UIChatCommand
 Command = {
     Name = 'gift-units',
@@ -13,8 +13,8 @@ Command = {
             return false, "/gift-units: observers can't gift units."
         end
 
-        -- Fall back to the unit under the cursor. `armyIndex` is 0-based;
-        -- the armies table is 1-based.
+        -- Fall back to the unit under the cursor. `armyIndex` is
+        -- 0-based, the armies table is 1-based.
         if args.target == nil then
             local info = GetRolloverInfo()
             if not info or not info.armyIndex then

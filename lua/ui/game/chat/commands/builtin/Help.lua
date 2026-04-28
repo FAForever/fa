@@ -1,7 +1,7 @@
 
 local Registry = import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua")
 
---- /help — prints every registered command as a local system line.
+--- /help: prints every registered command as a local system line.
 ---@type UIChatCommand
 Command = {
     Name = 'help',

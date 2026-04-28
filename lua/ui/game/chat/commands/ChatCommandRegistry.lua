@@ -3,19 +3,19 @@ local Types = import("/lua/ui/game/chat/commands/ChatCommandTypes.lua")
 -------------------------------------------------------------------------------
 -- Registry + parser + dispatcher for chat slash-commands. See design.md.
 
---- One declared parameter slot in a command's signature; resolver is picked by `Type`.
+--- One declared parameter slot in a command's signature. Resolver is picked by `Type`.
 ---@class UIChatCommandParam
 ---@field Name     string
 ---@field Type     UIChatCommandParamType
 ---@field Optional boolean?
 
---- Per-invocation context handed to `Accept` and `Execute`; holds model + controller + raw input.
+--- Per-invocation context handed to `Accept` and `Execute`. Holds model + controller + raw input.
 ---@class UIChatCommandContext
 ---@field Model      UIChatModel
 ---@field Controller table
 ---@field SourceText string
 
---- A registered slash-command — name, optional aliases/params/gates, and the dispatcher's hooks.
+--- A registered slash-command: name, optional aliases/params/gates, and the dispatcher's hooks.
 ---@class UIChatCommand
 ---@field Name        string
 ---@field Aliases?    string[]
@@ -29,7 +29,7 @@ local Types = import("/lua/ui/game/chat/commands/ChatCommandTypes.lua")
 ---@type table<string, UIChatCommand>
 local Commands = {}
 
---- Lower-cased alias → canonical command name; merged into lookup so `/w` resolves to `/whisper`.
+--- Lower-cased alias to canonical command name. Merged into lookup so `/w` resolves to `/whisper`.
 ---@type table<string, string>
 local Aliases = {}
 
@@ -50,11 +50,13 @@ function Unregister(name)
     Commands[key] = nil
 end
 
---- Overwrites any previous registration with the same canonical name;
---- aliases from the previous registration are cleared first. A
---- `ShouldRegister` returning false drops the command for this session.
+--- Registers a command in the registry.
 ---@param cmd UIChatCommand
 function Register(cmd)
+    -- Overwrites any previous registration with the same canonical name.
+    -- Aliases from the previous registration are cleared first. A
+    -- `ShouldRegister` returning false drops the command for this
+    -- session.
     assert(cmd and cmd.Name, "Chat command requires a name.")
     assert(cmd.Execute, "Chat command requires an execute function.")
 
@@ -79,11 +81,12 @@ function Register(cmd)
     end
 end
 
---- Loads a command file and registers its `Command` export inside
---- pcalls so one broken file can't take down the registration pass.
+--- Loads a command file at `path` and registers its `Command` export.
 --- Every failure is logged and swallowed.
 ---@param path string
 function RegisterFromPath(path)
+    -- Wrapped in pcalls so one broken file can't take down the
+    -- registration pass.
     if not DiskGetFileInfo(path) then
         WARN(string.format("Chat command skipped: file not found '%s'.", tostring(path)))
         return
@@ -178,7 +181,7 @@ end
 -------------------------------------------------------------------------------
 -- Parsing
 
---- "whisper Jip hello" → "whisper", {"Jip", "hello"}
+--- "whisper Jip hello" -> "whisper", {"Jip", "hello"}
 ---@param body string
 ---@return string?, string[]
 local function Tokenize(body)
@@ -248,15 +251,14 @@ end
 --- Fall-through to legacy `RunChatCommand` for pre-MVC commands
 --- registered via Notify's `AddChatCommand` (`/enablenotify`, etc.).
 --- New commands should live under `commands/builtin/`.
----
---- Args shape matches the legacy dispatcher: lowercased name in slot 1,
---- lowercased remaining tokens after. Wrapped in pcall for the same
---- reason as Accept/Execute — third-party commands throwing must not
---- leak up through the chat send path.
 ---@param name string         # the slash-stripped command word, original case
 ---@param tokens string[]     # remaining tokens (after the command word)
 ---@return boolean handled
 local function DispatchLegacy(name, tokens)
+    -- Args shape matches the legacy dispatcher: lowercased name in slot
+    -- 1, lowercased remaining tokens after. Wrapped in pcall for the
+    -- same reason as Accept/Execute. Third-party commands throwing must
+    -- not leak up through the chat send path.
     local args = { string.lower(name) }
     for _, tok in ipairs(tokens) do
         table.insert(args, string.lower(tok))
@@ -275,9 +277,9 @@ end
 
 --- Parses a chat line that starts with '/' and invokes the matching command.
 --- Return values:
----   (true,  nil)     → command ran (or was accept-rejected and already reported)
----   (false, errText) → slash-prefixed but failed; caller should surface errText
----   (false, nil)     → lone '/' or whitespace; caller may treat as normal text
+---   (true,  nil)     -> command ran (or was accept-rejected and already reported)
+---   (false, errText) -> slash-prefixed but failed. Caller should surface errText.
+---   (false, nil)     -> lone '/' or whitespace. Caller may treat as normal text.
 ---@param text string
 ---@return boolean handled
 ---@return string? errorText
@@ -314,13 +316,13 @@ function Dispatch(text)
     }
 
     if cmd.Accept then
-        -- Accept is user code; treat a throw as a soft failure so it
+        -- Accept is user code. Treat a throw as a soft failure so it
         -- doesn't propagate up through the edit-box event handler.
         local pcallOk, ok, reason = pcall(cmd.Accept, args, ctx)
         if not pcallOk then
             WARN(string.format("/%s: Accept threw (%s).", cmd.Name, tostring(ok)))
             return false, string.format(
-                "/%s: command errored while validating — see the log for details.",
+                "/%s: command errored while validating. See the log for details.",
                 cmd.Name)
         end
         if not ok then
@@ -329,12 +331,12 @@ function Dispatch(text)
     end
 
     -- Same pcall as Accept. Side effects before the throw aren't rolled
-    -- back; this just keeps the chat input usable.
+    -- back. This just keeps the chat input usable.
     local executeOk, err = pcall(cmd.Execute, args, ctx)
     if not executeOk then
         WARN(string.format("/%s: Execute threw (%s).", cmd.Name, tostring(err)))
         return false, string.format(
-            "/%s: command errored while running — see the log for details.",
+            "/%s: command errored while running. See the log for details.",
             cmd.Name)
     end
     return true, nil

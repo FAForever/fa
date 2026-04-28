@@ -1,7 +1,7 @@
 
 local Prefs = import("/lua/user/prefs.lua")
 
---- /load [name] — load a save; default is the quick-save slot, matching `QuickSave`'s path.
+--- /load [name]: load a save. Default is the quick-save slot, matching `QuickSave`'s path.
 ---@type UIChatCommand
 Command = {
     Name = 'load',

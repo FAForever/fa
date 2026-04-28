@@ -1,5 +1,5 @@
 
---- /resume — un-pause the local simulation; symmetric with `/pause`.
+--- /resume: un-pause the local simulation. Symmetric with `/pause`.
 ---@type UIChatCommand
 Command = {
     Name = 'resume',

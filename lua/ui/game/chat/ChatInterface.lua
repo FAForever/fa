@@ -22,7 +22,7 @@ local Debug = false
 
 --- Skin textures for the chat window frame. `SkinnableFile` resolves
 --- against the current skin on each read, so the bitmaps follow skin
---- changes — unlike `UIFile`, which freezes the path at module-load time.
+--- changes (unlike `UIFile`, which freezes the path at module-load time).
 local WindowTextures = {
     tl          = UIUtil.SkinnableFile('/game/chat_brd/chat_brd_ul.dds'),
     tr          = UIUtil.SkinnableFile('/game/chat_brd/chat_brd_ur.dds'),
@@ -129,8 +129,8 @@ local ChatInterface = ClassUI(Window) {
         )
 
         -- Pin tooltip wording swaps reactively so it matches the next
-        -- click's effect. `_closeBtn` / `_configBtn` / `_pinBtn` are owned
-        -- by `Window` but not in its declared class fields.
+        -- click's effect. `_closeBtn` / `_configBtn` / `_pinBtn` are
+        -- owned by `Window` but not in its declared class fields.
         ---@diagnostic disable: undefined-field
         Tooltip.AddButtonTooltip(self._closeBtn, 'chat_close')
         Tooltip.AddButtonTooltip(self._configBtn, 'chat_config')
@@ -160,8 +160,8 @@ local ChatInterface = ClassUI(Window) {
         self.DragBL.textures = DragHandleTextures('ll')
         self.DragBR.textures = DragHandleTextures('lr')
 
-        -- Seed with the skinnable texture, not a frozen `UIFile` path —
-        -- otherwise the bitmaps stay on the module-load skin until the
+        -- Seed with the skinnable texture, not a frozen `UIFile` path.
+        -- Otherwise the bitmaps stay on the module-load skin until the
         -- first hover-exit hands `SetTexture` the live value.
         for _, grip in { self.DragTL, self.DragTR, self.DragBL, self.DragBR } do
             grip:DisableHitTest()
@@ -187,7 +187,7 @@ local ChatInterface = ClassUI(Window) {
 
         -- Window calls `self.RolloverHandler(control, ...)` as a plain
         -- function (no method syntax). The class method is named differently
-        -- (`OnRollover`) — sharing the name would shadow the class method
+        -- (`OnRollover`). Sharing the name would shadow the class method
         -- and recurse.
         self.RolloverHandler = function(_, event, xControl, yControl, cursor, controlID)
             self:OnRollover(event, xControl, yControl, cursor, controlID)
@@ -273,12 +273,12 @@ local ChatInterface = ClassUI(Window) {
             :AnchorToTop(self.ChatEditInterface, 4)
             :End()
 
-        -- Build the pool now that we have a real rect — `Initialize` reads
-        -- `Pool.Height()` for fixed-count sizing.
+        -- Build the pool now that we have a real rect. `Initialize`
+        -- reads `Pool.Height()` for fixed-count sizing.
         self.ChatLinesInterface:Initialize()
 
         -- Window-level options only (`win_alpha`). `SetAlpha(_, true)`
-        -- cascades to chrome / edit / scrollbar; re-cascading 1.0 from
+        -- cascades to chrome / edit / scrollbar. Re-cascading 1.0 from
         -- `Pool` keeps the line text crisp. `Pool` doesn't contain the
         -- scrollbar (it's a sibling), so the reset stays scoped.
         self.OptionsObserver = self.Trash:Add(
@@ -303,12 +303,13 @@ local ChatInterface = ClassUI(Window) {
     -- Idle / fade timer
     ---------------------------------------------------------------------------
 
-    --- Idle-fade timer. Only fires while `SetNeedsFrameUpdate(true)` is
-    --- set; the visibility observer toggles that with the window. Pinning
-    --- short-circuits the check.
+    --- Idle-fade timer. Closes the window once the user has been idle for
+    --- `fade_time` seconds. While `Pinned` is true the check is skipped.
     ---@param self UIChatInterface
-    ---@param delta number   # unused — we read absolute time
+    ---@param delta number   # unused, we read absolute time
     OnFrame = function(self, delta)
+        -- Only fires while `SetNeedsFrameUpdate(true)` is set. The
+        -- visibility observer toggles that with the window.
         local model = ChatModel.GetSingleton()
         if model.Pinned() then return end
         local fadeTime = ChatConfigModel.GetOptions().fade_time or 15
@@ -318,11 +319,12 @@ local ChatInterface = ClassUI(Window) {
         end
     end,
 
-    --- Title-bar pin checkbox. Refocuses the edit box because clicking
-    --- the checkbox steals focus.
+    --- Title-bar pin checkbox handler.
     ---@param self UIChatInterface
     ---@param checked boolean
     OnPinCheck = function(self, checked)
+        -- Refocuses the edit box because clicking the checkbox steals
+        -- focus.
         ChatController.SetPinned(checked)
         self.ChatEditInterface:AcquireFocus()
     end,
@@ -331,16 +333,17 @@ local ChatInterface = ClassUI(Window) {
     -- Window event hooks
     ---------------------------------------------------------------------------
 
-    --- Per-frame during a resize drag. Resizes the pool only — rewrap
-    --- happens once on `OnResizeSet`.
+    --- Per-frame during a resize drag.
     OnResize = function(self, width, height, firstFrame)
+        -- Resizes the pool only. Rewrap happens once on `OnResizeSet`.
         ChatController.NotifyActivity()
         self.ChatLinesInterface:OnResizeLive()
     end,
 
-    --- Resize finished. Snaps grips back to `up` — `StartSizing` takes
-    --- over from RolloverHandler so they'd otherwise stay on `down`.
+    --- Resize finished. Snaps grips back to `up`.
     OnResizeSet = function(self)
+        -- `StartSizing` takes over from RolloverHandler so the grips
+        -- would otherwise stay on `down`.
         ChatController.NotifyActivity()
         self.ChatLinesInterface:OnResizeFinished()
         self.DragTL:SetTexture(self.DragTL.textures.up)
@@ -349,9 +352,9 @@ local ChatInterface = ClassUI(Window) {
         self.DragBR:SetTexture(self.DragBR.textures.up)
     end,
 
-    --- Per-frame during a title-bar drag. Stamps activity so a long drag
-    --- can't trip the idle auto-close.
+    --- Per-frame during a title-bar drag.
     OnMove = function(self)
+        -- Stamps activity so a long drag can't trip the idle auto-close.
         ChatController.NotifyActivity()
     end,
 
@@ -378,9 +381,10 @@ local ChatInterface = ClassUI(Window) {
         import("/lua/ui/game/chat/config/ChatConfigInterface.lua").Toggle()
     end,
 
-    --- Tears down the sibling feed (it lives outside our control tree, so
-    --- a Destroy cascade doesn't reach it) and empties the trash bag.
+    --- Tears down the sibling feed and empties the trash bag.
     OnDestroy = function(self)
+        -- The feed lives outside our control tree, so a Destroy cascade
+        -- doesn't reach it.
         if self.ChatFeedInterface then
             self.ChatFeedInterface:Destroy()
             self.ChatFeedInterface = nil
@@ -397,7 +401,7 @@ local ChatInterface = ClassUI(Window) {
 local Instance = nil
 
 --- Builds the chat window and its sibling feed if they don't already
---- exist. Doesn't change visibility — `model.WindowVisible` starts false.
+--- exist. Does not change visibility (`model.WindowVisible` starts false).
 --- `ChatController.Init` calls this at game start so the feed is alive
 --- before the user opens the dialog.
 function EnsureInstance()
@@ -439,10 +443,10 @@ function ScrollPages(delta)
     end
 end
 
---- Jumps to the oldest visible entry. Not bound to a default key because
---- Edit consumes Home for caret nav before `OnNonTextKeyPressed` fires;
---- exposed for keymap entries and mods.
+--- Jumps to the oldest visible entry. Exposed for keymap entries and mods.
 function ScrollToTop()
+    -- Not bound to a default key because Edit consumes Home for caret
+    -- nav before `OnNonTextKeyPressed` fires.
     if Instance then
         Instance.ChatLinesInterface:ScrollSetTop(nil, 1)
     end

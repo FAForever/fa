@@ -1,7 +1,7 @@
 
 local ChatConfigController = import("/lua/ui/game/chat/config/ChatConfigController.lua")
 
---- /mute <target> — hide messages from a player for the rest of this game.
+--- /mute <target>: hide messages from a player for the rest of this game.
 ---@type UIChatCommand
 Command = {
     Name = 'mute',

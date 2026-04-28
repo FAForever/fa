@@ -141,18 +141,18 @@ ChatFeedInterface = ClassUI(Group) {
         self.LastHistoryLength = newCount
     end,
 
-    --- Appends one feed row per wrapped chunk. Per-row `Time` means
-    --- capping drops only the single oldest row, not an entry's whole
-    --- block of continuations.
-    ---
-    --- Forces the wrap before reading `entry.WrappedText` because both
-    --- views observe `model.History` and `used_by` iteration order is
-    --- unspecified — if we fire before the chat-lines observer the cache
-    --- is empty. We borrow the chat panel's measure-line because it
-    --- shares our row width by LazyVar bind.
+    --- Appends one feed row per wrapped chunk of the entry.
     ---@param self UIChatFeedInterface
     ---@param entry UIChatEntry
     AppendRow = function(self, entry)
+        -- Per-row `Time` means capping drops only the single oldest row,
+        -- not an entry's whole block of continuations.
+        --
+        -- Forces the wrap before reading `entry.WrappedText` because both
+        -- views observe `model.History` and `used_by` iteration order is
+        -- unspecified. If we fire before the chat-lines observer the
+        -- cache is empty. We borrow the chat panel's measure-line because
+        -- it shares our row width by LazyVar bind.
         if not entry then return end
 
         if not entry.WrappedText and self.Window then
@@ -200,11 +200,11 @@ ChatFeedInterface = ClassUI(Group) {
         self:UpdateVisibility()
     end,
 
-    --- Pins each row from the bottom up. Header rows naturally end up at
-    --- the top of their wrapped block because AppendRow inserts in
-    --- reading order.
+    --- Lays out feed rows pinned from the bottom up.
     ---@param self UIChatFeedInterface
     LayoutRows = function(self)
+        -- Header rows naturally end up at the top of their wrapped block
+        -- because AppendRow inserts in reading order.
         local count = table.getn(self.Rows)
         for i = count, 1, -1 do
             local row = self.Rows[i]
@@ -249,10 +249,10 @@ ChatFeedInterface = ClassUI(Group) {
     -- Visibility / lifecycle
     ---------------------------------------------------------------------------
 
-    --- Visible iff window hidden AND we have at least one row.
-    --- `SetNeedsFrameUpdate` toggles in lockstep so we don't tick idle.
+    --- Updates visibility: visible iff the window is hidden AND we have at least one row.
     ---@param self UIChatFeedInterface
     UpdateVisibility = function(self)
+        -- `SetNeedsFrameUpdate` toggles in lockstep so we don't tick idle.
         local windowVisible = ChatModel.GetSingleton().WindowVisible()
         if not windowVisible and table.getn(self.Rows) > 0 then
             self:Show()
@@ -263,13 +263,14 @@ ChatFeedInterface = ClassUI(Group) {
         end
     end,
 
-    --- Per-frame: ages each row, fades the line text (full per-row fade
-    --- only — text stays crisp regardless of `win_alpha`) and the BG
-    --- strip (modulated by `win_alpha` × fade × base intensity), and
-    --- destroys rows past `fade_time`.
+    --- Per-frame: ages each row, fades the line text and BG strip,
+    --- and destroys rows past `fade_time`.
     ---@param self UIChatFeedInterface
     ---@param delta number
     OnFrame = function(self, delta)
+        -- Line text fades on the per-row fade only (it stays crisp
+        -- regardless of `win_alpha`). BG strip alpha is modulated by
+        -- `win_alpha` * fade * base intensity.
         local options  = ChatConfigModel.GetOptions()
         local fadeTime = options.fade_time or 15
         local winAlpha = options.win_alpha or 1.0

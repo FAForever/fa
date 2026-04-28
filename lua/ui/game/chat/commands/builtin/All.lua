@@ -1,7 +1,7 @@
 
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
 
---- /all — switch send target to every player and observer.
+--- /all: switch send target to every player and observer.
 ---@type UIChatCommand
 Command = {
     Name = 'all',

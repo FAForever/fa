@@ -1,5 +1,5 @@
 
---- /debug-log — toggle the log window; only registered with `/debug`.
+--- /debug-log: toggle the log window. Only registered with `/debug`.
 ---@type UIChatCommand
 Command = {
     Name = 'debug-log',

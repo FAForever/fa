@@ -1,5 +1,5 @@
 
---- /recall — vote yes on the team recall. Only "yes" is exposed; voting no stays in the diplomacy UI.
+--- /recall: vote yes on the team recall. Only "yes" is exposed (voting no stays in the diplomacy UI).
 ---@type UIChatCommand
 Command = {
     Name = 'recall',

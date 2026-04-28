@@ -1,5 +1,5 @@
 
---- /save [name] — quick-save; default name matches the quick-save hotkey so repeats overwrite the slot.
+--- /save [name]: quick-save. Default name matches the quick-save hotkey so repeats overwrite the slot.
 ---@type UIChatCommand
 Command = {
     Name = 'save',

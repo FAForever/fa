@@ -35,7 +35,7 @@ local function LastSpaceBefore(text, caret)
 end
 
 --- Codepoint position of the next space at or after `caret + 1`, or
---- `textLen` if the word runs to end-of-text.
+--- `textLen` if the word runs to end of text.
 ---@param text    string
 ---@param caret   number
 ---@param textLen number
@@ -52,10 +52,10 @@ local function NextSpaceAfter(text, caret, textLen)
 end
 
 --- Non-civilian nicknames from the armies table, minus the local player.
---- `focusArmy` is 0 for observers, making the comparison a no-op — fine,
---- observers have no nickname to complete anyway.
 ---@return string[]
 local function CollectNicknames()
+    -- `focusArmy` is 0 for observers, making the comparison a no-op.
+    -- That is fine, observers have no nickname to complete anyway.
     local out = {}
     local armies = GetArmiesTable()
     if not armies or not armies.armiesTable then return out end
@@ -76,12 +76,13 @@ local function StartsWithCI(s, prefix)
 end
 
 --- Returns a completion record for the caret position, or nil if nothing
---- matches. `Consume` covers the full word under the caret so mid-word
---- completion overwrites the tail too.
+--- matches.
 ---@param text  string
 ---@param caret number
 ---@return UIChatCompletion?
 function Compute(text, caret)
+    -- `Consume` covers the full word under the caret so mid-word
+    -- completion overwrites the tail too.
     if not text or text == '' then return nil end
 
     local textLen = STR_Utf8Len(text)
@@ -92,7 +93,7 @@ function Compute(text, caret)
     local isCommand = (wordStart == 0) and (STR_Utf8SubString(text, 1, 1) == '/')
 
     -- Only append a trailing space when the completion is unambiguous AND
-    -- the word runs to end-of-text — otherwise we'd double up an existing
+    -- the word runs to end of text. Otherwise we'd double up an existing
     -- separator.
     local atEnd = wordEnd == textLen
 
@@ -119,8 +120,8 @@ function Compute(text, caret)
     if prefix == '' then return nil end
 
     -- `@nick` shorthand: strip the `@` for matching but keep it in
-    -- candidates so `/whisper @Jip` still works. ChatCommandTypes
-    -- strips `@` symmetrically on the resolver side.
+    -- candidates so `/whisper @Jip` still works. ChatCommandTypes strips
+    -- `@` symmetrically on the resolver side.
     local atSign = ''
     local matchPrefix = prefix
     if string.sub(prefix, 1, 1) == '@' then

@@ -1,7 +1,7 @@
 
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
 
---- Normalises a resource-kind token to 'mass' or 'energy'; returns nil on no match.
+--- Normalises a resource-kind token to 'mass' or 'energy'. Returns nil on no match.
 local function NormalizeType(token)
     local lower = string.lower(token or '')
     if lower == 'mass' or lower == 'm' then
@@ -12,7 +12,7 @@ local function NormalizeType(token)
     return nil
 end
 
---- /gift-resources <percent> <type> [target] — gift a fraction of mass or energy to an ally.
+--- /gift-resources <percent> <type> [target]: gift a fraction of mass or energy to an ally.
 ---@type UIChatCommand
 Command = {
     Name = 'gift-resources',

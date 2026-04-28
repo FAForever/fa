@@ -1,5 +1,5 @@
 
---- /debug-statistics — cycle the engine's `ShowStats` overlay; only registered with `/debug`.
+--- /debug-statistics: cycle the engine's `ShowStats` overlay. Only registered with `/debug`.
 ---@type UIChatCommand
 Command = {
     Name = 'debug-statistics',

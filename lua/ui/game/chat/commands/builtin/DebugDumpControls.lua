@@ -1,5 +1,5 @@
 
---- /debug-dump-controls — invoke `UI_DumpControlsUnderCursor`; only registered with `/debug`.
+--- /debug-dump-controls: invoke `UI_DumpControlsUnderCursor`. Only registered with `/debug`.
 ---@type UIChatCommand
 Command = {
     Name = 'debug-dump-controls',

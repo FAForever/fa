@@ -72,12 +72,13 @@ ChatListInterface = ClassUI(Group) {
         end
     end,
 
-    --- Targets: All, Allies, then one entry per connected non-local human
-    --- player. Client matched to army by nickname; target stays an army ID
-    --- so the send path is unchanged.
+    --- Returns target defs: All, Allies, then one entry per connected
+    --- non-local human player.
     ---@param self UIChatListInterface
     ---@return table[]
     BuildTargetDefs = function(self)
+        -- Client matched to army by nickname. Target stays an army ID
+        -- so the send path is unchanged.
         local defs = {
             { Nickname = "All",    Target = ChatModel.RecipientAll },
             { Nickname = "Allies", Target = ChatModel.RecipientAllies },

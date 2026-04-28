@@ -45,7 +45,7 @@ end
 
 -------------------------------------------------------------------------------
 -- Command-hint popup. Shows commands whose name or aliases prefix-match.
--- Reuses a pool of row controls across refreshes — rows are
+-- Reuses a pool of row controls across refreshes. Rows are
 -- shown/hidden and re-positioned via a per-row `ordinal` LazyVar.
 
 --- One pooled hint row; ordinal 0 means hidden, otherwise it's the row's position from the bottom.
@@ -466,8 +466,8 @@ ChatCommandHintInterface = ClassUI(Group) {
         elseif cur < 1 or cur > n then
             self.Selected:Set(1)
         else
-            -- Ordinal unchanged but the target underneath isn't —
-            -- repaint so colours match the new row assignments.
+            -- Ordinal unchanged but the target underneath isn't.
+            -- Repaint so colours match the new row assignments.
             self:RepaintRows()
         end
 

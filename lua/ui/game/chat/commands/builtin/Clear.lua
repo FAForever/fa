@@ -1,7 +1,7 @@
 
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
 
---- /clear — wipes local chat history.
+--- /clear: wipes local chat history.
 ---@type UIChatCommand
 Command = {
     Name = 'clear',

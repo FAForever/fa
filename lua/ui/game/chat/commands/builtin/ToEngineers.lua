@@ -1,5 +1,5 @@
 
---- /to-engineers — narrow selection to engineers; errors rather than silently clearing on no-match.
+--- /to-engineers: narrow selection to engineers. Errors rather than silently clearing on no-match.
 ---@type UIChatCommand
 Command = {
     Name = 'to-engineers',

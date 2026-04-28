@@ -37,14 +37,14 @@ local function ResolveArmy(token)
     return false, string.format("no player named '%s'.", token)
 end
 
---- Tag identifying which `Resolvers` entry parses a parameter token; one tag per supported type.
+--- Tag identifying which `Resolvers` entry parses a parameter token. One tag per supported type.
 ---@alias UIChatCommandParamType 'Recipient' | 'Player' | 'Int' | 'String' | 'Rest'
 
---- Param-type → resolver table; each resolver returns `(true, value)` on success or `(false, errMsg)`.
+--- Param-type to resolver table. Each resolver returns `(true, value)` on success or `(false, errMsg)`.
 ---@type table<UIChatCommandParamType, fun(token: string): boolean, any>
 Resolvers = {}
 
---- "all", "allies"/"team", nickname, or army ID → `UIChatRecipient`.
+--- Resolves "all", "allies"/"team", nickname, or army ID into a `UIChatRecipient`.
 Resolvers.Recipient = function(token)
     local lower = string.lower(token)
     if lower == 'all' then
@@ -55,12 +55,12 @@ Resolvers.Recipient = function(token)
     return ResolveArmy(token)
 end
 
---- Nickname or army ID → numeric army ID. Rejects "all"/"allies".
+--- Resolves a nickname or army ID into a numeric army ID. Rejects "all"/"allies".
 Resolvers.Player = function(token)
     return ResolveArmy(token)
 end
 
---- Parses a token as an integer; rejects fractional or non-numeric input.
+--- Parses a token as an integer. Rejects fractional or non-numeric input.
 Resolvers.Int = function(token)
     local n = tonumber(token)
     if not n or math.floor(n) ~= n then

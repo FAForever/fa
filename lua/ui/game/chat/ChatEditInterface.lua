@@ -88,7 +88,7 @@ ChatEditInterface = ClassUI(Group) {
         self.EditBox = Edit(self)
 
         -- `SetupEditStd` below reads the control's bounds before
-        -- `__post_init` runs, so seed placeholder values to avoid tripping
+        -- `__post_init` runs. Seed placeholder values to avoid tripping
         -- the default circular Left/Right/Width chain.
         Layouter(self.EditBox)
             :Left(0)
@@ -127,7 +127,7 @@ ChatEditInterface = ClassUI(Group) {
             end
         end
 
-        -- `OnCharPressed` fires before insertion, so `>=` catches the
+        -- `OnCharPressed` fires before insertion. `>=` catches the
         -- keystroke the cap is about to reject.
         self.EditBox.OnCharPressed = function(edit, charcode)
             if charcode == UIUtil.VK_TAB then
@@ -273,10 +273,10 @@ ChatEditInterface = ClassUI(Group) {
     end,
 
     --- Writes the current candidate at the recorded anchor.
-    --- `SuppressCompletionReset` keeps the `OnTextChanged` branch from
-    --- clearing the cycle state as a side-effect of our own edit.
     ---@param self UIChatEditInterface
     ApplyCompletion = function(self)
+        -- `SuppressCompletionReset` keeps the `OnTextChanged` branch from
+        -- clearing the cycle state as a side-effect of our own edit.
         if not self.Completion then return end
         local c = self.Completion --[[@as UIChatCompletion]]
 
@@ -358,11 +358,12 @@ ChatEditInterface = ClassUI(Group) {
         self.EditBox:SetCaretPosition(STR_Utf8Len(entry))
     end,
 
-    --- Only opens when the text transitions to exactly `/` — so closing
-    --- the hint via Escape leaves it closed while the user keeps typing.
+    --- Refreshes (or opens) the command-hint popup based on the current text.
     ---@param self UIChatEditInterface
     ---@param text string
     RefreshCommandHint = function(self, text)
+        -- Only opens when the text transitions to exactly `/`. Closing
+        -- the hint via Escape leaves it closed while the user keeps typing.
         if self.ChatCommandHintInterface then
             if string.sub(text, 1, 1) == '/' then
                 self.ChatCommandHintInterface:Refresh(text)
@@ -378,9 +379,9 @@ ChatEditInterface = ClassUI(Group) {
     --- Mounts the slash-command hint popup above the edit box. No-op if open.
     ---@param self UIChatEditInterface
     OpenCommandHint = function(self)
+        -- Ensure the built-ins exist before the hint queries the registry.
         if self.ChatCommandHintInterface then return end
 
-        -- Ensure the built-ins exist before the hint queries the registry.
         ChatController.RegisterBuiltinCommands()
 
         local hint = ChatCommandHintInterface(self, self.EditBox)

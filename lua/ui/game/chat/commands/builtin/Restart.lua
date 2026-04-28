@@ -1,5 +1,5 @@
 
---- /restart — restart the current session; skips the escape-menu's confirmation dialog.
+--- /restart: restart the current session. Skips the escape-menu's confirmation dialog.
 ---@type UIChatCommand
 Command = {
     Name = 'restart',
