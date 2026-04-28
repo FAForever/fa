@@ -1071,8 +1071,7 @@ end
 ---@param sender string     # username
 ---@param data table        
 function ReceiveChat(sender, data)
-
-    -- early exit for console output
+    -- console output ends up as a chat message, hence we early exit here
     if data.ConsoleOutput then
         print(LOCF("%s %s", sender, data.ConsoleOutput))
         return
