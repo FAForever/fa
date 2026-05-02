@@ -9,5 +9,5 @@
 
   **Governor: T2 Cruiser (UES0202):**
   - Long Range Cruise Missile:
-    - Damage: 300-> 400
+    - Damage: 300 -> 400
     - Damage Radius: 2 -> 3
