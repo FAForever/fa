@@ -1,0 +1,1 @@
+- (#7009) Rework the HQ and support factories designs
