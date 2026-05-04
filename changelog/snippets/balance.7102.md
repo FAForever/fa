@@ -1,0 +1,1 @@
+- (#7102) Increase Sparky Field Engineer build distance from 5->6 (matching other t2 engineers).
