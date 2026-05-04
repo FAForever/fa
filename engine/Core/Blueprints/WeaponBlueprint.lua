@@ -77,7 +77,8 @@
 ---@field CollideFriendly boolean
 --- beams fire without stopping - overrides `RateOfFire`
 ---@field ContinuousBeam boolean
---- this projectile needs to be built and stored before the weapon can fire
+--- This projectile needs to be built and stored before the weapon can fire.
+--- Makes the engine check if the weapon has silo ammo before being allowed to fire.
 ---@field CountedProjectile? boolean
 --- damage value of the projectile fired from the weapon
 ---@field Damage number
@@ -237,11 +238,11 @@
 --- The total time in seconds it takes the outer damage ring to apply its damage from the epicenter
 --- of the nuke to its outer ring radius. If `0` or `1`, this behaves as a damage area.
 ---@field NukeOuterRingTotalTime? number
---- nuke weapon flag
+--- Flag that makes weapons valid for nuke orders and makes them use nuke silo ammo.
 ---@field NukeWeapon? boolean
 ---@field Overcharge? WeaponBlueprintOvercharge
 --- overcharge weapon flag
----@field OverchargeWeapon? boolean
+---@field OverChargeWeapon? boolean
 --- flag that specifies if the weapon prefers to target what the primary weapon is currently
 --- targeting
 ---@field PrefersPrimaryWeaponTarget? boolean

@@ -853,7 +853,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             -- they need a RackSalvoReloadTime that's 1/RateOfFire set to avoid firing twice on the first shot
             local unit = self.unit
             local bp = self.Blueprint
-            if bp.CountedProjectile and bp.WeaponUnpacks then
+            if bp.ManualFire and not bp.OverChargeWeapon then
                 unit:SetBusy(true)
             else
                 unit:SetBusy(false)
@@ -1057,7 +1057,13 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                         break
                     end
 
-                    local proj = self:CreateProjectileAtMuzzle(muzzle)
+                    local proj
+                    if not countedProjectile or
+                        (bp.NukeWeapon and self.unit:GetNukeSiloAmmoCount() > 0) or
+                        (not bp.NukeWeapon and self.unit:GetTacticalSiloAmmoCount() > 0)
+                    then
+                        proj = self:CreateProjectileAtMuzzle(muzzle)
+                    end
 
                     -- Decrement the ammo if they are a counted projectile
                     if proj and not proj:BeenDestroyed() and countedProjectile then

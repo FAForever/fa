@@ -1767,7 +1767,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         local mass, energy = self:GetTotalResourceCosts()
         mass = mass * (bp.Wreckage.MassMult or 0)
         energy = energy * (bp.Wreckage.EnergyMult or 0)
-        local time = (bp.Wreckage.ReclaimTimeMultiplier or 1)
+        local timeMult = (bp.Wreckage.ReclaimTimeMultiplier or 1)
         local pos = self:GetPosition()
         local wasOutside = false
         local layer = self.Layer
@@ -1811,12 +1811,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         local overkillMultiplier = 1 - (overkillRatio or 1)
         mass = mass * overkillMultiplier * self:GetFractionComplete()
         energy = energy * overkillMultiplier * self:GetFractionComplete()
-        time = time * overkillMultiplier
 
         -- Now we adjust the global multiplier. This is used for balance purposes to adjust global reclaim rate.
-        local time  = time * 2
+        timeMult  = timeMult * 2
 
-        local prop = Wreckage.CreateWreckage(bp, pos, self:GetOrientation(), mass, energy, time, self.DeathHitBox)
+        local prop = Wreckage.CreateWreckage(bp, pos, self:GetOrientation(), mass, energy, timeMult, self.DeathHitBox)
 
         -- Attempt to copy our animation pose to the prop. Only works if
         -- the mesh and skeletons are the same, but will not produce an error if not.
@@ -3149,6 +3148,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     -- GENERIC WORK
     -------------------------------------------------------------------------------------------
 
+    --- Called by the engine when a unit starts repairing a unit in the enhancing state.
     ---@param self Unit
     ---@param target Unit
     InheritWork = function(self, target)

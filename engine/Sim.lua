@@ -600,9 +600,13 @@ end
 function GetArmyUnitCostTotal(army)
 end
 
---- Returns the currently active command source in the sim state. This number is the army index
---- of the army that sent the command.
----@return number
+--- Returns the currently active command source in the sim state. This is the index of the client
+--- that issued the command, which is from a list including players (human armies) and observers.
+--- The list is in the order of the lobby slots, with observers at the end.
+---
+--- Use `GetCurrentCommandSourceArmy` from `SimUtils.lua` to reliably get the army index of the 
+--- current command source.
+---@return integer
 function GetCurrentCommandSource()
 end
 
