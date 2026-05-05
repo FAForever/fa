@@ -92,7 +92,7 @@ jobs:
       - name: Create changelog post
         working-directory: changelog/snippets
         run: |
-          PATCHDATE=${{ inputs.reference }}
+          PATCHDATE=${{ inputs.date }}
           if [ -z "$PATCHDATE" ]; then
             PATCHDATE=$(date +%Y-%m-%d)
           fi
@@ -121,6 +121,7 @@ jobs:
       - name: Push branch
         run: |
           git push origin "${{ steps.branch.outputs.branch }}"
+        # The push also triggers docs-synchronize-changelog.yaml
 
       - name: Create Pull Request
         uses: actions/github-script@v7
@@ -137,10 +138,3 @@ jobs:
               base: "develop",
               body: `Automated changelog and version bump for game version ${version}.`
             });
-
-  synchronize-changelog:
-    name: Convert changelog to Lua
-    needs: release-preparation
-    uses: ./.github/workflows/docs-synchronize-changelog.yaml
-    with:
-      branch: ${{needs.release-preparation.outputs.branch}}
