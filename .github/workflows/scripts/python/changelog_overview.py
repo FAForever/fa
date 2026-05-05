@@ -53,7 +53,7 @@ def process_markdown_file(markdown_file: Path) -> Optional[Tuple[str, date]]:
         logging.warning(f"Unexpected filename format: {markdown_file.name}")
         parsed_date = date.today()
         date_str = parsed_date.isoformat()
-        version = 1
+        version = markdown_file.stem
 
     try:
         yaml_content, _ = extract_yaml_front_matter(markdown_file.read_text())
