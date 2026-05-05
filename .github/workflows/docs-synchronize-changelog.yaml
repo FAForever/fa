@@ -69,12 +69,17 @@ jobs:
           path: lua/ui/lobby/changelog/generated
 
       - name: Commit the generated files
-        continue-on-error: true  # there might be nothing to commit
         run: |
           # Configure git
           git config user.email "github@faforever.com"
           git config user.name "FAForever Machine User"
 
-          git add .
+          # Check if there are any changes
+          if [ -z "$(git status --porcelain)" ]; then
+          echo "No changes to deploy"
+          exit 0
+          fi
+
+          git stage lua/ui/lobby/changelog/generated
           git commit -m "Update lobby changelogs"
           git push

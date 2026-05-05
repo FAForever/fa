@@ -103,7 +103,11 @@ jobs:
 
       - name: Commit lua changelog
         run: |
-          git status
+          # Check if there are any changes
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No changes to deploy"
+            exit 0
+          fi
           git stage lua/ui/lobby/changelog/generated
           git commit -m "Add changelog"
 
