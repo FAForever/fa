@@ -1,5 +1,15 @@
 UnitBlueprint{
     Description = "<LOC uab0302_desc>Air Factory HQ",
+    AI = {
+        TargetBones = {
+            "Attachpoint",
+            "Right_Slider",
+            "Front_Slider",
+            "Left_Arm_Slider",
+            "Left_Arm_Slider01",
+            "Left_Slider",
+        },
+    },
     Audio = {
         Construct      = Sound { Bank = 'UAB',        Cue = 'UAB0302_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
         ConstructLoop  = Sound { Bank = 'UAB',        Cue = 'UAB0302_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
@@ -38,7 +48,7 @@ UnitBlueprint{
     },
     Display = {
         BlinkingLights = {
-            { BLBone = 0,     BLOffsetX = 0,     BLOffsetY = 4,     BLOffsetZ = -1.4,  BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 0,     BLOffsetY = 3.8,     BLOffsetZ = -1.4,  BLScale = 1 },
             { BLBone = 0,     BLOffsetX = -2.05, BLOffsetY = 2.4,   BLOffsetZ = -1.12, BLScale = 1 },
             { BLBone = 0,     BLOffsetX = 2.05,  BLOffsetY = 2.4,   BLOffsetZ = -1.12, BLScale = 1 },
         },

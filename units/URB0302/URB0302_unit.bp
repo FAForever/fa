@@ -2,11 +2,11 @@ UnitBlueprint{
     Description = "<LOC urb0302_desc>Air Factory HQ",
     AI = {
         TargetBones = {
-            "URB0302",
-            "B05",
-            "B07",
-            "B08",
-            "B10",
+            "B01",
+            "B15",
+            "Arm04",
+            "WL",
+            "WR",
         },
     },
     Audio = {
@@ -50,8 +50,8 @@ UnitBlueprint{
         AnimationBuild = "/units/urb0302/urb0302_abuild.sca",
         AnimationFinishBuildLand = "/units/urb0302/urb0302_aplatform.sca",
         BlinkingLights = {
-            { BLBone = 0,     BLOffsetX = 1.1,   BLOffsetY = 1.4,   BLOffsetZ = -1.9,  BLScale = 1 },
-            { BLBone = 0,     BLOffsetX = -1.1,  BLOffsetY = 1.4,   BLOffsetZ = -1.9,  BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 1.1,   BLOffsetY = 1.42,   BLOffsetZ = -1.9,  BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = -1.1,  BLOffsetY = 1.42,   BLOffsetZ = -1.9,  BLScale = 1 },
         },
         BlinkingLightsFx = {
             Green = "/effects/emitters/light_green_03_emit.bp",
@@ -179,7 +179,7 @@ UnitBlueprint{
     SelectionSizeZ = 3,
     SelectionThickness = 0.33,
     SizeX = 3.5,
-    SizeY = 0.75,
+    SizeY = 1,
     SizeZ = 3.5,
     StrategicIconName = "icon_factoryhq3_air",
     StrategicIconSortPriority = 210,

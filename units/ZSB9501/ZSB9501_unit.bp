@@ -2,9 +2,9 @@ UnitBlueprint{
     Description = "<LOC zsb9501_desc>Land Factory",
     AI = {
         TargetBones = {
-            "B06",
-            "B01",
             "Attachpoint",
+            "B01",
+            "B06",
         },
     },
     Audio = {
@@ -50,13 +50,13 @@ UnitBlueprint{
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
         AnimationDeath = {
             {
-                Animation = "/units/zsb9501/zsb9501_ADeath.sca",
+                Animation = "/units/zsb9501/zsb9501_adeath.sca",
                 AnimationRateMax = 1,
                 AnimationRateMin = 1,
                 Weight = 100,
             },
         },
-        AnimationUpgrade = "/units/zsb9501/zsb9501_Aupgrade.sca",
+        AnimationUpgrade = "/units/zsb9501/zsb9501_aupgrade.sca",
         BlinkingLights = {
             { BLBone = 0,     BLOffsetX = -1.75, BLOffsetY = 0.15,  BLOffsetZ = -1.68, BLScale = 1 },
             { BLBone = 0,     BLOffsetX = 1.74,  BLOffsetY = 0.15,  BLOffsetZ = -1.68, BLScale = 1 },
@@ -77,13 +77,16 @@ UnitBlueprint{
                     LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
                     Scrolling = true,
                     ShaderName = "Seraphim",
+                    AlbedoName = "/units/xsb0101/xsb0101_albedo.dds",
+                    NormalsName = "/units/xsb0101/xsb0101_normalsts.dds",
+                    SpecularName = "/units/xsb0101/xsb0101_specteam.dds",
                 },
                 {
                     LODCutoff = 500,
-                    LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
                     ShaderName = "Seraphim",
-                    AlbedoName = "zsb9501_lod1_albedo.dds",
-                    SpecularName = "zsb9501_lod1_specteam.dds",
+                    AlbedoName = "/units/xsb0101/xsb0101_lod1_albedo.dds",
+                    NormalsName = "/units/xsb0101/xsb0101_lod1_normalsts.dds",
+                    SpecularName = "/units/xsb0101/xsb0101_lod1_specteam.dds",
                 },
             },
         },

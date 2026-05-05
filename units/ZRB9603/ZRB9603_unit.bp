@@ -3,9 +3,10 @@ UnitBlueprint{
     AI = {
         TargetBones = {
             "B03",
-            "B08",
+            "B29",
             "B28",
             "B14",
+            "B01",
         },
     },
     Audio = {
@@ -47,7 +48,7 @@ UnitBlueprint{
         RegenRate = 40,
     },
     Display = {
-        AnimationBuild = "/units/urb0303/urb0303_abuild.sca",
+        AnimationBuild = "/units/zrb9603/zrb9603_aBuild.sca",
         BlinkingLights = {
             { BLBone = "B03", BLOffsetX = -0.7,  BLOffsetY = 0.2,   BLOffsetZ = 0.08,  BLScale = 2 },
             { BLBone = "B03", BLOffsetX = 0,     BLOffsetY = 0.2,   BLOffsetZ = 0,     BLScale = 2 },
@@ -148,7 +149,7 @@ UnitBlueprint{
         SkirtOffsetX = -6,
         SkirtOffsetZ = -2,
         SkirtSizeX = 12,
-        SkirtSizeZ = 14,
+        SkirtSizeZ = 15,
     },
     SelectionCenterOffsetX = -0.57,
     SelectionMeshUseTopAmount = 0.15,
@@ -158,7 +159,7 @@ UnitBlueprint{
     CollisionOffsetX = -0.25,
     CollisionOffsetY = -1,
     CollisionOffsetZ = -1,
-    SizeX = 3.0,
+    SizeX = 4,
     SizeY = 3,
     SizeZ = 13,
     StrategicIconName = "icon_factory3_naval",
