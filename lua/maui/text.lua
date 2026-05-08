@@ -109,7 +109,9 @@ Text = ClassUI(moho.text_methods, Control) {
         local ellipsis = self._truncationText
         local str = self._fullText
         if str == nil then return end
+        -- restore full text if it now fits
         if self:GetStringAdvance(str) <= maxWidth then
+                self.SetDisplayText(self, str)
             return
         end
 
