@@ -37,12 +37,14 @@ Text = ClassUI(moho.text_methods, Control) {
         self._fullText = nil
 
 
-        -- Direct Engine SetText() that changes what text is displayed
+        --- Direct Engine SetText() that changes what text is displayed
         ---@type function
+        ---@param str string | number
         self.SetDisplayText = self.SetText
 
 
-        -- FAF extensible SetText() that uses SetDisplayText() but can retain it's original text for fancy text display setups like truncation
+        --- FAF extensible SetText() that uses SetDisplayText() but can retain it's original text for fancy text display setups like truncation
+        ---@param text string | number
         self.SetText = function (self, text)
             self.SetDisplayText(self,text)
             self._fullText = text
@@ -53,11 +55,13 @@ Text = ClassUI(moho.text_methods, Control) {
             end
         end
 
-        -- Direct Engine GetText() for getting the current displayed value
+        --- Direct Engine GetText() for getting the current displayed value
         ---@type function
+        ---@return string
         self.GetDisplayText = self.GetText
 
-        -- FAF extensible GetText() that retrieves raw original text that isn't modified for display 
+        --- FAF extensible GetText() that retrieves raw original text that isn't modified for display 
+        ---@return string
         self.GetText = function (self)
             return self._fullText
         end
@@ -69,7 +73,7 @@ Text = ClassUI(moho.text_methods, Control) {
         self:SetClipToWidth(false)
     end,
 
-    -- Sets custom truncation trailing characters like "..." or "-". Set to "" to disable.
+    --- Sets custom truncation trailing characters like "..." or "-". Set to "" to disable.
     ---@param text string | number
     SetTruncationText = function (self, text)
         self._truncationText = tostring(text)
@@ -91,6 +95,7 @@ Text = ClassUI(moho.text_methods, Control) {
         self:SetNewClipToWidth(clipToWidth)
     end,
 
+    --- Internal function to fit the truncation string inside the max width
     _applyTruncation = function(self)
         local maxWidth = self.Width()
         if maxWidth <= 0 then
