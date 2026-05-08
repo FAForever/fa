@@ -1,4 +1,5 @@
 -(#7055) Buff torpedo bombers and nerf cruisers to make torpedo bombers better early game, while buffing carriers to give an replacement splash AA solution late-game.
+
   **UEF, Aeon, and Cybran T2 Cruisers (UES0202, UAS0202, URS0202)**
     - AA Damage Radius: 1 -> 0
   
