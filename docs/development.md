@@ -67,7 +67,7 @@ The tool `act` only works on workflows that have the `push` event. Temporarily a
 
 ```bash
          # Container to use                                        # Workflow to debug              # Token to authorize (optional)    # Do not pull the docker image each time
-    act -P 'ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-latest' -W '.github/workflows/test.yaml' -s GITHUB_TOKEN="$(gh auth token)" -p=false
+    act -P 'ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-latest' -W '.github/workflows/tests.yaml' -s GITHUB_TOKEN="$(gh auth token)" -p=false
 ```
 
 You can find all the Docker images that work with Act [on Github](https://github.com/catthehacker/docker_images).

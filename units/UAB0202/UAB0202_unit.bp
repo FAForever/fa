@@ -1,5 +1,14 @@
 UnitBlueprint{
     Description = "<LOC uab0202_desc>Air Factory HQ",
+    AI = {
+        TargetBones = {
+            "Attachpoint",
+            "Right_Slider",
+            "Front_Slider",
+            "Left_Arm_Slider",
+            "Left_Arm_Slider01",
+        },
+    },
     Audio = {
         Construct      = Sound { Bank = 'UAB',        Cue = 'UAB0202_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
         ConstructLoop  = Sound { Bank = 'UAB',        Cue = 'UAB0202_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
@@ -40,8 +49,8 @@ UnitBlueprint{
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
         AnimationUpgrade = "/units/uab0202/uab0202_aupgrade.sca",
         BlinkingLights = {
-            { BLBone = 0,     BLOffsetX = 0,     BLOffsetY = 2.75,  BLOffsetZ = -1.45, BLScale = 1 },
-            { BLBone = 0,     BLOffsetX = -2.26, BLOffsetY = 2.4,   BLOffsetZ = -1.28, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 0,     BLOffsetY = 2.7,  BLOffsetZ = -1.45, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = -2.0, BLOffsetY = 2.4,   BLOffsetZ = -1.1, BLScale = 1 },
         },
         BlinkingLightsFx = {
             Green = "/effects/emitters/light_green_03_emit.bp",

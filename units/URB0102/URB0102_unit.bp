@@ -4,6 +4,9 @@ UnitBlueprint{
         TargetBones = {
             "B01",
             "B08",
+            "B15",
+            "Arm02",
+            "Arm01",
         },
     },
     Audio = {
@@ -51,11 +54,11 @@ UnitBlueprint{
         AnimationUpgrade = "/units/urb0102/urb0102_aupgrade.sca",
         AnimationUpgradeTable = {
             urb0202 = "/units/urb0102/URB0102_aupgrade.sca",
-            zrb9502 = "/units/urb0102/URB0102_aupgrade_sup.sca",
-        },
-        BlinkingLights = {
-            { BLBone = 0,     BLOffsetX = 1.1,   BLOffsetY = 1.4,   BLOffsetZ = -1.9,  BLScale = 1 },
-            { BLBone = 0,     BLOffsetX = -1.1,  BLOffsetY = 1.4,   BLOffsetZ = -1.9,  BLScale = 1 },
+            zrb9502 = "/units/urb0102/URB0102_aupgrade2.sca",
+        },        
+		BlinkingLights = {
+            { BLBone = 0,     BLOffsetX = 1.1,   BLOffsetY = 1.42,   BLOffsetZ = -1.9,  BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = -1.1,  BLOffsetY = 1.42,   BLOffsetZ = -1.9,  BLScale = 1 },
         },
         BlinkingLightsFx = {
             Green = "/effects/emitters/light_green_03_emit.bp",
@@ -174,7 +177,7 @@ UnitBlueprint{
     SelectionSizeZ = 3,
     SelectionThickness = 0.33,
     SizeX = 3.5,
-    SizeY = 0.75,
+    SizeY = 1,
     SizeZ = 3.5,
     StrategicIconName = "icon_factory1_air",
     StrategicIconSortPriority = 220,
