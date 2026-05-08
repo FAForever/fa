@@ -233,7 +233,7 @@ UnitBlueprint{
             FiringRandomness = 2.5,
             FiringTolerance = 2,
             Label = "LeftAAGun",
-            MaxRadius = 60,
+            MaxRadius = 55,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 20,
