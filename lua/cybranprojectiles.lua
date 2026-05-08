@@ -491,7 +491,7 @@ CNeutronClusterBombProjectile = ClassProjectile(SinglePolyTrailProjectile) {
     ---@param targetType ImpactType
     ---@param targetEntity Unit
     OnImpact = function(self, targetType, targetEntity)
-        if self.Impacted == false then
+        if not self.Impacted then
             self.Impacted = true
 
             if targetType ~= 'Air' then
