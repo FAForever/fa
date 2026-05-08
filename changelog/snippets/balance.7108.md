@@ -1,4 +1,4 @@
-- (#7018) Decrease Seraphim cruiser's missile damage and splash radius.
+- (#7108) Decrease Seraphim cruiser's missile damage and splash radius.
 
   The TML rework gave Seraphim fast missiles as a faction trait which caused their high DPS cruiser missiles to start hitting navy. While hitting navy is interesting, the DPS was not balanced for this, so the damage and splash are reduced. The Seraphim carrier keeps its 250 DPS missile launcher since it costs twice as much.
 
