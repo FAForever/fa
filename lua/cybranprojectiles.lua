@@ -478,11 +478,11 @@ CNeutronClusterBombChildProjectile = ClassProjectile(SinglePolyTrailProjectile) 
 CNeutronClusterBombProjectile = ClassProjectile(SinglePolyTrailProjectile) {
     PolyTrail = '/effects/emitters/default_polytrail_03_emit.bp',
     ChildProjectile = '/projectiles/CIFNeutronClusterBomb02/CIFNeutronClusterBomb02_proj.bp',
+    Impacted = false,
 
     ---@param self CNeutronClusterBombProjectile
     OnCreate = function(self)
         SinglePolyTrailProjectile.OnCreate(self)
-        self.Impacted = false
     end,
 
     --- Note: Damage is done once in AOE by main projectile. Secondary projectiles
