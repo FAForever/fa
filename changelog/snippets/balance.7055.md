@@ -14,7 +14,7 @@
       The Cybran carrier has a bit more splash to make up for the decreased effectiveness of stealth late-game and lack of supporting shields and hover flak.
 
   **UEF, Aeon, and Cybran Torpedo Bombers (UAA0204, UEA0204, URA0204)**
-    - Torpedos per volley: 4 -> 5
+    - Torpedoes per volley: 4 -> 5
       Damage per volley is kept the same (750).
 
   **Aeon T3 Torpedo Bomber: Solace (XAA0306)**
