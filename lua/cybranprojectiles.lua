@@ -483,16 +483,6 @@ CNeutronClusterBombProjectile = ClassProjectile(SinglePolyTrailProjectile) {
     OnCreate = function(self)
         SinglePolyTrailProjectile.OnCreate(self)
         self.Impacted = false
-        self.Trash:Add(ForkThread(self.FailsafeDestroyThread, self))
-    end,
-
-    --- Destroys the projectile in rare cases where no impact callback happens
-    ---@param self CNeutronClusterBombProjectile
-    FailsafeDestroyThread = function(self)
-        WaitTicks(120)
-        if not self:BeenDestroyed() then
-            self:Destroy()
-        end
     end,
 
     --- Note: Damage is done once in AOE by main projectile. Secondary projectiles
