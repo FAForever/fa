@@ -129,7 +129,7 @@ function CreateScoreUI(parent)
     Tooltip.AddControlTooltip(controls.timeIcon, 'score_time')
     Tooltip.AddControlTooltip(controls.time, 'score_time')
     controls.gameSpeed = UIUtil.CreateText(controls.bgTop, '', 12, UIUtil.bodyFont, true)
-    controls.gameSpeed:SetColor('BADAFF')
+    controls.gameSpeed:SetColor('ffbadaff')
     Tooltip.AddControlTooltip(controls.gameSpeed, 'score_game_speed')
     controls.gameQuality = UIUtil.CreateText(controls.bgTop, '', 12, UIUtil.bodyFont, true)
     controls.gameQuality:SetColor('ff00dbff')
@@ -655,7 +655,7 @@ function _OnBeat()
     controls.gameSpeed:SetText(s)
 
     if sessionInfo.Options.Quality then
-        q = string.format("Q:%.2f%%", sessionInfo.Options.Quality)
+        local q = string.format("Q:%.2f%%", sessionInfo.Options.Quality)
         controls.gameQuality:SetText(q)
     end
 
