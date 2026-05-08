@@ -5951,6 +5951,10 @@ tooltipui0734="No Vote"
 tooltipui0735="Vote no to your team recalling from battle as a defeat."
 tooltipui0736="[Hide/Show] Mass Fabricator Panel"
 tooltipui0737="[Hide/Show] Voting Panel"
+tooltipui0738="Game Speed"
+tooltipui0739="[your requested speed] / [actual game speed]"
+tooltipui0740="Game Quality"
+tooltipui0741="Estimated game quality"
 
 -- External Factory and Auto-Deploy tooltips
 tooltipui0750 = "Mobile Factory"
