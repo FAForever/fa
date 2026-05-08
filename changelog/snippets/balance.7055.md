@@ -3,7 +3,7 @@
   **UEF, Aeon, and Cybran T2 Cruisers (UES0202, UAS0202, URS0202)**
     - AA Damage Radius: 1 -> 0
   
-  **Seraphim T2 Cruiser (XAS0202)**
+  **Seraphim T2 Cruiser (XSS0202)**
     - Flak range: 60 -> 55
 
   **Aeon, and Seraphim T3 Carriers (UAS0303, XSS0303)**
