@@ -32,7 +32,7 @@ on:
 
 jobs:
   test:
-    uses: ./.github/workflows/test.yaml
+    uses: ./.github/workflows/tests.yaml
   update:
     name: Update FAF
     needs: [test]
