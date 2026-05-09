@@ -212,7 +212,7 @@ UnitBlueprint{
             BallisticArc = "RULEUBA_None",
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 20,
+            Damage = 80,
             DamageRadius = 1.5,
             DamageType = "Normal",
             DisplayName = "Electron Autocannon",
@@ -233,8 +233,23 @@ UnitBlueprint{
                 {
                     MuzzleBones = {
                         "Front_Right_AA_Muzzle_01",
+                    },
+                    RackBone = "Front_Right_AA_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {
                         "Front_Right_AA_Muzzle_02",
+                    },
+                    RackBone = "Front_Right_AA_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {
                         "Front_Right_AA_Muzzle_03",
+                    },
+                    RackBone = "Front_Right_AA_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {
                         "Front_Right_AA_Muzzle_04",
                     },
                     RackBone = "Front_Right_AA_Turret_Barrel",
@@ -276,7 +291,7 @@ UnitBlueprint{
             BallisticArc = "RULEUBA_None",
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 20,
+            Damage = 80,
             DamageRadius = 1.5,
             DamageType = "Normal",
             DisplayName = "Electron Autocannon",
@@ -298,8 +313,23 @@ UnitBlueprint{
                 {
                     MuzzleBones = {
                         "Back_Right_AA_Muzzle_01",
+                    },
+                    RackBone = "Back_Right_AA_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {
                         "Back_Right_AA_Muzzle_02",
+                    },
+                    RackBone = "Back_Right_AA_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {
                         "Back_Right_AA_Muzzle_03",
+                    },
+                    RackBone = "Back_Right_AA_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {
                         "Back_Right_AA_Muzzle_04",
                     },
                     RackBone = "Back_Right_AA_Turret_Barrel",
@@ -346,7 +376,7 @@ UnitBlueprint{
             BallisticArc = "RULEUBA_None",
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 20,
+            Damage = 80,
             DamageRadius = 1.5,
             DamageType = "Normal",
             DisplayName = "Electron Autocannon",
@@ -368,8 +398,23 @@ UnitBlueprint{
                 {
                     MuzzleBones = {
                         "Back_Left_AA_Muzzle_01",
+                    },
+                    RackBone = "Back_Left_AA_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {
                         "Back_Left_AA_Muzzle_02",
+                    },
+                    RackBone = "Back_Left_AA_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {
                         "Back_Left_AA_Muzzle_03",
+                    },
+                    RackBone = "Back_Left_AA_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {
                         "Back_Left_AA_Muzzle_04",
                     },
                     RackBone = "Back_Left_AA_Turret_Barrel",
@@ -416,7 +461,7 @@ UnitBlueprint{
             BallisticArc = "RULEUBA_None",
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 20,
+            Damage = 80,
             DamageRadius = 1.5,
             DamageType = "Normal",
             DisplayName = "Electron Autocannon",
@@ -438,8 +483,23 @@ UnitBlueprint{
                 {
                     MuzzleBones = {
                         "Front_Left_AA_Muzzle_01",
+                    },
+                    RackBone = "Front_Left_AA_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {
                         "Front_Left_AA_Muzzle_02",
+                    },
+                    RackBone = "Front_Left_AA_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {
                         "Front_Left_AA_Muzzle_03",
+                    },
+                    RackBone = "Front_Left_AA_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {
                         "Front_Left_AA_Muzzle_04",
                     },
                     RackBone = "Front_Left_AA_Turret_Barrel",
