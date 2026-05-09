@@ -1,19 +1,19 @@
 - (#7110) Salem has its AA range reduced to weaken its ability to shoot down air scouts and allow for better counterplay against Cybran stealth boats covering the Salems.
 
   **Cybran Destroyer (URS0201):**
-    - AA MaxRadius (60 -> 55) [Area: 11310 -> 9503 (-16%)]
+    - AA Max Radius: 60 -> 55
 
 - (#7110) Omen has its cost increased and its DPS slightly reduced as it is currently the most powerful battleship; the new higher cost matches the higher performance compared to other battleships.
 
   **Aeon Battleship (UAS0302):**
-    - BuildCostEnergy (54000 -> 58000)
-    - BuildCostMass (9000 -> 9500)
-    - BuildTime (28800 -> 30300) [192s -> 202s w/ T3 Factory]
-    - RateOfFire (10/59 -> 10/60) [DPS: 169.5 -> 166.7] [Note: the UI rounds; total DPS is 500.]
+    - Mass Cost: 9000 -> 9500 (+5.6%)
+    - Energy Cost: 54000 -> 58000 (+7.4%)
+    - Build Time: 28800 -> 30300 (+5.2%)
+    - Reload time: 5.9s (169.5 DPS x3) -> 6.0s (166.7 DPS x3)
 
 - (#7110) Tempest is good at safely farming value and staying healthy despite its low stats per cost compared to battleships due to its long range, high splash weapon and because it still greatly benefits from veterancy despite the previous nerf.
 
   **Tempest (UAS0401):**
-    - BuildCostEnergy (380000 -> 400000)
-    - BuildCostMass (24000 -> 25000)
-    - BuildTime (38400 -> 40000) [1181.5s -> 1230.8s w/ T3 Engineer]
+    - Mass Cost: 24000 -> 25000 (+4.2%)
+    - Energy Cost: 380000 -> 400000 (+5.3%)
+    - Build Time: 38400 -> 40000 (+4.2%)
