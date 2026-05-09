@@ -3,7 +3,7 @@
   **Cybran Destroyer (URS0201):**
     - AA MaxRadius (60 -> 55) [Area: 11310 -> 9503 (-16%)]
 
-- (#7110) Omen has its cost increased and its DPS slightly reduced as it is currently the most powerful battleship; the new stats should make the cost match the performance better compared to other battleships.
+- (#7110) Omen has its cost increased and its DPS slightly reduced as it is currently the most powerful battleship; the new higher cost matches the higher performance compared to other battleships.
 
   **Aeon Battleship (UAS0302):**
     - BuildCostEnergy (54000 -> 58000)
