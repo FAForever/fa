@@ -1,0 +1,1 @@
+- (#7111) Fixed an issue where battleships' aft turrets reset the fire clock.
