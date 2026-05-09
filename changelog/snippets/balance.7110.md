@@ -1,4 +1,4 @@
-- (#7110) Salem has its AA range reduced to weaken its ability to shoot down air scouts to allow for better counterplay against Cybran stealth boats covering the Salems.
+- (#7110) Salem has its AA range reduced to weaken its ability to shoot down air scouts and allow for better counterplay against Cybran stealth boats covering the Salems.
 
   **Cybran Destroyer (URS0201):**
     - AA MaxRadius (60 -> 55) [Area: 11310 -> 9503 (-16%)]
