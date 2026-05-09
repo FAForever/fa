@@ -362,7 +362,7 @@ UnitBlueprint{
             FiringTolerance = 1,
             Label = "AAGun",
             LeadTarget = true,
-            MaxRadius = 55,
+            MaxRadius = 60,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 60,

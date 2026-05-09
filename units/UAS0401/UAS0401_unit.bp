@@ -178,10 +178,10 @@ UnitBlueprint{
         UniformScale = 0.1,
     },
     Economy = {
-        BuildCostEnergy = 400000,
-        BuildCostMass = 25000,
+        BuildCostEnergy = 380000,
+        BuildCostMass = 24000,
         BuildRate = 225,
-        BuildTime = 40000,
+        BuildTime = 38400,
         BuildableCategory = {
             "BUILTBYTIER3FACTORY AEON MOBILE CONSTRUCTION",
             "BUILTBYTIER2FACTORY AEON MOBILE CONSTRUCTION",

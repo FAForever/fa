@@ -29,9 +29,9 @@ SIFLaanseTacticalMissile02 = ClassProjectile(SLaanseTacticalMissile, TacticalMis
 
     LaunchTicks = 9,
     LaunchTicksRange = 1,
-    LaunchTurnRate = 50,
+    LaunchTurnRate = 60,
     LaunchTurnRateRange = 1,
-    HeightDistanceFactor = 7,
+    HeightDistanceFactor = 8,
     HeightDistanceFactorRange = 0,
     MinHeight = 5,
     MinHeightRange = 0,

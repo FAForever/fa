@@ -169,7 +169,7 @@ UnitBlueprint{
             CountedProjectile = false,
             Damage = 500,
             DamageFriendly = true,
-            DamageRadius = 2.5,
+            DamageRadius = 3,
             DamageType = "Normal",
             DisplayName = "Laanse Tactical Missile Launcher",
             FireTargetLayerCapsTable = { Water = "Land|Water|Seabed" },
@@ -179,7 +179,7 @@ UnitBlueprint{
             MinRadius = 18,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 10,
+            MuzzleVelocity = 12,
             ProjectileId = "/projectiles/SIFLaanseTacticalMissile02/SIFLaanseTacticalMissile02_proj.bp",
             ProjectileLifetime = 60,
             RackBones = {
