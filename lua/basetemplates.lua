@@ -1,31 +1,46 @@
-local Style1CoordinateGeneration = function(initialEntry, n, offset_i, offset_j)
-    local res = { initialEntry }
+---@alias BaseTemplateType (string[] | Vector)[]
+
+---@param unitList string[]
+---@param size number
+---@param offset_i number
+---@param offset_j number
+---@return BaseTemplateType
+local Style1CoordinateGeneration = function(unitList, size, offset_i, offset_j)
+    local res = { unitList }
     local resIndex = 2
-    for i = 0, n do
-        for j = 0, n-1 do
-            res[resIndex] = { 2*i+offset_i-n, 2*j+offset_j-n+1, 0 }
+    for i = 0, size do
+        for j = 0, size-1 do
+            res[resIndex] = { 2*i+offset_i-size, 2*j+offset_j-size+1, 0 }
             resIndex = resIndex + 1
         end
     end
     return res
 end
 
-local Style2CoordinateGeneration = function(initialEntry, n, offset_i, offset_j)
-    local res = { initialEntry }
+---@param unitList string[]
+---@param size number
+---@param offset_i number
+---@param offset_j number
+---@return BaseTemplateType
+local Style2CoordinateGeneration = function(unitList, size, offset_i, offset_j)
+    local res = { unitList }
     local resIndex = 2
-    for i = 0, n-1 do
-        for j = 0, n do
-            res[resIndex] = { 2*i+offset_i-n+1, 2*j+offset_j-n, 0 }
+    for i = 0, size-1 do
+        for j = 0, size do
+            res[resIndex] = { 2*i+offset_i-size+1, 2*j+offset_j-size, 0 }
             resIndex = resIndex + 1
         end
     end
     return res
 end
 
-local Style3CoordinateGeneration = function(initialEntry, n)
-    local res = { initialEntry }
+---@param unitList string[]
+---@param size number
+---@return BaseTemplateType
+local Style3CoordinateGeneration = function(unitList, size)
+    local res = { unitList }
     local resIndex = 2
-    for i = 1, n do
+    for i = 1, size do
         for j = 0, 2*i-2 do
             res[resIndex] = { 2*i-2*j-2, 1-2*i, 0 }
             resIndex = resIndex + 1
@@ -46,10 +61,13 @@ local Style3CoordinateGeneration = function(initialEntry, n)
     return res
 end
 
-local Style4CoordinateGeneration = function(initialEntry, n)
-    local res = { initialEntry }
+---@param unitList string[]
+---@param size number
+---@return BaseTemplateType
+local Style4CoordinateGeneration = function(unitList, size)
+    local res = { unitList }
     local resIndex = 2
-    for i = 1, n do
+    for i = 1, size do
         for j = 0, 2*i-2 do
             res[resIndex] = { 2*i-1, 2*i-2*j-2, 0 }
             resIndex = resIndex + 1
@@ -70,6 +88,7 @@ local Style4CoordinateGeneration = function(initialEntry, n)
     return res
 end
 
+---@type string[]
 local UnitList1 = {
     'T1EnergyProduction', 
     'MassStorage', 
@@ -100,11 +119,7 @@ local UnitList1 = {
     'T3Optics', 
 }
 
---[[
-    Differences compared to original basetemplates.lua file:
-    - In MovedTemplates7, Aeon Faction (index 2), "T3Artillery" and "T4Artillery" were swapped
-    - In MovedTemplates8, UEF Faction (index 1), "T4Artillery" and "T3RapidArtillery" were swapped
-]]
+---@type string[]
 local UnitList2 = {
     'T2StrategicMissile', 
     'T2ShieldDefense', 
@@ -140,6 +155,7 @@ local UnitList2 = {
     'T4EconExperimental', 
 }
 
+---@type string[]
 local UnitListAdjacency = {
     'T1EnergyProduction', 
     'MassStorage', 
@@ -194,33 +210,20 @@ local UnitListAdjacency = {
     'T3Sonar'
 }
 
---[[
-    Differences compared to the original:
-    - Instead of a distinct copy for each template array, this code creates the array once and then points subsequent factions at the first version, saving memory.
-]]
-BaseTemplates =   { { Style1CoordinateGeneration(UnitList1, 30,   0,   0), Style2CoordinateGeneration(UnitList2, 30,   0,   0) } }
-MovedTemplates1 = { { Style1CoordinateGeneration(UnitList1, 20, -50, -50), Style2CoordinateGeneration(UnitList2, 20, -50, -50) } }
-MovedTemplates2 = { { Style1CoordinateGeneration(UnitList1, 20, -50,   0), Style2CoordinateGeneration(UnitList2, 20, -50,   0) } }
-MovedTemplates3 = { { Style1CoordinateGeneration(UnitList1, 20, -50,  50), Style2CoordinateGeneration(UnitList2, 20, -50,  50) } }
-MovedTemplates4 = { { Style1CoordinateGeneration(UnitList1, 20,   0, -50), Style2CoordinateGeneration(UnitList2, 20,   0, -50) } }
-MovedTemplates5 = { { Style1CoordinateGeneration(UnitList1, 20,   0,  50), Style2CoordinateGeneration(UnitList2, 20,   0,  50) } }
-MovedTemplates6 = { { Style1CoordinateGeneration(UnitList1, 20,  50, -50), Style2CoordinateGeneration(UnitList2, 20,  50, -50) } }
-MovedTemplates7 = { { Style1CoordinateGeneration(UnitList1, 20,  50,   0), Style2CoordinateGeneration(UnitList2, 20,  50,   0) } }
-MovedTemplates8 = { { Style1CoordinateGeneration(UnitList1, 20,  50,  50), Style2CoordinateGeneration(UnitList2, 20,  50,  50) } }
-
-ExpansionBaseTemplates = { { Style3CoordinateGeneration(UnitList1, 10), Style4CoordinateGeneration(UnitList2, 10) } }
-Adjacency2x2 = { { UnitListAdjacency, { 2, 0, 0 }, { -2, 0, 0 }, { 0, 2, 0 }, { 0, -2, 0 } } }
-
-for factionIndex = 2, 4 do
-    BaseTemplates[factionIndex] = BaseTemplates[1]
-    MovedTemplates1[factionIndex] = MovedTemplates1[1]
-    MovedTemplates2[factionIndex] = MovedTemplates2[1]
-    MovedTemplates3[factionIndex] = MovedTemplates3[1]
-    MovedTemplates4[factionIndex] = MovedTemplates4[1]
-    MovedTemplates5[factionIndex] = MovedTemplates5[1]
-    MovedTemplates6[factionIndex] = MovedTemplates6[1]
-    MovedTemplates7[factionIndex] = MovedTemplates7[1]
-    MovedTemplates8[factionIndex] = MovedTemplates8[1]
-    ExpansionBaseTemplates[factionIndex] = ExpansionBaseTemplates[1]
-    Adjacency2x2[factionIndex] = Adjacency2x2[1]
+---@param template BaseTemplateType
+---@return { [1]: BaseTemplateType, [2]: BaseTemplateType, [3]: BaseTemplateType, [4]: BaseTemplateType }
+local CreateFactionIndexNesting = function(template)
+    return { template, template, template, template }
 end
+
+BaseTemplates =   CreateFactionIndexNesting({ Style1CoordinateGeneration(UnitList1, 30,   0,   0), Style2CoordinateGeneration(UnitList2, 30,   0,   0) })
+MovedTemplates1 = CreateFactionIndexNesting({ Style1CoordinateGeneration(UnitList1, 20, -50, -50), Style2CoordinateGeneration(UnitList2, 20, -50, -50) })
+MovedTemplates2 = CreateFactionIndexNesting({ Style1CoordinateGeneration(UnitList1, 20, -50,   0), Style2CoordinateGeneration(UnitList2, 20, -50,   0) })
+MovedTemplates3 = CreateFactionIndexNesting({ Style1CoordinateGeneration(UnitList1, 20, -50,  50), Style2CoordinateGeneration(UnitList2, 20, -50,  50) })
+MovedTemplates4 = CreateFactionIndexNesting({ Style1CoordinateGeneration(UnitList1, 20,   0, -50), Style2CoordinateGeneration(UnitList2, 20,   0, -50) })
+MovedTemplates5 = CreateFactionIndexNesting({ Style1CoordinateGeneration(UnitList1, 20,   0,  50), Style2CoordinateGeneration(UnitList2, 20,   0,  50) })
+MovedTemplates6 = CreateFactionIndexNesting({ Style1CoordinateGeneration(UnitList1, 20,  50, -50), Style2CoordinateGeneration(UnitList2, 20,  50, -50) })
+MovedTemplates7 = CreateFactionIndexNesting({ Style1CoordinateGeneration(UnitList1, 20,  50,   0), Style2CoordinateGeneration(UnitList2, 20,  50,   0) })
+MovedTemplates8 = CreateFactionIndexNesting({ Style1CoordinateGeneration(UnitList1, 20,  50,  50), Style2CoordinateGeneration(UnitList2, 20,  50,  50) })
+ExpansionBaseTemplates = CreateFactionIndexNesting({ Style3CoordinateGeneration(UnitList1, 10), Style4CoordinateGeneration(UnitList2, 10) })
+Adjacency2x2 = CreateFactionIndexNesting({ UnitListAdjacency, { 2, 0, 0 }, { -2, 0, 0 }, { 0, 2, 0 }, { 0, -2, 0 } })
