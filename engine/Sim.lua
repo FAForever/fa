@@ -600,9 +600,13 @@ end
 function GetArmyUnitCostTotal(army)
 end
 
---- Returns the currently active command source in the sim state. This number is the army index
---- of the army that sent the command.
----@return number
+--- Returns the currently active command source in the sim state. This is the index of the client
+--- that issued the command, which is from a list including players (human armies) and observers.
+--- The list is in the order of the lobby slots, with observers at the end.
+---
+--- Use `GetCurrentCommandSourceArmy` from `SimUtils.lua` to reliably get the army index of the 
+--- current command source.
+---@return integer
 function GetCurrentCommandSource()
 end
 
@@ -620,7 +624,7 @@ end
 
 --- Gets the current game time in ticks.
 --- The game time is the simulation time, that stops when the game is paused.
----@return number
+---@return integer
 function GetGameTick()
 end
 
@@ -1171,8 +1175,8 @@ function SetArmyUnitCap(army, unitCap)
 end
 
 --- Sets the command source of an army to match another army's command source.
----@param targetArmyIndex number        # The target army that we're managing command sources for
----@param sourceHumanIndex number       # The source index that is added or removed as a command source
+---@param targetArmyIndex number        # The target army that we're managing command sources for. This is a 0-based index, unlike army indices that are 1-based.
+---@param sourceHumanIndex number       # The source index that is added or removed as a command source. This is a 0-based index, including only actual sources. Mimics the index of `GetClientSessions` in the UI.
 ---@param enable boolean                # Whether or not the source index is a command source for the target army
 function SetCommandSource(targetArmyIndex, sourceHumanIndex, enable)
 end

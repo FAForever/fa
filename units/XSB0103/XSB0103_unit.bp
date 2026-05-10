@@ -49,13 +49,17 @@ UnitBlueprint{
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
         AnimationDeath = {
             {
-                Animation = "/units/xsb0103/xsb0103_ADeath.sca",
+                Animation = "/units/xsb0103/xsb0103_adeath.sca",
                 AnimationRateMax = 1,
                 AnimationRateMin = 1,
                 Weight = 100,
             },
         },
         AnimationUpgrade = "/units/xsb0103/xsb0103_aupgrade.sca",
+        AnimationUpgradeTable = {
+            xsb0203 = "/units/xsb0103/xsb0103_aupgrade.sca",
+            zsb9503 = "/units/xsb0103/xsb0103_aupgrade_sup.sca",
+        },		
         BlinkingLights = {
             { BLBone = 0,     BLOffsetX = 0,     BLOffsetY = 1,     BLOffsetZ = 2.75,  BLScale = 2 },
         },
@@ -149,7 +153,7 @@ UnitBlueprint{
         SkirtOffsetX = -2,
         SkirtOffsetZ = -2,
         SkirtSizeX = 12,
-        SkirtSizeZ = 14,
+        SkirtSizeZ = 15,
     },
     SelectionCenterOffsetX = -1.5,
     SelectionSizeX = 3,

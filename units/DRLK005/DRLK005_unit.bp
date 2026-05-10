@@ -35,7 +35,6 @@ UnitBlueprint{
     },
     Display = {
         AnimationOpen = "/units/drlk005/drlk005_aopen.sca",
-        BuildAttachBone = "AttachPoint",
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
@@ -54,9 +53,9 @@ UnitBlueprint{
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 10000,
-        BuildCostMass = 800,
-        BuildTime = 2000,
+        BuildCostEnergy = 7500,
+        BuildCostMass = 600,
+        BuildTime = 1500,
         BuildUnit = "drlk001",
     },
     Footprint = {
@@ -74,7 +73,7 @@ UnitBlueprint{
     LifeBarSize = 1,
     Physics = {
         DragCoefficient = 0.2,
-        FlattenSkirt = true,
+        AlwaysAlignToTerrain = true,
         MotionType = "RULEUMT_None",
         SkirtSizeX = 1,
         SkirtSizeZ = 1,

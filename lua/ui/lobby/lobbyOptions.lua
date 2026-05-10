@@ -10,12 +10,16 @@
 ---| '99999' unlimited expansions allowed
 
 ---@alias VictoryCondition 'demoralization' | 'domination' | 'eradication' | 'sandbox' | 'decapitation'
+---@alias ShareOption "CivilianDeserter" | "Defectors" | "FullShare" | "PartialShare" | "ShareUntilDeath" | "TransferToKiller"
+---@alias DisconnectShareOption ShareOption | "SameAsShare"
+---@alias DisconnectShareCommandersOption "Explode" | "Permanent" | "Recall" | "RecallDelayed"
 
 --- Additionally, extra options can be specified by the map in `mapname .. 'options.lua'`
 ---@class GameOptions
 ---@field AutoTeams 'none' | 'manual' | 'tvsb' | 'lvsr' | 'pvsi'
 ---@field TeamLock 'locked' | 'unlocked'
 ---@field TeamSpawn 'fixed' | 'random' | 'balanced' | 'balanced_flex' | 'random_reveal' | 'balanced_reveal' | 'balanced_reveal_mirrored' | 'balanced_flex_reveal'
+---@field TeamShareOverflow "enabled" | "disabled"
 ---
 ---@field AllowObservers boolean
 ---@field CheatsEnabled 'false' | 'true'
@@ -24,17 +28,17 @@
 ---@field FogOfWar 'none' | 'explored'
 ---@field GameSpeed 'normal' | 'fast' | 'adjustable'
 ---@field ManualUnitShare 'none' | 'no_builders' | 'all'
----@field NoRushOption '1' | '2' | '3' | '4' | '5' | '10' | '15' | '20' | '25' | '30' | '35' | '40' | '45' | '50' | '55' | '60'
+---@field NoRushOption '1' | '2' | '3' | '4' | '5' | '10' | '15' | '20' | '25' | '30' | '35' | '40' | '45' | '50' | '55' | '60' | 'Off'
 ---@field PrebuiltUnits 'Off' | 'On'
 ---@field Ranked boolean
 ---@field RevealCivilians 'No' | 'Yes'
 ---@field RandomMap 'Off' | 'Official' | 'All'
 ---@field Score 'no' | 'yes'
----@field Share 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
----@field DisconnectShare 'SameAsShare' | 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
----@field DisconnectShareCommanders 'Explode' | 'Recall' | 'RecallDelayed' | 'Permanent'
+---@field Share ShareOption
+---@field DisconnectShare DisconnectShareOption
+---@field DisconnectShareCommanders DisconnectShareCommandersOption
 ---@field ShareUnitCap 'none' | 'allies' | 'all'
----@field Timeouts '0' | '3'| '-1'
+---@field Timeouts '0' | '3'| '-1' | -1
 ---@field UnitCap '125' | '250' | '375' | '500' | '625' | '750' | '875' | '1000' | '1250' | '1500'
 ---@field Unranked 'No' | 'Yes'
 ---@field Victory VictoryCondition
@@ -182,8 +186,13 @@ teamOptions =
                 key = 'Off'
             },
             {
+                text = "<LOC lobui_CAUponDisconnectTitle>Union control upon disconnect",
+                help = "<LOC lobui_CAUponDisconnectDescription>Initially each player has their own army and their own resources. When a player disconnects the army is not considered defeated and the share condition does not trigger. Instead, allied players can switch focus to the disconnected army to issue commands.",
+                key = 'UnionWhenDisconnected'
+            },
+            {
                 text = "<LOC lobui_CAUnion>Multiple armies, union control",
-                help = "<LOC lobui_CAUDesc>Each player has their own army and their own resources. Allied players can switch focus to your army and to issue commands.",
+            help = "<LOC lobui_CAUDesc>Each player has their own army and their own resources. Allied players can switch focus to your army and to issue commands.",
                 key = 'Union'
             },
             {
@@ -192,6 +201,25 @@ teamOptions =
                 key = 'Common'
             }
         }
+    },
+
+    {
+        default = 1,
+        label = "<LOC lobui_resource_sharing_label>Overflow",
+        help = "<LOC lobui_resource_sharing_help>Set whether distribution of excess resources to allies is initially enabled or disabled. Players can toggle it through the diplomacy menu when teams are unlocked.",
+        key = 'TeamShareOverflow',
+        values = {
+            {
+                text = "<LOC lobui_resource_sharing_enabled_text>Enabled",
+                help = "<LOC lobui_resource_sharing_enabled_help>Excess resources are shared with allies by default.",
+                key = 'enabled',
+            },
+            {
+                text = "<LOC lobui_resource_sharing_disabled_text>Disabled",
+                help = "<LOC lobui_resource_sharing_disabled_help>Excess resources are spilled by default.",
+                key = 'disabled',
+            },
+        },
     },
 }
 

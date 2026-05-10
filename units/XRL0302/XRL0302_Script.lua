@@ -172,10 +172,13 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
         self.Trash:Add(ForkThread(self.HideUnit, self))
+        self:SetMaintenanceConsumptionActive()
     end,
 
+    --- Sets cloak mesh on a delay because `Unit.StopBeingBuiltEffects` sets the normal mesh regardless of cloak
     ---@param self XRL0302
     HideUnit = function(self)
+        -- Wait until `StopBeingBuiltEffects` is done
         WaitTicks(1)
         self:SetMesh(self.Blueprint.Display.CloakMeshBlueprint, true)
     end,

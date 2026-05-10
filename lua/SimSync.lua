@@ -20,6 +20,7 @@ end
 
 ---@class UnitSyncData
 ---@field WepPriority? UnitSyncWepPriority
+---@field Buffs? BuffName[] # Buffs affecting this unit
 
 -- UnitData that has been synced. We keep a separate copy of this so when we change
 -- focus army we can resync the data.
@@ -108,6 +109,11 @@ function SyncUnitEnhancements()
     Sync.UserUnitEnhancements = sync
 end
 
+--- Called by the engine when using the console command `DebugMoveCamera`
+---@param x0 number
+---@param y0 number
+---@param x1 number
+---@param y1 number
 function DebugMoveCamera(x0,y0,x1,y1)
     local Camera = import("/lua/simcamera.lua").SimCamera
     local cam = Camera("WorldCamera")
@@ -166,7 +172,7 @@ function FloatingEntityText(entityId, text)
 end
 
 function StartCountdown(entityId, duration)
-    cdDuration = duration or 5
+    local cdDuration = duration or 5
     if not entityId then
         WARN('Trying to start countdown text with no entityId.')
         return false

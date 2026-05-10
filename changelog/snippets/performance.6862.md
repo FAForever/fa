@@ -1,1 +1,0 @@
-- (#6862) Reduce table accesses of projectiles especially on impact.

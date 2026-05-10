@@ -7,6 +7,8 @@
 -- - https://www.lua.org/pil/23.1.html
 
 
+local SerializableDeepCopy = import("/lua/utilities.lua").SerializableDeepCopy
+
 local CollapseDebugInfo = import("/lua/shared/debugfunction.lua").CollapseDebugInfo
 local CreateEmptyProfilerTable = import("/lua/shared/profiler.lua").CreateEmptyProfilerTable
 local GetDebugFunctionInfo = import("/lua/shared/debugfunction.lua").GetDebugFunctionInfo
@@ -399,13 +401,7 @@ BenchmarkModuleLoader = Class() {
 
         -- can't serialize functions
         info.info.func = nil
-        for k, v in info.upvalues do
-            if type(v) == "function" then
-                info.upvalues[k] = "<func>"
-            elseif type(v) == "cfunction" then
-                info.upvalues[k] = "<cfunc>"
-            end
-        end
+        info.upvalues = SerializableDeepCopy(info.upvalues)
 
         return {
             name = funName,

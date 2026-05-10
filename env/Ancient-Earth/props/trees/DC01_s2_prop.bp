@@ -20,13 +20,13 @@ PropBlueprint{
                     NormalsName = "DC01_s1_normalsTS.dds",
                 },
                 {
-                    LODCutoff = 150,
+                    LODCutoff = 165,
                     ShaderName = "TMeshAlpha",
                     AlbedoName = "DC01_s1_albedo.dds",
                     NormalsName = "DC01_s1_normalsTS.dds",
                 },
                 {
-                    LODCutoff = 330,
+                    LODCutoff = 640,
                     ShaderName = "TMeshAlpha",
                     AlbedoName = "DC01_s1_albedo.dds",
                     NormalsName = "DC01_s1_normalsTS.dds",
