@@ -1,0 +1,1 @@
+- (#7020) Fix pathfinding by disabling column formation for long-distance moves.
