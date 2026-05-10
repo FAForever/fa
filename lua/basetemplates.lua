@@ -1,5 +1,9 @@
 ---@alias BaseTemplateType (string[] | Vector)[]
 
+--- Generates a (size+1) × size rectangular grid of cells on a 2-unit pitch,
+--- with cells at parity A (even x, odd y) — one half of a checkerboard.
+--- Centered on (offset_i, offset_j). Pairs with `Style2CoordinateGeneration`
+--- to fill the full checkerboard of a (2*size+1) × (2*size+1) square
 ---@param unitList string[]
 ---@param size number
 ---@param offset_i number
@@ -17,6 +21,11 @@ local Style1CoordinateGeneration = function(unitList, size, offset_i, offset_j)
     return res
 end
 
+--- Mirror of `Style1CoordinateGeneration`: a size × (size+1) rectangular grid
+--- on the same 2-unit pitch but with the complementary parity (odd x,
+--- even y). Pairs with `Style1CoordinateGeneration` to cover every
+--- checkerboard cell of a (2*size+1) × (2*size+1) square centered on
+--- (offset_i, offset_j)
 ---@param unitList string[]
 ---@param size number
 ---@param offset_i number
@@ -34,6 +43,11 @@ local Style2CoordinateGeneration = function(unitList, size, offset_i, offset_j)
     return res
 end
 
+--- Generates `size` concentric square rings around the origin, growing
+--- outward one ring per iteration. Each ring is traced bottom → top →
+--- right → left, so cells are listed roughly in the order the AI should
+--- build them — innermost ring first. Cells use parity A (even x, odd y),
+--- matching `Style1CoordinateGeneration`
 ---@param unitList string[]
 ---@param size number
 ---@return BaseTemplateType
