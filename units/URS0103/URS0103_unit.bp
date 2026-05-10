@@ -6,8 +6,6 @@ UnitBlueprint{
             "Front_Radar",
             "Back_Radar",
             "Back_Wake",
-            "Front_Left_Wake",
-            "Front_Right_Wake",
             "URS0103",
         },
     },

@@ -12,11 +12,11 @@ A changelog describes the changes that are made to a project. Usually a changelo
 
 ## Changelog folder
 
-All changelogs can be found in the [changelog](../changelog/) folder. Each game version has a separate file with the changelog notes in them. Each changelog file closely matches with a corresponding [release note](https://github.com/FAForever/fa/releases). The release note is better formatted by GitHub and we encourage you to read the release notes instead.
+All changelogs can be found in the [changelog folder](https://github.com/FAForever/fa/blob/develop/docs/_posts/). Each game version has a separate file with the changelog notes in them. These files are conveniently available as [web pages](../changelog).
 
 ## Changelog snippets
 
-We use snippets to reduce the burden on maintainers to write an accurate changelog and at the same time enable contributors to describe the changes of a pull request. A contributor is required to create a snippet before a pull request is merged. Remember that the target audience of the changelog are the players, so try to make the changelog easily understandable. All snippets reside in the [snippets folder](../changelog/snippets/). We use a [workflow](./workflows/changelog.yaml) to compile the snippets into a typical changelog file. This changelog file can then be tweaked, spell checked and be used as (intermediate) release notes.
+We use snippets to reduce the burden on maintainers to write an accurate changelog and at the same time enable contributors to describe the changes of a pull request. A contributor is required to create a snippet before a pull request is merged. Remember that the target audience of the changelog are the players, so try to make the changelog easily understandable. All snippets reside in the [snippets folder](https://github.com/FAForever/fa/blob/develop/changelog/snippets/). We use a [workflow](https://github.com/FAForever/fa/blob/develop/.github/workflows/docs-generate-changelog.yaml) to compile the snippets into a typical changelog file. This changelog file can then be tweaked, spell checked and be used as (intermediate) release notes.
 
 ### Format of a snippet
 

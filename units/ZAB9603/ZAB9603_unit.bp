@@ -1,5 +1,14 @@
 UnitBlueprint{
     Description = "<LOC zab9603_desc>Naval Factory",
+    AI = {
+        TargetBones = {
+            "Slider_02",
+            "Slider_05",
+            "B06",
+            "B05",
+
+        },
+    },
     Audio = {
         Construct      = Sound { Bank = 'UAB',        Cue = 'UAB0303_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
         ConstructLoop  = Sound { Bank = 'UAB',        Cue = 'UAB0303_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
@@ -39,9 +48,9 @@ UnitBlueprint{
     },
     Display = {
         BlinkingLights = {
-            { BLBone = 0,     BLOffsetX = 0.45,  BLOffsetY = 5.7,   BLOffsetZ = 0.8,   BLScale = 1 },
-            { BLBone = 0,     BLOffsetX = 3.5,   BLOffsetY = 3.3,   BLOffsetZ = -0.25, BLScale = 1 },
-            { BLBone = 0,     BLOffsetX = -4,    BLOffsetY = 3.3,   BLOffsetZ = -0.25, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 0.45,    BLOffsetY = 5.7,   BLOffsetZ = 0.4,   BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 0.45,    BLOffsetY = 3.3,   BLOffsetZ = 3.45,  BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 0.45,    BLOffsetY = 3.3,   BLOffsetZ = -3.5,  BLScale = 1 },
         },
         BlinkingLightsFx = {
             Green = "/effects/emitters/light_green_03_emit.bp",
@@ -54,7 +63,7 @@ UnitBlueprint{
                 Effects = {
                     {
                         Bones = { "ZAB9603" },
-                        Scale = 3,
+                        Scale = 3.5,
                         Type = "SeaIdle01",
                     },
                 },
@@ -138,15 +147,16 @@ UnitBlueprint{
             { UnitSpin = 180,   X = -6,    Y = 0,     Z = -8 },
             { UnitSpin = 0,     X = -6,    Y = 0,     Z = 8 },
         },
-        SkirtOffsetX = -6,
-        SkirtOffsetZ = -2,
+        SkirtOffsetX = -7,
+        SkirtOffsetZ = -1,
         SkirtSizeX = 12,
-        SkirtSizeZ = 14,
+        SkirtSizeZ = 15,
     },
     SelectionSizeX = 2.5,
     SelectionSizeZ = 8.8,
     SelectionThickness = 0.2,
     CollisionOffsetY = -1,
+    CollisionOffsetZ = 0.5,	
     SizeX = 4,
     SizeY = 3,
     SizeZ = 13,

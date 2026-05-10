@@ -49,7 +49,9 @@ UnitBlueprint{
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
         AnimationUpgrade = "/units/ueb0203/ueb0203_aupgrade.sca",
         BlinkingLights = {
-            { BLBone = "Dock_Cover", BLOffsetX = -0.05, BLOffsetY = 0.5,   BLOffsetZ = 0,     BLScale = 2 },
+
+            { BLBone = "Dock_Cover", BLOffsetX = 0.5,   BLOffsetY = 0.9,     BLOffsetZ = 0,     BLScale = 2 },
+            { BLBone = "Dock_Cover", BLOffsetX = 0.9,   BLOffsetY = 0.9,     BLOffsetZ = 0,     BLScale = 2 },
         },
         BlinkingLightsFx = {
             Green = "/effects/emitters/light_green_03_emit.bp",
@@ -74,12 +76,16 @@ UnitBlueprint{
                 {
                     LODCutoff = 200,
                     ShaderName = "UEFNavy",
+                    AlbedoName = "/units/ueb0103/ueb0103_albedo.dds",
+                    NormalsName = "/units/ueb0103/ueb0103_normalsts.dds",
+                    SpecularName = "/units/ueb0103/ueb0103_specteam.dds",
                 },
                 {
                     LODCutoff = 600,
                     ShaderName = "UEFNavy",
-                    AlbedoName = "ueb0203_lod1_albedo.dds",
-                    SpecularName = "ueb0203_lod1_specteam.dds",
+                    AlbedoName = "/units/ueb0103/ueb0103_lod1_albedo.dds",
+                    NormalsName = "/units/ueb0103/ueb0103_lod1_normalsts.dds",
+                    SpecularName = "/units/ueb0103/ueb0103_lod1_specteam.dds",
                 },
             },
         },
@@ -143,7 +149,7 @@ UnitBlueprint{
         SkirtOffsetX = -7,
         SkirtOffsetZ = -1,
         SkirtSizeX = 12,
-        SkirtSizeZ = 14,
+        SkirtSizeZ = 15,
     },
     SelectionMeshScaleX = 0.3,
     SelectionMeshScaleZ = 0.4,
