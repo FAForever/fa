@@ -60,7 +60,7 @@ jobs:
           ref: ${{ inputs.branch || github.head_ref || github.ref_name }}
 
       - name: Delete old lua changelogs
-        run: rm lua/ui/lobby/changelog/generated/*
+        run: rm -f lua/ui/lobby/changelog/generated/*
 
       - name: Retrieve generated lua changelog
         uses: actions/download-artifact@v4

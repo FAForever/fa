@@ -89,7 +89,7 @@ jobs:
 
       - name: Convert changelog to Lua
         run: |
-          rm lua/ui/lobby/changelog/generated/*
+          rm -f lua/ui/lobby/changelog/generated/*
           out_dir=lua/ui/lobby/changelog/generated
           python3 $SCRIPTS/changelog_markdown2lua.py "docs/_posts" "${out_dir}"
 
