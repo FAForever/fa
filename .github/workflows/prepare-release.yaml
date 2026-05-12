@@ -91,15 +91,16 @@ jobs:
 
       - name: Create changelog post
         working-directory: changelog/snippets
+        env:
+          PATCHDATE: ${{ inputs.date }}
         run: |
-          PATCHDATE=${{ inputs.date }}
           if [ -z "$PATCHDATE" ]; then
             PATCHDATE=$(date +%Y-%m-%d)
           fi
-          DATE=$(date -d $PATCHDATE +%Y-%m-%d)
-          DAY=$(date -d $PATCHDATE +%d)
-          MONTH=$(date -d $PATCHDATE +%B)
-          YEAR=$(date -d $PATCHDATE +%Y)
+          DATE=$(date -d "$PATCHDATE" +%Y-%m-%d)
+          DAY=$(date -d "$PATCHDATE" +%d)
+          MONTH=$(date -d "$PATCHDATE" +%B)
+          YEAR=$(date -d "$PATCHDATE" +%Y)
           FILE="${{ github.workspace }}/docs/_posts/$DATE-${{ steps.version.outputs.version }}.md"
           cat sections/template-header-patch.md >> $FILE
           sed -i "s/XYZW/${{ steps.version.outputs.version }}/g" $FILE
