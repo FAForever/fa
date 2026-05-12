@@ -126,7 +126,7 @@ Changelog = {
         "",
         "## Graphics",
         "",
-        "- (#7009) Redesign of all HQ and Support Factories",
+        "- (#7009, #7114) Redesign of all HQ and Support Factories",
         "",
         "  Integrate the factory redesign made by Saver (forum",
         "  thread)\\[https://forum.faforever.com/topic/5790/redesign-of-all-hq-and-support-factories/11\\]. All factories now have proper upgrade",
