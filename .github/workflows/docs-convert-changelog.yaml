@@ -18,16 +18,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-name: Convert Markdown changelog to Lua
+name: Convert all Markdown changelogs to Lua
 
 on:
-  push:
-    paths: ["docs/_posts/**", ".github/workflows/scripts/python/**"]
   workflow_call:
     inputs:
-      artifact:
+      branch:
+        type: string
+        required: true
+        description: The branch to check out
+      additional-changelog:
         type: string # fafdevelop or fafbeta
-        description: The reference (branch or tag) to use to compile the changelog snippets from
+        description: Add changelog entry for current fafdevelop or fafbeta changes
 
 jobs:
   convert_changelog:
@@ -42,22 +44,38 @@ jobs:
         uses: actions/checkout@v4
         with:
           ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
+          ref: ${{ inputs.branch }}
+          sparse-checkout: |
+            changelog/snippets
+            docs/_posts
+            lua/ui/lobby
+            .github/workflows
 
-      - name: Download develop artifact
-        if: inputs.artifact == 'fafdevelop'
+      - name: Download develop changelog
+        if: inputs.additional-changelog == 'fafdevelop'
         uses: actions/download-artifact@v4
         with:
           name: changelog-fafdevelop
-          path: docs/_posts
-          merge-multiple: true
 
-      - name: Download balance artifact
-        if: inputs.artifact == 'fafbeta'
+      - name: Add develop changelog
+        if: inputs.additional-changelog == 'fafdevelop'
+        run: |
+          FILE="${{ github.workspace }}/docs/_posts/fafdevelop.md"
+          cat changelog/snippets/sections/template-header-fafdevelop.md >> $FILE
+          cat changelog-fafdevelop.md >> $FILE
+
+      - name: Download beta changelog
+        if: inputs.additional-changelog == 'fafbeta'
         uses: actions/download-artifact@v4
         with:
           name: changelog-fafbeta
-          path: docs/_posts
-          merge-multiple: true
+
+      - name: Add beta changelog
+        if: inputs.additional-changelog == 'fafbeta'
+        run: |
+          FILE="${{ github.workspace }}/docs/_posts/fafbeta.md"
+          cat changelog/snippets/sections/template-header-fafbeta.md >> $FILE
+          cat changelog-fafbeta.md >> $FILE
 
       - name: Setup python
         uses: actions/setup-python@v5
@@ -71,7 +89,7 @@ jobs:
 
       - name: Convert changelog to Lua
         run: |
-          rm lua/ui/lobby/changelog/generated/*
+          rm -f lua/ui/lobby/changelog/generated/*
           out_dir=lua/ui/lobby/changelog/generated
           python3 $SCRIPTS/changelog_markdown2lua.py "docs/_posts" "${out_dir}"
 
@@ -80,17 +98,6 @@ jobs:
           out_dir=lua/ui/lobby/changelog/generated
           python3 $SCRIPTS/changelog_overview.py "docs/_posts" "${out_dir}/overview.lua"
 
-      - name: Commit the generated files
-        continue-on-error: true  # there might be nothing to commit
-        run: |
-          # Configure git
-          git config user.email "github@faforever.com"
-          git config user.name "FAForever Machine User"
-
-          git add .
-          git commit -m "Update lobby changelogs"
-          git push
-
       - name: Add the Lua changelog as an artifact
         uses: actions/upload-artifact@v4
         with:
@@ -98,11 +105,6 @@ jobs:
           path: |
             lua/ui/lobby/changelog/generated
 
-  # It's a bit awkward to validate after committing, but doing it in a unified
-  # pipeline would either require making all other steps work in this container
-  # or manually installing https://github.com/FAForever/lua-lang and I don't want
-  # to do either of those.
-  # The failing CI should still alert the user that something went wrong.
   validate_lua_changelog:
     name: Validate Lua changelog
     runs-on: ubuntu-latest
