@@ -56,9 +56,11 @@ At this point you need to wait until the changelog branch is merged.
 - - (7.3) Paste a link to our changelog website.
 - - (7.4) Create the release.
 
-While not technically necessary for the deployment, .
+This step is not technically necessary for the deployment, but it keeps the information on github in sync with our website.
 
 ### Deployment - final steps
+
+Update the [staging/faf](https://github.com/FAForever/fa/tree/staging/faf) branch once more to include the committed changelog branch.
 
 Use the [Deploy to FAF Workflow](https://github.com/FAForever/fa/actions/workflows/deploy-faf.yaml) to perform the deployment.
 

@@ -29,7 +29,7 @@ on:
     inputs:
       date:
         type: string
-        description: The date of the patch (yyyy-mm-dd). Leave empty to use today's date.
+        description: The date of the patch (yyyy-mm-dd). Leave empty to use today's date. Make sure that the staging/faf branch points to the correct commit.
         required: false
         default: ""
 
