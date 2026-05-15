@@ -12,6 +12,10 @@ Forged Alliance Forever is a vibrant, community-driven [project](https://github.
 - Log in using the account you registered and host a game with AIs and/or players, queue up for matchmaker or upload your own content to our vaults for other players to enjoy.
 - Engage with the community through the [forums](https://forum.faforever.com/) using the account you registered or join us on the official [Discord server](https://discord.gg/mXahVSKGVb).
 
+## Changelog
+
+Over the years we continued to update the game to improve the balancing and refine mechanics. You can find the complete changelog [here](https://faforever.github.io/fa/changelog).
+
 ## Information for contributors
 
 All contributions are expected to apply the [code of conduct](https://www.faforever.com/rules) to create a healthy and sustainable contributor environment.
