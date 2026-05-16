@@ -98,8 +98,8 @@ jobs:
       # Append the generated changelogs to the Jekyll-compatible templates
       - name: Append the generated changelogs
         run: |
-          cat generated/fafdevelop.md >> changelog/fafdevelop.md
-          cat generated/fafbeta.md >> changelog/fafbeta.md
+          cat generated/changelog-fafdevelop.md >> changelog/fafdevelop.md
+          cat generated/changelog-fafbeta.md >> changelog/fafbeta.md
 
       # Add links to the files in the posts directory
       - name: Update changelog posts directory
