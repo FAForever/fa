@@ -1,55 +1,72 @@
----@alias BaseTemplateType (string[] | Vector)[]
+--- The 'Base Templates' defined in this file are used by AI to search for build locations.
+--- Coordinate vectors are interpreted as { x, z, 0 }.
 
---- Generates a (size+1) × size rectangular grid of cells on a 2-unit pitch,
---- with cells at parity A (even x, odd y) — one half of a checkerboard.
---- Centered on (offset_i, offset_j). Pairs with `Style2CoordinateGeneration`
---- to fill the full checkerboard of a (2*size+1) × (2*size+1) square
----@param unitList string[]
----@param size number
----@param offset_i number
----@param offset_j number
+---@alias UnitList string[]
+
+--- The first index is of type UnitList, and the rest of type Vector
+---@alias BaseTemplateType (UnitList | Vector)[]
+
+--- Generates a coordinate grid, where x and z values are within the interval [offset-size, offset+size] (for their respective offsets).
+---
+--- Coordinates are ordered first by x value then by z value (both smallest first).
+---
+--- Only generates coordinates of parity (even x, odd z).
+---
+--- Similar to Style2CoordinateGeneration, differing only in coordinate parity.
+---@param unitList UnitList
+---@param size integer
+---@param offset_x integer
+---@param offset_z integer
 ---@return BaseTemplateType
-local Style1CoordinateGeneration = function(unitList, size, offset_i, offset_j)
+local Style1CoordinateGeneration = function(unitList, size, offset_x, offset_z)
     local res = { unitList }
     local resIndex = 2
     for i = 0, size do
         for j = 0, size - 1 do
-            res[resIndex] = { 2 * i + offset_i - size, 2 * j + offset_j - size + 1, 0 }
+            res[resIndex] = { 2 * i + offset_x - size, 2 * j + offset_z - size + 1, 0 }
             resIndex = resIndex + 1
         end
     end
     return res
 end
 
---- Mirror of `Style1CoordinateGeneration`: a size × (size+1) rectangular grid
---- on the same 2-unit pitch but with the complementary parity (odd x,
---- even y). Pairs with `Style1CoordinateGeneration` to cover every
---- checkerboard cell of a (2*size+1) × (2*size+1) square centered on
---- (offset_i, offset_j)
----@param unitList string[]
----@param size number
----@param offset_i number
----@param offset_j number
+--- Generates a coordinate grid, where x and z values are within the interval [offset-size, offset+size] (for their respective offsets).
+---
+--- Coordinates are ordered first by x value then by z value (both smallest first).
+---
+--- Only generates coordinates of parity (odd x, even z).
+---
+--- Similar to Style1CoordinateGeneration, differing only in coordinate parity.
+---@param unitList UnitList
+---@param size integer
+---@param offset_x integer
+---@param offset_z integer
 ---@return BaseTemplateType
-local Style2CoordinateGeneration = function(unitList, size, offset_i, offset_j)
+local Style2CoordinateGeneration = function(unitList, size, offset_x, offset_z)
     local res = { unitList }
     local resIndex = 2
     for i = 0, size - 1 do
         for j = 0, size do
-            res[resIndex] = { 2 * i + offset_i - size + 1, 2 * j + offset_j - size, 0 }
+            res[resIndex] = { 2 * i + offset_x - size + 1, 2 * j + offset_z - size, 0 }
             resIndex = resIndex + 1
         end
     end
     return res
 end
 
---- Generates `size` concentric square rings around the origin, growing
---- outward one ring per iteration. Each ring is traced bottom → top →
---- right → left, so cells are listed roughly in the order the AI should
---- build them — innermost ring first. Cells use parity A (even x, odd y),
---- matching `Style1CoordinateGeneration`
----@param unitList string[]
----@param size number
+--- Generates a coordinate grid, where x and z values are within the interval [-2\*size, 2\*size].
+---
+--- Coordinates are ordered as concentric square rings growing out from around the origin, with each ring traced as follows:
+--- - 'Bottom side' - i.e. low z, high to low x;
+--- - 'Top side' - i.e. high z, low to high x;
+--- - 'Right side' - i.e. high x, high to low z;
+--- - 'Left side' - i.e. low x, low to high z.
+---
+--- Only generates coordinates of parity (even x, odd z).
+---
+--- Similar to Style4CoordinateGeneration, but differs in parity and ordering of sides in each ring.
+---@param unitList UnitList
+---@param size integer
 ---@return BaseTemplateType
 local Style3CoordinateGeneration = function(unitList, size)
     local res = { unitList }
@@ -75,8 +92,19 @@ local Style3CoordinateGeneration = function(unitList, size)
     return res
 end
 
----@param unitList string[]
----@param size number
+--- Generates a coordinate grid, where x and z values are within the interval [-2\*size, 2\*size].
+---
+--- Coordinates are ordered as concentric square rings growing out from around the origin, with each ring traced as follows:
+--- - 'Right side' - i.e. high x, high to low z;
+--- - 'Left side' - i.e. low x, low to high z;
+--- - 'Bottom side' - i.e. low z, high to low x;
+--- - 'Top side' - i.e. high z, low to high x.
+---
+--- Only generates coordinates of parity (odd x, even z).
+---
+--- Similar to Style3CoordinateGeneration, but differs in parity and ordering of sides in each ring.
+---@param unitList UnitList
+---@param size integer
 ---@return BaseTemplateType
 local Style4CoordinateGeneration = function(unitList, size)
     local res = { unitList }
@@ -102,7 +130,7 @@ local Style4CoordinateGeneration = function(unitList, size)
     return res
 end
 
----@type string[]
+---@type UnitList
 local UnitList1 = {
     'T1EnergyProduction',
     'MassStorage',
@@ -133,7 +161,7 @@ local UnitList1 = {
     'T3Optics',
 }
 
----@type string[]
+---@type UnitList
 local UnitList2 = {
     'T2StrategicMissile',
     'T2ShieldDefense',
@@ -169,7 +197,7 @@ local UnitList2 = {
     'T4EconExperimental',
 }
 
----@type string[]
+---@type UnitList
 local UnitListAdjacency = {
     'T1EnergyProduction',
     'MassStorage',
