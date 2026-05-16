@@ -84,12 +84,15 @@ jobs:
 
       # Retrieve the generated changelogs
       - name: Download artifact changelog of FAF Develop
+        # No artifact exists when there are no snippets to process
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: changelog-fafdevelop
           path: docs/generated
 
       - name: Download artifact changelog of FAF Beta
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: changelog-fafbeta
@@ -98,8 +101,8 @@ jobs:
       # Append the generated changelogs to the Jekyll-compatible templates
       - name: Append the generated changelogs
         run: |
-          cat generated/changelog-fafdevelop.md >> changelog/fafdevelop.md
-          cat generated/changelog-fafbeta.md >> changelog/fafbeta.md
+          cat generated/changelog-fafdevelop.md >> changelog/fafdevelop.md || true
+          cat generated/changelog-fafbeta.md >> changelog/fafbeta.md || true
 
       # Add links to the files in the posts directory
       - name: Update changelog posts directory
