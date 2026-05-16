@@ -72,14 +72,14 @@ def process_markdown_file(markdown_file: Path) -> Optional[Tuple[str, date]]:
             URL = "http://faforever.github.io/fa/changelog/{url}",
             Path = "/lua/ui/lobby/changelog/generated/{markdown_file.stem}.lua"
         }},"""
-        return entry, parsed_date
+        return entry, parsed_date, int(version)
 
     except Exception as e:
         raise RuntimeError(f"Failed to process {markdown_file.name}") from e
 
 def create_overview_file(input_dir: Path, output_file: Path):
     """Creates an overview Lua file listing all changelogs with metadata."""
-    entries: list[Tuple[str, date]] = []
+    entries: list[Tuple[str, date, int]] = []
 
     logging.info(f"Scanning directory: {input_dir}")
     for markdown_file in input_dir.glob("*.md"):
@@ -91,7 +91,8 @@ def create_overview_file(input_dir: Path, output_file: Path):
         logging.warning("No valid changelog entries found.")
         return
 
-    entries.sort(key=lambda pair: pair[1], reverse=True)
+    # Sort by date and then by version
+    entries.sort(key=lambda pair: (pair[1], pair[2]), reverse=True)
 
     logging.info("Generating overview Lua content...")
     overview_content = OVERVIEW_HEADER + """
@@ -99,7 +100,7 @@ def create_overview_file(input_dir: Path, output_file: Path):
 Overview = {
     Changelogs = {
 """
-    overview_content += "\n".join(entry for entry, _ in entries)
+    overview_content += "\n".join(entry for entry, _, _ in entries)
     overview_content += "\n    }\n}\n"
 
     output_file.write_text(overview_content)
