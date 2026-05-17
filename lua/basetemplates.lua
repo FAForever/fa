@@ -1,10 +1,10 @@
 --- The 'Base Templates' defined in this file are used by AI to search for build locations.
---- Coordinate vectors are interpreted as { x, z, 0 }.
+--- Coordinate vectors are interpreted as { x, z }.
 
 ---@alias UnitList string[]
 
 --- The first index is of type UnitList, and the rest of type Vector
----@alias BaseTemplateType { [1]: UnitList, [number]: Vector }
+---@alias BaseTemplateType { [1]: UnitList, [number]: Vector2 }
 
 --- Generates a coordinate grid, where x and z values are within the interval [offset-size, offset+size] (for their respective offsets).
 ---
@@ -23,7 +23,7 @@ local Style1CoordinateGeneration = function(unitList, size, offset_x, offset_z)
     local resIndex = 2
     for i = 0, size do
         for j = 0, size - 1 do
-            res[resIndex] = { 2 * i + offset_x - size, 2 * j + offset_z - size + 1, 0 }
+            res[resIndex] = { 2 * i + offset_x - size, 2 * j + offset_z - size + 1 }
             resIndex = resIndex + 1
         end
     end
@@ -47,7 +47,7 @@ local Style2CoordinateGeneration = function(unitList, size, offset_x, offset_z)
     local resIndex = 2
     for i = 0, size - 1 do
         for j = 0, size do
-            res[resIndex] = { 2 * i + offset_x - size + 1, 2 * j + offset_z - size, 0 }
+            res[resIndex] = { 2 * i + offset_x - size + 1, 2 * j + offset_z - size }
             resIndex = resIndex + 1
         end
     end
@@ -73,19 +73,19 @@ local Style3CoordinateGeneration = function(unitList, size)
     local resIndex = 2
     for i = 1, size do
         for j = 0, 2 * i - 2 do
-            res[resIndex] = { 2 * i - 2 * j - 2, 1 - 2 * i, 0 }
+            res[resIndex] = { 2 * i - 2 * j - 2, 1 - 2 * i }
             resIndex = resIndex + 1
         end
         for j = 0, 2 * i - 2 do
-            res[resIndex] = { 2 - 2 * i + 2 * j, 2 * i - 1, 0 }
+            res[resIndex] = { 2 - 2 * i + 2 * j, 2 * i - 1 }
             resIndex = resIndex + 1
         end
         for j = 0, 2 * i - 1 do
-            res[resIndex] = { i * 2, 2 * i - 2 * j - 1, 0 }
+            res[resIndex] = { i * 2, 2 * i - 2 * j - 1 }
             resIndex = resIndex + 1
         end
         for j = 0, 2 * i - 1 do
-            res[resIndex] = { -i * 2, 1 - 2 * i + 2 * j, 0 }
+            res[resIndex] = { -i * 2, 1 - 2 * i + 2 * j }
             resIndex = resIndex + 1
         end
     end
@@ -111,19 +111,19 @@ local Style4CoordinateGeneration = function(unitList, size)
     local resIndex = 2
     for i = 1, size do
         for j = 0, 2 * i - 2 do
-            res[resIndex] = { 2 * i - 1, 2 * i - 2 * j - 2, 0 }
+            res[resIndex] = { 2 * i - 1, 2 * i - 2 * j - 2 }
             resIndex = resIndex + 1
         end
         for j = 0, 2 * i - 2 do
-            res[resIndex] = { 1 - 2 * i, 2 - 2 * i + 2 * j, 0 }
+            res[resIndex] = { 1 - 2 * i, 2 - 2 * i + 2 * j }
             resIndex = resIndex + 1
         end
         for j = 0, 2 * i - 1 do
-            res[resIndex] = { 2 * i - 2 * j - 1, -2 * i, 0 }
+            res[resIndex] = { 2 * i - 2 * j - 1, -2 * i }
             resIndex = resIndex + 1
         end
         for j = 0, 2 * i - 1 do
-            res[resIndex] = { 1 - 2 * i + 2 * j, 2 * i, 0 }
+            res[resIndex] = { 1 - 2 * i + 2 * j, 2 * i }
             resIndex = resIndex + 1
         end
     end
@@ -268,4 +268,4 @@ MovedTemplates6 = CreateFactionIndexNesting({ Style1CoordinateGeneration(UnitLis
 MovedTemplates7 = CreateFactionIndexNesting({ Style1CoordinateGeneration(UnitList1, 20, 50, 0), Style2CoordinateGeneration(UnitList2, 20, 50, 0) })
 MovedTemplates8 = CreateFactionIndexNesting({ Style1CoordinateGeneration(UnitList1, 20, 50, 50), Style2CoordinateGeneration(UnitList2, 20, 50, 50) })
 ExpansionBaseTemplates = CreateFactionIndexNesting({ Style3CoordinateGeneration(UnitList1, 10), Style4CoordinateGeneration(UnitList2, 10) })
-Adjacency2x2 = CreateFactionIndexNesting({ UnitListAdjacency, { 2, 0, 0 }, { -2, 0, 0 }, { 0, 2, 0 }, { 0, -2, 0 } })
+Adjacency2x2 = CreateFactionIndexNesting({ UnitListAdjacency, { 2, 0 }, { -2, 0 }, { 0, 2 }, { 0, -2 } })
