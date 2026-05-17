@@ -2,7 +2,7 @@
 --- Coordinate vectors are interpreted as { x, z }.
 
 --- List of building template names from `BuildingTemplates.lua`
----@alias UnitList BlueprintId[]
+---@alias UnitList string[]
 
 --- The first index is of type UnitList, and the rest of type Vector
 ---@alias BaseTemplateType { [1]: UnitList, [number]: Vector2 }
