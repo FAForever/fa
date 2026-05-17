@@ -1,1 +1,1 @@
-- Your explanation here (#XYZW).
+- Your explanation here... [Don't forget to change the category in the filename] (#XYZW).
