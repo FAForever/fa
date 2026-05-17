@@ -74,10 +74,10 @@ UnitBlueprint{
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 512000,
-        BuildCostMass = 36000,
+        BuildCostEnergy = 440000,
+        BuildCostMass = 32000,
         BuildRate = 300,
-        BuildTime = 44800,
+        BuildTime = 43600,
         BuildableCategory = { "SATELLITE" },
         RebuildBonusIds = { "xeb2402" },
     },
