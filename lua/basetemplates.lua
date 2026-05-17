@@ -1,6 +1,7 @@
 --- The 'Base Templates' defined in this file are used by AI to search for build locations.
 --- Coordinate vectors are interpreted as { x, z }.
 
+--- List of building template names from `BuildingTemplates.lua`
 ---@alias UnitList string[]
 
 --- The first index is of type UnitList, and the rest of type Vector
