@@ -30,9 +30,10 @@ jobs:
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout branch
+      - name: Checkout PR branch
         uses: actions/checkout@v6
         with:
+          ref: ${{ github.event.pull_request.head.ref }}
           ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
 
       - name: Add snippet
