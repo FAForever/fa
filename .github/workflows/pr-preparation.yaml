@@ -20,9 +20,6 @@
 
 name: Pull Request preparation
 
-permissions:
-  contents: write
-
 on:
   pull_request:
     types: [opened]
@@ -30,6 +27,7 @@ on:
 jobs:
   prepare_pr:
     name: Prepare pull request
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
