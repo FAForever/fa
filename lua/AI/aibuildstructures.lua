@@ -15,8 +15,6 @@ local allowedMassStorageRatio = 0.6
 
 local TriggerFile = import("/lua/scenariotriggers.lua")
 
-lastTick = 0
-
 ---@param aiBrain AIBrain
 function AISetEconomyNumbers(aiBrain)
     local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
@@ -216,11 +214,6 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
         relativeTo = {startPosX, 0, startPosZ}
     end
     local location = false
-    local tick = GetGameTick()
-    if tick - 10 > lastTick then
-        reprsl(baseTemplate)
-        lastTick = GetGameTick()
-    end
     if IsResource(buildingType) then
         location = aiBrain:FindPlaceToBuild(buildingType, whatToBuild, baseTemplate, relative, closeToBuilder, 'Enemy', relativeTo[1], relativeTo[3], 5)
     else
