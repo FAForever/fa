@@ -4,7 +4,7 @@
 ---@alias UnitList string[]
 
 --- The first index is of type UnitList, and the rest of type Vector
----@alias BaseTemplateType (UnitList | Vector)[]
+---@alias BaseTemplateType { [1]: UnitList, [number]: Vector }
 
 --- Generates a coordinate grid, where x and z values are within the interval [offset-size, offset+size] (for their respective offsets).
 ---
