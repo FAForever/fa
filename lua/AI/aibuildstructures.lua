@@ -365,7 +365,6 @@ function AIBuildBaseTemplateFromLocation(baseTemplate, location)
                     baseT[templateNum][rowNum] = {}
                     baseT[templateNum][rowNum][1] = math.floor(rowData[1] + location[1]) + 0.5
                     baseT[templateNum][rowNum][2] = math.floor(rowData[2] + location[3]) + 0.5
-                    baseT[templateNum][rowNum][3] = 0
                 else
                     baseT[templateNum][rowNum] = template[rowNum]
                 end
