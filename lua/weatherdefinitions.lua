@@ -59,7 +59,7 @@ MapStyleList = {
     'Evergreen',
     'Geothermal',
     'Lava',
-    'RedRock',
+    'Redrock',
     'Tropical',
     'Tundra',
 }
