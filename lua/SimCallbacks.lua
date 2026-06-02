@@ -195,11 +195,15 @@ Callbacks.ToggleSelfDestruct = function(data, units)
         return
     end
 
-    -- moderation rule: if you self destruct with one or more ACUs in the selection, then you only self destruct the ACUs
-    local commandUnits = EntityCategoryFilterDown(categories.COMMAND, SecureUnits(units))
-    if (table.getn(commandUnits) > 0) then
-        import("/lua/selfdestruct.lua").ToggleSelfDestruct(data, commandUnits)
-        return
+    -- moderation rule: if you self destruct with one or more ACUs in the selection when playing full 
+    -- share, then you only self destruct the ACUs. This does not make it impossible to abuse, but it 
+    -- does introduce a simple guardrail. 
+    if ScenarioInfo.Options.Share == "FullShare" then
+        local commandUnits = EntityCategoryFilterDown(categories.COMMAND, SecureUnits(units))
+        if table.getn(commandUnits) > 0 then
+            import("/lua/selfdestruct.lua").ToggleSelfDestruct(data, commandUnits)
+            return
+        end
     end
 
     -- otherwise just pass it through as usual
