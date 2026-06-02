@@ -191,7 +191,7 @@ Callbacks.ToggleSelfDestruct = function(data, units)
     end
 
     -- prevent abuse
-    if (not data.owner) or (not OkayToMessWithArmy(data.owner)) then
+    if (not data) or (not data.owner) or (not OkayToMessWithArmy(data.owner)) then
         return
     end
 
