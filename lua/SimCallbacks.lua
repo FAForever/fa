@@ -182,7 +182,30 @@ Callbacks.UpdateMarker = SimPing.UpdateMarker
 
 Callbacks.FactionSelection = ScenarioFramework.OnFactionSelect
 
-Callbacks.ToggleSelfDestruct = import("/lua/selfdestruct.lua").ToggleSelfDestruct
+---@param data ToggleSelfDestructData
+---@param units Unit[]
+Callbacks.ToggleSelfDestruct = function(data, units)
+    -- prevent malformed input
+    if (not units) or (table.getn(units) == 0) then
+        return
+    end
+
+    -- prevent abuse
+    if (not data.owner) or (not OkayToMessWithArmy(data.owner)) then
+        return
+    end
+
+    -- moderation rule: if you self destruct with one or more ACUs in the selection, then you only self destruct the ACUs
+    local commandUnits = EntityCategoryFilterDown(categories.COMMAND, SecureUnits(units))
+    if (table.getn(commandUnits) > 0) then
+        import("/lua/selfdestruct.lua").ToggleSelfDestruct(data, commandUnits)
+        return
+    end
+
+    -- otherwise just pass it through as usual
+    import("/lua/selfdestruct.lua").ToggleSelfDestruct(data, units)
+end
+
 
 Callbacks.MarkerOnScreen = import("/lua/simcameramarkers.lua").MarkerOnScreen
 
