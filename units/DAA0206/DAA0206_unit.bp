@@ -39,7 +39,6 @@ UnitBlueprint{
         "AIR",
         "BOMB",
         "BOMBER",
-        "CANNOTUSEAIRSTAGING",
         "MOBILE",
         "PRODUCTDL",
         "RECLAIMABLE",
