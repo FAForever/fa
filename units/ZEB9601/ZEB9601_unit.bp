@@ -1,11 +1,12 @@
 UnitBlueprint{
-    Description = "<LOC zeb9601_desc>Suport Land Factory",
+    Description = "<LOC zeb9601_desc>Support Land Factory",
     AI = {
         TargetBones = {
-            "Foot_Right",
-            "Foot_Left",
+            "Attachpoint",
             "Pad_Left",
             "Pad_Right",
+            "Foot_Left",
+            "Foot_Right",
         },
     },
     Audio = {
@@ -47,8 +48,8 @@ UnitBlueprint{
     },
     Display = {
         BlinkingLights = {
-            { BLBone = "Foot_Right", BLOffsetX = -0.4,  BLOffsetY = 0.8,   BLOffsetZ = -0.35, BLScale = 1.5 },
-            { BLBone = "Foot_Left", BLOffsetX = 0.4,   BLOffsetY = 0.8,   BLOffsetZ = -0.35, BLScale = 1.5 },
+            { BLBone = "Foot_Right",    BLOffsetX = -0.4,  BLOffsetY = 0.8,   BLOffsetZ = -0.35, BLScale = 1.5 },
+            { BLBone = "Foot_Left",     BLOffsetX = 0.4,   BLOffsetY = 0.8,   BLOffsetZ = -0.35, BLScale = 1.5 },
             { BLBone = "Control_Tower", BLOffsetX = 0,     BLOffsetY = 0,     BLOffsetZ = 0.5,   BLScale = 1.5 },
         },
         BlinkingLightsFx = {
@@ -63,12 +64,16 @@ UnitBlueprint{
                 {
                     LODCutoff = 200,
                     ShaderName = "Unit",
+                    AlbedoName = "/units/ueb0101/ueb0101_albedo.dds",
+                    NormalsName = "/units/ueb0101/ueb0101_normalsts.dds",
+                    SpecularName = "/units/ueb0101/ueb0101_specteam.dds",
                 },
                 {
                     LODCutoff = 500,
                     ShaderName = "Unit",
-                    AlbedoName = "zeb9601_lod1_albedo.dds",
-                    SpecularName = "zeb9601_lod1_specteam.dds",
+                    AlbedoName = "/units/ueb0101/ueb0101_lod1_albedo.dds",
+                    NormalsName = "/units/ueb0101/ueb0101_lod1_normalsts.dds",
+                    SpecularName = "/units/ueb0101/ueb0101_lod1_specteam.dds",
                 },
             },
         },

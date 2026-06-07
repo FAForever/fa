@@ -1,0 +1,3 @@
+- (#7104) Fix computing the wrong area in the navigational mesh
+
+The new values may differ from the old values by +/- 15%.

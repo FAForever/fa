@@ -44,6 +44,7 @@ def process_markdown_file(markdown_file: Path) -> Optional[Tuple[str, date]]:
     if len(file_name_parts) == 4:
         date_str = '-'.join(file_name_parts[:3])
         version = file_name_parts[3]
+        url = version
         try:
             parsed_date = datetime.strptime(date_str, "%Y-%m-%d").date()
         except ValueError:
@@ -53,7 +54,8 @@ def process_markdown_file(markdown_file: Path) -> Optional[Tuple[str, date]]:
         logging.warning(f"Unexpected filename format: {markdown_file.name}")
         parsed_date = date.today()
         date_str = parsed_date.isoformat()
-        version = markdown_file.stem
+        version = 1
+        url = markdown_file.stem
 
     try:
         yaml_content, _ = extract_yaml_front_matter(markdown_file.read_text())
@@ -67,7 +69,7 @@ def process_markdown_file(markdown_file: Path) -> Optional[Tuple[str, date]]:
             Version = {version},
             Name = "{name}",
             Date = "{date_str}",
-            URL = "http://faforever.github.io/fa/changelog/{version}",
+            URL = "http://faforever.github.io/fa/changelog/{url}",
             Path = "/lua/ui/lobby/changelog/generated/{markdown_file.stem}.lua"
         }},"""
         return entry, parsed_date

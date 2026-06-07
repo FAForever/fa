@@ -48,14 +48,7 @@ local AIKeys = {}
 local AIStrings = {}
 local AITooltips = {}
 
--- TODO: remove these console commands before release
--- The following is enabled on non-production branches to assist with debugging for ICE/WebRTC issues
-local versionNumber, versionType, versionCommit = import("/lua/version.lua").GetVersionData()
-if versionType != "FAF" then
-    WARN("Enabling network debug console commands")
-    ConExecute("net_LogPackets")
-    ConExecute("net_DebugLevel 10")
-end
+
 
 function GetAITypes()
     AIKeys = {}

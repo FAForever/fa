@@ -54,7 +54,7 @@ def get_parser():
 def convert_changelog(markdown: Path, lua: Path):
     """Converts a single markdown file to a Lua file."""
     file_name_parts = markdown.stem.split('-')
-    version = file_name_parts[3]
+    version = file_name_parts[3] if len(file_name_parts) > 3 else 1
 
     source_info = f"Source: {markdown}"
     header = HEADER.format(source=source_info)
