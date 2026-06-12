@@ -57,7 +57,7 @@ local function ParsePriorities()
             for _, priority in priorities do
                 if not finalPriorities[priority] then
                     local log = priority == "(ALLUNITS - SPECIALLOWPRI)"
-                    if StringFind(priority, '%(', 1, true) then
+                    if StringFind(priority, '(', 1, true) then
                         finalPriorities[priority] = ParseEntityCategoryProperly(priority)
                         if log then LOG("ParseEntityCategoryProperly", priority, repr(EntityCategoryGetUnitList(finalPriorities[priority]))) end
                     else
