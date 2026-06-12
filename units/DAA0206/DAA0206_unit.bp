@@ -136,7 +136,7 @@ UnitBlueprint{
     Physics = {
         AttackElevation = 0.5,
         Elevation = 12,
-        FuelRechargeRate = 0,
+        FuelRechargeRate = 5,
         FuelUseTime = 400,
         GroundCollisionOffset = -0.25,
         MaxSpeed = 13,
