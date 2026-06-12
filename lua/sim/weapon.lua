@@ -37,7 +37,6 @@ local DebugWeaponComponent = import("/lua/sim/weapons/components/debugweaponcomp
 
 ---@return EntityCategory[]
 local function ParsePriorities()
-    LOG("Parsing prios init")
     local idlist = EntityCategoryGetUnitList(categories.ALLUNITS)
     local finalPriorities = {}
     local StringFind = string.find
@@ -56,13 +55,10 @@ local function ParsePriorities()
             end
             for _, priority in priorities do
                 if not finalPriorities[priority] then
-                    local log = priority == "(ALLUNITS - SPECIALLOWPRI)"
                     if StringFind(priority, '(', 1, true) then
                         finalPriorities[priority] = ParseEntityCategoryProperly(priority)
-                        if log then LOG("ParseEntityCategoryProperly", priority, repr(EntityCategoryGetUnitList(finalPriorities[priority]))) end
                     else
                         finalPriorities[priority] = ParseEntityCategory(priority)
-                        if log then LOG("ParseEntityCategory", priority, repr(EntityCategoryGetUnitList(finalPriorities[priority]))) end
                     end
                 end
             end
