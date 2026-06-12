@@ -45,8 +45,8 @@ UnitBlueprint{
         "SELECTABLE",
         "SHOWATTACKRETICLE",
         "TECH2",
-        "TRANSPORTBUILTBYTIER2FACTORY",
-        "TRANSPORTBUILTBYTIER3FACTORY",
+        "BUILTBYTIER2FACTORY",
+        "BUILTBYTIER3FACTORY",
         "VISIBLETORECON",
     },
     Defense = {
