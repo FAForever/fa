@@ -55,6 +55,7 @@ categories = {
     BUILTBYTIER3COMMANDER = categoryValue,
     BUILTBYTIER3ENGINEER = categoryValue,
     BUILTBYTIER3FACTORY = categoryValue,
+    --- Used by engine to disallow air units to right click into transports/air staging.
     CANNOTUSEAIRSTAGING = categoryValue,
     CANTRANSPORTCOMMANDER = categoryValue,
     CAPTURE = categoryValue,
