@@ -162,6 +162,7 @@ UnitBlueprint{
     Weapon = {
         {
             AboveWaterTargetsOnly = true,
+            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound { Bank = 'UAAWeapon', Cue = 'UAA0304_Bomb_Quark', LodCutoff = 'Weapon_LodCutoff' },
             },
@@ -205,7 +206,7 @@ UnitBlueprint{
             RateOfFire = 10/1, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 35,
-            TargetCheckInterval = 999999,
+            TargetCheckInterval = 1,
             TargetPriorities = {
                 "TECH4",
                 "TECH3 STRUCTURE",
@@ -214,7 +215,6 @@ UnitBlueprint{
                 "(ALLUNITS - SPECIALLOWPRI)",
             },
             TargetRestrictDisallow = "UNTARGETABLE",
-            TrackingRadius = 0.5,
             TurretBoneMuzzle = "DAA0206",
             TurretBonePitch = "DAA0206",
             TurretBoneYaw = "DAA0206",
