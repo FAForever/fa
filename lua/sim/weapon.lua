@@ -35,19 +35,6 @@ local DebugWeaponComponent = import("/lua/sim/weapons/components/debugweaponcomp
 ---@field Buffs BlueprintBuff[]         # Active buffs for the weapon
 ---@field __index WeaponDamageTable
 
-local properPrios = {}
-
-local function getStr(id, weapon)
-    local bp = __blueprints[id]
-    local descAndName = string.format('%s %s', LOC(bp.Description), LOC(bp.General.UnitName) or '')
-    return string.format('%-8s %-12s %-45s%-35s'
-        , bp.FactionCategory
-        , bp.TechCategory
-        , descAndName
-        , weapon.BlueprintId
-    )
-end
-
 ---@return EntityCategory[]
 local function ParsePriorities()
     local idlist = EntityCategoryGetUnitList(categories.ALLUNITS)
@@ -70,19 +57,13 @@ local function ParsePriorities()
                 if not finalPriorities[priority] then
                     if StringFind(priority, '(', 1, true) then
                         finalPriorities[priority] = ParseEntityCategoryProperly(priority)
-                        properPrios[priority] = { getStr(id, weapon) }
                     else
                         finalPriorities[priority] = ParseEntityCategory(priority)
-                    end
-                else
-                    if properPrios[priority] then
-                        table.insert(properPrios[priority], getStr(id, weapon))
                     end
                 end
             end
         end
     end
-    _ALERT(repr(properPrios))
     return finalPriorities
 end
 
