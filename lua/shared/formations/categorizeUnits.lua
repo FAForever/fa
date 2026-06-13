@@ -215,9 +215,9 @@ local UnitsList = {Land = {}, Air = {}, Naval = {}, Subs = {}}
 -- map layers to categories
 local CategoryTables = {Land = LandCategories, Air = AirCategories, Naval = NavalCategories, Subs = SubCategories}
 -- initialize the layer tables
-for unitType, categoriesForType in pairs(CategoryTables) do
+for unitType, categoriesForType in CategoryTables do
     local typeData = UnitsList[unitType]
-    for unitTypeCategory, _ in pairs(categoriesForType) do
+    for unitTypeCategory, _ in categoriesForType do
         typeData[unitTypeCategory] = {}
     end
     typeData.FootprintCounts = {}
@@ -257,16 +257,16 @@ function CalculateSizes(unitsList)
     local largestFootprint = 1
     local smallestFootprints = {}
 
-    for group, data in pairs(TypeGroups) do
+    for group, data in TypeGroups do
         local groupFootprintCounts = {}
         local largestForGroup = 1
         local numSizes = 0
         local unitTotal = 0
-        for _, type in pairs(data.Types) do
+        for _, type in data.Types do
             local typeData = unitsList[type]
 
             unitTotal = unitTotal + typeData.UnitTotal
-            for fs, count in pairs(typeData.FootprintCounts) do
+            for fs, count in typeData.FootprintCounts do
                 groupFootprintCounts[fs] = (groupFootprintCounts[fs] or 0) + count
                 largestFootprint = MathMax(largestFootprint, fs)
                 largestForGroup = MathMax(largestForGroup, fs)
@@ -278,7 +278,7 @@ function CalculateSizes(unitsList)
         if numSizes > 0 then
             local minCount = unitTotal / 2
             local smallerUnitCount = 0
-            for fs, count in pairs(groupFootprintCounts) do
+            for fs, count in groupFootprintCounts do
                 smallerUnitCount = smallerUnitCount + count
                 if smallerUnitCount >= minCount then
                     smallestFootprints[group] = fs -- Base the grid size on the median unit size to avoid a few small units shrinking a formation of large untis
@@ -288,9 +288,9 @@ function CalculateSizes(unitsList)
         end
     end
 
-    for group, data in pairs(TypeGroups) do
+    for group, data in TypeGroups do
         local gridSize = MathMax(smallestFootprints[group] * data.GridSizeFraction, smallestFootprints[group] + data.GridSizeAbsolute)
-        for _, type in pairs(data.Types) do
+        for _, type in data.Types do
             local unitData = unitsList[type]
 
              -- A distance of 1 in formation coordinates translates to (largestFootprint + 2) in world coordinates.
@@ -298,7 +298,7 @@ function CalculateSizes(unitsList)
              -- That means if a CZAR and some light tanks are selected together, the tank formation will be scaled by the CZAR's size and we can't compensate.
             unitData.Scale = gridSize / (largestFootprint + 2)
 
-            for fs, count in pairs(unitData.FootprintCounts) do
+            for fs, count in unitData.FootprintCounts do
                 local size = MathCeil(fs * data.MinSeparationFraction / gridSize)
                 unitData.FootprintSizes[fs] = size
                 unitData.AreaTotal = unitData.AreaTotal + count * size * size
@@ -316,22 +316,22 @@ function CategorizeUnits(formationUnits)
     local categoryTables = CategoryTables
 
     -- flush the table
-    for unitType, categoriesForType in pairs(categoryTables) do
+    for unitType, categoriesForType in categoryTables do
         local typeData = UnitsList[unitType]
-        for unitTypeCategory, _ in pairs(categoriesForType) do
+        for unitTypeCategory, _ in categoriesForType do
             local typeDataCategory = typeData[unitTypeCategory]
-            for k in pairs(typeDataCategory) do
+            for k in typeDataCategory do
                 typeDataCategory[k] = nil
             end
         end
 
         local footprintCounts = typeData.FootprintCounts
-        for k in pairs(footprintCounts) do
+        for k in footprintCounts do
             footprintCounts[k] = nil
         end
 
         local footprintSizes = typeData.FootprintSizes
-        for k in pairs(footprintSizes) do
+        for k in footprintSizes do
             footprintSizes[k] = nil
         end
 
@@ -341,14 +341,14 @@ function CategorizeUnits(formationUnits)
     end
 
     -- Loop through each unit to get its category and size
-    for _, unit in pairs(formationUnits) do
+    for _, unit in formationUnits do
         -- If the unit is identified then do not iterate the remaining formation layer categories
         local identified = false
         -- Loop through each of the static category tables
-        for type, table in pairs(categoryTables) do
+        for type, table in categoryTables do
             local typeData = UnitsList[type]
             -- Loop through each EntityCategory of each of the category tables
-            for cat, _ in pairs(table) do
+            for cat, _ in table do
                 -- Attempt to match the unit to the category
                 if EntityCategoryContains(table[cat], unit) then
                     local bp = unit:GetBlueprint()
