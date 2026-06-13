@@ -364,14 +364,15 @@ function CategorizeUnits(formationUnits)
                     ---@type FormationLayerFootprints
                     local categoryData = typeData[cat]
 
-                    if not categoryData[fs] then
-                        categoryData[fs] = {Count = 0, Filter = categories[id]} -- This will duplicate the first category but doesn't affect the result
-                    end
                     ---@type FormationLayerFootprintTable
                     local footprintSizeData = categoryData[fs]
-
-                    footprintSizeData.Count = footprintSizeData.Count + 1
-                    footprintSizeData.Filter = footprintSizeData.Filter + categories[id]
+                    if not footprintSizeData then
+                        footprintSizeData = { Count = 1, Filter = categories[id] }
+                        categoryData[fs] = footprintSizeData
+                    else
+                        footprintSizeData.Count = footprintSizeData.Count + 1
+                        footprintSizeData.Filter = footprintSizeData.Filter + categories[id]
+                    end
                     typeData.FootprintCounts[fs] = (typeData.FootprintCounts[fs] or 0) + 1
 
                     if cat == "RemainingCategory" then
