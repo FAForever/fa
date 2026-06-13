@@ -1,0 +1,1 @@
+- (#7036) Game repository: Update the setup instructions for the development environment.
