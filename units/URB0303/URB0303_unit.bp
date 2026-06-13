@@ -3,9 +3,10 @@ UnitBlueprint{
     AI = {
         TargetBones = {
             "B03",
-            "B08",
+            "B29",
             "B28",
             "B14",
+            "B01",
         },
     },
     Audio = {
@@ -147,7 +148,7 @@ UnitBlueprint{
         SkirtOffsetX = -6,
         SkirtOffsetZ = -2,
         SkirtSizeX = 12,
-        SkirtSizeZ = 14,
+        SkirtSizeZ = 15,
     },
     SelectionCenterOffsetX = -0.57,
     SelectionMeshUseTopAmount = 0.15,

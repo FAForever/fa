@@ -35,7 +35,6 @@ UnitBlueprint{
     },
     Display = {
         AnimationOpen = "/units/xrl0005/xrl0005_aopen.sca",
-        BuildAttachBone = "AttachPoint",
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
@@ -56,7 +55,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 8000,
         BuildCostMass = 800,
-        BuildTime = 2400,
+        BuildTime = 2150,
         BuildUnit = "url0304",
     },
     Footprint = {
@@ -74,7 +73,7 @@ UnitBlueprint{
     LifeBarSize = 1,
     Physics = {
         DragCoefficient = 0.2,
-        FlattenSkirt = true,
+        AlwaysAlignToTerrain = true,
         MotionType = "RULEUMT_None",
         SkirtSizeX = 1,
         SkirtSizeZ = 1,

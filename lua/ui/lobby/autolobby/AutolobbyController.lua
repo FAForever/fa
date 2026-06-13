@@ -212,6 +212,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
             DisconnectionDelay02 = '90',
             DisconnectShare = 'SameAsShare',
             DisconnectShareCommanders = 'Explode',
+            TeamShareOverflow = "enabled",
 
             -- yep, great
             Ranked = true,
@@ -558,11 +559,19 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
                 WaitSeconds(5.0)
                 if (not IsDestroyed(self)) and self:CanLaunch(self.LaunchStatutes) then
 
+                    -- Army numbers need to be calculated: they are numbered incrementally in slot order.
+                    local slots = {}
+                    for slotIndex, _ in pairs(self.PlayerOptions) do
+                        table.insert(slots, slotIndex)
+                    end
+                    table.sort(slots)
+
                     -- send player options to the server
-                    for slot, playerOptions in self.PlayerOptions do
+                    for armyIndex, slotIndex in ipairs(slots) do
+                        local playerOptions = self.PlayerOptions[slotIndex]
                         local ownerId = playerOptions.OwnerID
                         self:SendPlayerOptionToServer(ownerId, 'Team', playerOptions.Team)
-                        self:SendPlayerOptionToServer(ownerId, 'Army', playerOptions.StartSpot)
+                        self:SendPlayerOptionToServer(ownerId, 'Army', armyIndex)
                         self:SendPlayerOptionToServer(ownerId, 'StartSpot', playerOptions.StartSpot)
                         self:SendPlayerOptionToServer(ownerId, 'Faction', playerOptions.Faction)
                     end
@@ -993,7 +1002,8 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
     ---@param self UIAutolobbyCommunications
     ---@param data UILobbyReceivedMessage
     DataReceived = function(self, data)
-        self:DebugSpew("DataReceived", data.Type, data.SenderID, data.SenderName)
+        -- make it more convenient to debug malicious traffic
+        SPEW(string.format("Received data of type %s from %s (%s)", tostring(data.Type), tostring(data.SenderID), tostring(data.SenderName)))
 
         -- signal UI that we received something
         local peerIndex = self:PeerIdToIndex(self.PlayerOptions, data.SenderID)

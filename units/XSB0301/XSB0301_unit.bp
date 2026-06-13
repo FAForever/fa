@@ -1,5 +1,12 @@
 UnitBlueprint{
     Description = "<LOC xsb0301_desc>Land Factory HQ",
+    AI = {
+        TargetBones = {
+            "Attachpoint",
+            "B01",
+            "B06",
+        },
+    },
     Audio = {
         Construct      = Sound { Bank = 'XSB',            Cue = 'XSB0301_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
         ConstructLoop  = Sound { Bank = 'XSB',            Cue = 'XSB0301_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
@@ -39,7 +46,7 @@ UnitBlueprint{
     Display = {
         AnimationDeath = {
             {
-                Animation = "/units/xsb0301/xsb0301_ADeath.sca",
+                Animation = "/units/xsb0301/xsb0301_adeath.sca",
                 AnimationRateMax = 1.6,
                 AnimationRateMin = 1.6,
                 Weight = 100,
@@ -65,13 +72,16 @@ UnitBlueprint{
                     LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
                     Scrolling = true,
                     ShaderName = "Seraphim",
+                    AlbedoName = "/units/xsb0101/xsb0101_albedo.dds",
+                    NormalsName = "/units/xsb0101/xsb0101_normalsts.dds",
+                    SpecularName = "/units/xsb0101/xsb0101_specteam.dds",
                 },
                 {
                     LODCutoff = 500,
-                    LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
                     ShaderName = "Seraphim",
-                    AlbedoName = "xsb0301_lod1_albedo.dds",
-                    SpecularName = "xsb0301_lod1_specteam.dds",
+                    AlbedoName = "/units/xsb0101/xsb0101_lod1_albedo.dds",
+                    NormalsName = "/units/xsb0101/xsb0101_lod1_normalsts.dds",
+                    SpecularName = "/units/xsb0101/xsb0101_lod1_specteam.dds",
                 },
             },
         },

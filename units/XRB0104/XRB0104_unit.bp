@@ -22,7 +22,6 @@ UnitBlueprint{
     BuildBotTotal = 1,
     BuildIconSortPriority = 200,
     Categories = {
-        "BUILTBYCOMMANDER",
         "BUILTBYTIER2COMMANDER",
         "BUILTBYTIER2ENGINEER",
         "BUILTBYTIER3COMMANDER",
@@ -93,7 +92,7 @@ UnitBlueprint{
         BuildCostEnergy = 2100,
         BuildCostMass = 350,
         BuildRate = 20,
-        BuildTime = 1171,
+        BuildTime = 880,
         BuildableCategory = { "xrb0204" },
         UpgradeOnlyCategory = { "xrb0204" },
         MaxBuildDistance = 15,

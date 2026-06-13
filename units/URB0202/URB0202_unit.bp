@@ -2,10 +2,11 @@ UnitBlueprint{
     Description = "<LOC urb0202_desc>Air Factory HQ",
     AI = {
         TargetBones = {
-            "URB0202",
-            "B05",
-            "B07",
+            "B01",
             "B08",
+            "B15",
+            "WL",
+            "WR",
         },
     },
     Audio = {
@@ -41,9 +42,9 @@ UnitBlueprint{
     Defense = {
         ArmorType = "Structure",
         EconomyThreatLevel = 190,
-        Health = 5500,
-        MaxHealth = 5500,
-        RegenRate = 20,
+        Health = 6100,
+        MaxHealth = 6100,
+        RegenRate = 15,
     },
     Display = {
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
@@ -51,8 +52,8 @@ UnitBlueprint{
         AnimationFinishBuildLand = "/units/urb0202/urb0202_aplatform.sca",
         AnimationUpgrade = "/units/urb0202/urb0202_aupgrade.sca",
         BlinkingLights = {
-            { BLBone = 0,     BLOffsetX = 1.1,   BLOffsetY = 1.4,   BLOffsetZ = -1.9,  BLScale = 1 },
-            { BLBone = 0,     BLOffsetX = -1.1,  BLOffsetY = 1.4,   BLOffsetZ = -1.9,  BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 1.1,   BLOffsetY = 1.42,   BLOffsetZ = -1.9,  BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = -1.1,  BLOffsetY = 1.42,   BLOffsetZ = -1.9,  BLScale = 1 },
         },
         BlinkingLightsFx = {
             Green = "/effects/emitters/light_green_03_emit.bp",
@@ -179,7 +180,7 @@ UnitBlueprint{
     SelectionSizeZ = 3,
     SelectionThickness = 0.33,
     SizeX = 3.5,
-    SizeY = 0.75,
+    SizeY = 1,
     SizeZ = 3.5,
     StrategicIconName = "icon_factoryhq2_air",
     StrategicIconSortPriority = 215,

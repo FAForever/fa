@@ -221,6 +221,8 @@ function SetupSession()
     doscript(ScenarioInfo.script, ScenarioInfo.Env)
 
     ResetSyncTable()
+    
+    SetupPathfinding()
 end
 
 -- OnCreateArmyBrain() is called by then engine as the brains are created, and we
@@ -283,6 +285,13 @@ function OnCreateArmyBrain(index, brain, name, nickname)
     if brainType == 'AI' and brainSkirmishSystems then
         ScenarioInfo.GameHasAIs = true
         SPEW("Detected an AI with skirmish systems: " .. brain.Name .. ", enabling AI functionality")
+    end
+
+    -- feature: enable or disable sharing of excess resources through the lobby
+    if ScenarioInfo.Options.TeamShareOverflow == "enabled" then
+        ArmyBrains[index]:SetResourceSharing(true)
+    elseif ScenarioInfo.Options.TeamShareOverflow == "disabled" then
+        ArmyBrains[index]:SetResourceSharing(false)
     end
 end
 
@@ -450,12 +459,16 @@ end
 
 --- Setup for union army, where all teams can control the units of its allies
 function BeginSessionUnionArmy(teams)
+    SPEW("Initialing session with union army control...")
+
     local humanIndex = 0
     for i, brain in ArmyBrains do
         if brain.BrainType ~= 'Human' then continue end
         for i2, _ in ArmyBrains do
             if not IsAlly(i, i2) then continue end
             SetCommandSource(i2 - 1, humanIndex, true)
+
+            SPEW("Army " .. tostring(i2) .. " control shared with army " .. tostring(i) .. " (source index " .. tostring(humanIndex) .. ")")
         end
         humanIndex = humanIndex + 1
     end
@@ -464,6 +477,8 @@ end
 
 --- Setup for common army, where all teams are batched together into one army
 function BeginSessionCommonArmy(teams)
+    SPEW("Initialing session with common army control...")
+
     local humanIndex = 0
     local IsHuman = {}
     for _, brain in ArmyBrains do
@@ -560,6 +575,18 @@ function OnPostLoad()
     if GetFocusArmy() ~= -1 then
         Sync.SetAlliedVictory = ArmyBrains[GetFocusArmy()].RequestingAlliedVictory or false
     end
+    
+    SetupPathfinding()
+end
+
+-- This changes default navigator's behaviour to make pathfinding more predictable and less frustrating. 
+-- Default value in the engine is 50. When distance between current units positions and 
+-- their final destination point >50, they use some weird pathfinding logic based on hidden waypoints and 
+-- start moving in columns. We disable such behaviour by setting this value to 9999, so navigator
+-- will be using personal positioning instead of waypoints for any move order (doesn't affect "formation move").
+-- useful console commands for debugging: "dbg navwaypoints", "dbg navpath", "dbg navsteering"
+function SetupPathfinding()
+    SetNavigatorPersonalPosMaxDistance(9999)
 end
 
 -- these imports break cycle dependencies of import sequences of mods

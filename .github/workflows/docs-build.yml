@@ -18,11 +18,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+
+# This workflow automates the generation, building, and deployment of the project's
+# documentation to GitHub Pages (https://faforever.github.io/fa/).
+#
+# The process includes:
+# - Generating current changelogs for FAF Develop and FAF Beta
+# - Adding links to pull request references in all changelogs
+# - Building the static site using Jekyll
+# - Uploading and deploying the final site to GitHub Pages
+
 name: Documentation - Build and deploy
 
 on:
   push:
-    branches: ["develop", "deploy/fafdevelop", "deploy/fafbeta"]
+    branches: ["deploy/faf", "deploy/fafdevelop", "deploy/fafbeta"]
     paths: ["docs/**", "changelog/snippets/*.md"]
 
   # Allows you to run this workflow manually from the Actions tab
@@ -42,15 +52,15 @@ concurrency:
 jobs:
   changelog-develop:
     name: Create changelog of FAF Develop
-    uses: ./.github/workflows/docs-changelog.yaml
+    uses: ./.github/workflows/docs-generate-changelog.yaml
     with:
-      reference: deploy/fafdevelop
+      branch: deploy/fafdevelop
 
   changelog-beta:
     name: Create changelog of FAF Beta
-    uses: ./.github/workflows/docs-changelog.yaml
+    uses: ./.github/workflows/docs-generate-changelog.yaml
     with:
-      reference: deploy/fafbeta
+      branch: deploy/fafbeta
 
   build:
     name: Build the documentation
@@ -74,12 +84,15 @@ jobs:
 
       # Retrieve the generated changelogs
       - name: Download artifact changelog of FAF Develop
+        # No artifact exists when there are no snippets to process
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: changelog-fafdevelop
           path: docs/generated
 
       - name: Download artifact changelog of FAF Beta
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: changelog-fafbeta
@@ -88,16 +101,16 @@ jobs:
       # Append the generated changelogs to the Jekyll-compatible templates
       - name: Append the generated changelogs
         run: |
-          cat generated/fafdevelop.md >> changelog/fafdevelop.md
-          cat generated/fafbeta.md >> changelog/fafbeta.md
+          cat generated/changelog-fafdevelop.md >> changelog/fafdevelop.md || true
+          cat generated/changelog-fafbeta.md >> changelog/fafbeta.md || true
 
-      # Update the posts directory contents
+      # Add links to the files in the posts directory
       - name: Update changelog posts directory
         shell: bash
         run: |
           changelog-links.sh _posts FAForever fa github.com
 
-      # Update the changelog directory contents
+      # Add links to the files in the changelog directory
       - name: Update changelog directory
         shell: bash
         run: |
@@ -106,7 +119,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.3"
+          ruby-version: "3.4"
           bundler-cache: true
           cache-version: 0
           working-directory: "${{ github.workspace }}/docs"

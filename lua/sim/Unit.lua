@@ -24,6 +24,7 @@ local Weapon = import("/lua/sim/weapon.lua").Weapon
 local IntelComponent = import('/lua/defaultcomponents.lua').IntelComponent
 local VeterancyComponent = import('/lua/defaultcomponents.lua').VeterancyComponent
 local DebugUnitComponent = import("/lua/sim/units/components/debugunitcomponent.lua").DebugUnitComponent
+local FastDecayComponent = import("/lua/sim/units/components/fastdecayunitcomponent.lua").FastDecayComponent
 
 local GetBlueprintCaptureCost = import('/lua/shared/capturecost.lua').GetBlueprintCaptureCost
 
@@ -123,7 +124,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field Affects table<BuffAffectName, table<BuffName, BlueprintBuffAffectState>>
 ---@field BuffTable table<BuffType, table<BuffName, BuffData>>
 
----@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties, CampaignAIUnitProperties, UnitBuffFields, DebugUnitComponent
+---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties, CampaignAIUnitProperties, UnitBuffFields, DebugUnitComponent, FastDecayComponent
 ---@field CDRHome? LocationType
 ---@field AIManagerIdentifier? string
 ---@field Repairers table<EntityId, Unit>
@@ -174,7 +175,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field ImmuneToStun? boolean
 ---@field Anims? Animator[] # Animators that get stopped when a unit is stunned. Not used in FAF.
 ---@field IsBeingTransferred? boolean
-Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent) {
+Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent, FastDecayComponent) {
 
     IsUnit = true,
     Weapons = {},
@@ -1124,18 +1125,21 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self.BuildTimeMultiplier = time_mult
     end,
 
+    --- Used by the engine in silo build calculations.
     ---@param self Unit
     ---@return integer
     GetMassBuildAdjMod = function(self)
         return self.MassBuildAdjMod or 1
     end,
 
+    --- Used by the engine in silo build calculations.
     ---@param self Unit
     ---@return integer
     GetEnergyBuildAdjMod = function(self)
         return self.EnergyBuildAdjMod or 1
     end,
 
+    --- Used by the engine in silo build calculations.
     ---@param self Unit
     GetEconomyBuildRate = function(self)
         return self:GetBuildRate()
@@ -1763,7 +1767,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         local mass, energy = self:GetTotalResourceCosts()
         mass = mass * (bp.Wreckage.MassMult or 0)
         energy = energy * (bp.Wreckage.EnergyMult or 0)
-        local time = (bp.Wreckage.ReclaimTimeMultiplier or 1)
+        local timeMult = (bp.Wreckage.ReclaimTimeMultiplier or 1)
         local pos = self:GetPosition()
         local wasOutside = false
         local layer = self.Layer
@@ -1807,12 +1811,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         local overkillMultiplier = 1 - (overkillRatio or 1)
         mass = mass * overkillMultiplier * self:GetFractionComplete()
         energy = energy * overkillMultiplier * self:GetFractionComplete()
-        time = time * overkillMultiplier
 
         -- Now we adjust the global multiplier. This is used for balance purposes to adjust global reclaim rate.
-        local time  = time * 2
+        timeMult  = timeMult * 2
 
-        local prop = Wreckage.CreateWreckage(bp, pos, self:GetOrientation(), mass, energy, time, self.DeathHitBox)
+        local prop = Wreckage.CreateWreckage(bp, pos, self:GetOrientation(), mass, energy, timeMult, self.DeathHitBox)
 
         -- Attempt to copy our animation pose to the prop. Only works if
         -- the mesh and skeletons are the same, but will not produce an error if not.
@@ -2357,6 +2360,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         -- for AI events
         self.Brain:OnUnitStartBeingBuilt(self, builder, layer)
+
+        if self.Blueprint.CategoriesHash["FASTDECAY"] then
+            self:StartFastDecayThread()
+        end
     end,
 
     ---@param self Unit
@@ -3141,6 +3148,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     -- GENERIC WORK
     -------------------------------------------------------------------------------------------
 
+    --- Called by the engine when a unit starts repairing a unit in the enhancing state.
     ---@param self Unit
     ---@param target Unit
     InheritWork = function(self, target)
@@ -3553,8 +3561,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     OnMotionTurnEventChange = function() end,
 
     ---@param self Unit
-    ---@param new string
-    ---@param old string
+    ---@param new TerrainType
+    ---@param old TerrainType
     OnTerrainTypeChange = function(self, new, old)
         self.TerrainType = new
         if self.MovementEffectsExist then
@@ -3721,13 +3729,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param effectsBag? TrashBag
     ---@param terrainType? TerrainType
     CreateTerrainTypeEffects = function(self, effectTypeGroups, fxBlockType, layer, typeSuffix, effectsBag, terrainType)
-        local effects, terrainFX, GetTerrainTypeEffects
+        local GetTerrainTypeEffects = self.GetTerrainTypeEffects
         local pos = self:GetPosition()
         local army = self.Army
+
+        local terrainFX
         if terrainType then
             terrainFX = terrainType[fxBlockType][layer]
-        else
-            GetTerrainTypeEffects = self.GetTerrainTypeEffects
         end
 
         for _, typeGroup in effectTypeGroups do
@@ -3737,11 +3745,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                 continue
             end
 
-            if terrainType then
-                effects = terrainFX[typeGroup.Type]
-            else
-                effects = GetTerrainTypeEffects(fxBlockType, layer, pos, typeGroup.Type, typeSuffix)
-            end
+            -- Use TerrainType specific effects or fallback to 'Default' TerrainType effects
+            local effects = terrainType and terrainFX[typeGroup.Type] or GetTerrainTypeEffects(fxBlockType, layer, pos, typeGroup.Type, typeSuffix)
             if table.empty(effects) then
                 continue
             end
@@ -4867,12 +4872,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end,
 
     ---@param self Unit
-    ---@param location Vector
+    ---@param destination Vector
     ---@param orientation Quaternion
     ---@param teleDelay? number
-    PlayTeleportChargeEffects = function(self, location, orientation, teleDelay)
+    PlayTeleportChargeEffects = function(self, destination, orientation, teleDelay)
         self.TeleportFxBag = self.TeleportFxBag or TrashBag()
-        EffectUtilities.PlayTeleportChargingEffects(self, location, self.TeleportFxBag, teleDelay)
+        EffectUtilities.PlayTeleportChargingEffects(self, destination, self.TeleportFxBag, teleDelay)
     end,
 
     ---@param self Unit
@@ -5008,12 +5013,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
     end,
 
+    --- Adds nuclear missiles to the unit.
     ---@param self Unit
     ---@param count number
     GiveNukeSiloAmmo = function(self, count)
         cUnit.GiveNukeSiloAmmo(self, count)
     end,
 
+    --- Sets build progress for nuclear/tactical missile construction.
     ---@param self Unit
     ---@param fraction number
     GiveNukeSiloBlocks = function(self, fraction)
@@ -5021,19 +5028,28 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             return
         end
 
-        local buildRate = self.Blueprint.Economy.BuildRate
+        local buildRate = self:GetEconomyBuildRate()
         if not buildRate then
             return
         end
 
-        local buildTime = self:GetWeapon(1):GetProjectileBlueprint().Economy.BuildTime
-        if not buildTime then
-            return
+        local buildTime
+        for i = 1, self.WeaponCount do
+            local weaponBp = self.WeaponInstances[i].Blueprint
+            if weaponBp.MaxProjectileStorage >= 1 then
+                buildTime = __blueprints[weaponBp.ProjectileId].Economy.BuildTime
+                if buildTime then
+                    break
+                end
+            end
         end
+        if not buildTime then return end
 
         local total = 10 * (buildTime / buildRate)
         local blocks = math.ceil(fraction * total)
         cUnit.GiveNukeSiloAmmo(self, blocks, true)
+        -- Engine won't update work progress so we do it manually
+        self:SetWorkProgress(fraction)
     end,
 
     --- Updates a statistic that you can retrieve on the UI side using `userunit:GetStat`. See `unit:UpdateStat` for an alternative
