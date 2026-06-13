@@ -12,7 +12,7 @@ ShieldCategory = categories.uel0307 + categories.ual0307 + categories.xsl0307
 NonShieldCategory = categories.ALLUNITS - ShieldCategory
 
 ---@alias LandCategoryNames
----| "Shield"
+---| "Shields"
 ---| "Bot1"
 ---| "Bot2"
 ---| "Bot3"
