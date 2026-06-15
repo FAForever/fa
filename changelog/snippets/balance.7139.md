@@ -1,0 +1,1 @@
+- (#7139) Align the Lobo's (UEL0103) fragmentation shell impact vision radius to the engine's vision grid (5 -> 4).
