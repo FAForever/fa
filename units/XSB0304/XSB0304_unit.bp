@@ -96,10 +96,10 @@ UnitBlueprint{
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 30000,
-        BuildCostMass = 3000,
+        BuildCostEnergy = 25500,
+        BuildCostMass = 2550,
         BuildRate = 120,
-        BuildTime = 4097,
+        BuildTime = 4100,
         BuildableCategory = { "BUILTBYQUANTUMGATE SERAPHIM" },
         RebuildBonusIds = { "xsb0304" },
     },
