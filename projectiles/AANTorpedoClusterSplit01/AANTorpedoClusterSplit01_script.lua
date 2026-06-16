@@ -89,6 +89,7 @@ AANTorpedoClusterSplit01 = ClassProjectile(ATorpedoCluster) {
         marker:UpdatePosition(px, pz)
         marker:UpdateDuration(5)
         marker:UpdateIntel(self.Army, 4, 'Vision', true)
+        marker:UpdateIntel(self.Army, 4, 'WaterVision', true)
         ATorpedoClusterOnImpact(self, TargetType, TargetEntity)
     end,
 }

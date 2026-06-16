@@ -61,6 +61,7 @@ AANTorpedoCluster01 = ClassProjectile(ATorpedoCluster, SplitComponent) {
         marker:UpdatePosition(px, pz)
         marker:UpdateDuration(10)
         marker:UpdateIntel(self.Army, 4, 'Vision', true)
+        marker:UpdateIntel(self.Army, 4, 'WaterVision', true)
 
         self:Destroy()
     end,
