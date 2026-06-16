@@ -101,6 +101,22 @@ XSL0301 = ClassUnit(CommandUnit) {
 
     ---@param self XSL0301
     ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementResourceAllocation = function(self, bp)
+        local bpEcon = self.Blueprint.Economy
+        self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy or 0) + (bpEcon.ProductionPerSecondEnergy or 0))
+        self:SetProductionPerSecondMass((bp.ProductionPerSecondMass or 0) + (bpEcon.ProductionPerSecondMass or 0))
+    end,
+
+    ---@param self XSL0301
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementResourceAllocationRemove = function(self, bp)
+        local bpEcon = self.Blueprint.Economy
+        self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
+        self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
+    end,
+
+    ---@param self XSL0301
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementShield = function(self, bp)
         self:AddToggleCap('RULEUTC_ShieldToggle')
         self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)

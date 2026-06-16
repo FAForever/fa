@@ -278,6 +278,14 @@ UnitBlueprint{
             SortCategory = "SORTOTHER",
             UnitName = "<LOC xsl0301_Rambo_name>SACU (Rambo preset)",
         },
+        RAS = {
+            Description = "<LOC xsl0301_RAS_desc>SACU (RAS preset)",
+            BuildIconSortPriority = 10,
+            Enhancements = { "ResourceAllocation" },
+            HelpText = "<LOC xsl0301_RAS_help>Support Armored Command Unit. Enhanced during construction with a Resource Allocation System.",
+            SortCategory = "SORTOTHER",
+            UnitName = "<LOC xsl0301_RAS_name>",
+        },
     },
     Enhancements = {
         DamageStabilization = {
@@ -413,6 +421,32 @@ UnitBlueprint{
             RemoveEnhancements = {
                 "Overcharge",
                 "OverchargeRemove",
+            },
+            Slot = "RCH",
+        },
+        ResourceAllocation = {
+            BuildCostEnergy = 90000,
+            BuildCostMass = 4500,
+            BuildTime = 8400,
+            Icon = "ras",
+            Name = "<LOC enhancements_0069>Resource Allocation System",
+            ProductionPerSecondEnergy = 1000,
+            ProductionPerSecondMass = 10,
+            ShowBones = { "Back_Upgrade" },
+            Slot = "RCH",
+            UpgradeUnitAmbientBones = { "Torso" },
+        },
+        ResourceAllocationRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            HideBones = { "Back_Upgrade" },
+            Icon = "ras",
+            Name = "<LOC enhancements_0070>Remove Resource Allocation System",
+            Prerequisite = "ResourceAllocation",
+            RemoveEnhancements = {
+                "ResourceAllocation",
+                "ResourceAllocationRemove",
             },
             Slot = "RCH",
         },

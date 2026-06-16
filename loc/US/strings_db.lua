@@ -86,6 +86,7 @@ xsl0301_NanoCombat_name=""
 xsl0301_Rambo_desc="SACU (Rambo Preset)"
 xsl0301_Rambo_help="Enhanced during construction with the Personal Shield Generator, Nano-Repair System and Overcharge."
 xsl0301_Rambo_name=""
+xsl0301_RAS_name = ""
 
 A02_M01_OBJ_010_113="(%s%%/%s%%)"
 Abasi="Abasi"
