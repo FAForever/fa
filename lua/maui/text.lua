@@ -60,6 +60,9 @@ Text = ClassUI(moho.text_methods, Control) {
     SetText = function(self, text)
         self:SetDisplayText(text)
         self._fullText = text
+        if self._truncationEnabled then
+            self:_applyTruncation()
+        end
     end,
 
     --- FAF extensible GetText() that retrieves raw original text that isn't modified for display
