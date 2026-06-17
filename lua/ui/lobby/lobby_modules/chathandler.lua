@@ -56,7 +56,10 @@ function AddChatText(text, playerID, scrollToBottom)
             if not chatPlayerColor then
                 nameFont = UIUtil.bodyFont
                 if Prefs.GetOption('faction_font_color') then
-                    nameColor = import("/lua/skins/skins.lua").skins[ FACTION_NAMES[GetLocalPlayerData():AsTable().Faction] ].fontColor
+                    local localData = GetLocalPlayerData()
+                    local localTable = localData and localData:AsTable()
+                    local factionKey = localTable and FACTION_NAMES[localTable.Faction]
+                    nameColor = factionKey and import("/lua/skins/skins.lua").skins[factionKey].fontColor or nameColor
                     textColor = nameColor
                 else
                     nameColor = nil

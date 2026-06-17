@@ -1786,6 +1786,7 @@ function CreateUI(maxPlayers)
             WaitSeconds(1)
         end
     end)
+    -- Seasonal feature: enable manually for snowflake effect during winter events
     if false then
         import("/lua/ui/events/snowflake.lua"). CreateSnowFlakes(GUI)
     end

@@ -92,8 +92,9 @@ end
 function CPU_AddControlTooltip(control, delay, slotNumber)
     local CPUText = function()
         local CPUInfo
-        if GUI.slots[slotNumber].CPUSpeedBar.CPUActualValue then
-            CPUInfo = GUI.slots[slotNumber].CPUSpeedBar.CPUActualValue
+        local slot = GUI.slots and GUI.slots[slotNumber]
+        if slot and slot.CPUSpeedBar and slot.CPUSpeedBar.CPUActualValue then
+            CPUInfo = slot.CPUSpeedBar.CPUActualValue
         else
             CPUInfo = LOC('<LOC lobui_0458>UnKnown')
         end
@@ -146,15 +147,16 @@ end
 -- @param waitTime  Seconds to wait before starting.
 -- @return Best score, or nil if the lobby was exited mid-run.
 function StressCPU(waitTime)
-    GUI.rerunBenchmark:Disable()
+    local btn = GUI.rerunBenchmark
+    if btn then btn:Disable() end
     for i = waitTime, 1, -1 do
-        GUI.rerunBenchmark.label:SetText(i..'s')
+        if btn and btn.label then btn.label:SetText(i..'s') end
         WaitSeconds(1)
         if not lobbyComm then return end
     end
 
     local currentBestBenchmark = 10000
-    GUI.rerunBenchmark.label:SetText('. . .')
+    if btn and btn.label then btn.label:SetText('. . .') end
 
     for i = 1, 3, 1 do
         BenchTime = 0
@@ -168,8 +170,8 @@ function StressCPU(waitTime)
         end
     end
 
-    GUI.rerunBenchmark:Enable()
-    GUI.rerunBenchmark.label:SetText('')
+    if btn then btn:Enable() end
+    if btn and btn.label then btn.label:SetText('') end
 
     return currentBestBenchmark
 end

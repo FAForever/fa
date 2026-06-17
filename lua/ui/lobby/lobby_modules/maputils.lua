@@ -159,7 +159,6 @@ function ConfigureMapListeners(mapCtrl, scenario)
                         end
                     elseif IsObserver(localPlayerID) then
                         if lobbyComm:IsHost() then
-                            local requestedFaction = GetSanitisedLastFaction()
                             HostUtils.ConvertObserverToPlayer(FindObserverSlotForID(localPlayerID), slot)
                         else
                             lobbyComm:SendData(

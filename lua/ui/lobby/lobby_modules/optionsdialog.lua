@@ -310,6 +310,7 @@ function ShowLobbyOptionsDialog()
             GUI.chatPanel:ScrollToBottom()
         end
     end
+    -- Seasonal feature: snowflake slider (always shown; toggle the outer `if` to disable)
     if true then
         --snowflakes count
         local currentSnowFlakesCount = Prefs.GetFromCurrentProfile('SnowFlakesCount') or 100
