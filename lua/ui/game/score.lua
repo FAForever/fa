@@ -72,7 +72,7 @@ function updatePlayerName(line)
         line.division:SetText(playerRating)
     end
 
-    line.name:SetTruncationText("...")
+    line.name:SetTruncationEnabled(true)
     line.name:SetText(playerClan .. playerName)
     line.name:SetDropShadow(true)
     LayoutHelpers.AnchorToLeft(line.name, line.division)

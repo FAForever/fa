@@ -33,38 +33,10 @@ Text = ClassUI(moho.text_methods, Control) {
         self._color.OnDirty = function(var)
             self:SetNewColor(var())
         end
-        self._truncationText = ""
+
+        self._truncationText = "..."
         self._fullText = nil
-
-
-        --- Direct Engine SetText() that changes what text is displayed
-        ---@type function
-        ---@param str string | number
-        self.SetDisplayText = self.SetText
-
-
-        --- FAF extensible SetText() that uses SetDisplayText() but can retain it's original text for fancy text display setups like truncation
-        ---@param text string | number
-        self.SetText = function (self, text)
-            self.SetDisplayText(self,text)
-            self._fullText = text
-            if self._truncationText ~= nil and self._truncationText ~= "" then
-                if self._initialized then
-                    self:_applyTruncation()
-                end
-            end
-        end
-
-        --- Direct Engine GetText() for getting the current displayed value
-        ---@type function
-        ---@return string
-        self.GetDisplayText = self.GetText
-
-        --- FAF extensible GetText() that retrieves raw original text that isn't modified for display 
-        ---@return string
-        self.GetText = function (self)
-            return self._fullText
-        end
+        self._truncationEnabled = false
     end,
 
     OnInit = function(self)
@@ -73,13 +45,38 @@ Text = ClassUI(moho.text_methods, Control) {
         self:SetClipToWidth(false)
     end,
 
-    --- Sets custom truncation trailing characters like "..." or "-". Set to "" to disable.
+    --- Direct Engine SetText() that changes what text is displayed
+    ---@type function
+    ---@type fun(self: Text, str: string | number)
+    SetDisplayText = moho.text_methods.SetText,
+
+    --- Direct Engine GetText() for getting the current displayed value
+    ---@type function
+    ---@return string
+    GetDisplayText = moho.text_methods.GetText,
+
+    --- FAF extensible SetText() that uses SetDisplayText() but can retain it's original text for fancy text display setups like truncation
     ---@param text string | number
-    SetTruncationText = function (self, text)
+    SetText = function(self, text)
+        self:SetDisplayText(text)
+        self._fullText = text
+    end,
+
+    --- FAF extensible GetText() that retrieves raw original text that isn't modified for display
+    ---@return string
+    GetText = function(self)
+        return self._fullText
+    end,
+
+    --- Sets custom truncation trailing characters like "..." or "-".
+    ---@param text string | number
+    SetTruncationText = function(self, text)
         self._truncationText = tostring(text)
-        if self._fullText ~= nil and self._initialized then
-            self:_applyTruncation()
-        end
+    end,
+
+    ---@param enabled boolean
+    SetTruncationEnabled = function(self, enabled)
+        self._truncationEnabled = enabled
     end,
 
     SetClipToWidth = function(self, clipToWidth)
@@ -87,7 +84,7 @@ Text = ClassUI(moho.text_methods, Control) {
             self.Width:Set(function() return self.Right() - self.Left() end)
 
             self.Width.OnDirty = function()
-                if self._truncationText ~= nil and self._truncationText ~= "" then
+                if self._truncationEnabled then
                     self:_applyTruncation()
                 end
             end
@@ -101,8 +98,8 @@ Text = ClassUI(moho.text_methods, Control) {
     --- Internal function to fit the truncation string inside the max width
     _applyTruncation = function(self)
         local maxWidth = self.Width()
-        if maxWidth <= 0 then
-             return
+        if not maxWidth or maxWidth <= 0 then
+            return
         end
 
         -- ellipsis is the trailing '...' on truncated text
@@ -111,7 +108,7 @@ Text = ClassUI(moho.text_methods, Control) {
         if str == nil then return end
         -- restore full text if it now fits
         if self:GetStringAdvance(str) <= maxWidth then
-                self.SetDisplayText(self, str)
+            self:SetDisplayText(str)
             return
         end
 
@@ -122,7 +119,7 @@ Text = ClassUI(moho.text_methods, Control) {
             i = i - 1
         end
 
-        self.SetDisplayText(self, str .. ellipsis)
+        self:SetDisplayText(str .. ellipsis)
     end,
 
     -- lazy var support
