@@ -195,10 +195,10 @@ UnitBlueprint{
         },
     },
     Economy = {
-        BuildCostEnergy = 25800,
-        BuildCostMass = 2050,
+        BuildCostEnergy = 20800,
+        BuildCostMass = 1650,
         BuildRate = 56,
-        BuildTime = 14400,
+        BuildTime = 8800,
         BuildableCategory = { "BUILTBYTIER3ENGINEER SERAPHIM" },
         MaxBuildDistance = 10,
         NaturalProducer = true,
