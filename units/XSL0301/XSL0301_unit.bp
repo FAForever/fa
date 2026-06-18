@@ -374,9 +374,9 @@ UnitBlueprint{
             Slot = "Back",
         },
         Missile = {
-            BuildCostEnergy = 46000,
-            BuildCostMass = 1500,
-            BuildTime = 4200,
+            BuildCostEnergy = 55300,
+            BuildCostMass = 1800,
+            BuildTime = 5050,
             Icon = "tmu",
             Name = "<LOC enhancements_0145>Tactical Missile Launcher",
             ShowBones = { "Back_Upgrade" },
