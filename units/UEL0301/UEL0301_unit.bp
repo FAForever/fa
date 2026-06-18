@@ -365,7 +365,7 @@ UnitBlueprint{
         ResourceAllocation = {
             BuildCostEnergy = 90000,
             BuildCostMass = 4500,
-            BuildTime = 8400,
+            BuildTime = 20150,
             Icon = "isb",
             Name = "<LOC enhancements_0069>Resource Allocation System",
             ProductionPerSecondEnergy = 1000,
