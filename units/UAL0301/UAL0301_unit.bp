@@ -291,9 +291,9 @@ UnitBlueprint{
             Slot = "LCH",
         },
         ResourceAllocation = {
-            BuildCostEnergy = 90000,
-            BuildCostMass = 4500,
-            BuildTime = 20150,
+            BuildCostEnergy = 92000,
+            BuildCostMass = 4600,
+            BuildTime = 20550,
             Icon = "ras",
             Name = "<LOC enhancements_0024>Resource Allocation System",
             ProductionPerSecondEnergy = 1000,
