@@ -30,3 +30,10 @@
     - Sniper mode speed: 1.74 -> 2.0
 
       The last patch changing sniper mode speed said that it was changed to 2.0, but an engine bug made the speed multiplier apply twice, resulting in 1.74 speed. This new speed is an intentional buff, not just a bug fix.
+
+  - **Absolver: T3 Shield Disruptor (DAA0310)**
+    
+    Range is nerfed to balance Aeon vs Seraphim sniper wars.
+
+    - Shield Disruptor Cannon:
+      - Range: 65 -> 52
