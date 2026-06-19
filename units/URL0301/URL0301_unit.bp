@@ -267,7 +267,7 @@ UnitBlueprint{
     Enhancements = {
         CloakingGenerator = {
             BuildCostEnergy = 382200,
-            BuildCostMass = 5000,
+            BuildCostMass = 4700,
             BuildTime = 13800,
             Icon = "cfs",
             MaintenanceConsumptionPerSecondEnergy = 3500,
@@ -293,7 +293,7 @@ UnitBlueprint{
         },
         EMPCharge = {
             BuildCostEnergy = 60000,
-            BuildCostMass = 1000,
+            BuildCostMass = 700,
             BuildTime = 3600,
             Icon = "emp",
             Name = "<LOC enhancements_0091>EMP Burst",
@@ -315,7 +315,7 @@ UnitBlueprint{
         },
         FocusConvertor = {
             BuildCostEnergy = 24000,
-            BuildCostMass = 800,
+            BuildCostMass = 1400,
             BuildTime = 3000,
             Icon = "fc",
             Name = "<LOC enhancements_0093>Disintegrator Amplifier",
@@ -385,7 +385,7 @@ UnitBlueprint{
         },
         SelfRepairSystem = {
             BuildCostEnergy = 103500,
-            BuildCostMass = 2200,
+            BuildCostMass = 1900,
             BuildTime = 6000,
             Icon = "srs",
             Name = "<LOC enhancements_0099>Nano-Repair System",
