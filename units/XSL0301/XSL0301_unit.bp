@@ -291,7 +291,7 @@ UnitBlueprint{
         DamageStabilization = {
             BuildCostEnergy = 76800,
             BuildCostMass = 2500,
-            BuildTime = 5900,
+            BuildTime = 11300,
             Icon = "dss",
             Name = "<LOC enhancements_0131>Nano-Repair System",
             NewHealth = 14000,
@@ -348,7 +348,7 @@ UnitBlueprint{
         EnhancedSensors = {
             BuildCostEnergy = 34000,
             BuildCostMass = 800,
-            BuildTime = 3100,
+            BuildTime = 3550,
             Icon = "sre",
             Name = "<LOC enhancements_0141>Enhanced Sensor System",
             NewMaxRadius = 35,
@@ -376,7 +376,7 @@ UnitBlueprint{
         Missile = {
             BuildCostEnergy = 55300,
             BuildCostMass = 1800,
-            BuildTime = 5050,
+            BuildTime = 8450,
             Icon = "tmu",
             Name = "<LOC enhancements_0145>Tactical Missile Launcher",
             ShowBones = { "Back_Upgrade" },
@@ -401,7 +401,7 @@ UnitBlueprint{
         Overcharge = {
             BuildCostEnergy = 283500,
             BuildCostMass = 1000,
-            BuildTime = 12600,
+            BuildTime = 4350,
             Icon = "oc",
             Name = "<LOC enhancements_0139>Overcharge",
             Slot = "RCH",
@@ -453,7 +453,7 @@ UnitBlueprint{
         Shield = {
             BuildCostEnergy = 109400,
             BuildCostMass = 1200,
-            BuildTime = 6720,
+            BuildTime = 5400,
             Icon = "sp",
             ImpactEffects = "SeraphimShieldHit01",
             MaintenanceConsumptionPerSecondEnergy = 300,
