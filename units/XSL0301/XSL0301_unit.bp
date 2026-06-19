@@ -289,7 +289,7 @@ UnitBlueprint{
     },
     Enhancements = {
         DamageStabilization = {
-            BuildCostEnergy = 76800,
+            BuildCostEnergy = 75000,
             BuildCostMass = 2500,
             BuildTime = 11300,
             Icon = "dss",
@@ -346,7 +346,7 @@ UnitBlueprint{
             Slot = "LCH",
         },
         EnhancedSensors = {
-            BuildCostEnergy = 34000,
+            BuildCostEnergy = 33000,
             BuildCostMass = 800,
             BuildTime = 3550,
             Icon = "sre",
@@ -374,7 +374,7 @@ UnitBlueprint{
             Slot = "Back",
         },
         Missile = {
-            BuildCostEnergy = 55300,
+            BuildCostEnergy = 68000,
             BuildCostMass = 1800,
             BuildTime = 8450,
             Icon = "tmu",
@@ -399,7 +399,7 @@ UnitBlueprint{
             Slot = "Back",
         },
         Overcharge = {
-            BuildCostEnergy = 283500,
+            BuildCostEnergy = 79500,
             BuildCostMass = 1000,
             BuildTime = 4350,
             Icon = "oc",
@@ -451,7 +451,7 @@ UnitBlueprint{
             Slot = "RCH",
         },
         Shield = {
-            BuildCostEnergy = 109400,
+            BuildCostEnergy = 43500,
             BuildCostMass = 1200,
             BuildTime = 5400,
             Icon = "sp",
