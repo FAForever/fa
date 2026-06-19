@@ -425,7 +425,7 @@ UnitBlueprint{
             Slot = "RCH",
         },
         ResourceAllocation = {
-            BuildCostEnergy = 92000,
+            BuildCostEnergy = 94400,
             BuildCostMass = 4600,
             BuildTime = 20550,
             Icon = "ras",
