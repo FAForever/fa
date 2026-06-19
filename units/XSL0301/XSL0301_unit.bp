@@ -214,7 +214,7 @@ UnitBlueprint{
     EnhancementPresets = {
         AdvancedCombat = {
             Description = "<LOC xsl0301_AdvancedCombat_desc>SACU (Advanced Combatant preset)",
-            BuildIconSortPriority = 30,
+            BuildIconSortPriority = 35,
             Enhancements = {
                 "EnhancedSensors",
                 "DamageStabilization",
@@ -267,13 +267,13 @@ UnitBlueprint{
         },
         Rambo = {
             Description = "<LOC xsl0301_Rambo_desc>SACU (Rambo preset)",
-            BuildIconSortPriority = 35,
+            BuildIconSortPriority = 30,
             Enhancements = {
-                "Overcharge",
+                "EnhancedSensors",
                 "Shield",
                 "DamageStabilization",
             },
-            HelpText = "<LOC xsl0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with the personal shield generator, nano-repair system and overcharge enhancements.",
+            HelpText = "<LOC xsl0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system, personal shield generator, and nano-repair system enhancements.",
             SelectionPriority = 1,
             SortCategory = "SORTOTHER",
             UnitName = "<LOC xsl0301_Rambo_name>SACU (Rambo preset)",
@@ -466,9 +466,11 @@ UnitBlueprint{
             ShieldRechargeTime = 160,
             ShieldRegenRate = 22,
             ShieldRegenStartTime = 1,
-            ShowBones = { "Back_Upgrade" },
-            Slot = "Back",
-            UpgradeEffectBones = { "Back_Upgrade" },
+            Slot = "RCH",
+            UpgradeEffectBones = {
+                "Right_Arm_Muzzle",
+                "Right_Arm_Barrel",
+            },
             UpgradeUnitAmbientBones = { "Torso" },
         },
         ShieldRemove = {

@@ -84,7 +84,7 @@ xsl0301_NanoCombat_desc="SACU (Nano Combatant Preset)"
 xsl0301_NanoCombat_help="Enhanced during construction with the Enhanced Sensor System and Nano-Repair System."
 xsl0301_NanoCombat_name=""
 xsl0301_Rambo_desc="SACU (Rambo Preset)"
-xsl0301_Rambo_help="Enhanced during construction with the Personal Shield Generator, Nano-Repair System and Overcharge."
+xsl0301_Rambo_help="Support Armored Command Unit. Enhanced during construction with the enhanced sensor system, personal shield generator, and nano-repair system enhancements."
 xsl0301_Rambo_name=""
 xsl0301_RAS_name = ""
 

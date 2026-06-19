@@ -8602,7 +8602,7 @@ xsl0301_NanoCombat_help="副指挥官，在建造过程中预先安装了传感�
 xsl0301_NanoCombat_name="副指挥官(战斗型)"
 
 xsl0301_Rambo_desc="副指挥官(防御型)"
-xsl0301_Rambo_help="副指挥官，在建造过程中预先安装了纳米修复系统、护盾发生器以及超充能."
+xsl0301_Rambo_help="副指挥官，在建造过程中预先安装了强化传感器系统、个人护盾发生器，以及纳米修复系统强化。"
 xsl0301_Rambo_name="副指挥官(防御型)"
 
 aireplace_0001="AI托管"

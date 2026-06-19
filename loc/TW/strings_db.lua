@@ -9513,7 +9513,7 @@ xsl0301_NanoCombat_desc="支援裝甲指揮單位(奈米戰鬥套裝)"
 xsl0301_NanoCombat_help="支援裝甲指揮單位。在建造時預裝設了強化偵測系統，以及奈米維修系統強化。"
 xsl0301_NanoCombat_name=""
 xsl0301_Rambo_desc="支援裝甲指揮單位(進階戰鬥套裝)"
-xsl0301_Rambo_help="支援裝甲指揮單位。在建造時預裝設了超充能、個人護盾產生器，以及奈米維修系統強化。"
+xsl0301_Rambo_help="支援裝甲指揮單位。在建造時預裝設了強化偵測系統、個人護盾產生器，以及奈米維修系統強化。"
 xsl0301_Rambo_name=""
 
 -- Misc
