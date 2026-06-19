@@ -337,7 +337,7 @@ UnitBlueprint{
             Slot = "LCH",
         },
         Shield = {
-            BuildCostEnergy = 64950,
+            BuildCostEnergy = 44900,
             BuildCostMass = 1200,
             BuildTime = 4950,
             Icon = "tsg",
@@ -358,7 +358,7 @@ UnitBlueprint{
             UpgradeUnitAmbientBones = { "UAL0301" },
         },
         ShieldHeavy = {
-            BuildCostEnergy = 100000,
+            BuildCostEnergy = 73600,
             BuildCostMass = 1800,
             BuildTime = 7900,
             Icon = "phtsg",
@@ -424,7 +424,7 @@ UnitBlueprint{
             },
         },
         StabilitySuppressant = {
-            BuildCostEnergy = 46200,
+            BuildCostEnergy = 45600,
             BuildCostMass = 1250,
             BuildTime = 6200,
             Icon = "ss",
@@ -449,7 +449,7 @@ UnitBlueprint{
             Slot = "RCH",
         },
         SystemIntegrityCompensator = {
-            BuildCostEnergy = 74000,
+            BuildCostEnergy = 42500,
             BuildCostMass = 1500,
             BuildTime = 6720,
             Icon = "sic",
