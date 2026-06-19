@@ -456,7 +456,7 @@ UnitBlueprint{
             BuildTime = 5400,
             Icon = "sp",
             ImpactEffects = "SeraphimShieldHit01",
-            MaintenanceConsumptionPerSecondEnergy = 300,
+            MaintenanceConsumptionPerSecondEnergy = 210,
             Name = "<LOC enhancements_0028>Personal Shield Generator",
             OwnerShieldMesh = "/units/xsl0301/xsl0301_personalshield_mesh",
             PersonalShield = true,
