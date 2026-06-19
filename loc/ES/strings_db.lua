@@ -1821,7 +1821,7 @@ Unit_Description_0015="Añade un segundo Zángano ingeniero. Requiere contar con
 Unit_Description_0016="Unidad polivalente de construcción, reparación, captura y recuperación. Equivale a un ingeniero de nivel 3. "
 Unit_Description_0017="El Zángano ingeniero actúa como un ingeniero secundario. Ayuda a la UCBA cuando es posible."
 Unit_Description_0018="Genera un escudo protector alrededor de la UCBA. Requiere de energía para mantenerse activo."
-Unit_Description_0019="Aumenta el radio del escudo personal de la UCBA. Requiere de energía para mantenerse activo."
+Unit_Description_0019="Aumenta el radio del escudo personal de la UCBA. Requiere de energía para mantenerse activo.\n\nVelocidad de regeneración del escudo = 160 HP/s\nTiempo de recarga del escudo = 110 segundos"
 Unit_Description_0020="El Bloqueo de radar crea imágenes de radar falsas. Puede contrarrestarse con omnisensores."
 Unit_Description_0021="Aumenta la generación de recursos de la UCBA."
 Unit_Description_0022="Amplía en gran medida el alcance de los sistemas de sensores a bordo de la UCBA."

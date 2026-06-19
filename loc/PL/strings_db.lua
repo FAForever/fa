@@ -1836,7 +1836,7 @@ Unit_Description_0015="Dodaje drugą Sondę inżynieryjną dla twojej OJD. Druga
 Unit_Description_0016="Jednostka ta może nieustannie odbudowywać lub naprawiać inną jednostkę lub strukturę. Zastępcza OJD jest sprowadzana przez Bramę kwantową."
 Unit_Description_0017="Sonda inżynieryjna działa jak inżynier, wspomagając OJD we wszystkich budowach i naprawach."
 Unit_Description_0018="Aktywowana Osobista tarcza tworzy osłonę wokół OJD. Podobnie jak inne tarcze UEF Osobista tarcza zaniknie po przyjęciu określonej liczby obrażeń i będzie musiała się naładować przed ponowną aktywacją"
-Unit_Description_0019="Ulepszenie Osobistej tarczy, Pole generatora tarczy rozszerza obszar chroniony przez tarczę OJD, pozwalając dowódcy ochraniać inne jednostki."
+Unit_Description_0019="Ulepszenie Osobistej tarczy, Pole generatora tarczy rozszerza obszar chroniony przez tarczę OJD, pozwalając dowódcy ochraniać inne jednostki.\n\nSzybkość regeneracji tarczy = 160 HP/s\nCzas przeładowania tarczy = 110 sekund"
 Unit_Description_0020="System Zakłócacza radarów sprawia, że OJD staje się niewykrywalna dla radarów. Zakłócacz radarów nie działa przeciwko czujnikom optycznym lub klasy Omni."
 Unit_Description_0021="System alokacji zasobów wprowadza efektywne algorytmy, które zwiększają szybkość, z jaką OJD generuje zasoby."
 Unit_Description_0022="To ulepszenie znacznie rozszerza zasięg standardowego, pokładowego systemu czujników OJD. To popularny wybór dla dowódców, którzy często działają poza główną bazą."

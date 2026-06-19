@@ -1837,7 +1837,7 @@ Unit_Description_0015="Toto vylepšení přidá ACU druhou ženijní sondu. Poch
 Unit_Description_0016="Tato jednotka neustále opravuje jakoukoli jednotku či budovu. Podřízený velitel se přivolává pomocí kvantové brány."
 Unit_Description_0017="Ženijní sonda funguje jako sekundární ženista, pomáhá ACU s opravami a stavěním."
 Unit_Description_0018="Aktivovaný osobní štít vytváří kolem SACU ochranné pole. Pro provoz vyžaduje enegii."
-Unit_Description_0019="Rozšiřuje oblast, kterou štít SACU chrání. Pro provoz vyžaduje enegii."
+Unit_Description_0019="Rozšiřuje oblast, kterou štít SACU chrání. Pro provoz vyžaduje enegii.\n\nObnova štítu = 160 HP/s\nČas nabití štítu = 110 sekund"
 Unit_Description_0020="Rušička radaru vytváří množství klamných radarových obrazů, které mají zmást nepřítele. Omnisenzory dokáží rušení prohlédnout."
 Unit_Description_0021="Zlepšuje rychlost, s jakou ACU generuje zdroje."
 Unit_Description_0022="Toto vylepšení značně zvyšuje dosah standardních senzorů SACU. Je to oblíbené zařízení velitelů, kteří často operují daleko od své hlavní základny."

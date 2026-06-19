@@ -1835,7 +1835,7 @@ Unit_Description_0015="Fügt eine zweite technische Drohne hinzu. Setzt eine ber
 Unit_Description_0016="Eine Mehrzweckeinheit für Bau, Reparatur, Eroberung und Wiederverwertung. Entspricht einem Techniker der Stufe 3."
 Unit_Description_0017="Die technische Drohne fungiert als zweiter Techniker. Unterstützt die SACU, wo möglich."
 Unit_Description_0018="Erzeugt einen schützenden Schild um die SACU. Verbraucht im Betrieb Energie."
-Unit_Description_0019="Erweitert den Radius des persönlichen Schildes der SACU. Verbraucht im Betrieb Energie."
+Unit_Description_0019="Erweitert den Radius des persönlichen Schildes der SACU. Verbraucht im Betrieb Energie.\n\nSchildregeneration = 160 HP/s\nSchildaufladezeit = 110 Sekunden"
 Unit_Description_0020="Das Radarstörsystem erzeugt falsche Radarbilder. Diesem kann mit Omnisensoren entgegengewirkt werden."
 Unit_Description_0021="Erhöht die Ressourcenproduktion der SACU."
 Unit_Description_0022="Erhöht die Reichweite der standardmäßigen Sensorsysteme der SACU erheblich."

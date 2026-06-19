@@ -1311,7 +1311,7 @@ Unit_Description_0015="Aggiunge una seconda Unità teleguidata. Richiede la pres
 Unit_Description_0016="Unità multifunzione di costruzione, riparazione, cattura e recupero. Equivale a un Ingegnere Tech 3."
 Unit_Description_0017="L'Unità teleguidata funge da Ingegnere secondario e, dove possibile, assiste l'UCCS. "
 Unit_Description_0018="Crea uno scudo protettivo intorno all'UCCS."
-Unit_Description_0019="Espande il raggio dello scudo individuale dell'UCCS."
+Unit_Description_0019="Espande il raggio dello scudo individuale dell'UCCS.\n\nRigenerazione scudo = 160 HP/s\nTempo di ricarica scudo = 110 secondi"
 Unit_Description_0020="Il Disturbatore radar crea immagini radar false. È contrastato dagli Omni-sensori."
 Unit_Description_0021="Aumenta la generazione di risorse dell'UCCS."
 Unit_Description_0022="Espande notevolmente il raggio dei sistemi di sensori standard a bordo dell'UCCS."

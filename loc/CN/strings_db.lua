@@ -1700,7 +1700,7 @@ Unit_Description_0015="这会为ACU增加第二部工程机器人。在安装第
 Unit_Description_0016="这个部队可以持续地重建及修复任何部队或建筑物。「副指挥官」通过量子闸门进行召唤。"
 Unit_Description_0017="工程机器人就像第二名工程师，协助ACU进行建造或修理工作。"
 Unit_Description_0018="在SACU周围产生一道护盾。需要能源来运行。"
-Unit_Description_0019="扩展SACU个人护盾的半径范围。需要能源来运作。"
+Unit_Description_0019="扩展SACU个人护盾的半径范围。需要能源来运作。\n\n护盾恢复率 = 160 HP/s\n护盾充能时间 = 110 秒"
 Unit_Description_0020="雷达干扰仪制造许多假的雷达影像，以混淆敌军。全方位侦测器可以看穿干扰。"
 Unit_Description_0021="增加SACU的资源生产。"
 Unit_Description_0022="这项升级大幅扩展SACU侦测系统的范围，对于喜欢在远离主基地之处行动的指挥官而言，这是很受欢迎的选择。"

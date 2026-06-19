@@ -1309,7 +1309,7 @@ Unit_Description_0015="Ajoute un second drone d'ingénierie à l'UBC. Nécessite
 Unit_Description_0016="Tayunt polyvalente de construction, réparation, capture et exploitation. Équivaut à un ingénieur de Tech 3."
 Unit_Description_0017="Le drone d'ingénierie est utilisé en tant qu'ingénieur secondaire. Il assiste l'UBCS dans ses actions."
 Unit_Description_0018="Crée un bouclier protecteur autour de l'UBCS. Nécessite de l'énergie i fonctionner."
-Unit_Description_0019="Augmente la zone de protection du bouclier personnel de l'UBCS. Nécessite de l'énergie i fonctionner."
+Unit_Description_0019="Augmente la zone de protection du bouclier personnel de l'UBCS. Nécessite de l'énergie i fonctionner.\n\nRégénération du bouclier = 160 HP/s\nTemps de recharge du bouclier = 110 secondes"
 Unit_Description_0020="Le brouilleur radar crée de fausses images radar. Peut être contré par des omni-capteurs."
 Unit_Description_0021="Augmente les capacités de production de ressources de l'UBCS."
 Unit_Description_0022="Augmente grandement la portée des systèmes de capteurs standards embarqués ɣef l'UBCS."
