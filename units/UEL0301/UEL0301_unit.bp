@@ -257,7 +257,7 @@ UnitBlueprint{
     },
     Enhancements = {
         AdvancedCoolingUpgrade = {
-            BuildCostEnergy = 44700,
+            BuildCostEnergy = 40000,
             BuildCostMass = 1000,
             BuildTime = 5060,
             Icon = "acu",
@@ -281,7 +281,7 @@ UnitBlueprint{
             Slot = "LCH",
         },
         HighExplosiveOrdnance = {
-            BuildCostEnergy = 30000,
+            BuildCostEnergy = 25500,
             BuildCostMass = 800,
             BuildTime = 3370,
             Icon = "heo",
@@ -417,7 +417,7 @@ UnitBlueprint{
             Slot = "LCH",
         },
         Shield = {
-            BuildCostEnergy = 100200,
+            BuildCostEnergy = 90200,
             BuildCostMass = 2000,
             BuildTime = 8390,
             Icon = "psg",
@@ -444,7 +444,7 @@ UnitBlueprint{
             UpgradeUnitAmbientBones = { "UEL0301" },
         },
         ShieldGeneratorField = {
-            BuildCostEnergy = 360800,
+            BuildCostEnergy = 187700,
             BuildCostMass = 3500,
             BuildTime = 15400,
             Icon = "sgf",
