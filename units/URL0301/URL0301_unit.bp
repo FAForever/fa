@@ -447,9 +447,9 @@ UnitBlueprint{
             Slot = "Back",
         },
         Switchback = {
-            BuildCostEnergy = 51100,
-            BuildCostMass = 800,
-            BuildTime = 4200,
+            BuildCostEnergy = 10100,
+            BuildCostMass = 500,
+            BuildTime = 1350,
             Icon = "ses",
             Name = "<LOC enhancements_0109>Rapid Fabricator",
             NewBuildRate = 98,

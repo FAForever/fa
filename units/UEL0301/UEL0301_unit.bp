@@ -313,9 +313,9 @@ UnitBlueprint{
             Slot = "RCH",
         },
         Pod = {
-            BuildCostEnergy = 8700,
+            BuildCostEnergy = 7700,
             BuildCostMass = 380,
-            BuildTime = 2500,
+            BuildTime = 1000,
             Icon = "ed",
             Name = "<LOC enhancements_0065>C-D3 Engineering Drone",
             Slot = "Back",

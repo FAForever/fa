@@ -319,9 +319,9 @@ UnitBlueprint{
             Slot = "LCH",
         },
         EngineeringThroughput = {
-            BuildCostEnergy = 51800,
-            BuildCostMass = 800,
-            BuildTime = 4200,
+            BuildCostEnergy = 10100,
+            BuildCostMass = 500,
+            BuildTime = 1350,
             Icon = "efm",
             Name = "<LOC enhancements_0143>Rapid Fabricator",
             NewBuildRate = 98,
