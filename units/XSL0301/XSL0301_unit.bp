@@ -400,7 +400,7 @@ UnitBlueprint{
         },
         Overcharge = {
             BuildCostEnergy = 283500,
-            BuildCostMass = 4500,
+            BuildCostMass = 1000,
             BuildTime = 12600,
             Icon = "oc",
             Name = "<LOC enhancements_0139>Overcharge",
