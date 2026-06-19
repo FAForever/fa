@@ -194,7 +194,6 @@ UnitBlueprint{
             Description = "<LOC uel0301_BubbleShield_desc>SACU (Shield preset)",
             BuildIconSortPriority = 30,
             Enhancements = {
-                "Shield",
                 "ShieldGeneratorField",
             },
             HelpText = "<LOC uel0301_BubbleShield_help>Support Armored Command Unit. Enhanced during construction with the bubble shield generator enhancement.",
@@ -454,7 +453,6 @@ UnitBlueprint{
             Mesh = "/effects/entities/Shield01/Shield01_mesh",
             MeshZ = "/effects/entities/Shield01/Shield01z_mesh",
             Name = "<LOC enhancements_0074>Shield Generator Field",
-            Prerequisite = "Shield",
             ShieldEnergyDrainRechargeTime = 5,
             ShieldMaxHealth = 52000,
             ShieldRechargeTime = 215,
@@ -476,7 +474,6 @@ UnitBlueprint{
             Name = "<LOC enhancements_0075>Remove Shields",
             Prerequisite = "ShieldGeneratorField",
             RemoveEnhancements = {
-                "Shield",
                 "ShieldGeneratorField",
                 "ShieldGeneratorFieldRemove",
             },
