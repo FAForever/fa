@@ -268,7 +268,7 @@ UnitBlueprint{
         CloakingGenerator = {
             BuildCostEnergy = 382200,
             BuildCostMass = 4700,
-            BuildTime = 13800,
+            BuildTime = 21350,
             Icon = "cfs",
             MaintenanceConsumptionPerSecondEnergy = 3500,
             Name = "<LOC enhancements_0089>Personal Cloaking Generator",
@@ -294,7 +294,7 @@ UnitBlueprint{
         EMPCharge = {
             BuildCostEnergy = 60000,
             BuildCostMass = 700,
-            BuildTime = 3600,
+            BuildTime = 3000,
             Icon = "emp",
             Name = "<LOC enhancements_0091>EMP Burst",
             Slot = "LCH",
@@ -316,7 +316,7 @@ UnitBlueprint{
         FocusConvertor = {
             BuildCostEnergy = 24000,
             BuildCostMass = 1400,
-            BuildTime = 3000,
+            BuildTime = 6950,
             Icon = "fc",
             Name = "<LOC enhancements_0093>Disintegrator Amplifier",
             NewDamageMod = 200,
@@ -340,7 +340,7 @@ UnitBlueprint{
         NaniteMissileSystem = {
             BuildCostEnergy = 20000,
             BuildCostMass = 800,
-            BuildTime = 3000,
+            BuildTime = 2750,
             Icon = "nms",
             Name = "<LOC enhancements_0095>Nanite Missile System",
             Slot = "Back",
@@ -386,7 +386,7 @@ UnitBlueprint{
         SelfRepairSystem = {
             BuildCostEnergy = 103500,
             BuildCostMass = 1900,
-            BuildTime = 6000,
+            BuildTime = 7850,
             Icon = "srs",
             Name = "<LOC enhancements_0099>Nano-Repair System",
             NewRegenRate = 375,
@@ -426,7 +426,7 @@ UnitBlueprint{
         StealthGenerator = {
             BuildCostEnergy = 7400,
             BuildCostMass = 400,
-            BuildTime = 1800,
+            BuildTime = 1620,
             Icon = "sfs",
             MaintenanceConsumptionPerSecondEnergy = 100,
             Name = "<LOC enhancements_0101>Personal Stealth Generator",
