@@ -93,6 +93,12 @@ function CloseChat()
     ChatController.CloseWindow()
 end
 
+---@deprecated use [ChatController.FindClients](chat/ChatController.lua) instead
+function FindClients(id)
+    _deprecate('FindClients', 'ChatController.FindClients')
+    return ChatController.FindClients(id)
+end
+
 --- @deprecated subscribe to [ChatConfigModel.GetSingleton().Committed](chat/config/ChatConfigModel.lua) via `LazyVarDerive` instead. Best-effort shim — fires the callback once with the current options so legacy callers see a value, then wires a one-way derived observer so subsequent changes propagate. Mods should migrate to a real `LazyVarDerive` they can destroy on teardown.
 function AddChatOptionSetCallback(callback, _)
     _deprecate('AddChatOptionSetCallback', 'LazyVarDerive(ChatConfigModel.GetSingleton().Committed, ...)')
