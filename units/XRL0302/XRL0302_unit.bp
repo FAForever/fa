@@ -9,7 +9,7 @@ UnitBlueprint{
         StopMove           = Sound { Bank = 'XRL',        Cue = 'XRL0302_Move_Stop',        LodCutoff = 'UnitMove_LodCutoff' },
         UISelection        = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Vehicle',    LodCutoff = 'UnitMove_LodCutoff' },
     },
-    AverageDensity = 400,
+    AverageDensity = 1200,
     Buffs = {
         Stun = {
             Add = {
@@ -43,8 +43,8 @@ UnitBlueprint{
     },
     Defense = {
         ArmorType = "Normal",
-        Health = 400,
-        MaxHealth = 400,
+        Health = 1200,
+        MaxHealth = 1200,
         SurfaceThreatLevel = 110,
     },
     Display = {
@@ -129,8 +129,8 @@ UnitBlueprint{
         DragCoefficient = 0.2,
         Elevation = 0.25,
         MaxAcceleration = 7,
-        MaxBrake = 5,
-        MaxSpeed = 5,
+        MaxBrake = 3.5,
+        MaxSpeed = 3.5,
         MaxSpeedReverse = 5,
         MaxSteerForce = 1000,
         MeshExtentsX = 0.55,
