@@ -1,10 +1,11 @@
-- (#7142) Rebalance sniper bots to be cheaper and faster but reduce their range to make them easier to defend with T2 PD and easier to catch with units.
+- (#7142) Rebalance sniper bots to be cheaper and faster but reduce their range to make them easier to defend with T2 PD and easier to catch with units. Their ability to prioritize ACUs is removed to keep ACUs useful despite the speed and cost buffs.
 
   - **Sprite Striker: T3 Sniper Bot (XAL0305)**
     - Energy cost: 25000 (35.7 e/m) -> 7700 (11.0 e/m)
     - Build time: 4950 (7.07 bt/m) -> 3850 (5.5 bt/m)
     - Max speed: 2.5 -> 2.7
     - Acceleration and Braking: 2.5 -> 3.7
+    - Removed ability to prioritize ACUs
     - Heavy Disruptor Cannon:
       - Range: 60 -> 47 
 
@@ -17,6 +18,7 @@
     - Build time: 5400 (6.9 bt/m) -> 4125 (5.5 bt/m)
     - Max speed: 2.3 -> 2.8
     - Acceleration and Braking: 2.3 -> 3.8
+    - Removed ability to prioritize ACUs
     - Sih Energy Rifle:
       - Range: 55 -> 42
     - Sih Energy Rifle (Sniper Mode):
