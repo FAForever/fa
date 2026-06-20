@@ -49,7 +49,6 @@ UnitBlueprint{
     },
     Display = {
         Abilities = {
-            "<LOC ability_cloak>Cloaking",
             "<LOC ability_suicideweapon>Suicide Weapon",
             "<LOC ability_stun>EMP Weapon",
         },
@@ -92,7 +91,6 @@ UnitBlueprint{
         BuildCostEnergy = 1300,
         BuildCostMass = 190,
         BuildTime = 700,
-        MaintenanceConsumptionPerSecondEnergy = 10,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -117,14 +115,10 @@ UnitBlueprint{
                 helpText = "Detonate",
             },
         },
-        ToggleCaps = {
-            RULEUTC_ProductionToggle = true,
-            RULEUTC_CloakToggle = true,
-        },
+        ToggleCaps = { RULEUTC_ProductionToggle = true, },
         UnitName = "<LOC xrl0302_name>Fire Beetle",
     },
     Intel = {
-        Cloak = true,
         VisionRadius = 24,
     },
     LifeBarHeight = 0.075,
