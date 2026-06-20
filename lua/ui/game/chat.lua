@@ -158,9 +158,9 @@ end
 
 local function _stateProxy(name)
     return setmetatable({}, {
-        __index = function(_, k)
+        __index = function(self, k)
             _deprecate(name .. '.' .. tostring(k), 'the new chat MVC view tree')
-            return nil
+            return self
         end,
         __newindex = function(_, k, _)
             _deprecate(name .. '.' .. tostring(k) .. ' (assignment)', 'the new chat MVC view tree')
