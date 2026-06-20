@@ -143,20 +143,22 @@ function GetArmyData(army)
 end
 
 -------------------------------------------------------------------------------
--- Deprecated state tables
+-- Deprecated legacy API proxies
 --
--- The legacy file exposed `GUI` and `ChatLines` as live tables of MAUI
--- handles. There's no clean way to recreate that against the MVC tree —
--- the new view doesn't pin its controls to a globally-addressable
--- structure. Mods that read these tables directly were always coupled to
--- internals that could move.
+-- The legacy file exposed `GUI`, `ChatLines`, and `CreateChatEdit` as
+-- legacy chat API entry points. There's no clean way to recreate those
+-- against the MVC tree — the new view doesn't pin its controls to a
+-- globally-addressable structure. Mods that read or call these entries
+-- directly were always coupled to internals that could move.
 --
 -- We expose empty tables proxied through metatables so any access logs
--- a deprecation warning and returns nil. Existing `chat.GUI.bg` reads
--- still terminate eventually (with a clear log line) instead of pretending
--- the field exists.
+-- a deprecation warning and returns the proxy table. This preserves
+-- legacy reads and chained accesses without pretending the field exists.
+-- Function-style calls also log a deprecation warning and return the
+-- proxy, allowing old APIs to fail gracefully while steering mods toward
+-- the new chat MVC view tree.
 
-local function _stateProxy(name)
+local function _deprecationProxy(name)
     return setmetatable({}, {
         __index = function(self, k)
             _deprecate(name .. '.' .. tostring(k), 'the new chat MVC view tree')
@@ -172,6 +174,6 @@ local function _stateProxy(name)
     })
 end
 
-GUI = _stateProxy('GUI')
-ChatLines = _stateProxy('ChatLines')
-CreateChatEdit = _stateProxy('CreateChatEdit')
+GUI = _deprecationProxy('GUI')
+ChatLines = _deprecationProxy('ChatLines')
+CreateChatEdit = _deprecationProxy('CreateChatEdit')
