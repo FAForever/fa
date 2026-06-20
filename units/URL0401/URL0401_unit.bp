@@ -43,6 +43,7 @@ UnitBlueprint{
         EconomyThreatLevel = 1600,
         Health = 18000,
         MaxHealth = 18000,
+        RegenRate = 134,
     },
     Display = {
         Abilities = {
