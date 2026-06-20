@@ -33,6 +33,8 @@ local AutolobbyArgumentsComponent = import("/lua/ui/lobby/autolobby/components/a
 
 local AutolobbyMessages = import("/lua/ui/lobby/autolobby/autolobbymessages.lua").AutolobbyMessages
 
+local AutolobbyModel = import("/lua/ui/lobby/autolobby/autolobbymodel.lua")
+
 local AutolobbyEngineStrings = {
     --  General info strings
     ['Connecting'] = "<LOC lobui_0083>Connecting to Game",
@@ -109,17 +111,16 @@ local AutolobbyEngineStrings = {
 ---@field DesiredPeerId UILobbyPeerId
 
 --- Responsible for the behavior of the automated lobby.
+---
+--- The synced lobby state (player options, game options, connections, launch
+--- statuses, ...) lives in `AutolobbyModel` — a reactive singleton the view
+--- observes. This controller is the only writer to that model. The fields it
+--- keeps here are purely controller-internal (identity + rejoin parameters)
+--- and are not observed by the view.
 ---@class UIAutolobbyCommunications : moho.lobby_methods, DebugComponent, UIAutolobbyServerCommunicationsComponent, UIAutolobbyArgumentsComponent
 ---@field Trash TrashBag
----@field LocalPeerId UILobbyPeerId                             # a number that is stringified
 ---@field LocalPlayerName string                            # nickname
 ---@field HostID UILobbyPeerId
----@field PlayerCount number                                        # Originates from the command line
----@field GameMods UILobbyLaunchGameModsConfiguration[]
----@field GameOptions UILobbyLaunchGameOptionsConfiguration         # Is synced from the host via `SendData` or `BroadcastData`.
----@field PlayerOptions UIAutolobbyPlayer[]                         # Is synced from the host via `SendData` or `BroadcastData`.
----@field ConnectionMatrix table<UILobbyPeerId, UILobbyPeerId[]>    # Is synced between players via `EstablishedPeers`
----@field LaunchStatutes table<UILobbyPeerId, UIPeerLaunchStatus>  # Is synced between players via `BroadcastData`
 ---@field LobbyParameters? UIAutolobbyParameters                # Used for rejoining functionality
 ---@field HostParameters? UIAutolobbyHostParameters             # Used for rejoining functionality
 ---@field JoinParameters? UIAutolobbyJoinParameters             # Used for rejoining functionality
@@ -129,16 +130,19 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
     __init = function(self)
         self.Trash = TrashBag()
 
-        self.LocalPeerId = "-2"
         self.LocalPlayerName = "Charlie"
-        self.PlayerCount = self:GetCommandLineArgumentNumber("/players", 2)
         self.HostID = "-2"
 
-        self.GameMods = {}
-        self.GameOptions = self:CreateLocalGameOptions()
-        self.PlayerOptions = {}
-        self.LaunchStatutes = {}
-        self.ConnectionMatrix = {}
+        -- The model singleton is created in `autolobby.lua > CreateLobby`
+        -- before the lobby (and thus this controller) is instantiated. Seed
+        -- the initial state here.
+        local model = AutolobbyModel.GetSingleton()
+        model.LocalPeerId:Set("-2")
+        model.GameMods:Set({})
+        model.GameOptions:Set(self:CreateLocalGameOptions())
+        model.PlayerOptions:Set({})
+        model.LaunchStatutes:Set({})
+        model.ConnectionMatrix:Set({})
     end,
 
     ---@param self UIAutolobbyCommunications
@@ -233,194 +237,13 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
 
     ---------------------------------------------------------------------------
     --#region Utilities
-
-    ---@param self UIAutolobbyCommunications
-    ---@param playerOptions UIAutolobbyPlayer[]
-    ---@param connectionMatrix table<UILobbyPeerId, UILobbyPeerId[]>
-    ---@return UIAutolobbyConnections
-    CreateConnectionsMatrix = function(self, playerOptions, connectionMatrix)
-        ---@type UIAutolobbyConnections
-        local connections = {}
-
-        -- initial setup
-        for y = 1, self.PlayerCount do
-            connections[y] = {}
-            for x = 1, self.PlayerCount do
-                connections[y][x] = false
-            end
-        end
-
-        -- populate the matrix
-        for peerId, establishedPeers in connectionMatrix do
-            for _, peerConnectedToId in establishedPeers do
-                local peerIdNumber = self:PeerIdToIndex(playerOptions, peerId)
-                local peerConnectedToIdNumber = self:PeerIdToIndex(playerOptions, peerConnectedToId)
-
-                -- connection works both ways
-                if peerIdNumber and peerConnectedToIdNumber then
-                    if peerIdNumber > self.PlayerCount or peerConnectedToIdNumber > self.PlayerCount then
-                        self:DebugWarn("Invalid peer id", peerIdNumber, peerConnectedToIdNumber)
-                    else
-                        connections[peerIdNumber][peerConnectedToIdNumber] = true
-                        connections[peerConnectedToIdNumber][peerIdNumber] = true
-                    end
-                end
-            end
-        end
-
-        return connections
-    end,
-
-    ---@param self UIAutolobbyCommunications
-    ---@param playerOptions UIAutolobbyPlayer[]
-    ---@param statuses table<UILobbyPeerId, UIPeerLaunchStatus>
-    ---@return UIAutolobbyStatus
-    CreateConnectionStatuses = function(self, playerOptions, statuses)
-        local output = {}
-        for peerId, launchStatus in statuses do
-            local peerIdNumber = self:PeerIdToIndex(playerOptions, peerId)
-            if peerIdNumber then
-                output[peerIdNumber] = launchStatus
-            end
-        end
-
-        return output
-    end,
-
-    ---@param self UIAutolobbyCommunications
-    ---@param playerCount number
-    ---@param localIndex number
-    ---@return boolean[][]
-    CreateOwnershipMatrix = function(self, playerCount, localIndex)
-        local output = {}
-        for y = 1, playerCount do
-            output[y] = {}
-            for x = 1, playerCount do
-                output[y][x] = false
-            end
-        end
-
-        for k = 1, playerCount do
-            output[localIndex][k] = true
-            output[k][localIndex] = true
-        end
-        return output
-    end,
-
-    --- Determines the launch status of the local peer.
-    ---@param self UIAutolobbyCommunications
-    ---@param connectionMatrix table<UILobbyPeerId, UILobbyPeerId[]>
-    ---@return UIPeerLaunchStatus
-    CreateLaunchStatus = function(self, connectionMatrix)
-        -- check number of peers
-        local validPeerCount = self.PlayerCount - 1
-        if table.getsize(connectionMatrix) < validPeerCount then
-            return 'Missing local peers'
-        end
-
-        return 'Ready'
-    end,
-
-    ---@param self UIAutolobbyCommunications
-    ---@param playerOptions UIAutolobbyPlayer[]
-    ---@return table<string, number>
-    CreateRatingsTable = function(self, playerOptions)
-        ---@type table<string, number>
-        local allRatings = {}
-
-        for slot, options in pairs(playerOptions) do
-            if options.Human and options.PL then
-                allRatings[options.PlayerName] = options.PL
-            end
-        end
-
-        return allRatings
-    end,
-
-    ---@param self UIAutolobbyCommunications
-    ---@param playerOptions UIAutolobbyPlayer[]
-    ---@return table<string, string>
-    CreateDivisionsTable = function(self, playerOptions)
-        ---@type table<string, string>
-        local allDivisions = {}
-
-        for slot, options in pairs(playerOptions) do
-            if options.Human and options.PL then
-                if options.DIV ~= "unlisted" then
-                    local division = options.DIV
-                    if options.SUBDIV and options.SUBDIV ~= "" then
-                        division = division .. ' ' .. options.SUBDIV
-                    end
-                    allDivisions[options.PlayerName] = division
-                end
-            end
-        end
-
-        return allDivisions
-    end,
-
-    ---@param self UIAutolobbyCommunications
-    ---@param playerOptions UIAutolobbyPlayer[]
-    ---@return table<string, string>
-    CreateClanTagsTable = function(self, playerOptions)
-        local allClanTags = {}
-
-        for slot, options in pairs(playerOptions) do
-            if options.PlayerClan then
-                allClanTags[options.PlayerName] = options.PlayerClan
-            end
-        end
-
-        return allClanTags
-    end,
-
-    --- Verifies whether we can launch the game.
-    ---@param self UIAutolobbyCommunications
-    ---@param peerStatus UIAutolobbyStatus
-    ---@return boolean
-    CanLaunch = function(self, peerStatus)
-        -- check if we know of all peers
-        if table.getsize(peerStatus) ~= self.PlayerCount then
-            return false
-        end
-
-        -- check if all peers are ready for launch
-        for k, launchStatus in peerStatus do
-            if launchStatus ~= 'Ready' then
-                return false
-            end
-        end
-
-        return true
-    end,
-
-    --- Maps a peer id to an index that can be used in the interface. In
-    --- practice the peer id can be all over the place, ranging from -1
-    --- to numbers such as 35240. With this function we map it to a sane
-    --- index that we can use in the interface.
-    ---@param self UIAutolobbyCommunications
-    ---@param playerOptions UIAutolobbyPlayer[]
-    ---@param peerId UILobbyPeerId
-    ---@return number | false
-    PeerIdToIndex = function(self, playerOptions, peerId)
-        if type(peerId) ~= 'string' then
-            self:DebugWarn("Invalid peer id", peerId)
-            return false
-        end
-
-        -- try to find matching player options
-        if playerOptions then
-            for k, options in playerOptions do
-                if options.OwnerID == peerId then
-                    if options.StartSpot then
-                        return options.StartSpot
-                    end
-                end
-            end
-        end
-
-        return false
-    end,
+    --
+    -- The pure derivation helpers that used to live here (CreateConnectionsMatrix,
+    -- CreateConnectionStatuses, CreateOwnershipMatrix, CreateLaunchStatus,
+    -- CreateRatingsTable, CreateDivisionsTable, CreateClanTagsTable, CanLaunch,
+    -- PeerIdToIndex) moved to `AutolobbyModel` as free functions. The model
+    -- uses them to compute its derived LazyVars; this controller calls the few
+    -- it still needs (launch flow, alive stamp) via `AutolobbyModel.<fn>`.
 
     --- Prefetches a scenario to try and reduce the loading screen time.
     ---@param self UIAutolobbyCommunications
@@ -498,13 +321,16 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
 
         while not IsDestroyed(self) do
 
+            local model = AutolobbyModel.GetSingleton()
+            local launchStatutes = model.LaunchStatutes()
+
             -- check if we're ready to launch
-            if self.LaunchStatutes[self.LocalPeerId] ~= 'Ready' then
+            if launchStatutes[model.LocalPeerId()] ~= 'Ready' then
 
                 -- if we're not, check the status of peers
                 local onePeerIsRejoining = false
                 local onePeerIsReady = false
-                for k, launchStatus in self.LaunchStatutes do
+                for k, launchStatus in launchStatutes do
                     onePeerIsReady = onePeerIsReady or (launchStatus == 'Ready')
                     onePeerIsRejoining = onePeerIsRejoining or (launchStatus == 'Rejoining')
                 end
@@ -534,18 +360,18 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
     ---@param self UIAutolobbyCommunications
     ShareLaunchStatusThread = function(self)
         while not IsDestroyed(self) do
-            local launchStatus = self:CreateLaunchStatus(self.ConnectionMatrix)
-            self.LaunchStatutes[self.LocalPeerId] = launchStatus
+            local model = AutolobbyModel.GetSingleton()
+            local launchStatus = AutolobbyModel.CreateLaunchStatus(model.ConnectionMatrix(), model.PlayerCount())
+
+            local statuses = table.copy(model.LaunchStatutes())
+            statuses[model.LocalPeerId()] = launchStatus
+            model.LaunchStatutes:Set(statuses)
 
             -- update peers
             self:BroadcastData({ Type = "UpdateLaunchStatus", LaunchStatus = launchStatus })
 
             -- update server
             self:SendLaunchStatusToServer(launchStatus)
-
-            -- update UI for launch statuses
-            import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
-                :UpdateLaunchStatuses(self:CreateConnectionStatuses(self.PlayerOptions, self.LaunchStatutes))
 
             WaitSeconds(2.0)
         end
@@ -554,39 +380,44 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
     ---@param self UIAutolobbyCommunications
     LaunchThread = function(self)
         while not IsDestroyed(self) do
-            if self:CanLaunch(self.LaunchStatutes) then
+            local model = AutolobbyModel.GetSingleton()
+            if AutolobbyModel.CanLaunch(model.LaunchStatutes(), model.PlayerCount()) then
 
                 WaitSeconds(5.0)
-                if (not IsDestroyed(self)) and self:CanLaunch(self.LaunchStatutes) then
+                if (not IsDestroyed(self)) and AutolobbyModel.CanLaunch(model.LaunchStatutes(), model.PlayerCount()) then
+
+                    local playerOptions = model.PlayerOptions()
 
                     -- Army numbers need to be calculated: they are numbered incrementally in slot order.
                     local slots = {}
-                    for slotIndex, _ in pairs(self.PlayerOptions) do
+                    for slotIndex, _ in pairs(playerOptions) do
                         table.insert(slots, slotIndex)
                     end
                     table.sort(slots)
 
                     -- send player options to the server
                     for armyIndex, slotIndex in ipairs(slots) do
-                        local playerOptions = self.PlayerOptions[slotIndex]
-                        local ownerId = playerOptions.OwnerID
-                        self:SendPlayerOptionToServer(ownerId, 'Team', playerOptions.Team)
+                        local options = playerOptions[slotIndex]
+                        local ownerId = options.OwnerID
+                        self:SendPlayerOptionToServer(ownerId, 'Team', options.Team)
                         self:SendPlayerOptionToServer(ownerId, 'Army', armyIndex)
-                        self:SendPlayerOptionToServer(ownerId, 'StartSpot', playerOptions.StartSpot)
-                        self:SendPlayerOptionToServer(ownerId, 'Faction', playerOptions.Faction)
+                        self:SendPlayerOptionToServer(ownerId, 'StartSpot', options.StartSpot)
+                        self:SendPlayerOptionToServer(ownerId, 'Faction', options.Faction)
                     end
 
                     -- tuck them into the game options. By all means a hack, but
                     -- this way they are available in both the sim and the UI
-                    self.GameOptions.Ratings = self:CreateRatingsTable(self.PlayerOptions)
-                    self.GameOptions.Divisions = self:CreateDivisionsTable(self.PlayerOptions)
-                    self.GameOptions.ClanTags = self:CreateClanTagsTable(self.PlayerOptions)
+                    local gameOptions = table.copy(model.GameOptions())
+                    gameOptions.Ratings = AutolobbyModel.CreateRatingsTable(playerOptions)
+                    gameOptions.Divisions = AutolobbyModel.CreateDivisionsTable(playerOptions)
+                    gameOptions.ClanTags = AutolobbyModel.CreateClanTagsTable(playerOptions)
+                    model.GameOptions:Set(gameOptions)
 
                     -- create game configuration
                     local gameConfiguration = {
-                        GameMods = self.GameMods,
-                        GameOptions = self.GameOptions,
-                        PlayerOptions = self.PlayerOptions,
+                        GameMods = model.GameMods(),
+                        GameOptions = gameOptions,
+                        PlayerOptions = playerOptions,
                         Observers = {},
                     }
 
@@ -620,56 +451,40 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         playerOptions.OwnerID = data.SenderID
         playerOptions.PlayerName = self:MakeValidPlayerName(playerOptions.OwnerID, playerOptions.PlayerName)
 
+        local model = AutolobbyModel.GetSingleton()
+
         -- TODO: verify that the StartSpot is not occupied
         -- put the player where it belongs
-        self.PlayerOptions[playerOptions.StartSpot] = playerOptions
+        local players = table.copy(model.PlayerOptions())
+        players[playerOptions.StartSpot] = playerOptions
+        model.PlayerOptions:Set(players)
 
         -- sync game options with the connected peer
-        self:SendData(data.SenderID, { Type = "UpdateGameOptions", GameOptions = self.GameOptions })
+        self:SendData(data.SenderID, { Type = "UpdateGameOptions", GameOptions = model.GameOptions() })
 
         -- sync player options to all connected peers
-        self:BroadcastData({ Type = "UpdatePlayerOptions", PlayerOptions = self.PlayerOptions })
+        self:BroadcastData({ Type = "UpdatePlayerOptions", PlayerOptions = players })
 
-        -- update UI for player options
-        import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
-            :UpdateScenario(self.GameOptions.ScenarioFile, self.PlayerOptions)
-
-        local localIndex = self:PeerIdToIndex(self.PlayerOptions, self.LocalPeerId)
-        if localIndex then
-            local ownershipMatrix = self:CreateOwnershipMatrix(self.PlayerCount, localIndex)
-            import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
-                :UpdateOwnership(ownershipMatrix)
-        end
+        -- the view's scenario + ownership observers react to the PlayerOptions change
     end,
 
     ---@param self UIAutolobbyCommunications
     ---@param data UIAutolobbyUpdatePlayerOptionsMessage
     ProcessUpdatePlayerOptionsMessage = function(self, data)
-        self.PlayerOptions = data.PlayerOptions
-
-        -- update UI for player options
-        import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
-            :UpdateScenario(self.GameOptions.ScenarioFile, self.PlayerOptions)
-
-        local localIndex = self:PeerIdToIndex(self.PlayerOptions, self.LocalPeerId)
-        if localIndex then
-            local ownershipMatrix = self:CreateOwnershipMatrix(self.PlayerCount, localIndex)
-            -- update UI for player options
-            import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
-                :UpdateOwnership(ownershipMatrix)
-        end
+        -- a fresh table straight off the network; replace wholesale. The view's
+        -- scenario + ownership observers react to the change.
+        AutolobbyModel.GetSingleton().PlayerOptions:Set(data.PlayerOptions)
     end,
 
     ---@param self UIAutolobbyCommunications
     ---@param data UIAutolobbyUpdateGameOptionsMessage
     ProcessUpdateGameOptionsMessage = function(self, data)
-        self.GameOptions = data.GameOptions
+        local model = AutolobbyModel.GetSingleton()
+        model.GameOptions:Set(data.GameOptions)
 
-        self:Prefetch(self.GameOptions, self.GameMods)
+        self:Prefetch(model.GameOptions(), model.GameMods())
 
-        -- update UI for game options
-        import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
-            :UpdateScenario(self.GameOptions.ScenarioFile, self.PlayerOptions)
+        -- the view's scenario observer reacts to the GameOptions change
     end,
 
     ---@param self UIAutolobbyCommunications
@@ -681,11 +496,12 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
     ---@param self UIAutolobbyCommunications
     ---@param data UIAutolobbyUpdateLaunchStatusMessage
     ProcessUpdateLaunchStatusMessage = function(self, data)
-        self.LaunchStatutes[data.SenderID] = data.LaunchStatus
+        local model = AutolobbyModel.GetSingleton()
+        local statuses = table.copy(model.LaunchStatutes())
+        statuses[data.SenderID] = data.LaunchStatus
+        model.LaunchStatutes:Set(statuses)
 
-        -- update UI for launch statuses
-        import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
-            :UpdateLaunchStatuses(self:CreateConnectionStatuses(self.PlayerOptions, self.LaunchStatutes))
+        -- the view's Statuses observer reacts to the LaunchStatutes change
     end,
 
     --#endregion
@@ -896,28 +712,31 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
     Hosting = function(self)
         self:DebugSpew("Hosting")
 
-        self.LocalPeerId = self:GetLocalPlayerID()
+        local model = AutolobbyModel.GetSingleton()
+
+        local localPeerId = self:GetLocalPlayerID()
+        model.LocalPeerId:Set(localPeerId)
         self.LocalPlayerName = self:GetLocalPlayerName()
-        self.HostID = self:GetLocalPlayerID()
+        self.HostID = localPeerId
 
         -- give ourself a seat at the table
         local hostPlayerOptions = self:CreateLocalPlayer()
-        hostPlayerOptions.OwnerID = self.LocalPeerId
-        hostPlayerOptions.PlayerName = self:MakeValidPlayerName(self.LocalPeerId, self.LocalPlayerName)
-        self.PlayerOptions[hostPlayerOptions.StartSpot] = hostPlayerOptions
+        hostPlayerOptions.OwnerID = localPeerId
+        hostPlayerOptions.PlayerName = self:MakeValidPlayerName(localPeerId, self.LocalPlayerName)
+        local players = table.copy(model.PlayerOptions())
+        players[hostPlayerOptions.StartSpot] = hostPlayerOptions
+        model.PlayerOptions:Set(players)
 
         -- occasionally send data over the network to create pings on screen
         self.Trash:Add(ForkThread(self.ShareLaunchStatusThread, self))
         self.Trash:Add(ForkThread(self.LaunchThread, self))
 
         -- start prefetching the scenario
-        self:Prefetch(self.GameOptions, self.GameMods)
+        self:Prefetch(model.GameOptions(), model.GameMods())
 
         self:SendLaunchStatusToServer('Hosting')
 
-        -- update UI for game options
-        import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
-            :UpdateScenario(self.GameOptions.ScenarioFile, self.PlayerOptions)
+        -- the view's scenario observer reacts to the PlayerOptions change
     end,
 
     --- Called by the engine as we're trying to join a lobby.
@@ -944,7 +763,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
     ConnectionToHostEstablished = function(self, localPeerId, newLocalName, hostPeerId)
         self:DebugSpew("ConnectionToHostEstablished", localPeerId, newLocalName, hostPeerId)
         self.LocalPlayerName = newLocalName
-        self.LocalPeerId = localPeerId
+        AutolobbyModel.GetSingleton().LocalPeerId:Set(localPeerId)
         self.HostID = hostPeerId
 
         -- occasionally send data over the network to create pings on screen
@@ -964,16 +783,18 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         -- update server
         self:SendEstablishedPeer(peerId)
 
-        self.LaunchStatutes[peerId] = self.LaunchStatutes[peerId] or 'Unknown'
-        -- update UI for launch statuses
-        import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
-            :UpdateLaunchStatuses(self:CreateConnectionStatuses(self.PlayerOptions, self.LaunchStatutes))
+        local model = AutolobbyModel.GetSingleton()
 
-        -- update the matrix and the UI
-        self.ConnectionMatrix[peerId] = peerConnectedTo
-        local connections = self:CreateConnectionsMatrix(self.PlayerOptions, self.ConnectionMatrix)
-        import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
-            :UpdateConnections(connections)
+        -- seed an initial status for the peer if we don't have one yet; the
+        -- view's Statuses observer reacts to the change
+        local statuses = table.copy(model.LaunchStatutes())
+        statuses[peerId] = statuses[peerId] or 'Unknown'
+        model.LaunchStatutes:Set(statuses)
+
+        -- update the connection matrix; the view's Connections observer reacts
+        local connectionMatrix = table.copy(model.ConnectionMatrix())
+        connectionMatrix[peerId] = peerConnectedTo
+        model.ConnectionMatrix:Set(connectionMatrix)
     end,
 
     --#endregion
@@ -1005,11 +826,12 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         -- make it more convenient to debug malicious traffic
         SPEW(string.format("Received data of type %s from %s (%s)", tostring(data.Type), tostring(data.SenderID), tostring(data.SenderName)))
 
-        -- signal UI that we received something
-        local peerIndex = self:PeerIdToIndex(self.PlayerOptions, data.SenderID)
+        -- signal UI that we received something; a fresh stamp table fires the
+        -- view's IsAlive observer even for repeated pulses from the same peer
+        local model = AutolobbyModel.GetSingleton()
+        local peerIndex = AutolobbyModel.PeerIdToIndex(model.PlayerOptions(), data.SenderID)
         if peerIndex then
-            import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
-                :UpdateIsAliveStamp(peerIndex)
+            model.IsAliveStamp:Set({ Index = peerIndex, Time = GetSystemTimeSeconds() })
         end
 
         -- validate message type

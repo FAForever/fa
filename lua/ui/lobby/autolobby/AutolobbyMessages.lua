@@ -26,6 +26,8 @@
 -- function. If the message is accepted the handler is called, which is just a
 -- wrapper to another function in the autolobby.
 
+local AutolobbyModel = import("/lua/ui/lobby/autolobby/autolobbymodel.lua")
+
 ---@class UIAutolobbyMessageHandler
 ---@field Validate fun(lobby: UIAutolobbyCommunications, data: UILobbyReceivedMessage): boolean # Responsible for filtering out non-sense
 ---@field Accept fun(lobby: UIAutolobbyCommunications, data: UILobbyReceivedMessage): boolean   # Responsible for filtering out malicous messages
@@ -110,7 +112,7 @@ AutolobbyMessages = {
             end
 
             -- verify that the player is not already in the lobby
-            for _, otherPlayerOptions in lobby.PlayerOptions do
+            for _, otherPlayerOptions in AutolobbyModel.GetSingleton().PlayerOptions() do
                 if otherPlayerOptions.OwnerID == data.SenderID then
                     lobby:DebugWarn("Received duplicate message of type ", data.Type)
                     return false

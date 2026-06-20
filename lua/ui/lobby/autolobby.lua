@@ -45,8 +45,11 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
     -- we intentionally do not log the 'natTraversalProvider' parameter as it can cause issues due to being an uninitialized C object
     LOG("CreateLobby", protocol, localPort, desiredPlayerName, localPlayerUID)
 
-    -- create the interface, needs to be done before the lobby is
+    -- create the model and interface, needs to be done before the lobby is.
+    -- the model is set up first so the interface subscribes against it, and so
+    -- a rejoin (which re-runs CreateLobby) starts from fresh, non-stale state.
     local playerCount = tonumber(GetCommandLineArg("/players", 1)[1]) or 8
+    import("/lua/ui/lobby/autolobby/autolobbymodel.lua").SetupSingleton(playerCount)
     local interface = import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").SetupSingleton(playerCount)
 
     -- create the lobby
@@ -84,9 +87,12 @@ function HostGame(gameName, scenarioFileName, singlePlayer)
         AutolobbyCommunicationsInstance.HostParameters.ScenarioFile = scenarioFileName
         AutolobbyCommunicationsInstance.HostParameters.SinglePlayer = singlePlayer
 
-        AutolobbyCommunicationsInstance.GameOptions.ScenarioFile = string.gsub(scenarioFileName,
-            ".v%d%d%d%d_scenario.lua",
-            "_scenario.lua")
+        -- the synced game options live on the model; copy-then-Set so the
+        -- view's scenario observer reacts and the host sees the map preview
+        local model = import("/lua/ui/lobby/autolobby/autolobbymodel.lua").GetSingleton()
+        local gameOptions = table.copy(model.GameOptions())
+        gameOptions.ScenarioFile = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
+        model.GameOptions:Set(gameOptions)
         AutolobbyCommunicationsInstance:HostGame()
     end
 end

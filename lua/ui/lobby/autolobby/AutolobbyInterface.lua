@@ -34,21 +34,22 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Group = import("/lua/maui/group.lua").Group
 local AutolobbyMapPreview = import("/lua/ui/lobby/autolobby/autolobbymappreview.lua")
 local AutolobbyConnectionMatrix = import("/lua/ui/lobby/autolobby/autolobbyconnectionmatrix.lua")
+local AutolobbyModel = import("/lua/ui/lobby/autolobby/autolobbymodel.lua")
 
----@class UIAutolobbyInterfaceState
----@field PlayerCount number
----@field PlayerOptions? table<UILobbyPeerId, UIAutolobbyPlayer>
----@field PathToScenarioFile? FileName
----@field GameOptions? UILobbyLaunchGameOptionsConfiguration
----@field Connections? UIAutolobbyConnections
----@field Statuses? UIAutolobbyStatus
+local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
 ---@class UIAutolobbyInterface : Group
----@field State UIAutolobbyInterfaceState
+---@field Trash TrashBag
 ---@field BackgroundTextures string[]
 ---@field Background Bitmap
 ---@field Preview UIAutolobbyMapPreview
 ---@field ConnectionMatrix UIAutolobbyConnectionMatrix
+---@field GameOptionsObserver LazyVar
+---@field PlayerOptionsObserver LazyVar
+---@field ConnectionsObserver LazyVar
+---@field StatusesObserver LazyVar
+---@field OwnershipObserver LazyVar
+---@field IsAliveObserver LazyVar
 local AutolobbyInterface = Class(Group) {
 
     BackgroundTextures = {
@@ -64,15 +65,55 @@ local AutolobbyInterface = Class(Group) {
     __init = function(self, parent, playerCount)
         Group.__init(self, parent, "AutolobbyInterface")
 
-        -- initial, empty state
-        self.State = {
-            PlayerCount = playerCount
-        }
+        self.Trash = TrashBag()
 
         local backgroundTexture = self.BackgroundTextures[math.random(1, 5)] --[[@as FileName]]
         self.Background = UIUtil.CreateBitmap(self, backgroundTexture)
         self.Preview = AutolobbyMapPreview.GetInstance(self)
         self.ConnectionMatrix = AutolobbyConnectionMatrix.Create(self, playerCount)
+
+        -- Subscribe to the model. The handlers read the current value from the
+        -- model and feed the existing child controls, replacing the imperative
+        -- `Update*` pushes the controller used to make. The scenario preview
+        -- depends on both the scenario file (carried in GameOptions) and the
+        -- player options, so both feed `OnScenarioChanged`.
+        local model = AutolobbyModel.GetSingleton()
+
+        -- Each handler must read its own LazyVar (`gameOptionsLazy()` /
+        -- `playerOptionsLazy()`) so the dependency edge is (re)established and
+        -- later `:Set` calls re-fire it; the other half is read straight from
+        -- the model. Reading neither would leave the edge unformed and the
+        -- observer would only ever fire once, during construction.
+        self.GameOptionsObserver = self.Trash:Add(
+            LazyVarDerive(model.GameOptions, function(gameOptionsLazy)
+                self:OnScenarioChanged(gameOptionsLazy(), model.PlayerOptions())
+            end))
+        self.PlayerOptionsObserver = self.Trash:Add(
+            LazyVarDerive(model.PlayerOptions, function(playerOptionsLazy)
+                self:OnScenarioChanged(model.GameOptions(), playerOptionsLazy())
+            end))
+
+        self.ConnectionsObserver = self.Trash:Add(
+            LazyVarDerive(model.Connections, function(connectionsLazy)
+                self:OnConnectionsChanged(connectionsLazy())
+            end))
+        self.StatusesObserver = self.Trash:Add(
+            LazyVarDerive(model.Statuses, function(statusesLazy)
+                self:OnStatusesChanged(statusesLazy())
+            end))
+        self.OwnershipObserver = self.Trash:Add(
+            LazyVarDerive(model.Ownership, function(ownershipLazy)
+                self:OnOwnershipChanged(ownershipLazy())
+            end))
+        self.IsAliveObserver = self.Trash:Add(
+            LazyVarDerive(model.IsAliveStamp, function(stampLazy)
+                self:OnIsAliveChanged(stampLazy())
+            end))
+    end,
+
+    ---@param self UIAutolobbyInterface
+    OnDestroy = function(self)
+        self.Trash:Destroy()
     end,
 
     ---@param self UIAutolobbyInterface
@@ -100,9 +141,11 @@ local AutolobbyInterface = Class(Group) {
     end,
 
     ---@param self UIAutolobbyInterface
-    ---@param ownership boolean[][]
-    UpdateOwnership = function(self, ownership)
-        self.State.OwnerShip = ownership
+    ---@param ownership boolean[][] | false
+    OnOwnershipChanged = function(self, ownership)
+        if not ownership then
+            return
+        end
 
         self.ConnectionMatrix:Show()
         self.ConnectionMatrix:UpdateOwnership(ownership)
@@ -110,28 +153,37 @@ local AutolobbyInterface = Class(Group) {
 
     ---@param self UIAutolobbyInterface
     ---@param connections UIAutolobbyConnections
-    UpdateConnections = function(self, connections)
-        self.State.Connections = connections
+    OnConnectionsChanged = function(self, connections)
+        if not connections then
+            return
+        end
 
-        self.ConnectionMatrix:Show()
+        -- only reveal the matrix once we actually know of a peer; the initial
+        -- (empty) derivation should not flash an empty grid on screen
+        if next(AutolobbyModel.GetSingleton().ConnectionMatrix()) then
+            self.ConnectionMatrix:Show()
+        end
         self.ConnectionMatrix:UpdateConnections(connections)
     end,
 
     ---@param self UIAutolobbyInterface
     ---@param statuses UIAutolobbyStatus
-    UpdateLaunchStatuses = function(self, statuses)
-        self.State.Statuses = statuses
+    OnStatusesChanged = function(self, statuses)
+        if not statuses then
+            return
+        end
 
-        self.ConnectionMatrix:Show()
+        if next(statuses) then
+            self.ConnectionMatrix:Show()
+        end
         self.ConnectionMatrix:UpdateStatuses(statuses)
     end,
 
     ---@param self UIAutolobbyInterface
-    ---@param pathToScenarioInfo FileName
+    ---@param gameOptions UILobbyLaunchGameOptionsConfiguration
     ---@param playerOptions UIAutolobbyPlayer[]
-    UpdateScenario = function(self, pathToScenarioInfo, playerOptions)
-        self.State.PathToScenarioFile = pathToScenarioInfo
-        self.State.PlayerOptions = playerOptions
+    OnScenarioChanged = function(self, gameOptions, playerOptions)
+        local pathToScenarioInfo = gameOptions.ScenarioFile
 
         if pathToScenarioInfo and playerOptions then
             -- hide it for now until we have a better way to decipher its possible (negative) impact
@@ -141,41 +193,14 @@ local AutolobbyInterface = Class(Group) {
     end,
 
     ---@param self UIAutolobbyInterface
-    ---@param id number
-    UpdateIsAliveStamp = function(self, id)
-        self.ConnectionMatrix:UpdateIsAliveTimestamp(id)
+    ---@param stamp UIAutolobbyAliveStamp | false
+    OnIsAliveChanged = function(self, stamp)
+        if not stamp then
+            return
+        end
+
+        self.ConnectionMatrix:UpdateIsAliveTimestamp(stamp.Index)
     end,
-
-    --#region Debugging
-
-    ---@param self UIAutolobbyInterface
-    ---@param state UIAutolobbyInterfaceState
-    RestoreState = function(self, state)
-        self.State = state
-
-        if state.PathToScenarioFile and state.PlayerOptions then
-            local ok, msg = pcall(self.UpdateScenario, self, state.PathToScenarioFile, state.PlayerOptions)
-            if not ok then
-                WARN(msg)
-            end
-        end
-
-        if state.Connections then
-            local ok, msg = pcall(self.UpdateConnections, self, state.Connections)
-            if not ok then
-                WARN(msg)
-            end
-        end
-
-        if state.Statuses then
-            local ok, msg = pcall(self.UpdateLaunchStatuses, self, state.Statuses)
-            if not ok then
-                WARN(msg)
-            end
-        end
-    end,
-
-    --#endregion
 }
 
 --- A trashbag that should be destroyed upon reload.
@@ -221,8 +246,10 @@ end
 ---@param newModule any
 function __moduleinfo.OnReload(newModule)
     if AutolobbyInterfaceInstance then
-        local handle = newModule.SetupSingleton(AutolobbyInterfaceInstance.State.PlayerCount)
-        handle:RestoreState(AutolobbyInterfaceInstance.State)
+        -- the model survives the reload (it is its own singleton), so a fresh
+        -- interface restores itself: its observers read the current model
+        -- values on their first fire. No manual state replay is needed.
+        newModule.SetupSingleton(AutolobbyModel.GetSingleton().PlayerCount())
     end
 end
 
