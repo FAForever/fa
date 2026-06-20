@@ -25,10 +25,15 @@ engine ──callbacks──► AutolobbyController (moho.lobby_methods)
 
 | Role | File | Responsibility |
 |------|------|----------------|
-| Model | [AutolobbyModel.lua](AutolobbyModel.lua) | Reactive singleton: raw synced state (player/game options, connection matrix, launch statuses) + derived view-models (`Connections`, `Statuses`, `Ownership`) + the pure derivation helpers. No UI, no networking. |
-| View | [AutolobbyInterface.lua](AutolobbyInterface.lua) | Observes the model via `Derive` and feeds the child controls ([AutolobbyMapPreview.lua](AutolobbyMapPreview.lua), [AutolobbyConnectionMatrix.lua](AutolobbyConnectionMatrix.lua)). Never writes the model. |
+| Model | [AutolobbyModel.lua](AutolobbyModel.lua) | Reactive singleton: raw synced state (player/game options, connection matrix, launch statuses) + derived view-models (`Connections`, `Statuses`, `Ownership`, `Scenario`) + the pure derivation helpers + the copy-then-`Set` write helpers. No UI, no networking. |
+| Composition root | [AutolobbyInterface.lua](AutolobbyInterface.lua) | Builds and lays out the children; holds **no** model subscriptions. |
+| Components | [AutolobbyConnectionMatrix.lua](AutolobbyConnectionMatrix.lua), [AutolobbyMapPreview.lua](AutolobbyMapPreview.lua) | Each subscribes to the model via `Derive`, feeds its dot grid / preview, and owns its own visibility. Never write the model. |
 | Controller | [AutolobbyController.lua](AutolobbyController.lua) | `AutolobbyCommunications`, the engine's lobby object. The only writer to the model and the only place that talks to peers / the lobby server. |
 | Entry point | [/lua/ui/lobby/autolobby.lua](/lua/ui/lobby/autolobby.lua) | Engine-facing wrapper: `CreateLobby` / `HostGame` / `JoinGame` / `ConnectToPeer` / `DisconnectFromPeer`. Bootstraps model + view + controller in that order. |
+
+Like the chat (`ChatLinesInterface`, `ChatEditInterface`, … each subscribe to the
+model themselves), the components own their reactivity. `AutolobbyInterface` is a
+pure composition root, not a push hub.
 
 ---
 
@@ -64,14 +69,18 @@ engine calls. So:
 
 **Derived** (computed via `:Set(function() … end)`, never written directly):
 
-| Derived | From | Replaces the old push |
-|---------|------|-----------------------|
-| `Connections` | `PlayerOptions`, `ConnectionMatrix`, `PlayerCount` | `interface:UpdateConnections` |
-| `Statuses` | `PlayerOptions`, `LaunchStatutes` | `interface:UpdateLaunchStatuses` |
-| `Ownership` | `PlayerCount`, `PeerIdToIndex(PlayerOptions, LocalPeerId)`; `false` until the local index is known | `interface:UpdateOwnership` |
+| Derived | From | Consumed by |
+|---------|------|-------------|
+| `Connections` | `PlayerOptions`, `ConnectionMatrix`, `PlayerCount` | matrix |
+| `Statuses` | `PlayerOptions`, `LaunchStatutes` | matrix |
+| `Ownership` | `PlayerCount`, `PeerIdToIndex(PlayerOptions, LocalPeerId)`; `false` until the local index is known | matrix |
+| `Scenario` | `{ ScenarioFile = GameOptions().ScenarioFile, PlayerOptions }` | preview |
 
-The scenario preview is not a derived var — the view observes `GameOptions`
-(for `ScenarioFile`) and `PlayerOptions` together.
+`Scenario` is a bundle so the preview can subscribe with **one** observer that
+reads **one** LazyVar — the same shape as every other observer. (An earlier
+two-observer version that read the model directly instead of its LazyVar never
+formed the dependency edge and silently stopped firing; bundling removes that
+footgun.)
 
 The pure derivation helpers (`PeerIdToIndex`, `CreateConnectionsMatrix`,
 `CreateConnectionStatuses`, `CreateOwnershipMatrix`, `CreateLaunchStatus`,
@@ -79,6 +88,13 @@ The pure derivation helpers (`PeerIdToIndex`, `CreateConnectionsMatrix`,
 `CreateClanTagsTable`) are free functions in the model module. The model uses
 them for its derived vars; the controller calls the launch-flow / alive-stamp
 ones via `AutolobbyModel.<fn>`.
+
+### Write helpers
+
+Writes to the synced tables go through helpers that encapsulate the copy-then-`Set`
+discipline, so call sites can't accidentally mutate in place: `SetPlayer`,
+`SetPeerStatus`, `EnsurePeerStatus`, `SetPeerConnections`, `SetScenarioFile`,
+`StampLaunchTables`. The controller calls these instead of building tables by hand.
 
 `LocalPlayerName`, `HostID` and the rejoin parameters
 (`LobbyParameters` / `HostParameters` / `JoinParameters`) stay
@@ -88,12 +104,17 @@ controller-internal — no view reads them and no derivation depends on them.
 
 ## Rules
 
-- **The controller is the only writer to the model.** The view only reads
-  (subscribes via `Derive`) and the child controls only render.
-- **Never mutate a held table in place.** The synced tables (`PlayerOptions`,
-  `ConnectionMatrix`, `LaunchStatutes`, `GameOptions`) are LazyVar values:
-  `table.copy` → mutate the copy → `:Set` it, or dependents never go dirty. See
-  [`/lua/ui/CLAUDE.md § 2`](/lua/ui/CLAUDE.md).
+- **The controller is the only writer to the model.** Components only read
+  (subscribe via `Derive`) and render.
+- **Write through the model helpers, never mutate a held table in place.** The
+  synced tables (`PlayerOptions`, `ConnectionMatrix`, `LaunchStatutes`,
+  `GameOptions`) are LazyVar values — mutating in place never marks dependents
+  dirty (see [`/lua/ui/CLAUDE.md § 2`](/lua/ui/CLAUDE.md)). The write helpers
+  encapsulate the `table.copy` → mutate → `:Set` dance; use them.
+- **A `Derive` handler must read its own LazyVar.** `Derive` only forms the
+  dependency edge when the handler calls `lv()`. A handler that reads the model
+  some other way fires once at construction and then never again. Always
+  `function(fooLazy) self:OnFoo(fooLazy()) end`.
 - **`IsAliveStamp` is a pulse, not state.** Set a fresh `{Index, Time}` table on
   every receive so the value identity always changes and the observer fires even
   for repeated pulses from the same peer.
@@ -107,8 +128,19 @@ controller-internal — no view reads them and no derivation depends on them.
 
 ## Verifying changes
 
-Lobby ↔ server traffic can't be exercised with the local launch script. Use the
-two-client procedure documented in
+For a quick visual check of the UI without any networking, mount it against a
+fake-populated model from the console:
+
+```
+UI_Lua import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").OpenDebug()
+```
+
+`OpenDebug` builds a 4-player model with statuses and a fully-connected matrix;
+`CloseDebug()` tears it down. (The map preview stays hidden unless you also
+`AutolobbyModel.SetScenarioFile` with an installed scenario.)
+
+For the real flow, lobby ↔ server traffic can't be exercised with the local
+launch script. Use the two-client procedure documented in
 [components/AutolobbyServerCommunicationsComponent.lua](components/AutolobbyServerCommunicationsComponent.lua)
 (two FAF clients against the test server, command-line format
 `"%s" /init init_local_development.lua`, both on the same PR, both searching).

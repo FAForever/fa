@@ -27,8 +27,12 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Group = import("/lua/maui/group.lua").Group
 local MapPreview = import("/lua/ui/controls/mappreview.lua").MapPreview
 local AutolobbyMapPreviewSpawn = import("/lua/ui/lobby/autolobby/autolobbymappreviewspawn.lua")
+local AutolobbyModel = import("/lua/ui/lobby/autolobby/autolobbymodel.lua")
+
+local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
 ---@class UIAutolobbyMapPreview : Group
+---@field Trash TrashBag
 ---@field Preview MapPreview
 ---@field Overlay Bitmap
 ---@field PathToScenarioFile? FileName
@@ -39,12 +43,15 @@ local AutolobbyMapPreviewSpawn = import("/lua/ui/lobby/autolobby/autolobbymappre
 ---@field WreckageIcon Bitmap   # Acts as a pool
 ---@field IconTrash TrashBag    # Trashbag that contains all icons
 ---@field SpawnIcons UIAutolobbyMapPreviewSpawn[]
+---@field ScenarioObserver LazyVar
 local AutolobbyMapPreview = ClassUI(Group) {
 
     ---@param self UIAutolobbyMapPreview
     ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent)
+
+        self.Trash = TrashBag()
 
         self.Preview = MapPreview(self)
 
@@ -59,6 +66,31 @@ local AutolobbyMapPreview = ClassUI(Group) {
         UIUtil.CreateDialogBrackets(self, 30, 24, 30, 24)
 
         self.IconTrash = TrashBag()
+
+        -- subscribe to the model's scenario bundle directly; reading the lazy
+        -- establishes the dependency edge so later changes re-fire
+        self.ScenarioObserver = self.Trash:Add(
+            LazyVarDerive(AutolobbyModel.GetSingleton().Scenario, function(scenarioLazy)
+                self:OnScenarioChanged(scenarioLazy())
+            end))
+    end,
+
+    ---@param self UIAutolobbyMapPreview
+    OnDestroy = function(self)
+        self.Trash:Destroy()
+    end,
+
+    --- Reacts to the model's scenario bundle: show + render the preview once a
+    --- scenario file is known, hide it otherwise.
+    ---@param self UIAutolobbyMapPreview
+    ---@param scenario UIAutolobbyScenario
+    OnScenarioChanged = function(self, scenario)
+        if scenario.ScenarioFile and scenario.PlayerOptions then
+            self:Show()
+            self:UpdateScenario(scenario.ScenarioFile, scenario.PlayerOptions)
+        else
+            self:Hide()
+        end
     end,
 
     ---@param self UIAutolobbyMapPreview

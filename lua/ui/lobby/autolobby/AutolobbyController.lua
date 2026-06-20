@@ -363,9 +363,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
             local model = AutolobbyModel.GetSingleton()
             local launchStatus = AutolobbyModel.CreateLaunchStatus(model.ConnectionMatrix(), model.PlayerCount())
 
-            local statuses = table.copy(model.LaunchStatutes())
-            statuses[model.LocalPeerId()] = launchStatus
-            model.LaunchStatutes:Set(statuses)
+            AutolobbyModel.SetPeerStatus(model, model.LocalPeerId(), launchStatus)
 
             -- update peers
             self:BroadcastData({ Type = "UpdateLaunchStatus", LaunchStatus = launchStatus })
@@ -405,13 +403,10 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
                         self:SendPlayerOptionToServer(ownerId, 'Faction', options.Faction)
                     end
 
-                    -- tuck them into the game options. By all means a hack, but
-                    -- this way they are available in both the sim and the UI
-                    local gameOptions = table.copy(model.GameOptions())
-                    gameOptions.Ratings = AutolobbyModel.CreateRatingsTable(playerOptions)
-                    gameOptions.Divisions = AutolobbyModel.CreateDivisionsTable(playerOptions)
-                    gameOptions.ClanTags = AutolobbyModel.CreateClanTagsTable(playerOptions)
-                    model.GameOptions:Set(gameOptions)
+                    -- tuck the rating / division / clan tables into the game
+                    -- options. By all means a hack, but this way they are
+                    -- available in both the sim and the UI
+                    local gameOptions = AutolobbyModel.StampLaunchTables(model, playerOptions)
 
                     -- create game configuration
                     local gameConfiguration = {
@@ -455,17 +450,15 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
 
         -- TODO: verify that the StartSpot is not occupied
         -- put the player where it belongs
-        local players = table.copy(model.PlayerOptions())
-        players[playerOptions.StartSpot] = playerOptions
-        model.PlayerOptions:Set(players)
+        AutolobbyModel.SetPlayer(model, playerOptions.StartSpot, playerOptions)
 
         -- sync game options with the connected peer
         self:SendData(data.SenderID, { Type = "UpdateGameOptions", GameOptions = model.GameOptions() })
 
         -- sync player options to all connected peers
-        self:BroadcastData({ Type = "UpdatePlayerOptions", PlayerOptions = players })
+        self:BroadcastData({ Type = "UpdatePlayerOptions", PlayerOptions = model.PlayerOptions() })
 
-        -- the view's scenario + ownership observers react to the PlayerOptions change
+        -- the scenario + ownership observers react to the PlayerOptions change
     end,
 
     ---@param self UIAutolobbyCommunications
@@ -496,12 +489,8 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
     ---@param self UIAutolobbyCommunications
     ---@param data UIAutolobbyUpdateLaunchStatusMessage
     ProcessUpdateLaunchStatusMessage = function(self, data)
-        local model = AutolobbyModel.GetSingleton()
-        local statuses = table.copy(model.LaunchStatutes())
-        statuses[data.SenderID] = data.LaunchStatus
-        model.LaunchStatutes:Set(statuses)
-
-        -- the view's Statuses observer reacts to the LaunchStatutes change
+        -- the matrix' Statuses observer reacts to the LaunchStatutes change
+        AutolobbyModel.SetPeerStatus(AutolobbyModel.GetSingleton(), data.SenderID, data.LaunchStatus)
     end,
 
     --#endregion
@@ -723,9 +712,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         local hostPlayerOptions = self:CreateLocalPlayer()
         hostPlayerOptions.OwnerID = localPeerId
         hostPlayerOptions.PlayerName = self:MakeValidPlayerName(localPeerId, self.LocalPlayerName)
-        local players = table.copy(model.PlayerOptions())
-        players[hostPlayerOptions.StartSpot] = hostPlayerOptions
-        model.PlayerOptions:Set(players)
+        AutolobbyModel.SetPlayer(model, hostPlayerOptions.StartSpot, hostPlayerOptions)
 
         -- occasionally send data over the network to create pings on screen
         self.Trash:Add(ForkThread(self.ShareLaunchStatusThread, self))
@@ -785,16 +772,10 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
 
         local model = AutolobbyModel.GetSingleton()
 
-        -- seed an initial status for the peer if we don't have one yet; the
-        -- view's Statuses observer reacts to the change
-        local statuses = table.copy(model.LaunchStatutes())
-        statuses[peerId] = statuses[peerId] or 'Unknown'
-        model.LaunchStatutes:Set(statuses)
-
-        -- update the connection matrix; the view's Connections observer reacts
-        local connectionMatrix = table.copy(model.ConnectionMatrix())
-        connectionMatrix[peerId] = peerConnectedTo
-        model.ConnectionMatrix:Set(connectionMatrix)
+        -- seed an initial status for the peer and record its connections; the
+        -- matrix' Statuses / Connections observers react to the changes
+        AutolobbyModel.EnsurePeerStatus(model, peerId, 'Unknown')
+        AutolobbyModel.SetPeerConnections(model, peerId, peerConnectedTo)
     end,
 
     --#endregion

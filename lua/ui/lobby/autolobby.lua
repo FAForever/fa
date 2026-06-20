@@ -87,12 +87,11 @@ function HostGame(gameName, scenarioFileName, singlePlayer)
         AutolobbyCommunicationsInstance.HostParameters.ScenarioFile = scenarioFileName
         AutolobbyCommunicationsInstance.HostParameters.SinglePlayer = singlePlayer
 
-        -- the synced game options live on the model; copy-then-Set so the
-        -- view's scenario observer reacts and the host sees the map preview
-        local model = import("/lua/ui/lobby/autolobby/autolobbymodel.lua").GetSingleton()
-        local gameOptions = table.copy(model.GameOptions())
-        gameOptions.ScenarioFile = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
-        model.GameOptions:Set(gameOptions)
+        -- the synced game options live on the model; the scenario observer
+        -- reacts and the host sees the map preview
+        local AutolobbyModel = import("/lua/ui/lobby/autolobby/autolobbymodel.lua")
+        local scenarioFile = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua") --[[@as FileName]]
+        AutolobbyModel.SetScenarioFile(AutolobbyModel.GetSingleton(), scenarioFile)
         AutolobbyCommunicationsInstance:HostGame()
     end
 end

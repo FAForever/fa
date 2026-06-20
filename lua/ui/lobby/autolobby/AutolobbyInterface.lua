@@ -36,20 +36,11 @@ local AutolobbyMapPreview = import("/lua/ui/lobby/autolobby/autolobbymappreview.
 local AutolobbyConnectionMatrix = import("/lua/ui/lobby/autolobby/autolobbyconnectionmatrix.lua")
 local AutolobbyModel = import("/lua/ui/lobby/autolobby/autolobbymodel.lua")
 
-local LazyVarDerive = import("/lua/lazyvar.lua").Derive
-
 ---@class UIAutolobbyInterface : Group
----@field Trash TrashBag
 ---@field BackgroundTextures string[]
 ---@field Background Bitmap
 ---@field Preview UIAutolobbyMapPreview
 ---@field ConnectionMatrix UIAutolobbyConnectionMatrix
----@field GameOptionsObserver LazyVar
----@field PlayerOptionsObserver LazyVar
----@field ConnectionsObserver LazyVar
----@field StatusesObserver LazyVar
----@field OwnershipObserver LazyVar
----@field IsAliveObserver LazyVar
 local AutolobbyInterface = Class(Group) {
 
     BackgroundTextures = {
@@ -60,60 +51,18 @@ local AutolobbyInterface = Class(Group) {
         "/menus02/background-paint05_bmp.dds",
     },
 
+    -- Pure composition root: it builds and lays out the background, the map
+    -- preview and the connection matrix. It holds no model subscriptions —
+    -- each child subscribes to the model itself and owns its own visibility.
     ---@param self UIAutolobbyInterface
     ---@param parent Control
-    __init = function(self, parent, playerCount)
+    __init = function(self, parent)
         Group.__init(self, parent, "AutolobbyInterface")
-
-        self.Trash = TrashBag()
 
         local backgroundTexture = self.BackgroundTextures[math.random(1, 5)] --[[@as FileName]]
         self.Background = UIUtil.CreateBitmap(self, backgroundTexture)
         self.Preview = AutolobbyMapPreview.GetInstance(self)
-        self.ConnectionMatrix = AutolobbyConnectionMatrix.Create(self, playerCount)
-
-        -- Subscribe to the model. The handlers read the current value from the
-        -- model and feed the existing child controls, replacing the imperative
-        -- `Update*` pushes the controller used to make. The scenario preview
-        -- depends on both the scenario file (carried in GameOptions) and the
-        -- player options, so both feed `OnScenarioChanged`.
-        local model = AutolobbyModel.GetSingleton()
-
-        -- Each handler must read its own LazyVar (`gameOptionsLazy()` /
-        -- `playerOptionsLazy()`) so the dependency edge is (re)established and
-        -- later `:Set` calls re-fire it; the other half is read straight from
-        -- the model. Reading neither would leave the edge unformed and the
-        -- observer would only ever fire once, during construction.
-        self.GameOptionsObserver = self.Trash:Add(
-            LazyVarDerive(model.GameOptions, function(gameOptionsLazy)
-                self:OnScenarioChanged(gameOptionsLazy(), model.PlayerOptions())
-            end))
-        self.PlayerOptionsObserver = self.Trash:Add(
-            LazyVarDerive(model.PlayerOptions, function(playerOptionsLazy)
-                self:OnScenarioChanged(model.GameOptions(), playerOptionsLazy())
-            end))
-
-        self.ConnectionsObserver = self.Trash:Add(
-            LazyVarDerive(model.Connections, function(connectionsLazy)
-                self:OnConnectionsChanged(connectionsLazy())
-            end))
-        self.StatusesObserver = self.Trash:Add(
-            LazyVarDerive(model.Statuses, function(statusesLazy)
-                self:OnStatusesChanged(statusesLazy())
-            end))
-        self.OwnershipObserver = self.Trash:Add(
-            LazyVarDerive(model.Ownership, function(ownershipLazy)
-                self:OnOwnershipChanged(ownershipLazy())
-            end))
-        self.IsAliveObserver = self.Trash:Add(
-            LazyVarDerive(model.IsAliveStamp, function(stampLazy)
-                self:OnIsAliveChanged(stampLazy())
-            end))
-    end,
-
-    ---@param self UIAutolobbyInterface
-    OnDestroy = function(self)
-        self.Trash:Destroy()
+        self.ConnectionMatrix = AutolobbyConnectionMatrix.Create(self)
     end,
 
     ---@param self UIAutolobbyInterface
@@ -127,79 +76,17 @@ local AutolobbyInterface = Class(Group) {
             :Fill(self)
             :End()
 
+        -- position / size only; the preview and matrix manage their own
+        -- visibility from the model
         LayoutHelpers.ReusedLayoutFor(self.Preview)
             :AtCenterIn(self, -100, 0)
             :Width(400)
             :Height(400)
-            :Hide()
             :End()
 
         LayoutHelpers.ReusedLayoutFor(self.ConnectionMatrix)
             :CenteredBelow(self.Preview, 20)
-            :Hide()
             :End()
-    end,
-
-    ---@param self UIAutolobbyInterface
-    ---@param ownership boolean[][] | false
-    OnOwnershipChanged = function(self, ownership)
-        if not ownership then
-            return
-        end
-
-        self.ConnectionMatrix:Show()
-        self.ConnectionMatrix:UpdateOwnership(ownership)
-    end,
-
-    ---@param self UIAutolobbyInterface
-    ---@param connections UIAutolobbyConnections
-    OnConnectionsChanged = function(self, connections)
-        if not connections then
-            return
-        end
-
-        -- only reveal the matrix once we actually know of a peer; the initial
-        -- (empty) derivation should not flash an empty grid on screen
-        if next(AutolobbyModel.GetSingleton().ConnectionMatrix()) then
-            self.ConnectionMatrix:Show()
-        end
-        self.ConnectionMatrix:UpdateConnections(connections)
-    end,
-
-    ---@param self UIAutolobbyInterface
-    ---@param statuses UIAutolobbyStatus
-    OnStatusesChanged = function(self, statuses)
-        if not statuses then
-            return
-        end
-
-        if next(statuses) then
-            self.ConnectionMatrix:Show()
-        end
-        self.ConnectionMatrix:UpdateStatuses(statuses)
-    end,
-
-    ---@param self UIAutolobbyInterface
-    ---@param gameOptions UILobbyLaunchGameOptionsConfiguration
-    ---@param playerOptions UIAutolobbyPlayer[]
-    OnScenarioChanged = function(self, gameOptions, playerOptions)
-        local pathToScenarioInfo = gameOptions.ScenarioFile
-
-        if pathToScenarioInfo and playerOptions then
-            -- hide it for now until we have a better way to decipher its possible (negative) impact
-            self.Preview:Show()
-            self.Preview:UpdateScenario(pathToScenarioInfo, playerOptions)
-        end
-    end,
-
-    ---@param self UIAutolobbyInterface
-    ---@param stamp UIAutolobbyAliveStamp | false
-    OnIsAliveChanged = function(self, stamp)
-        if not stamp then
-            return
-        end
-
-        self.ConnectionMatrix:UpdateIsAliveTimestamp(stamp.Index)
     end,
 }
 

@@ -127,6 +127,13 @@ function CreateOwnershipMatrix(playerCount, localIndex)
         end
     end
 
+    -- a StartSpot can in theory fall outside the grid; guard against indexing a
+    -- non-existent row/column rather than erroring out the whole derivation
+    if localIndex < 1 or localIndex > playerCount then
+        WARN("Autolobby model: local index out of range ", localIndex)
+        return output
+    end
+
     for k = 1, playerCount do
         output[localIndex][k] = true
         output[k][localIndex] = true
@@ -244,6 +251,13 @@ end
 ---@field Connections      LazyVar<UIAutolobbyConnections>                            # derived from PlayerOptions + ConnectionMatrix + PlayerCount
 ---@field Statuses         LazyVar<UIAutolobbyStatus>                                 # derived from PlayerOptions + LaunchStatutes
 ---@field Ownership        LazyVar<boolean[][] | false>                               # derived from PlayerCount + PeerIdToIndex(PlayerOptions, LocalPeerId)
+---@field Scenario         LazyVar<UIAutolobbyScenario>                               # derived bundle of { ScenarioFile, PlayerOptions } for the map preview
+
+--- The scenario preview depends on two raw vars; bundling them into one derived
+--- var lets the preview subscribe with a single observer (one LazyVar to read).
+---@class UIAutolobbyScenario
+---@field ScenarioFile? FileName
+---@field PlayerOptions UIAutolobbyPlayer[]
 
 --- Singleton handle; nil until `SetupSingleton` (or `GetSingleton`) builds the model.
 ---@type UIAutolobbyModel | nil
@@ -270,6 +284,7 @@ function SetupSingleton(playerCount)
         Connections      = Create(),
         Statuses         = Create(),
         Ownership        = Create(),
+        Scenario         = Create(),
     }
 
     -- Derived values. Reading the raw LazyVars inside these compute functions
@@ -291,6 +306,10 @@ function SetupSingleton(playerCount)
         return CreateOwnershipMatrix(model.PlayerCount(), localIndex)
     end)
 
+    model.Scenario:Set(function()
+        return { ScenarioFile = model.GameOptions().ScenarioFile, PlayerOptions = model.PlayerOptions() }
+    end)
+
     ModelInstance = model
     return model
 end
@@ -302,6 +321,81 @@ function GetSingleton()
         SetupSingleton()
     end
     return ModelInstance --[[@as UIAutolobbyModel]]
+end
+
+--#endregion
+
+-------------------------------------------------------------------------------
+--#region Write helpers
+--
+-- The synced tables are LazyVar values, so a write must build a NEW table and
+-- `:Set` it — mutating the held table in place never marks dependents dirty
+-- (see /lua/ui/CLAUDE.md § 2). These helpers encapsulate that copy-then-Set
+-- discipline so call sites in the controller can't get it wrong.
+
+--- Places (or replaces) a player at a start spot.
+---@param model UIAutolobbyModel
+---@param startSpot number
+---@param options UIAutolobbyPlayer
+function SetPlayer(model, startSpot, options)
+    local players = table.copy(model.PlayerOptions())
+    players[startSpot] = options
+    model.PlayerOptions:Set(players)
+end
+
+--- Sets the launch status of a peer.
+---@param model UIAutolobbyModel
+---@param peerId UILobbyPeerId
+---@param status UIPeerLaunchStatus
+function SetPeerStatus(model, peerId, status)
+    local statuses = table.copy(model.LaunchStatutes())
+    statuses[peerId] = status
+    model.LaunchStatutes:Set(statuses)
+end
+
+--- Seeds a launch status for a peer only if we don't have one yet.
+---@param model UIAutolobbyModel
+---@param peerId UILobbyPeerId
+---@param status UIPeerLaunchStatus
+function EnsurePeerStatus(model, peerId, status)
+    if model.LaunchStatutes()[peerId] then
+        return
+    end
+    SetPeerStatus(model, peerId, status)
+end
+
+--- Records the peers a peer is connected to.
+---@param model UIAutolobbyModel
+---@param peerId UILobbyPeerId
+---@param peers UILobbyPeerId[]
+function SetPeerConnections(model, peerId, peers)
+    local connectionMatrix = table.copy(model.ConnectionMatrix())
+    connectionMatrix[peerId] = peers
+    model.ConnectionMatrix:Set(connectionMatrix)
+end
+
+--- Sets the scenario file on the game options.
+---@param model UIAutolobbyModel
+---@param scenarioFile FileName
+function SetScenarioFile(model, scenarioFile)
+    local gameOptions = table.copy(model.GameOptions())
+    gameOptions.ScenarioFile = scenarioFile
+    model.GameOptions:Set(gameOptions)
+end
+
+--- Tucks the rating / division / clan tables into a copy of the game options
+--- and sets it. Returns the new game options so the caller can reuse them in the
+--- launch configuration.
+---@param model UIAutolobbyModel
+---@param playerOptions UIAutolobbyPlayer[]
+---@return UILobbyLaunchGameOptionsConfiguration
+function StampLaunchTables(model, playerOptions)
+    local gameOptions = table.copy(model.GameOptions())
+    gameOptions.Ratings = CreateRatingsTable(playerOptions)
+    gameOptions.Divisions = CreateDivisionsTable(playerOptions)
+    gameOptions.ClanTags = CreateClanTagsTable(playerOptions)
+    model.GameOptions:Set(gameOptions)
+    return gameOptions
 end
 
 --#endregion
