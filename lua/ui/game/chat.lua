@@ -165,6 +165,10 @@ local function _stateProxy(name)
         __newindex = function(_, k, _)
             _deprecate(name .. '.' .. tostring(k) .. ' (assignment)', 'the new chat MVC view tree')
         end,
+        __call = function(self)
+            _deprecate(name .. ' (function call)', 'the new chat MVC view tree')
+            return self
+        end,
     })
 end
 
