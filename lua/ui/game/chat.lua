@@ -174,3 +174,4 @@ end
 
 GUI = _stateProxy('GUI')
 ChatLines = _stateProxy('ChatLines')
+CreateChatEdit = _stateProxy('CreateChatEdit')
