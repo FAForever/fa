@@ -1,0 +1,1 @@
+- (#7139) Align the on-impact vision radius of the Lobo's (UEL0103) fragmentation shell, Aeon depth charges, and the Solace's cluster torpedoes to the engine's vision grid (5 -> 4).
