@@ -13,3 +13,10 @@
       - Build time: 44800 -> 43600
     
     The build cost is reduced by the cost of power generators (with storage adjacency) required to power the satellite's firing cost. The energy cost is increased to guide players towards building the power required for firing before building the Novax.
+
+- (#7123) Remove Omni from the Novax as it unnecessarily counters cloak which is already more than sufficiently countered by T3 Omni radars. Since Omni can detect underwater units, sonar is added to partially keep that interaction.
+
+  **Novax Center: Experimental Satellite System (XEB2402, XEA0002)**
+  - Defense Satellite:
+    - Omni radius: 60 -> 0
+    - Sonar radius: 0 -> 60

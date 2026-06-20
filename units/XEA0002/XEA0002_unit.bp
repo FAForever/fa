@@ -32,14 +32,14 @@ UnitBlueprint{
         "EXPERIMENTAL",
         "HIGHALTAIR",
         "MOBILE",
-        "OMNI",
-        "OVERLAYOMNI",
         "OVERLAYRADAR",
+        "OVERLAYSONAR",
         "PRODUCTFA",
         "RECLAIMABLE",
         "SATELLITE",
         "SELECTABLE",
         "SNIPEMODE",
+        "SONAR",
         "UEF",
         "UNTARGETABLE",
         "VISIBLETORECON",
@@ -52,8 +52,8 @@ UnitBlueprint{
     },
     Display = {
         Abilities = {
-            "<LOC ability_omni>Omni Sensor",
             "<LOC ability_radar>Radar",
+            "<LOC ability_sonar>Sonar",
         },
         Mesh = {
             IconFadeInZoom = 130,
@@ -94,8 +94,8 @@ UnitBlueprint{
         Icon = "air",
     },
     Intel = {
-        OmniRadius = 60,
         RadarRadius = 200,
+        SonarRadius = 60,
         VisionRadius = 60,
     },
     LifeBarHeight = 0.075,
