@@ -32,7 +32,7 @@ local NISActive = false
 local isReplay = false
 local waitingDialog = false
 
-local sendChat = import("/lua/ui/game/chat.lua").ReceiveChatFromSim
+local sendChat = import("/lua/ui/game/chat/ChatController.lua").OnReceive
 local oldData = {}
 local lastObserving
 
@@ -87,7 +87,6 @@ function SetLayout(layout)
     import("/lua/ui/game/score.lua").SetLayout()
     import("/lua/ui/game/tabs.lua").SetLayout()
     import("/lua/ui/game/controlgroups.lua").SetLayout()
-    import("/lua/ui/game/chat.lua").SetLayout()
     import("/lua/ui/game/minimap.lua").SetLayout()
     import("/lua/ui/game/massfabs.lua").SetLayout()
     import("/lua/ui/game/recall.lua").SetLayout()
@@ -298,8 +297,8 @@ function CreateUI(isReplay)
     import("/lua/ui/game/consoleecho.lua").CreateConsoleEcho(mapGroup)
     import("/lua/ui/game/build_templates.lua").Init()
     import("/lua/ui/game/taunt.lua").Init()
+    import("/lua/ui/game/chat/ChatController.lua").Init()
 
-    import("/lua/ui/game/chat.lua").SetupChatLayout(windowGroup)
     import("/lua/ui/game/minimap.lua").CreateMinimap(windowGroup)
 
     if import("/lua/ui/campaign/campaignmanager.lua").campaignMode then
@@ -735,6 +734,7 @@ function OnQueueChanged(newQueue)
     end
 end
 
+
 --- Called by the engine after the sim confirmed that the game is indeed paused. This is run on all instances that are connected to the lobby.
 ---@param pausedBy integer   # The index of the client in the clients list (that you get via `GetSessionClients`)
 ---@param timeoutsRemaining number
@@ -941,7 +941,7 @@ function NISMode(state)
         import("/lua/ui/game/consoleecho.lua").ToggleOutput(false)
         import("/lua/ui/game/multifunction.lua").PreNIS()
         import("/lua/ui/game/tooltip.lua").DestroyMouseoverDisplay()
-        import("/lua/ui/game/chat.lua").OnNISBegin()
+        import("/lua/ui/game/chat/ChatInterface.lua").Close()
         import("/lua/ui/game/unitviewdetail.lua").OnNIS()
         HideGameUI(state)
         ShowNISBars()
@@ -1071,6 +1071,12 @@ end
 ---@param sender string     # username
 ---@param data table        
 function ReceiveChat(sender, data)
+    -- console output ends up as a chat message, hence we early exit here
+    if data.ConsoleOutput then
+        print(LOCF("%s %s", sender, data.ConsoleOutput))
+        return
+    end
+
     if data.Identifier then
 
         -- we highly encourage to use the 'Identifier' field to quickly identify the correct function
@@ -1167,7 +1173,15 @@ SendChat = function()
                     if newChat then
                         chat.oldTime = GetGameTimeSeconds()
                         table.insert(oldData, chat)
-                        sendChat(chat.sender, chat.msg)
+                        -- Sim-side `ConsoleOutput` messages are log-only —
+                        -- they never open a chat line. The new receive path
+                        -- drops non-`Chat` messages, so handle the print
+                        -- here instead of in the controller.
+                        if chat.msg.ConsoleOutput then
+                            print(LOCF("%s %s", chat.sender or "nil sender", chat.msg.ConsoleOutput))
+                        else
+                            sendChat(chat.sender, chat.msg)
+                        end
                     end
                 end
                 UnitData.Chat = {}
