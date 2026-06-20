@@ -202,7 +202,7 @@ UnitBlueprint{
             },
             FiringRandomness = 0,
             FiringTolerance = 0,
-            FixedSpreadRadius = 70,
+            FixedSpreadRadius = 63,
             Label = "Gun01",
             LeadTarget = true,
             MaxRadius = 4000,
