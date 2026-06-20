@@ -54,7 +54,7 @@ jobs:
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
           ref: ${{ inputs.branch || github.head_ref || github.ref_name }}
@@ -63,7 +63,7 @@ jobs:
         run: rm -f lua/ui/lobby/changelog/generated/*
 
       - name: Retrieve generated lua changelog
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: lua_changelog
           path: lua/ui/lobby/changelog/generated

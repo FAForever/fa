@@ -36,7 +36,7 @@ jobs:
     steps:
       # https://github.com/actions/checkout/tree/v4/
       - name: Checkout spooky db code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
             repository: FAForever/spooky-db
             path: gh-pages
@@ -45,7 +45,7 @@ jobs:
     
       # https://github.com/actions/download-artifact/tree/v4/
       - name: Download recent unit information
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
             name: spookydb-dist
             path: dist

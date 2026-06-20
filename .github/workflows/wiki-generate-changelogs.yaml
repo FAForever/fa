@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           sparse-checkout: |
             changelog/snippets
@@ -44,14 +44,14 @@ jobs:
     needs: [verify]
     steps:
       - name: Checkout FA repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: fa
           sparse-checkout: |
             changelog
 
       - name: Checkout FA Wiki repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: faforever/fa.wiki
           path: fa.wiki

@@ -35,7 +35,7 @@ jobs:
     steps:
       # https://github.com/actions/checkout/tree/v4/
       - name: Checkout FA repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
           repository: FAForever/fa

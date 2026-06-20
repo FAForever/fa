@@ -50,14 +50,14 @@ jobs:
       # We check out the scripts separate because the branch that we use to
       # generate the changelog may not contain the scripts that we want to work with.
       - name: Checkout scripts
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: scripts
           sparse-checkout: |
             .github/workflows/scripts/bash
 
       - name: Checkout snippets
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           # We need to check out the fork repo when the PR branch is on a fork.
           repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
@@ -90,7 +90,7 @@ jobs:
           changelog-combine.sh "$NAME"
 
       - name: Add the changelog as an artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.NAME }}
           path: |

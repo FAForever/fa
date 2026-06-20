@@ -57,14 +57,14 @@ jobs:
     steps:
       # Checkout the wiki generator that we use to bake blueprints
       - name: Checkout Brewlan Wikigen Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
               repository: The-Balthazar/BrewWikiGen
               path: ./brew-wiki-gen
 
       # Checkout the FA repository
       - name: Checkout FAF Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.reference }}
           ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
@@ -76,7 +76,7 @@ jobs:
 
       # Install the correct version of Lua for the wiki generator
       - name: Install Lua 5.4
-        uses: leafo/gh-actions-lua@v10
+        uses: leafo/gh-actions-lua@v13
         with:
           luaVersion: "5.4"
 

@@ -35,7 +35,7 @@ jobs:
       steps:
         # https://github.com/actions/checkout/tree/v4/
         - name: Checkout FAF Repository
-          uses: actions/checkout@v4
+          uses: actions/checkout@v7
           with:
             repository: FAForever/fa
             ref: deploy/faf
@@ -60,14 +60,14 @@ jobs:
 
         # https://github.com/actions/upload-artifact/tree/v4/
         - name: Upload unit icons
-          uses: actions/upload-artifact@v4
+          uses: actions/upload-artifact@v7
           with:
             name: fa-unit-icons
             path: wiki/generated/units
 
         # https://github.com/actions/upload-artifact/tree/v4/
         - name: Upload strategic icons
-          uses: actions/upload-artifact@v4
+          uses: actions/upload-artifact@v7
           with:
             name: fa-strategic-icons
             path: wiki/generated/strategicicons

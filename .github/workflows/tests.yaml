@@ -21,7 +21,7 @@ jobs:
       - name: Install tooling
         run: apk add bash git findutils
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
@@ -70,7 +70,7 @@ jobs:
       - name: Install tooling
         run: apk add bash git findutils
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
@@ -88,7 +88,7 @@ jobs:
       - name: Install tooling
         run: apk add bash git findutils
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |

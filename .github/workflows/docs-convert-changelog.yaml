@@ -41,7 +41,7 @@ jobs:
           echo "SCRIPTS=.github/workflows/scripts/python" >> $GITHUB_ENV
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
           ref: ${{ inputs.branch }}
@@ -53,7 +53,7 @@ jobs:
 
       - name: Download develop changelog
         if: inputs.additional-changelog == 'fafdevelop'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: changelog-fafdevelop
 
@@ -66,7 +66,7 @@ jobs:
 
       - name: Download beta changelog
         if: inputs.additional-changelog == 'fafbeta'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: changelog-fafbeta
 
@@ -78,7 +78,7 @@ jobs:
           cat changelog-fafbeta.md >> $FILE
 
       - name: Setup python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.8'
 
@@ -99,7 +99,7 @@ jobs:
           python3 $SCRIPTS/changelog_overview.py "docs/_posts" "${out_dir}/overview.lua"
 
       - name: Add the Lua changelog as an artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: lua_changelog
           path: |
@@ -116,13 +116,13 @@ jobs:
           apk add bash git findutils
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           sparse-checkout: |
             tests/run-syntax-test.sh
 
       - name: Download the Lua changelog artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: lua_changelog
 
