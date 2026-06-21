@@ -2,7 +2,7 @@
 -- when you order and complete ACU upgrades
 
 local Prefs = import("/lua/user/prefs.lua")
-local FindClients = import("/lua/ui/game/chat.lua").FindClients
+local FindClients = import("/lua/ui/game/chat/ChatController.lua").FindClients
 local defaultMessages = import("/lua/ui/notify/defaultmessages.lua").defaultMessages
 local AddChatCommand = import("/lua/ui/notify/commands.lua").AddChatCommand
 local NotifyOverlay = import("/lua/ui/notify/notifyoverlay.lua")
