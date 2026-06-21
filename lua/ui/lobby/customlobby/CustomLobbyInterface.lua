@@ -31,7 +31,7 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
-local CustomLobbyModel = import("/lua/ui/lobby/customlobby/customlobbymodel.lua")
+local CustomLobbyAuthoritativeModel = import("/lua/ui/lobby/customlobby/customlobbyauthoritativemodel.lua")
 local CustomLobbySlotInterface = import("/lua/ui/lobby/customlobby/customlobbyslotinterface.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
@@ -67,11 +67,11 @@ local CustomLobbyInterface = Class(Group) {
 
         -- One row per possible slot; the SlotCount observer reveals the active ones.
         self.Slots = {}
-        for slot = 1, CustomLobbyModel.MaxSlots do
+        for slot = 1, CustomLobbyAuthoritativeModel.MaxSlots do
             self.Slots[slot] = CustomLobbySlotInterface.Create(self.SlotsPanel, slot)
         end
 
-        local model = CustomLobbyModel.GetSingleton()
+        local model = CustomLobbyAuthoritativeModel.GetSingleton()
         self.SlotCountObserver = self.Trash:Add(
             LazyVarDerive(model.SlotCount, function(slotCountLazy)
                 self:OnSlotCountChanged(slotCountLazy())
@@ -89,11 +89,11 @@ local CustomLobbyInterface = Class(Group) {
         Layouter(self.SlotsPanel)
             :AtLeftTopIn(self, 40, 80)
             :Width(PanelWidth)
-            :Height(CustomLobbyModel.MaxSlots * SlotHeight)
+            :Height(CustomLobbyAuthoritativeModel.MaxSlots * SlotHeight)
             :End()
 
         -- stack the rows top-to-bottom inside the panel via sibling anchoring
-        for slot = 1, CustomLobbyModel.MaxSlots do
+        for slot = 1, CustomLobbyAuthoritativeModel.MaxSlots do
             local row = self.Slots[slot]
             local builder = Layouter(row)
                 :AtLeftIn(self.SlotsPanel)
@@ -112,7 +112,7 @@ local CustomLobbyInterface = Class(Group) {
     ---@param self UICustomLobbyInterface
     ---@param count number
     OnSlotCountChanged = function(self, count)
-        for slot = 1, CustomLobbyModel.MaxSlots do
+        for slot = 1, CustomLobbyAuthoritativeModel.MaxSlots do
             if slot <= count then
                 self.Slots[slot]:Show()
             else
@@ -168,13 +168,13 @@ end
 ---   `UI_Lua import("/lua/ui/lobby/customlobby/customlobbyinterface.lua").OpenDebug()`
 function OpenDebug()
     local slotCount = 6
-    local model = CustomLobbyModel.SetupSingleton(slotCount)
+    local model = CustomLobbyAuthoritativeModel.SetupSingleton(slotCount)
     model.LocalPeerId:Set("1")
     model.IsHost:Set(true)
 
     -- four players in the first four slots, last two left open
     for slot = 1, 4 do
-        CustomLobbyModel.SetPlayer(model, slot, {
+        CustomLobbyAuthoritativeModel.SetPlayer(model, slot, {
             PlayerName  = "Player " .. slot,
             OwnerID     = tostring(slot),
             Human       = slot ~= 4,                       -- slot 4 is an AI, to show the AI colour

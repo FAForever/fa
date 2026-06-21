@@ -31,8 +31,9 @@ local GameColors = import("/lua/gamecolors.lua").GameColors
 
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
-local CustomLobbyModel = import("/lua/ui/lobby/customlobby/customlobbymodel.lua")
+local CustomLobbyAuthoritativeModel = import("/lua/ui/lobby/customlobby/customlobbyauthoritativemodel.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
+local CustomLobbyModel = import("/lua/ui/lobby/customlobby/customlobbymodel.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
@@ -59,9 +60,11 @@ end
 ---@field ColorSwatch Bitmap
 ---@field Name Text
 ---@field Faction Text
+---@field Cpu Text
 ---@field Team Text
 ---@field Ready Text
 ---@field PlayerObserver LazyVar
+---@field CpuObserver LazyVar
 ---@field CurrentPlayer UICustomLobbyPlayer | false
 local CustomLobbySlotInterface = Class(Group) {
 
@@ -84,6 +87,7 @@ local CustomLobbySlotInterface = Class(Group) {
         self.ColorSwatch:SetSolidColor('00000000')
         self.Name = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
         self.Faction = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
+        self.Cpu = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
         self.Team = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
         self.Ready = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
 
@@ -99,10 +103,18 @@ local CustomLobbySlotInterface = Class(Group) {
             return false
         end
 
-        local model = CustomLobbyModel.GetSingleton()
+        local model = CustomLobbyAuthoritativeModel.GetSingleton()
         self.PlayerObserver = self.Trash:Add(
             LazyVarDerive(model.Players[slotIndex], function(playerLazy)
                 self:OnPlayerChanged(playerLazy())
+            end))
+
+        self.CpuObserver = self.Trash:Add(
+            LazyVarDerive(CustomLobbyModel.GetSingleton().CpuBenchmarks, function(benchmarksLazy)
+                -- read the lazy so the dependency edge (re)forms; the value itself
+                -- is read from the model inside RefreshCpu
+                benchmarksLazy()
+                self:RefreshCpu()
             end))
     end,
 
@@ -117,7 +129,8 @@ local CustomLobbySlotInterface = Class(Group) {
         Layouter(self.Name):AnchorToRight(self.ColorSwatch, 8):AtVerticalCenterIn(self):End()
         Layouter(self.Ready):AtRightIn(self, 8):AtVerticalCenterIn(self):End()
         Layouter(self.Team):AnchorToLeft(self.Ready, 12):AtVerticalCenterIn(self):End()
-        Layouter(self.Faction):AnchorToLeft(self.Team, 12):AtVerticalCenterIn(self):End()
+        Layouter(self.Cpu):AnchorToLeft(self.Team, 12):AtVerticalCenterIn(self):End()
+        Layouter(self.Faction):AnchorToLeft(self.Cpu, 12):AtVerticalCenterIn(self):End()
     end,
 
     --- Renders the slot from its player (or the empty state).
@@ -125,6 +138,7 @@ local CustomLobbySlotInterface = Class(Group) {
     ---@param player UICustomLobbyPlayer | false
     OnPlayerChanged = function(self, player)
         self.CurrentPlayer = player
+        self:RefreshCpu()
 
         if not player then
             self.ColorSwatch:SetSolidColor('00000000')
@@ -148,6 +162,19 @@ local CustomLobbySlotInterface = Class(Group) {
         self.Ready:SetColor(player.Ready and 'ff7ad97a' or 'ff888888')
     end,
 
+    --- Updates the CPU-score text for this slot's player from the connectivity model.
+    ---@param self UICustomLobbySlotInterface
+    RefreshCpu = function(self)
+        local player = self.CurrentPlayer
+        if not player then
+            self.Cpu:SetText("")
+            return
+        end
+        local score = CustomLobbyModel.GetSingleton().CpuBenchmarks()[player.OwnerID]
+        self.Cpu:SetText(score and ("CPU " .. tostring(score)) or "CPU ...")
+        self.Cpu:SetColor('ff9aa0a8')
+    end,
+
     --- Click on the row. For now, clicking your own slot toggles your ready flag
     --- (a controller intent — the host applies and broadcasts it).
     ---@param self UICustomLobbySlotInterface
@@ -156,7 +183,7 @@ local CustomLobbySlotInterface = Class(Group) {
         if not player then
             return
         end
-        if player.OwnerID == CustomLobbyModel.GetSingleton().LocalPeerId() then
+        if player.OwnerID == CustomLobbyAuthoritativeModel.GetSingleton().LocalPeerId() then
             CustomLobbyController.RequestSetReady(not player.Ready)
         end
     end,

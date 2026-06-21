@@ -16,32 +16,41 @@ Folder `customlobby/`, class/module prefix `CustomLobby` — pairs with `autolob
 `Autolobby*`. "Custom" is FAF's own term for non-matchmaker games (the autolobby is
 the automated/matchmaker path).
 
-## Status — first vertical slice
+## Two models
 
-Built so far (no networking yet — driven by the model + a debug entry point):
+- **[CustomLobbyAuthoritativeModel.lua](CustomLobbyAuthoritativeModel.lua)** — the
+  state the **host dictates** and that becomes part of the launched scenario: players,
+  game options, mods, scenario, slot flags, identity. `Players` is an **array of
+  per-slot LazyVars** so one slot's change re-fires only that row. Write helpers
+  (`SetPlayer`, `SetPlayerField`, …) keep the copy-then-`Set` discipline.
+- **[CustomLobbyModel.lua](CustomLobbyModel.lua)** — general, local, high-frequency
+  state that is **not** part of the scenario (CPU benchmarks now; ping / connection
+  status later). Kept separate so its churn doesn't dirty the authoritative snapshot.
+
+## Status
 
 | File | Role |
 |------|------|
-| [CustomLobbyModel.lua](CustomLobbyModel.lua) | reactive model singleton. `Players` is an **array of per-slot LazyVars** so one slot's change re-fires only that row. Write helpers (`SetPlayer`, `SetPlayerField`, …) keep the copy-then-`Set` discipline. |
-| [CustomLobbySlotInterface.lua](CustomLobbySlotInterface.lua) | one slot row; subscribes to `model.Players[slot]`, renders it (read-only for now). |
-| [CustomLobbyInterface.lua](CustomLobbyInterface.lua) | composition root (no subscriptions of its own); lays out the slot rows; `OpenDebug()` / `SetupSingleton` / hot-reload. |
+| [CustomLobbyAuthoritativeModel.lua](CustomLobbyAuthoritativeModel.lua) | host-dictated / scenario state (see above). |
+| [CustomLobbyModel.lua](CustomLobbyModel.lua) | local connectivity state (CPU benchmarks). |
+| [CustomLobbyInstance.lua](CustomLobbyInstance.lua) | thin `moho.lobby_methods` shell; validates/dispatches traffic, forwards callbacks to the controller. |
+| [CustomLobbyController.lua](CustomLobbyController.lua) | host-authority logic (free functions): seating, `Process*` handlers, intents (`RequestSetReady`), CPU benchmark. |
+| [CustomLobbyMessages.lua](CustomLobbyMessages.lua) | message registry: `AddPlayer`, `SetPlayers`, `SetReady`, `CPUBenchmark`, `SetCpuBenchmarks`. |
+| [CustomLobbySlotInterface.lua](CustomLobbySlotInterface.lua) | one slot row; subscribes to its slot + CPU benchmarks; click toggles own ready. |
+| [CustomLobbyInterface.lua](CustomLobbyInterface.lua) | composition root (no subscriptions of its own); lays out slot rows; `OpenDebug()` / hot-reload. |
+| [/lua/ui/lobby/lobby.lua](../lobby.lua) | engine entry wrapper (`CreateLobby`/`HostGame`/`JoinGame`) → CustomLobby. Old lobby preserved at `lobby-old.lua`. |
 
-Inspect it without networking:
-
-```
-UI_Lua import("/lua/ui/lobby/customlobby/customlobbyinterface.lua").OpenDebug()
-```
-
-`CloseDebug()` tears it down. For the real flow, `scripts/LaunchCustomLobby.ps1`
-launches host + clients into the regular lobby.
+Working today: host + clients see each other (host-authoritative player sync),
+ready toggles round-trip, and CPU benchmarks are shared. Launched via
+`scripts/LaunchCustomLobby.ps1`, or inspect UI only with
+`UI_Lua import("/lua/ui/lobby/customlobby/customlobbyinterface.lua").OpenDebug()`.
 
 ## Next slices (per TARGET_ARCHITECTURE.md)
 
-1. `CustomLobbyController` (free functions) + `CustomLobbyInstance` (thin `moho` shell) +
-   `CustomLobbyMessages` registry — the host-authority request→validate→broadcast flow.
-2. Make slot controls interactive (faction/colour/team/ready → controller **intents**).
-3. Options panel, map preview, observer list, footer, chat — each its own subscribing component.
-4. Sub-dialogs (map select, mods, units, presets, prefs) as mini-MVC.
+1. Make slot controls interactive (faction/colour/team → controller **intents**).
+2. Options panel, map preview, observer list, footer, chat — each its own subscribing component.
+3. Sub-dialogs (map select, mods, units, presets, prefs) as mini-MVC.
+4. Map-derived `SlotCount`; the GPGNet (`localPort == -1`) FAF-client path.
 
 ## Rules (same as autolobby)
 

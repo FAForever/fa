@@ -28,7 +28,7 @@
 -- This is intentionally a SMALL set for the barebones lobby: enough to see players
 -- join and to round-trip one interactive change (ready).
 
-local CustomLobbyModel = import("/lua/ui/lobby/customlobby/customlobbymodel.lua")
+local CustomLobbyAuthoritativeModel = import("/lua/ui/lobby/customlobby/customlobbyauthoritativemodel.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 
 ---@param lobby UICustomLobbyInstance
@@ -41,7 +41,7 @@ end
 ---@param data table
 ---@return boolean
 local function IsFromHost(lobby, data)
-    return data.SenderID == CustomLobbyModel.GetSingleton().HostID()
+    return data.SenderID == CustomLobbyAuthoritativeModel.GetSingleton().HostID()
 end
 
 ---@class UICustomLobbyMessageHandler
@@ -88,6 +88,32 @@ CustomLobbyMessages = {
         end,
         Handler = function(lobby, data)
             CustomLobbyController.ProcessSetReady(lobby, data)
+        end,
+    },
+
+    -- A client reports its CPU benchmark to the host. The host owns the table.
+    CPUBenchmark = {
+        Validate = function(lobby, data)
+            return type(data.Benchmark) == 'number'
+        end,
+        Accept = function(lobby, data)
+            return AmHost(lobby)
+        end,
+        Handler = function(lobby, data)
+            CustomLobbyController.ProcessCpuBenchmark(lobby, data)
+        end,
+    },
+
+    -- The host's authoritative snapshot of everyone's CPU benchmarks.
+    SetCpuBenchmarks = {
+        Validate = function(lobby, data)
+            return type(data.Benchmarks) == 'table'
+        end,
+        Accept = function(lobby, data)
+            return IsFromHost(lobby, data)
+        end,
+        Handler = function(lobby, data)
+            CustomLobbyController.ProcessSetCpuBenchmarks(lobby, data)
         end,
     },
 }

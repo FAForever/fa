@@ -35,6 +35,7 @@
 local MenuCommon = import("/lua/ui/menus/menucommon.lua")
 local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 
+local CustomLobbyAuthoritativeModel = import("/lua/ui/lobby/customlobby/customlobbyauthoritativemodel.lua")
 local CustomLobbyModel = import("/lua/ui/lobby/customlobby/customlobbymodel.lua")
 local CustomLobbyInterface = import("/lua/ui/lobby/customlobby/customlobbyinterface.lua")
 
@@ -67,7 +68,8 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
     -- Models first, then the view (so its components subscribe to a live model),
     -- then the lobby object (whose callbacks write the model).
     -- TODO: derive SlotCount from the chosen map instead of a fixed default.
-    CustomLobbyModel.SetupSingleton(8)
+    CustomLobbyAuthoritativeModel.SetupSingleton(8)
+    CustomLobbyModel.SetupSingleton()
     CustomLobbyInterface.SetupSingleton()
 
     Instance = InternalCreateLobby(
@@ -98,7 +100,7 @@ function HostGame(desiredGameName, scenarioFileName, inSinglePlayer)
         return
     end
     local scenario = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua") --[[@as FileName]]
-    CustomLobbyModel.SetScenario(CustomLobbyModel.GetSingleton(), scenario)
+    CustomLobbyAuthoritativeModel.SetScenario(CustomLobbyAuthoritativeModel.GetSingleton(), scenario)
     Instance:HostGame()
 end
 

@@ -22,7 +22,7 @@
 
 -- Lobby logic for the custom lobby, as free functions (the autolobby pattern). The
 -- engine instantiates the thin CustomLobbyInstance and forwards its callbacks here,
--- passing itself as `instance`. All state goes to CustomLobbyModel via its write
+-- passing itself as `instance`. All state goes to CustomLobbyAuthoritativeModel via its write
 -- helpers; the host is authoritative.
 --
 -- Barebones host-authority flow:
@@ -34,6 +34,7 @@
 --
 -- See /lua/ui/lobby/TARGET_ARCHITECTURE.md § 5.
 
+local CustomLobbyAuthoritativeModel = import("/lua/ui/lobby/customlobby/customlobbyauthoritativemodel.lua")
 local CustomLobbyModel = import("/lua/ui/lobby/customlobby/customlobbymodel.lua")
 
 --- The live lobby object, set by the first engine callback. UI-triggered intents
@@ -45,7 +46,7 @@ local LobbyInstance = false
 --#region Helpers
 
 --- First empty player slot within the active slot count, or nil.
----@param model UICustomLobbyModel
+---@param model UICustomLobbyAuthoritativeModel
 ---@return number | nil
 local function FindFreeSlot(model)
     for slot = 1, model.SlotCount() do
@@ -57,11 +58,11 @@ local function FindFreeSlot(model)
 end
 
 --- The slot a peer occupies, or nil.
----@param model UICustomLobbyModel
+---@param model UICustomLobbyAuthoritativeModel
 ---@param ownerId UILobbyPeerId
 ---@return number | nil
 local function FindSlotForOwner(model, ownerId)
-    for slot = 1, CustomLobbyModel.MaxSlots do
+    for slot = 1, CustomLobbyAuthoritativeModel.MaxSlots do
         local player = model.Players[slot]()
         if player and player.OwnerID == ownerId then
             return slot
@@ -71,11 +72,11 @@ local function FindSlotForOwner(model, ownerId)
 end
 
 --- A plain per-slot snapshot of all players (false for empty), for the wire.
----@param model UICustomLobbyModel
+---@param model UICustomLobbyAuthoritativeModel
 ---@return table
 local function GatherPlayers(model)
     local players = {}
-    for slot = 1, CustomLobbyModel.MaxSlots do
+    for slot = 1, CustomLobbyAuthoritativeModel.MaxSlots do
         players[slot] = model.Players[slot]() or false
     end
     return players
@@ -83,7 +84,7 @@ end
 
 --- Host broadcasts the authoritative player snapshot to everyone.
 ---@param instance UICustomLobbyInstance
----@param model UICustomLobbyModel
+---@param model UICustomLobbyAuthoritativeModel
 local function BroadcastPlayers(instance, model)
     instance:BroadcastData({ Type = 'SetPlayers', Players = GatherPlayers(model) })
 end
@@ -106,7 +107,7 @@ end
 function OnHosting(instance)
     LobbyInstance = instance
 
-    local model = CustomLobbyModel.GetSingleton()
+    local model = CustomLobbyAuthoritativeModel.GetSingleton()
     local id = instance:GetLocalPlayerID()
     model.LocalPeerId:Set(id)
     model.HostID:Set(id)
@@ -117,7 +118,9 @@ function OnHosting(instance)
     player.StartSpot = 1
     player.PlayerColor = 1
     player.ArmyColor = 1
-    CustomLobbyModel.SetPlayer(model, 1, player)
+    CustomLobbyAuthoritativeModel.SetPlayer(model, 1, player)
+
+    instance.Trash:Add(ForkThread(RunBenchmarkThread, instance))
 end
 
 --- Called when our connection to the host succeeds.
@@ -128,7 +131,7 @@ end
 function OnConnectionToHostEstablished(instance, localId, localName, hostId)
     LobbyInstance = instance
 
-    local model = CustomLobbyModel.GetSingleton()
+    local model = CustomLobbyAuthoritativeModel.GetSingleton()
     model.LocalPeerId:Set(localId)
     model.HostID:Set(hostId)
     model.IsHost:Set(false)
@@ -138,6 +141,8 @@ function OnConnectionToHostEstablished(instance, localId, localName, hostId)
     player.PlayerName = localName or player.PlayerName
 
     instance:SendData(hostId, { Type = 'AddPlayer', PlayerOptions = player })
+
+    instance.Trash:Add(ForkThread(RunBenchmarkThread, instance))
 end
 
 --- Called when the connection fails.
@@ -152,13 +157,13 @@ end
 ---@param peerName string
 ---@param uid UILobbyPeerId
 function OnPeerDisconnected(instance, peerName, uid)
-    local model = CustomLobbyModel.GetSingleton()
+    local model = CustomLobbyAuthoritativeModel.GetSingleton()
     if not model.IsHost() then
         return
     end
     local slot = FindSlotForOwner(model, uid)
     if slot then
-        CustomLobbyModel.ClearPlayer(model, slot)
+        CustomLobbyAuthoritativeModel.ClearPlayer(model, slot)
         BroadcastPlayers(instance, model)
     end
 end
@@ -178,7 +183,7 @@ end
 ---@param instance UICustomLobbyInstance
 ---@param data table
 function ProcessAddPlayer(instance, data)
-    local model = CustomLobbyModel.GetSingleton()
+    local model = CustomLobbyAuthoritativeModel.GetSingleton()
     local slot = FindFreeSlot(model)
     if not slot then
         WARN("CustomLobby: no free slot for joining peer " .. tostring(data.SenderID))
@@ -191,7 +196,7 @@ function ProcessAddPlayer(instance, data)
     player.StartSpot = slot
     player.PlayerColor = slot
     player.ArmyColor = slot
-    CustomLobbyModel.SetPlayer(model, slot, player)
+    CustomLobbyAuthoritativeModel.SetPlayer(model, slot, player)
 
     BroadcastPlayers(instance, model)
 end
@@ -200,8 +205,8 @@ end
 ---@param instance UICustomLobbyInstance
 ---@param data table
 function ProcessSetPlayers(instance, data)
-    local model = CustomLobbyModel.GetSingleton()
-    for slot = 1, CustomLobbyModel.MaxSlots do
+    local model = CustomLobbyAuthoritativeModel.GetSingleton()
+    for slot = 1, CustomLobbyAuthoritativeModel.MaxSlots do
         model.Players[slot]:Set(data.Players[slot] or false)
     end
 end
@@ -210,11 +215,118 @@ end
 ---@param instance UICustomLobbyInstance
 ---@param data table
 function ProcessSetReady(instance, data)
-    local model = CustomLobbyModel.GetSingleton()
+    local model = CustomLobbyAuthoritativeModel.GetSingleton()
     local slot = FindSlotForOwner(model, data.SenderID)
     if slot then
-        CustomLobbyModel.SetPlayerField(model, slot, 'Ready', data.Ready and true or false)
+        CustomLobbyAuthoritativeModel.SetPlayerField(model, slot, 'Ready', data.Ready and true or false)
         BroadcastPlayers(instance, model)
+    end
+end
+
+--- Host records a peer's CPU score and re-broadcasts the authoritative table.
+---@param instance UICustomLobbyInstance
+---@param data table
+function ProcessCpuBenchmark(instance, data)
+    CustomLobbyModel.SetCpuBenchmark(
+        CustomLobbyModel.GetSingleton(), data.SenderID, data.Benchmark)
+    BroadcastCpuBenchmarks(instance)
+end
+
+--- Everyone applies the host's authoritative CPU-benchmark snapshot.
+---@param instance UICustomLobbyInstance
+---@param data table
+function ProcessSetCpuBenchmarks(instance, data)
+    CustomLobbyModel.GetSingleton().CpuBenchmarks:Set(data.Benchmarks)
+end
+
+--#endregion
+
+-------------------------------------------------------------------------------
+--#region CPU benchmark
+--
+-- A faithful port of the legacy lobby's CPU stress test (lobby-old.lua). Each peer
+-- runs it shortly after connecting; the host owns the table and broadcasts it.
+-- The score is a busy-loop duration (lower = faster CPU); skews were no-ops, so
+-- they're dropped.
+
+--- Host broadcasts the authoritative CPU-benchmark snapshot to everyone.
+---@param instance UICustomLobbyInstance
+function BroadcastCpuBenchmarks(instance)
+    instance:BroadcastData({
+        Type = 'SetCpuBenchmarks',
+        Benchmarks = CustomLobbyModel.GetSingleton().CpuBenchmarks(),
+    })
+end
+
+--- Runs the busy-loop once and returns its `ceil(seconds * 100)` cost, or nil if
+--- the lobby was torn down mid-run. Must run inside a forked thread (it yields).
+---@param instance UICustomLobbyInstance
+---@return number | nil
+local function RunOnce(instance)
+    local TableInsert = table.insert
+    local totalTime = 0
+    local countTime = 0
+    local lastTime, currTime, j, k, l, m
+    local n = {}
+    for h = 1, 24 do
+        if IsDestroyed(instance) then
+            return nil
+        end
+        lastTime = GetSystemTimeSeconds()
+        for i = 1.0, 30.4, 0.0008 do
+            j = i + i
+            k = i * i
+            l = k / j
+            m = j - i
+            j = math.pow(i, 4)
+            l = -i
+            m = { '1234567890', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', true }
+            TableInsert(m, '1234567890')
+            k = i < j
+            k = i == j
+            k = i <= j
+            k = not k
+            n[tostring(i)] = m
+        end
+        currTime = GetSystemTimeSeconds()
+        totalTime = totalTime + currTime - lastTime
+        if totalTime > countTime then
+            -- yield so the UI keeps ticking during the benchmark
+            countTime = totalTime + 0.125
+            coroutine.yield(1)
+        end
+    end
+    return math.ceil(totalTime * 100)
+end
+
+--- Benchmarks the local CPU (best of three runs) and reports the score: the host
+--- records + broadcasts it; a client sends it to the host.
+---@param instance UICustomLobbyInstance
+function RunBenchmarkThread(instance)
+    -- defer briefly so connection negotiation isn't starved
+    WaitSeconds(2.0)
+
+    local best
+    for run = 1, 3 do
+        local score = RunOnce(instance)
+        if not score or IsDestroyed(instance) then
+            return
+        end
+        if not best or score < best then
+            best = score
+        end
+    end
+
+    local model = CustomLobbyAuthoritativeModel.GetSingleton()
+    local connModel = CustomLobbyModel.GetSingleton()
+
+    -- show our own score immediately; the host's snapshot reconciles everyone
+    CustomLobbyModel.SetCpuBenchmark(connModel, model.LocalPeerId(), best)
+
+    if model.IsHost() then
+        BroadcastCpuBenchmarks(instance)
+    else
+        instance:SendData(model.HostID(), { Type = 'CPUBenchmark', Benchmark = best })
     end
 end
 
@@ -232,11 +344,11 @@ function RequestSetReady(ready)
         return
     end
 
-    local model = CustomLobbyModel.GetSingleton()
+    local model = CustomLobbyAuthoritativeModel.GetSingleton()
     if model.IsHost() then
         local slot = FindSlotForOwner(model, model.LocalPeerId())
         if slot then
-            CustomLobbyModel.SetPlayerField(model, slot, 'Ready', ready and true or false)
+            CustomLobbyAuthoritativeModel.SetPlayerField(model, slot, 'Ready', ready and true or false)
             BroadcastPlayers(instance, model)
         end
     else
