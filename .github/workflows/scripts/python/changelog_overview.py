@@ -37,7 +37,7 @@ def extract_yaml_front_matter(content: str) -> Tuple[str, str]:
             return yaml_content, rest_of_content
     return '', content
 
-def process_markdown_file(markdown_file: Path) -> Optional[Tuple[str, date]]:
+def process_markdown_file(markdown_file: Path) -> Optional[Tuple[str, date, int]]:
     logging.info(f"Processing file: {markdown_file.name}")
 
     file_name_parts = markdown_file.stem.split('-')
