@@ -125,18 +125,18 @@ Overview = {
             Path = "/lua/ui/lobby/changelog/generated/2025-04-01-3820.lua"
         },
         {
-            Version = 3819,
-            Name = "3819 - Hotfix",
-            Date = "2025-02-14",
-            URL = "http://faforever.github.io/fa/changelog/3819",
-            Path = "/lua/ui/lobby/changelog/generated/2025-02-14-3819.lua"
-        },
-        {
             Version = 3818,
             Name = "3818 - Game Patch",
             Date = "2025-02-14",
             URL = "http://faforever.github.io/fa/changelog/3818",
             Path = "/lua/ui/lobby/changelog/generated/2025-02-14-3818.lua"
+        },
+        {
+            Version = 3819,
+            Name = "3819 - Hotfix",
+            Date = "2025-02-14",
+            URL = "http://faforever.github.io/fa/changelog/3819",
+            Path = "/lua/ui/lobby/changelog/generated/2025-02-14-3819.lua"
         },
         {
             Version = 3817,
@@ -258,18 +258,18 @@ Overview = {
             Path = "/lua/ui/lobby/changelog/generated/2024-03-16-3801.lua"
         },
         {
-            Version = 3780,
-            Name = "3780 - Hotfix",
-            Date = "2024-01-26",
-            URL = "http://faforever.github.io/fa/changelog/3780",
-            Path = "/lua/ui/lobby/changelog/generated/2024-01-26-3780.lua"
-        },
-        {
             Version = 3781,
             Name = "3781 - Hotfix",
             Date = "2024-01-26",
             URL = "http://faforever.github.io/fa/changelog/3781",
             Path = "/lua/ui/lobby/changelog/generated/2024-01-26-3781.lua"
+        },
+        {
+            Version = 3780,
+            Name = "3780 - Hotfix",
+            Date = "2024-01-26",
+            URL = "http://faforever.github.io/fa/changelog/3780",
+            Path = "/lua/ui/lobby/changelog/generated/2024-01-26-3780.lua"
         },
         {
             Version = 3779,
@@ -573,11 +573,11 @@ Overview = {
             Path = "/lua/ui/lobby/changelog/generated/2022-04-24-3735.lua"
         },
         {
-            Version = 3733,
-            Name = "3733 - Hotfix",
+            Version = 3734,
+            Name = "3734 - Hotfix",
             Date = "2022-04-22",
-            URL = "http://faforever.github.io/fa/changelog/3733",
-            Path = "/lua/ui/lobby/changelog/generated/2022-04-22-3733.lua"
+            URL = "http://faforever.github.io/fa/changelog/3734",
+            Path = "/lua/ui/lobby/changelog/generated/2022-04-22-3734.lua"
         },
         {
             Version = 3732,
@@ -587,11 +587,11 @@ Overview = {
             Path = "/lua/ui/lobby/changelog/generated/2022-04-22-3732.lua"
         },
         {
-            Version = 3734,
-            Name = "3734 - Hotfix",
+            Version = 3733,
+            Name = "3733 - Hotfix",
             Date = "2022-04-22",
-            URL = "http://faforever.github.io/fa/changelog/3734",
-            Path = "/lua/ui/lobby/changelog/generated/2022-04-22-3734.lua"
+            URL = "http://faforever.github.io/fa/changelog/3733",
+            Path = "/lua/ui/lobby/changelog/generated/2022-04-22-3733.lua"
         },
         {
             Version = 3731,
@@ -608,18 +608,18 @@ Overview = {
             Path = "/lua/ui/lobby/changelog/generated/2021-12-23-3730.lua"
         },
         {
-            Version = 3728,
-            Name = "3728 - Game Patch",
-            Date = "2021-12-20",
-            URL = "http://faforever.github.io/fa/changelog/3728",
-            Path = "/lua/ui/lobby/changelog/generated/2021-12-20-3728.lua"
-        },
-        {
             Version = 3729,
             Name = "3729 - Hotfix",
             Date = "2021-12-20",
             URL = "http://faforever.github.io/fa/changelog/3729",
             Path = "/lua/ui/lobby/changelog/generated/2021-12-20-3729.lua"
+        },
+        {
+            Version = 3728,
+            Name = "3728 - Game Patch",
+            Date = "2021-12-20",
+            URL = "http://faforever.github.io/fa/changelog/3728",
+            Path = "/lua/ui/lobby/changelog/generated/2021-12-20-3728.lua"
         },
         {
             Version = 3726,
@@ -657,18 +657,18 @@ Overview = {
             Path = "/lua/ui/lobby/changelog/generated/2021-09-19-3722.lua"
         },
         {
-            Version = 3723,
-            Name = "3723 - Hotfix",
-            Date = "2021-09-19",
-            URL = "http://faforever.github.io/fa/changelog/3723",
-            Path = "/lua/ui/lobby/changelog/generated/2021-09-19-3723.lua"
-        },
-        {
             Version = 3721,
             Name = "3721 - Game Patch",
             Date = "2021-09-19",
             URL = "http://faforever.github.io/fa/changelog/3721",
             Path = "/lua/ui/lobby/changelog/generated/2021-09-19-3721.lua"
+        },
+        {
+            Version = 3723,
+            Name = "3723 - Hotfix",
+            Date = "2021-09-19",
+            URL = "http://faforever.github.io/fa/changelog/3723",
+            Path = "/lua/ui/lobby/changelog/generated/2021-09-19-3723.lua"
         },
         {
             Version = 3720,
@@ -944,18 +944,18 @@ Overview = {
             Path = "/lua/ui/lobby/changelog/generated/2017-02-27-3676.lua"
         },
         {
-            Version = 3675,
-            Name = "3675 - Hotfix",
-            Date = "2017-02-05",
-            URL = "http://faforever.github.io/fa/changelog/3675",
-            Path = "/lua/ui/lobby/changelog/generated/2017-02-05-3675.lua"
-        },
-        {
             Version = 3674,
             Name = "3674 - Game Patch",
             Date = "2017-02-05",
             URL = "http://faforever.github.io/fa/changelog/3674",
             Path = "/lua/ui/lobby/changelog/generated/2017-02-05-3674.lua"
+        },
+        {
+            Version = 3675,
+            Name = "3675 - Hotfix",
+            Date = "2017-02-05",
+            URL = "http://faforever.github.io/fa/changelog/3675",
+            Path = "/lua/ui/lobby/changelog/generated/2017-02-05-3675.lua"
         },
         {
             Version = 3672,
@@ -972,13 +972,6 @@ Overview = {
             Path = "/lua/ui/lobby/changelog/generated/2017-01-19-3671.lua"
         },
         {
-            Version = 3670,
-            Name = "3670 - Hotfix",
-            Date = "2017-01-17",
-            URL = "http://faforever.github.io/fa/changelog/3670",
-            Path = "/lua/ui/lobby/changelog/generated/2017-01-17-3670.lua"
-        },
-        {
             Version = 3668,
             Name = "3668 - Hotfix",
             Date = "2017-01-17",
@@ -988,6 +981,13 @@ Overview = {
         {
             Version = 3669,
             Name = "3669 - Hotfix",
+            Date = "2017-01-17",
+            URL = "http://faforever.github.io/fa/changelog/3669",
+            Path = "/lua/ui/lobby/changelog/generated/2017-01-17-3669.lua"
+        },
+        {
+            Version = 3670,
+            Name = "3670 - Hotfix",
             Date = "2017-01-17",
             URL = "http://faforever.github.io/fa/changelog/3669",
             Path = "/lua/ui/lobby/changelog/generated/2017-01-17-3669.lua"

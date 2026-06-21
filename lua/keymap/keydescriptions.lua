@@ -198,6 +198,17 @@ keyDescriptions = {
     ['chat_line_up'] = '<LOC key_desc_0089>Chat line up',
     ['chat_line_down'] = '<LOC key_desc_0090>Chat line down',
 
+    ['debug_chat_window'] = '<LOC key_desc_debug_chat_window>Toggle the chat window',
+    ['debug_chat_config'] = '<LOC key_desc_debug_chat_config>Toggle the chat options dialog',
+    ['debug_chat_append_system_message'] = '<LOC key_desc_debug_chat_append_system_message>Append a synthetic system message to the chat',
+    ['debug_chat_append_short_message'] = '<LOC key_desc_debug_chat_append_short_message>Append a short synthetic chat message',
+    ['debug_chat_append_long_message'] = '<LOC key_desc_debug_chat_append_long_message>Append a long synthetic chat message (tests text wrapping)',
+    ['debug_chat_append_burst'] = '<LOC key_desc_debug_chat_append_burst>Append ten synthetic chat messages in a burst (tests scrolling)',
+    ['debug_chat_append_camera_message'] = '<LOC key_desc_debug_chat_append_camera_message>Append a chat message with a location hint at the current camera focus',
+    ['debug_chat_set_recipient_all'] = '<LOC key_desc_debug_chat_set_recipient_all>Set the chat recipient to all',
+    ['debug_chat_set_recipient_allies'] = '<LOC key_desc_debug_chat_set_recipient_allies>Set the chat recipient to allies',
+    ['debug_chat_clear_history'] = '<LOC key_desc_debug_chat_clear_history>Clear the chat history',
+
     ['switch_skin_up'] = '<LOC key_desc_0091>Rotate skins up',
     ['switch_skin_down'] = '<LOC key_desc_0092>Rotate skins down',
     ['switch_layout_up'] = '<LOC key_desc_0093>Rotate layouts up',

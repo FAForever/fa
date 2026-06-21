@@ -108,7 +108,7 @@ jobs:
   validate_lua_changelog:
     name: Validate Lua changelog
     runs-on: ubuntu-latest
-    container: faforever/lua:v5.0-1
+    container: faforever/lua:v5.0-3
     needs: convert_changelog
     steps:
       - name: Install tooling
