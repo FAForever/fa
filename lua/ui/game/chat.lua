@@ -23,7 +23,7 @@ local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 -- log doesn't drown when a mod is busy hammering a deprecated entry point.
 local _warned = {}
 local function _deprecate(name, replacement)
-    -- if _warned[name] then return end
+    if _warned[name] then return end
     _warned[name] = true
     WARN(string.format(
         "chat.lua %s is deprecated — use %s instead",
