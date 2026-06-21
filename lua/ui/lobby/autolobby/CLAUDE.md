@@ -14,22 +14,26 @@ reactive MVC structure as the in-game chat: a reactive **model**, a dumb
 ## Architecture
 
 ```
-engine ──callbacks──► AutolobbyController (moho.lobby_methods)
-                              │ writes (:Set)
+engine ──callbacks──► AutolobbyInstance (moho.lobby_methods, thin shell)
+                              │ forwards (passing self)
+                              ▼
+                      AutolobbyController (logic, free functions)
+                              │ writes via model helpers
                               ▼
                       AutolobbyModel  (LazyVars, singleton)
                               │ OnDirty / Derive
                               ▼
-                      AutolobbyInterface (view, reads)
+                      AutolobbyInterface (composition) → matrix / preview (read)
 ```
 
 | Role | File | Responsibility |
 |------|------|----------------|
-| Model | [AutolobbyModel.lua](AutolobbyModel.lua) | Reactive singleton: raw synced state (player/game options, connection matrix, launch statuses) + derived view-models (`Connections`, `Statuses`, `Ownership`, `Scenario`) + the pure derivation helpers + the copy-then-`Set` write helpers. No UI, no networking. |
+| Model | [AutolobbyModel.lua](AutolobbyModel.lua) | Reactive singleton: raw synced state + derived view-models (`Connections`, `Statuses`, `Ownership`, `Scenario`) + the pure derivation helpers + the copy-then-`Set` write helpers. No UI, no networking. |
+| Instance | [AutolobbyInstance.lua](AutolobbyInstance.lua) | The `moho.lobby_methods` object the engine instantiates. Thin shell: engine-ABI wrappers + validation/dispatch + command-line creators stay here; callbacks with behaviour forward to the controller. |
+| Controller | [AutolobbyController.lua](AutolobbyController.lua) | The lobby logic as **free functions** (`OnHosting`, `OnEstablishedPeers`, `Process*`, threads, `Rejoin`, launch-flow). The only writer to the model. Hot-reloadable. |
 | Composition root | [AutolobbyInterface.lua](AutolobbyInterface.lua) | Builds and lays out the children; holds **no** model subscriptions. |
 | Components | [AutolobbyConnectionMatrix.lua](AutolobbyConnectionMatrix.lua), [AutolobbyMapPreview.lua](AutolobbyMapPreview.lua) | Each subscribes to the model via `Derive`, feeds its dot grid / preview, and owns its own visibility. Never write the model. |
-| Controller | [AutolobbyController.lua](AutolobbyController.lua) | `AutolobbyCommunications`, the engine's lobby object. The only writer to the model and the only place that talks to peers / the lobby server. |
-| Entry point | [/lua/ui/lobby/autolobby.lua](/lua/ui/lobby/autolobby.lua) | Engine-facing wrapper: `CreateLobby` / `HostGame` / `JoinGame` / `ConnectToPeer` / `DisconnectFromPeer`. Bootstraps model + view + controller in that order. |
+| Entry point | [/lua/ui/lobby/autolobby.lua](/lua/ui/lobby/autolobby.lua) | Engine-facing wrapper: `CreateLobby` / `HostGame` / `JoinGame` / `ConnectToPeer` / `DisconnectFromPeer`. Bootstraps model + view + instance in that order. |
 
 Like the chat (`ChatLinesInterface`, `ChatEditInterface`, … each subscribe to the
 model themselves), the components own their reactivity. `AutolobbyInterface` is a
@@ -37,24 +41,33 @@ pure composition root, not a push hub.
 
 ---
 
-## The key difference from chat
+## Instance vs Controller
 
-The chat controller is a module of free functions. **The autolobby controller
-cannot be** — it is a `moho.lobby_methods` subclass that the *engine*
-instantiates via `InternalCreateLobby` (in [autolobby.lua](/lua/ui/lobby/autolobby.lua))
-and whose callbacks (`Hosting`, `DataReceived`, `EstablishedPeers`, …) the
-engine calls. So:
+The chat controller is a module of free functions; the engine doesn't own it. The
+autolobby's engine object (`AutolobbyInstance`) *is* owned by the engine — it
+instantiates it via `InternalCreateLobby` and calls its callbacks. So the
+autolobby uses a **humble-object** split:
 
-- The controller stays a C-bound class. We extracted only its **state** (into
-  the model) and its **view coupling** (it used to push into the view via
-  `interface:Update*`; it now writes the model and the view reacts).
-- **The controller does not hot-reload.** Unlike `ChatController.Init`, which
-  re-binds via `__moduleinfo.OnReload`, the live C object keeps its bound
-  methods and threads across a reload of this file. Edits to
-  `AutolobbyController.lua` only take effect on the next `CreateLobby`. The
-  model and the view *do* hot-reload (own `__moduleinfo` hooks), and because
-  state now lives in the model, a view reload restores itself by re-reading the
-  surviving model — no manual state replay.
+- **`AutolobbyInstance`** is the C-bound shell. It keeps what is genuinely
+  engine-adjacent: the `moho` overrides (`BroadcastData` / `SendData` / …, with
+  their `AutolobbyMessages` validation), `DataReceived`'s validate→accept→dispatch,
+  and the command-line creators (`CreateLocalPlayer` / `CreateLocalGameOptions`,
+  which lean on the mixed-in argument component). Trivial callbacks (a single
+  `SendXToServer`) stay inline; callbacks with behaviour forward to the controller.
+- **`AutolobbyController`** holds the behaviour as free functions taking the
+  instance as their first argument (`OnHosting(instance)`, etc.). `AutolobbyMessages`
+  routes each validated message straight to `AutolobbyController.Process*`.
+
+**Why:** the logic becomes **hot-reloadable** — the instance's forwarders resolve
+through the live controller module table, so editing a handler takes effect
+without re-hosting. It is also testable with a mock instance. Two caveats:
+
+- The **instance does not hot-reload** (the live C object keeps its bound methods
+  across a reload of `AutolobbyInstance.lua`). Keep it thin; edits there need a new
+  `CreateLobby`. The view and model hot-reload on their own.
+- The **threads don't hot-reload** either — a forked `ShareLaunchStatusThread` /
+  `LaunchThread` holds the function it started with, so thread edits take effect
+  on the next lobby. The message/event handlers do reload.
 
 ---
 
@@ -97,8 +110,8 @@ discipline, so call sites can't accidentally mutate in place: `SetPlayer`,
 `StampLaunchTables`. The controller calls these instead of building tables by hand.
 
 `LocalPlayerName`, `HostID` and the rejoin parameters
-(`LobbyParameters` / `HostParameters` / `JoinParameters`) stay
-controller-internal — no view reads them and no derivation depends on them.
+(`LobbyParameters` / `HostParameters` / `JoinParameters`) live on the
+**instance** — no view reads them and no derivation depends on them.
 
 ---
 
@@ -119,8 +132,8 @@ controller-internal — no view reads them and no derivation depends on them.
   every receive so the value identity always changes and the observer fires even
   for repeated pulses from the same peer.
 - **Bootstrap order matters.** `CreateLobby` sets up the model *before* the view
-  so the view subscribes against it, and *before* the controller so the
-  controller's `__init` seeds an existing model. Rejoin re-runs `CreateLobby`,
+  so the view subscribes against it, and *before* the instance so the instance's
+  `__init` seeds an existing model. Rejoin re-runs `CreateLobby`,
   which calls `SetupSingleton` and thus resets the model to fresh state — a new
   lobby must not inherit stale connection / launch state.
 

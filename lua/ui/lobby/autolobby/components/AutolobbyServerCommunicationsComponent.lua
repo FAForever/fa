@@ -90,7 +90,7 @@ local GpgNetSend = GpgNetSend
 AutolobbyServerCommunicationsComponent = ClassSimple {
 
     --- Sends a message to the server to update relevant army options of a player.
-    ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyCommunications
+    ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyInstance
     ---@param peerId UILobbyPeerId
     ---@param key 'Team' | 'Army' | 'StartSpot' | 'Faction'
     ---@param value any
@@ -105,7 +105,7 @@ AutolobbyServerCommunicationsComponent = ClassSimple {
     end,
 
     --- Sends a message to the server to update relevant army options of an AI.
-    ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyCommunications
+    ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyInstance
     ---@param aiName string
     ---@param key 'Team' | 'Army' | 'StartSpot' | 'Faction'
     ---@param value any
@@ -120,7 +120,7 @@ AutolobbyServerCommunicationsComponent = ClassSimple {
     end,
 
     --- Sends a message to the server to update relevant game options.
-    ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyCommunications
+    ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyInstance
     ---@param key 'Slots' | any
     ---@param value any
     SendGameOptionToServer = function(self, key, value)
@@ -134,7 +134,7 @@ AutolobbyServerCommunicationsComponent = ClassSimple {
     end,
 
     --- Sends a message to the server indicating what the status of the lobby as a whole.
-    ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyCommunications
+    ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyInstance
     ---@param value UILobbyState
     SendGameStateToServer = function(self, value)
         -- any other value seriously messes with the lobby protocol on the server
@@ -146,21 +146,21 @@ AutolobbyServerCommunicationsComponent = ClassSimple {
     end,
 
     --- sends a message to the server about the status of the local peer.
-    ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyCommunications
+    ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyInstance
     ---@param value UIPeerLaunchStatus
     SendLaunchStatusToServer = function(self, value)
         GpgNetSend('LaunchStatus', value)
     end,
 
     --- Sends a message to the server that we established a connection to a peer. This message can be send multiple times for the same peer and the server should be idempotent to it.
-    ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyCommunications
+    ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyInstance
     ---@param peerId UILobbyPeerId
     SendEstablishedPeer = function(self, peerId)
         GpgNetSend('EstablishedPeer', peerId)
     end,
 
     --- Sends a message to the server that we disconnected from a peer. Note that a peer may be trying to rejoin. See also the launch status of the given peer.
-    ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyCommunications
+    ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyInstance
     ---@param peerId UILobbyPeerId
     SendDisconnectedPeer = function(self, peerId)
         GpgNetSend('DisconnectedPeer', peerId)

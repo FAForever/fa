@@ -141,89 +141,9 @@ function CreateOwnershipMatrix(playerCount, localIndex)
     return output
 end
 
---- Determines the launch status of the local peer.
----@param connectionMatrix table<UILobbyPeerId, UILobbyPeerId[]>
----@param playerCount number
----@return UIPeerLaunchStatus
-function CreateLaunchStatus(connectionMatrix, playerCount)
-    -- check number of peers
-    local validPeerCount = playerCount - 1
-    if table.getsize(connectionMatrix) < validPeerCount then
-        return 'Missing local peers'
-    end
-
-    return 'Ready'
-end
-
----@param playerOptions UIAutolobbyPlayer[]
----@return table<string, number>
-function CreateRatingsTable(playerOptions)
-    ---@type table<string, number>
-    local allRatings = {}
-
-    for slot, options in pairs(playerOptions) do
-        if options.Human and options.PL then
-            allRatings[options.PlayerName] = options.PL
-        end
-    end
-
-    return allRatings
-end
-
----@param playerOptions UIAutolobbyPlayer[]
----@return table<string, string>
-function CreateDivisionsTable(playerOptions)
-    ---@type table<string, string>
-    local allDivisions = {}
-
-    for slot, options in pairs(playerOptions) do
-        if options.Human and options.PL then
-            if options.DIV ~= "unlisted" then
-                local division = options.DIV
-                if options.SUBDIV and options.SUBDIV ~= "" then
-                    division = division .. ' ' .. options.SUBDIV
-                end
-                allDivisions[options.PlayerName] = division
-            end
-        end
-    end
-
-    return allDivisions
-end
-
----@param playerOptions UIAutolobbyPlayer[]
----@return table<string, string>
-function CreateClanTagsTable(playerOptions)
-    local allClanTags = {}
-
-    for slot, options in pairs(playerOptions) do
-        if options.PlayerClan then
-            allClanTags[options.PlayerName] = options.PlayerClan
-        end
-    end
-
-    return allClanTags
-end
-
---- Verifies whether we can launch the game.
----@param peerStatus UIAutolobbyStatus
----@param playerCount number
----@return boolean
-function CanLaunch(peerStatus, playerCount)
-    -- check if we know of all peers
-    if table.getsize(peerStatus) ~= playerCount then
-        return false
-    end
-
-    -- check if all peers are ready for launch
-    for k, launchStatus in peerStatus do
-        if launchStatus ~= 'Ready' then
-            return false
-        end
-    end
-
-    return true
-end
+-- Launch-flow computations (CreateLaunchStatus, CanLaunch, CreateRatingsTable,
+-- CreateDivisionsTable, CreateClanTagsTable) live in `AutolobbyController` — they
+-- are controller logic, not part of the reactive model's derivations.
 
 --#endregion
 
@@ -383,17 +303,20 @@ function SetScenarioFile(model, scenarioFile)
     model.GameOptions:Set(gameOptions)
 end
 
---- Tucks the rating / division / clan tables into a copy of the game options
---- and sets it. Returns the new game options so the caller can reuse them in the
---- launch configuration.
+--- Tucks the (pre-computed) rating / division / clan tables into a copy of the
+--- game options and sets it. The tables are computed by the controller (the
+--- launch-flow logic lives there); this helper only keeps the copy-then-`Set`
+--- discipline. Returns the new game options so the caller can reuse them.
 ---@param model UIAutolobbyModel
----@param playerOptions UIAutolobbyPlayer[]
+---@param ratings table<string, number>
+---@param divisions table<string, string>
+---@param clanTags table<string, string>
 ---@return UILobbyLaunchGameOptionsConfiguration
-function StampLaunchTables(model, playerOptions)
+function StampLaunchTables(model, ratings, divisions, clanTags)
     local gameOptions = table.copy(model.GameOptions())
-    gameOptions.Ratings = CreateRatingsTable(playerOptions)
-    gameOptions.Divisions = CreateDivisionsTable(playerOptions)
-    gameOptions.ClanTags = CreateClanTagsTable(playerOptions)
+    gameOptions.Ratings = ratings
+    gameOptions.Divisions = divisions
+    gameOptions.ClanTags = clanTags
     model.GameOptions:Set(gameOptions)
     return gameOptions
 end

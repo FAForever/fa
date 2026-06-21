@@ -31,8 +31,8 @@
 -- the provided functionality. It now acts as a wrapper for the autolobby controller
 -- that can be found at: lua\ui\lobby\autolobby\AutolobbyController.lua
 
----@type UIAutolobbyCommunications | false
-local AutolobbyCommunicationsInstance = false
+---@type UIAutolobbyInstance | false
+local LobbyInstance = false
 
 --- Creates the lobby communications, called (indirectly) by the engine to setup the module state.
 ---@param protocol UILobbyProtocol
@@ -40,7 +40,7 @@ local AutolobbyCommunicationsInstance = false
 ---@param desiredPlayerName string
 ---@param localPlayerUID UILobbyPeerId
 ---@param natTraversalProvider any
----@return UIAutolobbyCommunications
+---@return UIAutolobbyInstance
 function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
     -- we intentionally do not log the 'natTraversalProvider' parameter as it can cause issues due to being an uninitialized C object
     LOG("CreateLobby", protocol, localPort, desiredPlayerName, localPlayerUID)
@@ -54,21 +54,21 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
 
     -- create the lobby
     local maxConnections = 16
-    AutolobbyCommunicationsInstance = InternalCreateLobby(
-        import("/lua/ui/lobby/autolobby/autolobbycontroller.lua").AutolobbyCommunications,
+    LobbyInstance = InternalCreateLobby(
+        import("/lua/ui/lobby/autolobby/autolobbyinstance.lua").AutolobbyInstance,
         protocol, localPort, maxConnections, desiredPlayerName,
         localPlayerUID, natTraversalProvider
     )
 
-    AutolobbyCommunicationsInstance.LobbyParameters = AutolobbyCommunicationsInstance.LobbyParameters or {}
-    AutolobbyCommunicationsInstance.LobbyParameters.Protocol = protocol
-    AutolobbyCommunicationsInstance.LobbyParameters.LocalPort = localPort
-    AutolobbyCommunicationsInstance.LobbyParameters.MaxConnections = maxConnections
-    AutolobbyCommunicationsInstance.LobbyParameters.DesiredPlayerName = desiredPlayerName
-    AutolobbyCommunicationsInstance.LobbyParameters.LocalPlayerPeerId = localPlayerUID
-    AutolobbyCommunicationsInstance.LobbyParameters.NatTraversalProvider = natTraversalProvider
+    LobbyInstance.LobbyParameters = LobbyInstance.LobbyParameters or {}
+    LobbyInstance.LobbyParameters.Protocol = protocol
+    LobbyInstance.LobbyParameters.LocalPort = localPort
+    LobbyInstance.LobbyParameters.MaxConnections = maxConnections
+    LobbyInstance.LobbyParameters.DesiredPlayerName = desiredPlayerName
+    LobbyInstance.LobbyParameters.LocalPlayerPeerId = localPlayerUID
+    LobbyInstance.LobbyParameters.NatTraversalProvider = natTraversalProvider
 
-    return AutolobbyCommunicationsInstance
+    return LobbyInstance
 end
 
 --- Instantiates a lobby instance by hosting one.
@@ -80,19 +80,19 @@ end
 function HostGame(gameName, scenarioFileName, singlePlayer)
     LOG("HostGame", gameName, scenarioFileName, singlePlayer)
 
-    if AutolobbyCommunicationsInstance then
+    if LobbyInstance then
 
-        AutolobbyCommunicationsInstance.HostParameters = AutolobbyCommunicationsInstance.HostParameters or {}
-        AutolobbyCommunicationsInstance.HostParameters.GameName = gameName
-        AutolobbyCommunicationsInstance.HostParameters.ScenarioFile = scenarioFileName
-        AutolobbyCommunicationsInstance.HostParameters.SinglePlayer = singlePlayer
+        LobbyInstance.HostParameters = LobbyInstance.HostParameters or {}
+        LobbyInstance.HostParameters.GameName = gameName
+        LobbyInstance.HostParameters.ScenarioFile = scenarioFileName
+        LobbyInstance.HostParameters.SinglePlayer = singlePlayer
 
         -- the synced game options live on the model; the scenario observer
         -- reacts and the host sees the map preview
         local AutolobbyModel = import("/lua/ui/lobby/autolobby/autolobbymodel.lua")
         local scenarioFile = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua") --[[@as FileName]]
         AutolobbyModel.SetScenarioFile(AutolobbyModel.GetSingleton(), scenarioFile)
-        AutolobbyCommunicationsInstance:HostGame()
+        LobbyInstance:HostGame()
     end
 end
 
@@ -108,13 +108,13 @@ local rejoinTest = false
 function JoinGame(address, asObserver, playerName, uid)
     LOG("JoinGame", address, asObserver, playerName, uid)
 
-    if AutolobbyCommunicationsInstance then
-        AutolobbyCommunicationsInstance.JoinParameters = AutolobbyCommunicationsInstance.JoinParameters or {}
-        AutolobbyCommunicationsInstance.JoinParameters.Address = address
-        AutolobbyCommunicationsInstance.JoinParameters.AsObserver = asObserver
-        AutolobbyCommunicationsInstance.JoinParameters.DesiredPlayerName = playerName
-        AutolobbyCommunicationsInstance.JoinParameters.DesiredPeerId = uid
-        AutolobbyCommunicationsInstance:JoinGame(address, playerName, uid)
+    if LobbyInstance then
+        LobbyInstance.JoinParameters = LobbyInstance.JoinParameters or {}
+        LobbyInstance.JoinParameters.Address = address
+        LobbyInstance.JoinParameters.AsObserver = asObserver
+        LobbyInstance.JoinParameters.DesiredPlayerName = playerName
+        LobbyInstance.JoinParameters.DesiredPeerId = uid
+        LobbyInstance:JoinGame(address, playerName, uid)
     end
 end
 
@@ -125,8 +125,8 @@ end
 function ConnectToPeer(addressAndPort, name, uid)
     LOG("ConnectToPeer", addressAndPort, name, uid)
 
-    if AutolobbyCommunicationsInstance then
-        AutolobbyCommunicationsInstance:ConnectToPeer(addressAndPort, name, uid)
+    if LobbyInstance then
+        LobbyInstance:ConnectToPeer(addressAndPort, name, uid)
     end
 end
 
@@ -136,7 +136,7 @@ end
 function DisconnectFromPeer(uid, doNotUpdateView)
     LOG("DisconnectFromPeer", uid, doNotUpdateView)
 
-    if AutolobbyCommunicationsInstance then
-        AutolobbyCommunicationsInstance:DisconnectFromPeer(uid)
+    if LobbyInstance then
+        LobbyInstance:DisconnectFromPeer(uid)
     end
 end

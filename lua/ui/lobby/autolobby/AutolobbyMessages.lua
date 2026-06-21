@@ -27,19 +27,20 @@
 -- wrapper to another function in the autolobby.
 
 local AutolobbyModel = import("/lua/ui/lobby/autolobby/autolobbymodel.lua")
+local AutolobbyController = import("/lua/ui/lobby/autolobby/autolobbycontroller.lua")
 
 ---@class UIAutolobbyMessageHandler
----@field Validate fun(lobby: UIAutolobbyCommunications, data: UILobbyReceivedMessage): boolean # Responsible for filtering out non-sense
----@field Accept fun(lobby: UIAutolobbyCommunications, data: UILobbyReceivedMessage): boolean   # Responsible for filtering out malicous messages
----@field Handler fun(lobby: UIAutolobbyCommunications, data: UILobbyReceivedMessage)           # Responsible for handling the message
+---@field Validate fun(lobby: UIAutolobbyInstance, data: UILobbyReceivedMessage): boolean # Responsible for filtering out non-sense
+---@field Accept fun(lobby: UIAutolobbyInstance, data: UILobbyReceivedMessage): boolean   # Responsible for filtering out malicous messages
+---@field Handler fun(lobby: UIAutolobbyInstance, data: UILobbyReceivedMessage)           # Responsible for handling the message
 
----@param lobby UIAutolobbyCommunications
+---@param lobby UIAutolobbyInstance
 ---@param data UILobbyReceivedMessage
 local function IsFromHost(lobby, data)
     return data.SenderID == lobby.HostID
 end
 
----@param lobby UIAutolobbyCommunications
+---@param lobby UIAutolobbyInstance
 ---@param data UILobbyReceivedMessage
 local function IsHost(lobby, data)
     return lobby:IsHost()
@@ -52,7 +53,7 @@ AutolobbyMessages = {
         ---@class UIAutolobbyUpdateLaunchStatusMessage : UILobbyReceivedMessage
         ---@field LaunchStatus UIPeerLaunchStatus
 
-        ---@param lobby UIAutolobbyCommunications
+        ---@param lobby UIAutolobbyInstance
         ---@param data UIAutolobbyUpdateLaunchStatusMessage
         ---@return boolean
         Validate = function(lobby, data)
@@ -63,17 +64,17 @@ AutolobbyMessages = {
             return true
         end,
 
-        ---@param lobby UIAutolobbyCommunications
+        ---@param lobby UIAutolobbyInstance
         ---@param data UIAutolobbyUpdateLaunchStatusMessage
         ---@return boolean
         Accept = function(lobby, data)
             return true
         end,
 
-        ---@param lobby UIAutolobbyCommunications
+        ---@param lobby UIAutolobbyInstance
         ---@param data UIAutolobbyUpdateLaunchStatusMessage
         Handler = function(lobby, data)
-            lobby:ProcessUpdateLaunchStatusMessage(data)
+            AutolobbyController.ProcessUpdateLaunchStatusMessage(lobby, data)
         end
     },
 
@@ -83,7 +84,7 @@ AutolobbyMessages = {
         ---@class UIAutolobbyAddPlayerMessage : UILobbyReceivedMessage
         ---@field PlayerOptions UIAutolobbyPlayer
 
-        ---@param lobby UIAutolobbyCommunications
+        ---@param lobby UIAutolobbyInstance
         ---@param data UIAutolobbyAddPlayerMessage
         ---@return boolean
         Validate = function(lobby, data)
@@ -94,7 +95,7 @@ AutolobbyMessages = {
             return true
         end,
 
-        ---@param lobby UIAutolobbyCommunications
+        ---@param lobby UIAutolobbyInstance
         ---@param data UIAutolobbyAddPlayerMessage
         ---@return boolean
         Accept = function(lobby, data)
@@ -122,10 +123,10 @@ AutolobbyMessages = {
             return true
         end,
 
-        ---@param lobby UIAutolobbyCommunications
+        ---@param lobby UIAutolobbyInstance
         ---@param data UIAutolobbyAddPlayerMessage
         Handler = function(lobby, data)
-            lobby:ProcessAddPlayerMessage(data)
+            AutolobbyController.ProcessAddPlayerMessage(lobby, data)
         end
     },
 
@@ -134,7 +135,7 @@ AutolobbyMessages = {
         ---@class UIAutolobbyUpdatePlayerOptionsMessage : UILobbyReceivedMessage
         ---@field PlayerOptions UIAutolobbyPlayer[]
 
-        ---@param lobby UIAutolobbyCommunications
+        ---@param lobby UIAutolobbyInstance
         ---@param data UIAutolobbyUpdatePlayerOptionsMessage
         ---@return boolean
         Validate = function(lobby, data)
@@ -145,7 +146,7 @@ AutolobbyMessages = {
             return true
         end,
 
-        ---@param lobby UIAutolobbyCommunications
+        ---@param lobby UIAutolobbyInstance
         ---@param data UIAutolobbyUpdatePlayerOptionsMessage
         ---@return boolean
         Accept = function(lobby, data)
@@ -157,10 +158,10 @@ AutolobbyMessages = {
             return true
         end,
 
-        ---@param lobby UIAutolobbyCommunications
+        ---@param lobby UIAutolobbyInstance
         ---@param data UIAutolobbyUpdatePlayerOptionsMessage
         Handler = function(lobby, data)
-            lobby:ProcessUpdatePlayerOptionsMessage(data)
+            AutolobbyController.ProcessUpdatePlayerOptionsMessage(lobby, data)
         end
     },
 
@@ -169,7 +170,7 @@ AutolobbyMessages = {
         ---@class UIAutolobbyUpdateGameOptionsMessage : UILobbyReceivedMessage
         ---@field GameOptions UILobbyLaunchGameOptionsConfiguration
 
-        ---@param lobby UIAutolobbyCommunications
+        ---@param lobby UIAutolobbyInstance
         ---@param data UIAutolobbyUpdateGameOptionsMessage
         ---@return boolean
         Validate = function(lobby, data)
@@ -180,7 +181,7 @@ AutolobbyMessages = {
             return true
         end,
 
-        ---@param lobby UIAutolobbyCommunications
+        ---@param lobby UIAutolobbyInstance
         ---@param data UIAutolobbyUpdateGameOptionsMessage
         ---@return boolean
         Accept = function(lobby, data)
@@ -194,10 +195,10 @@ AutolobbyMessages = {
             return true
         end,
 
-        ---@param lobby UIAutolobbyCommunications
+        ---@param lobby UIAutolobbyInstance
         ---@param data UIAutolobbyUpdateGameOptionsMessage
         Handler = function(lobby, data)
-            lobby:ProcessUpdateGameOptionsMessage(data)
+            AutolobbyController.ProcessUpdateGameOptionsMessage(lobby, data)
         end
     },
 
@@ -206,7 +207,7 @@ AutolobbyMessages = {
         ---@class UIAutolobbyLaunchMessage : UILobbyReceivedMessage
         ---@field GameConfig UILobbyLaunchConfiguration
 
-        ---@param lobby UIAutolobbyCommunications
+        ---@param lobby UIAutolobbyInstance
         ---@param data UIAutolobbyLaunchMessage
         ---@return boolean
         Validate = function(lobby, data)
@@ -224,7 +225,7 @@ AutolobbyMessages = {
             return true
         end,
 
-        ---@param lobby UIAutolobbyCommunications
+        ---@param lobby UIAutolobbyInstance
         ---@param data UIAutolobbyLaunchMessage
         ---@return boolean
         Accept = function(lobby, data)
@@ -238,10 +239,10 @@ AutolobbyMessages = {
             return true
         end,
 
-        ---@param lobby UIAutolobbyCommunications
+        ---@param lobby UIAutolobbyInstance
         ---@param data UIAutolobbyLaunchMessage
         Handler = function(lobby, data)
-            lobby:ProcessLaunchMessage(data)
+            AutolobbyController.ProcessLaunchMessage(lobby, data)
         end
     }
 }
