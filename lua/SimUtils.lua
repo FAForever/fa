@@ -992,6 +992,8 @@ end
 -- shortly thereafter due to the army being defeated (as is common), we then
 -- have an opportunity to see the final game state as observers before everything
 -- would have blown up.
+--
+-- This should be longer than `AbandonedArmyGracePeriod`
 EndGameGracePeriod = 10
 
 -- Seconds to wait after an army has been abandoned (the player disconnected)
@@ -999,6 +1001,8 @@ EndGameGracePeriod = 10
 -- explosion, and prevents disconnecting players from providing the server with
 -- a cut-off replay due to the sim on their client instantly killing all other ACUs
 -- and reporting a game over state.
+--
+-- This should be shorter than `EndGameGracePeriod`
 AbandonedArmyGracePeriod = 3
 
 -- Set to true in `AbstractVictoryCondition.EndGame` to prevent killing units after a
@@ -1015,6 +1019,16 @@ local function KillUnits(toKill)
             end
         end
     end
+end
+
+--- Kills all given units after a delay, if not already dead.
+---@param toKill Entity[]
+---@param delaySec number
+local function DelayedKillUnits(toKill, delaySec)
+    ForkThread(function ()
+        WaitSeconds(delaySec)
+        KillUnits(toKill)
+    end)
 end
 
 ---@param self AIBrain
@@ -1258,13 +1272,17 @@ MinimumShareTime = 5 * 60 * 10 -- 5 minutes
 function KillUnsafeCommanders(commanders, tick)
     tick = tick or GetGameTick()
     local safeCommanders = {}
+    local unsafeCommanders = {}
     for _, com in commanders do
         if com.LastTickDamaged and com.LastTickDamaged + CommanderSafeTime > tick then
-            com:Kill()
+            table.insert(unsafeCommanders, com)
         else
             table.insert(safeCommanders, com)
         end
     end
+
+    DelayedKillUnits(unsafeCommanders, AbandonedArmyGracePeriod)
+
     return safeCommanders
 end
 
@@ -1312,8 +1330,7 @@ function KillArmyOnDelayedRecall(self, shareOption, shareTime)
             local safeCommanders = KillUnsafeCommanders(sharedCommanders)
 
             if not table.empty(safeCommanders) then
-                -- note: this adds 3 seconds to the grace period
-                FakeTeleportUnits(safeCommanders, true)
+                ForkThread(FakeTeleportUnits, safeCommanders, true)
             end
         end
     end
@@ -1352,8 +1369,6 @@ function KillAbandonedArmy(self, shareOption, shareAcuOption, victoryOption)
         shareOption = ScenarioInfo.Options.Share
     end
 
-    WaitSeconds(AbandonedArmyGracePeriod)
-
     if shareAcuOption == 'Explode' or shareAcuOption == 'Recall' then
         local safeCommanders
         local commanders = self:GetListOfUnits(categories.COMMAND, false)
@@ -1361,7 +1376,7 @@ function KillAbandonedArmy(self, shareOption, shareAcuOption, victoryOption)
             safeCommanders = KillUnsafeCommanders(commanders)
         else
             -- explode all the ACUs so they don't get shared
-            KillUnits(commanders)
+            DelayedKillUnits(commanders, AbandonedArmyGracePeriod)
         end
 
         -- Only handle Assassination victory, as in other settings the player is unlikely to be defeated soon
@@ -1371,8 +1386,7 @@ function KillAbandonedArmy(self, shareOption, shareAcuOption, victoryOption)
 
         -- non-assassination modes can have armies abandon without commanders
         if shareAcuOption == 'Recall' and not table.empty(safeCommanders) then
-            -- note: this adds 3 seconds to the grace period
-            FakeTeleportUnits(safeCommanders, true)
+            ForkThread(FakeTeleportUnits, safeCommanders, true)
         end
 
         KillArmy(self, shareOption)
