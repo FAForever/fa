@@ -35,15 +35,18 @@ the automated/matchmaker path).
 | [CustomLobbyModel.lua](CustomLobbyModel.lua) | local connectivity state (CPU benchmarks + per-peer sim-performance history). |
 | [CustomLobbyPerformancePopover.lua](CustomLobbyPerformancePopover.lua) | hover popover over the CPU column; hand-built bitmap bar chart of a peer's `PerformanceTrackingV2` history, with a yellow recommended-unit-cap line. |
 | [CustomLobbyInstance.lua](CustomLobbyInstance.lua) | thin `moho.lobby_methods` shell; validates/dispatches traffic, forwards callbacks to the controller. |
-| [CustomLobbyController.lua](CustomLobbyController.lua) | host-authority logic (free functions): seating, `Process*` handlers, intents (`RequestSetReady`, `RequestTakeSlot`, `RequestSwapSlots` — also callable from a future chat command), sharing the stored CPU benchmark. |
+| [CustomLobbyController.lua](CustomLobbyController.lua) | host-authority logic (free functions): seating, `Process*` handlers, intents (`RequestSetReady`, `RequestTakeSlot`, `RequestSwapSlots`, `RequestEject`, `RequestMoveToObserver` — the slot-management set, also callable from a chat command), sharing the stored CPU benchmark. |
 | [CustomLobbyMessages.lua](CustomLobbyMessages.lua) | message registry: `AddPlayer`, `SetPlayers`, `SetReady`, `TakeSlot`, `DisconnectPeer`, `ReportCpuBenchmark`, `SetCpuBenchmarks`. |
-| [CustomLobbySlotInterface.lua](CustomLobbySlotInterface.lua) | one slot row; subscribes to its slot + CPU benchmarks; CPU column shows max units at +0 with a green→red cap-headroom square; click an open slot to take it, your own to toggle ready; the host can drag a row onto another to swap. |
+| [CustomLobbyContextMenu.lua](CustomLobbyContextMenu.lua) | generic framed floating menu; `Show(entries, x, y)` renders any `{label, action, enabled}` list, dismisses on item click / click-outside / Esc. Knows nothing about the lobby. |
+| [CustomLobbyMenus.lua](CustomLobbyMenus.lua) | declarative menu **definitions**: entry lists with `when(ctx)`/`action(ctx)` filtered by lobby state (`BuildSlotMenu`). Adding/state-gating an item is a one-liner here. |
+| [CustomLobbySlotInterface.lua](CustomLobbySlotInterface.lua) | one slot row; subscribes to its slot + CPU benchmarks; CPU column shows max units at +0 with a green→red cap-headroom square; left-click an open slot to take it / your own to toggle ready; right-click opens its context menu; the host can drag a row onto another to swap. |
 | [CustomLobbyInterface.lua](CustomLobbyInterface.lua) | composition root (one model subscription for SlotCount); lays out slot rows and acts as their drag coordinator (`UICustomLobbySlotCoordinator`: hit-test, drop-highlight, drag ghost → `RequestSwapSlots`); `OpenDebug()` / hot-reload. |
 | [/lua/ui/lobby/lobby.lua](../lobby.lua) | engine entry wrapper (`CreateLobby`/`HostGame`/`JoinGame`) → CustomLobby. Old lobby preserved at `lobby-old.lua`. |
 
 Working today: host + clients see each other (host-authoritative player sync),
 ready toggles round-trip, players can **take an open slot** (click it) and the host can
-**swap two slots** (`RequestSwapSlots`, intent ready for a `/swap` command), each peer's
+**swap** (drag a row onto another), **eject**, and **move a player to observers** (right-click
+→ context menu); observers are synced in the `SetPlayers` snapshot. Each peer's
 stored sim-performance benchmark is shared (no live stress test), and a **Leave** button
 (or Esc) disconnects and returns to the menu — a leaving client frees its slot for
 everyone via `OnPeerDisconnected`. Launched via

@@ -37,6 +37,8 @@ local CustomLobbyAuthoritativeModel = import("/lua/ui/lobby/customlobby/customlo
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 local CustomLobbyModel = import("/lua/ui/lobby/customlobby/customlobbymodel.lua")
 local CustomLobbyPerformancePopover = import("/lua/ui/lobby/customlobby/customlobbyperformancepopover.lua")
+local CustomLobbyContextMenu = import("/lua/ui/lobby/customlobby/customlobbycontextmenu.lua")
+local CustomLobbyMenus = import("/lua/ui/lobby/customlobby/customlobbymenus.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
@@ -221,7 +223,11 @@ local CustomLobbySlotInterface = Class(Group) {
         self.ClickArea:SetSolidColor('00000000')
         self.ClickArea.HandleEvent = function(control, event)
             if event.Type == 'ButtonPress' then
-                self:OnRowPress(event)
+                if event.Modifiers.Right then
+                    self:OnRowContext(event)
+                else
+                    self:OnRowPress(event)
+                end
                 return true
             end
             return false
@@ -238,7 +244,11 @@ local CustomLobbySlotInterface = Class(Group) {
                 CustomLobbyPerformancePopover.Hide()
                 return true
             elseif event.Type == 'ButtonPress' then
-                self:OnRowPress(event)
+                if event.Modifiers.Right then
+                    self:OnRowContext(event)
+                else
+                    self:OnRowPress(event)
+                end
                 return true
             end
             return false
@@ -379,6 +389,15 @@ local CustomLobbySlotInterface = Class(Group) {
         else
             self:OnClicked()
         end
+    end,
+
+    --- Right-click: open this slot's context menu (entries depend on lobby state —
+    --- see CustomLobbyMenus). Empty menus simply don't show.
+    ---@param self UICustomLobbySlotInterface
+    ---@param event KeyEvent
+    OnRowContext = function(self, event)
+        CustomLobbyPerformancePopover.Hide()
+        CustomLobbyContextMenu.Show(CustomLobbyMenus.BuildSlotMenu(self.SlotIndex), event.MouseX, event.MouseY)
     end,
 
     --- Starts a drag from this row. The press only becomes a drag once the cursor

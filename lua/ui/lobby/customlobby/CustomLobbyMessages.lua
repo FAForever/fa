@@ -74,6 +74,7 @@ CustomLobbyMessages = {
     SetPlayers = {
         ---@class UICustomLobbySetPlayersMessage : UILobbyReceivedMessage
         ---@field Players (UICustomLobbyPlayer | false)[]
+        ---@field Observers? UICustomLobbyPlayer[]
 
         ---@param data UICustomLobbySetPlayersMessage
         Validate = function(lobby, data)

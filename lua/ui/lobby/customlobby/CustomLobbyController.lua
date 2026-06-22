@@ -82,11 +82,15 @@ local function GatherPlayers(model)
     return players
 end
 
---- Host broadcasts the authoritative player snapshot to everyone.
+--- Host broadcasts the authoritative player + observer snapshot to everyone.
 ---@param instance UICustomLobbyInstance
 ---@param model UICustomLobbyAuthoritativeModel
 local function BroadcastPlayers(instance, model)
-    instance:BroadcastData({ Type = 'SetPlayers', Players = GatherPlayers(model) })
+    instance:BroadcastData({
+        Type = 'SetPlayers',
+        Players = GatherPlayers(model),
+        Observers = model.Observers(),
+    })
 end
 
 --- Whether `slot` is a real, currently-open seat (in range, empty, not closed).
@@ -284,13 +288,16 @@ function ProcessAddPlayer(instance, data)
     BroadcastPlayers(instance, model)
 end
 
---- Everyone applies the host's authoritative snapshot.
+--- Everyone applies the host's authoritative player + observer snapshot.
 ---@param instance UICustomLobbyInstance
 ---@param data table
 function ProcessSetPlayers(instance, data)
     local model = CustomLobbyAuthoritativeModel.GetSingleton()
     for slot = 1, CustomLobbyAuthoritativeModel.MaxSlots do
         model.Players[slot]:Set(data.Players[slot] or false)
+    end
+    if data.Observers then
+        model.Observers:Set(data.Observers)
     end
 end
 
@@ -424,6 +431,62 @@ function RequestSwapSlots(slotA, slotB)
         return
     end
     SwapSlots(instance, model, slotA, slotB)
+end
+
+--- The host ejects a player. A human is dropped from the network (the resulting
+--- PeerDisconnected clears the slot + re-broadcasts); an AI is just cleared. Host-only.
+---@param ownerId UILobbyPeerId
+function RequestEject(ownerId)
+    local instance = LobbyInstance
+    if not instance then
+        return
+    end
+
+    local model = CustomLobbyAuthoritativeModel.GetSingleton()
+    if not model.IsHost() then
+        WARN("CustomLobby: only the host can eject players")
+        return
+    end
+
+    local slot = FindSlotForOwner(model, ownerId)
+    if not slot then
+        return
+    end
+    local player = model.Players[slot]()
+    if player and player.Human then
+        instance:EjectPeer(ownerId, "KickedByHost")
+    else
+        CustomLobbyAuthoritativeModel.ClearPlayer(model, slot)
+        BroadcastPlayers(instance, model)
+    end
+end
+
+--- The host moves a player out of its slot and into the observer list, then
+--- re-broadcasts. Host-only. (Reverse — observer back to a slot — is a later slice.)
+---@param ownerId UILobbyPeerId
+function RequestMoveToObserver(ownerId)
+    local instance = LobbyInstance
+    if not instance then
+        return
+    end
+
+    local model = CustomLobbyAuthoritativeModel.GetSingleton()
+    if not model.IsHost() then
+        WARN("CustomLobby: only the host can move players to observers")
+        return
+    end
+
+    local slot = FindSlotForOwner(model, ownerId)
+    if not slot then
+        return
+    end
+    local player = model.Players[slot]()
+    if not player then
+        return
+    end
+    CustomLobbyAuthoritativeModel.AddObserver(model, player)
+    CustomLobbyAuthoritativeModel.ClearPlayer(model, slot)
+    BroadcastPlayers(instance, model)
 end
 
 --- The local player toggles their ready flag. Host applies + broadcasts; a client

@@ -190,6 +190,15 @@ function SetScenario(model, scenarioFile)
     model.ScenarioFile:Set(scenarioFile)
 end
 
+--- Appends a player to the observer list (copy-then-Set).
+---@param model UICustomLobbyAuthoritativeModel
+---@param player UICustomLobbyPlayer
+function AddObserver(model, player)
+    local observers = table.copy(model.Observers())
+    table.insert(observers, player)
+    model.Observers:Set(observers)
+end
+
 --#endregion
 
 -------------------------------------------------------------------------------
