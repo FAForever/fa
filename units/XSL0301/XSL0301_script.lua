@@ -105,6 +105,10 @@ XSL0301 = ClassUnit(CommandUnit) {
         local bpEcon = self.Blueprint.Economy
         self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy or 0) + (bpEcon.ProductionPerSecondEnergy or 0))
         self:SetProductionPerSecondMass((bp.ProductionPerSecondMass or 0) + (bpEcon.ProductionPerSecondMass or 0))
+
+        local deathNuke = self:GetWeaponByLabel("DeathWeapon") --[[@as SCUDeathWeapon]]
+        deathNuke:AddDamageMod(bp.DeathWeaponDamageAdd)
+        deathNuke:AddDamageRadiusMod(bp.DeathWeaponRadiusAdd)
     end,
 
     ---@param self XSL0301
@@ -113,6 +117,11 @@ XSL0301 = ClassUnit(CommandUnit) {
         local bpEcon = self.Blueprint.Economy
         self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
         self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
+
+        local deathNuke = self:GetWeaponByLabel("DeathWeapon") --[[@as SCUDeathWeapon]]
+        local baseBp = self.Blueprint.Enhancements["ResourceAllocation"]
+        deathNuke:AddDamageMod(-baseBp.DeathWeaponDamageAdd)
+        deathNuke:AddDamageRadiusMod(-baseBp.DeathWeaponRadiusAdd)
     end,
 
     ---@param self XSL0301

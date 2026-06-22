@@ -435,6 +435,8 @@ UnitBlueprint{
             ShowBones = { "Back_Upgrade" },
             Slot = "RCH",
             UpgradeUnitAmbientBones = { "Torso" },
+            DeathWeaponDamageAdd = 1000,
+            DeathWeaponRadiusAdd = 4,
         },
         ResourceAllocationRemove = {
             BuildCostEnergy = 1,

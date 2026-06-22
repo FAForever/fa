@@ -264,6 +264,8 @@ UnitBlueprint{
             NewRateOfFire = 2,
             Slot = "LCH",
             UpgradeUnitAmbientBones = { "UEL0301" },
+            DeathWeaponDamageAdd = 1000,
+            DeathWeaponRadiusAdd = 4,
         },
         AdvancedCoolingUpgradeRemove = {
             BuildCostEnergy = 1,

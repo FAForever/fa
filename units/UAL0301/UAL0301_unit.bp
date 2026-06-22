@@ -300,6 +300,8 @@ UnitBlueprint{
             ProductionPerSecondMass = 10,
             Slot = "RCH",
             UpgradeUnitAmbientBones = { "UAL0301" },
+            DeathWeaponDamageAdd = 1000,
+            DeathWeaponRadiusAdd = 4,
         },
         ResourceAllocationRemove = {
             BuildCostEnergy = 1,
