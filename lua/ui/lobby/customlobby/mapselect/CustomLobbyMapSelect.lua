@@ -336,7 +336,6 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         self.Search:SetText(saved.search or "")
         self.Search.OnTextChanged = function(control, newText, oldText)
             self:Populate()
-            self:SavePrefs()
         end
         self.Search.OnEnterPressed = function(control, text)
             self:Confirm()
@@ -598,7 +597,6 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         valueCombo.OnClick = function(combo, index, text)
             onValue(index)
             self:Populate()
-            self:SavePrefs()
         end
         Tooltip.AddControlTooltipManual(valueCombo, tooltipTitle, tooltipBody)
 
@@ -607,7 +605,6 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         opCombo.OnClick = function(combo, index, text)
             onOp(index)
             self:Populate()
-            self:SavePrefs()
         end
         Tooltip.AddControlTooltipManual(opCombo, tooltipTitle, "Comparison operator (=, at least, at most).")
 
@@ -862,6 +859,7 @@ local CustomLobbyMapSelect = ClassUI(Group) {
 
     ---@param self UICustomLobbyMapSelect
     OnDestroy = function(self)
+        self:SavePrefs()
         self.Trash:Destroy()
     end,
 }

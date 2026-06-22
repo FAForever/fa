@@ -290,18 +290,17 @@ local CustomLobbyModSelect = ClassUI(Group) {
         self.Search:SetText(saved.search or "")
         self.Search.OnTextChanged = function(control, newText, oldText)
             self:Populate()
-            self:SavePrefs()
         end
         Tooltip.AddControlTooltipManual(self.Search, "Search", "Filter the list by mod name or author.")
 
         self.GameToggle = self:CreateToggle("Game", self.ShowGame,
-            function(checked) self.ShowGame = checked; self:Populate(); self:SavePrefs() end,
+            function(checked) self.ShowGame = checked; self:Populate() end,
             "Game mods", "Show mods that change the simulation (all players need them).")
         self.UIToggle = self:CreateToggle("UI", self.ShowUI,
-            function(checked) self.ShowUI = checked; self:Populate(); self:SavePrefs() end,
+            function(checked) self.ShowUI = checked; self:Populate() end,
             "UI mods", "Show mods that change only your interface (per-player).")
         self.UnavailableToggle = self:CreateToggle("Deprecated", self.ShowUnavailable,
-            function(checked) self.ShowUnavailable = checked; self:Populate(); self:SavePrefs() end,
+            function(checked) self.ShowUnavailable = checked; self:Populate() end,
             "Deprecated mods", "Show blacklisted mods and mods missing a dependency.")
         --#endregion
 
@@ -920,6 +919,7 @@ local CustomLobbyModSelect = ClassUI(Group) {
 
     ---@param self UICustomLobbyModSelect
     OnDestroy = function(self)
+        self:SavePrefs()
         self.Trash:Destroy()
     end,
 }

@@ -165,7 +165,6 @@ local CustomLobbyOptionSelect = ClassUI(Group) {
         self.Search:SetText(saved.search or "")
         self.Search.OnTextChanged = function(control, newText, oldText)
             self:RefreshColumns()
-            self:SavePrefs()
         end
         Tooltip.AddControlTooltipManual(self.Search, "Search", "Filter options by name across all three columns.")
 
@@ -174,7 +173,6 @@ local CustomLobbyOptionSelect = ClassUI(Group) {
         self.HideDefaultsToggle.OnCheck = function(control, checked)
             self.HideDefaults = checked
             self:RefreshColumns()
-            self:SavePrefs()
         end
         Tooltip.AddControlTooltipManual(self.HideDefaultsToggle, "Hide defaults",
             "Show only the options that have been changed from their default value.")
@@ -279,7 +277,8 @@ local CustomLobbyOptionSelect = ClassUI(Group) {
         self:RefreshColumns()
     end,
 
-    --- Persists the search + hide-defaults filter for next time.
+    --- Persists the search + hide-defaults filter for next time. Called once on close (not per
+    --- interaction — `SetToCurrentProfile` writes the profile, too costly to fire per keystroke).
     ---@param self UICustomLobbyOptionSelect
     SavePrefs = function(self)
         import("/lua/user/prefs.lua").SetToCurrentProfile(PrefsKey, {
@@ -297,6 +296,7 @@ local CustomLobbyOptionSelect = ClassUI(Group) {
 
     ---@param self UICustomLobbyOptionSelect
     OnDestroy = function(self)
+        self:SavePrefs()
         self.Trash:Destroy()
     end,
 }
