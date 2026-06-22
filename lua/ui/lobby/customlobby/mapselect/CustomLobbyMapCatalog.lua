@@ -49,7 +49,7 @@ local MapUtil = import("/lua/ui/maputil.lua")
 local LoadScenarioInfoFile = MapUtil.LoadScenarioInfoFile
 
 -- maps loaded per frame-slice before yielding — keeps the open responsive on big vaults
-local BatchSize = 4
+local BatchSize = 5
 
 --- The growing list of playable skirmish maps. Re-fired (new table ref) as batches land.
 ---@type LazyVar<UILobbyScenarioInfo[]>

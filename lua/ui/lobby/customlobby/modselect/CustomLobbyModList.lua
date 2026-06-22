@@ -20,22 +20,24 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
--- A scrollable, pooled map list for the map-select dialog: each row shows the map name and a
--- `size · players` badge. Replaces the flat `ItemList` so rows can carry richer content (see
--- /lua/ui/CLAUDE.md § 6.1).
+-- A scrollable, pooled mod list for the mod-select dialog. Each row carries a checkbox (select /
+-- deselect the mod), the mod name, and a short type badge. The sibling of CustomLobbyMapList —
+-- same virtualisation, same scrollbar contract — with selection checkboxes added.
 --
--- NOTE: rows used to carry a mini map-preview thumbnail, but the engine never releases the
--- textures `MapPreview:SetTextureFromMap` / `SetTexture` allocate — not on re-texture, not on
--- `ClearTexture`, not on `Destroy`, not on dialog close. Scrolling a vault leaked tens of MB
--- that the game needs in-match, so thumbnails were removed. Rows are now text-only.
+-- Rows are *text-only* (no per-row mod icons) on purpose: a mod's icon is a distinct texture per
+-- mod, and the engine never frees the textures a `Bitmap`/`MapPreview` loads (see
+-- mapselect/CLAUDE.md). One icon per row × a big vault would leak the memory the game needs
+-- in-match, so the icon is shown once, in the dialog's detail panel, for the highlighted mod.
 --
--- It is *virtualised*: a fixed pool of row controls (sized to the visible height) is reused as
--- you scroll. The standard scrollbar contract (GetScrollValues / ScrollLines / ScrollPages /
--- ScrollSetTop / IsScrollable / CalcVisible) drives the windowing.
+-- Two interactions, two regions:
+--   * the checkbox toggles membership in the selection (`OnToggle`);
+--   * clicking the rest of the row highlights it for the detail panel (`OnSelect`), and
+--     double-clicking confirms (`OnConfirm`).
 --
--- Mouse-driven (click selects, double-click confirms, wheel + scrollbar scroll). A custom Group
--- list can't take keyboard focus the way ItemList can, so arrow-key navigation lives with the
--- owner (the dialog wires Enter on its search box / Esc on the popup).
+-- The list does not own the selection — it paints checkboxes from a selection set the dialog
+-- hands it (`SetChecked`) and asks the dialog whether each row may be toggled (`SetCanToggle`,
+-- e.g. a non-host can't change sim mods, blacklisted mods can't be enabled). After the dialog
+-- mutates the selection it calls `Refresh` to repaint.
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
@@ -45,47 +47,67 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
-local RowHeight = 24
+local RowHeight = 26
+
+-- mod names are single-line Text (which doesn't clip), so cap them with an ellipsis to stop a
+-- long name running under the type badge. Char-based (the engine's Text has no width-measure).
+local NameMaxChars = 28
+
+--- Truncates `text` to `maxChars`, appending "…" when it had to cut.
+---@param text string
+---@param maxChars number
+---@return string
+local function Truncate(text, maxChars)
+    text = text or ""
+    if string.len(text) > maxChars then
+        return string.sub(text, 1, maxChars - 1) .. "…"
+    end
+    return text
+end
 
 local SelectedColor = 'ff2c3e48'
 local HoverColor = 'ff1a2630'
 local IdleColor = '00000000'
 
---- Number of start spots a scenario declares, or 0.
----@param scenario UILobbyScenarioInfo
----@return number
-local function ArmyCount(scenario)
-    local armies = scenario.Configurations
-        and scenario.Configurations.standard
-        and scenario.Configurations.standard.teams
-        and scenario.Configurations.standard.teams[1]
-        and scenario.Configurations.standard.teams[1].armies
-    return armies and table.getsize(armies) or 0
-end
+local EnabledNameColor = 'ffe9ece9'
+local DisabledNameColor = 'ff6a7078'
 
----@class UICustomLobbyMapListRow : Group
+-- short badge text + colour per mod type
+local TypeBadges = {
+    GAME =          { text = "GAME", color = 'ffd0a24c' },
+    UI =            { text = "UI",   color = 'ff6db3e2' },
+    BLACKLISTED =   { text = "BL",   color = 'ffb05050' },
+    NO_DEPENDENCY = { text = "DEP",  color = 'ffb05050' },
+    LOCAL =         { text = "LCL",  color = 'ffb0902c' },
+}
+
+---@class UICustomLobbyModListRow : Group
 ---@field Background Bitmap
+---@field Check Checkbox
 ---@field Name Text
----@field Meta Text
+---@field Badge Text
 ---@field _poolIndex number
 ---@field _hover boolean
 
----@class UICustomLobbyMapList : Group
+---@class UICustomLobbyModList : Group
 ---@field Trash TrashBag
----@field Items UILobbyScenarioInfo[]
----@field Rows UICustomLobbyMapListRow[]
+---@field Items UILobbyModInfo[]
+---@field Rows UICustomLobbyModListRow[]
 ---@field PoolCount number
----@field ScrollTop number                    # 0-based scroll offset (first visible = Items[ScrollTop+1]); NOT the `Top` edge LazyVar
----@field Selected number | false             # selected item index (1-based)
+---@field ScrollTop number                    # 0-based scroll offset; NOT the `Top` edge LazyVar
+---@field Selected number | false             # highlighted item index (1-based)
 ---@field Scrollbar Scrollbar | false         # hidden while everything fits
----@field OnSelect fun(scenario: UILobbyScenarioInfo, index: number)
----@field OnConfirm fun(scenario: UILobbyScenarioInfo)
-local CustomLobbyMapList = ClassUI(Group) {
+---@field Checked UIModSelection              # the dialog's selection set (read-only here)
+---@field CanToggle fun(mod: UILobbyModInfo): boolean
+---@field OnSelect fun(mod: UILobbyModInfo, index: number)
+---@field OnToggle fun(mod: UILobbyModInfo, checked: boolean)
+---@field OnConfirm fun(mod: UILobbyModInfo)
+local CustomLobbyModList = ClassUI(Group) {
 
-    ---@param self UICustomLobbyMapList
+    ---@param self UICustomLobbyModList
     ---@param parent Control
     __init = function(self, parent)
-        Group.__init(self, parent, "CustomLobbyMapList")
+        Group.__init(self, parent, "CustomLobbyModList")
 
         self.Trash = TrashBag()
         self.Items = {}
@@ -94,11 +116,14 @@ local CustomLobbyMapList = ClassUI(Group) {
         self.ScrollTop = 0
         self.Selected = false
         self.Scrollbar = false
+        self.Checked = {}
+        self.CanToggle = function(mod) return true end
         self.OnSelect = nil
+        self.OnToggle = nil
         self.OnConfirm = nil
     end,
 
-    ---@param self UICustomLobbyMapList
+    ---@param self UICustomLobbyModList
     __post_init = function(self)
         self.HandleEvent = function(control, event)
             if event.Type == 'WheelRotation' then
@@ -111,9 +136,9 @@ local CustomLobbyMapList = ClassUI(Group) {
     end,
 
     --- Builds the row pool sized to the (now concrete) height and attaches the scrollbar.
-    --- Called by the owner after the list is laid out + mounted — the pool count is read from
-    --- `Height()`, which isn't settled during __post_init (three-phase init, /lua/ui/CLAUDE.md § 1).
-    ---@param self UICustomLobbyMapList
+    --- Called by the owner after the list is laid out + mounted (three-phase init,
+    --- /lua/ui/CLAUDE.md § 1) — the pool count reads `Height()`, unsettled during __post_init.
+    ---@param self UICustomLobbyModList
     Initialize = function(self)
         if self.PoolCount > 0 then
             return
@@ -134,19 +159,19 @@ local CustomLobbyMapList = ClassUI(Group) {
                 :End()
         end
         -- set the pool count only once the whole pool exists, so a build error never leaves
-        -- CalcVisible iterating past the rows that were actually created
+        -- CalcVisible iterating past rows that were actually created
         self.PoolCount = count
 
         self.Scrollbar = UIUtil.CreateVertScrollbarFor(self)
         self:CalcVisible()
     end,
 
-    --- Builds one pooled row (name + size/players badge). Private.
-    ---@param self UICustomLobbyMapList
+    --- Builds one pooled row (checkbox + name + type badge). Private.
+    ---@param self UICustomLobbyModList
     ---@param poolIndex number
-    ---@return UICustomLobbyMapListRow
+    ---@return UICustomLobbyModListRow
     CreateRow = function(self, poolIndex)
-        ---@type UICustomLobbyMapListRow
+        ---@type UICustomLobbyModListRow
         local row = Group(self)
         row._poolIndex = poolIndex
         row._hover = false
@@ -154,33 +179,43 @@ local CustomLobbyMapList = ClassUI(Group) {
         row.Background = Bitmap(row)
         row.Background:SetSolidColor(IdleColor)
 
+        row.Check = UIUtil.CreateCheckbox(row, '/CHECKBOX/', "", false, 11)
+        row.Check.OnCheck = function(control, checked)
+            local index = self.ScrollTop + poolIndex
+            local mod = self.Items[index]
+            if mod and self.OnToggle then
+                self.OnToggle(mod, checked)
+            end
+        end
+
         row.Name = UIUtil.CreateText(row, "", 14, UIUtil.bodyFont)
         row.Name:DisableHitTest()
 
-        row.Meta = UIUtil.CreateText(row, "", 12, UIUtil.bodyFont)
-        row.Meta:SetColor('ff9aa0a8')
-        row.Meta:DisableHitTest()
+        row.Badge = UIUtil.CreateText(row, "", 11, UIUtil.bodyFont)
+        row.Badge:DisableHitTest()
 
         Layouter(row.Background):Fill(row):End()
-        Layouter(row.Name):AtLeftIn(row, 10):AtVerticalCenterIn(row):End()
-        Layouter(row.Meta):AtRightIn(row, 10):AtVerticalCenterIn(row):End()
+        Layouter(row.Check):AtLeftIn(row, 6):AtVerticalCenterIn(row):End()
+        Layouter(row.Name):AnchorToRight(row.Check, 8):AtVerticalCenterIn(row):End()
+        Layouter(row.Badge):AtRightIn(row, 10):AtVerticalCenterIn(row):End()
 
-        -- the background catches the mouse; children are hit-test-disabled so they don't block it
+        -- the background catches selection / confirm; the checkbox handles its own clicks, and
+        -- the text labels are hit-test-disabled so they don't block the background
         row.Background.HandleEvent = function(control, event)
             local index = self.ScrollTop + poolIndex
-            local scenario = self.Items[index]
-            if not scenario then
+            local mod = self.Items[index]
+            if not mod then
                 return false
             end
             if event.Type == 'ButtonPress' then
                 self:SetSelection(index)
                 if self.OnSelect then
-                    self.OnSelect(scenario, index)
+                    self.OnSelect(mod, index)
                 end
                 return true
             elseif event.Type == 'ButtonDClick' then
                 if self.OnConfirm then
-                    self.OnConfirm(scenario)
+                    self.OnConfirm(mod)
                 end
                 return true
             elseif event.Type == 'MouseEnter' then
@@ -199,8 +234,8 @@ local CustomLobbyMapList = ClassUI(Group) {
     end,
 
     --- Replaces the data set and refreshes the window (resets scroll to the top).
-    ---@param self UICustomLobbyMapList
-    ---@param items UILobbyScenarioInfo[]
+    ---@param self UICustomLobbyModList
+    ---@param items UILobbyModInfo[]
     SetItems = function(self, items)
         self.Items = items or {}
         self.ScrollTop = 0
@@ -208,23 +243,46 @@ local CustomLobbyMapList = ClassUI(Group) {
         self:CalcVisible()
     end,
 
+    --- Points the list at the dialog's selection set (held by reference; the dialog mutates it
+    --- and calls `Refresh`). Drives each row's checkbox state.
+    ---@param self UICustomLobbyModList
+    ---@param checked UIModSelection
+    SetChecked = function(self, checked)
+        self.Checked = checked or {}
+        self:CalcVisible()
+    end,
+
+    --- Sets the predicate deciding whether a row's checkbox is interactive (e.g. a non-host
+    --- can't toggle sim mods; blacklisted mods can't be enabled).
+    ---@param self UICustomLobbyModList
+    ---@param predicate fun(mod: UILobbyModInfo): boolean
+    SetCanToggle = function(self, predicate)
+        self.CanToggle = predicate or function(mod) return true end
+    end,
+
+    --- Repaints the visible window (call after the dialog mutates the selection).
+    ---@param self UICustomLobbyModList
+    Refresh = function(self)
+        self:CalcVisible()
+    end,
+
     --- Selects an item by index (1-based) and repaints; does not scroll (see ShowItem).
-    ---@param self UICustomLobbyMapList
+    ---@param self UICustomLobbyModList
     ---@param index number | false
     SetSelection = function(self, index)
         self.Selected = index or false
         self:CalcVisible()
     end,
 
-    --- The selected scenario, or nil.
-    ---@param self UICustomLobbyMapList
-    ---@return UILobbyScenarioInfo | nil
+    --- The highlighted mod, or nil.
+    ---@param self UICustomLobbyModList
+    ---@return UILobbyModInfo | nil
     GetSelected = function(self)
         return self.Selected and self.Items[self.Selected] or nil
     end,
 
     --- Scrolls so item `index` (1-based) is within the visible window.
-    ---@param self UICustomLobbyMapList
+    ---@param self UICustomLobbyModList
     ---@param index number
     ShowItem = function(self, index)
         if self.PoolCount == 0 then
@@ -239,16 +297,16 @@ local CustomLobbyMapList = ClassUI(Group) {
         self:CalcVisible()
     end,
 
-    --- Paints a single row to reflect its data + selection/hover state. Private.
-    ---@param self UICustomLobbyMapList
-    ---@param row UICustomLobbyMapListRow
+    --- Paints a single row to reflect its data + selection / hover / checkbox state. Private.
+    ---@param self UICustomLobbyModList
+    ---@param row UICustomLobbyModListRow
     ---@param index number
     PaintRow = function(self, row, index)
         if not row then
             return
         end
-        local scenario = self.Items[index]
-        if not scenario then
+        local mod = self.Items[index]
+        if not mod then
             row:Hide()
             return
         end
@@ -262,17 +320,26 @@ local CustomLobbyMapList = ClassUI(Group) {
         end
         row.Background:SetSolidColor(color)
 
-        row.Name:SetText(LOC(scenario.name) or "?")
+        local canToggle = self.CanToggle(mod)
+        row.Check:SetCheck(self.Checked[mod.uid] and true or false, true)
+        if canToggle then
+            row.Check:Enable()
+        else
+            row.Check:Disable()
+        end
 
-        local players = ArmyCount(scenario)
-        local size = scenario.size and math.floor(scenario.size[1] / 50) or "?"
-        row.Meta:SetText(size .. "km  ·  " .. players .. "p")
+        row.Name:SetText(Truncate(mod.title or mod.name or "?", NameMaxChars))
+        row.Name:SetColor(canToggle and EnabledNameColor or DisabledNameColor)
+
+        local badge = TypeBadges[mod.type] or TypeBadges.GAME
+        row.Badge:SetText(badge.text)
+        row.Badge:SetColor(badge.color)
     end,
 
     ---------------------------------------------------------------------------
     --#region Scrollbar contract
 
-    ---@param self UICustomLobbyMapList
+    ---@param self UICustomLobbyModList
     CalcVisible = function(self)
         for i = 1, self.PoolCount do
             self:PaintRow(self.Rows[i], self.ScrollTop + i)
@@ -281,7 +348,7 @@ local CustomLobbyMapList = ClassUI(Group) {
     end,
 
     --- Shows the scrollbar only when there are more items than fit the pool.
-    ---@param self UICustomLobbyMapList
+    ---@param self UICustomLobbyModList
     UpdateScrollbar = function(self)
         if not self.Scrollbar then
             return
@@ -293,7 +360,7 @@ local CustomLobbyMapList = ClassUI(Group) {
         end
     end,
 
-    ---@param self UICustomLobbyMapList
+    ---@param self UICustomLobbyModList
     ClampTop = function(self)
         local maxTop = math.max(0, table.getn(self.Items) - self.PoolCount)
         if self.ScrollTop > maxTop then
@@ -304,23 +371,23 @@ local CustomLobbyMapList = ClassUI(Group) {
         end
     end,
 
-    ---@param self UICustomLobbyMapList
+    ---@param self UICustomLobbyModList
     GetScrollValues = function(self, axis)
         local size = table.getn(self.Items)
         return 0, size, self.ScrollTop, math.min(self.ScrollTop + self.PoolCount, size)
     end,
 
-    ---@param self UICustomLobbyMapList
+    ---@param self UICustomLobbyModList
     ScrollLines = function(self, axis, delta)
         self:ScrollSetTop(axis, self.ScrollTop + math.floor(delta))
     end,
 
-    ---@param self UICustomLobbyMapList
+    ---@param self UICustomLobbyModList
     ScrollPages = function(self, axis, delta)
         self:ScrollSetTop(axis, self.ScrollTop + math.floor(delta) * self.PoolCount)
     end,
 
-    ---@param self UICustomLobbyMapList
+    ---@param self UICustomLobbyModList
     ScrollSetTop = function(self, axis, top)
         top = math.floor(top)
         if top == self.ScrollTop then
@@ -331,21 +398,21 @@ local CustomLobbyMapList = ClassUI(Group) {
         self:CalcVisible()
     end,
 
-    ---@param self UICustomLobbyMapList
+    ---@param self UICustomLobbyModList
     IsScrollable = function(self, axis)
         return true
     end,
 
     --#endregion
 
-    ---@param self UICustomLobbyMapList
+    ---@param self UICustomLobbyModList
     OnDestroy = function(self)
         self.Trash:Destroy()
     end,
 }
 
 ---@param parent Control
----@return UICustomLobbyMapList
+---@return UICustomLobbyModList
 Create = function(parent)
-    return CustomLobbyMapList(parent)
+    return CustomLobbyModList(parent)
 end

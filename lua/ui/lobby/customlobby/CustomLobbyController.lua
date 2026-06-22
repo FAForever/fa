@@ -525,6 +525,25 @@ function RequestSetScenario(scenarioFile)
     BroadcastLaunchInfo(instance)
 end
 
+--- The host sets the active sim mods. Host-only — backs the mod-select dialog. Sets `GameMods`
+--- in the launch model and broadcasts the launch config so every peer sees the same sim mods.
+--- UI mods are per-peer and handled locally by the dialog, never here.
+---@param gameMods table<string, true>
+function RequestSetGameMods(gameMods)
+    local instance = LobbyInstance
+    if not instance then
+        return
+    end
+
+    if not CustomLobbyLocalModel.GetSingleton().IsHost() then
+        WARN("CustomLobby: only the host can change the game mods")
+        return
+    end
+
+    CustomLobbyLaunchModel.SetGameMods(CustomLobbyLaunchModel.GetSingleton(), gameMods)
+    BroadcastLaunchInfo(instance)
+end
+
 --- The host swaps the contents of two slots. Host-only (a client request isn't
 --- offered) — backs a host-side drag/menu and a `/swap <a> <b>` chat command.
 ---@param slotA number

@@ -136,6 +136,27 @@ local function IsAllowedUrl(url)
     return false
 end
 
+--- Downgrades an `https://` URL to `http://` — the engine's `OpenURL` only handles `http://`.
+---@param url string
+---@return string
+local function ToOpenableUrl(url)
+    return (string.gsub(url, "^https://", "http://"))
+end
+
+--- Shows `scrollbar` only when the TextArea's content is taller than the box it sits in.
+---@param textArea TextArea
+---@param scrollbar Scrollbar | false
+local function UpdateTextAreaScrollbar(textArea, scrollbar)
+    if not scrollbar then
+        return
+    end
+    if textArea:GetTextHeight() > textArea.Height() then
+        scrollbar:Show()
+    else
+        scrollbar:Hide()
+    end
+end
+
 --- Pulls the `.label` column out of a filter table for `Combo:AddItems`.
 ---@param filters table[]
 ---@return string[]
@@ -214,6 +235,7 @@ end
 ---@field ActionArea Group
 ---@field Title Text
 ---@field FilterTitle Text
+---@field SearchLabel Text
 ---@field Search Edit
 ---@field SizeLabel Text
 ---@field SizeCombo Combo
@@ -241,6 +263,7 @@ end
 ---@field InfoMeta Text
 ---@field Warning Text
 ---@field Description TextArea
+---@field DescriptionScrollbar Scrollbar | false
 ---@field UrlButton Text
 ---@field CurrentUrl string | false
 ---@field RandomButton Button
@@ -301,6 +324,9 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         --#region filters (in FilterArea)
         self.FilterTitle = UIUtil.CreateText(self.FilterArea, "Filter", 14, UIUtil.titleFont)
 
+        self.SearchLabel = UIUtil.CreateText(self.FilterArea, "Search", 13, UIUtil.bodyFont)
+        self.SearchLabel:SetColor('ff9aa0a8')
+
         self.Search = Edit(self.FilterArea)
         Layouter(self.Search):Left(0):Top(0):Width(96):Height(22):End()
         self.Search:SetFont(UIUtil.bodyFont, 16)
@@ -316,7 +342,7 @@ local CustomLobbyMapSelect = ClassUI(Group) {
             self:Confirm()
             return true
         end
-        Tooltip.AddControlTooltipManual(self.Search, "Search", "Filter the list by map name.")
+        Tooltip.AddControlTooltipManual(self.Search, "Search", "Filter the list by map name or author.")
 
         self.SizeLabel = UIUtil.CreateText(self.FilterArea, "Size", 13, UIUtil.bodyFont)
         self.SizeLabel:SetColor('ff9aa0a8')
@@ -391,7 +417,7 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         self.UrlButton.HandleEvent = function(control, event)
             if event.Type == 'ButtonPress' then
                 if self.CurrentUrl then
-                    OpenURL(self.CurrentUrl)
+                    OpenURL(ToOpenableUrl(self.CurrentUrl))
                 end
                 return true
             elseif event.Type == 'MouseEnter' then
@@ -488,7 +514,8 @@ local CustomLobbyMapSelect = ClassUI(Group) {
 
         --#region filters
         Layouter(self.FilterTitle):AtLeftIn(self.FilterArea):AtTopIn(self.FilterArea):End()
-        Layouter(self.Search):AtLeftIn(self.FilterArea):AtRightIn(self.FilterArea):AnchorToBottom(self.FilterTitle, 8):Height(22):End()
+        Layouter(self.SearchLabel):AtLeftIn(self.FilterArea):AtVerticalCenterIn(self.Search):End()
+        Layouter(self.Search):AnchorToRight(self.SearchLabel, 8):AtRightIn(self.FilterArea):AnchorToBottom(self.FilterTitle, 8):Height(22):End()
 
         Layouter(self.SizeCombo):AtLeftIn(self.FilterArea, 56):AnchorToBottom(self.Search, 12):Width(110):End()
         Layouter(self.SizeLabel):AtLeftIn(self.FilterArea):AtVerticalCenterIn(self.SizeCombo):End()
@@ -541,7 +568,7 @@ local CustomLobbyMapSelect = ClassUI(Group) {
             :AtLeftIn(self.Surface):AnchorToBottom(self.Warning, 10):AtBottomIn(self.PreviewArea)
             :End()
         self.Description.Right:Set(function() return self.Surface.Right() end)
-        UIUtil.CreateVertScrollbarFor(self.Description)
+        self.DescriptionScrollbar = UIUtil.CreateVertScrollbarFor(self.Description)
         --#endregion
 
         --#region actions
@@ -610,6 +637,12 @@ local CustomLobbyMapSelect = ClassUI(Group) {
     ---@param self UICustomLobbyMapSelect
     Initialize = function(self)
         self.Ready = true
+
+        -- TextArea pins Width to its constructor value and wraps to Width(), not Left..Right. Bind
+        -- it to the laid-out (map-wide) span now — not in __post_init: the bind eagerly fires
+        -- Width.OnDirty → ReflowText, which reads parent geometry that's circular until mounted.
+        self.Description.Width:Set(function() return self.Description.Right() - self.Description.Left() end)
+
         self.MapList:Initialize()
         self:Populate()
     end,
@@ -663,7 +696,12 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         local selectedRow = 0
 
         for _, scenario in self.Scenarios do
-            local matchesName = search == "" or string.find(string.lower(scenario.name), search, 1, true)
+            -- search matches the map name or (when the scenario provides one) its author
+            local haystack = string.lower(scenario.name or "")
+            if scenario.author then
+                haystack = haystack .. " " .. string.lower(scenario.author)
+            end
+            local matchesName = search == "" or string.find(haystack, search, 1, true)
             if matchesName and self:PassesFilters(scenario) then
                 table.insert(self.Filtered, scenario)
                 if target and string.lower(scenario.file) == target then
@@ -796,6 +834,7 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         end
 
         self.Description:SetText(scenario.description and LOC(scenario.description) or "")
+        UpdateTextAreaScrollbar(self.Description, self.DescriptionScrollbar)
     end,
 
     --- Clears the preview + info (no candidate / empty list).
@@ -809,6 +848,7 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         self.Description:SetText("")
         self.CurrentUrl = false
         self.UrlButton:Hide()
+        UpdateTextAreaScrollbar(self.Description, self.DescriptionScrollbar)
     end,
 
     --- Commits the highlighted candidate via the controller intent.

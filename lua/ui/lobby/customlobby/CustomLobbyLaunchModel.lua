@@ -168,6 +168,14 @@ function SetScenario(model, scenarioFile)
     model.ScenarioFile:Set(scenarioFile)
 end
 
+--- Sets the active sim mods (a uid set). UI mods are per-peer and never live here — only sim
+--- mods become part of the launch (and must agree across players).
+---@param model UICustomLobbyLaunchModel
+---@param gameMods table<string, true>
+function SetGameMods(model, gameMods)
+    model.GameMods:Set(table.copy(gameMods))
+end
+
 --- Appends a player to the observer list (copy-then-Set).
 ---@param model UICustomLobbyLaunchModel
 ---@param player UICustomLobbyPlayer

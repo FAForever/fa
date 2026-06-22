@@ -40,6 +40,7 @@ local CustomLobbySlotInterface = import("/lua/ui/lobby/customlobby/customlobbysl
 local CustomLobbyObserversInterface = import("/lua/ui/lobby/customlobby/customlobbyobserversinterface.lua")
 local CustomLobbyMapPreview = import("/lua/ui/lobby/customlobby/customlobbymappreview.lua")
 local CustomLobbyMapSelect = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapselect.lua")
+local CustomLobbyModSelect = import("/lua/ui/lobby/customlobby/modselect/customlobbymodselect.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
@@ -57,6 +58,7 @@ local PanelWidth = 520
 ---@field ObserversPanel UICustomLobbyObserversInterface
 ---@field MapPreview UICustomLobbyMapPreview
 ---@field MapButton Button
+---@field ModsButton Button
 ---@field LeaveButton Button
 ---@field SlotCountObserver LazyVar
 ---@field IsHostObserver LazyVar
@@ -95,6 +97,13 @@ local CustomLobbyInterface = Class(Group) {
         self.MapButton = UIUtil.CreateButtonStd(self, '/scx_menu/small-btn/small', "Change Map", 16, 2)
         self.MapButton.OnClick = function(button, modifiers)
             CustomLobbyMapSelect.Open(GetFrame(0))
+        end
+
+        -- everyone can open the mod picker (UI mods are per-player); only the host can change the
+        -- shared sim mods, which the dialog gates on its own
+        self.ModsButton = UIUtil.CreateButtonStd(self, '/scx_menu/small-btn/small', "Mods", 16, 2)
+        self.ModsButton.OnClick = function(button, modifiers)
+            CustomLobbyModSelect.Open(GetFrame(0))
         end
 
         -- leaving disconnects + returns to the menu via the escape handler that
@@ -143,6 +152,12 @@ local CustomLobbyInterface = Class(Group) {
         Layouter(self.MapButton)
             :AnchorToBottom(self.MapPreview, 12)
             :AtLeftIn(self.MapPreview)
+            :End()
+
+        -- mods button beside it (shown to everyone)
+        Layouter(self.ModsButton)
+            :AnchorToRight(self.MapButton, 8)
+            :AtVerticalCenterIn(self.MapButton)
             :End()
 
         -- stack the rows top-to-bottom inside the panel via sibling anchoring
