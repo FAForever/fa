@@ -165,12 +165,14 @@ local CustomLobbyMapPanel = ClassUI(Group) {
         self.ReclaimMass = UIUtil.CreateText(self.ReclaimValue, "", 13, UIUtil.bodyFont)
         self.ReclaimMass:SetColor(ValueColor)
         self.ReclaimMass:DisableHitTest()
-        self.ReclaimMassIcon = Bitmap(self.ReclaimValue, MassIcon)
+        self.ReclaimMassIcon = Bitmap(self.ReclaimValue)
+        self.ReclaimMassIcon:SetTexture(UIUtil.UIFile(MassIcon))
         self.ReclaimMassIcon:DisableHitTest()
         self.ReclaimEnergy = UIUtil.CreateText(self.ReclaimValue, "", 13, UIUtil.bodyFont)
         self.ReclaimEnergy:SetColor(ValueColor)
         self.ReclaimEnergy:DisableHitTest()
-        self.ReclaimEnergyIcon = Bitmap(self.ReclaimValue, EnergyIcon)
+        self.ReclaimEnergyIcon = Bitmap(self.ReclaimValue)
+        self.ReclaimEnergyIcon:SetTexture(UIUtil.UIFile(EnergyIcon))
         self.ReclaimEnergyIcon:DisableHitTest()
         --#endregion
 
