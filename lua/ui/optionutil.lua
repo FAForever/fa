@@ -97,6 +97,26 @@ function GetScenarioOptions(scenarioFile)
     return options
 end
 
+--- Loads a single mod's lobby options (its `lobbyoptions.lua` `AIOpts`), or nil. Untrusted disk
+--- data, so the import + the in-place default repair are both pcall'd.
+---@param mod ModInfo
+---@return ScenarioOption[] | nil
+local function LoadModOptions(mod)
+    if not (mod and mod.location) then
+        return nil
+    end
+    local path = mod.location .. ModOptionsFile
+    if not DiskGetFileInfo(path) then
+        return nil
+    end
+    local ok, module = pcall(import, path)
+    if not (ok and module and module.AIOpts) then
+        return nil
+    end
+    pcall(MapUtil.ValidateScenarioOptions, module.AIOpts)
+    return module.AIOpts
+end
+
 --- The options contributed by the selected sim mods — each mod's `lobbyoptions.lua` `AIOpts`,
 --- merged and de-duplicated by key.
 ---@param gameMods table<string, true> # selected sim-mod uid set (the launch model's GameMods)
@@ -108,21 +128,32 @@ function GetModOptions(gameMods)
     local allMods = Mods.AllMods()
     local options = {}
     for uid in gameMods do
-        local mod = allMods[uid]
-        if mod and mod.location then
-            local path = mod.location .. ModOptionsFile
-            if DiskGetFileInfo(path) then
-                local ok, module = pcall(import, path)
-                if ok and module and module.AIOpts then
-                    AppendUniqueByKey(options, module.AIOpts)
-                end
-            end
+        local opts = LoadModOptions(allMods[uid])
+        if opts then
+            AppendUniqueByKey(options, opts)
         end
     end
-    -- repair any bad `default` indices in place (same contract as the scenario options); pcall'd
-    -- because mod-supplied options are untrusted disk data
-    pcall(MapUtil.ValidateScenarioOptions, options)
     return options
+end
+
+--- The selected sim mods' options grouped by mod, for showing each option's origin. Only mods
+--- that actually contribute options appear.
+---@param gameMods table<string, true>
+---@return { uid: string, name: string, options: ScenarioOption[] }[]
+function GetModOptionsByMod(gameMods)
+    if not gameMods then
+        return {}
+    end
+    local allMods = Mods.AllMods()
+    local groups = {}
+    for uid in gameMods do
+        local mod = allMods[uid]
+        local opts = LoadModOptions(mod)
+        if opts and table.getn(opts) > 0 then
+            table.insert(groups, { uid = uid, name = mod.name or uid, options = opts })
+        end
+    end
+    return groups
 end
 
 --#endregion

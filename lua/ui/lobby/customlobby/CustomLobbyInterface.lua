@@ -49,14 +49,14 @@ local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocal
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 local CustomLobbySlotInterface = import("/lua/ui/lobby/customlobby/customlobbyslotinterface.lua")
 local CustomLobbyObserversInterface = import("/lua/ui/lobby/customlobby/customlobbyobserversinterface.lua")
-local CustomLobbyConfigInterface = import("/lua/ui/lobby/customlobby/customlobbyconfiginterface.lua")
+local CustomLobbyConfigInterface = import("/lua/ui/lobby/customlobby/config/customlobbyconfiginterface.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
 -- flip to tint each layout area so the regions are visible while iterating
-local Debug = false
+local Debug = true
 
 -- the lobby content is designed for the 1024x768 floor; the root fills the frame (full-screen
 -- backdrop) but the content is centered and capped to this size, so it never stretches on a
@@ -299,6 +299,10 @@ local CustomLobbyInterface = Class(Group) {
         Layouter(self.StatusLabel):AtLeftIn(self.ActionArea, 8):AtVerticalCenterIn(self.ActionArea):End()
         Layouter(self.LaunchButton):AtRightIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea):End()
         --#endregion
+
+        -- the config panel is now sized; let it build its grids' scrollbars + first render
+        -- (three-phase init — its Grids need a concrete height)
+        self.Config:Initialize()
     end,
 
     --- Shows the active slots (1..count), hides the rest, and resizes the slots area to fit them
