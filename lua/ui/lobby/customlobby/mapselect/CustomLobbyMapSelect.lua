@@ -30,8 +30,8 @@
 -- It is a transient picker, NOT a persistent model component:
 --   * it subscribes to the catalog (CustomLobbyMapCatalog), which streams maps in across frames,
 --   * it previews the *highlighted candidate* (decoupled from the launch model) via the shared
---     scenario-preview surface (CustomLobbyScenarioPreview, same control the in-lobby preview
---     uses), here with numbered-dot spawns + a title bar / url link layered on top, and
+--     CustomLobbyMapPreview, created unbound so this dialog drives it (vs. the in-lobby preview's
+--     model binding), here with numbered-dot spawns + a title bar / url link layered on top, and
 --   * on Select it calls the controller intent `RequestSetScenario(file)` — the same path a
 --     `/map <name>` chat command would use. It owns no synced state.
 --
@@ -54,7 +54,7 @@ local Popup = import("/lua/ui/controls/popups/popup.lua").Popup
 local Combo = import("/lua/ui/controls/combo.lua").Combo
 local TextArea = import("/lua/ui/controls/textarea.lua").TextArea
 
-local CustomLobbyScenarioPreview = import("/lua/ui/lobby/customlobby/customlobbyscenariopreview.lua")
+local CustomLobbyMapPreview = import("/lua/ui/lobby/customlobby/customlobbymappreview.lua")
 local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
 local CustomLobbyMapList = import("/lua/ui/lobby/customlobby/mapselect/customlobbymaplist.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
@@ -256,8 +256,8 @@ end
 ---@field SpawnsToggle Checkbox
 ---@field ResourcesToggle Checkbox
 ---@field WrecksToggle Checkbox
+---@field Preview UICustomLobbyMapPreview
 ---@field Surface UICustomLobbyScenarioPreview
----@field PreviewBg Bitmap
 ---@field PreviewTitleBar Bitmap
 ---@field PreviewTitle Text
 ---@field InfoMeta Text
@@ -382,13 +382,11 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         --#endregion
 
         --#region preview area (toggles, preview, info, description)
-        -- the candidate preview surface (shared with the in-lobby preview); spawns render as
-        -- numbered dots (the surface default). Resources/wrecks start hidden — the toggles flip
-        -- them; spawns start shown.
-        self.PreviewBg = Bitmap(self.PreviewArea)
-        self.PreviewBg:SetSolidColor('ff000000')
-        self.PreviewBg:DisableHitTest()
-        self.Surface = CustomLobbyScenarioPreview.Create(self.PreviewArea)
+        -- the candidate preview — the same component as the in-lobby preview, created unbound so we
+        -- drive it ourselves (no model wiring); spawns render as numbered dots (the surface default).
+        -- Resources/wrecks start hidden — the toggles flip them; spawns start shown.
+        self.Preview = CustomLobbyMapPreview.Create(self.PreviewArea)
+        self.Surface = self.Preview.Surface
         self.Surface:SetOverlayVisible('resources', false)
         self.Surface:SetOverlayVisible('wrecks', false)
 
@@ -540,12 +538,12 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         Layouter(self.SpawnsToggle):AnchorToLeft(self.ResourcesToggle, 16):AtVerticalCenterIn(self.ResourcesToggle):End()
         Layouter(self.WrecksToggle):AnchorToRight(self.ResourcesToggle, 16):AtVerticalCenterIn(self.ResourcesToggle):End()
 
-        Layouter(self.Surface)
+        -- size the preview (glow + backdrop); the surface (the map) is inset within it. Overlays
+        -- below anchor to self.Surface, so they land on the map, not the glow margin.
+        Layouter(self.Preview)
             :AtHorizontalCenterIn(self.PreviewArea):AnchorToBottom(self.ResourcesToggle, 10)
             :Width(PreviewSize):Height(PreviewSize)
             :End()
-        Layouter(self.PreviewBg):Fill(self.Surface):End()
-        self.PreviewBg.Depth:Set(function() return self.Surface.Depth() - 1 end)
 
         -- map name overlaid across the top of the preview
         Layouter(self.PreviewTitleBar):AtLeftIn(self.Surface):AtRightIn(self.Surface):AtTopIn(self.Surface):Height(26):End()

@@ -56,7 +56,7 @@ Roles: **Host**, **Player** (human in a slot), **Observer**, **Joining client**
 ## E. Observers
 
 - 🟡 As a **joining client**, I want to enter as an observer when no slot is free or when I request it, so that I can still watch. *(Observers are modelled/synced; auto-enter-as-observer on a full lobby isn't wired.)*
-- 🟡 As a **player**, I want to become an observer (or request it from the host), so that I can step out of the game without leaving. *(Host moves a player to observers via the context menu; self-request not yet.)*
+- 🟡 As a **player**, I want to become an observer (or request it from the host), so that I can step out of the game without leaving. *(Host moves a player to observers via the context menu, and an **"Observe" button** moves the local player out of their slot — host-side; a non-host's request-to-host path isn't wired yet.)*
 - ✅ As an **observer**, I want to become a player / request a specific slot, so that I can join in; *given* a slot is available (host may evict an AI). *(Right-click → "Play this slot".)*
 - 🟡 As a **player**, I want to see the observer list with rating, ping and CPU, so that I know who's spectating. *(Observer strip shows count + names; no rating/ping/CPU.)*
 - ⬜ As a **host**, I want to kick an observer, so that I can manage spectators; *and* observers are auto-kicked at launch if observers are disallowed.
@@ -80,7 +80,7 @@ Roles: **Host**, **Player** (human in a slot), **Observer**, **Joining client**
 - ✅ As a **host**, I want to set AI multipliers (cheat/build), omni, TML randomization and expansion limits, so that AIx difficulty is tuned. *(AI column of the options dialog.)*
 - 🟡 As a **host**, I want a "reset to defaults" action, so that I can clear all options at once (which also unreadies everyone). *(Reset button clears to defaults; the auto-unready side-effect isn't wired.)*
 - ✅ As a **host**, I want map-specific and mod-provided options surfaced alongside the standard ones, so that nothing is hidden. *(Scenario + Mods columns.)*
-- 🟡 As a **player**, I want to see the active (and optionally only the changed) options, so that I understand the ruleset. *(Hide-defaults + non-default marking exist, but the dialog is host-only — no read-only client view.)*
+- ✅ As a **player**, I want to see the active (and optionally only the changed) options, so that I understand the ruleset. *(The config panel's **Options tab** shows the current values read-only to everyone, grouped Lobby / Scenario / Mods, with a hide-defaults toggle and origin markers; the host edits them via the Options dialog.)*
 
 ## H. Auto-teams & spawn
 
@@ -94,7 +94,7 @@ Roles: **Host**, **Player** (human in a slot), **Observer**, **Joining client**
 
 - ✅ As a **host**, I want to browse maps with a preview, so that I can choose a map informedly.
 - 🟡 As a **host**, I want to filter maps by player count, size, type (official/custom), AI markers and hide-obsolete, and search by name, so that I find the right map quickly; *and* my filters persist. *(Size, player count, name search + persistence done; type/AI-markers/hide-obsolete filters not.)*
-- 🟡 As a **host**, I want a resource-aware preview (mass/hydro, water/cliff/buildable masks, start spots), so that I understand the map layout. *(Start spots, mass/hydro, wrecks done; terrain masks not.)*
+- 🟡 As a **host**, I want a resource-aware preview (mass/hydro, water/cliff/buildable masks, start spots), so that I understand the map layout. *(Preview shows start spots, mass/hydro, wrecks; the lobby's Map tab also shows reclaim totals + description / author / url / version; terrain masks not.)*
 - ✅ As a **host**, I want to pick a random map, so that I can play something fresh.
 - ✅ As a **player**, I want clear warnings when a map's files are missing, so that I'm not stuck on an unplayable map. *(File-health check disables Select.)*
 

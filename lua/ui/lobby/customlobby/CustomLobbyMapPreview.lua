@@ -20,84 +20,190 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
--- The in-lobby map preview: the shared scenario-preview surface (CustomLobbyScenarioPreview)
--- with the lobby's chrome — a glow border (no dialog brackets; they don't suit a preview this
--- small) — wrapped around it, bound to the
--- launch model.
+-- The map preview, as one whole: the chrome (a glow border + dark backdrop) wrapped around the
+-- shared CustomLobbyScenarioPreview surface, plus the faction spawn icon (the local
+-- `MapPreviewSpawn`). Both preview consumers use this one component, so they look identical:
 --
--- It owns the model wiring only: it subscribes to `ScenarioFile` (load the scenario, hand it to
--- the surface, show/hide) and to each slot's player (refresh the surface's spawn data, no map
--- reload). The texture / overlay / positioning work all lives in the surface, which the
--- map-select dialog reuses too — see CustomLobbyScenarioPreview.lua.
+--   * In the lobby — created with `Bound = true`. It subscribes to the launch model and renders the
+--     committed `ScenarioFile` automatically (load via the catalog, hand to the surface, show/hide),
+--     with per-slot faction-icon spawns refreshed as players take/swap/recolour (no map reload).
 --
--- Spawns render as faction icons (CustomLobbyMapPreviewSpawn): the surface calls each icon's
--- :Update(faction) for a seated spot and :Reset() for an empty one, so empty spots stay blank.
+--   * In the map-select dialog — created unbound (the default). No model wiring, numbered-dot spawns
+--     (the surface default); the owner drives the preview itself through `self.Surface`
+--     (`SetScenario` / `SetSpawnData` / `SetOverlayVisible` / `Clear`) to show the browse candidate,
+--     and anchors its own overlays (name bar, info, …) to `self.Surface` — the inner map rect.
+--
+-- Layout: this group is the OUTER rect (the glow fills it); the backdrop and the surface are inset
+-- by `Padding`, so the map sits within and the glow frames it. The glow renders ON TOP of the map
+-- (its depth is lifted above the surface), so the ring overlays the map's edges rather than hiding
+-- behind them — the texture's centre is transparent, so the map shows through.
+--
+-- The texture / overlay / positioning work all lives in the surface — see CustomLobbyScenarioPreview.lua.
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local CustomLobbyScenarioPreview = import("/lua/ui/lobby/customlobby/customlobbyscenariopreview.lua")
-local CustomLobbyMapPreviewSpawn = import("/lua/ui/lobby/customlobby/customlobbymappreviewspawn.lua")
 local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
+local Layouter = LayoutHelpers.ReusedLayoutFor
+
+local GlowTexture = '/scx_menu/gameselect/map-panel-glow_bmp.dds'
+local BackdropColor = 'ff000000'
+local Padding = 14                  -- map inset from the outer edge; the glow ring lives in this margin
+local SpawnIconSize = 32
+
+--------------------------------------------------------------------------------------------------
+--#region Faction spawn icon
+
+-- A start-position marker: a faction icon placed at a spawn. Faction-only — no lobby coupling.
+-- The surface calls `:Update(faction)` for a seated spot and `:Reset()` for an empty one (so empty
+-- spots stay blank). Used only when the preview is `Bound`; unbound previews get numbered dots.
+
+---@class UICustomLobbyMapPreviewSpawn : Bitmap
+---@field Faction? number
+local MapPreviewSpawn = ClassUI(Bitmap) {
+
+    EmptyPath = "/textures/ui/common/dialogs/mapselect02/commander_alpha.dds",
+    FactionIconPaths = {
+        "/textures/ui/common/faction_icon-lg/uef_med.dds",
+        "/textures/ui/common/faction_icon-lg/aeon_med.dds",
+        "/textures/ui/common/faction_icon-lg/cybran_med.dds",
+        "/textures/ui/common/faction_icon-lg/seraphim_med.dds",
+    },
+
+    ---@param self UICustomLobbyMapPreviewSpawn
+    ---@param parent Control
+    __init = function(self, parent)
+        Bitmap.__init(self, parent, self.EmptyPath)
+
+        self.Faction = nil
+        self:Hide()
+    end,
+
+    ---@param self UICustomLobbyMapPreviewSpawn
+    ---@param parent Control
+    __post_init = function(self, parent)
+        Layouter(self):Width(SpawnIconSize):Height(SpawnIconSize):Over(parent, 32):End()
+    end,
+
+    ---@param self UICustomLobbyMapPreviewSpawn
+    Reset = function(self)
+        self.Faction = nil
+        self:Hide()
+    end,
+
+    ---@param self Control
+    ---@param event KeyEvent
+    ---@return boolean
+    HandleEvent = function(self, event)
+        if event.Type == 'MouseEnter' then
+            self:SetAlpha(0.25)
+        elseif event.Type == 'MouseExit' then
+            self:SetAlpha(1.0)
+        end
+        return true
+    end,
+
+    ---@param self UICustomLobbyMapPreviewSpawn
+    Show = function(self)
+        if self.Faction then
+            Bitmap.Show(self)
+        else
+            self:Hide()
+        end
+    end,
+
+    ---@param self UICustomLobbyMapPreviewSpawn
+    ---@param faction number
+    Update = function(self, faction)
+        local factionIcon = self.FactionIconPaths[faction]
+        if factionIcon then
+            self.Faction = faction
+            self:SetTexture(UIUtil.UIFile(factionIcon))
+            self:Show()
+        end
+    end,
+}
+
+--#endregion
+
+--------------------------------------------------------------------------------------------------
+--#region Map preview
+
+---@class UICustomLobbyMapPreviewOptions
+---@field Bound? boolean   # subscribe to the launch model + use faction-icon spawns (default false)
 
 ---@class UICustomLobbyMapPreview : Group
 ---@field Trash TrashBag
----@field Overlay Bitmap
+---@field Bound boolean
+---@field Glow Bitmap
+---@field Backdrop Bitmap
 ---@field Surface UICustomLobbyScenarioPreview
----@field ScenarioObserver LazyVar
----@field PlayerObservers LazyVar[]
+---@field ScenarioObserver? LazyVar
+---@field PlayerObservers? LazyVar[]
 local CustomLobbyMapPreview = ClassUI(Group) {
 
     ---@param self UICustomLobbyMapPreview
     ---@param parent Control
-    __init = function(self, parent)
-        Group.__init(self, parent)
+    ---@param options? UICustomLobbyMapPreviewOptions
+    __init = function(self, parent, options)
+        Group.__init(self, parent, "CustomLobbyMapPreview")
 
+        options = options or {}
         self.Trash = TrashBag()
+        self.Bound = options.Bound or false
 
-        self.Overlay = UIUtil.CreateBitmap(self, '/scx_menu/gameselect/map-panel-glow_bmp.dds')
+        -- chrome: a dark backdrop behind the map (shows through letterboxing / before the texture
+        -- loads); the glow ring is lifted on top of the map in __post_init to frame its edges
+        self.Backdrop = Bitmap(self)
+        self.Backdrop:SetSolidColor(BackdropColor)
+        self.Backdrop:DisableHitTest()
 
-        -- the shared surface, with faction icons for spawns
+        -- the shared surface; faction-icon spawns when bound, numbered dots (the default) otherwise
         self.Surface = CustomLobbyScenarioPreview.Create(self, {
-            CreateSpawnIcon = function(surface, index)
-                return CustomLobbyMapPreviewSpawn.Create(surface)
-            end,
+            CreateSpawnIcon = self.Bound and function(surface, index)
+                return MapPreviewSpawn(surface)
+            end or nil,
         })
 
-        local model = CustomLobbyLaunchModel.GetSingleton()
+        self.Glow = UIUtil.CreateBitmap(self, GlowTexture)
+        self.Glow:DisableHitTest()
 
-        -- the scenario file drives the whole preview: render on change, hide when unset
-        self.ScenarioObserver = self.Trash:Add(
-            LazyVarDerive(model.ScenarioFile, function(scenarioFileLazy)
-                self:OnScenarioFileChanged(scenarioFileLazy())
-            end))
-
-        -- each slot drives only the spawn icons (faction / position) — refreshed against the
-        -- already-loaded scenario, so a take/swap/faction change doesn't reload the map
-        self.PlayerObservers = {}
-        for slot = 1, CustomLobbyLaunchModel.MaxSlots do
-            self.PlayerObservers[slot] = self.Trash:Add(
-                LazyVarDerive(model.Players[slot], function(playerLazy)
-                    playerLazy()
-                    self:OnPlayersChanged()
+        -- bound: the launch model drives the preview. The scenario file renders the whole map; each
+        -- slot drives only the spawn icons (against the already-loaded scenario, so take/swap/faction
+        -- changes don't reload the map). Unbound: the owner drives self.Surface directly.
+        if self.Bound then
+            local model = CustomLobbyLaunchModel.GetSingleton()
+            self.ScenarioObserver = self.Trash:Add(
+                LazyVarDerive(model.ScenarioFile, function(scenarioFileLazy)
+                    self:OnScenarioFileChanged(scenarioFileLazy())
                 end))
+
+            self.PlayerObservers = {}
+            for slot = 1, CustomLobbyLaunchModel.MaxSlots do
+                self.PlayerObservers[slot] = self.Trash:Add(
+                    LazyVarDerive(model.Players[slot], function(playerLazy)
+                        playerLazy()
+                        self:OnPlayersChanged()
+                    end))
+            end
         end
     end,
 
     ---@param self UICustomLobbyMapPreview
     __post_init = function(self)
-        LayoutHelpers.ReusedLayoutFor(self.Overlay)
-            :Fill(self)
-            :DisableHitTest(true)
-            :End()
+        Layouter(self.Glow):Fill(self):End()
+        Layouter(self.Backdrop):FillFixedBorder(self.Glow, Padding):End()
+        Layouter(self.Surface):FillFixedBorder(self.Glow, Padding):End()
 
-        LayoutHelpers.ReusedLayoutFor(self.Surface)
-            :FillFixedBorder(self.Overlay, 24)
-            :End()
+        -- render the glow above the surface and all its overlays (spawn icons sit at
+        -- Preview.Depth()+10), so the ring frames the map's edges instead of hiding behind them
+        self.Glow.Depth:Set(function() return self.Surface.Depth() + 100 end)
     end,
 
     ---@param self UICustomLobbyMapPreview
@@ -105,7 +211,7 @@ local CustomLobbyMapPreview = ClassUI(Group) {
         self.Trash:Destroy()
     end,
 
-    --- Loads the scenario and hands it to the surface; hides the preview when unset.
+    --- (Bound only) Loads the scenario and hands it to the surface; hides the preview when unset.
     ---@param self UICustomLobbyMapPreview
     ---@param scenarioFile FileName | false
     OnScenarioFileChanged = function(self, scenarioFile)
@@ -127,7 +233,7 @@ local CustomLobbyMapPreview = ClassUI(Group) {
         self:Show()
     end,
 
-    --- A slot changed: refresh the surface's spawn data (faction by start spot).
+    --- (Bound only) A slot changed: refresh the surface's spawn data (faction by start spot).
     ---@param self UICustomLobbyMapPreview
     OnPlayersChanged = function(self)
         self.Surface:SetSpawnData(self:GatherSpawnData())
@@ -149,8 +255,11 @@ local CustomLobbyMapPreview = ClassUI(Group) {
     end,
 }
 
+--#endregion
+
 ---@param parent Control
+---@param options? UICustomLobbyMapPreviewOptions
 ---@return UICustomLobbyMapPreview
-Create = function(parent)
-    return CustomLobbyMapPreview(parent)
+Create = function(parent, options)
+    return CustomLobbyMapPreview(parent, options)
 end

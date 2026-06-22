@@ -22,9 +22,9 @@
 
 -- A reusable map-preview *surface*: the scenario's map texture plus its overlays — start
 -- spots, resource deposits (mass / hydrocarbon) and prebuilt wrecks — placed at the right
--- spots with aspect-correct maths. It is deliberately chrome-free: no title, border, glow or
--- brackets. Owners wrap it and add their own decoration (the in-lobby `CustomLobbyMapPreview`
--- adds a glow + brackets; the map-select dialog adds a title bar + frame).
+-- spots with aspect-correct maths. It is deliberately chrome-free: no title, border or glow.
+-- Owners wrap it and add their own decoration — `CustomLobbyMapPreview` adds the glow + backdrop
+-- frame (and the map-select dialog layers a title bar on top of that).
 --
 -- It exists so the two preview consumers share ONE implementation of the fiddly bits — the
 -- texture-leak-safe icon sharing, the aspect-correct positioning, the three-phase init — rather
@@ -35,8 +35,8 @@
 -- mapselect/CLAUDE.md). The map texture itself is one `MapPreview`; don't instantiate this
 -- control per list row.
 --
--- Spawn appearance is the owner's choice via the `CreateSpawnIcon` option: the in-lobby preview
--- passes faction icons (`CustomLobbyMapPreviewSpawn`), the picker passes numbered dots (the
+-- Spawn appearance is the owner's choice via the `CreateSpawnIcon` option: a bound
+-- `CustomLobbyMapPreview` passes faction icons, the picker passes numbered dots (the
 -- default). A spawn icon may implement `:Update(data)` / `:Reset()`; the surface calls `Update`
 -- with `SetSpawnData()[index]` when present, else `Reset` — so faction icons hide on empty
 -- spots while numbered dots (no Update/Reset) stay shown.

@@ -59,7 +59,7 @@ local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
 -- flip to tint the areas while iterating
-local Debug = true
+local Debug = UpdateCurrentFactoryForQueueDisplay
 
 local PreviewSize = 225                          -- the preview is square (FAF maps are square)
 local PreviewBlockHeight = PreviewSize + 46      -- preview + name + size/players line
@@ -147,7 +147,7 @@ local CustomLobbyConfigInterface = ClassUI(Group) {
         self.TabContentArea = CreateArea(self, "TabContentArea", 'ff8040cc')
 
         -- pinned, persistent map block — never destroyed (the preview's textures aren't freed)
-        self.Preview = CustomLobbyMapPreview.Create(self.PreviewArea)
+        self.Preview = CustomLobbyMapPreview.Create(self.PreviewArea, { Bound = true })
         self.Name = UIUtil.CreateText(self.PreviewArea, "", 16, UIUtil.titleFont)
         self.Name:DisableHitTest()
         self.Info = UIUtil.CreateText(self.PreviewArea, "", 13, UIUtil.bodyFont)
