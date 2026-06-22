@@ -58,8 +58,8 @@ local TextArea = import("/lua/ui/controls/textarea.lua").TextArea
 -- primitives, same category as the catalog's LoadScenarioInfoFile)
 local MapUtil = import("/lua/ui/maputil.lua")
 
-local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/customlobbymapcatalog.lua")
-local CustomLobbyMapList = import("/lua/ui/lobby/customlobby/customlobbymaplist.lua")
+local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
+local CustomLobbyMapList = import("/lua/ui/lobby/customlobby/mapselect/customlobbymaplist.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
 
@@ -73,6 +73,7 @@ local Debug = false
 local DialogWidth = 720
 local DialogHeight = 620
 local Pad = 12
+local ColumnGap = 30      -- whitespace separating the left column from the preview column
 local LeftWidth = 300
 local PreviewSize = 300
 local TitleHeight = 32
@@ -206,6 +207,7 @@ local function CreateArea(parent, name, color)
     bg:SetAlpha(Debug and 0.18 or 0.0)
     bg:DisableHitTest()
     Layouter(bg):Fill(area):End()
+    area.Bg = bg
     return area
 end
 
@@ -439,6 +441,7 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         self.Description = TextArea(self.PreviewArea, 200, 80)
         self.Description:SetFont(UIUtil.bodyFont, 12)
         self.Description:SetColors('ff8a909a', "00000000", 'ff8a909a', "00000000")
+        self.Description:SetTextAlignment(0.5)   -- centre each line, matching the info above
         --#endregion
 
         --#region actions
@@ -497,7 +500,7 @@ local CustomLobbyMapSelect = ClassUI(Group) {
             :AnchorToBottom(self.TitleArea, Pad):AnchorToTop(self.ActionArea, Pad)
             :End()
         Layouter(self.PreviewArea)
-            :AnchorToRight(self.LeftArea, Pad):AtRightIn(self, Pad)
+            :AnchorToRight(self.LeftArea, ColumnGap):AtRightIn(self, Pad)
             :AnchorToBottom(self.TitleArea, Pad):AnchorToTop(self.ActionArea, Pad)
             :End()
 
@@ -512,7 +515,8 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         Layouter(self.Title):AtHorizontalCenterIn(self.TitleArea):AtVerticalCenterIn(self.TitleArea):End()
 
         --#region filters
-        Layouter(self.Search):AtLeftIn(self.FilterArea):AtRightIn(self.FilterArea):AtTopIn(self.FilterArea):Height(22):End()
+        Layouter(self.FilterTitle):AtLeftIn(self.FilterArea):AtTopIn(self.FilterArea):End()
+        Layouter(self.Search):AtLeftIn(self.FilterArea):AtRightIn(self.FilterArea):AnchorToBottom(self.FilterTitle, 8):Height(22):End()
 
         Layouter(self.SizeCombo):AtLeftIn(self.FilterArea, 56):AnchorToBottom(self.Search, 12):Width(110):End()
         Layouter(self.SizeLabel):AtLeftIn(self.FilterArea):AtVerticalCenterIn(self.SizeCombo):End()
@@ -559,11 +563,12 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         Layouter(self.InfoMeta):AtHorizontalCenterIn(self.Preview):AnchorToBottom(self.Preview, 12):End()
         Layouter(self.Warning):AtHorizontalCenterIn(self.Preview):AnchorToBottom(self.InfoMeta, 4):End()
 
-        -- description fills the rest of the preview area and scrolls when it overflows
+        -- description sits under the preview, exactly as wide as the map (so it reads as
+        -- centred, since the preview is centred in its column); scrolls when it overflows
         Layouter(self.Description)
-            :AtLeftIn(self.PreviewArea):AnchorToBottom(self.Warning, 10):AtBottomIn(self.PreviewArea)
+            :AtLeftIn(self.Preview):AnchorToBottom(self.Warning, 10):AtBottomIn(self.PreviewArea)
             :End()
-        self.Description.Right:Set(function() return self.PreviewArea.Right() - LayoutHelpers.ScaleNumber(32) end)
+        self.Description.Right:Set(function() return self.Preview.Right() end)
         UIUtil.CreateVertScrollbarFor(self.Description)
         --#endregion
 
@@ -942,6 +947,12 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         template:DisableHitTest()
         Layouter(template):Left(0):Top(0):Width(8):Height(8):End()
         template:Hide()
+        -- lock it hidden: a parent Show() (Popup mounting the dialog) would otherwise reveal
+        -- this never-positioned-for-display bitmap. Same trick TexturePool uses for pooled
+        -- bitmaps — OnHide returning true keeps it hidden regardless of the parent.
+        template.OnHide = function(control, hidden)
+            return true
+        end
         return template
     end,
 
@@ -953,11 +964,11 @@ local CustomLobbyMapSelect = ClassUI(Group) {
     ---@param size number
     ---@return Bitmap
     CreateMarkerIcon = function(self, template, size)
-        local icon = UIUtil.CreateBitmapColor(self.PreviewArea, 'ffffffff')
+        local icon = UIUtil.CreateBitmapColor(self.PreviewArea, 'ffffff')
         icon:DisableHitTest()
-        -- pin a full (dummy) rect BEFORE ShareTextures — it reads the bitmap's edges, which are
-        -- circular on a just-created control; PositionMarker overrides Left/Top afterwards
-        Layouter(icon):Left(0):Top(0):Width(size):Height(size):End()
+        -- size only (matches CustomLobbyMapPreview's working pattern); PositionMarker pins
+        -- Left/Top afterwards, so the size must be set so its centring maths has a real Width
+        Layouter(icon):Width(size):Height(size):End()
         icon:ShareTextures(template)
         icon.Depth:Set(function() return self.Preview.Depth() + 5 end)
         return icon

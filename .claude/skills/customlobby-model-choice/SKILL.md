@@ -21,7 +21,7 @@ Everything else host-dictated that isn't launched is **Session**.
 
 **Not all state is a model.** *Reference data* — identical on every peer and derived from disk
 or computed from synced inputs — belongs in **neither**. It's a cached module, not a LazyVar
-singleton on the wire. Examples: the **map catalog** ([CustomLobbyMapCatalog.lua](/lua/ui/lobby/customlobby/CustomLobbyMapCatalog.lua),
+singleton on the wire. Examples: the **map catalog** ([CustomLobbyMapCatalog.lua](/lua/ui/lobby/customlobby/mapselect/CustomLobbyMapCatalog.lua),
 enumerated scenarios), and the upcoming **option schema** (derived from `ScenarioFile` + `GameMods`).
 Only the host's *choice* (the `ScenarioFile` / `GameMods` / `GameOptions` values in Launch) syncs;
 each peer recomputes the catalog/schema locally. Filter/search state in a picker is per-peer UI
