@@ -233,7 +233,7 @@ local adj = {           -- SIZE4     SIZE8   SIZE12    SIZE16   SIZE20
         MassActive=         {-0.025, -0.0125, -0.008333, -0.0125, -0.0125},
     },
     T3MassFabricator={
-        MassActive=         {-0.2, -0.2, -0.125, -0.2, -0.15},
+        MassActive=         {-0.2, -0.2, -0.125, -0.2, -0.20},
     },
     T1EnergyStorage={
         EnergyProduction=   {0.25, 0.125, 0.083334, 0.0625, 0.05},
