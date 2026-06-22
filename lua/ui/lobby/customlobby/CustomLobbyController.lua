@@ -297,6 +297,9 @@ function ProcessAddPlayer(instance, data)
     CustomLobbyAuthoritativeModel.SetPlayer(model, slot, player)
 
     BroadcastPlayers(instance, model)
+    -- a fresh peer needs the current launch config (scenario / options / mods), not just
+    -- the player list — without it their map preview etc. have nothing to render
+    BroadcastLaunchInfo(instance)
 end
 
 --- Everyone applies the host's authoritative player + observer snapshot.
@@ -310,6 +313,21 @@ function ProcessSetPlayers(instance, data)
     if data.Observers then
         model.Observers:Set(data.Observers)
     end
+end
+
+--- Everyone applies the host's authoritative launch config (scenario / options / mods /
+--- slot flags) — everything launch needs beyond the player list.
+---@param instance UICustomLobbyInstance
+---@param data UICustomLobbySentLaunchInfoMessage
+function ProcessSentLaunchInfo(instance, data)
+    local model = CustomLobbyAuthoritativeModel.GetSingleton()
+    model.ScenarioFile:Set(data.ScenarioFile or false)
+    model.GameOptions:Set(data.GameOptions or {})
+    model.GameMods:Set(data.GameMods or {})
+    model.ClosedSlots:Set(data.ClosedSlots or {})
+    model.SpawnMex:Set(data.SpawnMex or {})
+    model.AutoTeams:Set(data.AutoTeams or {})
+    model.SlotCount:Set(data.SlotCount or model.SlotCount())
 end
 
 --- Host flips a peer's ready flag and re-broadcasts.
@@ -353,6 +371,32 @@ end
 ---@param data UICustomLobbySetCpuBenchmarksMessage
 function ProcessSetCpuBenchmarks(instance, data)
     CustomLobbyModel.GetSingleton().CpuBenchmarks:Set(data.CpuBenchmarks)
+end
+
+--#endregion
+
+-------------------------------------------------------------------------------
+--#region Launch info
+--
+-- The host's launch configuration — everything the launch needs beyond the players:
+-- scenario, options, mods, slot flags. Kept deliberately simple: rather than syncing
+-- each field with its own message, the host broadcasts the whole snapshot whenever any
+-- of it changes (and to each peer as it joins). Call this after any host-side change.
+
+--- Host broadcasts the full launch-config snapshot to everyone.
+---@param instance UICustomLobbyInstance
+function BroadcastLaunchInfo(instance)
+    local model = CustomLobbyAuthoritativeModel.GetSingleton()
+    instance:BroadcastData({
+        Type = 'SentLaunchInfo',
+        ScenarioFile = model.ScenarioFile(),
+        GameOptions = model.GameOptions(),
+        GameMods = model.GameMods(),
+        ClosedSlots = model.ClosedSlots(),
+        SpawnMex = model.SpawnMex(),
+        AutoTeams = model.AutoTeams(),
+        SlotCount = model.SlotCount(),
+    })
 end
 
 --#endregion

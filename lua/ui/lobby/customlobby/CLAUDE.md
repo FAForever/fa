@@ -37,15 +37,18 @@ the automated/matchmaker path).
 | [CustomLobbyInstance.lua](CustomLobbyInstance.lua) | thin `moho.lobby_methods` shell; validates/dispatches traffic, forwards callbacks to the controller. |
 | [CustomLobbyController.lua](CustomLobbyController.lua) | host-authority logic (free functions): seating, `Process*` handlers, intents (`RequestSetReady`, `RequestTakeSlot`, `RequestSwapSlots`, `RequestEject`, `RequestMoveToObserver` — all keyed by slot index / bool so a chat command can call them too; permission is gated separately), sharing the stored CPU benchmark. |
 | [CustomLobbyRules.lua](CustomLobbyRules.lua) | game-rule derivations from lobby state (not view, not networking): `RecommendedUnitCap()` (per-player cap by map size, memoised scenario lookup). |
-| [CustomLobbyMessages.lua](CustomLobbyMessages.lua) | message registry: `AddPlayer`, `SetPlayers`, `SetReady`, `TakeSlot`, `DisconnectPeer`, `ReportCpuBenchmark`, `SetCpuBenchmarks`. |
+| [CustomLobbyMessages.lua](CustomLobbyMessages.lua) | message registry: `AddPlayer`, `SetPlayers`, `SentLaunchInfo` (full launch-config snapshot: scenario / options / mods / slot flags), `SetReady`, `TakeSlot`, `DisconnectPeer`, `ReportCpuBenchmark`, `SetCpuBenchmarks`. |
 | [CustomLobbyContextMenu.lua](CustomLobbyContextMenu.lua) | generic framed floating menu; `Show(entries, x, y)` renders any `{label, action, enabled}` list, dismisses on item click / click-outside / Esc. Knows nothing about the lobby. |
 | [CustomLobbyMenus.lua](CustomLobbyMenus.lua) | declarative menu **definitions**: entry lists with `when(ctx)`/`action(ctx)` filtered by lobby state (`BuildSlotMenu`). Adding/state-gating an item is a one-liner here. |
 | [CustomLobbySlotInterface.lua](CustomLobbySlotInterface.lua) | one slot row; subscribes to its slot + CPU benchmarks; CPU column shows max units at +0 with a green→red cap-headroom square; left-click an open slot to take it / your own to toggle ready; right-click opens its context menu; the host can drag a row onto another to swap. |
 | [CustomLobbyObserversInterface.lua](CustomLobbyObserversInterface.lua) | observer strip; subscribes to the model's `Observers` list and shows the count + names (read-only). |
+| [CustomLobbyMapPreview.lua](CustomLobbyMapPreview.lua) / [CustomLobbyMapPreviewSpawn.lua](CustomLobbyMapPreviewSpawn.lua) | map preview (copied from the autolobby's, adapted to this model): subscribes to `ScenarioFile` (full render) + each slot (spawn-icon refresh); hidden until a scenario is set. Reuses the shared `/lua/ui/controls/mappreview.lua`. |
 | [CustomLobbyInterface.lua](CustomLobbyInterface.lua) | composition root (one model subscription for SlotCount); lays out slot rows + the observer strip, and acts as the rows' drag coordinator (`UICustomLobbySlotCoordinator`: hit-test, drop-highlight, drag ghost → `RequestSwapSlots`); `OpenDebug()` / hot-reload. |
 | [/lua/ui/lobby/lobby.lua](../lobby.lua) | engine entry wrapper (`CreateLobby`/`HostGame`/`JoinGame`) → CustomLobby. Old lobby preserved at `lobby-old.lua`. |
 
-Working today: host + clients see each other (host-authoritative player sync),
+Working today: host + clients see each other (host-authoritative player sync), the
+host's launch config (scenario / options / mods / slot flags) is pushed to clients as a
+whole `SentLaunchInfo` snapshot (on join and on change) so the map preview etc. render,
 ready toggles round-trip, players can **take an open slot** (click it) and the host can
 **swap** (drag a row onto another), **eject**, and **move a player to observers** (right-click
 → context menu); observers are synced in the `SetPlayers` snapshot, shown in an observer

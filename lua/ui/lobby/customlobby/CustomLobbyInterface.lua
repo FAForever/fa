@@ -36,6 +36,7 @@ local CustomLobbyAuthoritativeModel = import("/lua/ui/lobby/customlobby/customlo
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 local CustomLobbySlotInterface = import("/lua/ui/lobby/customlobby/customlobbyslotinterface.lua")
 local CustomLobbyObserversInterface = import("/lua/ui/lobby/customlobby/customlobbyobserversinterface.lua")
+local CustomLobbyMapPreview = import("/lua/ui/lobby/customlobby/customlobbymappreview.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
@@ -51,6 +52,7 @@ local PanelWidth = 520
 ---@field SlotsPanel Group
 ---@field Slots UICustomLobbySlotInterface[]
 ---@field ObserversPanel UICustomLobbyObserversInterface
+---@field MapPreview UICustomLobbyMapPreview
 ---@field LeaveButton Button
 ---@field SlotCountObserver LazyVar
 ---@field HighlightedSlot number | false   # slot currently shown as a drop target
@@ -81,6 +83,7 @@ local CustomLobbyInterface = Class(Group) {
         end
 
         self.ObserversPanel = CustomLobbyObserversInterface.Create(self)
+        self.MapPreview = CustomLobbyMapPreview.Create(self)
 
         -- leaving disconnects + returns to the menu via the escape handler that
         -- lobby.lua registered (one teardown definition, shared with the Esc key)
@@ -108,6 +111,14 @@ local CustomLobbyInterface = Class(Group) {
             :AtLeftTopIn(self, 40, 80)
             :Width(PanelWidth)
             :Height(CustomLobbyAuthoritativeModel.MaxSlots * SlotHeight)
+            :End()
+
+        -- map preview to the right of the slots; hides itself until a scenario is set
+        Layouter(self.MapPreview)
+            :AnchorToRight(self.SlotsPanel, 24)
+            :AtTopIn(self, 80)
+            :Width(320)
+            :Height(320)
             :End()
 
         -- stack the rows top-to-bottom inside the panel via sibling anchoring
@@ -334,6 +345,10 @@ function OpenDebug()
         { PlayerName = "Zock",  OwnerID = "10", Human = true },
         { PlayerName = "Spag",  OwnerID = "11", Human = true },
     })
+
+    -- a stock map so the preview renders; swap to any installed scenario if this
+    -- one isn't present (an unknown path just leaves the preview frame empty)
+    CustomLobbyAuthoritativeModel.SetScenario(model, "/maps/scmp_009/scmp_009_scenario.lua")
 
     SetupSingleton()
 end

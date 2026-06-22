@@ -89,6 +89,32 @@ CustomLobbyMessages = {
         end,
     },
 
+    -- The host's authoritative game configuration — everything the launch needs beyond
+    -- the player list (scenario, options, mods, slot flags). Broadcast on any change and
+    -- to each peer as it joins, so the whole snapshot is sent rather than per-field deltas.
+    SentLaunchInfo = {
+        ---@class UICustomLobbySentLaunchInfoMessage : UILobbyReceivedMessage
+        ---@field ScenarioFile FileName | false
+        ---@field GameOptions table
+        ---@field GameMods table
+        ---@field ClosedSlots table<number, boolean>
+        ---@field SpawnMex table<number, boolean>
+        ---@field AutoTeams table<number, number>
+        ---@field SlotCount number
+
+        ---@param data UICustomLobbySentLaunchInfoMessage
+        Validate = function(lobby, data)
+            return type(data.GameOptions) == 'table' and type(data.GameMods) == 'table'
+        end,
+        Accept = function(lobby, data)
+            return IsFromHost(lobby, data)
+        end,
+        ---@param data UICustomLobbySentLaunchInfoMessage
+        Handler = function(lobby, data)
+            CustomLobbyController.ProcessSentLaunchInfo(lobby, data)
+        end,
+    },
+
     -- A client asks the host to flip its ready flag.
     SetReady = {
         ---@class UICustomLobbySetReadyMessage : UILobbyReceivedMessage
