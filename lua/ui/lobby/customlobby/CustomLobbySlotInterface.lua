@@ -32,6 +32,7 @@ local Color = import("/lua/shared/color.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Dragger = import("/lua/maui/dragger.lua").Dragger
 local CustomLobbyAuthoritativeModel = import("/lua/ui/lobby/customlobby/customlobbyauthoritativemodel.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 local CustomLobbyModel = import("/lua/ui/lobby/customlobby/customlobbymodel.lua")
@@ -143,10 +144,25 @@ local function StepColor(step)
     return Color.ColorHSV(hue, 1.0, 0.85, 1.0)
 end
 
+-- cursor travel (screen px) before a press becomes a drag instead of a click
+local DragThreshold = 5
+
+--- The container that owns the slot rows and coordinates drag-to-swap. The row only
+--- starts the gesture; the coordinator hit-tests across all rows (it's the only thing
+--- that knows their rects) and resolves a drop to a controller intent.
+---@class UICustomLobbySlotCoordinator
+---@field CanDrag fun(self: UICustomLobbySlotCoordinator, slot: number): boolean
+---@field SlotIndexAt fun(self: UICustomLobbySlotCoordinator, x: number, y: number): number | nil
+---@field OnSlotDragMove fun(self: UICustomLobbySlotCoordinator, source: number, x: number, y: number)
+---@field OnSlotDrop fun(self: UICustomLobbySlotCoordinator, source: number, x: number, y: number)
+---@field OnSlotDragEnd fun(self: UICustomLobbySlotCoordinator)
+
 ---@class UICustomLobbySlotInterface : Group
 ---@field Trash TrashBag
 ---@field SlotIndex number
+---@field Coordinator UICustomLobbySlotCoordinator
 ---@field Background Bitmap
+---@field DropHighlight Bitmap
 ---@field ClickArea Bitmap
 ---@field CpuHover Bitmap
 ---@field SlotNumber Text
@@ -165,16 +181,24 @@ local CustomLobbySlotInterface = Class(Group) {
     ---@param self UICustomLobbySlotInterface
     ---@param parent Control
     ---@param slotIndex number
-    __init = function(self, parent, slotIndex)
+    ---@param coordinator UICustomLobbySlotCoordinator
+    __init = function(self, parent, slotIndex, coordinator)
         Group.__init(self, parent, "CustomLobbySlot" .. tostring(slotIndex))
 
         self.Trash = TrashBag()
         self.SlotIndex = slotIndex
+        self.Coordinator = coordinator
         self.CurrentPlayer = false
 
         self.Background = Bitmap(self)
         self.Background:SetSolidColor('22ffffff')
         self.Background:DisableHitTest()
+
+        -- drop-target highlight during a drag (sits above the background, below text)
+        self.DropHighlight = Bitmap(self)
+        self.DropHighlight:SetSolidColor('ffffffff')
+        self.DropHighlight:SetAlpha(0.0)
+        self.DropHighlight:DisableHitTest()
 
         self.SlotNumber = UIUtil.CreateText(self, tostring(slotIndex), 14, UIUtil.bodyFont)
         self.ColorSwatch = Bitmap(self)
@@ -197,7 +221,7 @@ local CustomLobbySlotInterface = Class(Group) {
         self.ClickArea:SetSolidColor('00000000')
         self.ClickArea.HandleEvent = function(control, event)
             if event.Type == 'ButtonPress' then
-                self:OnClicked()
+                self:OnRowPress(event)
                 return true
             end
             return false
@@ -214,7 +238,7 @@ local CustomLobbySlotInterface = Class(Group) {
                 CustomLobbyPerformancePopover.Hide()
                 return true
             elseif event.Type == 'ButtonPress' then
-                self:OnClicked()
+                self:OnRowPress(event)
                 return true
             end
             return false
@@ -239,6 +263,7 @@ local CustomLobbySlotInterface = Class(Group) {
     ---@param parent Control
     __post_init = function(self, parent)
         Layouter(self.Background):Fill(self):End()
+        Layouter(self.DropHighlight):Fill(self):End()
         Layouter(self.ClickArea):Fill(self):Over(self, 10):End()
         Layouter(self.CpuHover):Fill(self.Cpu):Over(self, 20):End()
 
@@ -344,6 +369,66 @@ local CustomLobbySlotInterface = Class(Group) {
         CustomLobbyPerformancePopover.Show(self.Cpu, benchmark, RecommendedUnitCap())
     end,
 
+    --- A press on the row: if the coordinator allows dragging this slot (host, holding
+    --- a player) start a drag-to-swap; otherwise it's a plain click.
+    ---@param self UICustomLobbySlotInterface
+    ---@param event KeyEvent
+    OnRowPress = function(self, event)
+        if self.Coordinator and self.Coordinator:CanDrag(self.SlotIndex) then
+            self:BeginDrag(event)
+        else
+            self:OnClicked()
+        end
+    end,
+
+    --- Starts a drag from this row. The press only becomes a drag once the cursor
+    --- travels past DragThreshold — under it, the release is treated as a click, so
+    --- take/ready still work. Movement + drop are routed to the coordinator (it owns
+    --- the hit-test across rows); a drop resolves to RequestSwapSlots.
+    ---@param self UICustomLobbySlotInterface
+    ---@param event KeyEvent
+    BeginDrag = function(self, event)
+        -- the press may have started on the CPU hover zone; the captured mouse won't
+        -- fire MouseExit, so dismiss the popover up front
+        CustomLobbyPerformancePopover.Hide()
+
+        local startX, startY = event.MouseX, event.MouseY
+        local moved = false
+        local source = self.SlotIndex
+        local coordinator = self.Coordinator
+
+        local drag = Dragger()
+        drag.OnMove = function(dragSelf, x, y)
+            if not moved and (math.abs(x - startX) > DragThreshold or math.abs(y - startY) > DragThreshold) then
+                moved = true
+            end
+            if moved then
+                coordinator:OnSlotDragMove(source, x, y)
+            end
+        end
+        drag.OnRelease = function(dragSelf, x, y)
+            if moved then
+                coordinator:OnSlotDrop(source, x, y)
+                coordinator:OnSlotDragEnd()
+            else
+                self:OnClicked()
+            end
+            drag:Destroy()
+        end
+        drag.OnCancel = function(dragSelf)
+            coordinator:OnSlotDragEnd()
+            drag:Destroy()
+        end
+        PostDragger(self:GetRootFrame(), event.KeyCode, drag)
+    end,
+
+    --- Toggles the drop-target highlight (called by the coordinator during a drag).
+    ---@param self UICustomLobbySlotInterface
+    ---@param on boolean
+    SetDropHighlight = function(self, on)
+        self.DropHighlight:SetAlpha(on and 0.15 or 0.0)
+    end,
+
     --- Click on the row (a controller intent — the host applies and broadcasts it):
     --- an open slot is taken by the local player; your own slot toggles ready.
     ---@param self UICustomLobbySlotInterface
@@ -366,7 +451,8 @@ local CustomLobbySlotInterface = Class(Group) {
 
 ---@param parent Control
 ---@param slotIndex number
+---@param coordinator UICustomLobbySlotCoordinator
 ---@return UICustomLobbySlotInterface
-Create = function(parent, slotIndex)
-    return CustomLobbySlotInterface(parent, slotIndex)
+Create = function(parent, slotIndex, coordinator)
+    return CustomLobbySlotInterface(parent, slotIndex, coordinator)
 end

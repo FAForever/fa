@@ -33,6 +33,7 @@ local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local CustomLobbyAuthoritativeModel = import("/lua/ui/lobby/customlobby/customlobbyauthoritativemodel.lua")
+local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 local CustomLobbySlotInterface = import("/lua/ui/lobby/customlobby/customlobbyslotinterface.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
@@ -42,7 +43,7 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 local SlotHeight = 24
 local PanelWidth = 520
 
----@class UICustomLobbyInterface : Group
+---@class UICustomLobbyInterface : Group, UICustomLobbySlotCoordinator
 ---@field Trash TrashBag
 ---@field Background Bitmap
 ---@field Title Text
@@ -50,6 +51,8 @@ local PanelWidth = 520
 ---@field Slots UICustomLobbySlotInterface[]
 ---@field LeaveButton Button
 ---@field SlotCountObserver LazyVar
+---@field HighlightedSlot number | false   # slot currently shown as a drop target
+---@field DragGhost Group | false          # floating label following the cursor mid-drag
 local CustomLobbyInterface = Class(Group) {
 
     ---@param self UICustomLobbyInterface
@@ -58,6 +61,8 @@ local CustomLobbyInterface = Class(Group) {
         Group.__init(self, parent, "CustomLobbyInterface")
 
         self.Trash = TrashBag()
+        self.HighlightedSlot = false
+        self.DragGhost = false
 
         self.Background = Bitmap(self)
         self.Background:SetSolidColor('ff0a0a0a')
@@ -70,7 +75,7 @@ local CustomLobbyInterface = Class(Group) {
         -- One row per possible slot; the SlotCount observer reveals the active ones.
         self.Slots = {}
         for slot = 1, CustomLobbyAuthoritativeModel.MaxSlots do
-            self.Slots[slot] = CustomLobbySlotInterface.Create(self.SlotsPanel, slot)
+            self.Slots[slot] = CustomLobbySlotInterface.Create(self.SlotsPanel, slot, self)
         end
 
         -- leaving disconnects + returns to the menu via the escape handler that
@@ -131,6 +136,123 @@ local CustomLobbyInterface = Class(Group) {
             end
         end
     end,
+
+    ---------------------------------------------------------------------------
+    --#region Slot drag coordination (UICustomLobbySlotCoordinator)
+    --
+    -- The slot rows raise the gesture; this container owns it because it's the only
+    -- thing that knows every row's rect. The "what's grabbed / where" state here is
+    -- purely visual — a drop resolves to the RequestSwapSlots intent, host-authoritative.
+
+    --- Only the host can drag, and only a slot that holds a player (you grab a token).
+    ---@param self UICustomLobbyInterface
+    ---@param slot number
+    ---@return boolean
+    CanDrag = function(self, slot)
+        local model = CustomLobbyAuthoritativeModel.GetSingleton()
+        if not model.IsHost() then
+            return false
+        end
+        return model.Players[slot]() ~= false
+    end,
+
+    --- The active slot whose row contains the screen point, or nil.
+    ---@param self UICustomLobbyInterface
+    ---@param x number
+    ---@param y number
+    ---@return number | nil
+    SlotIndexAt = function(self, x, y)
+        local count = CustomLobbyAuthoritativeModel.GetSingleton().SlotCount()
+        for slot = 1, count do
+            local row = self.Slots[slot]
+            if row and x >= row.Left() and x <= row.Right() and y >= row.Top() and y <= row.Bottom() then
+                return slot
+            end
+        end
+        return nil
+    end,
+
+    --- Mid-drag: follow the cursor with the ghost and highlight the row under it.
+    ---@param self UICustomLobbyInterface
+    ---@param source number
+    ---@param x number
+    ---@param y number
+    OnSlotDragMove = function(self, source, x, y)
+        if not self.DragGhost then
+            self.DragGhost = self:CreateDragGhost(source)
+        end
+        self.DragGhost.Left:Set(x + LayoutHelpers.ScaleNumber(12))
+        self.DragGhost.Top:Set(y + LayoutHelpers.ScaleNumber(8))
+        self:HighlightSlot(self:SlotIndexAt(x, y))
+    end,
+
+    --- Drop: swap the source slot with whatever row the cursor is over (a move if it's
+    --- empty). Dropping outside any row is a no-op.
+    ---@param self UICustomLobbyInterface
+    ---@param source number
+    ---@param x number
+    ---@param y number
+    OnSlotDrop = function(self, source, x, y)
+        local target = self:SlotIndexAt(x, y)
+        if target and target ~= source then
+            CustomLobbyController.RequestSwapSlots(source, target)
+        end
+    end,
+
+    --- Clears the transient drag visuals.
+    ---@param self UICustomLobbyInterface
+    OnSlotDragEnd = function(self)
+        self:HighlightSlot(nil)
+        if self.DragGhost then
+            self.DragGhost:Destroy()
+            self.DragGhost = false
+        end
+    end,
+
+    --- Moves the drop-target highlight to `slot` (nil clears it).
+    ---@param self UICustomLobbyInterface
+    ---@param slot number | nil
+    HighlightSlot = function(self, slot)
+        slot = slot or false
+        if self.HighlightedSlot == slot then
+            return
+        end
+        if self.HighlightedSlot and self.Slots[self.HighlightedSlot] then
+            self.Slots[self.HighlightedSlot]:SetDropHighlight(false)
+        end
+        self.HighlightedSlot = slot
+        if slot and self.Slots[slot] then
+            self.Slots[slot]:SetDropHighlight(true)
+        end
+    end,
+
+    --- Builds the floating drag label (the grabbed player's name) on the interface so
+    --- it draws above the rows. Destroyed in OnSlotDragEnd.
+    ---@param self UICustomLobbyInterface
+    ---@param source number
+    ---@return Group
+    CreateDragGhost = function(self, source)
+        local player = CustomLobbyAuthoritativeModel.GetSingleton().Players[source]()
+        local name = (player and player.PlayerName) or ("Slot " .. tostring(source))
+
+        local ghost = Group(self, "CustomLobbyDragGhost")
+        ghost:DisableHitTest()
+
+        local bg = Bitmap(ghost)
+        bg:SetSolidColor('cc101418')
+        bg:DisableHitTest()
+
+        local label = UIUtil.CreateText(ghost, name, 14, UIUtil.bodyFont)
+        label:DisableHitTest()
+
+        Layouter(label):AtLeftTopIn(ghost, 6, 3):End()
+        Layouter(bg):Fill(ghost):End()
+        ghost.Width:Set(function() return label.Width() + LayoutHelpers.ScaleNumber(12) end)
+        ghost.Height:Set(function() return label.Height() + LayoutHelpers.ScaleNumber(6) end)
+        return ghost
+    end,
+
+    --#endregion
 
     ---@param self UICustomLobbyInterface
     OnDestroy = function(self)
