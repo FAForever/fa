@@ -502,9 +502,26 @@ function RequestTakeSlot(slot)
     end
 end
 
+--- The number of start spots (max players) a scenario declares, or 0 when it can't be read.
+---@param scenarioFile FileName | false
+---@return number
+local function ScenarioSlotCount(scenarioFile)
+    if not scenarioFile then
+        return 0
+    end
+    local info = import("/lua/ui/maputil.lua").LoadScenario(scenarioFile)
+    local armies = info
+        and info.Configurations
+        and info.Configurations.standard
+        and info.Configurations.standard.teams
+        and info.Configurations.standard.teams[1]
+        and info.Configurations.standard.teams[1].armies
+    return armies and table.getsize(armies) or 0
+end
+
 --- The host picks the scenario (map). Host-only — backs the map-select dialog and a
---- `/map <name>` chat command. Sets the scenario in the launch model and broadcasts the
---- launch config; the map preview / unit-cap react to the new `ScenarioFile`.
+--- `/map <name>` chat command. Sets the scenario in the launch model, sizes the lobby room to the
+--- map's start spots, and broadcasts both; the map preview / unit-cap react to the new `ScenarioFile`.
 ---
 --- TODO (options slice): when the scenario changes, the game-options *schema* changes too
 --- (the map contributes its own options). Reconcile `GameOptions` here — drop values whose
@@ -522,6 +539,15 @@ function RequestSetScenario(scenarioFile)
     end
 
     CustomLobbyLaunchModel.SetScenario(CustomLobbyLaunchModel.GetSingleton(), scenarioFile)
+
+    -- size the lobby room to the map's start spots, so all of its slots show (capped at MaxSlots)
+    local count = ScenarioSlotCount(scenarioFile)
+    if count > 0 then
+        local session = CustomLobbySessionModel.GetSingleton()
+        session.SlotCount:Set(math.min(count, CustomLobbyLaunchModel.MaxSlots))
+        BroadcastSessionState(instance)
+    end
+
     BroadcastLaunchInfo(instance)
 end
 

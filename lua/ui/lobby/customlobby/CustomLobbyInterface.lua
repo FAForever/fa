@@ -30,17 +30,18 @@
 --
 --   ┌ TitleArea ─ title · TEAM SCORE · leave ─────────────────────────────┐
 --   │ SlotsArea (slots ONLY — up to 16, two columns)                       │
---   │                                                                      │
 --   ├──────────────────────────────┬───────────────────────────────────────┤
 --   │ BottomLeftArea (Chat /        │ BottomRightArea (Map / Mods / Options │
---   │   Observers — tabs)           │   / Restrictions — tabs) + launch     │
---   └──────────────────────────────┴───────────────────────────────────────┘
+--   │   Observers — tabs)           │   / Restrictions — tabs)              │
+--   ├──────────────────────────────┴───────────────────────────────────────┤
+--   │ ActionArea (status · … · launch) ─ full width                        │
+--   └──────────────────────────────────────────────────────────────────────┘
 --
--- The top is dedicated to the slot rows (we expect up to 16). The bottom splits in two tabbed
+-- The top is dedicated to the slot rows (we expect up to 16). The middle splits in two tabbed
 -- panels: the left is chat/observers (CustomLobbyTabs), the right is the config tab panel
--- (CustomLobbyConfigInterface — Map / Mods / Options / Restrictions) over a launch footer. The
--- accumulated team rating (CustomLobbyTeamScore) sits in the title, shown only for the binary
--- auto-team formations.
+-- (CustomLobbyConfigInterface — Map / Mods / Options / Restrictions). A full-width action bar at
+-- the bottom holds the global actions (status + launch, and the like). The accumulated team rating
+-- (CustomLobbyTeamScore) sits in the title, shown only for the binary auto-team formations.
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
@@ -65,7 +66,7 @@ local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
 -- flip to tint each layout area so the regions are visible while iterating
-local Debug = false
+local Debug = true
 
 -- the lobby content is designed for the 1024x768 floor; the root fills the frame (full-screen
 -- backdrop) but the content is centered and capped to this size, so it never stretches on a
@@ -75,10 +76,10 @@ local LobbyHeight = 768
 
 local Pad = 8
 local SlotHeight = 24
+local SlotsHeaderHeight = 24     -- the "Players" header + gap above the two slot columns
 local TitleHeight = 48
-local BottomHeight = 300         -- the bottom row of tabbed panels; the slots take the rest above
-local BottomRightWidth = 420     -- config (map/mods/options/restrictions); the chat/obs panel fills the rest
-local LaunchFooterHeight = 44    -- status + launch, under the config tabs
+local BottomRightWidth = 560     -- config (map/mods/options/restrictions); the chat/obs panel fills the rest
+local ActionHeight = 52          -- the full-width action bar at the very bottom (status + launch)
 
 --- Creates a layout area (an invisible Group with an optional debug tint).
 ---@param parent Control
@@ -112,9 +113,8 @@ end
 ---@field BottomLeftArea Group
 ---@field BottomLeftTabs UICustomLobbyTabs
 ---@field BottomRightArea Group
----@field ConfigArea Group
----@field Config UICustomLobbyConfigInterface
----@field LaunchFooter Group
+---@field Config UICustomLobbyTabs
+---@field ActionArea Group
 ---@field StatusLabel Text
 ---@field LaunchButton Button
 ---@field SlotCountObserver LazyVar
@@ -144,6 +144,7 @@ local CustomLobbyInterface = Class(Group) {
         self.SlotsArea = CreateArea(self.Content, "SlotsArea", 'ffcccc40')
         self.BottomLeftArea = CreateArea(self.Content, "BottomLeftArea", 'ff40cc60')
         self.BottomRightArea = CreateArea(self.Content, "BottomRightArea", 'ff4060cc')
+        self.ActionArea = CreateArea(self.Content, "ActionArea", 'ff808080')
         --#endregion
 
         --#region title bar (title · team score · leave)
@@ -189,16 +190,16 @@ local CustomLobbyInterface = Class(Group) {
         })
         --#endregion
 
-        --#region bottom-right: config tabs (map / mods / options / restrictions) + launch footer
-        self.ConfigArea = Group(self.BottomRightArea, "CustomLobbyConfigArea")
-        self.Config = CustomLobbyConfigInterface.Create(self.ConfigArea)
+        --#region bottom-right: config tabs (map / mods / options / restrictions)
+        self.Config = CustomLobbyConfigInterface.Create(self.BottomRightArea)
+        --#endregion
 
-        self.LaunchFooter = Group(self.BottomRightArea, "CustomLobbyLaunchFooter")
-        self.StatusLabel = UIUtil.CreateText(self.LaunchFooter, "", 13, UIUtil.bodyFont)
+        --#region action bar (full-width, bottom): status + launch and other global actions
+        self.StatusLabel = UIUtil.CreateText(self.ActionArea, "", 13, UIUtil.bodyFont)
         self.StatusLabel:SetColor('ff9aa0a8')
         self.StatusLabel:DisableHitTest()
 
-        self.LaunchButton = UIUtil.CreateButtonWithDropshadow(self.LaunchFooter, '/BUTTON/large/', "Launch")
+        self.LaunchButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/large/', "Launch")
         self.LaunchButton.OnClick = function(button, modifiers)
             -- launch flow isn't wired up yet
         end
@@ -234,21 +235,29 @@ local CustomLobbyInterface = Class(Group) {
         --#region areas
         Layouter(self.TitleArea):AtLeftIn(self.Content, Pad):AtRightIn(self.Content, Pad):AtTopIn(self.Content, Pad):Height(TitleHeight):End()
 
-        -- the bottom row of tabbed panels has a fixed height; the slots take everything above it.
-        -- the right (config) panel is a fixed width; the left (chat/observers) fills the rest
-        Layouter(self.BottomRightArea)
-            :AtRightIn(self.Content, Pad):Width(BottomRightWidth)
-            :AtBottomIn(self.Content, Pad):Height(BottomHeight)
-            :End()
-        Layouter(self.BottomLeftArea)
-            :AtLeftIn(self.Content, Pad):AtBottomIn(self.Content, Pad):Height(BottomHeight)
-            :End()
-        self.BottomLeftArea.Right:Set(function() return self.BottomRightArea.Left() - LayoutHelpers.ScaleNumber(Pad) end)
-
+        -- the slots region is sized to exactly fit its rows (two columns of MaxSlots/2 = 8); the
+        -- bottom row of tabbed panels then fills ALL the remaining vertical room below it
+        local slotRows = math.ceil(CustomLobbyLaunchModel.MaxSlots / 2)
         Layouter(self.SlotsArea)
             :AtLeftIn(self.Content, Pad):AtRightIn(self.Content, Pad)
-            :AnchorToBottom(self.TitleArea, Pad):AnchorToTop(self.BottomLeftArea, Pad)
+            :AnchorToBottom(self.TitleArea, Pad):Height(SlotsHeaderHeight + slotRows * SlotHeight)
             :End()
+
+        -- the action bar spans the full width at the very bottom; the two tabbed panels fill the
+        -- room between the slots and it. The right (config) panel is a fixed width; the left
+        -- (chat/observers) fills the rest
+        Layouter(self.ActionArea)
+            :AtLeftIn(self.Content, Pad):AtRightIn(self.Content, Pad):AtBottomIn(self.Content, Pad)
+            :Height(ActionHeight)
+            :End()
+        Layouter(self.BottomRightArea)
+            :AtRightIn(self.Content, Pad):Width(BottomRightWidth)
+            :AnchorToBottom(self.SlotsArea, Pad):AnchorToTop(self.ActionArea, Pad)
+            :End()
+        Layouter(self.BottomLeftArea)
+            :AtLeftIn(self.Content, Pad):AnchorToBottom(self.SlotsArea, Pad):AnchorToTop(self.ActionArea, Pad)
+            :End()
+        self.BottomLeftArea.Right:Set(function() return self.BottomRightArea.Left() - LayoutHelpers.ScaleNumber(Pad) end)
         --#endregion
 
         --#region title bar (title · team score · leave)
@@ -291,19 +300,13 @@ local CustomLobbyInterface = Class(Group) {
         Layouter(self.BottomLeftTabs):Fill(self.BottomLeftArea):End()
         --#endregion
 
-        --#region bottom-right: config tabs over a launch footer
-        Layouter(self.LaunchFooter)
-            :AtLeftIn(self.BottomRightArea):AtRightIn(self.BottomRightArea):AtBottomIn(self.BottomRightArea)
-            :Height(LaunchFooterHeight)
-            :End()
-        Layouter(self.ConfigArea)
-            :AtLeftIn(self.BottomRightArea):AtRightIn(self.BottomRightArea):AtTopIn(self.BottomRightArea)
-            :AnchorToTop(self.LaunchFooter, Pad)
-            :End()
-        Layouter(self.Config):Fill(self.ConfigArea):End()
+        --#region bottom-right: config tabs fill the panel
+        Layouter(self.Config):Fill(self.BottomRightArea):End()
+        --#endregion
 
-        Layouter(self.StatusLabel):AtLeftIn(self.LaunchFooter, 4):AtVerticalCenterIn(self.LaunchFooter):End()
-        Layouter(self.LaunchButton):AtRightIn(self.LaunchFooter):AtVerticalCenterIn(self.LaunchFooter):End()
+        --#region action bar: status on the left, launch on the right
+        Layouter(self.StatusLabel):AtLeftIn(self.ActionArea, 8):AtVerticalCenterIn(self.ActionArea):End()
+        Layouter(self.LaunchButton):AtRightIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea):End()
         --#endregion
 
         -- size-dependent children build their scrollbars / first render now that they're sized

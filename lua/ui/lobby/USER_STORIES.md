@@ -157,3 +157,7 @@ Roles: **Host**, **Player** (human in a slot), **Observer**, **Joining client**
 - ⬜ As a **player**, I want a large map preview (with terrain/resource masks), so that I can study the map closely.
 - ⬜ As a **host (skirmish)**, I want a save/load dialog, so that I can resume saved games.
 - ⬜ As a **host**, I want confirmation prompts for destructive actions (kick, reset options), so that I don't trigger them by mistake.
+
+## R. New requests
+
+- ⬜ As a **host**, I want the ability to lock players in-place when autobalance is applied so that players that want to play together stay in the same team.

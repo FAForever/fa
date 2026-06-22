@@ -72,7 +72,8 @@ local DialogHeight = 620
 local Pad = 12
 local ColumnGap = 30      -- whitespace separating the left column from the preview column
 local LeftWidth = 300
-local PreviewSize = 300
+local PreviewSize = 220   -- square; kept small enough that the title + sections + description fit
+                          -- under it in the preview column (DialogHeight) without overflowing
 local TitleHeight = 32
 local ActionHeight = 48
 local FilterHeight = 134

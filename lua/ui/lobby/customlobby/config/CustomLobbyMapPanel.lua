@@ -52,12 +52,15 @@ local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaun
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
 local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
 local CustomLobbyMapSelect = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapselect.lua")
+local CustomLobbyMapPreview = import("/lua/ui/lobby/customlobby/customlobbymappreview.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
 local ActionHeight = 40
 local IconSize = 14
+local PreviewMaxSize = 240           -- the square preview grows with the panel, capped to this
+local NameMaxChars = 28
 local LabelColor = 'ff8a909a'        -- the section labels (Author / Reclaim / Description)
 local ValueColor = 'ffc8ccd0'
 local MassIcon = "/game/build-ui/icon-mass_bmp.dds"
@@ -117,11 +120,38 @@ local function FormatAmount(amount)
     return string.format("%d", amount)
 end
 
+--- Truncates `text` to `maxChars`, appending "…" when it had to cut.
+---@param text string
+---@param maxChars number
+---@return string
+local function Truncate(text, maxChars)
+    text = text or ""
+    if string.len(text) > maxChars then
+        return string.sub(text, 1, maxChars - 1) .. "…"
+    end
+    return text
+end
+
+--- Number of start spots a scenario declares, or 0.
+---@param scenario UILobbyScenarioInfo
+---@return number
+local function ArmyCount(scenario)
+    local armies = scenario.Configurations
+        and scenario.Configurations.standard
+        and scenario.Configurations.standard.teams
+        and scenario.Configurations.standard.teams[1]
+        and scenario.Configurations.standard.teams[1].armies
+    return armies and table.getsize(armies) or 0
+end
+
 ---@class UICustomLobbyMapPanel : Group
 ---@field Trash TrashBag
 ---@field Ready boolean
 ---@field IsHost boolean
 ---@field CurrentUrl string | false
+---@field Preview UICustomLobbyMapPreview
+---@field Name Text
+---@field Info Text
 ---@field AuthorLabel Text
 ---@field AuthorValue Text
 ---@field ReclaimLabel Text
@@ -150,6 +180,15 @@ local CustomLobbyMapPanel = ClassUI(Group) {
         self.IsHost = false
         self.CurrentUrl = false
         self.DescriptionScrollbar = false
+
+        --#region map preview + name + size/players/version (preview left, the rest to its right)
+        self.Preview = CustomLobbyMapPreview.Create(self, { Bound = true })
+        self.Name = UIUtil.CreateText(self, "", 16, UIUtil.titleFont)
+        self.Name:DisableHitTest()
+        self.Info = UIUtil.CreateText(self, "", 13, UIUtil.bodyFont)
+        self.Info:SetColor('ff9aa0a8')
+        self.Info:DisableHitTest()
+        --#endregion
 
         --#region Author section
         self.AuthorLabel = self:CreateSectionLabel("Author")
@@ -230,6 +269,17 @@ local CustomLobbyMapPanel = ClassUI(Group) {
         Layouter(self.ChangeButton):AtRightIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea):End()
         Layouter(self.UrlButton):AtLeftIn(self.ActionArea, 6):AtVerticalCenterIn(self.ActionArea):End()
 
+        -- the preview is a square on the left, growing with the panel height but capped so it never
+        -- swallows the details column; the name, info and labelled sections stack to its right
+        Layouter(self.Preview):AtLeftIn(self, 6):AtTopIn(self, 6):End()
+        self.Preview.Height:Set(function()
+            local avail = self.ActionArea.Top() - self.Preview.Top() - LayoutHelpers.ScaleNumber(8)
+            return math.min(avail, LayoutHelpers.ScaleNumber(PreviewMaxSize))
+        end)
+        self.Preview.Width:Set(function() return self.Preview.Height() end)
+        Layouter(self.Name):AnchorToRight(self.Preview, 12):AtTopIn(self, 6):End()
+        Layouter(self.Info):AnchorToRight(self.Preview, 12):AnchorToBottom(self.Name, 4):End()
+
         -- the reclaim value row: amount + mass icon, amount + energy icon (fixed internal layout;
         -- the group's position is set by LayoutSections)
         LayoutHelpers.SetHeight(self.ReclaimValue, IconSize + 4)
@@ -240,8 +290,8 @@ local CustomLobbyMapPanel = ClassUI(Group) {
 
         -- the description's left/right are fixed here so its Width can be bound in Initialize
         -- (the TextArea reflows on the Width bind, which reads Left/Right); its top/bottom are set
-        -- dynamically by LayoutSections so empty sections above it collapse
-        Layouter(self.Description):AtLeftIn(self, 6):AtRightIn(self, 24):End()
+        -- dynamically by LayoutSections. Left = right of the preview, so it sits in the right column
+        Layouter(self.Description):AnchorToRight(self.Preview, 12):AtRightIn(self, 32):End()
     end,
 
     --- Builds a dim section label (Author / Reclaim / Description). Private.
@@ -265,6 +315,16 @@ local CustomLobbyMapPanel = ClassUI(Group) {
         self.DescriptionScrollbar = UIUtil.CreateVertScrollbarFor(self.Description)
         self:Refresh()
         self:ApplyHostVisibility()
+
+        -- the scrollbar's need depends on the reflowed line count vs the laid-out box height, and
+        -- neither is final until a frame after mount — Initialize can run pre-frame (the tab host
+        -- calls it synchronously). Re-check once settled so a fitting description doesn't keep a bar.
+        self.Trash:Add(ForkThread(function()
+            WaitFrames(1)
+            if not IsDestroyed(self) then
+                self:UpdateScrollbar()
+            end
+        end))
     end,
 
     --- Loads the current scenario's info and fills the labelled sections (author / reclaim /
@@ -278,6 +338,26 @@ local CustomLobbyMapPanel = ClassUI(Group) {
         -- `info` is a table when a readable scenario is selected, else false (no map) / nil
         local info = scenarioFile and CustomLobbyMapCatalog.LoadInfo(scenarioFile)
         local fields = type(info) == "table" and info or {}
+
+        -- header: name + the size · players · version line
+        if type(info) == "table" then
+            self.Name:SetText(Truncate(LOC(info.name) or "?", NameMaxChars))
+            local parts = {}
+            if info.size then
+                table.insert(parts, string.format("%dkm", math.floor(info.size[1] / 50)))
+            end
+            local players = ArmyCount(info)
+            if players > 0 then
+                table.insert(parts, players .. " players")
+            end
+            if info.map_version then
+                table.insert(parts, "v" .. tostring(info.map_version))
+            end
+            self.Info:SetText(table.concat(parts, "   ·   "))
+        else
+            self.Name:SetText(scenarioFile and "Unknown map" or "No map selected")
+            self.Info:SetText("")
+        end
 
         local author = fields.author
         local reclaim = fields.reclaim
@@ -311,21 +391,16 @@ local CustomLobbyMapPanel = ClassUI(Group) {
     ---@param hasAuthor boolean
     ---@param hasReclaim boolean
     LayoutSections = function(self, hasAuthor, hasReclaim)
-        local prev = false   -- the bottom of the last placed value (false = panel top)
+        -- everything lives in the column to the right of the preview, stacking below the info line
+        local prev = self.Info
 
         -- places a label + value pair under `prev`, or hides both
         local function place(label, value, visible)
             if visible then
                 label:Show()
                 value:Show()
-                local builder = Layouter(label):AtLeftIn(self, 6)
-                if prev then
-                    builder:AnchorToBottom(prev, 8)
-                else
-                    builder:AtTopIn(self, 8)
-                end
-                builder:End()
-                Layouter(value):AtLeftIn(self, 6):AnchorToBottom(label, 2):End()
+                Layouter(label):AnchorToRight(self.Preview, 12):AnchorToBottom(prev, 8):End()
+                Layouter(value):AnchorToRight(self.Preview, 12):AnchorToBottom(label, 2):End()
                 prev = value
             else
                 label:Hide()
@@ -336,16 +411,11 @@ local CustomLobbyMapPanel = ClassUI(Group) {
         place(self.AuthorLabel, self.AuthorValue, hasAuthor)
         place(self.ReclaimLabel, self.ReclaimValue, hasReclaim)
 
-        -- description always shows; its label sits under the last visible section
-        local builder = Layouter(self.DescriptionLabel):AtLeftIn(self, 6)
-        if prev then
-            builder:AnchorToBottom(prev, 8)
-        else
-            builder:AtTopIn(self, 8)
-        end
-        builder:End()
+        -- description always shows; its label sits under the last visible section, then it fills
+        -- the rest of the right column down to the action bar
+        Layouter(self.DescriptionLabel):AnchorToRight(self.Preview, 12):AnchorToBottom(prev, 8):End()
         Layouter(self.Description)
-            :AtLeftIn(self, 6):AtRightIn(self, 24)
+            :AnchorToRight(self.Preview, 12):AtRightIn(self, 32)
             :AnchorToBottom(self.DescriptionLabel, 4):AnchorToTop(self.ActionArea, 8)
             :End()
     end,
