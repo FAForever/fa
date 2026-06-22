@@ -96,6 +96,42 @@ the map-select dialog (searchable list + preview), which sets `ScenarioFile` thr
 - A `Derive` handler must read its own LazyVar (`function(xLazy) self:OnX(xLazy()) end`).
 - FAF is Lua 5.0 — no `%` operator; use `math.mod`.
 
+## The label/value detail format
+
+How we present a single entity's metadata (a map, a mod). Used by the in-lobby **Map tab**
+([config/CustomLobbyMapPanel.lua](config/CustomLobbyMapPanel.lua)), the **map-select dialog**
+([mapselect/CustomLobbyMapSelect.lua](mapselect/CustomLobbyMapSelect.lua)) and the **mod-select
+dialog** ([modselect/CustomLobbyModSelect.lua](modselect/CustomLobbyModSelect.lua)) — they read
+identically.
+
+**Shape (top → bottom):**
+
+- An optional **header** — the title (16–18pt `titleFont`) over a single **quick-facts line** of
+  the short, always-present facts joined by `"   ·   "` (`20km · 8 players · v3`; `v3 · Game mod`),
+  centred. The map dialog/tab put the preview here; the mod dialog puts the icon.
+- A stack of **labelled sections**, each a **dim label above its value**:
+  - **Label** — `UIUtil.CreateText(parent, text, 12, UIUtil.titleFont)`, colour `LabelColor` =
+    `'ff8a909a'`, hit-test off. Built by a local `CreateSectionLabel`.
+  - **Value** — 13pt `bodyFont` in `ValueColor` = `'ffc8ccd0'` for one-liners (author, reclaim), or
+    a `TextArea` (same `ValueColor`) for long text (description, dependencies).
+  - Examples: `Author` / `Description` / `Reclaim` (mass·energy icons) / `Dependencies` / `Details`.
+
+**Collapse + stacking.** A `LayoutSections` / `LayoutDetail` method stacks the *visible* sections
+top-to-bottom, anchoring each under the previous and **skipping (hiding) the ones the entity
+doesn't declare** so the rest floats up; the long text area (description / deps) fills the
+remaining space. Anchor the value's left/right statically in `__post_init` but set the *tops*
+in this method — and call it from the clear path too, so an empty open doesn't leave a control
+unanchored (→ circular dependency at render).
+
+**TextArea width** still follows the gotcha below: bind `Width` to the laid-out span in
+`Initialize` (post-mount), never `__post_init`.
+
+**On sharing.** Each consumer keeps its **own local copy** of these helpers (`CreateSectionLabel`,
+`LayoutSections`/`LayoutDetail`, `FormatAmount`, the `LabelColor`/`ValueColor` constants) rather
+than a shared component — a deliberate *drift-is-fine* call, so the three can diverge as each
+context needs. If they start drifting in ways that matter, that's the signal to extract a shared
+`CustomLobbyMapDetails`-style view.
+
 ## Layout / init gotchas (learned building the map-select dialog)
 
 These are the recurring footguns when writing a custom control here — all variations of

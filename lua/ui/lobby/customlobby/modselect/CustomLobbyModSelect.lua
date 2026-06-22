@@ -78,6 +78,10 @@ local ActionHeight = 120  -- two stacked rows: presets on top, OK / Cancel at th
 local FilterHeight = 120
 local StatsHeight = 22
 
+-- detail-panel label/value presentation (mirrors the map dialog / Map tab)
+local LabelColor = 'ff8a909a'        -- the section labels (Author / Description / …)
+local ValueColor = 'ffc8ccd0'
+
 local PrefsKey = "customlobby_modselect"
 
 -- Mod web pages we'll open in a browser (mods carry `url` / `github`). Matched against the URL's
@@ -220,10 +224,17 @@ end
 ---@field GithubButton Text
 ---@field CurrentUrl string | false
 ---@field CurrentGithub string | false
+---@field AuthorLabel Text
+---@field AuthorValue Text
+---@field DescriptionLabel Text
 ---@field Description TextArea
 ---@field DescriptionScrollbar Scrollbar | false
+---@field DepsLabel Text
 ---@field DepsText TextArea
 ---@field DepsScrollbar Scrollbar | false
+---@field DetailsLabel Text
+---@field DetailsText TextArea
+---@field DetailsScrollbar Scrollbar | false
 ---@field Note Text
 ---@field PresetLabel Text
 ---@field PresetCombo Combo
@@ -337,7 +348,7 @@ local CustomLobbyModSelect = ClassUI(Group) {
         self.DetailTitle = UIUtil.CreateText(self.PreviewArea, "", 18, UIUtil.titleFont)
         self.DetailTitle:DisableHitTest()
         self.DetailMeta = UIUtil.CreateText(self.PreviewArea, "", 13, UIUtil.bodyFont)
-        self.DetailMeta:SetColor('ffc8ccd0')
+        self.DetailMeta:SetColor(ValueColor)
         self.DetailMeta:DisableHitTest()
 
         self.CurrentUrl = false
@@ -347,13 +358,27 @@ local CustomLobbyModSelect = ClassUI(Group) {
         self.GithubButton = self:CreateLink("Source", "Open the mod's source repository in your browser.",
             function() return self.CurrentGithub end)
 
+        -- labelled detail sections below the header (Author / Description / Dependencies / Details),
+        -- mirroring the map dialog / Map tab — see CreateSectionLabel + LayoutDetail
+        self.AuthorLabel = self:CreateSectionLabel("Author")
+        self.AuthorValue = UIUtil.CreateText(self.PreviewArea, "", 13, UIUtil.bodyFont)
+        self.AuthorValue:SetColor(ValueColor)
+        self.AuthorValue:DisableHitTest()
+
+        self.DescriptionLabel = self:CreateSectionLabel("Description")
         self.Description = TextArea(self.PreviewArea, 200, 80)
         self.Description:SetFont(UIUtil.bodyFont, 12)
-        self.Description:SetColors('ffc8ccd0', "00000000", 'ffc8ccd0', "00000000")
+        self.Description:SetColors(ValueColor, "00000000", ValueColor, "00000000")
 
+        self.DepsLabel = self:CreateSectionLabel("Dependencies")
         self.DepsText = TextArea(self.PreviewArea, 200, 60)
         self.DepsText:SetFont(UIUtil.bodyFont, 12)
         self.DepsText:SetColors('ff9aa0a8', "00000000", 'ff9aa0a8', "00000000")
+
+        self.DetailsLabel = self:CreateSectionLabel("Details")
+        self.DetailsText = TextArea(self.PreviewArea, 200, 52)
+        self.DetailsText:SetFont(UIUtil.bodyFont, 12)
+        self.DetailsText:SetColors('ff9aa0a8', "00000000", 'ff9aa0a8', "00000000")
 
         self.Note = UIUtil.CreateText(self.PreviewArea, "", 12, UIUtil.bodyFont)
         self.Note:SetColor('ffd0a24c')
@@ -472,25 +497,33 @@ local CustomLobbyModSelect = ClassUI(Group) {
         --#endregion
 
         --#region detail panel
+        -- header: icon + title + quick-facts meta (version · type) + links
         Layouter(self.Icon):AtLeftIn(self.PreviewArea):AtTopIn(self.PreviewArea):Width(IconSize):Height(IconSize):End()
         Layouter(self.DetailTitle):AnchorToRight(self.Icon, 12):AtTopIn(self.PreviewArea, 2):End()
         Layouter(self.DetailMeta):AnchorToRight(self.Icon, 12):AnchorToBottom(self.DetailTitle, 6):End()
         Layouter(self.UrlButton):AnchorToRight(self.Icon, 12):AnchorToBottom(self.DetailMeta, 8):End()
         Layouter(self.GithubButton):AnchorToRight(self.UrlButton, 16):AtVerticalCenterIn(self.UrlButton):End()
 
-        Layouter(self.Description)
-            :AtLeftIn(self.PreviewArea):AtRightIn(self.PreviewArea, 32)
-            :AnchorToBottom(self.Icon, 14):Height(160)
-            :End()
-        self.DescriptionScrollbar = UIUtil.CreateVertScrollbarFor(self.Description)
-
         Layouter(self.Note):AtLeftIn(self.PreviewArea):AtBottomIn(self.PreviewArea):End()
 
-        -- dependency summary fills the gap between the description and the note line; scrolls if a
-        -- mod lists many requirements / conflicts
+        -- Details (copyright / uid / location): a fixed block pinned above the note
+        Layouter(self.DetailsText)
+            :AtLeftIn(self.PreviewArea, 6):AtRightIn(self.PreviewArea, 32)
+            :AnchorToTop(self.Note, 10):Height(52)
+            :End()
+        Layouter(self.DetailsLabel):AtLeftIn(self.PreviewArea, 6):AnchorToTop(self.DetailsText, 2):End()
+        self.DetailsScrollbar = UIUtil.CreateVertScrollbarFor(self.DetailsText)
+
+        -- Description: left/right + height fixed here (width is bound in Initialize); its top + the
+        -- Author section above it are placed by LayoutDetail so Author can collapse when absent
+        Layouter(self.Description):AtLeftIn(self.PreviewArea, 6):AtRightIn(self.PreviewArea, 32):Height(120):End()
+        self.DescriptionScrollbar = UIUtil.CreateVertScrollbarFor(self.Description)
+
+        -- Dependencies: fills the gap between the description and the details block; scrolls
+        Layouter(self.DepsLabel):AtLeftIn(self.PreviewArea, 6):AnchorToBottom(self.Description, 10):End()
         Layouter(self.DepsText)
-            :AtLeftIn(self.PreviewArea):AtRightIn(self.PreviewArea, 32)
-            :AnchorToBottom(self.Description, 12):AnchorToTop(self.Note, 8)
+            :AtLeftIn(self.PreviewArea, 6):AtRightIn(self.PreviewArea, 32)
+            :AnchorToBottom(self.DepsLabel, 4):AnchorToTop(self.DetailsLabel, 8)
             :End()
         self.DepsScrollbar = UIUtil.CreateVertScrollbarFor(self.DepsText)
         --#endregion
@@ -561,6 +594,40 @@ local CustomLobbyModSelect = ClassUI(Group) {
         return link
     end,
 
+    --- Builds a dim section label (Author / Description / Dependencies / Details). Private.
+    ---@param self UICustomLobbyModSelect
+    ---@param text string
+    ---@return Text
+    CreateSectionLabel = function(self, text)
+        local label = UIUtil.CreateText(self.PreviewArea, text, 12, UIUtil.titleFont)
+        label:SetColor(LabelColor)
+        label:DisableHitTest()
+        return label
+    end,
+
+    --- Places the Author section (collapsing it when the mod declares no author) and the
+    --- Description label/area below it — the rest of the stack (Dependencies, Details) is anchored
+    --- statically off the Description in __post_init.
+    ---@param self UICustomLobbyModSelect
+    ---@param hasAuthor boolean
+    LayoutDetail = function(self, hasAuthor)
+        if hasAuthor then
+            self.AuthorLabel:Show()
+            self.AuthorValue:Show()
+            Layouter(self.AuthorLabel):AtLeftIn(self.PreviewArea, 6):AnchorToBottom(self.Icon, 14):End()
+            Layouter(self.AuthorValue):AtLeftIn(self.PreviewArea, 6):AnchorToBottom(self.AuthorLabel, 2):End()
+            Layouter(self.DescriptionLabel):AtLeftIn(self.PreviewArea, 6):AnchorToBottom(self.AuthorValue, 8):End()
+        else
+            self.AuthorLabel:Hide()
+            self.AuthorValue:Hide()
+            Layouter(self.DescriptionLabel):AtLeftIn(self.PreviewArea, 6):AnchorToBottom(self.Icon, 14):End()
+        end
+        Layouter(self.Description)
+            :AtLeftIn(self.PreviewArea, 6):AtRightIn(self.PreviewArea, 32)
+            :AnchorToBottom(self.DescriptionLabel, 4):Height(120)
+            :End()
+    end,
+
     --- Builds the list pool + populates + wires the selection. Called by the opener after the
     --- dialog is mounted + centred by Popup (three-phase init, /lua/ui/CLAUDE.md § 1).
     ---@param self UICustomLobbyModSelect
@@ -573,6 +640,7 @@ local CustomLobbyModSelect = ClassUI(Group) {
         -- ReflowText, which reads the parent geometry, circular until we're mounted.
         self.Description.Width:Set(function() return self.Description.Right() - self.Description.Left() end)
         self.DepsText.Width:Set(function() return self.DepsText.Right() - self.DepsText.Left() end)
+        self.DetailsText.Width:Set(function() return self.DetailsText.Right() - self.DetailsText.Left() end)
 
         self.ModList:Initialize()
         self.ModList:SetCanToggle(function(mod)
@@ -718,8 +786,8 @@ local CustomLobbyModSelect = ClassUI(Group) {
         end
     end,
 
-    --- Fills the detail panel for `mod`: icon, title, author/version/type, links, description,
-    --- and the dependency summary.
+    --- Fills the detail panel for `mod` as labelled sections (Author / Description / Dependencies /
+    --- Details), plus the icon, title, quick-facts meta (version · type) and links.
     ---@param self UICustomLobbyModSelect
     ---@param mod UILobbyModInfo
     UpdateDetail = function(self, mod)
@@ -729,8 +797,8 @@ local CustomLobbyModSelect = ClassUI(Group) {
 
         self.DetailTitle:SetText(Truncate(mod.title or mod.name or "?", TitleMaxChars))
 
+        -- quick facts beside the icon (author moved to its own labelled section below)
         local parts = {}
-        table.insert(parts, "by " .. (mod.author or "UNKNOWN"))
         if mod.versionText ~= "" then
             table.insert(parts, mod.versionText)
         end
@@ -742,20 +810,28 @@ local CustomLobbyModSelect = ClassUI(Group) {
         self.CurrentGithub = IsAllowedUrl(mod.github) and mod.github or false
         if self.CurrentGithub then self.GithubButton:Show() else self.GithubButton:Hide() end
 
+        local author = mod.author
+        local hasAuthor = type(author) == "string" and author ~= ""
+        if hasAuthor then
+            self.AuthorValue:SetText(author)
+        end
+
+        self.DescriptionLabel:Show()
         self.Description:SetText(mod.description and LOC(mod.description) or "")
 
-        -- dependency summary, then the minor identity fields (uid / copyright / location)
+        -- Dependencies (requires / conflicts / missing) and Details (copyright / uid / location)
+        -- are now their own labelled sections
         local deps = self:DependencySummary(mod)
-        local info = self:ModInfoLines(mod)
-        if deps ~= "" and info ~= "" then
-            self.DepsText:SetText(deps .. "\n\n" .. info)
-        else
-            self.DepsText:SetText(deps ~= "" and deps or info)
-        end
+        self.DepsLabel:Show()
+        self.DepsText:SetText(deps ~= "" and deps or "None")
+        self.DetailsLabel:Show()
+        self.DetailsText:SetText(self:ModInfoLines(mod))
         self.Note:SetText("")
 
+        self:LayoutDetail(hasAuthor)
         UpdateTextAreaScrollbar(self.Description, self.DescriptionScrollbar)
         UpdateTextAreaScrollbar(self.DepsText, self.DepsScrollbar)
+        UpdateTextAreaScrollbar(self.DetailsText, self.DetailsScrollbar)
     end,
 
     --- The minor identity fields shown at the bottom of the detail block: copyright, uid, and the
@@ -796,14 +872,25 @@ local CustomLobbyModSelect = ClassUI(Group) {
         return table.concat(lines, "\n")
     end,
 
-    --- Clears the detail panel (no highlight / empty list).
+    --- Clears the detail panel (no highlight / empty list): blanks the values and hides the
+    --- section labels so no empty headings linger.
     ---@param self UICustomLobbyModSelect
     ClearDetail = function(self)
+        -- keep the stack anchored (Description's top lives in LayoutDetail) so an empty open
+        -- doesn't leave it unanchored → circular dependency at render
+        self:LayoutDetail(false)
         self.Icon:Hide()
         self.DetailTitle:SetText("")
         self.DetailMeta:SetText("")
+        self.AuthorLabel:Hide()
+        self.AuthorValue:SetText("")
+        self.AuthorValue:Hide()
+        self.DescriptionLabel:Hide()
         self.Description:SetText("")
+        self.DepsLabel:Hide()
         self.DepsText:SetText("")
+        self.DetailsLabel:Hide()
+        self.DetailsText:SetText("")
         self.Note:SetText("")
         self.CurrentUrl = false
         self.CurrentGithub = false
@@ -811,6 +898,7 @@ local CustomLobbyModSelect = ClassUI(Group) {
         self.GithubButton:Hide()
         UpdateTextAreaScrollbar(self.Description, self.DescriptionScrollbar)
         UpdateTextAreaScrollbar(self.DepsText, self.DepsScrollbar)
+        UpdateTextAreaScrollbar(self.DetailsText, self.DetailsScrollbar)
     end,
 
     --- Updates the footer: "X of Y mods" + the selected breakdown ("G game · U UI"), so the host

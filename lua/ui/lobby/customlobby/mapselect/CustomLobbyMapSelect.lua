@@ -78,6 +78,13 @@ local ActionHeight = 48
 local FilterHeight = 134
 local StatsHeight = 22
 
+-- map-detail presentation (mirrors the in-lobby Map tab — see config/CustomLobbyMapPanel.lua)
+local IconSize = 14
+local LabelColor = 'ff8a909a'        -- the section labels (Author / Reclaim / Description)
+local ValueColor = 'ffc8ccd0'
+local MassIcon = "/game/build-ui/icon-mass_bmp.dds"
+local EnergyIcon = "/game/build-ui/icon-energy_bmp.dds"
+
 local PrefsKey = "customlobby_mapselect"
 
 -- Filter dropdowns. The first entry is the "no filter" option; `value` matches the scenario
@@ -180,6 +187,18 @@ local function ArmyCount(scenario)
     return armies and table.getsize(armies) or 0
 end
 
+--- Formats a resource amount compactly: 1016424 -> "1.0M", 119858 -> "120k", 950 -> "950".
+---@param amount number
+---@return string
+local function FormatAmount(amount)
+    if amount >= 1000000 then
+        return string.format("%.1fM", amount / 1000000)
+    elseif amount >= 1000 then
+        return string.format("%.0fk", amount / 1000)
+    end
+    return string.format("%d", amount)
+end
+
 --- Applies a comparison operator. A nil/false target means "no filter" → always passes.
 ---@param value number
 ---@param op string
@@ -258,12 +277,20 @@ end
 ---@field WrecksToggle Checkbox
 ---@field Preview UICustomLobbyMapPreview
 ---@field Surface UICustomLobbyScenarioPreview
----@field PreviewTitleBar Bitmap
 ---@field PreviewTitle Text
 ---@field InfoMeta Text
----@field Warning Text
+---@field AuthorLabel Text
+---@field AuthorValue Text
+---@field ReclaimLabel Text
+---@field ReclaimValue Group
+---@field ReclaimMass Text
+---@field ReclaimMassIcon Bitmap
+---@field ReclaimEnergy Text
+---@field ReclaimEnergyIcon Bitmap
+---@field DescriptionLabel Text
 ---@field Description TextArea
 ---@field DescriptionScrollbar Scrollbar | false
+---@field Warning Text
 ---@field UrlButton Text
 ---@field CurrentUrl string | false
 ---@field RandomButton Button
@@ -400,15 +427,54 @@ local CustomLobbyMapSelect = ClassUI(Group) {
             function(checked) self.Surface:SetOverlayVisible('wrecks', checked) end,
             "Wrecks", "Show prebuilt wreckage (if the map defines any).")
 
-        self.PreviewTitleBar = Bitmap(self.PreviewArea)
-        self.PreviewTitleBar:SetSolidColor('aa0a0e12')
-        self.PreviewTitleBar:DisableHitTest()
+        -- map title + info line, centred below the preview (mirrors the in-lobby Map header)
         self.PreviewTitle = UIUtil.CreateText(self.PreviewArea, "", 16, UIUtil.titleFont)
         self.PreviewTitle:DisableHitTest()
+        self.InfoMeta = UIUtil.CreateText(self.PreviewArea, "", 13, UIUtil.bodyFont)
+        self.InfoMeta:SetColor('ff9aa0a8')
+        self.InfoMeta:DisableHitTest()
 
-        -- clickable "open page" link in the title bar; shown only when the map has an allowed url
+        -- labelled detail sections below, exactly as the Map tab (config/CustomLobbyMapPanel.lua):
+        --#region Author section
+        self.AuthorLabel = self:CreateSectionLabel("Author")
+        self.AuthorValue = UIUtil.CreateText(self.PreviewArea, "", 13, UIUtil.bodyFont)
+        self.AuthorValue:SetColor(ValueColor)
+        self.AuthorValue:DisableHitTest()
+        --#endregion
+
+        --#region Reclaim section (amount + mass icon, amount + energy icon)
+        self.ReclaimLabel = self:CreateSectionLabel("Reclaim")
+        self.ReclaimValue = Group(self.PreviewArea, "CustomLobbyMapSelectReclaim")
+        self.ReclaimValue:DisableHitTest()
+        self.ReclaimMass = UIUtil.CreateText(self.ReclaimValue, "", 13, UIUtil.bodyFont)
+        self.ReclaimMass:SetColor(ValueColor)
+        self.ReclaimMass:DisableHitTest()
+        self.ReclaimMassIcon = Bitmap(self.ReclaimValue)
+        self.ReclaimMassIcon:SetTexture(UIUtil.UIFile(MassIcon))
+        self.ReclaimMassIcon:DisableHitTest()
+        self.ReclaimEnergy = UIUtil.CreateText(self.ReclaimValue, "", 13, UIUtil.bodyFont)
+        self.ReclaimEnergy:SetColor(ValueColor)
+        self.ReclaimEnergy:DisableHitTest()
+        self.ReclaimEnergyIcon = Bitmap(self.ReclaimValue)
+        self.ReclaimEnergyIcon:SetTexture(UIUtil.UIFile(EnergyIcon))
+        self.ReclaimEnergyIcon:DisableHitTest()
+        --#endregion
+
+        --#region Description section
+        self.DescriptionLabel = self:CreateSectionLabel("Description")
+        self.Description = TextArea(self.PreviewArea, 200, 80)
+        self.Description:SetFont(UIUtil.bodyFont, 12)
+        self.Description:SetColors(ValueColor, "00000000", ValueColor, "00000000")
+        --#endregion
+
+        -- file-health warning (dialog-only); pinned to the bottom of the preview column
+        self.Warning = UIUtil.CreateText(self.PreviewArea, "", 13, UIUtil.bodyFont)
+        self.Warning:SetColor('ffff6b6b')
+        self.Warning:DisableHitTest()
+
+        -- "Open page" link → opens an allowed map url; secondary action, bottom-left (like the tab)
         self.CurrentUrl = false
-        self.UrlButton = UIUtil.CreateText(self.PreviewArea, "Open page", 12, UIUtil.bodyFont)
+        self.UrlButton = UIUtil.CreateText(self.ActionArea, "Open page", 12, UIUtil.bodyFont)
         self.UrlButton:SetColor('ff7fb3ff')
         self.UrlButton:Hide()
         self.UrlButton.HandleEvent = function(control, event)
@@ -427,16 +493,6 @@ local CustomLobbyMapSelect = ClassUI(Group) {
             return false
         end
         Tooltip.AddControlTooltipManual(self.UrlButton, "Map page", "Open the map's web page in your browser.")
-
-        self.InfoMeta = UIUtil.CreateText(self.PreviewArea, "", 13, UIUtil.bodyFont)
-        self.InfoMeta:SetColor('ffc8ccd0')
-        self.Warning = UIUtil.CreateText(self.PreviewArea, "", 13, UIUtil.bodyFont)
-        self.Warning:SetColor('ffff6b6b')
-
-        self.Description = TextArea(self.PreviewArea, 200, 80)
-        self.Description:SetFont(UIUtil.bodyFont, 12)
-        self.Description:SetColors('ff8a909a', "00000000", 'ff8a909a', "00000000")
-        self.Description:SetTextAlignment(0.5)   -- centre each line, matching the info above
         --#endregion
 
         --#region actions
@@ -545,26 +601,25 @@ local CustomLobbyMapSelect = ClassUI(Group) {
             :Width(PreviewSize):Height(PreviewSize)
             :End()
 
-        -- map name overlaid across the top of the preview
-        Layouter(self.PreviewTitleBar):AtLeftIn(self.Surface):AtRightIn(self.Surface):AtTopIn(self.Surface):Height(26):End()
-        self.PreviewTitleBar.Depth:Set(function() return self.Surface.Depth() + 20 end)
-        Layouter(self.PreviewTitle):AtHorizontalCenterIn(self.Surface):AtVerticalCenterIn(self.PreviewTitleBar):End()
-        self.PreviewTitle.Depth:Set(function() return self.PreviewTitleBar.Depth() + 1 end)
+        -- title + info line, centred under the preview (the labelled sections below are placed
+        -- dynamically by LayoutSections so empty ones collapse)
+        Layouter(self.PreviewTitle):AtHorizontalCenterIn(self.PreviewArea):AnchorToBottom(self.Preview, 8):End()
+        Layouter(self.InfoMeta):AtHorizontalCenterIn(self.PreviewArea):AnchorToBottom(self.PreviewTitle, 2):End()
 
-        -- url link on the right of the title bar (shown only when the map has an allowed url)
-        Layouter(self.UrlButton):AtRightIn(self.Surface, 8):AtVerticalCenterIn(self.PreviewTitleBar):End()
-        self.UrlButton.Depth:Set(function() return self.PreviewTitleBar.Depth() + 2 end)
+        -- the reclaim value row: amount + mass icon, amount + energy icon (fixed internal layout;
+        -- the group's position is set by LayoutSections)
+        LayoutHelpers.SetHeight(self.ReclaimValue, IconSize + 4)
+        Layouter(self.ReclaimMass):AtLeftIn(self.ReclaimValue):AtVerticalCenterIn(self.ReclaimValue):End()
+        Layouter(self.ReclaimMassIcon):AnchorToRight(self.ReclaimMass, 3):AtVerticalCenterIn(self.ReclaimValue):Width(IconSize):Height(IconSize):End()
+        Layouter(self.ReclaimEnergy):AnchorToRight(self.ReclaimMassIcon, 10):AtVerticalCenterIn(self.ReclaimValue):End()
+        Layouter(self.ReclaimEnergyIcon):AnchorToRight(self.ReclaimEnergy, 3):AtVerticalCenterIn(self.ReclaimValue):Width(IconSize):Height(IconSize):End()
 
-        -- info centred under the preview
-        Layouter(self.InfoMeta):AtHorizontalCenterIn(self.Surface):AnchorToBottom(self.Surface, 12):End()
-        Layouter(self.Warning):AtHorizontalCenterIn(self.Surface):AnchorToBottom(self.InfoMeta, 4):End()
+        -- file-health warning pinned to the bottom-left; the description floats above it
+        Layouter(self.Warning):AtLeftIn(self.PreviewArea, 6):AtBottomIn(self.PreviewArea):End()
 
-        -- description sits under the preview, exactly as wide as the map (so it reads as
-        -- centred, since the preview is centred in its column); scrolls when it overflows
-        Layouter(self.Description)
-            :AtLeftIn(self.Surface):AnchorToBottom(self.Warning, 10):AtBottomIn(self.PreviewArea)
-            :End()
-        self.Description.Right:Set(function() return self.Surface.Right() end)
+        -- the description's left/right are fixed here so its Width can be bound in Initialize (the
+        -- TextArea reflows on the Width bind, which reads Left/Right); top/bottom set by LayoutSections
+        Layouter(self.Description):AtLeftIn(self.PreviewArea, 6):AtRightIn(self.PreviewArea, 24):End()
         self.DescriptionScrollbar = UIUtil.CreateVertScrollbarFor(self.Description)
         --#endregion
 
@@ -573,6 +628,8 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         Layouter(self.SelectButton):AnchorToLeft(self.CancelButton, 12):AtVerticalCenterIn(self.ActionArea):End()
         -- Random: horizontally centred under the left area, vertically centred in the actions
         Layouter(self.RandomButton):AtHorizontalCenterIn(self.LeftArea):AtVerticalCenterIn(self.ActionArea):End()
+        -- "Open page" link: secondary action, bottom-left
+        Layouter(self.UrlButton):AtLeftIn(self.ActionArea, 6):AtVerticalCenterIn(self.ActionArea):End()
         --#endregion
 
         self.MapList:AcquireKeyboardFocus(true)
@@ -798,8 +855,52 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         end
     end,
 
-    --- Fills the title overlay + info line (size · players · version), the url link, and the
-    --- description.
+    --- Builds a dim section label (Author / Reclaim / Description). Private.
+    ---@param self UICustomLobbyMapSelect
+    ---@param text string
+    ---@return Text
+    CreateSectionLabel = function(self, text)
+        local label = UIUtil.CreateText(self.PreviewArea, text, 12, UIUtil.titleFont)
+        label:SetColor(LabelColor)
+        label:DisableHitTest()
+        return label
+    end,
+
+    --- Stacks the visible sections under the info line (collapsing absent ones) and floats the
+    --- description into the space above the warning. Mirrors the Map tab's LayoutSections.
+    ---@param self UICustomLobbyMapSelect
+    ---@param hasAuthor boolean
+    ---@param hasReclaim boolean
+    LayoutSections = function(self, hasAuthor, hasReclaim)
+        local prev = self.InfoMeta   -- the sections begin under the info line
+
+        -- places a label + value pair under `prev`, or hides both
+        local function place(label, value, visible)
+            if visible then
+                label:Show()
+                value:Show()
+                Layouter(label):AtLeftIn(self.PreviewArea, 6):AnchorToBottom(prev, 8):End()
+                Layouter(value):AtLeftIn(self.PreviewArea, 6):AnchorToBottom(label, 2):End()
+                prev = value
+            else
+                label:Hide()
+                value:Hide()
+            end
+        end
+
+        place(self.AuthorLabel, self.AuthorValue, hasAuthor)
+        place(self.ReclaimLabel, self.ReclaimValue, hasReclaim)
+
+        -- description always shows; its label sits under the last visible section
+        Layouter(self.DescriptionLabel):AtLeftIn(self.PreviewArea, 6):AnchorToBottom(prev, 8):End()
+        Layouter(self.Description)
+            :AtLeftIn(self.PreviewArea, 6):AtRightIn(self.PreviewArea, 24)
+            :AnchorToBottom(self.DescriptionLabel, 4):AnchorToTop(self.Warning, 8)
+            :End()
+    end,
+
+    --- Fills the title + info line (size · players · version), the labelled sections (author /
+    --- reclaim / description) and the url link — collapsing sections the map doesn't provide.
     ---@param self UICustomLobbyMapSelect
     ---@param scenario UILobbyScenarioInfo
     UpdateInfo = function(self, scenario)
@@ -807,8 +908,7 @@ local CustomLobbyMapSelect = ClassUI(Group) {
 
         local parts = {}
         if scenario.size then
-            table.insert(parts, string.format("%dkm x %dkm",
-                math.floor(scenario.size[1] / 50), math.floor(scenario.size[2] / 50)))
+            table.insert(parts, string.format("%dkm", math.floor(scenario.size[1] / 50)))
         end
         local players = ArmyCount(scenario)
         if players > 0 then
@@ -819,6 +919,19 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         end
         self.InfoMeta:SetText(table.concat(parts, "   ·   "))
 
+        local author = scenario.author
+        local reclaim = scenario.reclaim
+        local hasAuthor = type(author) == "string" and author ~= ""
+        local hasReclaim = type(reclaim) == "table" and reclaim[1] ~= nil and reclaim[2] ~= nil
+        if hasAuthor then
+            self.AuthorValue:SetText(author)
+        end
+        if hasReclaim then
+            self.ReclaimMass:SetText(FormatAmount(reclaim[1]))
+            self.ReclaimEnergy:SetText(FormatAmount(reclaim[2]))
+        end
+        self.Description:SetText(scenario.description and LOC(scenario.description) or "")
+
         -- some scenarios carry a `url` to their source/page; offer to open allowed ones
         if scenario.url and IsAllowedUrl(scenario.url) then
             self.CurrentUrl = scenario.url
@@ -828,7 +941,7 @@ local CustomLobbyMapSelect = ClassUI(Group) {
             self.UrlButton:Hide()
         end
 
-        self.Description:SetText(scenario.description and LOC(scenario.description) or "")
+        self:LayoutSections(hasAuthor, hasReclaim)
         UpdateTextAreaScrollbar(self.Description, self.DescriptionScrollbar)
     end,
 
@@ -843,6 +956,7 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         self.Description:SetText("")
         self.CurrentUrl = false
         self.UrlButton:Hide()
+        self:LayoutSections(false, false)
         UpdateTextAreaScrollbar(self.Description, self.DescriptionScrollbar)
     end,
 
