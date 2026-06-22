@@ -106,6 +106,25 @@ CustomLobbyMessages = {
         end,
     },
 
+    -- The host tells everyone still connected to drop their direct link to a peer
+    -- that left, so the mesh is cleaned up (the player state follows via SetPlayers).
+    DisconnectPeer = {
+        ---@class UICustomLobbyDisconnectPeerMessage : UILobbyReceivedMessage
+        ---@field PeerID UILobbyPeerId
+
+        ---@param data UICustomLobbyDisconnectPeerMessage
+        Validate = function(lobby, data)
+            return data.PeerID ~= nil
+        end,
+        Accept = function(lobby, data)
+            return IsFromHost(lobby, data)
+        end,
+        ---@param data UICustomLobbyDisconnectPeerMessage
+        Handler = function(lobby, data)
+            CustomLobbyController.ProcessDisconnectPeer(lobby, data)
+        end,
+    },
+
     -- A client reports its in-game sim-performance history (the rich benchmark).
     ReportCpuBenchmark = {
         ---@class UICustomLobbyReportCpuBenchmarkMessage : UILobbyReceivedMessage

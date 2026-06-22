@@ -152,7 +152,10 @@ function OnConnectionFailed(instance, reason)
     LOG("CustomLobby: connection failed: " .. tostring(reason))
 end
 
---- Called when a peer disconnects. The host clears its slot and re-broadcasts.
+--- Called when a peer disconnects. Only the host acts: it clears the peer's slot,
+--- tells everyone still connected to drop their own link to that peer, and sends the
+--- new authoritative player snapshot. (A non-host ignores it — the host's broadcasts
+--- drive its state and mesh cleanup.)
 ---@param instance UICustomLobbyInstance
 ---@param peerName string
 ---@param uid UILobbyPeerId
@@ -161,11 +164,15 @@ function OnPeerDisconnected(instance, peerName, uid)
     if not model.IsHost() then
         return
     end
+
+    -- tell the remaining peers to tear down their direct connection to the leaver
+    instance:BroadcastData({ Type = 'DisconnectPeer', PeerID = uid })
+
     local slot = FindSlotForOwner(model, uid)
     if slot then
         CustomLobbyAuthoritativeModel.ClearPlayer(model, slot)
-        BroadcastPlayers(instance, model)
     end
+    BroadcastPlayers(instance, model)
 end
 
 --- Called when the game launches. Barebones: not wired yet.
@@ -221,6 +228,14 @@ function ProcessSetReady(instance, data)
         CustomLobbyAuthoritativeModel.SetPlayerField(model, slot, 'Ready', data.Ready and true or false)
         BroadcastPlayers(instance, model)
     end
+end
+
+--- A client drops its direct connection to a peer the host says has left. The slot
+--- itself is cleared by the SetPlayers snapshot the host sends alongside this.
+---@param instance UICustomLobbyInstance
+---@param data UICustomLobbyDisconnectPeerMessage
+function ProcessDisconnectPeer(instance, data)
+    instance:DisconnectFromPeer(data.PeerID)
 end
 
 --- Host records a peer's benchmark (sim-performance history) and re-broadcasts.

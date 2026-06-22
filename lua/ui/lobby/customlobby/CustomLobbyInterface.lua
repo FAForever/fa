@@ -28,6 +28,7 @@
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
@@ -47,6 +48,7 @@ local PanelWidth = 520
 ---@field Title Text
 ---@field SlotsPanel Group
 ---@field Slots UICustomLobbySlotInterface[]
+---@field LeaveButton Button
 ---@field SlotCountObserver LazyVar
 local CustomLobbyInterface = Class(Group) {
 
@@ -69,6 +71,13 @@ local CustomLobbyInterface = Class(Group) {
         self.Slots = {}
         for slot = 1, CustomLobbyAuthoritativeModel.MaxSlots do
             self.Slots[slot] = CustomLobbySlotInterface.Create(self.SlotsPanel, slot)
+        end
+
+        -- leaving disconnects + returns to the menu via the escape handler that
+        -- lobby.lua registered (one teardown definition, shared with the Esc key)
+        self.LeaveButton = UIUtil.CreateButtonStd(self, '/scx_menu/small-btn/small', "Leave", 16, 2)
+        self.LeaveButton.OnClick = function(button, modifiers)
+            EscapeHandler.HandleEsc(false)
         end
 
         local model = CustomLobbyAuthoritativeModel.GetSingleton()
@@ -106,6 +115,8 @@ local CustomLobbyInterface = Class(Group) {
             end
             builder:End()
         end
+
+        Layouter(self.LeaveButton):AtLeftIn(self, 40):AnchorToBottom(self.SlotsPanel, 24):End()
     end,
 
     --- Shows the active slots (1..count) and hides the rest.
