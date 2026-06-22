@@ -106,6 +106,25 @@ CustomLobbyMessages = {
         end,
     },
 
+    -- A client asks the host to move it into an open slot (also reachable via a
+    -- `/take <slot>` chat command). The host validates the seat and re-broadcasts.
+    TakeSlot = {
+        ---@class UICustomLobbyTakeSlotMessage : UILobbyReceivedMessage
+        ---@field Slot number
+
+        ---@param data UICustomLobbyTakeSlotMessage
+        Validate = function(lobby, data)
+            return type(data.Slot) == 'number'
+        end,
+        Accept = function(lobby, data)
+            return AmHost(lobby)
+        end,
+        ---@param data UICustomLobbyTakeSlotMessage
+        Handler = function(lobby, data)
+            CustomLobbyController.ProcessTakeSlot(lobby, data)
+        end,
+    },
+
     -- The host tells everyone still connected to drop their direct link to a peer
     -- that left, so the mesh is cleaned up (the player state follows via SetPlayers).
     DisconnectPeer = {

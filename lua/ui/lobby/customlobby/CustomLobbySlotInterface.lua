@@ -344,12 +344,13 @@ local CustomLobbySlotInterface = Class(Group) {
         CustomLobbyPerformancePopover.Show(self.Cpu, benchmark, RecommendedUnitCap())
     end,
 
-    --- Click on the row. For now, clicking your own slot toggles your ready flag
-    --- (a controller intent — the host applies and broadcasts it).
+    --- Click on the row (a controller intent — the host applies and broadcasts it):
+    --- an open slot is taken by the local player; your own slot toggles ready.
     ---@param self UICustomLobbySlotInterface
     OnClicked = function(self)
         local player = self.CurrentPlayer
         if not player then
+            CustomLobbyController.RequestTakeSlot(self.SlotIndex)
             return
         end
         if player.OwnerID == CustomLobbyAuthoritativeModel.GetSingleton().LocalPeerId() then

@@ -89,6 +89,82 @@ local function BroadcastPlayers(instance, model)
     instance:BroadcastData({ Type = 'SetPlayers', Players = GatherPlayers(model) })
 end
 
+--- Whether `slot` is a real, currently-open seat (in range, empty, not closed).
+---@param model UICustomLobbyAuthoritativeModel
+---@param slot any
+---@return boolean
+local function IsOpenSlot(model, slot)
+    if type(slot) ~= 'number' or slot < 1 or slot > model.SlotCount() then
+        return false
+    end
+    return not model.Players[slot]() and not model.ClosedSlots()[slot]
+end
+
+--- Host-side: moves the player owned by `ownerId` into an open `slot`, forcing it
+--- unready and keeping StartSpot mirrored to the seat. Broadcasts the new snapshot.
+--- A no-op (and harmless) if the move isn't valid — the host is the gate.
+---@param instance UICustomLobbyInstance
+---@param model UICustomLobbyAuthoritativeModel
+---@param ownerId UILobbyPeerId
+---@param slot number
+local function TakeSlot(instance, model, ownerId, slot)
+    if not IsOpenSlot(model, slot) then
+        return
+    end
+    local from = FindSlotForOwner(model, ownerId)
+    if not from or from == slot then
+        return
+    end
+
+    local player = table.copy(model.Players[from]())
+    player.StartSpot = slot
+    player.Ready = false                       -- moving seats resets readiness
+    CustomLobbyAuthoritativeModel.ClearPlayer(model, from)
+    CustomLobbyAuthoritativeModel.SetPlayer(model, slot, player)
+    BroadcastPlayers(instance, model)
+end
+
+--- Host-side: swaps the contents of two slots (players and/or empties), forcing any
+--- moved player unready and keeping StartSpot mirrored to the seat. Broadcasts.
+---@param instance UICustomLobbyInstance
+---@param model UICustomLobbyAuthoritativeModel
+---@param slotA number
+---@param slotB number
+local function SwapSlots(instance, model, slotA, slotB)
+    local count = model.SlotCount()
+    if type(slotA) ~= 'number' or type(slotB) ~= 'number' then
+        return
+    end
+    if slotA == slotB or slotA < 1 or slotA > count or slotB < 1 or slotB > count then
+        return
+    end
+
+    local a = model.Players[slotA]()
+    local b = model.Players[slotB]()
+    if a then
+        a = table.copy(a)
+        a.StartSpot = slotB
+        a.Ready = false
+    end
+    if b then
+        b = table.copy(b)
+        b.StartSpot = slotA
+        b.Ready = false
+    end
+
+    if b then
+        CustomLobbyAuthoritativeModel.SetPlayer(model, slotA, b)
+    else
+        CustomLobbyAuthoritativeModel.ClearPlayer(model, slotA)
+    end
+    if a then
+        CustomLobbyAuthoritativeModel.SetPlayer(model, slotB, a)
+    else
+        CustomLobbyAuthoritativeModel.ClearPlayer(model, slotB)
+    end
+    BroadcastPlayers(instance, model)
+end
+
 --- Builds the local player's options from the profile / engine name.
 ---@param instance UICustomLobbyInstance
 ---@return UICustomLobbyPlayer
@@ -230,6 +306,14 @@ function ProcessSetReady(instance, data)
     end
 end
 
+--- Host moves a requesting client into the open slot it asked for.
+---@param instance UICustomLobbyInstance
+---@param data UICustomLobbyTakeSlotMessage
+function ProcessTakeSlot(instance, data)
+    local model = CustomLobbyAuthoritativeModel.GetSingleton()
+    TakeSlot(instance, model, data.SenderID, data.Slot)
+end
+
 --- A client drops its direct connection to a peer the host says has left. The slot
 --- itself is cleared by the SetPlayers snapshot the host sends alongside this.
 ---@param instance UICustomLobbyInstance
@@ -305,7 +389,42 @@ end
 --#endregion
 
 -------------------------------------------------------------------------------
---#region Intents (called by the UI)
+--#region Intents (called by the UI or a chat command, e.g. `/take 2`, `/swap 2 3`)
+
+--- The local player takes an open slot. Host applies + broadcasts; a client asks the
+--- host. Backs both a click on an open slot and a `/take <slot>` chat command.
+---@param slot number
+function RequestTakeSlot(slot)
+    local instance = LobbyInstance
+    if not instance then
+        return
+    end
+
+    local model = CustomLobbyAuthoritativeModel.GetSingleton()
+    if model.IsHost() then
+        TakeSlot(instance, model, model.LocalPeerId(), slot)
+    else
+        instance:SendData(model.HostID(), { Type = 'TakeSlot', Slot = slot })
+    end
+end
+
+--- The host swaps the contents of two slots. Host-only (a client request isn't
+--- offered) — backs a host-side drag/menu and a `/swap <a> <b>` chat command.
+---@param slotA number
+---@param slotB number
+function RequestSwapSlots(slotA, slotB)
+    local instance = LobbyInstance
+    if not instance then
+        return
+    end
+
+    local model = CustomLobbyAuthoritativeModel.GetSingleton()
+    if not model.IsHost() then
+        WARN("CustomLobby: only the host can swap slots")
+        return
+    end
+    SwapSlots(instance, model, slotA, slotB)
+end
 
 --- The local player toggles their ready flag. Host applies + broadcasts; a client
 --- asks the host to.
