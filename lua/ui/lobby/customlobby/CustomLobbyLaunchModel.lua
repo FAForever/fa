@@ -161,6 +161,13 @@ function SetGameOption(model, key, value)
     model.GameOptions:Set(options)
 end
 
+--- Replaces the whole game-options value table (copy-then-Set).
+---@param model UICustomLobbyLaunchModel
+---@param options table
+function SetGameOptions(model, options)
+    model.GameOptions:Set(table.copy(options))
+end
+
 --- Sets the scenario file.
 ---@param model UICustomLobbyLaunchModel
 ---@param scenarioFile FileName | false

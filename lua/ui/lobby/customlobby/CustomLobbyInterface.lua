@@ -41,6 +41,7 @@ local CustomLobbyObserversInterface = import("/lua/ui/lobby/customlobby/customlo
 local CustomLobbyMapPreview = import("/lua/ui/lobby/customlobby/customlobbymappreview.lua")
 local CustomLobbyMapSelect = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapselect.lua")
 local CustomLobbyModSelect = import("/lua/ui/lobby/customlobby/modselect/customlobbymodselect.lua")
+local CustomLobbyOptionSelect = import("/lua/ui/lobby/customlobby/optionselect/customlobbyoptionselect.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
@@ -59,6 +60,7 @@ local PanelWidth = 520
 ---@field MapPreview UICustomLobbyMapPreview
 ---@field MapButton Button
 ---@field ModsButton Button
+---@field OptionsButton Button
 ---@field LeaveButton Button
 ---@field SlotCountObserver LazyVar
 ---@field IsHostObserver LazyVar
@@ -104,6 +106,13 @@ local CustomLobbyInterface = Class(Group) {
         self.ModsButton = UIUtil.CreateButtonStd(self, '/scx_menu/small-btn/small', "Mods", 16, 2)
         self.ModsButton.OnClick = function(button, modifiers)
             CustomLobbyModSelect.Open(GetFrame(0))
+        end
+
+        -- options are host-dictated + synced, so only the host edits them (button hidden for
+        -- others; the RequestSetGameOptions intent is host-gated regardless)
+        self.OptionsButton = UIUtil.CreateButtonStd(self, '/scx_menu/small-btn/small', "Options", 16, 2)
+        self.OptionsButton.OnClick = function(button, modifiers)
+            CustomLobbyOptionSelect.Open(GetFrame(0))
         end
 
         -- leaving disconnects + returns to the menu via the escape handler that
@@ -160,6 +169,12 @@ local CustomLobbyInterface = Class(Group) {
             :AtVerticalCenterIn(self.MapButton)
             :End()
 
+        -- options button beside mods (host-only; visibility set by OnIsHostChanged)
+        Layouter(self.OptionsButton)
+            :AnchorToRight(self.ModsButton, 8)
+            :AtVerticalCenterIn(self.ModsButton)
+            :End()
+
         -- stack the rows top-to-bottom inside the panel via sibling anchoring
         for slot = 1, CustomLobbyLaunchModel.MaxSlots do
             local row = self.Slots[slot]
@@ -194,14 +209,16 @@ local CustomLobbyInterface = Class(Group) {
         end
     end,
 
-    --- Shows the host-only controls (the map-change button) only to the host.
+    --- Shows the host-only controls (map-change + options buttons) only to the host.
     ---@param self UICustomLobbyInterface
     ---@param isHost boolean
     OnIsHostChanged = function(self, isHost)
         if isHost then
             self.MapButton:Show()
+            self.OptionsButton:Show()
         else
             self.MapButton:Hide()
+            self.OptionsButton:Hide()
         end
     end,
 

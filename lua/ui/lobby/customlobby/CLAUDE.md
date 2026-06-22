@@ -54,6 +54,7 @@ it get launched (becomes part of the game)?* See the `customlobby-model-choice` 
 | [CustomLobbyMapPreview.lua](CustomLobbyMapPreview.lua) / [CustomLobbyMapPreviewSpawn.lua](CustomLobbyMapPreviewSpawn.lua) | the in-lobby preview: a thin model-bound wrapper around `CustomLobbyScenarioPreview` (faction-icon spawns) + glow/brackets chrome. Subscribes to `ScenarioFile` (loads via the catalog, hands to the surface, show/hide) + each slot (refreshes the surface's spawn data, no reload). `CustomLobbyMapPreviewSpawn` is the faction spawn icon. |
 | [mapselect/](mapselect/CLAUDE.md) | the **map-select dialog** + its catalog and list, in their own folder (host-only `Popup`: searchable, filterable scenario list → `RequestSetScenario`). Self-contained sub-MVC; see [mapselect/CLAUDE.md](mapselect/CLAUDE.md) — including the **`MapPreview` texture-leak** writeup that shaped its design. |
 | [modselect/](modselect/CLAUDE.md) | the **mod-select dialog** + its catalog and list, built to the map-select shape (checkbox list + type filters + detail panel + **presets**). Returns a uid set; the opener routes it — sim mods → `RequestSetGameMods` (synced), UI mods → local prefs — or persists the lot standalone. Mod domain logic lives in [`/lua/ui/modutilities.lua`](/lua/ui/modutilities.lua) (the `maputil.lua` sibling, fronting `/lua/mods.lua`). See [modselect/CLAUDE.md](modselect/CLAUDE.md). |
+| [optionselect/](optionselect/CLAUDE.md) | the **options dialog**: three columns (lobby / scenario / mod options) over the selected scenario + mods, with search + hide-defaults filters; non-default options are marked. Derives the option *schema* per-peer (reference data) via [`/lua/ui/optionutil.lua`](/lua/ui/optionutil.lua); edits a working copy of the *values* and on OK routes the reconciled set through `RequestSetGameOptions` (synced via `GameOptions`). Host-only. See [optionselect/CLAUDE.md](optionselect/CLAUDE.md). |
 | [CustomLobbyInterface.lua](CustomLobbyInterface.lua) | composition root (one model subscription for SlotCount); lays out slot rows + the observer strip, and acts as the rows' drag coordinator (`UICustomLobbySlotCoordinator`: hit-test, drop-highlight, drag ghost → `RequestSwapSlots`); `OpenDebug()` / hot-reload. |
 | [/lua/ui/lobby/lobby.lua](../lobby.lua) | engine entry wrapper (`CreateLobby`/`HostGame`/`JoinGame`) → CustomLobby. Old lobby preserved at `lobby-old.lua`. |
 
@@ -75,16 +76,15 @@ the map-select dialog (searchable list + preview), which sets `ScenarioFile` thr
 
 ## Next slices (per TARGET_ARCHITECTURE.md)
 
-1. **Options panel** — the next slice. The legacy `dialogs/mapselect.lua` bundled game options
-   into the map dialog; we're splitting them out. Model the **option schema as a derivation** of
-   `ScenarioFile` + `GameMods` (static lobby options ∪ the map's `_options.lua` ∪ mod options —
-   computed per peer, *not* synced, like the map catalog), rendered against the synced
-   `GameOptions` *values*. When the scenario/mods change, the controller **reconciles** the values
-   (drop stale keys, seed new defaults) — see the `TODO` in `RequestSetScenario`. Merge rule:
-   start with map/mod options only *adding* keys (no overriding base lobby options).
-2. Remaining sub-dialogs (units, prefs) as mini-MVC, following the map-select shape. **Mods** is
-   done — see [modselect/](modselect/CLAUDE.md); it carries its own presets (replacing the legacy
-   per-mod "favorites"), so a separate presets dialog may not be needed.
+1. **Options panel** — done; see [optionselect/](optionselect/CLAUDE.md). The schema is derived
+   per-peer from `ScenarioFile` + `GameMods` (lobby ∪ scenario `_options.lua` ∪ mod options) via
+   [`/lua/ui/optionutil.lua`](/lua/ui/optionutil.lua); the dialog edits the synced `GameOptions`
+   *values* and reconciles on confirm (seed defaults, drop stale keys) → `RequestSetGameOptions`.
+   Still TODO: reconcile in the **controller** on scenario/mod change too (the `TODO` in
+   `RequestSetScenario`), so values stay sane even without opening the dialog.
+2. Remaining sub-dialogs (units, prefs) as mini-MVC, following the map-select shape. **Mods** and
+   **options** are done — see [modselect/](modselect/CLAUDE.md) (carries its own presets, replacing
+   the legacy per-mod "favorites") and [optionselect/](optionselect/CLAUDE.md).
 3. Make slot controls interactive (faction/colour/team → controller **intents**).
 4. Map-derived `SlotCount`; the GPGNet (`localPort == -1`) FAF-client path.
 

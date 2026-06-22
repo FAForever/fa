@@ -544,6 +544,25 @@ function RequestSetGameMods(gameMods)
     BroadcastLaunchInfo(instance)
 end
 
+--- The host sets the game options. Host-only — backs the options dialog. Replaces the whole
+--- `GameOptions` value table in the launch model and broadcasts so every peer sees the same
+--- options. The dialog already seeds defaults + drops stale keys, so this is the reconciled set.
+---@param options table
+function RequestSetGameOptions(options)
+    local instance = LobbyInstance
+    if not instance then
+        return
+    end
+
+    if not CustomLobbyLocalModel.GetSingleton().IsHost() then
+        WARN("CustomLobby: only the host can change the game options")
+        return
+    end
+
+    CustomLobbyLaunchModel.SetGameOptions(CustomLobbyLaunchModel.GetSingleton(), options)
+    BroadcastLaunchInfo(instance)
+end
+
 --- The host swaps the contents of two slots. Host-only (a client request isn't
 --- offered) — backs a host-side drag/menu and a `/swap <a> <b>` chat command.
 ---@param slotA number
