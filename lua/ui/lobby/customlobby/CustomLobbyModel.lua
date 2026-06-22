@@ -29,7 +29,7 @@ local Create = import("/lua/lazyvar.lua").Create
 
 --- Reactive connectivity-state singleton.
 ---@class UICustomLobbyModel
----@field CpuBenchmarks LazyVar<table<UILobbyPeerId, number>>   # peer id -> CPU score (lower is faster)
+---@field CpuBenchmarks LazyVar<table<UILobbyPeerId, UIPerformanceMetrics>>        # peer id -> in-game sim-performance history (see /lua/system/performance.lua)
 local ModelInstance = nil
 
 --- Allocates a fresh connectivity-model singleton, replacing any existing one.
@@ -52,14 +52,14 @@ function GetSingleton()
     return ModelInstance --[[@as UICustomLobbyModel]]
 end
 
---- Records (or clears) a peer's CPU benchmark (copy-then-Set).
+--- Records a peer's in-game sim-performance history / benchmark (copy-then-Set).
 ---@param model UICustomLobbyModel
 ---@param ownerId UILobbyPeerId
----@param score number
-function SetCpuBenchmark(model, ownerId, score)
-    local benchmarks = table.copy(model.CpuBenchmarks())
-    benchmarks[ownerId] = score
-    model.CpuBenchmarks:Set(benchmarks)
+---@param benchmark UIPerformanceMetrics
+function SetCpuBenchmark(model, ownerId, benchmark)
+    local all = table.copy(model.CpuBenchmarks())
+    all[ownerId] = benchmark
+    model.CpuBenchmarks:Set(all)
 end
 
 -------------------------------------------------------------------------------

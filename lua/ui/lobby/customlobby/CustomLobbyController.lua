@@ -120,7 +120,7 @@ function OnHosting(instance)
     player.ArmyColor = 1
     CustomLobbyAuthoritativeModel.SetPlayer(model, 1, player)
 
-    instance.Trash:Add(ForkThread(RunBenchmarkThread, instance))
+    instance.Trash:Add(ForkThread(ShareCpuBenchmarkThread, instance))
 end
 
 --- Called when our connection to the host succeeds.
@@ -142,7 +142,7 @@ function OnConnectionToHostEstablished(instance, localId, localName, hostId)
 
     instance:SendData(hostId, { Type = 'AddPlayer', PlayerOptions = player })
 
-    instance.Trash:Add(ForkThread(RunBenchmarkThread, instance))
+    instance.Trash:Add(ForkThread(ShareCpuBenchmarkThread, instance))
 end
 
 --- Called when the connection fails.
@@ -223,20 +223,19 @@ function ProcessSetReady(instance, data)
     end
 end
 
---- Host records a peer's CPU score and re-broadcasts the authoritative table.
+--- Host records a peer's benchmark (sim-performance history) and re-broadcasts.
 ---@param instance UICustomLobbyInstance
----@param data table
-function ProcessCpuBenchmark(instance, data)
-    CustomLobbyModel.SetCpuBenchmark(
-        CustomLobbyModel.GetSingleton(), data.SenderID, data.Benchmark)
+---@param data UICustomLobbyReportCpuBenchmarkMessage
+function ProcessReportCpuBenchmark(instance, data)
+    CustomLobbyModel.SetCpuBenchmark(CustomLobbyModel.GetSingleton(), data.SenderID, data.CpuBenchmark)
     BroadcastCpuBenchmarks(instance)
 end
 
---- Everyone applies the host's authoritative CPU-benchmark snapshot.
+--- Everyone applies the host's authoritative benchmark snapshot.
 ---@param instance UICustomLobbyInstance
----@param data table
+---@param data UICustomLobbySetCpuBenchmarksMessage
 function ProcessSetCpuBenchmarks(instance, data)
-    CustomLobbyModel.GetSingleton().CpuBenchmarks:Set(data.Benchmarks)
+    CustomLobbyModel.GetSingleton().CpuBenchmarks:Set(data.CpuBenchmarks)
 end
 
 --#endregion
@@ -244,89 +243,47 @@ end
 -------------------------------------------------------------------------------
 --#region CPU benchmark
 --
--- A faithful port of the legacy lobby's CPU stress test (lobby-old.lua). Each peer
--- runs it shortly after connecting; the host owns the table and broadcasts it.
--- The score is a busy-loop duration (lower = faster CPU); skews were no-ops, so
--- they're dropped.
+-- We share each peer's stored in-game sim-performance history (the engine's
+-- `PerformanceTrackingV2` preference, accumulated over past games) rather than
+-- running a live stress test. The host owns the table and broadcasts it; a client
+-- sends its own to the host, which reconciles everyone.
 
---- Host broadcasts the authoritative CPU-benchmark snapshot to everyone.
+--- Host broadcasts the authoritative benchmark snapshot to everyone.
 ---@param instance UICustomLobbyInstance
 function BroadcastCpuBenchmarks(instance)
     instance:BroadcastData({
         Type = 'SetCpuBenchmarks',
-        Benchmarks = CustomLobbyModel.GetSingleton().CpuBenchmarks(),
+        CpuBenchmarks = CustomLobbyModel.GetSingleton().CpuBenchmarks(),
     })
 end
 
---- Runs the busy-loop once and returns its `ceil(seconds * 100)` cost, or nil if
---- the lobby was torn down mid-run. Must run inside a forked thread (it yields).
+--- Shares the local machine's stored sim-performance benchmark: the host records +
+--- broadcasts it; a client sends it to the host. Forked so the brief defer doesn't
+--- block the connection callback.
 ---@param instance UICustomLobbyInstance
----@return number | nil
-local function RunOnce(instance)
-    local TableInsert = table.insert
-    local totalTime = 0
-    local countTime = 0
-    local lastTime, currTime, j, k, l, m
-    local n = {}
-    for h = 1, 24 do
-        if IsDestroyed(instance) then
-            return nil
-        end
-        lastTime = GetSystemTimeSeconds()
-        for i = 1.0, 30.4, 0.0008 do
-            j = i + i
-            k = i * i
-            l = k / j
-            m = j - i
-            j = math.pow(i, 4)
-            l = -i
-            m = { '1234567890', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', true }
-            TableInsert(m, '1234567890')
-            k = i < j
-            k = i == j
-            k = i <= j
-            k = not k
-            n[tostring(i)] = m
-        end
-        currTime = GetSystemTimeSeconds()
-        totalTime = totalTime + currTime - lastTime
-        if totalTime > countTime then
-            -- yield so the UI keeps ticking during the benchmark
-            countTime = totalTime + 0.125
-            coroutine.yield(1)
-        end
-    end
-    return math.ceil(totalTime * 100)
-end
-
---- Benchmarks the local CPU (best of three runs) and reports the score: the host
---- records + broadcasts it; a client sends it to the host.
----@param instance UICustomLobbyInstance
-function RunBenchmarkThread(instance)
-    -- defer briefly so connection negotiation isn't starved
+function ShareCpuBenchmarkThread(instance)
+    -- defer briefly so connection negotiation / seating settles first
     WaitSeconds(2.0)
+    if IsDestroyed(instance) then
+        return
+    end
 
-    local best
-    for run = 1, 3 do
-        local score = RunOnce(instance)
-        if not score or IsDestroyed(instance) then
-            return
-        end
-        if not best or score < best then
-            best = score
-        end
+    -- the machine's in-game sim-performance history (nil on a fresh install)
+    local benchmark = GetPreference('PerformanceTrackingV2')
+    if not benchmark then
+        return
     end
 
     local model = CustomLobbyAuthoritativeModel.GetSingleton()
     local connModel = CustomLobbyModel.GetSingleton()
 
-    -- show our own score immediately; the host's snapshot reconciles everyone
-    CustomLobbyModel.SetCpuBenchmark(connModel, model.LocalPeerId(), best)
+    -- show our own data immediately; the host's snapshots reconcile everyone
+    CustomLobbyModel.SetCpuBenchmark(connModel, model.LocalPeerId(), benchmark)
 
     if model.IsHost() then
         BroadcastCpuBenchmarks(instance)
     else
-        instance:SendData(model.HostID(), { Type = 'CPUBenchmark', Benchmark = best })
+        instance:SendData(model.HostID(), { Type = 'ReportCpuBenchmark', CpuBenchmark = benchmark })
     end
 end
 

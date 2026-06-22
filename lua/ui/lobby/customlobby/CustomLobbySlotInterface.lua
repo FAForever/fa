@@ -28,12 +28,14 @@
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local GameColors = import("/lua/gamecolors.lua").GameColors
+local Color = import("/lua/shared/color.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local CustomLobbyAuthoritativeModel = import("/lua/ui/lobby/customlobby/customlobbyauthoritativemodel.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 local CustomLobbyModel = import("/lua/ui/lobby/customlobby/customlobbymodel.lua")
+local CustomLobbyPerformancePopover = import("/lua/ui/lobby/customlobby/customlobbyperformancepopover.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
@@ -51,16 +53,108 @@ local function FactionLabel(faction)
     return "Random"
 end
 
+--- The recommended total-unit ceiling for the current map and player count: 250 /
+--- 375 / 500 units per seated player for 5x5 / 10x10 / 20x20-or-larger maps (the
+--- map's largest dimension in ogrids, 51.2 per km). Falls back to the largest tier
+--- when no map is set yet. Returns nil when there are no players to scale by.
+---@return number | nil
+local function RecommendedUnitCap()
+    local model = CustomLobbyAuthoritativeModel.GetSingleton()
+
+    local players = 0
+    for slot = 1, CustomLobbyAuthoritativeModel.MaxSlots do
+        if model.Players[slot]() then
+            players = players + 1
+        end
+    end
+    if players < 1 then
+        return nil
+    end
+
+    -- 500 (20x20+) until a map is known; refine from the scenario's dimensions
+    local perPlayer = 500
+    local scenarioFile = model.ScenarioFile()
+    if scenarioFile then
+        local scenarioInfo = import("/lua/ui/maputil.lua").LoadScenario(scenarioFile)
+        if scenarioInfo and scenarioInfo.size then
+            local maxDim = math.max(scenarioInfo.size[1] or 0, scenarioInfo.size[2] or 0)
+            if maxDim <= 256 then
+                perPlayer = 250        -- 5x5
+            elseif maxDim <= 512 then
+                perPlayer = 375        -- 10x10
+            else
+                perPlayer = 500        -- 20x20 or larger
+            end
+        end
+    end
+
+    return perPlayer * players
+end
+
+--- The sim-rate categories tracked in PerformanceTrackingV2, ordered for the
+--- "most-played" pick (matches the popover).
+local PerformanceCategories = { 'Skirmish', 'SkirmishWithAI', 'Campaign' }
+
+--- The bucket index for a sim rate (index k holds rate k - 11, so +0 -> 11, -4 -> 7).
+---@param rate number
+---@return number
+local function BucketForRate(rate)
+    return rate + 11
+end
+
+--- The most-played category in a benchmark, by sample count, or nil if none.
+---@param metrics UIPerformanceMetrics | nil
+---@return table | nil
+local function PickCategory(metrics)
+    if not metrics then
+        return nil
+    end
+    local best, bestSamples = nil, -1
+    for _, key in PerformanceCategories do
+        local c = metrics[key]
+        if c and (c.Samples or 0) > bestSamples then
+            bestSamples = c.Samples or 0
+            best = c
+        end
+    end
+    if not best or bestSamples <= 0 then
+        return nil
+    end
+    return best
+end
+
+--- Compact unit count for the slot label (e.g. 1421 -> "1.4k").
+---@param value number
+---@return string
+local function FormatUnits(value)
+    if value >= 1000 then
+        return string.format("%.1fk", value / 1000)
+    end
+    return tostring(math.floor(value + 0.5))
+end
+
+--- Indicator colour for how far the sim has to slow down to sustain the cap: green
+--- when +0 already suffices (step 0), fading to red at -4 or worse (step 4).
+---@param step number   # sim-rate steps below +0 needed to reach the cap (0..4)
+---@return Color
+local function StepColor(step)
+    local t = math.clamp(step / 4, 0.0, 1.0)
+    local hue = (1.0 - t) * 0.333   -- 0.333 turns = green, 0 = red
+    return Color.ColorHSV(hue, 1.0, 0.85, 1.0)
+end
+
 ---@class UICustomLobbySlotInterface : Group
 ---@field Trash TrashBag
 ---@field SlotIndex number
 ---@field Background Bitmap
 ---@field ClickArea Bitmap
+---@field CpuHover Bitmap
 ---@field SlotNumber Text
 ---@field ColorSwatch Bitmap
 ---@field Name Text
 ---@field Faction Text
 ---@field Cpu Text
+---@field CpuIndicator Bitmap
 ---@field Team Text
 ---@field Ready Text
 ---@field PlayerObserver LazyVar
@@ -88,6 +182,12 @@ local CustomLobbySlotInterface = Class(Group) {
         self.Name = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
         self.Faction = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
         self.Cpu = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
+        -- a small square left of the CPU label: green when the machine sustains the
+        -- recommended unit cap at full speed, fading to red the more the sim must slow
+        self.CpuIndicator = Bitmap(self)
+        self.CpuIndicator:SetSolidColor('ff7ad97a')
+        self.CpuIndicator:SetAlpha(0.0)
+        self.CpuIndicator:DisableHitTest()
         self.Team = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
         self.Ready = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
 
@@ -97,6 +197,23 @@ local CustomLobbySlotInterface = Class(Group) {
         self.ClickArea:SetSolidColor('00000000')
         self.ClickArea.HandleEvent = function(control, event)
             if event.Type == 'ButtonPress' then
+                self:OnClicked()
+                return true
+            end
+            return false
+        end
+
+        -- a hover zone over the CPU score; entering it pops the performance chart
+        self.CpuHover = Bitmap(self)
+        self.CpuHover:SetSolidColor('00000000')
+        self.CpuHover.HandleEvent = function(control, event)
+            if event.Type == 'MouseEnter' then
+                self:OnCpuHoverEnter()
+                return true
+            elseif event.Type == 'MouseExit' then
+                CustomLobbyPerformancePopover.Hide()
+                return true
+            elseif event.Type == 'ButtonPress' then
                 self:OnClicked()
                 return true
             end
@@ -123,6 +240,7 @@ local CustomLobbySlotInterface = Class(Group) {
     __post_init = function(self, parent)
         Layouter(self.Background):Fill(self):End()
         Layouter(self.ClickArea):Fill(self):Over(self, 10):End()
+        Layouter(self.CpuHover):Fill(self.Cpu):Over(self, 20):End()
 
         Layouter(self.SlotNumber):AtLeftIn(self, 6):AtVerticalCenterIn(self):End()
         Layouter(self.ColorSwatch):AnchorToRight(self.SlotNumber, 8):AtVerticalCenterIn(self):Width(14):Height(14):End()
@@ -130,7 +248,8 @@ local CustomLobbySlotInterface = Class(Group) {
         Layouter(self.Ready):AtRightIn(self, 8):AtVerticalCenterIn(self):End()
         Layouter(self.Team):AnchorToLeft(self.Ready, 12):AtVerticalCenterIn(self):End()
         Layouter(self.Cpu):AnchorToLeft(self.Team, 12):AtVerticalCenterIn(self):End()
-        Layouter(self.Faction):AnchorToLeft(self.Cpu, 12):AtVerticalCenterIn(self):End()
+        Layouter(self.CpuIndicator):AnchorToLeft(self.Cpu, 5):AtVerticalCenterIn(self):Width(8):Height(12):End()
+        Layouter(self.Faction):AnchorToLeft(self.CpuIndicator, 10):AtVerticalCenterIn(self):End()
     end,
 
     --- Renders the slot from its player (or the empty state).
@@ -162,17 +281,67 @@ local CustomLobbySlotInterface = Class(Group) {
         self.Ready:SetColor(player.Ready and 'ff7ad97a' or 'ff888888')
     end,
 
-    --- Updates the CPU-score text for this slot's player from the connectivity model.
+    --- Renders the CPU column from this slot player's shared sim-performance benchmark:
+    --- the label is the max units the machine handled at full speed (+0), and the square
+    --- is green if that already covers the recommended cap, fading to red the further the
+    --- sim has to slow down (down to -4) to reach it.
     ---@param self UICustomLobbySlotInterface
     RefreshCpu = function(self)
         local player = self.CurrentPlayer
         if not player then
             self.Cpu:SetText("")
+            self.CpuIndicator:SetAlpha(0.0)
             return
         end
-        local score = CustomLobbyModel.GetSingleton().CpuBenchmarks()[player.OwnerID]
-        self.Cpu:SetText(score and ("CPU " .. tostring(score)) or "CPU ...")
+
+        local metrics = CustomLobbyModel.GetSingleton().CpuBenchmarks()[player.OwnerID]
+        local category = PickCategory(metrics)
+        local atZero = category and category[BucketForRate(0)]
+        if not (atZero and atZero.UnitCount) then
+            self.Cpu:SetText("—")
+            self.Cpu:SetColor('ff9aa0a8')
+            self.CpuIndicator:SetAlpha(0.0)
+            return
+        end
+
+        local maxAtZero = atZero.UnitCount.Max or 0
+        self.Cpu:SetText(FormatUnits(maxAtZero))
         self.Cpu:SetColor('ff9aa0a8')
+
+        local cap = RecommendedUnitCap()
+        if not cap or cap <= 0 then
+            self.CpuIndicator:SetAlpha(0.0)
+            return
+        end
+
+        -- how many sim-rate steps below +0 are needed before the machine sustains the
+        -- cap (0 = fine at +0); worst case (red) if even -4 falls short
+        local step = 0
+        if maxAtZero < cap then
+            step = 4
+            for s = 1, 4 do
+                local bucket = category[BucketForRate(-s)]
+                if bucket and bucket.UnitCount and (bucket.UnitCount.Max or 0) >= cap then
+                    step = s
+                    break
+                end
+            end
+        end
+
+        self.CpuIndicator:SetSolidColor(StepColor(step))
+        self.CpuIndicator:SetAlpha(1.0)
+    end,
+
+    --- Mouse entered the CPU score: show this player's sim-performance popover.
+    ---@param self UICustomLobbySlotInterface
+    OnCpuHoverEnter = function(self)
+        local player = self.CurrentPlayer
+        if not player then
+            CustomLobbyPerformancePopover.Hide()
+            return
+        end
+        local benchmark = CustomLobbyModel.GetSingleton().CpuBenchmarks()[player.OwnerID]
+        CustomLobbyPerformancePopover.Show(self.Cpu, benchmark, RecommendedUnitCap())
     end,
 
     --- Click on the row. For now, clicking your own slot toggles your ready flag
