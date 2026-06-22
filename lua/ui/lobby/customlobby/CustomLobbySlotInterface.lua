@@ -39,6 +39,7 @@ local CustomLobbyModel = import("/lua/ui/lobby/customlobby/customlobbymodel.lua"
 local CustomLobbyPerformancePopover = import("/lua/ui/lobby/customlobby/customlobbyperformancepopover.lua")
 local CustomLobbyContextMenu = import("/lua/ui/lobby/customlobby/customlobbycontextmenu.lua")
 local CustomLobbyMenus = import("/lua/ui/lobby/customlobby/customlobbymenus.lua")
+local CustomLobbyRules = import("/lua/ui/lobby/customlobby/customlobbyrules.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
@@ -54,44 +55,6 @@ local function FactionLabel(faction)
         return data.DisplayName or data.Key or tostring(faction)
     end
     return "Random"
-end
-
---- The recommended total-unit ceiling for the current map and player count: 250 /
---- 375 / 500 units per seated player for 5x5 / 10x10 / 20x20-or-larger maps (the
---- map's largest dimension in ogrids, 51.2 per km). Falls back to the largest tier
---- when no map is set yet. Returns nil when there are no players to scale by.
----@return number | nil
-local function RecommendedUnitCap()
-    local model = CustomLobbyAuthoritativeModel.GetSingleton()
-
-    local players = 0
-    for slot = 1, CustomLobbyAuthoritativeModel.MaxSlots do
-        if model.Players[slot]() then
-            players = players + 1
-        end
-    end
-    if players < 1 then
-        return nil
-    end
-
-    -- 500 (20x20+) until a map is known; refine from the scenario's dimensions
-    local perPlayer = 500
-    local scenarioFile = model.ScenarioFile()
-    if scenarioFile then
-        local scenarioInfo = import("/lua/ui/maputil.lua").LoadScenario(scenarioFile)
-        if scenarioInfo and scenarioInfo.size then
-            local maxDim = math.max(scenarioInfo.size[1] or 0, scenarioInfo.size[2] or 0)
-            if maxDim <= 256 then
-                perPlayer = 250        -- 5x5
-            elseif maxDim <= 512 then
-                perPlayer = 375        -- 10x10
-            else
-                perPlayer = 500        -- 20x20 or larger
-            end
-        end
-    end
-
-    return perPlayer * players
 end
 
 --- The sim-rate categories tracked in PerformanceTrackingV2, ordered for the
@@ -343,7 +306,7 @@ local CustomLobbySlotInterface = Class(Group) {
         self.Cpu:SetText(FormatUnits(maxAtZero))
         self.Cpu:SetColor('ff9aa0a8')
 
-        local cap = RecommendedUnitCap()
+        local cap = CustomLobbyRules.RecommendedUnitCap()
         if not cap or cap <= 0 then
             self.CpuIndicator:SetAlpha(0.0)
             return
@@ -376,7 +339,7 @@ local CustomLobbySlotInterface = Class(Group) {
             return
         end
         local benchmark = CustomLobbyModel.GetSingleton().CpuBenchmarks()[player.OwnerID]
-        CustomLobbyPerformancePopover.Show(self.Cpu, benchmark, RecommendedUnitCap())
+        CustomLobbyPerformancePopover.Show(self.Cpu, benchmark, CustomLobbyRules.RecommendedUnitCap())
     end,
 
     --- A press on the row: if the coordinator allows dragging this slot (host, holding

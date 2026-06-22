@@ -83,12 +83,12 @@ local SlotMenu = {
     {
         label = "Move to observers",
         when = function(ctx) return ctx.isHost and ctx.player and ctx.player.Human end,
-        action = function(ctx) CustomLobbyController.RequestMoveToObserver(ctx.player.OwnerID) end,
+        action = function(ctx) CustomLobbyController.RequestMoveToObserver(ctx.slot) end,
     },
     {
         label = "Eject",
         when = function(ctx) return ctx.isHost and ctx.player and not ctx.isYou end,
-        action = function(ctx) CustomLobbyController.RequestEject(ctx.player.OwnerID) end,
+        action = function(ctx) CustomLobbyController.RequestEject(ctx.slot) end,
     },
 }
 

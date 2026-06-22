@@ -226,6 +226,9 @@ end
 
 --- Hot-reload hook: rebuilds the singleton on the new module and copies the current
 --- raw LazyVar values across so observers don't see a state reset.
+---
+--- NOTE: this list is maintained by hand — when you add a field to the model, add a
+--- copy line here too, or its value is lost on every hot-reload.
 ---@param newModule any
 function __moduleinfo.OnReload(newModule)
     if ModelInstance then

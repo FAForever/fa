@@ -444,10 +444,24 @@ function RequestSwapSlots(slotA, slotB)
     SwapSlots(instance, model, slotA, slotB)
 end
 
---- The host ejects a player. A human is dropped from the network (the resulting
---- PeerDisconnected clears the slot + re-broadcasts); an AI is just cleared. Host-only.
----@param ownerId UILobbyPeerId
-function RequestEject(ownerId)
+--- The player occupying `slot` within the active slot range, or nil. Tolerant of the
+--- arbitrary slot values a chat command might pass.
+---@param model UICustomLobbyAuthoritativeModel
+---@param slot any
+---@return UICustomLobbyPlayer | nil
+local function PlayerInSlot(model, slot)
+    if type(slot) ~= 'number' or slot < 1 or slot > CustomLobbyAuthoritativeModel.MaxSlots then
+        return nil
+    end
+    return model.Players[slot]() or nil
+end
+
+--- Ejects the player in `slot`: a human is dropped from the network (the resulting
+--- PeerDisconnected clears the slot + re-broadcasts), an AI is just cleared. Host-only.
+--- Slot-keyed so a chat command (`/eject <slot>`) can call it too; whether the caller
+--- is permitted to is gated separately.
+---@param slot number
+function RequestEject(slot)
     local instance = LobbyInstance
     if not instance then
         return
@@ -459,23 +473,23 @@ function RequestEject(ownerId)
         return
     end
 
-    local slot = FindSlotForOwner(model, ownerId)
-    if not slot then
+    local player = PlayerInSlot(model, slot)
+    if not player then
         return
     end
-    local player = model.Players[slot]()
-    if player and player.Human then
-        instance:EjectPeer(ownerId, "KickedByHost")
+    if player.Human then
+        instance:EjectPeer(player.OwnerID, "KickedByHost")
     else
         CustomLobbyAuthoritativeModel.ClearPlayer(model, slot)
         BroadcastPlayers(instance, model)
     end
 end
 
---- The host moves a player out of its slot and into the observer list, then
---- re-broadcasts. Host-only. (Reverse — observer back to a slot — is a later slice.)
----@param ownerId UILobbyPeerId
-function RequestMoveToObserver(ownerId)
+--- Moves the player in `slot` into the observer list, then re-broadcasts. Host-only.
+--- Slot-keyed for chat (`/observe <slot>`). The reverse (observer → slot) is
+--- `RequestTakeSlot` ("Play this slot").
+---@param slot number
+function RequestMoveToObserver(slot)
     local instance = LobbyInstance
     if not instance then
         return
@@ -487,11 +501,7 @@ function RequestMoveToObserver(ownerId)
         return
     end
 
-    local slot = FindSlotForOwner(model, ownerId)
-    if not slot then
-        return
-    end
-    local player = model.Players[slot]()
+    local player = PlayerInSlot(model, slot)
     if not player then
         return
     end
