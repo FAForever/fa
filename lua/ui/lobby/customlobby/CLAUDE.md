@@ -43,7 +43,7 @@ it get launched (becomes part of the game)?* See the `customlobby-model-choice` 
 | [CustomLobbyLocalModel.lua](CustomLobbyLocalModel.lua) | per-peer state, never synced: identity + CPU benchmarks. |
 | [CustomLobbyPerformancePopover.lua](CustomLobbyPerformancePopover.lua) | hover popover over the CPU column; hand-built bitmap bar chart of a peer's `PerformanceTrackingV2` history, with a yellow recommended-unit-cap line. |
 | [CustomLobbyInstance.lua](CustomLobbyInstance.lua) | thin `moho.lobby_methods` shell; validates/dispatches traffic, forwards callbacks to the controller. |
-| [CustomLobbyController.lua](CustomLobbyController.lua) | host-authority logic (free functions): seating, `Process*` handlers, intents (`RequestSetReady`, `RequestTakeSlot`, `RequestSwapSlots`, `RequestEject`, `RequestMoveToObserver` — all keyed by slot index / bool so a chat command can call them too; permission is gated separately), sharing the stored CPU benchmark. |
+| [CustomLobbyController.lua](CustomLobbyController.lua) | host-authority logic (free functions): seating, `Process*` handlers, intents (`RequestSetReady`, `RequestTakeSlot`, `RequestSwapSlots`, `RequestEject`, `RequestMoveToObserver`, `RequestSetScenario` — all keyed by slot/bool/file so a chat command can call them too; permission is gated separately), sharing the stored CPU benchmark. |
 | [CustomLobbyRules.lua](CustomLobbyRules.lua) | game-rule derivations from lobby state (not view, not networking): `RecommendedUnitCap()` (per-player cap by map size, memoised scenario lookup). |
 | [CustomLobbyMessages.lua](CustomLobbyMessages.lua) | message registry: `AddPlayer`, `SetPlayers` (launch model: players + observers), `SentLaunchInfo` (launch model: scenario / options / mods / teams / spawn mex), `SetSessionState` (session model: slot count / closed slots), `SetReady`, `TakeSlot`, `DisconnectPeer`, `ReportCpuBenchmark`, `SetCpuBenchmarks`. |
 | [CustomLobbyContextMenu.lua](CustomLobbyContextMenu.lua) | generic framed floating menu; `Show(entries, x, y)` renders any `{label, action, enabled}` list, dismisses on item click / click-outside / Esc. Knows nothing about the lobby. |
@@ -51,6 +51,8 @@ it get launched (becomes part of the game)?* See the `customlobby-model-choice` 
 | [CustomLobbySlotInterface.lua](CustomLobbySlotInterface.lua) | one slot row; subscribes to its slot + CPU benchmarks; CPU column shows max units at +0 with a green→red cap-headroom square; left-click an open slot to take it / your own to toggle ready; right-click opens its context menu; the host can drag a row onto another to swap. |
 | [CustomLobbyObserversInterface.lua](CustomLobbyObserversInterface.lua) | observer strip; subscribes to the model's `Observers` list and shows the count + names (read-only). |
 | [CustomLobbyMapPreview.lua](CustomLobbyMapPreview.lua) / [CustomLobbyMapPreviewSpawn.lua](CustomLobbyMapPreviewSpawn.lua) | map preview (copied from the autolobby's, adapted to this model): subscribes to `ScenarioFile` (full render) + each slot (spawn-icon refresh); hidden until a scenario is set. Reuses the shared `/lua/ui/controls/mappreview.lua`. |
+| [CustomLobbyMapCatalog.lua](CustomLobbyMapCatalog.lua) | cached enumeration of playable skirmish scenarios (`MapUtil.EnumerateSkirmishScenarios`). **Reference data — not a sync model**: identical on every peer, derived from disk, never on the wire. |
+| [CustomLobbyMapSelect.lua](CustomLobbyMapSelect.lua) | the map-select dialog (transient `Popup`, host-only): searchable list (from the catalog) + candidate preview + info; Select calls the `RequestSetScenario` intent. Owns no synced state. First slice of splitting the legacy `dialogs/mapselect.lua` god-dialog — map selection only (options / mods / units become their own components). |
 | [CustomLobbyInterface.lua](CustomLobbyInterface.lua) | composition root (one model subscription for SlotCount); lays out slot rows + the observer strip, and acts as the rows' drag coordinator (`UICustomLobbySlotCoordinator`: hit-test, drop-highlight, drag ghost → `RequestSwapSlots`); `OpenDebug()` / hot-reload. |
 | [/lua/ui/lobby/lobby.lua](../lobby.lua) | engine entry wrapper (`CreateLobby`/`HostGame`/`JoinGame`) → CustomLobby. Old lobby preserved at `lobby-old.lua`. |
 
@@ -64,15 +66,23 @@ ready toggles round-trip, players can **take an open slot** (click it) and the h
 strip, and an observer rejoins via right-click → **Play this slot**. Each peer's
 stored sim-performance benchmark is shared (no live stress test), and a **Leave** button
 (or Esc) disconnects and returns to the menu — a leaving client frees its slot for
-everyone via `OnPeerDisconnected`. Launched via
+everyone via `OnPeerDisconnected`. The host can **pick the map** via a Change-Map button →
+the map-select dialog (searchable list + preview), which sets `ScenarioFile` through the
+`RequestSetScenario` intent and broadcasts it so every peer's preview updates. Launched via
 `scripts/LaunchCustomLobby.ps1`, or inspect UI only with
 `UI_Lua import("/lua/ui/lobby/customlobby/customlobbyinterface.lua").OpenDebug()`.
 
 ## Next slices (per TARGET_ARCHITECTURE.md)
 
-1. Make slot controls interactive (faction/colour/team → controller **intents**).
-2. Options panel, map preview, observer list, footer, chat — each its own subscribing component.
-3. Sub-dialogs (map select, mods, units, presets, prefs) as mini-MVC.
+1. **Options panel** — the next slice. The legacy `dialogs/mapselect.lua` bundled game options
+   into the map dialog; we're splitting them out. Model the **option schema as a derivation** of
+   `ScenarioFile` + `GameMods` (static lobby options ∪ the map's `_options.lua` ∪ mod options —
+   computed per peer, *not* synced, like the map catalog), rendered against the synced
+   `GameOptions` *values*. When the scenario/mods change, the controller **reconciles** the values
+   (drop stale keys, seed new defaults) — see the `TODO` in `RequestSetScenario`. Merge rule:
+   start with map/mod options only *adding* keys (no overriding base lobby options).
+2. Remaining sub-dialogs (mods, units, presets, prefs) as mini-MVC, following the map-select shape.
+3. Make slot controls interactive (faction/colour/team → controller **intents**).
 4. Map-derived `SlotCount`; the GPGNet (`localPort == -1`) FAF-client path.
 
 ## Rules (same as autolobby)

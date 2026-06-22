@@ -502,6 +502,29 @@ function RequestTakeSlot(slot)
     end
 end
 
+--- The host picks the scenario (map). Host-only — backs the map-select dialog and a
+--- `/map <name>` chat command. Sets the scenario in the launch model and broadcasts the
+--- launch config; the map preview / unit-cap react to the new `ScenarioFile`.
+---
+--- TODO (options slice): when the scenario changes, the game-options *schema* changes too
+--- (the map contributes its own options). Reconcile `GameOptions` here — drop values whose
+--- keys no longer exist, seed defaults for new keys — before broadcasting. See CLAUDE.md.
+---@param scenarioFile FileName
+function RequestSetScenario(scenarioFile)
+    local instance = LobbyInstance
+    if not instance then
+        return
+    end
+
+    if not CustomLobbyLocalModel.GetSingleton().IsHost() then
+        WARN("CustomLobby: only the host can change the map")
+        return
+    end
+
+    CustomLobbyLaunchModel.SetScenario(CustomLobbyLaunchModel.GetSingleton(), scenarioFile)
+    BroadcastLaunchInfo(instance)
+end
+
 --- The host swaps the contents of two slots. Host-only (a client request isn't
 --- offered) — backs a host-side drag/menu and a `/swap <a> <b>` chat command.
 ---@param slotA number

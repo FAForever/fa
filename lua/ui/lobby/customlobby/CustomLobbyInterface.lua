@@ -39,6 +39,7 @@ local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontr
 local CustomLobbySlotInterface = import("/lua/ui/lobby/customlobby/customlobbyslotinterface.lua")
 local CustomLobbyObserversInterface = import("/lua/ui/lobby/customlobby/customlobbyobserversinterface.lua")
 local CustomLobbyMapPreview = import("/lua/ui/lobby/customlobby/customlobbymappreview.lua")
+local CustomLobbyMapSelect = import("/lua/ui/lobby/customlobby/customlobbymapselect.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
@@ -55,8 +56,10 @@ local PanelWidth = 520
 ---@field Slots UICustomLobbySlotInterface[]
 ---@field ObserversPanel UICustomLobbyObserversInterface
 ---@field MapPreview UICustomLobbyMapPreview
+---@field MapButton Button
 ---@field LeaveButton Button
 ---@field SlotCountObserver LazyVar
+---@field IsHostObserver LazyVar
 ---@field HighlightedSlot number | false   # slot currently shown as a drop target
 ---@field DragGhost Group | false          # floating label following the cursor mid-drag
 local CustomLobbyInterface = Class(Group) {
@@ -87,6 +90,13 @@ local CustomLobbyInterface = Class(Group) {
         self.ObserversPanel = CustomLobbyObserversInterface.Create(self)
         self.MapPreview = CustomLobbyMapPreview.Create(self)
 
+        -- only the host picks the map; the button hides for everyone else (and the
+        -- RequestSetScenario intent is host-gated regardless)
+        self.MapButton = UIUtil.CreateButtonStd(self, '/scx_menu/small-btn/small', "Change Map", 16, 2)
+        self.MapButton.OnClick = function(button, modifiers)
+            CustomLobbyMapSelect.Open(GetFrame(0))
+        end
+
         -- leaving disconnects + returns to the menu via the escape handler that
         -- lobby.lua registered (one teardown definition, shared with the Esc key)
         self.LeaveButton = UIUtil.CreateButtonStd(self, '/scx_menu/small-btn/small', "Leave", 16, 2)
@@ -98,6 +108,12 @@ local CustomLobbyInterface = Class(Group) {
         self.SlotCountObserver = self.Trash:Add(
             LazyVarDerive(session.SlotCount, function(slotCountLazy)
                 self:OnSlotCountChanged(slotCountLazy())
+            end))
+
+        local localModel = CustomLobbyLocalModel.GetSingleton()
+        self.IsHostObserver = self.Trash:Add(
+            LazyVarDerive(localModel.IsHost, function(isHostLazy)
+                self:OnIsHostChanged(isHostLazy())
             end))
     end,
 
@@ -121,6 +137,12 @@ local CustomLobbyInterface = Class(Group) {
             :AtTopIn(self, 80)
             :Width(320)
             :Height(320)
+            :End()
+
+        -- map-change button under the preview (host-only; visibility set by OnIsHostChanged)
+        Layouter(self.MapButton)
+            :AnchorToBottom(self.MapPreview, 12)
+            :AtLeftIn(self.MapPreview)
             :End()
 
         -- stack the rows top-to-bottom inside the panel via sibling anchoring
@@ -154,6 +176,17 @@ local CustomLobbyInterface = Class(Group) {
             else
                 self.Slots[slot]:Hide()
             end
+        end
+    end,
+
+    --- Shows the host-only controls (the map-change button) only to the host.
+    ---@param self UICustomLobbyInterface
+    ---@param isHost boolean
+    OnIsHostChanged = function(self, isHost)
+        if isHost then
+            self.MapButton:Show()
+        else
+            self.MapButton:Hide()
         end
     end,
 
