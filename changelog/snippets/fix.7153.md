@@ -1,0 +1,1 @@
+- (#7153) Add a delay before ACUs explode when their player disconnects. This should fix replays cuttting off at the first disconnected player.
