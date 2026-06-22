@@ -115,15 +115,26 @@ local function TakeSlot(instance, model, ownerId, slot)
     if not IsOpenSlot(model, slot) then
         return
     end
+
     local from = FindSlotForOwner(model, ownerId)
-    if not from or from == slot then
-        return
+    local player
+    if from then
+        if from == slot then
+            return
+        end
+        player = table.copy(model.Players[from]())
+        CustomLobbyAuthoritativeModel.ClearPlayer(model, from)
+    else
+        -- not in a slot: an observer joining a slot (the reverse of Move to observers)
+        local observer = CustomLobbyAuthoritativeModel.RemoveObserver(model, ownerId)
+        if not observer then
+            return
+        end
+        player = table.copy(observer)
     end
 
-    local player = table.copy(model.Players[from]())
     player.StartSpot = slot
-    player.Ready = false                       -- moving seats resets readiness
-    CustomLobbyAuthoritativeModel.ClearPlayer(model, from)
+    player.Ready = false                       -- (re)seating resets readiness
     CustomLobbyAuthoritativeModel.SetPlayer(model, slot, player)
     BroadcastPlayers(instance, model)
 end

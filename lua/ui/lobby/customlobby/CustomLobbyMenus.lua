@@ -45,6 +45,7 @@ local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontr
 ---@field isHost boolean
 ---@field isYou boolean
 ---@field isOpen boolean
+---@field localIsObserver boolean   # the local player is currently spectating (no slot)
 
 --- A declarative slot-menu entry.
 ---@class UICustomLobbySlotMenuEntry
@@ -56,8 +57,15 @@ local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontr
 ---@type UICustomLobbySlotMenuEntry[]
 local SlotMenu = {
     {
+        -- an observer joining a slot is "playing" it
+        label = "Play this slot",
+        when = function(ctx) return ctx.isOpen and ctx.localIsObserver end,
+        action = function(ctx) CustomLobbyController.RequestTakeSlot(ctx.slot) end,
+    },
+    {
+        -- a seated player relocating to another open slot
         label = "Take this slot",
-        when = function(ctx) return ctx.isOpen end,
+        when = function(ctx) return ctx.isOpen and not ctx.localIsObserver end,
         action = function(ctx) CustomLobbyController.RequestTakeSlot(ctx.slot) end,
     },
     {
@@ -84,18 +92,34 @@ local SlotMenu = {
     },
 }
 
+--- Whether `ownerId` is in the observer list.
+---@param model UICustomLobbyAuthoritativeModel
+---@param ownerId UILobbyPeerId
+---@return boolean
+local function IsObserver(model, ownerId)
+    local observers = model.Observers()
+    for i = 1, table.getn(observers) do
+        if observers[i].OwnerID == ownerId then
+            return true
+        end
+    end
+    return false
+end
+
 --- Snapshots the state a slot menu is built from.
 ---@param slot number
 ---@return UICustomLobbySlotMenuContext
 local function SlotContext(slot)
     local model = CustomLobbyAuthoritativeModel.GetSingleton()
     local player = model.Players[slot]()
+    local localId = model.LocalPeerId()
     return {
         slot = slot,
         player = player,
         isHost = model.IsHost(),
-        isYou = (player and player.OwnerID == model.LocalPeerId()) and true or false,
+        isYou = (player and player.OwnerID == localId) and true or false,
         isOpen = not player,
+        localIsObserver = IsObserver(model, localId),
     }
 end
 

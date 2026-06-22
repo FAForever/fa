@@ -40,13 +40,15 @@ the automated/matchmaker path).
 | [CustomLobbyContextMenu.lua](CustomLobbyContextMenu.lua) | generic framed floating menu; `Show(entries, x, y)` renders any `{label, action, enabled}` list, dismisses on item click / click-outside / Esc. Knows nothing about the lobby. |
 | [CustomLobbyMenus.lua](CustomLobbyMenus.lua) | declarative menu **definitions**: entry lists with `when(ctx)`/`action(ctx)` filtered by lobby state (`BuildSlotMenu`). Adding/state-gating an item is a one-liner here. |
 | [CustomLobbySlotInterface.lua](CustomLobbySlotInterface.lua) | one slot row; subscribes to its slot + CPU benchmarks; CPU column shows max units at +0 with a green→red cap-headroom square; left-click an open slot to take it / your own to toggle ready; right-click opens its context menu; the host can drag a row onto another to swap. |
-| [CustomLobbyInterface.lua](CustomLobbyInterface.lua) | composition root (one model subscription for SlotCount); lays out slot rows and acts as their drag coordinator (`UICustomLobbySlotCoordinator`: hit-test, drop-highlight, drag ghost → `RequestSwapSlots`); `OpenDebug()` / hot-reload. |
+| [CustomLobbyObserversInterface.lua](CustomLobbyObserversInterface.lua) | observer strip; subscribes to the model's `Observers` list and shows the count + names (read-only). |
+| [CustomLobbyInterface.lua](CustomLobbyInterface.lua) | composition root (one model subscription for SlotCount); lays out slot rows + the observer strip, and acts as the rows' drag coordinator (`UICustomLobbySlotCoordinator`: hit-test, drop-highlight, drag ghost → `RequestSwapSlots`); `OpenDebug()` / hot-reload. |
 | [/lua/ui/lobby/lobby.lua](../lobby.lua) | engine entry wrapper (`CreateLobby`/`HostGame`/`JoinGame`) → CustomLobby. Old lobby preserved at `lobby-old.lua`. |
 
 Working today: host + clients see each other (host-authoritative player sync),
 ready toggles round-trip, players can **take an open slot** (click it) and the host can
 **swap** (drag a row onto another), **eject**, and **move a player to observers** (right-click
-→ context menu); observers are synced in the `SetPlayers` snapshot. Each peer's
+→ context menu); observers are synced in the `SetPlayers` snapshot, shown in an observer
+strip, and an observer rejoins via right-click → **Play this slot**. Each peer's
 stored sim-performance benchmark is shared (no live stress test), and a **Leave** button
 (or Esc) disconnects and returns to the menu — a leaving client frees its slot for
 everyone via `OnPeerDisconnected`. Launched via

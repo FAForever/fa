@@ -35,6 +35,7 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local CustomLobbyAuthoritativeModel = import("/lua/ui/lobby/customlobby/customlobbyauthoritativemodel.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 local CustomLobbySlotInterface = import("/lua/ui/lobby/customlobby/customlobbyslotinterface.lua")
+local CustomLobbyObserversInterface = import("/lua/ui/lobby/customlobby/customlobbyobserversinterface.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
@@ -49,6 +50,7 @@ local PanelWidth = 520
 ---@field Title Text
 ---@field SlotsPanel Group
 ---@field Slots UICustomLobbySlotInterface[]
+---@field ObserversPanel UICustomLobbyObserversInterface
 ---@field LeaveButton Button
 ---@field SlotCountObserver LazyVar
 ---@field HighlightedSlot number | false   # slot currently shown as a drop target
@@ -77,6 +79,8 @@ local CustomLobbyInterface = Class(Group) {
         for slot = 1, CustomLobbyAuthoritativeModel.MaxSlots do
             self.Slots[slot] = CustomLobbySlotInterface.Create(self.SlotsPanel, slot, self)
         end
+
+        self.ObserversPanel = CustomLobbyObserversInterface.Create(self)
 
         -- leaving disconnects + returns to the menu via the escape handler that
         -- lobby.lua registered (one teardown definition, shared with the Esc key)
@@ -121,7 +125,10 @@ local CustomLobbyInterface = Class(Group) {
             builder:End()
         end
 
-        Layouter(self.LeaveButton):AtLeftIn(self, 40):AnchorToBottom(self.SlotsPanel, 24):End()
+        Layouter(self.ObserversPanel)
+            :AtLeftIn(self, 40):AnchorToBottom(self.SlotsPanel, 16):Width(PanelWidth):Height(44)
+            :End()
+        Layouter(self.LeaveButton):AtLeftIn(self, 40):AnchorToBottom(self.ObserversPanel, 16):End()
     end,
 
     --- Shows the active slots (1..count) and hides the rest.
@@ -321,6 +328,12 @@ function OpenDebug()
             AIPersonality = slot == 4 and "rush" or nil,
         })
     end
+
+    -- a couple of observers so the observer strip shows something
+    model.Observers:Set({
+        { PlayerName = "Zock",  OwnerID = "10", Human = true },
+        { PlayerName = "Spag",  OwnerID = "11", Human = true },
+    })
 
     SetupSingleton()
 end

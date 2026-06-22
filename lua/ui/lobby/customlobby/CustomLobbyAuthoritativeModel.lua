@@ -199,6 +199,26 @@ function AddObserver(model, player)
     model.Observers:Set(observers)
 end
 
+--- Removes the observer owned by `ownerId` (copy-then-Set) and returns it, or nil.
+---@param model UICustomLobbyAuthoritativeModel
+---@param ownerId UILobbyPeerId
+---@return UICustomLobbyPlayer | nil
+function RemoveObserver(model, ownerId)
+    local observers = model.Observers()
+    local kept, removed = {}, nil
+    for i = 1, table.getn(observers) do
+        if observers[i].OwnerID == ownerId then
+            removed = observers[i]
+        else
+            table.insert(kept, observers[i])
+        end
+    end
+    if removed then
+        model.Observers:Set(kept)
+    end
+    return removed
+end
+
 --#endregion
 
 -------------------------------------------------------------------------------
