@@ -95,6 +95,7 @@
 ---@field norushoffsetX_ARMY_16? number
 ---@field norushoffsetY_ARMY_16? number
 ---@field preview? FileName
+---@field url? string         # optional link to the map's page (vault / repo); shown in the lobby
 ---@field save FileName
 ---@field script FileName
 ---@field size {[1]: number, [2]: number}

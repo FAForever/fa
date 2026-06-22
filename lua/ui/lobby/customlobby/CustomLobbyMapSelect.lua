@@ -77,7 +77,7 @@ local LeftWidth = 300
 local PreviewSize = 300
 local TitleHeight = 32
 local ActionHeight = 48
-local FilterHeight = 110
+local FilterHeight = 134
 local StatsHeight = 22
 
 -- the same resource/wreck icons the in-lobby map preview uses (CustomLobbyMapPreview)
@@ -105,6 +105,43 @@ end
 
 -- comparison operators applied to the size / player filters
 local Operators = { "=", ">=", "<=" }
+
+-- Map web pages we'll open in a browser (some scenarios carry a `url`). Matched against the
+-- URL's host — exact or as a subdomain — so "faforever.com" also covers "forums.faforever.com".
+-- Add a line to extend.
+local AllowedUrlDomains = {
+    "github.com",
+    "githubusercontent.com",
+    "gitlab.com",
+    "github.io",
+    "faforever.com",
+}
+
+--- The lowercased host of a URL (between the scheme and the first `/` or `:`), or "".
+---@param url string
+---@return string
+local function UrlHost(url)
+    local rest = string.gsub(string.lower(url), "^https?://", "")
+    return (string.gsub(rest, "[/:].*$", ""))
+end
+
+--- Whether `url` is an http(s) link to an allowed domain (or a subdomain of one). Guards
+--- against look-alikes ("github.com.evil.com" is rejected) by matching the host suffix.
+---@param url any
+---@return boolean
+local function IsAllowedUrl(url)
+    if type(url) ~= 'string' or not string.find(string.lower(url), "^https?://") then
+        return false
+    end
+    local host = UrlHost(url)
+    for _, domain in AllowedUrlDomains do
+        local escaped = string.gsub(domain, "%.", "%%.")
+        if host == domain or string.find(host, "%." .. escaped .. "$") then
+            return true
+        end
+    end
+    return false
+end
 
 --- Pulls the `.label` column out of a filter table for `Combo:AddItems`.
 ---@param filters table[]
@@ -183,6 +220,7 @@ end
 ---@field PreviewArea Group
 ---@field ActionArea Group
 ---@field Title Text
+---@field FilterTitle Text
 ---@field Search Edit
 ---@field SizeLabel Text
 ---@field SizeCombo Combo
@@ -211,12 +249,16 @@ end
 ---@field WreckIcons Control[]
 ---@field Preview MapPreview
 ---@field PreviewBg Bitmap
+---@field MassTemplate Bitmap                  # hidden; overlay icons share its texture (loaded once)
+---@field EnergyTemplate Bitmap
+---@field WreckTemplate Bitmap
 ---@field PreviewTitleBar Bitmap
 ---@field PreviewTitle Text
 ---@field InfoMeta Text
----@field InfoMarkers Text
 ---@field Warning Text
 ---@field Description TextArea
+---@field UrlButton Text
+---@field CurrentUrl string | false
 ---@field RandomButton Button
 ---@field SelectButton Button
 ---@field CancelButton Button
@@ -277,9 +319,11 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         self.PreviewArea = CreateArea(self, "PreviewArea", 'ffcc40cc')
         self.ActionArea = CreateArea(self, "ActionArea", 'ff808080')
 
-        self.Title = UIUtil.CreateText(self.TitleArea, "<LOC map_sel_0000>Select Map", 22, UIUtil.titleFont)
+        self.Title = UIUtil.CreateText(self.TitleArea, "Select scenario", 22, UIUtil.titleFont)
 
         --#region filters (in FilterArea)
+        self.FilterTitle = UIUtil.CreateText(self.FilterArea, "Filter", 14, UIUtil.titleFont)
+
         self.Search = Edit(self.FilterArea)
         Layouter(self.Search):Left(0):Top(0):Width(96):Height(22):End()
         self.Search:SetFont(UIUtil.bodyFont, 16)
@@ -351,16 +395,44 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         self.PreviewBg:DisableHitTest()
         self.Preview = MapPreview(self.PreviewArea)
 
+        -- hidden template bitmaps: each overlay texture is loaded ONCE here, then every marker
+        -- shares it via ShareTextures (see CreateMarkerIcon) rather than re-loading per icon.
+        -- They still need a concrete (dummy) position — an unanchored control's Left/Right
+        -- reference each other and trip the circular-evaluation guard (see /lua/ui/CLAUDE.md § 1).
+        self.MassTemplate = self:CreateTemplateBitmap(MassIcon)
+        self.EnergyTemplate = self:CreateTemplateBitmap(EnergyIcon)
+        self.WreckTemplate = self:CreateTemplateBitmap(WreckIcon)
+
         self.PreviewTitleBar = Bitmap(self.PreviewArea)
         self.PreviewTitleBar:SetSolidColor('aa0a0e12')
         self.PreviewTitleBar:DisableHitTest()
         self.PreviewTitle = UIUtil.CreateText(self.PreviewArea, "", 16, UIUtil.titleFont)
         self.PreviewTitle:DisableHitTest()
 
+        -- clickable "open page" link in the title bar; shown only when the map has an allowed url
+        self.CurrentUrl = false
+        self.UrlButton = UIUtil.CreateText(self.PreviewArea, "Open page", 12, UIUtil.bodyFont)
+        self.UrlButton:SetColor('ff7fb3ff')
+        self.UrlButton:Hide()
+        self.UrlButton.HandleEvent = function(control, event)
+            if event.Type == 'ButtonPress' then
+                if self.CurrentUrl then
+                    OpenURL(self.CurrentUrl)
+                end
+                return true
+            elseif event.Type == 'MouseEnter' then
+                control:SetColor('ffaecbff')
+                return true
+            elseif event.Type == 'MouseExit' then
+                control:SetColor('ff7fb3ff')
+                return true
+            end
+            return false
+        end
+        Tooltip.AddControlTooltipManual(self.UrlButton, "Map page", "Open the map's web page in your browser.")
+
         self.InfoMeta = UIUtil.CreateText(self.PreviewArea, "", 13, UIUtil.bodyFont)
         self.InfoMeta:SetColor('ffc8ccd0')
-        self.InfoMarkers = UIUtil.CreateText(self.PreviewArea, "", 13, UIUtil.bodyFont)
-        self.InfoMarkers:SetColor('ff9aa0a8')
         self.Warning = UIUtil.CreateText(self.PreviewArea, "", 13, UIUtil.bodyFont)
         self.Warning:SetColor('ffff6b6b')
 
@@ -479,10 +551,13 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         Layouter(self.PreviewTitle):AtHorizontalCenterIn(self.Preview):AtVerticalCenterIn(self.PreviewTitleBar):End()
         self.PreviewTitle.Depth:Set(function() return self.PreviewTitleBar.Depth() + 1 end)
 
+        -- url link on the right of the title bar (shown only when the map has an allowed url)
+        Layouter(self.UrlButton):AtRightIn(self.Preview, 8):AtVerticalCenterIn(self.PreviewTitleBar):End()
+        self.UrlButton.Depth:Set(function() return self.PreviewTitleBar.Depth() + 2 end)
+
         -- info centred under the preview
         Layouter(self.InfoMeta):AtHorizontalCenterIn(self.Preview):AnchorToBottom(self.Preview, 12):End()
-        Layouter(self.InfoMarkers):AtHorizontalCenterIn(self.Preview):AnchorToBottom(self.InfoMeta, 4):End()
-        Layouter(self.Warning):AtHorizontalCenterIn(self.Preview):AnchorToBottom(self.InfoMarkers, 4):End()
+        Layouter(self.Warning):AtHorizontalCenterIn(self.Preview):AnchorToBottom(self.InfoMeta, 4):End()
 
         -- description fills the rest of the preview area and scrolls when it overflows
         Layouter(self.Description)
@@ -710,16 +785,14 @@ local CustomLobbyMapSelect = ClassUI(Group) {
             table.insert(problems, "save missing")
         end
 
-        local hasAiMarkers = false
         if save and scenario.size then
             self:BuildSpawns(scenario, save)
             self:BuildResources(scenario, save)
             self:BuildWrecks(scenario, save)
             self:ApplyOverlayVisibility()
-            hasAiMarkers = self:DetectAiMarkers(save)
         end
 
-        self:UpdateInfo(scenario, hasAiMarkers)
+        self:UpdateInfo(scenario)
         self.RandomButton:Enable()
 
         if table.getn(problems) > 0 then
@@ -731,11 +804,11 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         end
     end,
 
-    --- Fills the title overlay + info lines (size · players · version, AI markers, description).
+    --- Fills the title overlay + info line (size · players · version), the url link, and the
+    --- description.
     ---@param self UICustomLobbyMapSelect
     ---@param scenario UILobbyScenarioInfo
-    ---@param hasAiMarkers boolean
-    UpdateInfo = function(self, scenario, hasAiMarkers)
+    UpdateInfo = function(self, scenario)
         self.PreviewTitle:SetText(LOC(scenario.name) or "?")
 
         local parts = {}
@@ -752,7 +825,14 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         end
         self.InfoMeta:SetText(table.concat(parts, "   ·   "))
 
-        self.InfoMarkers:SetText(hasAiMarkers and "AI markers: Yes" or "AI markers: No")
+        -- some scenarios carry a `url` to their source/page; offer to open allowed ones
+        if scenario.url and IsAllowedUrl(scenario.url) then
+            self.CurrentUrl = scenario.url
+            self.UrlButton:Show()
+        else
+            self.CurrentUrl = false
+            self.UrlButton:Hide()
+        end
 
         self.Description:SetText(scenario.description and LOC(scenario.description) or "")
     end,
@@ -779,11 +859,11 @@ local CustomLobbyMapSelect = ClassUI(Group) {
     ---@param save UIScenarioSaveFile
     BuildResources = function(self, scenario, save)
         for _, marker in self:Markers(save) do
-            local icon = (marker.type == "Mass" and MassIcon)
-                or (marker.type == "Hydrocarbon" and EnergyIcon)
+            local template = (marker.type == "Mass" and self.MassTemplate)
+                or (marker.type == "Hydrocarbon" and self.EnergyTemplate)
                 or false
-            if icon and marker.position then
-                local dot = self.OverlayTrash:Add(self:CreateMarkerIcon(icon, 10))
+            if template and marker.position then
+                local dot = self.OverlayTrash:Add(self:CreateMarkerIcon(template, 10))
                 self:PositionMarker(dot, scenario.size[1], scenario.size[2], marker.position[1], marker.position[3])
                 table.insert(self.ResourceIcons, dot)
             end
@@ -797,7 +877,7 @@ local CustomLobbyMapSelect = ClassUI(Group) {
     BuildWrecks = function(self, scenario, save)
         for _, marker in self:Markers(save) do
             if marker.type and marker.position and string.find(string.lower(marker.type), 'wreck') then
-                local dot = self.OverlayTrash:Add(self:CreateMarkerIcon(WreckIcon, 11))
+                local dot = self.OverlayTrash:Add(self:CreateMarkerIcon(self.WreckTemplate, 11))
                 self:PositionMarker(dot, scenario.size[1], scenario.size[2], marker.position[1], marker.position[3])
                 table.insert(self.WreckIcons, dot)
             end
@@ -852,16 +932,34 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         return dot
     end,
 
-    --- Builds a small textured resource/wreck marker (the in-lobby preview's icons). Private.
+    --- Loads an overlay texture once into a hidden template bitmap that markers share from.
+    --- Given a dummy position because an unanchored control's Left/Right are circular. Private.
     ---@param self UICustomLobbyMapSelect
     ---@param texture FileName
+    ---@return Bitmap
+    CreateTemplateBitmap = function(self, texture)
+        local template = UIUtil.CreateBitmap(self.PreviewArea, texture)
+        template:DisableHitTest()
+        Layouter(template):Left(0):Top(0):Width(8):Height(8):End()
+        template:Hide()
+        return template
+    end,
+
+    --- Builds a small resource/wreck marker that SHARES its texture with a hidden template
+    --- bitmap (allocated once in __init), so the texture is loaded once and reused for every
+    --- marker — not re-loaded per icon. Private.
+    ---@param self UICustomLobbyMapSelect
+    ---@param template Bitmap
     ---@param size number
     ---@return Bitmap
-    CreateMarkerIcon = function(self, texture, size)
-        local icon = UIUtil.CreateBitmap(self.PreviewArea, texture)
+    CreateMarkerIcon = function(self, template, size)
+        local icon = UIUtil.CreateBitmapColor(self.PreviewArea, 'ffffffff')
         icon:DisableHitTest()
+        -- pin a full (dummy) rect BEFORE ShareTextures — it reads the bitmap's edges, which are
+        -- circular on a just-created control; PositionMarker overrides Left/Top afterwards
+        Layouter(icon):Left(0):Top(0):Width(size):Height(size):End()
+        icon:ShareTextures(template)
         icon.Depth:Set(function() return self.Preview.Depth() + 5 end)
-        Layouter(icon):Width(size):Height(size):End()
         return icon
     end,
 
@@ -893,19 +991,6 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         icon.Top:Set(function() return self.Preview.Top() + z - 0.5 * icon.Height() end)
     end,
 
-    --- Detects whether the save has AI pathing markers (any marker chained to another).
-    ---@param self UICustomLobbyMapSelect
-    ---@param save UIScenarioSaveFile
-    ---@return boolean
-    DetectAiMarkers = function(self, save)
-        for _, data in self:Markers(save) do
-            if data.adjacentTo and string.find(data.adjacentTo, ' ') then
-                return true
-            end
-        end
-        return false
-    end,
-
     --- Clears the preview + info (no candidate / empty list).
     ---@param self UICustomLobbyMapSelect
     ClearDetails = function(self)
@@ -917,9 +1002,10 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         self.Preview:ClearTexture()
         self.PreviewTitle:SetText("")
         self.InfoMeta:SetText("")
-        self.InfoMarkers:SetText("")
         self.Warning:SetText("")
         self.Description:SetText("")
+        self.CurrentUrl = false
+        self.UrlButton:Hide()
     end,
 
     --- Commits the highlighted candidate via the controller intent.
