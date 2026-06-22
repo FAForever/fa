@@ -161,3 +161,28 @@ Roles: **Host**, **Player** (human in a slot), **Observer**, **Joining client**
 ## R. New requests
 
 - ⬜ As a **host**, I want the ability to lock players in-place when autobalance is applied so that players that want to play together stay in the same team.
+- ⬜ As a **player**, I want the observer bug that can freeze/crash the lobby fixed — or at least a warning when it's hit — so that observing doesn't break the lobby. *(Reliable repro needs a debuggable lobby setup.)*
+- ⬜ As a **player**, I want to randomise among a chosen subset of factions (multi-choice), so that I get variety without pure random.
+- ⬜ As a **player**, I want my FAF avatar shown in the lobby, so that players are recognisable.
+- ⬜ As a **host**, I want a "players vs AI" AutoTeams option, so that all humans are teamed against the AIs automatically.
+- ⬜ As a **host**, I want closing a slot to auto-move its player to a free slot (in opti), so that rearranging doesn't drop anyone.
+- ⬜ As a **host**, I want an opti team preview, so that I can see the balanced teams before committing.
+- ⬜ As a **host**, I want flexible mirror balancing, so that mirror match-ups can be balanced with some give.
+- ⬜ As a **host**, I want a system for balancing premades, so that pre-made groups are distributed fairly across teams. *(Related to locking players in place during autobalance, above.)*
+- ⬜ As a **player**, I want easier rehosting — a dedicated in-game/lobby rehost button that works with the client, including rehosting someone else's lobby (when they're AFK, or just to duplicate it), so that rehosting is quick. *(Extends the "rehost my last game" stories in A/O.)*
+- ⬜ As a **non-host player**, I want to save presets as a client, so that I keep my setups even when I'm not hosting.
+- ⬜ As a **host**, I want to load presets without switching maps, so that applying a preset doesn't force a map change.
+- ⬜ As a **player**, I want lobby options categorised by mod, so that mod-provided options are grouped clearly.
+- ⬜ As a **player**, I want to collapse lobby-option categories, so that I can focus on the ones I care about.
+- ⬜ As a **non-host player**, I want to read each option's description, so that I understand what every setting does.
+- ⬜ As a **host**, I want the unit-manager bug fixed where presets stop appearing after you disable units manually, so that presets keep working.
+- ⬜ As a **host**, I want better unit stats in the unit manager, so that I can judge units when restricting them.
+- ⬜ As a **host**, I want faster map/option loading when many maps are installed, so that the lobby isn't slow to open.
+- ⬜ As a **player**, I want faster mod-manager loading, so that opening it isn't slow.
+- ⬜ As a **modder**, I want a moddable lobby UI, so that the lobby can be extended/customised by mods.
+- ⬜ As a **player**, I want mod presets kept separate from lobby-option presets, so that the two don't get entangled.
+- ⬜ As a **host**, I want map-specific lobby options to persist between sessions when I rehost the same map, so that I don't reconfigure them each time.
+- ⬜ As a **host**, I want last game's mods NOT auto-enabled when the game didn't launch (but kept when it did, for rehosting), so that a failed launch doesn't silently carry mods forward.
+- ⬜ As a **player**, I want "disable all sim / UI / all mods" buttons, so that I can clear mods in one click.
+- ⬜ As a **player**, I want the mod manager's dependency-related UI updates fixed, so that enabling/disabling reflects dependencies correctly.
+- ⬜ As a **developer**, I want mod-dependency management reworked in the lobby frontend so it no longer keys off singular version UUIDs, so that the dependency system is fixed at the source.
