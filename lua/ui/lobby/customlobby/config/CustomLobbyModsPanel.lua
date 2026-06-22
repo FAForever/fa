@@ -24,9 +24,10 @@
 -- shared sim mods from the launch model) and UI mods (this peer's local choice from prefs), plus
 -- a "Manage mods" button (available to everyone — UI mods are per-player).
 --
--- It is a config-interface tab panel driven by the host via `SetActive`. UI mods are prefs, not a
--- reactive model field, so they're picked up on activation (`SetActive(true)` refreshes) as well
--- as when the synced sim mods change.
+-- It is a config-interface tab panel: the host creates it when the Mods tab is selected and
+-- destroys it on switch, so it's the live/visible panel for its whole lifetime. UI mods are prefs,
+-- not a reactive model field, so they're read on the first render (`Initialize`); the synced sim
+-- mods additionally refresh it live.
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
@@ -48,6 +49,7 @@ local ScrollGap = 18
 local GridContentWidth = 360 - 6 - ScrollGap
 local LabelMaxChars = 30
 local NormalColor = 'ffc8ccd0'
+local ActionHeight = 40                -- the bottom action sub-area that holds the tab's buttons
 
 --- Truncates `text` to `maxChars`, appending "…" when it had to cut.
 ---@param text string
@@ -64,10 +66,10 @@ end
 ---@class UICustomLobbyModsPanel : Group
 ---@field Trash TrashBag
 ---@field Ready boolean
----@field Active boolean
 ---@field ModsGrid Grid
 ---@field Scrollbar Scrollbar | false
 ---@field Empty Text
+---@field ActionArea Group
 ---@field ManageButton Button
 ---@field ModsObserver LazyVar
 local CustomLobbyModsPanel = ClassUI(Group) {
@@ -79,7 +81,6 @@ local CustomLobbyModsPanel = ClassUI(Group) {
 
         self.Trash = TrashBag()
         self.Ready = false
-        self.Active = false
         self.Scrollbar = false
 
         self.ModsGrid = Grid(self, GridContentWidth, RowHeight)
@@ -88,51 +89,41 @@ local CustomLobbyModsPanel = ClassUI(Group) {
         self.Empty:DisableHitTest()
         self.Empty:Hide()
 
-        self.ManageButton = UIUtil.CreateButtonWithDropshadow(self, '/BUTTON/medium/', "Manage mods")
+        -- the tab's actions live in their own sub-area pinned to the bottom; the primary action is
+        -- right-aligned
+        self.ActionArea = Group(self, "CustomLobbyModsActions")
+        self.ManageButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/medium/', "Manage mods")
         self.ManageButton.OnClick = function(button, modifiers)
             CustomLobbyModSelect.Open(GetFrame(0))
         end
 
-        -- only the shared sim mods are a model field; UI mods (prefs) are refreshed on activation
+        -- only the shared sim mods are a model field; UI mods (prefs) are picked up on the first
+        -- render (Initialize), since the panel is created fresh each time its tab is selected
         self.ModsObserver = self.Trash:Add(
             LazyVarDerive(CustomLobbyLaunchModel.GetSingleton().GameMods, function(lazy)
                 lazy()
                 self:Refresh()
-                if not self.Active then
-                    self:Hide()
-                end
             end))
     end,
 
     ---@param self UICustomLobbyModsPanel
     __post_init = function(self)
-        Layouter(self.ManageButton):AtHorizontalCenterIn(self):AtBottomIn(self, 6):End()
+        Layouter(self.ActionArea):AtLeftIn(self):AtRightIn(self):AtBottomIn(self):Height(ActionHeight):End()
+        Layouter(self.ManageButton):AtRightIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea):End()
         Layouter(self.ModsGrid)
             :AtLeftIn(self, 6):Width(GridContentWidth)
-            :AtTopIn(self, 6):AnchorToTop(self.ManageButton, 8)
+            :AtTopIn(self, 6):AnchorToTop(self.ActionArea, 8)
             :End()
         Layouter(self.Empty):AtHorizontalCenterIn(self.ModsGrid):AtTopIn(self.ModsGrid, 8):End()
     end,
 
-    --- Builds the grid's scrollbar; called by the host after the panel has a concrete height.
+    --- Builds the grid's scrollbar + does the first render (picking up the current UI-mod prefs).
+    --- Called by the host after it has sized the panel (the grid needs a concrete height).
     ---@param self UICustomLobbyModsPanel
     Initialize = function(self)
         self.Ready = true
         self.Scrollbar = UIUtil.CreateVertScrollbarFor(self.ModsGrid)
-    end,
-
-    --- Shows + refreshes the panel when it becomes the active tab (also picks up UI-mod prefs
-    --- changed while it was inactive); hides it otherwise.
-    ---@param self UICustomLobbyModsPanel
-    ---@param active boolean
-    SetActive = function(self, active)
-        self.Active = active
-        if active then
-            self:Show()
-            self:Refresh()
-        else
-            self:Hide()
-        end
+        self:Refresh()
     end,
 
     --- Rebuilds the enabled-mods grid: a Game mods section (shared sim mods) + a UI mods section

@@ -21,8 +21,8 @@
 --******************************************************************************************************
 
 -- The Units tab panel of the config interface: a placeholder until the unit-restrictions slice
--- lands. A config-interface tab panel driven by the host via `SetActive`; it implements the same
--- panel interface (`Initialize` / `SetActive`) as the others so the host can treat them uniformly.
+-- lands. A config-interface tab panel: the host creates it when the Units tab is selected and
+-- destroys it on switch, and calls `Initialize` after sizing it (same interface as the others).
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
@@ -49,20 +49,9 @@ local CustomLobbyUnitsPanel = ClassUI(Group) {
         Layouter(self.Info):AtHorizontalCenterIn(self):AtTopIn(self, 16):End()
     end,
 
-    --- Nothing deferred; kept for a uniform panel interface.
+    --- Nothing deferred (no grid); kept for a uniform panel interface (the host calls it).
     ---@param self UICustomLobbyUnitsPanel
     Initialize = function(self)
-    end,
-
-    --- Shows or hides the panel.
-    ---@param self UICustomLobbyUnitsPanel
-    ---@param active boolean
-    SetActive = function(self, active)
-        if active then
-            self:Show()
-        else
-            self:Hide()
-        end
     end,
 }
 

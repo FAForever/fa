@@ -28,9 +28,10 @@
 -- marker's tooltip names the precise origin (`Map: …` / `Mod: …`). The schema is derived per-peer
 -- from the synced scenario + mods via `optionutil`; the values are the synced `GameOptions`.
 --
--- It is a config-interface tab panel — the host drives it via `SetActive`. It only builds + shows
--- its grid while active (and re-hides after a refresh if it isn't), so a hidden tab never renders
--- over the active one. `Initialize` builds the scrollbar once the panel has a concrete height.
+-- It is a config-interface tab panel: the host creates it when the Options tab is selected and
+-- destroys it on switch, so it's the live/visible panel for its whole lifetime — model observers
+-- just rebuild it. `Initialize` (called by the host after sizing it) builds the grid's scrollbar +
+-- does the first render; the grid needs a concrete height by then.
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
@@ -54,6 +55,7 @@ local RowHeight = 22
 local ScrollGap = 18
 local GridContentWidth = 360 - 6 - ScrollGap
 local LabelMaxChars = 26
+local ActionHeight = 40                -- the bottom action sub-area that holds the tab's buttons
 
 local SpecialColor = 'ffd0a24c'      -- marker + label tint for a map/mod option
 local NormalColor = 'ffc8ccd0'
@@ -74,13 +76,13 @@ end
 ---@class UICustomLobbyOptionsPanel : Group
 ---@field Trash TrashBag
 ---@field Ready boolean
----@field Active boolean
 ---@field IsHost boolean
 ---@field HideDefaults boolean
 ---@field HideDefaultsToggle Checkbox
 ---@field OptionsGrid Grid
 ---@field Scrollbar Scrollbar | false
 ---@field Empty Text
+---@field ActionArea Group
 ---@field EditButton Button
 ---@field ResetButton Button
 ---@field ScenarioObserver LazyVar
@@ -96,7 +98,6 @@ local CustomLobbyOptionsPanel = ClassUI(Group) {
 
         self.Trash = TrashBag()
         self.Ready = false
-        self.Active = false
         self.IsHost = false
         self.HideDefaults = true
         self.Scrollbar = false
@@ -116,76 +117,59 @@ local CustomLobbyOptionsPanel = ClassUI(Group) {
         self.Empty:DisableHitTest()
         self.Empty:Hide()
 
-        self.EditButton = UIUtil.CreateButtonWithDropshadow(self, '/BUTTON/medium/', "Options")
+        -- the tab's actions live in their own sub-area pinned to the bottom; the primary action
+        -- (open the editor) is right-aligned, the secondary (reset) sits to its left
+        self.ActionArea = Group(self, "CustomLobbyOptionsActions")
+        self.EditButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/medium/', "Options")
         self.EditButton.OnClick = function(button, modifiers)
             CustomLobbyOptionSelect.Open(GetFrame(0))
         end
-        self.ResetButton = UIUtil.CreateButtonWithDropshadow(self, '/BUTTON/medium/', "Reset options")
+        self.ResetButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/medium/', "Reset options")
         self.ResetButton.OnClick = function(button, modifiers)
             CustomLobbyController.RequestResetGameOptions()
         end
         Tooltip.AddControlTooltipManual(self.ResetButton, "Reset options", "Reset every option to its default value.")
 
+        -- the panel is created/destroyed with its tab, so it's always the live/visible panel while
+        -- it exists — observers just rebuild (Refresh is Ready-gated); no show/hide juggling
         local launch = CustomLobbyLaunchModel.GetSingleton()
         self.ScenarioObserver = self.Trash:Add(
-            LazyVarDerive(launch.ScenarioFile, function(lazy) lazy(); self:OnModelChanged() end))
+            LazyVarDerive(launch.ScenarioFile, function(lazy) lazy(); self:Refresh() end))
         self.OptionsObserver = self.Trash:Add(
-            LazyVarDerive(launch.GameOptions, function(lazy) lazy(); self:OnModelChanged() end))
+            LazyVarDerive(launch.GameOptions, function(lazy) lazy(); self:Refresh() end))
         self.ModsObserver = self.Trash:Add(
-            LazyVarDerive(launch.GameMods, function(lazy) lazy(); self:OnModelChanged() end))
+            LazyVarDerive(launch.GameMods, function(lazy) lazy(); self:Refresh() end))
 
         local localModel = CustomLobbyLocalModel.GetSingleton()
         self.IsHostObserver = self.Trash:Add(
             LazyVarDerive(localModel.IsHost, function(isHostLazy)
                 self.IsHost = isHostLazy()
                 self:ApplyHostVisibility()
-                if not self.Active then
-                    self:Hide()
-                end
             end))
     end,
 
     ---@param self UICustomLobbyOptionsPanel
     __post_init = function(self)
+        Layouter(self.ActionArea):AtLeftIn(self):AtRightIn(self):AtBottomIn(self):Height(ActionHeight):End()
+        Layouter(self.EditButton):AtRightIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea):End()
+        Layouter(self.ResetButton):AnchorToLeft(self.EditButton, 8):AtVerticalCenterIn(self.ActionArea):End()
+
         Layouter(self.HideDefaultsToggle):AtLeftIn(self, 6):AtTopIn(self, 4):End()
-        Layouter(self.ResetButton):AtHorizontalCenterIn(self):AtBottomIn(self, 6):End()
-        Layouter(self.EditButton):AtHorizontalCenterIn(self):AnchorToTop(self.ResetButton, 6):End()
         Layouter(self.OptionsGrid)
             :AtLeftIn(self, 6):Width(GridContentWidth)
-            :AnchorToBottom(self.HideDefaultsToggle, 6):AnchorToTop(self.EditButton, 8)
+            :AnchorToBottom(self.HideDefaultsToggle, 6):AnchorToTop(self.ActionArea, 8)
             :End()
         Layouter(self.Empty):AtHorizontalCenterIn(self.OptionsGrid):AtTopIn(self.OptionsGrid, 8):End()
     end,
 
-    --- Builds the grid's scrollbar; called by the host after the panel has a concrete height.
+    --- Builds the grid's scrollbar + does the first render. Called by the host after it has sized
+    --- the panel (the grid needs a concrete height — three-phase init, /lua/ui/CLAUDE.md § 1).
     ---@param self UICustomLobbyOptionsPanel
     Initialize = function(self)
         self.Ready = true
         self.Scrollbar = UIUtil.CreateVertScrollbarFor(self.OptionsGrid)
-    end,
-
-    --- A relevant model field changed: rebuild, and if we're not the active tab re-hide so the
-    --- freshly built rows don't render over the active one.
-    ---@param self UICustomLobbyOptionsPanel
-    OnModelChanged = function(self)
         self:Refresh()
-        if not self.Active then
-            self:Hide()
-        end
-    end,
-
-    --- Shows + refreshes the panel when it becomes the active tab; hides it otherwise.
-    ---@param self UICustomLobbyOptionsPanel
-    ---@param active boolean
-    SetActive = function(self, active)
-        self.Active = active
-        if active then
-            self:Show()
-            self:Refresh()
-            self:ApplyHostVisibility()
-        else
-            self:Hide()
-        end
+        self:ApplyHostVisibility()
     end,
 
     --- Rebuilds the read-only options grid, grouped into Lobby / Scenario / Mods sections with the

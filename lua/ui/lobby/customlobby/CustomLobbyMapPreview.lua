@@ -21,7 +21,8 @@
 --******************************************************************************************************
 
 -- The in-lobby map preview: the shared scenario-preview surface (CustomLobbyScenarioPreview)
--- with the lobby's chrome — a glow border + dialog brackets — wrapped around it, bound to the
+-- with the lobby's chrome — a glow border (no dialog brackets; they don't suit a preview this
+-- small) — wrapped around it, bound to the
 -- launch model.
 --
 -- It owns the model wiring only: it subscribes to `ScenarioFile` (load the scenario, hand it to
@@ -59,7 +60,6 @@ local CustomLobbyMapPreview = ClassUI(Group) {
         self.Trash = TrashBag()
 
         self.Overlay = UIUtil.CreateBitmap(self, '/scx_menu/gameselect/map-panel-glow_bmp.dds')
-        UIUtil.CreateDialogBrackets(self, 30, 24, 30, 24)
 
         -- the shared surface, with faction icons for spawns
         self.Surface = CustomLobbyScenarioPreview.Create(self, {

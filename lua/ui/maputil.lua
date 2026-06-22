@@ -96,6 +96,7 @@
 ---@field norushoffsetY_ARMY_16? number
 ---@field preview? FileName
 ---@field url? string         # optional link to the map's page (vault / repo); shown in the lobby
+---@field author? string      # optional map author; not standard, shown in the lobby when present
 ---@field save FileName
 ---@field script FileName
 ---@field size {[1]: number, [2]: number}
