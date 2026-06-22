@@ -32,7 +32,8 @@
 --
 -- The result feeds CustomLobbyContextMenu.Show (a list of { label, action, enabled }).
 
-local CustomLobbyAuthoritativeModel = import("/lua/ui/lobby/customlobby/customlobbyauthoritativemodel.lua")
+local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
+local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 
 -------------------------------------------------------------------------------
@@ -93,11 +94,11 @@ local SlotMenu = {
 }
 
 --- Whether `ownerId` is in the observer list.
----@param model UICustomLobbyAuthoritativeModel
+---@param launch UICustomLobbyLaunchModel
 ---@param ownerId UILobbyPeerId
 ---@return boolean
-local function IsObserver(model, ownerId)
-    local observers = model.Observers()
+local function IsObserver(launch, ownerId)
+    local observers = launch.Observers()
     for i = 1, table.getn(observers) do
         if observers[i].OwnerID == ownerId then
             return true
@@ -110,16 +111,17 @@ end
 ---@param slot number
 ---@return UICustomLobbySlotMenuContext
 local function SlotContext(slot)
-    local model = CustomLobbyAuthoritativeModel.GetSingleton()
-    local player = model.Players[slot]()
-    local localId = model.LocalPeerId()
+    local launch = CustomLobbyLaunchModel.GetSingleton()
+    local localModel = CustomLobbyLocalModel.GetSingleton()
+    local player = launch.Players[slot]()
+    local localId = localModel.LocalPeerId()
     return {
         slot = slot,
         player = player,
-        isHost = model.IsHost(),
+        isHost = localModel.IsHost(),
         isYou = (player and player.OwnerID == localId) and true or false,
         isOpen = not player,
-        localIsObserver = IsObserver(model, localId),
+        localIsObserver = IsObserver(launch, localId),
     }
 end
 

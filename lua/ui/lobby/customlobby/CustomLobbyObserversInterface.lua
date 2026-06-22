@@ -29,7 +29,7 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local Group = import("/lua/maui/group.lua").Group
-local CustomLobbyAuthoritativeModel = import("/lua/ui/lobby/customlobby/customlobbyauthoritativemodel.lua")
+local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
@@ -53,7 +53,7 @@ local CustomLobbyObserversInterface = Class(Group) {
         self.Names = UIUtil.CreateText(self, "—", 12, UIUtil.bodyFont)
         self.Names:SetColor('ff9aa0a8')
 
-        local model = CustomLobbyAuthoritativeModel.GetSingleton()
+        local model = CustomLobbyLaunchModel.GetSingleton()
         self.ObserversObserver = self.Trash:Add(
             LazyVarDerive(model.Observers, function(observersLazy)
                 self:OnObserversChanged(observersLazy())

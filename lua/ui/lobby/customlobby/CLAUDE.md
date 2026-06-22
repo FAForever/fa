@@ -16,28 +16,36 @@ Folder `customlobby/`, class/module prefix `CustomLobby` — pairs with `autolob
 `Autolobby*`. "Custom" is FAF's own term for non-matchmaker games (the autolobby is
 the automated/matchmaker path).
 
-## Two models
+## Three models
 
-- **[CustomLobbyAuthoritativeModel.lua](CustomLobbyAuthoritativeModel.lua)** — the
-  state the **host dictates** and that becomes part of the launched scenario: players,
-  game options, mods, scenario, slot flags, identity. `Players` is an **array of
-  per-slot LazyVars** so one slot's change re-fires only that row. Write helpers
-  (`SetPlayer`, `SetPlayerField`, …) keep the copy-then-`Set` discipline.
-- **[CustomLobbyModel.lua](CustomLobbyModel.lua)** — general, local, high-frequency
-  state that is **not** part of the scenario (CPU benchmarks now; ping / connection
-  status later). Kept separate so its churn doesn't dirty the authoritative snapshot.
+State is split by two questions — *is it shared (host-dictated → everyone)?* and *does
+it get launched (becomes part of the game)?* See the `customlobby-model-choice` skill.
+
+- **[CustomLobbyLaunchModel.lua](CustomLobbyLaunchModel.lua)** — shared **and** launched:
+  the launch payload (players, observers, scenario, game options, mods, auto-teams, spawn
+  mex) + `MaxSlots` + the `UICustomLobbyPlayer` shape. `Players` is an **array of per-slot
+  LazyVars** so one slot's change re-fires only that row. Write helpers (`SetPlayer`,
+  `SetPlayerField`, `AddObserver`, …) keep the copy-then-`Set` discipline.
+- **[CustomLobbySessionModel.lua](CustomLobbySessionModel.lua)** — shared but **not**
+  launched: lobby-room management (slot count, closed slots). A closed slot is just empty
+  at launch and slot count is map-derived presentation — neither reaches the scenario.
+- **[CustomLobbyLocalModel.lua](CustomLobbyLocalModel.lua)** — **per-peer, never synced**:
+  identity (`LocalPeerId` / `HostID` / `IsHost`, set on the connection handshake) +
+  connectivity (CPU benchmarks now; ping later). Broadcasting identity would corrupt the
+  receiver's sense of itself, so it never goes on the wire.
 
 ## Status
 
 | File | Role |
 |------|------|
-| [CustomLobbyAuthoritativeModel.lua](CustomLobbyAuthoritativeModel.lua) | host-dictated / scenario state (see above). |
-| [CustomLobbyModel.lua](CustomLobbyModel.lua) | local connectivity state (CPU benchmarks + per-peer sim-performance history). |
+| [CustomLobbyLaunchModel.lua](CustomLobbyLaunchModel.lua) | shared + launched state — the launch payload (see above). |
+| [CustomLobbySessionModel.lua](CustomLobbySessionModel.lua) | shared, lobby-room-only state (slot count, closed slots). |
+| [CustomLobbyLocalModel.lua](CustomLobbyLocalModel.lua) | per-peer state, never synced: identity + CPU benchmarks. |
 | [CustomLobbyPerformancePopover.lua](CustomLobbyPerformancePopover.lua) | hover popover over the CPU column; hand-built bitmap bar chart of a peer's `PerformanceTrackingV2` history, with a yellow recommended-unit-cap line. |
 | [CustomLobbyInstance.lua](CustomLobbyInstance.lua) | thin `moho.lobby_methods` shell; validates/dispatches traffic, forwards callbacks to the controller. |
 | [CustomLobbyController.lua](CustomLobbyController.lua) | host-authority logic (free functions): seating, `Process*` handlers, intents (`RequestSetReady`, `RequestTakeSlot`, `RequestSwapSlots`, `RequestEject`, `RequestMoveToObserver` — all keyed by slot index / bool so a chat command can call them too; permission is gated separately), sharing the stored CPU benchmark. |
 | [CustomLobbyRules.lua](CustomLobbyRules.lua) | game-rule derivations from lobby state (not view, not networking): `RecommendedUnitCap()` (per-player cap by map size, memoised scenario lookup). |
-| [CustomLobbyMessages.lua](CustomLobbyMessages.lua) | message registry: `AddPlayer`, `SetPlayers`, `SentLaunchInfo` (full launch-config snapshot: scenario / options / mods / slot flags), `SetReady`, `TakeSlot`, `DisconnectPeer`, `ReportCpuBenchmark`, `SetCpuBenchmarks`. |
+| [CustomLobbyMessages.lua](CustomLobbyMessages.lua) | message registry: `AddPlayer`, `SetPlayers` (launch model: players + observers), `SentLaunchInfo` (launch model: scenario / options / mods / teams / spawn mex), `SetSessionState` (session model: slot count / closed slots), `SetReady`, `TakeSlot`, `DisconnectPeer`, `ReportCpuBenchmark`, `SetCpuBenchmarks`. |
 | [CustomLobbyContextMenu.lua](CustomLobbyContextMenu.lua) | generic framed floating menu; `Show(entries, x, y)` renders any `{label, action, enabled}` list, dismisses on item click / click-outside / Esc. Knows nothing about the lobby. |
 | [CustomLobbyMenus.lua](CustomLobbyMenus.lua) | declarative menu **definitions**: entry lists with `when(ctx)`/`action(ctx)` filtered by lobby state (`BuildSlotMenu`). Adding/state-gating an item is a one-liner here. |
 | [CustomLobbySlotInterface.lua](CustomLobbySlotInterface.lua) | one slot row; subscribes to its slot + CPU benchmarks; CPU column shows max units at +0 with a green→red cap-headroom square; left-click an open slot to take it / your own to toggle ready; right-click opens its context menu; the host can drag a row onto another to swap. |
@@ -47,8 +55,9 @@ the automated/matchmaker path).
 | [/lua/ui/lobby/lobby.lua](../lobby.lua) | engine entry wrapper (`CreateLobby`/`HostGame`/`JoinGame`) → CustomLobby. Old lobby preserved at `lobby-old.lua`. |
 
 Working today: host + clients see each other (host-authoritative player sync), the
-host's launch config (scenario / options / mods / slot flags) is pushed to clients as a
-whole `SentLaunchInfo` snapshot (on join and on change) so the map preview etc. render,
+host's launch config (scenario / options / mods) and session state (slot count / closed
+slots) are pushed to clients as whole snapshots (`SentLaunchInfo` + `SetSessionState`, on
+join and on change) so the map preview / slot grid render,
 ready toggles round-trip, players can **take an open slot** (click it) and the host can
 **swap** (drag a row onto another), **eject**, and **move a player to observers** (right-click
 → context menu); observers are synced in the `SetPlayers` snapshot, shown in an observer

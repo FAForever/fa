@@ -33,9 +33,9 @@ local Color = import("/lua/shared/color.lua")
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Dragger = import("/lua/maui/dragger.lua").Dragger
-local CustomLobbyAuthoritativeModel = import("/lua/ui/lobby/customlobby/customlobbyauthoritativemodel.lua")
+local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
-local CustomLobbyModel = import("/lua/ui/lobby/customlobby/customlobbymodel.lua")
+local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
 local CustomLobbyPerformancePopover = import("/lua/ui/lobby/customlobby/customlobbyperformancepopover.lua")
 local CustomLobbyContextMenu = import("/lua/ui/lobby/customlobby/customlobbycontextmenu.lua")
 local CustomLobbyMenus = import("/lua/ui/lobby/customlobby/customlobbymenus.lua")
@@ -217,14 +217,14 @@ local CustomLobbySlotInterface = Class(Group) {
             return false
         end
 
-        local model = CustomLobbyAuthoritativeModel.GetSingleton()
+        local model = CustomLobbyLaunchModel.GetSingleton()
         self.PlayerObserver = self.Trash:Add(
             LazyVarDerive(model.Players[slotIndex], function(playerLazy)
                 self:OnPlayerChanged(playerLazy())
             end))
 
         self.CpuObserver = self.Trash:Add(
-            LazyVarDerive(CustomLobbyModel.GetSingleton().CpuBenchmarks, function(benchmarksLazy)
+            LazyVarDerive(CustomLobbyLocalModel.GetSingleton().CpuBenchmarks, function(benchmarksLazy)
                 -- read the lazy so the dependency edge (re)forms; the value itself
                 -- is read from the model inside RefreshCpu
                 benchmarksLazy()
@@ -292,7 +292,7 @@ local CustomLobbySlotInterface = Class(Group) {
             return
         end
 
-        local metrics = CustomLobbyModel.GetSingleton().CpuBenchmarks()[player.OwnerID]
+        local metrics = CustomLobbyLocalModel.GetSingleton().CpuBenchmarks()[player.OwnerID]
         local category = PickCategory(metrics)
         local atZero = category and category[BucketForRate(0)]
         if not (atZero and atZero.UnitCount) then
@@ -338,7 +338,7 @@ local CustomLobbySlotInterface = Class(Group) {
             CustomLobbyPerformancePopover.Hide()
             return
         end
-        local benchmark = CustomLobbyModel.GetSingleton().CpuBenchmarks()[player.OwnerID]
+        local benchmark = CustomLobbyLocalModel.GetSingleton().CpuBenchmarks()[player.OwnerID]
         CustomLobbyPerformancePopover.Show(self.Cpu, benchmark, CustomLobbyRules.RecommendedUnitCap())
     end,
 
@@ -420,7 +420,7 @@ local CustomLobbySlotInterface = Class(Group) {
             CustomLobbyController.RequestTakeSlot(self.SlotIndex)
             return
         end
-        if player.OwnerID == CustomLobbyAuthoritativeModel.GetSingleton().LocalPeerId() then
+        if player.OwnerID == CustomLobbyLocalModel.GetSingleton().LocalPeerId() then
             CustomLobbyController.RequestSetReady(not player.Ready)
         end
     end,

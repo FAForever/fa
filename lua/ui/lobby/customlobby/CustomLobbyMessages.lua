@@ -28,8 +28,8 @@
 -- Each message's payload is typed via a `---@class … : UILobbyReceivedMessage` so the
 -- handlers (and any future tooling) know its exact shape.
 
-local CustomLobbyAuthoritativeModel = import("/lua/ui/lobby/customlobby/customlobbyauthoritativemodel.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
+local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
 
 ---@param lobby UICustomLobbyInstance
 ---@return boolean
@@ -41,7 +41,7 @@ end
 ---@param data UILobbyReceivedMessage
 ---@return boolean
 local function IsFromHost(lobby, data)
-    return data.SenderID == CustomLobbyAuthoritativeModel.GetSingleton().HostID()
+    return data.SenderID == CustomLobbyLocalModel.GetSingleton().HostID()
 end
 
 ---@class UICustomLobbyMessageHandler
@@ -89,18 +89,16 @@ CustomLobbyMessages = {
         end,
     },
 
-    -- The host's authoritative game configuration — everything the launch needs beyond
-    -- the player list (scenario, options, mods, slot flags). Broadcast on any change and
-    -- to each peer as it joins, so the whole snapshot is sent rather than per-field deltas.
+    -- The host's launch configuration — the launch-state fields that aren't the player
+    -- list (scenario, options, mods, teams, spawn mex). Broadcast on any change and to
+    -- each peer as it joins; the whole snapshot is sent rather than per-field deltas.
     SentLaunchInfo = {
         ---@class UICustomLobbySentLaunchInfoMessage : UILobbyReceivedMessage
         ---@field ScenarioFile FileName | false
         ---@field GameOptions table
         ---@field GameMods table
-        ---@field ClosedSlots table<number, boolean>
-        ---@field SpawnMex table<number, boolean>
         ---@field AutoTeams table<number, number>
-        ---@field SlotCount number
+        ---@field SpawnMex table<number, boolean>
 
         ---@param data UICustomLobbySentLaunchInfoMessage
         Validate = function(lobby, data)
@@ -112,6 +110,26 @@ CustomLobbyMessages = {
         ---@param data UICustomLobbySentLaunchInfoMessage
         Handler = function(lobby, data)
             CustomLobbyController.ProcessSentLaunchInfo(lobby, data)
+        end,
+    },
+
+    -- The host's session state — lobby-room management that is NOT launched (slot count,
+    -- closed slots). A separate snapshot from the launch config so each stays focused.
+    SetSessionState = {
+        ---@class UICustomLobbySetSessionStateMessage : UILobbyReceivedMessage
+        ---@field SlotCount number
+        ---@field ClosedSlots table<number, boolean>
+
+        ---@param data UICustomLobbySetSessionStateMessage
+        Validate = function(lobby, data)
+            return type(data.SlotCount) == 'number'
+        end,
+        Accept = function(lobby, data)
+            return IsFromHost(lobby, data)
+        end,
+        ---@param data UICustomLobbySetSessionStateMessage
+        Handler = function(lobby, data)
+            CustomLobbyController.ProcessSetSessionState(lobby, data)
         end,
     },
 

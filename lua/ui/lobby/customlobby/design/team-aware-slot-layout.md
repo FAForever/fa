@@ -91,7 +91,7 @@ markers, as today.
 - `CustomLobbyInterface` shrinks to: header, this players component (left), the
   tabbed panel (right), footer.
 - No model changes beyond reading `AutoTeams` (already present on
-  `CustomLobbyAuthoritativeModel` as part of game options / its own LazyVar).
+  `CustomLobbyLaunchModel` as its own LazyVar) and `SlotCount` (on `CustomLobbySessionModel`).
 
 ## Open question
 

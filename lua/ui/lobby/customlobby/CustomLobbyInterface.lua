@@ -32,7 +32,9 @@ local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
-local CustomLobbyAuthoritativeModel = import("/lua/ui/lobby/customlobby/customlobbyauthoritativemodel.lua")
+local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
+local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/customlobbysessionmodel.lua")
+local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 local CustomLobbySlotInterface = import("/lua/ui/lobby/customlobby/customlobbyslotinterface.lua")
 local CustomLobbyObserversInterface = import("/lua/ui/lobby/customlobby/customlobbyobserversinterface.lua")
@@ -78,7 +80,7 @@ local CustomLobbyInterface = Class(Group) {
 
         -- One row per possible slot; the SlotCount observer reveals the active ones.
         self.Slots = {}
-        for slot = 1, CustomLobbyAuthoritativeModel.MaxSlots do
+        for slot = 1, CustomLobbyLaunchModel.MaxSlots do
             self.Slots[slot] = CustomLobbySlotInterface.Create(self.SlotsPanel, slot, self)
         end
 
@@ -92,9 +94,9 @@ local CustomLobbyInterface = Class(Group) {
             EscapeHandler.HandleEsc(false)
         end
 
-        local model = CustomLobbyAuthoritativeModel.GetSingleton()
+        local session = CustomLobbySessionModel.GetSingleton()
         self.SlotCountObserver = self.Trash:Add(
-            LazyVarDerive(model.SlotCount, function(slotCountLazy)
+            LazyVarDerive(session.SlotCount, function(slotCountLazy)
                 self:OnSlotCountChanged(slotCountLazy())
             end))
     end,
@@ -110,7 +112,7 @@ local CustomLobbyInterface = Class(Group) {
         Layouter(self.SlotsPanel)
             :AtLeftTopIn(self, 40, 80)
             :Width(PanelWidth)
-            :Height(CustomLobbyAuthoritativeModel.MaxSlots * SlotHeight)
+            :Height(CustomLobbyLaunchModel.MaxSlots * SlotHeight)
             :End()
 
         -- map preview to the right of the slots; hides itself until a scenario is set
@@ -122,7 +124,7 @@ local CustomLobbyInterface = Class(Group) {
             :End()
 
         -- stack the rows top-to-bottom inside the panel via sibling anchoring
-        for slot = 1, CustomLobbyAuthoritativeModel.MaxSlots do
+        for slot = 1, CustomLobbyLaunchModel.MaxSlots do
             local row = self.Slots[slot]
             local builder = Layouter(row)
                 :AtLeftIn(self.SlotsPanel)
@@ -146,7 +148,7 @@ local CustomLobbyInterface = Class(Group) {
     ---@param self UICustomLobbyInterface
     ---@param count number
     OnSlotCountChanged = function(self, count)
-        for slot = 1, CustomLobbyAuthoritativeModel.MaxSlots do
+        for slot = 1, CustomLobbyLaunchModel.MaxSlots do
             if slot <= count then
                 self.Slots[slot]:Show()
             else
@@ -167,11 +169,10 @@ local CustomLobbyInterface = Class(Group) {
     ---@param slot number
     ---@return boolean
     CanDrag = function(self, slot)
-        local model = CustomLobbyAuthoritativeModel.GetSingleton()
-        if not model.IsHost() then
+        if not CustomLobbyLocalModel.GetSingleton().IsHost() then
             return false
         end
-        return model.Players[slot]() ~= false
+        return CustomLobbyLaunchModel.GetSingleton().Players[slot]() ~= false
     end,
 
     --- The active slot whose row contains the screen point, or nil.
@@ -180,7 +181,7 @@ local CustomLobbyInterface = Class(Group) {
     ---@param y number
     ---@return number | nil
     SlotIndexAt = function(self, x, y)
-        local count = CustomLobbyAuthoritativeModel.GetSingleton().SlotCount()
+        local count = CustomLobbySessionModel.GetSingleton().SlotCount()
         for slot = 1, count do
             local row = self.Slots[slot]
             if row and x >= row.Left() and x <= row.Right() and y >= row.Top() and y <= row.Bottom() then
@@ -250,7 +251,7 @@ local CustomLobbyInterface = Class(Group) {
     ---@param source number
     ---@return Group
     CreateDragGhost = function(self, source)
-        local player = CustomLobbyAuthoritativeModel.GetSingleton().Players[source]()
+        local player = CustomLobbyLaunchModel.GetSingleton().Players[source]()
         local name = (player and player.PlayerName) or ("Slot " .. tostring(source))
 
         local ghost = Group(self, "CustomLobbyDragGhost")
@@ -319,13 +320,16 @@ end
 ---   `UI_Lua import("/lua/ui/lobby/customlobby/customlobbyinterface.lua").OpenDebug()`
 function OpenDebug()
     local slotCount = 6
-    local model = CustomLobbyAuthoritativeModel.SetupSingleton(slotCount)
-    model.LocalPeerId:Set("1")
-    model.IsHost:Set(true)
+    local launch = CustomLobbyLaunchModel.SetupSingleton()
+    CustomLobbySessionModel.SetupSingleton(slotCount)
+
+    local localModel = CustomLobbyLocalModel.SetupSingleton()
+    localModel.LocalPeerId:Set("1")
+    localModel.IsHost:Set(true)
 
     -- four players in the first four slots, last two left open
     for slot = 1, 4 do
-        CustomLobbyAuthoritativeModel.SetPlayer(model, slot, {
+        CustomLobbyLaunchModel.SetPlayer(launch, slot, {
             PlayerName  = "Player " .. slot,
             OwnerID     = tostring(slot),
             Human       = slot ~= 4,                       -- slot 4 is an AI, to show the AI colour
@@ -341,14 +345,14 @@ function OpenDebug()
     end
 
     -- a couple of observers so the observer strip shows something
-    model.Observers:Set({
+    launch.Observers:Set({
         { PlayerName = "Zock",  OwnerID = "10", Human = true },
         { PlayerName = "Spag",  OwnerID = "11", Human = true },
     })
 
     -- a stock map so the preview renders; swap to any installed scenario if this
     -- one isn't present (an unknown path just leaves the preview frame empty)
-    CustomLobbyAuthoritativeModel.SetScenario(model, "/maps/scmp_009/scmp_009_scenario.lua")
+    CustomLobbyLaunchModel.SetScenario(launch, "/maps/scmp_009/scmp_009_scenario.lua")
 
     SetupSingleton()
 end

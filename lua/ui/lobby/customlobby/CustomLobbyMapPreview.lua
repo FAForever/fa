@@ -34,7 +34,7 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Group = import("/lua/maui/group.lua").Group
 local MapPreview = import("/lua/ui/controls/mappreview.lua").MapPreview
 local CustomLobbyMapPreviewSpawn = import("/lua/ui/lobby/customlobby/customlobbymappreviewspawn.lua")
-local CustomLobbyAuthoritativeModel = import("/lua/ui/lobby/customlobby/customlobbyauthoritativemodel.lua")
+local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
@@ -75,7 +75,7 @@ local CustomLobbyMapPreview = ClassUI(Group) {
 
         self.IconTrash = TrashBag()
 
-        local model = CustomLobbyAuthoritativeModel.GetSingleton()
+        local model = CustomLobbyLaunchModel.GetSingleton()
 
         -- the scenario file drives the whole preview: render on change, hide when unset
         self.ScenarioObserver = self.Trash:Add(
@@ -86,7 +86,7 @@ local CustomLobbyMapPreview = ClassUI(Group) {
         -- each slot drives only the spawn icons (faction / position) — refreshed against
         -- the already-loaded scenario, so a take/swap/faction change doesn't reload the map
         self.PlayerObservers = {}
-        for slot = 1, CustomLobbyAuthoritativeModel.MaxSlots do
+        for slot = 1, CustomLobbyLaunchModel.MaxSlots do
             self.PlayerObservers[slot] = self.Trash:Add(
                 LazyVarDerive(model.Players[slot], function(playerLazy)
                     playerLazy()
@@ -125,9 +125,9 @@ local CustomLobbyMapPreview = ClassUI(Group) {
     ---@param self UICustomLobbyMapPreview
     ---@return table<number, UICustomLobbyPlayer>
     _GatherPlayerOptions = function(self)
-        local model = CustomLobbyAuthoritativeModel.GetSingleton()
+        local model = CustomLobbyLaunchModel.GetSingleton()
         local options = {}
-        for slot = 1, CustomLobbyAuthoritativeModel.MaxSlots do
+        for slot = 1, CustomLobbyLaunchModel.MaxSlots do
             local player = model.Players[slot]()
             if player then
                 options[player.StartSpot or slot] = player

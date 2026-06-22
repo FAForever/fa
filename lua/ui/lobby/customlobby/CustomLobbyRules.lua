@@ -24,7 +24,7 @@
 -- Views call these for display hints; the controller may call them at launch. Keep the
 -- model the source of truth; this layer only derives.
 
-local CustomLobbyAuthoritativeModel = import("/lua/ui/lobby/customlobby/customlobbyauthoritativemodel.lua")
+local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
 
 -- Scenario file -> largest map dimension (ogrids). Loading a scenario is I/O, so the
 -- result is memoised per file (a map rarely changes, and the key changes if it does).
@@ -44,7 +44,7 @@ local function UnitsPerPlayer(maxDimension)
 end
 
 --- Largest dimension (ogrids) of the current scenario, or 0 when no map is set.
----@param model UICustomLobbyAuthoritativeModel
+---@param model UICustomLobbyLaunchModel
 ---@return number
 local function CurrentMapDimension(model)
     local scenarioFile = model.ScenarioFile()
@@ -70,10 +70,10 @@ end
 --- Returns nil when there are no players to scale by.
 ---@return number | nil
 function RecommendedUnitCap()
-    local model = CustomLobbyAuthoritativeModel.GetSingleton()
+    local model = CustomLobbyLaunchModel.GetSingleton()
 
     local players = 0
-    for slot = 1, CustomLobbyAuthoritativeModel.MaxSlots do
+    for slot = 1, CustomLobbyLaunchModel.MaxSlots do
         if model.Players[slot]() then
             players = players + 1
         end

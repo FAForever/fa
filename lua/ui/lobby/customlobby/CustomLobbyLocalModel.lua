@@ -20,40 +20,62 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
--- Local, high-frequency lobby state that is NOT part of the host's authoritative
--- game snapshot: CPU benchmarks (and later ping / connection status). Kept separate
--- from CustomLobbyAuthoritativeModel so its churn doesn't dirty the synced game state. See
--- /lua/ui/lobby/TARGET_ARCHITECTURE.md § 3 (LobbyConnectivityModel).
+-- The **local** state: this peer's own state, NOT shared and NOT broadcast. Two kinds:
+--   * identity — who this client is in the lobby (`LocalPeerId`, `HostID`, `IsHost`),
+--     established by the connection handshake (OnHosting / OnConnectionToHostEstablished).
+--     These are per-peer: the host's `IsHost` is true, a client's is false — broadcasting
+--     them would corrupt the receiver's sense of itself, so they never go on the wire.
+--   * connectivity — high-frequency local data (CPU benchmarks now; ping / connection
+--     status later) whose churn must not dirty the synced launch/session snapshots.
+--
+-- One of three lobby models — see /lua/ui/lobby/customlobby/CLAUDE.md:
+--   * LaunchModel   — shared, launched.
+--   * SessionModel  — shared, lobby-room only.
+--   * LocalModel    (this) — per-peer, never synced.
 
 local Create = import("/lua/lazyvar.lua").Create
 
---- Reactive connectivity-state singleton.
----@class UICustomLobbyModel
----@field CpuBenchmarks LazyVar<table<UILobbyPeerId, UIPerformanceMetrics>>        # peer id -> in-game sim-performance history (see /lua/system/performance.lua)
+-------------------------------------------------------------------------------
+--#region Reactive model
+
+--- Reactive local-state singleton (per-peer, never synced).
+---@class UICustomLobbyLocalModel
+---@field LocalPeerId   LazyVar<UILobbyPeerId>                                      # this client's peer id
+---@field HostID        LazyVar<UILobbyPeerId>                                      # the host's peer id
+---@field IsHost        LazyVar<boolean>                                            # whether this client is the host
+---@field CpuBenchmarks LazyVar<table<UILobbyPeerId, UIPerformanceMetrics>>         # peer id -> in-game sim-performance history (see /lua/system/performance.lua)
 local ModelInstance = nil
 
---- Allocates a fresh connectivity-model singleton, replacing any existing one.
----@return UICustomLobbyModel
+--- Allocates a fresh local-model singleton, replacing any existing one.
+---@return UICustomLobbyLocalModel
 function SetupSingleton()
-    ---@type UICustomLobbyModel
+    ---@type UICustomLobbyLocalModel
     local model = {
+        LocalPeerId   = Create("-1"),
+        HostID        = Create("-1"),
+        IsHost        = Create(false),
         CpuBenchmarks = Create({}),
     }
     ModelInstance = model
     return model
 end
 
---- Returns the connectivity-model singleton, creating it on first access.
----@return UICustomLobbyModel
+--- Returns the local-model singleton, creating it on first access.
+---@return UICustomLobbyLocalModel
 function GetSingleton()
     if not ModelInstance then
         SetupSingleton()
     end
-    return ModelInstance --[[@as UICustomLobbyModel]]
+    return ModelInstance --[[@as UICustomLobbyLocalModel]]
 end
 
+--#endregion
+
+-------------------------------------------------------------------------------
+--#region Write helpers
+
 --- Records a peer's in-game sim-performance history / benchmark (copy-then-Set).
----@param model UICustomLobbyModel
+---@param model UICustomLobbyLocalModel
 ---@param ownerId UILobbyPeerId
 ---@param benchmark UIPerformanceMetrics
 function SetCpuBenchmark(model, ownerId, benchmark)
@@ -61,6 +83,8 @@ function SetCpuBenchmark(model, ownerId, benchmark)
     all[ownerId] = benchmark
     model.CpuBenchmarks:Set(all)
 end
+
+--#endregion
 
 -------------------------------------------------------------------------------
 --#region Debugging
@@ -70,6 +94,9 @@ end
 function __moduleinfo.OnReload(newModule)
     if ModelInstance then
         local handle = newModule.SetupSingleton()
+        handle.LocalPeerId:Set(ModelInstance.LocalPeerId())
+        handle.HostID:Set(ModelInstance.HostID())
+        handle.IsHost:Set(ModelInstance.IsHost())
         handle.CpuBenchmarks:Set(ModelInstance.CpuBenchmarks())
     end
 end

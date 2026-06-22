@@ -20,17 +20,19 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
--- Reactive state singleton for the (custom-games) lobby — the single source of truth
--- that the controller writes to and the components observe via `Derive`. It holds no
--- UI references and no networking.
+-- The **launch** state: everything the host dictates that becomes part of the launched
+-- game (the gameInfo replacement from TARGET_ARCHITECTURE.md). This model IS the launch
+-- payload — the host broadcasts it whole (see CustomLobbyController.BroadcastLaunchInfo /
+-- BroadcastPlayers), and what the game launches with is exactly what's here.
 --
--- This is the gameInfo replacement from TARGET_ARCHITECTURE.md. Players live as an
--- array of per-slot LazyVars so a change to one slot only re-fires that slot's row
--- (replacing the legacy `SetSlotInfo` whole-row sledgehammer).
+-- It is one of three lobby models — see /lua/ui/lobby/customlobby/CLAUDE.md:
+--   * LaunchModel  (this)        — shared, launched.
+--   * SessionModel               — shared, lobby-room only (slot count / closed slots).
+--   * LocalModel                 — per-peer, never synced (identity, CPU benchmarks).
 --
--- Patterns mirror /lua/ui/lobby/autolobby/AutolobbyModel.lua and
--- /lua/ui/game/chat/ChatModel.lua. See /lua/ui/CLAUDE.md for the reactivity rules
--- (notably: never mutate a held table in place — copy then `:Set`).
+-- Players live as an array of per-slot LazyVars so a change to one slot only re-fires
+-- that slot's row. Write helpers keep the copy-then-`Set` discipline (see /lua/ui/CLAUDE.md
+-- § 2 — never mutate a held table in place).
 
 local Create = import("/lua/lazyvar.lua").Create
 
@@ -65,62 +67,49 @@ MaxSlots = 16
 -------------------------------------------------------------------------------
 --#region Reactive model
 
---- Reactive lobby-state singleton.
----@class UICustomLobbyAuthoritativeModel
----@field SlotCount   LazyVar<number>                                  # player slots the current map supports
----@field Players     LazyVar<UICustomLobbyPlayer | false>[]           # one LazyVar per slot (1..MaxSlots); false = empty
----@field Observers   LazyVar<UICustomLobbyPlayer[]>                    # observer list
----@field ClosedSlots LazyVar<table<number, boolean>>
----@field SpawnMex    LazyVar<table<number, boolean>>
----@field AutoTeams   LazyVar<table<number, number>>
----@field GameOptions LazyVar<table>
----@field GameMods    LazyVar<table>
+--- Reactive launch-state singleton (shared, host-dictated, part of the launch).
+---@class UICustomLobbyLaunchModel
+---@field Players      LazyVar<UICustomLobbyPlayer | false>[]           # one LazyVar per slot (1..MaxSlots); false = empty
+---@field Observers    LazyVar<UICustomLobbyPlayer[]>                   # observer list
+---@field SpawnMex     LazyVar<table<number, boolean>>                  # adaptive-map spawn-mex flags (embedded into the scenario at launch)
+---@field AutoTeams    LazyVar<table<number, number>>
+---@field GameOptions  LazyVar<table>
+---@field GameMods     LazyVar<table>
 ---@field ScenarioFile LazyVar<FileName | false>
----@field LocalPeerId LazyVar<UILobbyPeerId>
----@field HostID      LazyVar<UILobbyPeerId>
----@field IsHost      LazyVar<boolean>
 
----@type UICustomLobbyAuthoritativeModel | nil
+---@type UICustomLobbyLaunchModel | nil
 local ModelInstance = nil
 
---- Allocates a fresh model singleton, replacing any existing instance.
----@param slotCount? number
----@return UICustomLobbyAuthoritativeModel
-function SetupSingleton(slotCount)
-    slotCount = slotCount or 8
-
+--- Allocates a fresh launch-model singleton, replacing any existing instance.
+---@return UICustomLobbyLaunchModel
+function SetupSingleton()
     local players = {}
     for slot = 1, MaxSlots do
         players[slot] = Create(false)
     end
 
-    ---@type UICustomLobbyAuthoritativeModel
+    ---@type UICustomLobbyLaunchModel
     local model = {
-        SlotCount    = Create(slotCount),
         Players      = players,
         Observers    = Create({}),
-        ClosedSlots  = Create({}),
         SpawnMex     = Create({}),
         AutoTeams    = Create({}),
         GameOptions  = Create({}),
         GameMods     = Create({}),
         ScenarioFile = Create(false),
-        LocalPeerId  = Create("-1"),
-        HostID       = Create("-1"),
-        IsHost       = Create(false),
     }
 
     ModelInstance = model
     return model
 end
 
---- Returns the model singleton, creating it on first access.
----@return UICustomLobbyAuthoritativeModel
+--- Returns the launch-model singleton, creating it on first access.
+---@return UICustomLobbyLaunchModel
 function GetSingleton()
     if not ModelInstance then
         SetupSingleton()
     end
-    return ModelInstance --[[@as UICustomLobbyAuthoritativeModel]]
+    return ModelInstance --[[@as UICustomLobbyLaunchModel]]
 end
 
 --#endregion
@@ -130,11 +119,10 @@ end
 --
 -- The synced tables are LazyVar values, so a write must build a NEW table/value and
 -- `:Set` it — mutating in place never marks dependents dirty (see /lua/ui/CLAUDE.md
--- § 2). These helpers keep that discipline in one place so the controller can't get
--- it wrong.
+-- § 2). These helpers keep that discipline in one place.
 
 --- Places (or replaces) a player at a slot.
----@param model UICustomLobbyAuthoritativeModel
+---@param model UICustomLobbyLaunchModel
 ---@param slot number
 ---@param player UICustomLobbyPlayer
 function SetPlayer(model, slot, player)
@@ -142,14 +130,14 @@ function SetPlayer(model, slot, player)
 end
 
 --- Empties a slot.
----@param model UICustomLobbyAuthoritativeModel
+---@param model UICustomLobbyLaunchModel
 ---@param slot number
 function ClearPlayer(model, slot)
     model.Players[slot]:Set(false)
 end
 
 --- Sets a single field on the player in a slot (copy-then-Set on that slot only).
----@param model UICustomLobbyAuthoritativeModel
+---@param model UICustomLobbyLaunchModel
 ---@param slot number
 ---@param key string
 ---@param value any
@@ -164,7 +152,7 @@ function SetPlayerField(model, slot, key, value)
 end
 
 --- Sets a single game option (copy-then-Set).
----@param model UICustomLobbyAuthoritativeModel
+---@param model UICustomLobbyLaunchModel
 ---@param key string
 ---@param value any
 function SetGameOption(model, key, value)
@@ -173,25 +161,15 @@ function SetGameOption(model, key, value)
     model.GameOptions:Set(options)
 end
 
---- Sets the closed flag for a slot (copy-then-Set).
----@param model UICustomLobbyAuthoritativeModel
----@param slot number
----@param closed boolean
-function SetClosed(model, slot, closed)
-    local closedSlots = table.copy(model.ClosedSlots())
-    closedSlots[slot] = closed
-    model.ClosedSlots:Set(closedSlots)
-end
-
 --- Sets the scenario file.
----@param model UICustomLobbyAuthoritativeModel
+---@param model UICustomLobbyLaunchModel
 ---@param scenarioFile FileName | false
 function SetScenario(model, scenarioFile)
     model.ScenarioFile:Set(scenarioFile)
 end
 
 --- Appends a player to the observer list (copy-then-Set).
----@param model UICustomLobbyAuthoritativeModel
+---@param model UICustomLobbyLaunchModel
 ---@param player UICustomLobbyPlayer
 function AddObserver(model, player)
     local observers = table.copy(model.Observers())
@@ -200,7 +178,7 @@ function AddObserver(model, player)
 end
 
 --- Removes the observer owned by `ownerId` (copy-then-Set) and returns it, or nil.
----@param model UICustomLobbyAuthoritativeModel
+---@param model UICustomLobbyLaunchModel
 ---@param ownerId UILobbyPeerId
 ---@return UICustomLobbyPlayer | nil
 function RemoveObserver(model, ownerId)
@@ -224,28 +202,23 @@ end
 -------------------------------------------------------------------------------
 --#region Debugging
 
---- Hot-reload hook: rebuilds the singleton on the new module and copies the current
---- raw LazyVar values across so observers don't see a state reset.
+--- Hot-reload hook: rebuilds the singleton and copies the current values across.
 ---
---- NOTE: this list is maintained by hand — when you add a field to the model, add a
---- copy line here too, or its value is lost on every hot-reload.
+--- NOTE: maintained by hand — add a field to the model, add a copy line here too, or
+--- its value is lost on every hot-reload.
 ---@param newModule any
 function __moduleinfo.OnReload(newModule)
     if ModelInstance then
-        local handle = newModule.SetupSingleton(ModelInstance.SlotCount())
+        local handle = newModule.SetupSingleton()
         for slot = 1, MaxSlots do
             handle.Players[slot]:Set(ModelInstance.Players[slot]())
         end
         handle.Observers:Set(ModelInstance.Observers())
-        handle.ClosedSlots:Set(ModelInstance.ClosedSlots())
         handle.SpawnMex:Set(ModelInstance.SpawnMex())
         handle.AutoTeams:Set(ModelInstance.AutoTeams())
         handle.GameOptions:Set(ModelInstance.GameOptions())
         handle.GameMods:Set(ModelInstance.GameMods())
         handle.ScenarioFile:Set(ModelInstance.ScenarioFile())
-        handle.LocalPeerId:Set(ModelInstance.LocalPeerId())
-        handle.HostID:Set(ModelInstance.HostID())
-        handle.IsHost:Set(ModelInstance.IsHost())
     end
 end
 
