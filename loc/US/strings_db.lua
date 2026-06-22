@@ -1931,6 +1931,7 @@ Unit_Description_0438="Creates a protective Personal Shield around the SACU. Req
 Unit_Description_0439="Adds Teleportation capability. Requires considerable energy to activate."
 Unit_Description_0440="Expands the SACU's weaponry with an Overcharge function identical to that of the standard ACU. Requires 100000 energy storage for maximum damage."
 Unit_Description_xsl0301_ras="Increases SACU's resource generation and volatility.\n\n+10 mass production per second\n+1000 energy production per second\n+1000 Death Nuke damage\n+4 Death Nuke radius"
+Unit_Description_xsl0301_ras="Increases SACU's resource generation and volatility.\n\n+10 mass production per second\n+1000 energy production per second\n+1000 Death Nuke damage\n+4 Death Nuke radius"
 
 -- SERAPHIM -- Land Units
 Unit_Description_0337="Light, fast mobile reconnaissance unit. Equipped with a special ability, which makes the unit invisible to both radar and visual sensors when it is immobile. Can be used to obstruct mass spots when enabled. Can be disabled by moving the unit and is countered by Omni Sensors."
