@@ -40,6 +40,7 @@ local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
 ---@class UICustomLobbyMapPreview : Group
 ---@field Trash TrashBag
+---@field Ready boolean         # true once laid out by the parent; gates geometry-reading renders
 ---@field Preview MapPreview
 ---@field Overlay Bitmap
 ---@field PathToScenarioFile? FileName
@@ -75,12 +76,21 @@ local CustomLobbyMapPreview = ClassUI(Group) {
 
         self.IconTrash = TrashBag()
 
+        -- Geometry-reading renders (spawn-icon placement reads self.Preview.Width()) are gated
+        -- until we've been laid out by our parent — see __post_init. The Derive observers below
+        -- fire immediately on creation; without this gate, a reload with a scenario already set
+        -- would position icons against a not-yet-sized preview and trip the circular guard.
+        self.Ready = false
+
         local model = CustomLobbyLaunchModel.GetSingleton()
 
         -- the scenario file drives the whole preview: render on change, hide when unset
         self.ScenarioObserver = self.Trash:Add(
             LazyVarDerive(model.ScenarioFile, function(scenarioFileLazy)
-                self:OnScenarioFileChanged(scenarioFileLazy())
+                local scenarioFile = scenarioFileLazy()
+                if self.Ready then
+                    self:OnScenarioFileChanged(scenarioFile)
+                end
             end))
 
         -- each slot drives only the spawn icons (faction / position) — refreshed against
@@ -90,7 +100,9 @@ local CustomLobbyMapPreview = ClassUI(Group) {
             self.PlayerObservers[slot] = self.Trash:Add(
                 LazyVarDerive(model.Players[slot], function(playerLazy)
                     playerLazy()
-                    self:OnPlayersChanged()
+                    if self.Ready then
+                        self:OnPlayersChanged()
+                    end
                 end))
         end
     end,
@@ -151,6 +163,21 @@ local CustomLobbyMapPreview = ClassUI(Group) {
         LayoutHelpers.ReusedLayoutFor(self.EnergyIcon):Hide():End()
         LayoutHelpers.ReusedLayoutFor(self.MassIcon):Hide():End()
         LayoutHelpers.ReusedLayoutFor(self.WreckageIcon):Hide():End()
+
+        -- our PARENT lays us out after this __post_init returns, so self.Preview.Width() isn't
+        -- concrete yet. Defer the first render one frame, then mark ready so the observers drive
+        -- subsequent updates. (Without this, a reload with a scenario already set renders here —
+        -- against an unsized preview — and trips the circular-dependency guard.)
+        self.Trash:Add(ForkThread(
+            function()
+                WaitFrames(1)
+                if IsDestroyed(self) then
+                    return
+                end
+                self.Ready = true
+                self:OnScenarioFileChanged(CustomLobbyLaunchModel.GetSingleton().ScenarioFile())
+            end
+        ))
     end,
 
     --- Places an icon at a map coordinate. Private.

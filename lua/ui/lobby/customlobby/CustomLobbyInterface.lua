@@ -396,18 +396,35 @@ function CloseDebug()
     Instance = false
 end
 
---- Called by the module manager when this module is reloaded.
+--- Called by the module manager when this module is reloaded. The rebuild is driven by
+--- OnDirty's deferred thread (below), so there's nothing to do here.
 ---@param newModule any
 function __moduleinfo.OnReload(newModule)
-    if Instance then
-        newModule.SetupSingleton()
-    end
 end
 
 --- Called by the module manager when this module becomes dirty.
+---
+--- Two things matter here:
+---  * the re-import is DEFERRED a couple of frames — a synchronous `import` re-enters the
+---    module manager mid-reload (e.g. when an edit to a `mapselect/` file cascades up to this
+---    importer), the reload never finishes, and the torn-down lobby is left as a black frame;
+---  * the rebuild is done HERE (in the deferred thread, against the freshly imported module),
+---    not in OnReload — OnReload isn't reliably called for a module reloaded *transitively*,
+---    which is exactly the cascade case. We only rebuild if a lobby was actually mounted, so
+---    editing a lobby file while in the menu doesn't spawn a phantom lobby.
 function __moduleinfo.OnDirty()
+    local wasMounted = Instance ~= false
     ModuleTrash:Destroy()
-    import(__moduleinfo.name)
+    Instance = false
+    ForkThread(
+        function()
+            WaitFrames(2)
+            local newModule = import(__moduleinfo.name)
+            if wasMounted then
+                newModule.SetupSingleton()
+            end
+        end
+    )
 end
 
 --#endregion
