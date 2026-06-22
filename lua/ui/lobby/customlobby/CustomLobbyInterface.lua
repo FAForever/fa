@@ -21,20 +21,26 @@
 --******************************************************************************************************
 
 -- Composition root for the custom-games lobby. It builds and lays out the children and holds only
--- the two presentation observers it needs (slot count, is-host); each child subscribes to the
--- model itself (see /lua/ui/lobby/TARGET_ARCHITECTURE.md).
+-- the presentation observers it needs (slot count, is-host); each child subscribes to the model
+-- itself (see /lua/ui/lobby/TARGET_ARCHITECTURE.md).
 --
 -- Layout is organised into labelled *areas* (Group containers), like the dialogs — flip the
 -- module-level `Debug` flag to tint each so the regions are visible while iterating. Targeted at
 -- the 1024x768 minimum resolution:
 --
---   ┌ TitleArea ─────────────────────────────────────────────┐
---   │ LeftArea (slots / observers / chat) │ ConfigInterface   │
---   └ ActionArea ────────────────────────────────────────────┘
+--   ┌ TitleArea ─ title · TEAM SCORE · leave ─────────────────────────────┐
+--   │ SlotsArea (slots ONLY — up to 16, two columns)                       │
+--   │                                                                      │
+--   ├──────────────────────────────┬───────────────────────────────────────┤
+--   │ BottomLeftArea (Chat /        │ BottomRightArea (Map / Mods / Options │
+--   │   Observers — tabs)           │   / Restrictions — tabs) + launch     │
+--   └──────────────────────────────┴───────────────────────────────────────┘
 --
--- The right column is the CustomLobbyConfigInterface component (the Map / Options / Mods / Units
--- tab panel); it owns its own tabs + host-gating. The interface keeps the slot grid, observer
--- strip, chat, and the action bar (status + launch).
+-- The top is dedicated to the slot rows (we expect up to 16). The bottom splits in two tabbed
+-- panels: the left is chat/observers (CustomLobbyTabs), the right is the config tab panel
+-- (CustomLobbyConfigInterface — Map / Mods / Options / Restrictions) over a launch footer. The
+-- accumulated team rating (CustomLobbyTeamScore) sits in the title, shown only for the binary
+-- auto-team formations.
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
@@ -48,15 +54,18 @@ local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/customlobbyses
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 local CustomLobbySlotInterface = import("/lua/ui/lobby/customlobby/customlobbyslotinterface.lua")
-local CustomLobbyObserversInterface = import("/lua/ui/lobby/customlobby/customlobbyobserversinterface.lua")
 local CustomLobbyConfigInterface = import("/lua/ui/lobby/customlobby/config/customlobbyconfiginterface.lua")
+local CustomLobbyTeamScore = import("/lua/ui/lobby/customlobby/customlobbyteamscore.lua")
+local CustomLobbyTabs = import("/lua/ui/lobby/customlobby/customlobbytabs.lua")
+local CustomLobbyChatPanel = import("/lua/ui/lobby/customlobby/social/customlobbychatpanel.lua")
+local CustomLobbyObserversPanel = import("/lua/ui/lobby/customlobby/social/customlobbyobserverspanel.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
 -- flip to tint each layout area so the regions are visible while iterating
-local Debug = true
+local Debug = false
 
 -- the lobby content is designed for the 1024x768 floor; the root fills the frame (full-screen
 -- backdrop) but the content is centered and capped to this size, so it never stretches on a
@@ -66,10 +75,10 @@ local LobbyHeight = 768
 
 local Pad = 8
 local SlotHeight = 24
-local RightWidth = 360
-local TitleHeight = 44
-local ActionHeight = 60
-local ObserverHeight = 44
+local TitleHeight = 48
+local BottomHeight = 300         -- the bottom row of tabbed panels; the slots take the rest above
+local BottomRightWidth = 420     -- config (map/mods/options/restrictions); the chat/obs panel fills the rest
+local LaunchFooterHeight = 44    -- status + launch, under the config tabs
 
 --- Creates a layout area (an invisible Group with an optional debug tint).
 ---@param parent Control
@@ -93,19 +102,19 @@ end
 ---@field Content Group
 ---@field TitleArea Group
 ---@field Title Text
+---@field TeamScore UICustomLobbyTeamScore
 ---@field LeaveButton Button
----@field LeftArea Group
 ---@field SlotsArea Group
 ---@field SlotsHeader Text
 ---@field SlotsPanel Group
+---@field SlotColumns Group[]               # [1] = left column, [2] = right column
 ---@field Slots UICustomLobbySlotInterface[]
----@field ObserversArea Group
----@field ObserversPanel UICustomLobbyObserversInterface
----@field SpectateButton Button
----@field ChatArea Group
----@field ChatPlaceholder Text
+---@field BottomLeftArea Group
+---@field BottomLeftTabs UICustomLobbyTabs
+---@field BottomRightArea Group
+---@field ConfigArea Group
 ---@field Config UICustomLobbyConfigInterface
----@field ActionArea Group
+---@field LaunchFooter Group
 ---@field StatusLabel Text
 ---@field LaunchButton Button
 ---@field SlotCountObserver LazyVar
@@ -132,19 +141,16 @@ local CustomLobbyInterface = Class(Group) {
 
         --#region areas
         self.TitleArea = CreateArea(self.Content, "TitleArea", 'ffcc4040')
-        self.ActionArea = CreateArea(self.Content, "ActionArea", 'ff808080')
-        self.LeftArea = CreateArea(self.Content, "LeftArea", 'ff4060cc')
-        self.SlotsArea = CreateArea(self.LeftArea, "SlotsArea", 'ffcccc40')
-        self.ObserversArea = CreateArea(self.LeftArea, "ObserversArea", 'ff40cccc')
-        self.ChatArea = CreateArea(self.LeftArea, "ChatArea", 'ff40cc60')
+        self.SlotsArea = CreateArea(self.Content, "SlotsArea", 'ffcccc40')
+        self.BottomLeftArea = CreateArea(self.Content, "BottomLeftArea", 'ff40cc60')
+        self.BottomRightArea = CreateArea(self.Content, "BottomRightArea", 'ff4060cc')
         --#endregion
 
-        -- the right column: the Map / Options / Mods / Units tab panel (owns its own tabs + gating)
-        self.Config = CustomLobbyConfigInterface.Create(self.Content)
-
-        --#region title bar
+        --#region title bar (title · team score · leave)
         self.Title = UIUtil.CreateText(self.TitleArea, "Custom game", 20, UIUtil.titleFont)
         self.Title:DisableHitTest()
+
+        self.TeamScore = CustomLobbyTeamScore.Create(self.TitleArea)
 
         self.LeaveButton = UIUtil.CreateButtonWithDropshadow(self.TitleArea, '/BUTTON/medium/', "Leave")
         self.LeaveButton.OnClick = function(button, modifiers)
@@ -154,47 +160,45 @@ local CustomLobbyInterface = Class(Group) {
         end
         --#endregion
 
-        --#region slots
+        --#region slots (top region — two columns; odd slots left, even right)
         self.SlotsHeader = UIUtil.CreateText(self.SlotsArea, "Players", 14, UIUtil.titleFont)
         self.SlotsHeader:SetColor('ff9aa0a8')
         self.SlotsHeader:DisableHitTest()
 
         self.SlotsPanel = Group(self.SlotsArea, "CustomLobbySlotsPanel")
+        self.SlotColumns = {
+            Group(self.SlotsPanel, "CustomLobbySlotsLeft"),
+            Group(self.SlotsPanel, "CustomLobbySlotsRight"),
+        }
 
-        -- One row per possible slot; the SlotCount observer reveals the active ones.
+        -- One row per possible slot, placed in the left (odd) or right (even) column; the
+        -- SlotCount observer reveals the active ones.
         self.Slots = {}
         for slot = 1, CustomLobbyLaunchModel.MaxSlots do
-            self.Slots[slot] = CustomLobbySlotInterface.Create(self.SlotsPanel, slot, self)
+            local column = self.SlotColumns[math.mod(slot, 2) == 1 and 1 or 2]
+            self.Slots[slot] = CustomLobbySlotInterface.Create(column, slot, self)
         end
         --#endregion
 
-        --#region observers
-        self.ObserversPanel = CustomLobbyObserversInterface.Create(self.ObserversArea)
-
-        -- everyone can drop to the observers; the move is host-authoritative (a client's click
-        -- asks the host through the intent)
-        self.SpectateButton = UIUtil.CreateButtonWithDropshadow(self.ObserversArea, '/BUTTON/medium/', "Observe")
-        self.SpectateButton.OnClick = function(button, modifiers)
-            local slot = self:FindLocalSlot()
-            if slot then
-                CustomLobbyController.RequestMoveToObserver(slot)
-            end
-        end
-        Tooltip.AddControlTooltipManual(self.SpectateButton, "Become observer", "Leave your slot and watch as an observer.")
+        --#region bottom-left: chat / observers tabs
+        self.BottomLeftTabs = CustomLobbyTabs.Create(self.BottomLeftArea, {
+            Tabs = {
+                { Label = "Chat",      Create = CustomLobbyChatPanel.Create },
+                { Label = "Observers", Create = CustomLobbyObserversPanel.Create },
+            },
+        })
         --#endregion
 
-        --#region chat (placeholder until the lobby-chat slice lands)
-        self.ChatPlaceholder = UIUtil.CreateText(self.ChatArea, "Chat — coming soon", 14, UIUtil.bodyFont)
-        self.ChatPlaceholder:SetColor('ff5a606a')
-        self.ChatPlaceholder:DisableHitTest()
-        --#endregion
+        --#region bottom-right: config tabs (map / mods / options / restrictions) + launch footer
+        self.ConfigArea = Group(self.BottomRightArea, "CustomLobbyConfigArea")
+        self.Config = CustomLobbyConfigInterface.Create(self.ConfigArea)
 
-        --#region action bar
-        self.StatusLabel = UIUtil.CreateText(self.ActionArea, "", 14, UIUtil.bodyFont)
+        self.LaunchFooter = Group(self.BottomRightArea, "CustomLobbyLaunchFooter")
+        self.StatusLabel = UIUtil.CreateText(self.LaunchFooter, "", 13, UIUtil.bodyFont)
         self.StatusLabel:SetColor('ff9aa0a8')
         self.StatusLabel:DisableHitTest()
 
-        self.LaunchButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/large/', "Launch")
+        self.LaunchButton = UIUtil.CreateButtonWithDropshadow(self.LaunchFooter, '/BUTTON/large/', "Launch")
         self.LaunchButton.OnClick = function(button, modifiers)
             -- launch flow isn't wired up yet
         end
@@ -229,84 +233,89 @@ local CustomLobbyInterface = Class(Group) {
 
         --#region areas
         Layouter(self.TitleArea):AtLeftIn(self.Content, Pad):AtRightIn(self.Content, Pad):AtTopIn(self.Content, Pad):Height(TitleHeight):End()
-        Layouter(self.ActionArea):AtLeftIn(self.Content, Pad):AtRightIn(self.Content, Pad):AtBottomIn(self.Content, Pad):Height(ActionHeight):End()
-        Layouter(self.Config)
-            :AtRightIn(self.Content, Pad):Width(RightWidth)
-            :AnchorToBottom(self.TitleArea, Pad):AnchorToTop(self.ActionArea, Pad)
-            :End()
-        Layouter(self.LeftArea)
-            :AtLeftIn(self.Content, Pad):AnchorToLeft(self.Config, Pad)
-            :AnchorToBottom(self.TitleArea, Pad):AnchorToTop(self.ActionArea, Pad)
-            :End()
 
-        -- the slots area sizes to the *active* slot count (map-derived, 1..MaxSlots) so the
-        -- observers + chat below it reflow up on smaller maps; OnSlotCountChanged keeps it in sync
-        local slotCount = CustomLobbySessionModel.GetSingleton().SlotCount()
+        -- the bottom row of tabbed panels has a fixed height; the slots take everything above it.
+        -- the right (config) panel is a fixed width; the left (chat/observers) fills the rest
+        Layouter(self.BottomRightArea)
+            :AtRightIn(self.Content, Pad):Width(BottomRightWidth)
+            :AtBottomIn(self.Content, Pad):Height(BottomHeight)
+            :End()
+        Layouter(self.BottomLeftArea)
+            :AtLeftIn(self.Content, Pad):AtBottomIn(self.Content, Pad):Height(BottomHeight)
+            :End()
+        self.BottomLeftArea.Right:Set(function() return self.BottomRightArea.Left() - LayoutHelpers.ScaleNumber(Pad) end)
+
         Layouter(self.SlotsArea)
-            :AtLeftIn(self.LeftArea):AtRightIn(self.LeftArea):AtTopIn(self.LeftArea)
-            :Height(20 + slotCount * SlotHeight)
-            :End()
-        Layouter(self.ObserversArea)
-            :AtLeftIn(self.LeftArea):AtRightIn(self.LeftArea)
-            :AnchorToBottom(self.SlotsArea, Pad):Height(ObserverHeight)
-            :End()
-        Layouter(self.ChatArea)
-            :AtLeftIn(self.LeftArea):AtRightIn(self.LeftArea)
-            :AnchorToBottom(self.ObserversArea, Pad):AtBottomIn(self.LeftArea)
+            :AtLeftIn(self.Content, Pad):AtRightIn(self.Content, Pad)
+            :AnchorToBottom(self.TitleArea, Pad):AnchorToTop(self.BottomLeftArea, Pad)
             :End()
         --#endregion
 
-        --#region title bar
+        --#region title bar (title · team score · leave)
         Layouter(self.Title):AtLeftIn(self.TitleArea, 8):AtVerticalCenterIn(self.TitleArea):End()
         Layouter(self.LeaveButton):AtRightIn(self.TitleArea):AtVerticalCenterIn(self.TitleArea):End()
+        Layouter(self.TeamScore)
+            :AnchorToRight(self.Title, Pad):AnchorToLeft(self.LeaveButton, Pad)
+            :AtTopIn(self.TitleArea):AtBottomIn(self.TitleArea)
+            :End()
         --#endregion
 
-        --#region slots
+        --#region slots (two columns; rows stack within each)
         Layouter(self.SlotsHeader):AtLeftIn(self.SlotsArea, 4):AtTopIn(self.SlotsArea):End()
         Layouter(self.SlotsPanel)
             :AtLeftIn(self.SlotsArea):AtRightIn(self.SlotsArea)
-            :AnchorToBottom(self.SlotsHeader, 4)
-            :Height(slotCount * SlotHeight)
+            :AnchorToBottom(self.SlotsHeader, 4):AtBottomIn(self.SlotsArea)
             :End()
 
-        -- stack the rows top-to-bottom inside the panel via sibling anchoring
+        -- two columns split down the middle of the panel (a small gutter between)
+        Layouter(self.SlotColumns[1]):AtLeftIn(self.SlotsPanel):AtTopIn(self.SlotsPanel):AtBottomIn(self.SlotsPanel):End()
+        self.SlotColumns[1].Right:Set(function() return self.SlotsPanel.Left() + 0.5 * self.SlotsPanel.Width() - LayoutHelpers.ScaleNumber(6) end)
+        Layouter(self.SlotColumns[2]):AtRightIn(self.SlotsPanel):AtTopIn(self.SlotsPanel):AtBottomIn(self.SlotsPanel):End()
+        self.SlotColumns[2].Left:Set(function() return self.SlotsPanel.Left() + 0.5 * self.SlotsPanel.Width() + LayoutHelpers.ScaleNumber(6) end)
+
+        -- stack each column's rows top-to-bottom (slot i sits under slot i-2, its column-mate)
         for slot = 1, CustomLobbyLaunchModel.MaxSlots do
             local row = self.Slots[slot]
-            local builder = Layouter(row)
-                :AtLeftIn(self.SlotsPanel)
-                :AtRightIn(self.SlotsPanel)
-                :Height(SlotHeight)
-            if slot == 1 then
-                builder:AtTopIn(self.SlotsPanel)
+            local column = self.SlotColumns[math.mod(slot, 2) == 1 and 1 or 2]
+            local builder = Layouter(row):AtLeftIn(column):AtRightIn(column):Height(SlotHeight)
+            if slot <= 2 then
+                builder:AtTopIn(column)
             else
-                builder:AnchorToBottom(self.Slots[slot - 1], 0)
+                builder:AnchorToBottom(self.Slots[slot - 2], 0)
             end
             builder:End()
         end
         --#endregion
 
-        --#region observers
-        Layouter(self.SpectateButton):AtRightIn(self.ObserversArea):AtVerticalCenterIn(self.ObserversArea):End()
-        Layouter(self.ObserversPanel)
-            :AtLeftIn(self.ObserversArea):AnchorToLeft(self.SpectateButton, Pad)
-            :AtTopIn(self.ObserversArea):AtBottomIn(self.ObserversArea)
+        --#region bottom-left tabs (chat / observers)
+        Layouter(self.BottomLeftTabs):Fill(self.BottomLeftArea):End()
+        --#endregion
+
+        --#region bottom-right: config tabs over a launch footer
+        Layouter(self.LaunchFooter)
+            :AtLeftIn(self.BottomRightArea):AtRightIn(self.BottomRightArea):AtBottomIn(self.BottomRightArea)
+            :Height(LaunchFooterHeight)
             :End()
+        Layouter(self.ConfigArea)
+            :AtLeftIn(self.BottomRightArea):AtRightIn(self.BottomRightArea):AtTopIn(self.BottomRightArea)
+            :AnchorToTop(self.LaunchFooter, Pad)
+            :End()
+        Layouter(self.Config):Fill(self.ConfigArea):End()
+
+        Layouter(self.StatusLabel):AtLeftIn(self.LaunchFooter, 4):AtVerticalCenterIn(self.LaunchFooter):End()
+        Layouter(self.LaunchButton):AtRightIn(self.LaunchFooter):AtVerticalCenterIn(self.LaunchFooter):End()
         --#endregion
 
-        Layouter(self.ChatPlaceholder):AtHorizontalCenterIn(self.ChatArea):AtVerticalCenterIn(self.ChatArea):End()
-
-        --#region action bar
-        Layouter(self.StatusLabel):AtLeftIn(self.ActionArea, 8):AtVerticalCenterIn(self.ActionArea):End()
-        Layouter(self.LaunchButton):AtRightIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea):End()
-        --#endregion
-
-        -- the config panel is now sized; let it build its grids' scrollbars + first render
-        -- (three-phase init — its Grids need a concrete height)
+        -- size-dependent children build their scrollbars / first render now that they're sized
+        -- (three-phase init)
+        self.TeamScore:Initialize()
+        self.BottomLeftTabs:Initialize()
         self.Config:Initialize()
     end,
 
-    --- Shows the active slots (1..count), hides the rest, and resizes the slots area to fit them
-    --- (so the observers + chat below reflow to the map's actual slot count, up to MaxSlots).
+    --- Shows the active slots (1..count) and hides the rest. The two columns are full-height, so
+    --- the rows simply stack from the top of each — no area resizing needed (the slots own the
+    --- whole top region regardless of count).
     ---@param self UICustomLobbyInterface
     ---@param count number
     OnSlotCountChanged = function(self, count)
@@ -317,8 +326,6 @@ local CustomLobbyInterface = Class(Group) {
                 self.Slots[slot]:Hide()
             end
         end
-        self.SlotsPanel.Height:Set(LayoutHelpers.ScaleNumber(count * SlotHeight))
-        self.SlotsArea.Height:Set(LayoutHelpers.ScaleNumber(20 + count * SlotHeight))
     end,
 
     --- Tracks host status: updates the status line and shows the launch button only to the host.
@@ -332,21 +339,6 @@ local CustomLobbyInterface = Class(Group) {
         else
             self.LaunchButton:Hide()
         end
-    end,
-
-    --- The local player's slot (the one this peer owns), or nil if they're an observer / unseated.
-    ---@param self UICustomLobbyInterface
-    ---@return number | nil
-    FindLocalSlot = function(self)
-        local launch = CustomLobbyLaunchModel.GetSingleton()
-        local localId = CustomLobbyLocalModel.GetSingleton().LocalPeerId()
-        for slot = 1, CustomLobbyLaunchModel.MaxSlots do
-            local player = launch.Players[slot]()
-            if player and player.OwnerID == localId then
-                return slot
-            end
-        end
-        return nil
     end,
 
     ---------------------------------------------------------------------------
@@ -541,6 +533,10 @@ function OpenDebug()
         { PlayerName = "Zock",  OwnerID = "10", Human = true },
         { PlayerName = "Spag",  OwnerID = "11", Human = true },
     })
+
+    -- an auto-team mode so the title's team score shows (pvsi splits by start-spot parity, so it
+    -- needs no map); the four debug players already carry a PL rating + StartSpot
+    launch.GameOptions:Set({ AutoTeams = 'pvsi' })
 
     -- a stock map so the preview renders; swap to any installed scenario if this
     -- one isn't present (an unknown path just leaves the preview frame empty)

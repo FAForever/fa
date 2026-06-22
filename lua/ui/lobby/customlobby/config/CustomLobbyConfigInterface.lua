@@ -59,24 +59,26 @@ local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
 -- flip to tint the areas while iterating
-local Debug = UpdateCurrentFactoryForQueueDisplay
+local Debug = false
 
-local PreviewSize = 225                          -- the preview is square (FAF maps are square)
-local PreviewBlockHeight = PreviewSize + 46      -- preview + name + size/players line
-local TabHeight = 28
-local TabWidth = 88
-local NameMaxChars = 32
+local PreviewMaxSize = 150                        -- the preview is square, capped to this (FAF maps are square)
+local TabHeight = 26
+local TabWidth = 92
+local NameMaxChars = 28
 
 local TabIdleColor = 'ff141a20'
 local TabHoverColor = 'ff1f262e'
 local TabActiveColor = 'ff2c3e48'
+local CoverColor = 'ff0a0e12'                     -- opaque backing that hides the preview off the Map tab
 
--- the four tabs, in order, each with the factory that builds its content component on demand
+-- the four tabs, in order, each with the factory that builds its content component on demand. The
+-- Map tab (index 1) is special: it shows the persistent preview block (see SelectTab).
+local MapTabIndex = 1
 local Tabs = {
-    { Label = "Map",     Create = CustomLobbyMapPanel.Create },
-    { Label = "Options", Create = CustomLobbyOptionsPanel.Create },
-    { Label = "Mods",    Create = CustomLobbyModsPanel.Create },
-    { Label = "Units",   Create = CustomLobbyUnitsPanel.Create },
+    { Label = "Map",          Create = CustomLobbyMapPanel.Create },
+    { Label = "Mods",         Create = CustomLobbyModsPanel.Create },
+    { Label = "Options",      Create = CustomLobbyOptionsPanel.Create },
+    { Label = "Restrictions", Create = CustomLobbyUnitsPanel.Create },
 }
 
 --- Truncates `text` to `maxChars`, appending "…" when it had to cut.
@@ -121,12 +123,12 @@ end
 
 ---@class UICustomLobbyConfigInterface : Group
 ---@field Trash TrashBag
----@field PreviewArea Group
+---@field TabStripArea Group
+---@field TabContentArea Group
 ---@field Preview UICustomLobbyMapPreview
 ---@field Name Text
 ---@field Info Text
----@field TabStripArea Group
----@field TabContentArea Group
+---@field Cover Bitmap                    # opaque backing shown over the content (hiding the preview) off the Map tab
 ---@field TabButtons Group[]
 ---@field ActiveTab number
 ---@field CurrentPanel Control | false   # the live tab content component (others are destroyed)
@@ -142,17 +144,23 @@ local CustomLobbyConfigInterface = ClassUI(Group) {
         self.ActiveTab = 1
         self.CurrentPanel = false
 
-        self.PreviewArea = CreateArea(self, "PreviewArea", 'ffcc40cc')
         self.TabStripArea = CreateArea(self, "TabStripArea", 'ffcc8040')
         self.TabContentArea = CreateArea(self, "TabContentArea", 'ff8040cc')
 
-        -- pinned, persistent map block — never destroyed (the preview's textures aren't freed)
-        self.Preview = CustomLobbyMapPreview.Create(self.PreviewArea, { Bound = true })
-        self.Name = UIUtil.CreateText(self.PreviewArea, "", 16, UIUtil.titleFont)
+        -- the persistent map block — created once, NEVER destroyed (the preview's textures aren't
+        -- freed). It lives in the content area and is shown only on the Map tab; on other tabs the
+        -- opaque Cover (created after it, so it's on top) hides it. We cover rather than hide it
+        -- because the preview self-shows on a ScenarioFile change regardless of the active tab.
+        self.Preview = CustomLobbyMapPreview.Create(self.TabContentArea, { Bound = true })
+        self.Name = UIUtil.CreateText(self.TabContentArea, "", 16, UIUtil.titleFont)
         self.Name:DisableHitTest()
-        self.Info = UIUtil.CreateText(self.PreviewArea, "", 13, UIUtil.bodyFont)
+        self.Info = UIUtil.CreateText(self.TabContentArea, "", 13, UIUtil.bodyFont)
         self.Info:SetColor('ff9aa0a8')
         self.Info:DisableHitTest()
+
+        self.Cover = Bitmap(self.TabContentArea)
+        self.Cover:SetSolidColor(CoverColor)
+        self.Cover:DisableHitTest()
 
         self.ScenarioObserver = self.Trash:Add(
             LazyVarDerive(CustomLobbyLaunchModel.GetSingleton().ScenarioFile, function(scenarioFileLazy)
@@ -167,19 +175,25 @@ local CustomLobbyConfigInterface = ClassUI(Group) {
 
     ---@param self UICustomLobbyConfigInterface
     __post_init = function(self)
-        Layouter(self.PreviewArea):AtLeftIn(self):AtRightIn(self):AtTopIn(self):Height(PreviewBlockHeight):End()
-        Layouter(self.TabStripArea):AtLeftIn(self):AtRightIn(self):AnchorToBottom(self.PreviewArea, 8):Height(TabHeight):End()
+        -- tab strip on top, content fills the rest
+        Layouter(self.TabStripArea):AtLeftIn(self):AtRightIn(self):AtTopIn(self):Height(TabHeight):End()
         Layouter(self.TabContentArea)
             :AtLeftIn(self):AtRightIn(self)
             :AnchorToBottom(self.TabStripArea, 6):AtBottomIn(self)
             :End()
 
-        Layouter(self.Preview)
-            :AtHorizontalCenterIn(self.PreviewArea):AtTopIn(self.PreviewArea, 4)
-            :Width(PreviewSize):Height(PreviewSize)
-            :End()
-        Layouter(self.Name):AtHorizontalCenterIn(self.PreviewArea):AnchorToBottom(self.Preview, 6):End()
-        Layouter(self.Info):AtHorizontalCenterIn(self.PreviewArea):AnchorToBottom(self.Name, 2):End()
+        -- the preview is a square pinned to the content area's top-left, capped to PreviewMaxSize;
+        -- name + info sit to its right. SelectTab shows/positions the rest of the Map tab.
+        Layouter(self.Preview):AtLeftIn(self.TabContentArea):AtTopIn(self.TabContentArea):End()
+        self.Preview.Height:Set(function()
+            return math.min(self.TabContentArea.Height(), LayoutHelpers.ScaleNumber(PreviewMaxSize))
+        end)
+        self.Preview.Width:Set(function() return self.Preview.Height() end)
+        Layouter(self.Name):AnchorToRight(self.Preview, 10):AtTopIn(self.TabContentArea, 2):End()
+        Layouter(self.Info):AnchorToRight(self.Preview, 10):AnchorToBottom(self.Name, 2):End()
+
+        -- the cover sits above the preview block (created after it); shown on every tab but Map
+        Layouter(self.Cover):Fill(self.TabContentArea):End()
 
         for index = 1, table.getn(self.TabButtons) do
             local button = self.TabButtons[index]
@@ -291,9 +305,20 @@ local CustomLobbyConfigInterface = ClassUI(Group) {
             self.CurrentPanel = false
         end
 
-        -- build the new tab's content, size it, then let it read its (now concrete) geometry
+        -- build the new tab's content, size it, then let it read its (now concrete) geometry. On
+        -- the Map tab the preview block shows (cover hidden) and the panel fills the space to the
+        -- right of / below it; on every other tab the cover hides the preview and the panel fills.
         local panel = Tabs[index].Create(self.TabContentArea)
-        Layouter(panel):Fill(self.TabContentArea):End()
+        if index == MapTabIndex then
+            self.Cover:Hide()
+            Layouter(panel)
+                :AnchorToRight(self.Preview, 10):AtRightIn(self.TabContentArea)
+                :AnchorToBottom(self.Info, 8):AtBottomIn(self.TabContentArea)
+                :End()
+        else
+            self.Cover:Show()
+            Layouter(panel):Fill(self.TabContentArea):End()
+        end
         panel:Initialize()
         self.CurrentPanel = panel
     end,
