@@ -994,6 +994,13 @@ end
 -- would have blown up.
 EndGameGracePeriod = 10
 
+-- Seconds to wait after an army has been abandoned (the player disconnected)
+-- before processing its units. This gives a small opportunity to avoid the ACU
+-- explosion, and prevents disconnecting players from providing the server with
+-- a cut-off replay due to the sim on their client instantly killing all other ACUs
+-- and reporting a game over state.
+AbandonedArmyGracePeriod = 3
+
 -- Set to true in `AbstractVictoryCondition.EndGame` to prevent killing units after a
 -- team is victorious but before the sim is stopped.
 GameIsEnding = false
@@ -1345,8 +1352,8 @@ function KillAbandonedArmy(self, shareOption, shareAcuOption, victoryOption)
         shareOption = ScenarioInfo.Options.Share
     end
 
-    -- Don't apply instant-effect disconnect rules for players/ACUs that might be defeated soon,
-    -- and might have intentionally disconnected.
+    WaitSeconds(AbandonedArmyGracePeriod)
+
     if shareAcuOption == 'Explode' or shareAcuOption == 'Recall' then
         local safeCommanders
         local commanders = self:GetListOfUnits(categories.COMMAND, false)
