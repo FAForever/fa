@@ -36,9 +36,9 @@ if SetProcessPriority and GetProcessAffinityMask and SetProcessAffinityMask then
 
     -- priority values can be found at:
     -- - https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setpriorityclass
-    local success = SetProcessPriority(0x00000080)
+    local success = SetProcessPriority(0x00008000)
     if success then
-        LOG("Process - priority set to: 'high'")
+        LOG("Process - priority set to: 'above normal'")
     else
         LOG("Process - Failed to adjust process priority, this may impact your framerate")
     end
