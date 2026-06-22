@@ -42,9 +42,11 @@
 
 local Create = import("/lua/lazyvar.lua").Create
 
--- The one MapUtil function we still lean on: the `doscript` loader for a single scenario-info
--- file (handles the on-disk version backcompat). Everything else is ours.
-local LoadScenarioInfoFile = import("/lua/ui/maputil.lua").LoadScenarioInfoFile
+-- The catalog is the lobby's single point of contact with MapUtil's `doscript` file loaders
+-- (info + save) — so no other custom-lobby module imports MapUtil. Everything above that
+-- (enumeration, filtering, caching) is ours.
+local MapUtil = import("/lua/ui/maputil.lua")
+local LoadScenarioInfoFile = MapUtil.LoadScenarioInfoFile
 
 -- maps loaded per frame-slice before yielding — keeps the open responsive on big vaults
 local BatchSize = 4
@@ -55,6 +57,12 @@ local Scenarios = Create({})
 
 local Loading = false   -- a load thread is currently running
 local Loaded = false    -- the disk has been fully enumerated
+
+-- memoised save files (the expensive `doscript`), keyed by lowercased save path; `false` = a
+-- known-missing/unreadable save. FIFO-bounded so browsing a big vault doesn't grow unbounded.
+local SaveCache = {}
+local SaveCacheOrder = {}
+local SaveCacheMax = 24
 
 -------------------------------------------------------------------------------
 --#region Enumeration
@@ -170,11 +178,65 @@ function FindByFile(scenarioFile)
     return nil
 end
 
+--- Loads a scenario's info for `scenarioFile`. Returns the already-enumerated entry if we have
+--- it (the streamed list is the info cache), else reads it from disk. nil if unreadable.
+---@param scenarioFile FileName | false
+---@return UILobbyScenarioInfo | nil
+function LoadInfo(scenarioFile)
+    if not scenarioFile then
+        return nil
+    end
+    local cached = FindByFile(scenarioFile)
+    if cached then
+        return cached
+    end
+    local info = LoadScenarioInfoFile(scenarioFile)
+    if not info then
+        return nil
+    end
+    info.file = scenarioFile
+    return info --[[@as UILobbyScenarioInfo]]
+end
+
+--- Loads (and caches) a scenario's save file — the marker data the preview overlays need.
+--- The save `doscript` is expensive, and both the in-lobby preview and the picker re-load the
+--- same maps repeatedly, so results are memoised by save path with a small FIFO bound. Returns
+--- nil if the save is missing / unreadable (cached as a negative so we don't retry the disk).
+---@param scenarioInfo UILobbyScenarioInfo
+---@return UIScenarioSaveFile | nil
+function LoadSave(scenarioInfo)
+    if not (scenarioInfo and scenarioInfo.save) then
+        return nil
+    end
+
+    local key = string.lower(scenarioInfo.save)
+    local cached = SaveCache[key]
+    if cached ~= nil then
+        return cached or nil               -- `false` = known-missing
+    end
+
+    local save = false
+    if DiskGetFileInfo(scenarioInfo.save) then
+        save = MapUtil.LoadScenarioSaveFile(scenarioInfo.save) or false
+    end
+
+    SaveCache[key] = save
+    table.insert(SaveCacheOrder, key)
+    if table.getn(SaveCacheOrder) > SaveCacheMax then
+        local oldest = table.remove(SaveCacheOrder, 1)
+        SaveCache[oldest] = nil
+    end
+
+    return save or nil
+end
+
 --- Drops everything so the next `EnsureLoaded` re-reads from disk (e.g. maps changed on disk).
 function Refresh()
     Loaded = false
     Loading = false
     Scenarios:Set({})
+    SaveCache = {}
+    SaveCacheOrder = {}
 end
 
 --#endregion

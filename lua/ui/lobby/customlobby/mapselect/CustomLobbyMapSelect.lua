@@ -30,7 +30,8 @@
 -- It is a transient picker, NOT a persistent model component:
 --   * it subscribes to the catalog (CustomLobbyMapCatalog), which streams maps in across frames,
 --   * it previews the *highlighted candidate* (decoupled from the launch model) via the shared
---     MapPreview control, and
+--     scenario-preview surface (CustomLobbyScenarioPreview, same control the in-lobby preview
+--     uses), here with numbered-dot spawns + a title bar / url link layered on top, and
 --   * on Select it calls the controller intent `RequestSetScenario(file)` — the same path a
 --     `/map <name>` chat command would use. It owns no synced state.
 --
@@ -49,15 +50,11 @@ local Prefs = import("/lua/user/prefs.lua")
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Edit = import("/lua/maui/edit.lua").Edit
-local MapPreview = import("/lua/ui/controls/mappreview.lua").MapPreview
 local Popup = import("/lua/ui/controls/popups/popup.lua").Popup
 local Combo = import("/lua/ui/controls/combo.lua").Combo
 local TextArea = import("/lua/ui/controls/textarea.lua").TextArea
 
--- still borrowed from MapUtil: the save-file loader + start-position extraction (file/geometry
--- primitives, same category as the catalog's LoadScenarioInfoFile)
-local MapUtil = import("/lua/ui/maputil.lua")
-
+local CustomLobbyScenarioPreview = import("/lua/ui/lobby/customlobby/customlobbyscenariopreview.lua")
 local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
 local CustomLobbyMapList = import("/lua/ui/lobby/customlobby/mapselect/customlobbymaplist.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
@@ -80,11 +77,6 @@ local TitleHeight = 32
 local ActionHeight = 48
 local FilterHeight = 134
 local StatsHeight = 22
-
--- the same resource/wreck icons the in-lobby map preview uses (CustomLobbyMapPreview)
-local MassIcon = "/game/build-ui/icon-mass_bmp.dds"
-local EnergyIcon = "/game/build-ui/icon-energy_bmp.dds"
-local WreckIcon = "/scx_menu/lan-game-lobby/mappreview/wreckage.dds"
 
 local PrefsKey = "customlobby_mapselect"
 
@@ -213,7 +205,6 @@ end
 
 ---@class UICustomLobbyMapSelect : Group
 ---@field Trash TrashBag
----@field OverlayTrash TrashBag
 ---@field TitleArea Group
 ---@field LeftArea Group
 ---@field FilterArea Group
@@ -243,17 +234,8 @@ end
 ---@field SpawnsToggle Checkbox
 ---@field ResourcesToggle Checkbox
 ---@field WrecksToggle Checkbox
----@field ShowSpawns boolean
----@field ShowResources boolean
----@field ShowWrecks boolean
----@field SpawnIcons Control[]
----@field ResourceIcons Control[]
----@field WreckIcons Control[]
----@field Preview MapPreview
+---@field Surface UICustomLobbyScenarioPreview
 ---@field PreviewBg Bitmap
----@field MassTemplate Bitmap                  # hidden; overlay icons share its texture (loaded once)
----@field EnergyTemplate Bitmap
----@field WreckTemplate Bitmap
 ---@field PreviewTitleBar Bitmap
 ---@field PreviewTitle Text
 ---@field InfoMeta Text
@@ -285,19 +267,12 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         Group.__init(self, parent, "CustomLobbyMapSelect")
 
         self.Trash = TrashBag()
-        self.OverlayTrash = self.Trash:Add(TrashBag())
         self.OnConfirmCb = onConfirm
         self.OnCancelCb = onCancel
 
         self.Ready = false
         self.Filtered = {}
         self.Selected = nil
-        self.ShowSpawns = true
-        self.ShowResources = false
-        self.ShowWrecks = false
-        self.SpawnIcons = {}
-        self.ResourceIcons = {}
-        self.WreckIcons = {}
         self.CurrentFile = CustomLobbyLaunchModel.GetSingleton().ScenarioFile()
         self.Scenarios = CustomLobbyMapCatalog.GetScenarios()
 
@@ -382,28 +357,25 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         --#endregion
 
         --#region preview area (toggles, preview, info, description)
-        self.SpawnsToggle = self:CreateToggle("Spawns", self.ShowSpawns,
-            function(checked) self.ShowSpawns = checked; self:ApplyOverlayVisibility() end,
-            "Spawns", "Show the start positions.")
-        self.ResourcesToggle = self:CreateToggle("Resources", self.ShowResources,
-            function(checked) self.ShowResources = checked; self:ApplyOverlayVisibility() end,
-            "Resources", "Show mass and hydrocarbon deposits.")
-        self.WrecksToggle = self:CreateToggle("Wrecks", self.ShowWrecks,
-            function(checked) self.ShowWrecks = checked; self:ApplyOverlayVisibility() end,
-            "Wrecks", "Show prebuilt wreckage (if the map defines any).")
-
+        -- the candidate preview surface (shared with the in-lobby preview); spawns render as
+        -- numbered dots (the surface default). Resources/wrecks start hidden — the toggles flip
+        -- them; spawns start shown.
         self.PreviewBg = Bitmap(self.PreviewArea)
         self.PreviewBg:SetSolidColor('ff000000')
         self.PreviewBg:DisableHitTest()
-        self.Preview = MapPreview(self.PreviewArea)
+        self.Surface = CustomLobbyScenarioPreview.Create(self.PreviewArea)
+        self.Surface:SetOverlayVisible('resources', false)
+        self.Surface:SetOverlayVisible('wrecks', false)
 
-        -- hidden template bitmaps: each overlay texture is loaded ONCE here, then every marker
-        -- shares it via ShareTextures (see CreateMarkerIcon) rather than re-loading per icon.
-        -- They still need a concrete (dummy) position — an unanchored control's Left/Right
-        -- reference each other and trip the circular-evaluation guard (see /lua/ui/CLAUDE.md § 1).
-        self.MassTemplate = self:CreateTemplateBitmap(MassIcon)
-        self.EnergyTemplate = self:CreateTemplateBitmap(EnergyIcon)
-        self.WreckTemplate = self:CreateTemplateBitmap(WreckIcon)
+        self.SpawnsToggle = self:CreateToggle("Spawns", true,
+            function(checked) self.Surface:SetOverlayVisible('spawns', checked) end,
+            "Spawns", "Show the start positions.")
+        self.ResourcesToggle = self:CreateToggle("Resources", false,
+            function(checked) self.Surface:SetOverlayVisible('resources', checked) end,
+            "Resources", "Show mass and hydrocarbon deposits.")
+        self.WrecksToggle = self:CreateToggle("Wrecks", false,
+            function(checked) self.Surface:SetOverlayVisible('wrecks', checked) end,
+            "Wrecks", "Show prebuilt wreckage (if the map defines any).")
 
         self.PreviewTitleBar = Bitmap(self.PreviewArea)
         self.PreviewTitleBar:SetSolidColor('aa0a0e12')
@@ -542,33 +514,33 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         Layouter(self.SpawnsToggle):AnchorToLeft(self.ResourcesToggle, 16):AtVerticalCenterIn(self.ResourcesToggle):End()
         Layouter(self.WrecksToggle):AnchorToRight(self.ResourcesToggle, 16):AtVerticalCenterIn(self.ResourcesToggle):End()
 
-        Layouter(self.Preview)
+        Layouter(self.Surface)
             :AtHorizontalCenterIn(self.PreviewArea):AnchorToBottom(self.ResourcesToggle, 10)
             :Width(PreviewSize):Height(PreviewSize)
             :End()
-        Layouter(self.PreviewBg):Fill(self.Preview):End()
-        self.PreviewBg.Depth:Set(function() return self.Preview.Depth() - 1 end)
+        Layouter(self.PreviewBg):Fill(self.Surface):End()
+        self.PreviewBg.Depth:Set(function() return self.Surface.Depth() - 1 end)
 
         -- map name overlaid across the top of the preview
-        Layouter(self.PreviewTitleBar):AtLeftIn(self.Preview):AtRightIn(self.Preview):AtTopIn(self.Preview):Height(26):End()
-        self.PreviewTitleBar.Depth:Set(function() return self.Preview.Depth() + 20 end)
-        Layouter(self.PreviewTitle):AtHorizontalCenterIn(self.Preview):AtVerticalCenterIn(self.PreviewTitleBar):End()
+        Layouter(self.PreviewTitleBar):AtLeftIn(self.Surface):AtRightIn(self.Surface):AtTopIn(self.Surface):Height(26):End()
+        self.PreviewTitleBar.Depth:Set(function() return self.Surface.Depth() + 20 end)
+        Layouter(self.PreviewTitle):AtHorizontalCenterIn(self.Surface):AtVerticalCenterIn(self.PreviewTitleBar):End()
         self.PreviewTitle.Depth:Set(function() return self.PreviewTitleBar.Depth() + 1 end)
 
         -- url link on the right of the title bar (shown only when the map has an allowed url)
-        Layouter(self.UrlButton):AtRightIn(self.Preview, 8):AtVerticalCenterIn(self.PreviewTitleBar):End()
+        Layouter(self.UrlButton):AtRightIn(self.Surface, 8):AtVerticalCenterIn(self.PreviewTitleBar):End()
         self.UrlButton.Depth:Set(function() return self.PreviewTitleBar.Depth() + 2 end)
 
         -- info centred under the preview
-        Layouter(self.InfoMeta):AtHorizontalCenterIn(self.Preview):AnchorToBottom(self.Preview, 12):End()
-        Layouter(self.Warning):AtHorizontalCenterIn(self.Preview):AnchorToBottom(self.InfoMeta, 4):End()
+        Layouter(self.InfoMeta):AtHorizontalCenterIn(self.Surface):AnchorToBottom(self.Surface, 12):End()
+        Layouter(self.Warning):AtHorizontalCenterIn(self.Surface):AnchorToBottom(self.InfoMeta, 4):End()
 
         -- description sits under the preview, exactly as wide as the map (so it reads as
         -- centred, since the preview is centred in its column); scrolls when it overflows
         Layouter(self.Description)
-            :AtLeftIn(self.Preview):AnchorToBottom(self.Warning, 10):AtBottomIn(self.PreviewArea)
+            :AtLeftIn(self.Surface):AnchorToBottom(self.Warning, 10):AtBottomIn(self.PreviewArea)
             :End()
-        self.Description.Right:Set(function() return self.Preview.Right() end)
+        self.Description.Right:Set(function() return self.Surface.Right() end)
         UIUtil.CreateVertScrollbarFor(self.Description)
         --#endregion
 
@@ -744,7 +716,7 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         local row = math.random(1, count)
         self.MapList:SetSelection(row)
         self.MapList:ShowItem(row)
-        self:OnMapSelected(self.Filtered[row])
+        self:OnMapSelected(self.Filtered[ ow])
     end,
 
     --- A map was selected: make it the candidate and refresh the preview + info.
@@ -761,20 +733,11 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         end
     end,
 
-    --- Loads what's needed to show a candidate: preview texture + overlays, info, and a
+    --- Shows a candidate: hands the scenario to the preview surface, fills the info, and runs a
     --- file-health check that gates Select.
     ---@param self UICustomLobbyMapSelect
     ---@param scenario UILobbyScenarioInfo
     Inspect = function(self, scenario)
-        self.OverlayTrash:Destroy()
-        self.SpawnIcons = {}
-        self.ResourceIcons = {}
-        self.WreckIcons = {}
-
-        if not self.Preview:SetTexture(scenario.preview) then
-            self.Preview:SetTextureFromMap(scenario.map)
-        end
-
         local problems = {}
         if not DiskGetFileInfo(scenario.map) then
             table.insert(problems, "map missing")
@@ -783,20 +746,13 @@ local CustomLobbyMapSelect = ClassUI(Group) {
             table.insert(problems, "script missing")
         end
 
-        local save = nil
-        if DiskGetFileInfo(scenario.save) then
-            save = MapUtil.LoadScenarioSaveFile(scenario.save)
-        else
+        if not DiskGetFileInfo(scenario.save) then
             table.insert(problems, "save missing")
         end
 
-        if save and scenario.size then
-            self:BuildSpawns(scenario, save)
-            self:BuildResources(scenario, save)
-            self:BuildWrecks(scenario, save)
-            self:ApplyOverlayVisibility()
-        end
-
+        -- the catalog owns scenario loading + caching (the save doscript is expensive and we
+        -- re-inspect the same maps as you browse)
+        self.Surface:SetScenario(scenario, CustomLobbyMapCatalog.LoadSave(scenario))
         self:UpdateInfo(scenario)
         self.RandomButton:Enable()
 
@@ -842,175 +798,11 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         self.Description:SetText(scenario.description and LOC(scenario.description) or "")
     end,
 
-    --- Places numbered start-spot markers on the preview from the save's start positions.
-    ---@param self UICustomLobbyMapSelect
-    ---@param scenario UILobbyScenarioInfo
-    ---@param save UIScenarioSaveFile
-    BuildSpawns = function(self, scenario, save)
-        local positions = MapUtil.GetStartPositionsFromScenario(scenario, save)
-        if not positions then
-            return
-        end
-        for index, position in positions do
-            local dot = self.OverlayTrash:Add(self:CreateSpawnDot(index))
-            self:PositionMarker(dot, scenario.size[1], scenario.size[2], position[1], position[2])
-            table.insert(self.SpawnIcons, dot)
-        end
-    end,
-
-    --- Places mass + hydrocarbon icons from the save's master-chain markers.
-    ---@param self UICustomLobbyMapSelect
-    ---@param scenario UILobbyScenarioInfo
-    ---@param save UIScenarioSaveFile
-    BuildResources = function(self, scenario, save)
-        for _, marker in self:Markers(save) do
-            local template = (marker.type == "Mass" and self.MassTemplate)
-                or (marker.type == "Hydrocarbon" and self.EnergyTemplate)
-                or false
-            if template and marker.position then
-                local dot = self.OverlayTrash:Add(self:CreateMarkerIcon(template, 10))
-                self:PositionMarker(dot, scenario.size[1], scenario.size[2], marker.position[1], marker.position[3])
-                table.insert(self.ResourceIcons, dot)
-            end
-        end
-    end,
-
-    --- Best-effort wreck icons: maps that expose prebuilt wreckage as save markers.
-    ---@param self UICustomLobbyMapSelect
-    ---@param scenario UILobbyScenarioInfo
-    ---@param save UIScenarioSaveFile
-    BuildWrecks = function(self, scenario, save)
-        for _, marker in self:Markers(save) do
-            if marker.type and marker.position and string.find(string.lower(marker.type), 'wreck') then
-                local dot = self.OverlayTrash:Add(self:CreateMarkerIcon(self.WreckTemplate, 11))
-                self:PositionMarker(dot, scenario.size[1], scenario.size[2], marker.position[1], marker.position[3])
-                table.insert(self.WreckIcons, dot)
-            end
-        end
-    end,
-
-    --- Shows/hides each overlay group according to its toggle.
-    ---@param self UICustomLobbyMapSelect
-    ApplyOverlayVisibility = function(self)
-        local function setVisible(icons, visible)
-            for _, icon in icons do
-                if visible then
-                    icon:Show()
-                else
-                    icon:Hide()
-                end
-            end
-        end
-        setVisible(self.SpawnIcons, self.ShowSpawns)
-        setVisible(self.ResourceIcons, self.ShowResources)
-        setVisible(self.WreckIcons, self.ShowWrecks)
-    end,
-
-    --- The save's master-chain markers, or an empty table.
-    ---@param self UICustomLobbyMapSelect
-    ---@param save UIScenarioSaveFile
-    ---@return table
-    Markers = function(self, save)
-        local masterChain = save.MasterChain and save.MasterChain['_MASTERCHAIN_']
-        return (masterChain and masterChain.Markers) or {}
-    end,
-
-    --- Builds a small numbered start-spot marker. Private.
-    ---@param self UICustomLobbyMapSelect
-    ---@param index number
-    ---@return Group
-    CreateSpawnDot = function(self, index)
-        local dot = Group(self.PreviewArea)
-        dot:DisableHitTest()
-        dot.Depth:Set(function() return self.Preview.Depth() + 10 end)
-
-        local bg = Bitmap(dot)
-        bg:SetSolidColor('cc1c2228')
-        bg:DisableHitTest()
-
-        local label = UIUtil.CreateText(dot, tostring(index), 12, UIUtil.bodyFont)
-        label:DisableHitTest()
-
-        Layouter(dot):Width(18):Height(18):End()
-        Layouter(bg):Fill(dot):End()
-        Layouter(label):AtCenterIn(dot):End()
-        return dot
-    end,
-
-    --- Loads an overlay texture once into a hidden template bitmap that markers share from.
-    --- Given a dummy position because an unanchored control's Left/Right are circular. Private.
-    ---@param self UICustomLobbyMapSelect
-    ---@param texture FileName
-    ---@return Bitmap
-    CreateTemplateBitmap = function(self, texture)
-        local template = UIUtil.CreateBitmap(self.PreviewArea, texture)
-        template:DisableHitTest()
-        Layouter(template):Left(0):Top(0):Width(8):Height(8):End()
-        template:Hide()
-        -- lock it hidden: a parent Show() (Popup mounting the dialog) would otherwise reveal
-        -- this never-positioned-for-display bitmap. Same trick TexturePool uses for pooled
-        -- bitmaps — OnHide returning true keeps it hidden regardless of the parent.
-        template.OnHide = function(control, hidden)
-            return true
-        end
-        return template
-    end,
-
-    --- Builds a small resource/wreck marker that SHARES its texture with a hidden template
-    --- bitmap (allocated once in __init), so the texture is loaded once and reused for every
-    --- marker — not re-loaded per icon. Private.
-    ---@param self UICustomLobbyMapSelect
-    ---@param template Bitmap
-    ---@param size number
-    ---@return Bitmap
-    CreateMarkerIcon = function(self, template, size)
-        local icon = UIUtil.CreateBitmapColor(self.PreviewArea, 'ffffff')
-        icon:DisableHitTest()
-        -- size only (matches CustomLobbyMapPreview's working pattern); PositionMarker pins
-        -- Left/Top afterwards, so the size must be set so its centring maths has a real Width
-        Layouter(icon):Width(size):Height(size):End()
-        icon:ShareTextures(template)
-        icon.Depth:Set(function() return self.Preview.Depth() + 5 end)
-        return icon
-    end,
-
-    --- Positions a marker over the preview at a map coordinate (mirrors the preview's own
-    --- aspect-correct placement). Private.
-    ---@param self UICustomLobbyMapSelect
-    ---@param icon Control
-    ---@param mapWidth number
-    ---@param mapHeight number
-    ---@param px number
-    ---@param pz number
-    PositionMarker = function(self, icon, mapWidth, mapHeight, px, pz)
-        local size = self.Preview.Width()
-        local xOffset, xFactor, yOffset, yFactor = 0, 1, 0, 1
-        if mapWidth > mapHeight then
-            local ratio = mapHeight / mapWidth
-            yOffset = ((size / ratio) - size) / 4
-            yFactor = ratio
-        else
-            local ratio = mapWidth / mapHeight
-            xOffset = ((size / ratio) - size) / 4
-            xFactor = ratio
-        end
-
-        local x = xOffset + (px / mapWidth) * (size - 2) * xFactor
-        local z = yOffset + (pz / mapHeight) * (size - 2) * yFactor
-
-        icon.Left:Set(function() return self.Preview.Left() + x - 0.5 * icon.Width() end)
-        icon.Top:Set(function() return self.Preview.Top() + z - 0.5 * icon.Height() end)
-    end,
-
     --- Clears the preview + info (no candidate / empty list).
     ---@param self UICustomLobbyMapSelect
     ClearDetails = function(self)
         self.LastInspected = nil
-        self.OverlayTrash:Destroy()
-        self.SpawnIcons = {}
-        self.ResourceIcons = {}
-        self.WreckIcons = {}
-        self.Preview:ClearTexture()
+        self.Surface:Clear()
         self.PreviewTitle:SetText("")
         self.InfoMeta:SetText("")
         self.Warning:SetText("")

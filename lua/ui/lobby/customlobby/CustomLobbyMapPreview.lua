@@ -20,38 +20,33 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
--- Map preview for the custom lobby. Copied from the autolobby's AutolobbyMapPreview and
--- adapted to this lobby's model: the autolobby observes one `Scenario` bundle, but here
--- the scenario file and the players live separately (`ScenarioFile` + per-slot `Players`),
--- so we observe the file (full re-render) and each slot (cheap spawn-icon refresh against
--- the cached scenario). The rendering itself (preview texture, resource markers, spawn
--- icons) is unchanged from the autolobby and uses the shared MapPreview control.
+-- The in-lobby map preview: the shared scenario-preview surface (CustomLobbyScenarioPreview)
+-- with the lobby's chrome — a glow border + dialog brackets — wrapped around it, bound to the
+-- launch model.
+--
+-- It owns the model wiring only: it subscribes to `ScenarioFile` (load the scenario, hand it to
+-- the surface, show/hide) and to each slot's player (refresh the surface's spawn data, no map
+-- reload). The texture / overlay / positioning work all lives in the surface, which the
+-- map-select dialog reuses too — see CustomLobbyScenarioPreview.lua.
+--
+-- Spawns render as faction icons (CustomLobbyMapPreviewSpawn): the surface calls each icon's
+-- :Update(faction) for a seated spot and :Reset() for an empty one, so empty spots stay blank.
 
 local UIUtil = import("/lua/ui/uiutil.lua")
-local MapUtil = import("/lua/ui/maputil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local Group = import("/lua/maui/group.lua").Group
-local MapPreview = import("/lua/ui/controls/mappreview.lua").MapPreview
+local CustomLobbyScenarioPreview = import("/lua/ui/lobby/customlobby/customlobbyscenariopreview.lua")
 local CustomLobbyMapPreviewSpawn = import("/lua/ui/lobby/customlobby/customlobbymappreviewspawn.lua")
+local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
 ---@class UICustomLobbyMapPreview : Group
 ---@field Trash TrashBag
----@field Ready boolean         # true once laid out by the parent; gates geometry-reading renders
----@field Preview MapPreview
 ---@field Overlay Bitmap
----@field PathToScenarioFile? FileName
----@field ScenarioInfo? UILobbyScenarioInfo
----@field ScenarioSave? UIScenarioSaveFile
----@field PlayerOptions? table<number, UICustomLobbyPlayer>
----@field EnergyIcon Bitmap     # Acts as a pool
----@field MassIcon Bitmap       # Acts as a pool
----@field WreckageIcon Bitmap   # Acts as a pool
----@field IconTrash TrashBag    # Trashbag that contains all icons
----@field SpawnIcons UICustomLobbyMapPreviewSpawn[]
+---@field Surface UICustomLobbyScenarioPreview
 ---@field ScenarioObserver LazyVar
 ---@field PlayerObservers LazyVar[]
 local CustomLobbyMapPreview = ClassUI(Group) {
@@ -63,48 +58,46 @@ local CustomLobbyMapPreview = ClassUI(Group) {
 
         self.Trash = TrashBag()
 
-        self.Preview = MapPreview(self)
-
         self.Overlay = UIUtil.CreateBitmap(self, '/scx_menu/gameselect/map-panel-glow_bmp.dds')
-
-        self.EnergyIcon = UIUtil.CreateBitmap(self, "/game/build-ui/icon-energy_bmp.dds")
-        self.MassIcon = UIUtil.CreateBitmap(self, "/game/build-ui/icon-mass_bmp.dds")
-        self.WreckageIcon = UIUtil.CreateBitmap(self, "/scx_menu/lan-game-lobby/mappreview/wreckage.dds")
-        self.SpawnIcons = {}
-
         UIUtil.CreateDialogBrackets(self, 30, 24, 30, 24)
 
-        self.IconTrash = TrashBag()
-
-        -- Geometry-reading renders (spawn-icon placement reads self.Preview.Width()) are gated
-        -- until we've been laid out by our parent — see __post_init. The Derive observers below
-        -- fire immediately on creation; without this gate, a reload with a scenario already set
-        -- would position icons against a not-yet-sized preview and trip the circular guard.
-        self.Ready = false
+        -- the shared surface, with faction icons for spawns
+        self.Surface = CustomLobbyScenarioPreview.Create(self, {
+            CreateSpawnIcon = function(surface, index)
+                return CustomLobbyMapPreviewSpawn.Create(surface)
+            end,
+        })
 
         local model = CustomLobbyLaunchModel.GetSingleton()
 
         -- the scenario file drives the whole preview: render on change, hide when unset
         self.ScenarioObserver = self.Trash:Add(
             LazyVarDerive(model.ScenarioFile, function(scenarioFileLazy)
-                local scenarioFile = scenarioFileLazy()
-                if self.Ready then
-                    self:OnScenarioFileChanged(scenarioFile)
-                end
+                self:OnScenarioFileChanged(scenarioFileLazy())
             end))
 
-        -- each slot drives only the spawn icons (faction / position) — refreshed against
-        -- the already-loaded scenario, so a take/swap/faction change doesn't reload the map
+        -- each slot drives only the spawn icons (faction / position) — refreshed against the
+        -- already-loaded scenario, so a take/swap/faction change doesn't reload the map
         self.PlayerObservers = {}
         for slot = 1, CustomLobbyLaunchModel.MaxSlots do
             self.PlayerObservers[slot] = self.Trash:Add(
                 LazyVarDerive(model.Players[slot], function(playerLazy)
                     playerLazy()
-                    if self.Ready then
-                        self:OnPlayersChanged()
-                    end
+                    self:OnPlayersChanged()
                 end))
         end
+    end,
+
+    ---@param self UICustomLobbyMapPreview
+    __post_init = function(self)
+        LayoutHelpers.ReusedLayoutFor(self.Overlay)
+            :Fill(self)
+            :DisableHitTest(true)
+            :End()
+
+        LayoutHelpers.ReusedLayoutFor(self.Surface)
+            :FillFixedBorder(self.Overlay, 24)
+            :End()
     end,
 
     ---@param self UICustomLobbyMapPreview
@@ -112,257 +105,48 @@ local CustomLobbyMapPreview = ClassUI(Group) {
         self.Trash:Destroy()
     end,
 
-    --- Show + render the preview once a scenario file is set, hide it otherwise.
+    --- Loads the scenario and hands it to the surface; hides the preview when unset.
     ---@param self UICustomLobbyMapPreview
     ---@param scenarioFile FileName | false
     OnScenarioFileChanged = function(self, scenarioFile)
-        if scenarioFile then
-            self:Show()
-            self:UpdateScenario(scenarioFile, self:_GatherPlayerOptions())
-        else
+        if not scenarioFile then
+            self.Surface:Clear()
             self:Hide()
+            return
         end
+
+        local scenarioInfo = CustomLobbyMapCatalog.LoadInfo(scenarioFile)
+        if not scenarioInfo then
+            self.Surface:Clear()
+            self:Hide()
+            return
+        end
+
+        self.Surface:SetScenario(scenarioInfo, CustomLobbyMapCatalog.LoadSave(scenarioInfo))
+        self.Surface:SetSpawnData(self:GatherSpawnData())
+        self:Show()
     end,
 
-    --- A slot changed: refresh just the spawn icons, reusing the loaded scenario.
+    --- A slot changed: refresh the surface's spawn data (faction by start spot).
     ---@param self UICustomLobbyMapPreview
     OnPlayersChanged = function(self)
-        if self.ScenarioInfo and self.ScenarioSave then
-            self.PlayerOptions = self:_GatherPlayerOptions()
-            self:_UpdateSpawnLocations(self.ScenarioInfo, self.ScenarioSave, self.PlayerOptions)
-        end
+        self.Surface:SetSpawnData(self:GatherSpawnData())
     end,
 
-    --- Collects the seated players keyed by start spot (the spawn id the preview uses).
+    --- The seated factions keyed by start spot (the spawn id the surface positions by).
     ---@param self UICustomLobbyMapPreview
-    ---@return table<number, UICustomLobbyPlayer>
-    _GatherPlayerOptions = function(self)
+    ---@return table<number, number>
+    GatherSpawnData = function(self)
         local model = CustomLobbyLaunchModel.GetSingleton()
-        local options = {}
+        local data = {}
         for slot = 1, CustomLobbyLaunchModel.MaxSlots do
             local player = model.Players[slot]()
             if player then
-                options[player.StartSpot or slot] = player
+                data[player.StartSpot or slot] = player.Faction
             end
         end
-        return options
+        return data
     end,
-
-    ---@param self UICustomLobbyMapPreview
-    ---@param parent Control
-    __post_init = function(self, parent)
-        LayoutHelpers.ReusedLayoutFor(self.Overlay)
-            :Fill(self)
-            :DisableHitTest(true)
-            :End()
-
-        LayoutHelpers.ReusedLayoutFor(self.Preview)
-            :FillFixedBorder(self.Overlay, 24)
-            :End()
-
-        LayoutHelpers.ReusedLayoutFor(self.EnergyIcon):Hide():End()
-        LayoutHelpers.ReusedLayoutFor(self.MassIcon):Hide():End()
-        LayoutHelpers.ReusedLayoutFor(self.WreckageIcon):Hide():End()
-
-        -- our PARENT lays us out after this __post_init returns, so self.Preview.Width() isn't
-        -- concrete yet. Defer the first render one frame, then mark ready so the observers drive
-        -- subsequent updates. (Without this, a reload with a scenario already set renders here —
-        -- against an unsized preview — and trips the circular-dependency guard.)
-        self.Trash:Add(ForkThread(
-            function()
-                WaitFrames(1)
-                if IsDestroyed(self) then
-                    return
-                end
-                self.Ready = true
-                self:OnScenarioFileChanged(CustomLobbyLaunchModel.GetSingleton().ScenarioFile())
-            end
-        ))
-    end,
-
-    --- Places an icon at a map coordinate. Private.
-    ---@param self UICustomLobbyMapPreview
-    ---@param icon Control
-    ---@param scenarioWidth number
-    ---@param scenarioHeight number
-    ---@param px number
-    ---@param pz number
-    PositionIcon = function(self, icon, scenarioWidth, scenarioHeight, px, pz)
-        local size = self.Preview.Width()
-        local xOffset = 0
-        local xFactor = 1
-        local yOffset = 0
-        local yFactor = 1
-        if scenarioWidth > scenarioHeight then
-            local ratio = scenarioHeight / scenarioWidth
-            yOffset = ((size / ratio) - size) / 4
-            yFactor = ratio
-        else
-            local ratio = scenarioWidth / scenarioHeight
-            xOffset = ((size / ratio) - size) / 4
-            xFactor = ratio
-        end
-
-        local x = xOffset + (px / scenarioWidth) * (size - 2) * xFactor
-        local z = yOffset + (pz / scenarioHeight) * (size - 2) * yFactor
-
-        icon.Left:Set(function() return self.Preview.Left() + x - 0.5 * icon.Width() end)
-        icon.Top:Set(function() return self.Preview.Top() + z - 0.5 * icon.Height() end)
-
-        return icon
-    end,
-
-    --- Sets the preview texture. Private.
-    ---@param self UICustomLobbyMapPreview
-    ---@param scenarioInfo UILobbyScenarioInfo
-    _UpdatePreview = function(self, scenarioInfo)
-        if not self.Preview:SetTexture(scenarioInfo.preview) then
-            self.Preview:SetTextureFromMap(scenarioInfo.map)
-        end
-    end,
-
-    --- Creates icons for resource markers. Private.
-    ---@param self UICustomLobbyMapPreview
-    ---@param scenarioInfo UILobbyScenarioInfo
-    ---@param scenarioSave UIScenarioSaveFile
-    _UpdateMarkers = function(self, scenarioInfo, scenarioSave)
-        local scenarioWidth = scenarioInfo.size[1]
-        local scenarioHeight = scenarioInfo.size[2]
-
-        local allmarkers = scenarioSave.MasterChain['_MASTERCHAIN_'].Markers
-        if not allmarkers then
-            return
-        end
-
-        for _, marker in allmarkers do
-            if marker['type'] == "Mass" then
-                ---@type Bitmap
-                local icon = LayoutHelpers.ReusedLayoutFor(self.IconTrash:Add(UIUtil.CreateBitmapColor(self, 'ffffff')))
-                    :Width(12)
-                    :Height(12)
-                    :End()
-
-                icon:ShareTextures(self.MassIcon)
-                self:PositionIcon(
-                    icon, scenarioWidth, scenarioHeight,
-                    marker.position[1], marker.position[3]
-                )
-
-            elseif marker['type'] == "Hydrocarbon" then
-                ---@type Bitmap
-                local icon = LayoutHelpers.ReusedLayoutFor(self.IconTrash:Add(UIUtil.CreateBitmapColor(self, 'ffffff')))
-                    :Width(12)
-                    :Height(12)
-                    :End()
-                icon:ShareTextures(self.EnergyIcon)
-                self:PositionIcon(
-                    icon, scenarioWidth, scenarioHeight,
-                    marker.position[1], marker.position[3]
-                )
-            end
-        end
-    end,
-
-    --- Creates icons for wreckages. Private.
-    ---@param self UICustomLobbyMapPreview
-    ---@param scenarioInfo UILobbyScenarioInfo
-    ---@param scenarioSave UIScenarioSaveFile
-    _UpdateWreckages = function(self, scenarioInfo, scenarioSave)
-        -- TODO
-    end,
-
-    --- Creates/updates spawn-location icons. Private.
-    ---@param self UICustomLobbyMapPreview
-    ---@param scenarioInfo UILobbyScenarioInfo
-    ---@param scenarioSave UIScenarioSaveFile
-    ---@param playerOptions table<number, UICustomLobbyPlayer>
-    _UpdateSpawnLocations = function(self, scenarioInfo, scenarioSave, playerOptions)
-        local spawnIcons = self.SpawnIcons
-        local positions = MapUtil.GetStartPositionsFromScenario(scenarioInfo, scenarioSave)
-        if not positions then
-            for id, icon in spawnIcons do
-                icon:Destroy()
-            end
-            return
-        end
-
-        -- clean up icons whose position no longer exists
-        for id, icon in spawnIcons do
-            if not positions[id] then
-                icon:Destroy()
-            end
-        end
-
-        for id, position in positions do
-            local icon = spawnIcons[id]
-            if not icon then
-                icon = CustomLobbyMapPreviewSpawn.Create(self)
-            end
-
-            spawnIcons[id] = icon
-
-            self:PositionIcon(
-                icon, scenarioInfo.size[1], scenarioInfo.size[2],
-                position[1], position[2]
-            )
-
-            local options = playerOptions[id]
-            if options then
-                icon:Update(options.Faction)
-            else
-                icon:Reset()
-            end
-        end
-    end,
-
-    --- Renders the preview for a scenario, including resource and spawn icons.
-    ---@param self UICustomLobbyMapPreview
-    ---@param pathToScenarioInfo FileName   # a reference to a _scenario.lua file
-    ---@param playerOptions table<number, UICustomLobbyPlayer>
-    UpdateScenario = function(self, pathToScenarioInfo, playerOptions)
-        self.IconTrash:Destroy()
-        self.Preview:ClearTexture()
-        self.PathToScenarioFile = pathToScenarioInfo
-
-        local scenarioInfo = MapUtil.LoadScenario(pathToScenarioInfo)
-        if not scenarioInfo then
-            -- TODO: show a default image that indicates something is off
-            self.ScenarioInfo = nil
-            self.ScenarioSave = nil
-            return
-        end
-
-        self.ScenarioInfo = scenarioInfo
-        self:_UpdatePreview(scenarioInfo)
-
-        local scenarioSave = MapUtil.LoadScenarioSaveFile(scenarioInfo.save)
-        if not scenarioSave then
-            self.ScenarioSave = nil
-            return
-        end
-
-        self.ScenarioSave = scenarioSave
-        self:_UpdateMarkers(scenarioInfo, scenarioSave)
-        self:_UpdateWreckages(scenarioInfo, scenarioSave)
-
-        self.PlayerOptions = playerOptions
-        self:_UpdateSpawnLocations(scenarioInfo, scenarioSave, playerOptions)
-    end,
-
-    ---------------------------------------------------------------------------
-    --#region Engine hooks
-
-    ---@param self UICustomLobbyMapPreview
-    Show = function(self)
-        Group.Show(self)
-
-        -- do not show the pooled icons
-        self.EnergyIcon:Hide()
-        self.MassIcon:Hide()
-        self.WreckageIcon:Hide()
-    end,
-
-    --#endregion
 }
 
 ---@param parent Control
