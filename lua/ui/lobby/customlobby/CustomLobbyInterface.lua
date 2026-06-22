@@ -58,6 +58,12 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 -- flip to tint each layout area so the regions are visible while iterating
 local Debug = false
 
+-- the lobby content is designed for the 1024x768 floor; the root fills the frame (full-screen
+-- backdrop) but the content is centered and capped to this size, so it never stretches on a
+-- larger screen
+local LobbyWidth = 1024
+local LobbyHeight = 768
+
 local Pad = 8
 local SlotHeight = 24
 local RightWidth = 360
@@ -84,6 +90,7 @@ end
 ---@class UICustomLobbyInterface : Group, UICustomLobbySlotCoordinator
 ---@field Trash TrashBag
 ---@field Background Bitmap
+---@field Content Group
 ---@field TitleArea Group
 ---@field Title Text
 ---@field LeaveButton Button
@@ -120,17 +127,20 @@ local CustomLobbyInterface = Class(Group) {
         self.Background:SetSolidColor('ff0a0a0a')
         self.Background:DisableHitTest()
 
+        -- everything below lives in a centered, size-capped content group (see __post_init)
+        self.Content = Group(self, "CustomLobbyContent")
+
         --#region areas
-        self.TitleArea = CreateArea(self, "TitleArea", 'ffcc4040')
-        self.ActionArea = CreateArea(self, "ActionArea", 'ff808080')
-        self.LeftArea = CreateArea(self, "LeftArea", 'ff4060cc')
+        self.TitleArea = CreateArea(self.Content, "TitleArea", 'ffcc4040')
+        self.ActionArea = CreateArea(self.Content, "ActionArea", 'ff808080')
+        self.LeftArea = CreateArea(self.Content, "LeftArea", 'ff4060cc')
         self.SlotsArea = CreateArea(self.LeftArea, "SlotsArea", 'ffcccc40')
         self.ObserversArea = CreateArea(self.LeftArea, "ObserversArea", 'ff40cccc')
         self.ChatArea = CreateArea(self.LeftArea, "ChatArea", 'ff40cc60')
         --#endregion
 
         -- the right column: the Map / Options / Mods / Units tab panel (owns its own tabs + gating)
-        self.Config = CustomLobbyConfigInterface.Create(self)
+        self.Config = CustomLobbyConfigInterface.Create(self.Content)
 
         --#region title bar
         self.Title = UIUtil.CreateText(self.TitleArea, "Custom game", 20, UIUtil.titleFont)
@@ -211,15 +221,21 @@ local CustomLobbyInterface = Class(Group) {
         Layouter(self):Fill(parent):End()
         Layouter(self.Background):Fill(self):End()
 
+        -- centred content, capped at the 1024x768 design size (fills the frame at the minimum
+        -- resolution; centred with a backdrop border on anything larger)
+        self.Content.Width:Set(function() return math.min(self.Width(), LayoutHelpers.ScaleNumber(LobbyWidth)) end)
+        self.Content.Height:Set(function() return math.min(self.Height(), LayoutHelpers.ScaleNumber(LobbyHeight)) end)
+        Layouter(self.Content):AtCenterIn(self):End()
+
         --#region areas
-        Layouter(self.TitleArea):AtLeftIn(self, Pad):AtRightIn(self, Pad):AtTopIn(self, Pad):Height(TitleHeight):End()
-        Layouter(self.ActionArea):AtLeftIn(self, Pad):AtRightIn(self, Pad):AtBottomIn(self, Pad):Height(ActionHeight):End()
+        Layouter(self.TitleArea):AtLeftIn(self.Content, Pad):AtRightIn(self.Content, Pad):AtTopIn(self.Content, Pad):Height(TitleHeight):End()
+        Layouter(self.ActionArea):AtLeftIn(self.Content, Pad):AtRightIn(self.Content, Pad):AtBottomIn(self.Content, Pad):Height(ActionHeight):End()
         Layouter(self.Config)
-            :AtRightIn(self, Pad):Width(RightWidth)
+            :AtRightIn(self.Content, Pad):Width(RightWidth)
             :AnchorToBottom(self.TitleArea, Pad):AnchorToTop(self.ActionArea, Pad)
             :End()
         Layouter(self.LeftArea)
-            :AtLeftIn(self, Pad):AnchorToLeft(self.Config, Pad)
+            :AtLeftIn(self.Content, Pad):AnchorToLeft(self.Config, Pad)
             :AnchorToBottom(self.TitleArea, Pad):AnchorToTop(self.ActionArea, Pad)
             :End()
 
