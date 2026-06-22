@@ -1,4 +1,4 @@
--- START OF COPY --
+--#region START OF COPY
 
 -- in an ideal world this file would be loaded (using dofile) by the other
 -- initialisation files to prevent code duplication. However, as it stands
@@ -592,7 +592,7 @@ local function LoadVaultContent(path)
     MountModContent(path .. '/mods')
 end
 
--- END OF COPY --
+--#endregion END OF COPY
 
 -- -- minimum viable shader version - should be bumped to the next release version when we change the shaders
 -- local minimumShaderVersion = 3745

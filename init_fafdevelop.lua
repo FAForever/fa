@@ -1,4 +1,4 @@
--- START OF COPY --
+--#region START OF COPY
 
 -- in an ideal world this file would be loaded (using dofile) by the other
 -- initialisation files to prevent code duplication. However, as it stands
@@ -592,7 +592,7 @@ local function LoadVaultContent(path)
     MountModContent(path .. '/mods')
 end
 
--- END OF COPY --
+--#endregion END OF COPY
 
 -- Clears out the shader cache as it takes a release to reset the shaders
 local shaderCache = SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games/Supreme Commander Forged Alliance/cache'
