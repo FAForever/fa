@@ -563,6 +563,38 @@ function RequestSetGameOptions(options)
     BroadcastLaunchInfo(instance)
 end
 
+--- The host resets every game option to its default. Host-only — backs the lobby's "Reset
+--- options" button. Derives the current option schema (lobby + scenario + mods) and seeds the
+--- defaults, then broadcasts, so it reconciles to exactly the options the current map/mods define.
+function RequestResetGameOptions()
+    local instance = LobbyInstance
+    if not instance then
+        return
+    end
+
+    if not CustomLobbyLocalModel.GetSingleton().IsHost() then
+        WARN("CustomLobby: only the host can reset the game options")
+        return
+    end
+
+    local OptionUtil = import("/lua/ui/optionutil.lua")
+    local launch = CustomLobbyLaunchModel.GetSingleton()
+
+    local options = {}
+    for _, option in OptionUtil.GetLobbyOptions() do
+        table.insert(options, option)
+    end
+    for _, option in OptionUtil.GetScenarioOptions(launch.ScenarioFile()) do
+        table.insert(options, option)
+    end
+    for _, option in OptionUtil.GetModOptions(launch.GameMods()) do
+        table.insert(options, option)
+    end
+
+    CustomLobbyLaunchModel.SetGameOptions(launch, OptionUtil.SeedDefaults(options, {}))
+    BroadcastLaunchInfo(instance)
+end
+
 --- The host swaps the contents of two slots. Host-only (a client request isn't
 --- offered) — backs a host-side drag/menu and a `/swap <a> <b>` chat command.
 ---@param slotA number

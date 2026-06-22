@@ -20,14 +20,25 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
--- Composition root for the custom-games lobby. It builds and lays out the children
--- and holds NO model subscriptions of its own — each child subscribes to the model
--- itself (see /lua/ui/lobby/TARGET_ARCHITECTURE.md). For now it lays out the slot
--- rows; the options panel, map preview, observer list, footer and chat are added in
--- later slices.
+-- Composition root for the custom-games lobby. It builds and lays out the children and holds only
+-- the two presentation observers it needs (slot count, is-host); each child subscribes to the
+-- model itself (see /lua/ui/lobby/TARGET_ARCHITECTURE.md).
+--
+-- Layout is organised into labelled *areas* (Group containers), like the dialogs — flip the
+-- module-level `Debug` flag to tint each so the regions are visible while iterating. Targeted at
+-- the 1024x768 minimum resolution:
+--
+--   ┌ TitleArea ─────────────────────────────────────────────┐
+--   │ LeftArea (slots / observers / chat) │ ConfigInterface   │
+--   └ ActionArea ────────────────────────────────────────────┘
+--
+-- The right column is the CustomLobbyConfigInterface component (the Map / Options / Mods / Units
+-- tab panel); it owns its own tabs + host-gating. The interface keeps the slot grid, observer
+-- strip, chat, and the action bar (status + launch).
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 
 local Group = import("/lua/maui/group.lua").Group
@@ -38,30 +49,58 @@ local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocal
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 local CustomLobbySlotInterface = import("/lua/ui/lobby/customlobby/customlobbyslotinterface.lua")
 local CustomLobbyObserversInterface = import("/lua/ui/lobby/customlobby/customlobbyobserversinterface.lua")
-local CustomLobbyMapPreview = import("/lua/ui/lobby/customlobby/customlobbymappreview.lua")
-local CustomLobbyMapSelect = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapselect.lua")
-local CustomLobbyModSelect = import("/lua/ui/lobby/customlobby/modselect/customlobbymodselect.lua")
-local CustomLobbyOptionSelect = import("/lua/ui/lobby/customlobby/optionselect/customlobbyoptionselect.lua")
+local CustomLobbyConfigInterface = import("/lua/ui/lobby/customlobby/customlobbyconfiginterface.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
+-- flip to tint each layout area so the regions are visible while iterating
+local Debug = false
+
+local Pad = 8
 local SlotHeight = 24
-local PanelWidth = 520
+local RightWidth = 360
+local TitleHeight = 44
+local ActionHeight = 60
+local ObserverHeight = 44
+
+--- Creates a layout area (an invisible Group with an optional debug tint).
+---@param parent Control
+---@param name string
+---@param color string
+---@return Group
+local function CreateArea(parent, name, color)
+    local area = Group(parent, name)
+    local bg = Bitmap(area)
+    bg:SetSolidColor(color)
+    bg:SetAlpha(Debug and 0.18 or 0.0)
+    bg:DisableHitTest()
+    Layouter(bg):Fill(area):End()
+    area.Bg = bg
+    return area
+end
 
 ---@class UICustomLobbyInterface : Group, UICustomLobbySlotCoordinator
 ---@field Trash TrashBag
 ---@field Background Bitmap
+---@field TitleArea Group
 ---@field Title Text
+---@field LeaveButton Button
+---@field LeftArea Group
+---@field SlotsArea Group
+---@field SlotsHeader Text
 ---@field SlotsPanel Group
 ---@field Slots UICustomLobbySlotInterface[]
+---@field ObserversArea Group
 ---@field ObserversPanel UICustomLobbyObserversInterface
----@field MapPreview UICustomLobbyMapPreview
----@field MapButton Button
----@field ModsButton Button
----@field OptionsButton Button
----@field LeaveButton Button
+---@field SpectateButton Button
+---@field ChatArea Group
+---@field ChatPlaceholder Text
+---@field Config UICustomLobbyConfigInterface
+---@field ActionArea Group
+---@field StatusLabel Text
+---@field LaunchButton Button
 ---@field SlotCountObserver LazyVar
 ---@field IsHostObserver LazyVar
 ---@field HighlightedSlot number | false   # slot currently shown as a drop target
@@ -81,46 +120,77 @@ local CustomLobbyInterface = Class(Group) {
         self.Background:SetSolidColor('ff0a0a0a')
         self.Background:DisableHitTest()
 
-        self.Title = UIUtil.CreateText(self, "Custom Lobby (barebones)", 20, UIUtil.titleFont)
+        --#region areas
+        self.TitleArea = CreateArea(self, "TitleArea", 'ffcc4040')
+        self.ActionArea = CreateArea(self, "ActionArea", 'ff808080')
+        self.LeftArea = CreateArea(self, "LeftArea", 'ff4060cc')
+        self.SlotsArea = CreateArea(self.LeftArea, "SlotsArea", 'ffcccc40')
+        self.ObserversArea = CreateArea(self.LeftArea, "ObserversArea", 'ff40cccc')
+        self.ChatArea = CreateArea(self.LeftArea, "ChatArea", 'ff40cc60')
+        --#endregion
 
-        self.SlotsPanel = Group(self, "CustomLobbySlotsPanel")
+        -- the right column: the Map / Options / Mods / Units tab panel (owns its own tabs + gating)
+        self.Config = CustomLobbyConfigInterface.Create(self)
+
+        --#region title bar
+        self.Title = UIUtil.CreateText(self.TitleArea, "Custom game", 20, UIUtil.titleFont)
+        self.Title:DisableHitTest()
+
+        self.LeaveButton = UIUtil.CreateButtonWithDropshadow(self.TitleArea, '/BUTTON/medium/', "Leave")
+        self.LeaveButton.OnClick = function(button, modifiers)
+            -- leaving disconnects + returns to the menu via the escape handler lobby.lua
+            -- registered (one teardown, shared with the Esc key)
+            EscapeHandler.HandleEsc(false)
+        end
+        --#endregion
+
+        --#region slots
+        self.SlotsHeader = UIUtil.CreateText(self.SlotsArea, "Players", 14, UIUtil.titleFont)
+        self.SlotsHeader:SetColor('ff9aa0a8')
+        self.SlotsHeader:DisableHitTest()
+
+        self.SlotsPanel = Group(self.SlotsArea, "CustomLobbySlotsPanel")
 
         -- One row per possible slot; the SlotCount observer reveals the active ones.
         self.Slots = {}
         for slot = 1, CustomLobbyLaunchModel.MaxSlots do
             self.Slots[slot] = CustomLobbySlotInterface.Create(self.SlotsPanel, slot, self)
         end
+        --#endregion
 
-        self.ObserversPanel = CustomLobbyObserversInterface.Create(self)
-        self.MapPreview = CustomLobbyMapPreview.Create(self)
+        --#region observers
+        self.ObserversPanel = CustomLobbyObserversInterface.Create(self.ObserversArea)
 
-        -- only the host picks the map; the button hides for everyone else (and the
-        -- RequestSetScenario intent is host-gated regardless)
-        self.MapButton = UIUtil.CreateButtonStd(self, '/scx_menu/small-btn/small', "Change Map", 16, 2)
-        self.MapButton.OnClick = function(button, modifiers)
-            CustomLobbyMapSelect.Open(GetFrame(0))
+        -- everyone can drop to the observers; the move is host-authoritative (a client's click
+        -- asks the host through the intent)
+        self.SpectateButton = UIUtil.CreateButtonWithDropshadow(self.ObserversArea, '/BUTTON/medium/', "Observe")
+        self.SpectateButton.OnClick = function(button, modifiers)
+            local slot = self:FindLocalSlot()
+            if slot then
+                CustomLobbyController.RequestMoveToObserver(slot)
+            end
         end
+        Tooltip.AddControlTooltipManual(self.SpectateButton, "Become observer", "Leave your slot and watch as an observer.")
+        --#endregion
 
-        -- everyone can open the mod picker (UI mods are per-player); only the host can change the
-        -- shared sim mods, which the dialog gates on its own
-        self.ModsButton = UIUtil.CreateButtonStd(self, '/scx_menu/small-btn/small', "Mods", 16, 2)
-        self.ModsButton.OnClick = function(button, modifiers)
-            CustomLobbyModSelect.Open(GetFrame(0))
-        end
+        --#region chat (placeholder until the lobby-chat slice lands)
+        self.ChatPlaceholder = UIUtil.CreateText(self.ChatArea, "Chat — coming soon", 14, UIUtil.bodyFont)
+        self.ChatPlaceholder:SetColor('ff5a606a')
+        self.ChatPlaceholder:DisableHitTest()
+        --#endregion
 
-        -- options are host-dictated + synced, so only the host edits them (button hidden for
-        -- others; the RequestSetGameOptions intent is host-gated regardless)
-        self.OptionsButton = UIUtil.CreateButtonStd(self, '/scx_menu/small-btn/small', "Options", 16, 2)
-        self.OptionsButton.OnClick = function(button, modifiers)
-            CustomLobbyOptionSelect.Open(GetFrame(0))
-        end
+        --#region action bar
+        self.StatusLabel = UIUtil.CreateText(self.ActionArea, "", 14, UIUtil.bodyFont)
+        self.StatusLabel:SetColor('ff9aa0a8')
+        self.StatusLabel:DisableHitTest()
 
-        -- leaving disconnects + returns to the menu via the escape handler that
-        -- lobby.lua registered (one teardown definition, shared with the Esc key)
-        self.LeaveButton = UIUtil.CreateButtonStd(self, '/scx_menu/small-btn/small', "Leave", 16, 2)
-        self.LeaveButton.OnClick = function(button, modifiers)
-            EscapeHandler.HandleEsc(false)
+        self.LaunchButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/large/', "Launch")
+        self.LaunchButton.OnClick = function(button, modifiers)
+            -- launch flow isn't wired up yet
         end
+        self.LaunchButton:Disable()
+        Tooltip.AddControlTooltipManual(self.LaunchButton, "Launch", "Launching isn't wired up yet.")
+        --#endregion
 
         local session = CustomLobbySessionModel.GetSingleton()
         self.SlotCountObserver = self.Trash:Add(
@@ -141,38 +211,46 @@ local CustomLobbyInterface = Class(Group) {
         Layouter(self):Fill(parent):End()
         Layouter(self.Background):Fill(self):End()
 
-        Layouter(self.Title):AtLeftTopIn(self, 40, 36):End()
+        --#region areas
+        Layouter(self.TitleArea):AtLeftIn(self, Pad):AtRightIn(self, Pad):AtTopIn(self, Pad):Height(TitleHeight):End()
+        Layouter(self.ActionArea):AtLeftIn(self, Pad):AtRightIn(self, Pad):AtBottomIn(self, Pad):Height(ActionHeight):End()
+        Layouter(self.Config)
+            :AtRightIn(self, Pad):Width(RightWidth)
+            :AnchorToBottom(self.TitleArea, Pad):AnchorToTop(self.ActionArea, Pad)
+            :End()
+        Layouter(self.LeftArea)
+            :AtLeftIn(self, Pad):AnchorToLeft(self.Config, Pad)
+            :AnchorToBottom(self.TitleArea, Pad):AnchorToTop(self.ActionArea, Pad)
+            :End()
 
+        -- the slots area sizes to the *active* slot count (map-derived, 1..MaxSlots) so the
+        -- observers + chat below it reflow up on smaller maps; OnSlotCountChanged keeps it in sync
+        local slotCount = CustomLobbySessionModel.GetSingleton().SlotCount()
+        Layouter(self.SlotsArea)
+            :AtLeftIn(self.LeftArea):AtRightIn(self.LeftArea):AtTopIn(self.LeftArea)
+            :Height(20 + slotCount * SlotHeight)
+            :End()
+        Layouter(self.ObserversArea)
+            :AtLeftIn(self.LeftArea):AtRightIn(self.LeftArea)
+            :AnchorToBottom(self.SlotsArea, Pad):Height(ObserverHeight)
+            :End()
+        Layouter(self.ChatArea)
+            :AtLeftIn(self.LeftArea):AtRightIn(self.LeftArea)
+            :AnchorToBottom(self.ObserversArea, Pad):AtBottomIn(self.LeftArea)
+            :End()
+        --#endregion
+
+        --#region title bar
+        Layouter(self.Title):AtLeftIn(self.TitleArea, 8):AtVerticalCenterIn(self.TitleArea):End()
+        Layouter(self.LeaveButton):AtRightIn(self.TitleArea):AtVerticalCenterIn(self.TitleArea):End()
+        --#endregion
+
+        --#region slots
+        Layouter(self.SlotsHeader):AtLeftIn(self.SlotsArea, 4):AtTopIn(self.SlotsArea):End()
         Layouter(self.SlotsPanel)
-            :AtLeftTopIn(self, 40, 80)
-            :Width(PanelWidth)
-            :Height(CustomLobbyLaunchModel.MaxSlots * SlotHeight)
-            :End()
-
-        -- map preview to the right of the slots; hides itself until a scenario is set
-        Layouter(self.MapPreview)
-            :AnchorToRight(self.SlotsPanel, 24)
-            :AtTopIn(self, 80)
-            :Width(320)
-            :Height(320)
-            :End()
-
-        -- map-change button under the preview (host-only; visibility set by OnIsHostChanged)
-        Layouter(self.MapButton)
-            :AnchorToBottom(self.MapPreview, 12)
-            :AtLeftIn(self.MapPreview)
-            :End()
-
-        -- mods button beside it (shown to everyone)
-        Layouter(self.ModsButton)
-            :AnchorToRight(self.MapButton, 8)
-            :AtVerticalCenterIn(self.MapButton)
-            :End()
-
-        -- options button beside mods (host-only; visibility set by OnIsHostChanged)
-        Layouter(self.OptionsButton)
-            :AnchorToRight(self.ModsButton, 8)
-            :AtVerticalCenterIn(self.ModsButton)
+            :AtLeftIn(self.SlotsArea):AtRightIn(self.SlotsArea)
+            :AnchorToBottom(self.SlotsHeader, 4)
+            :Height(slotCount * SlotHeight)
             :End()
 
         -- stack the rows top-to-bottom inside the panel via sibling anchoring
@@ -189,14 +267,26 @@ local CustomLobbyInterface = Class(Group) {
             end
             builder:End()
         end
+        --#endregion
 
+        --#region observers
+        Layouter(self.SpectateButton):AtRightIn(self.ObserversArea):AtVerticalCenterIn(self.ObserversArea):End()
         Layouter(self.ObserversPanel)
-            :AtLeftIn(self, 40):AnchorToBottom(self.SlotsPanel, 16):Width(PanelWidth):Height(44)
+            :AtLeftIn(self.ObserversArea):AnchorToLeft(self.SpectateButton, Pad)
+            :AtTopIn(self.ObserversArea):AtBottomIn(self.ObserversArea)
             :End()
-        Layouter(self.LeaveButton):AtLeftIn(self, 40):AnchorToBottom(self.ObserversPanel, 16):End()
+        --#endregion
+
+        Layouter(self.ChatPlaceholder):AtHorizontalCenterIn(self.ChatArea):AtVerticalCenterIn(self.ChatArea):End()
+
+        --#region action bar
+        Layouter(self.StatusLabel):AtLeftIn(self.ActionArea, 8):AtVerticalCenterIn(self.ActionArea):End()
+        Layouter(self.LaunchButton):AtRightIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea):End()
+        --#endregion
     end,
 
-    --- Shows the active slots (1..count) and hides the rest.
+    --- Shows the active slots (1..count), hides the rest, and resizes the slots area to fit them
+    --- (so the observers + chat below reflow to the map's actual slot count, up to MaxSlots).
     ---@param self UICustomLobbyInterface
     ---@param count number
     OnSlotCountChanged = function(self, count)
@@ -207,19 +297,36 @@ local CustomLobbyInterface = Class(Group) {
                 self.Slots[slot]:Hide()
             end
         end
+        self.SlotsPanel.Height:Set(LayoutHelpers.ScaleNumber(count * SlotHeight))
+        self.SlotsArea.Height:Set(LayoutHelpers.ScaleNumber(20 + count * SlotHeight))
     end,
 
-    --- Shows the host-only controls (map-change + options buttons) only to the host.
+    --- Tracks host status: updates the status line and shows the launch button only to the host.
+    --- (The right-column config panel gates its own host-only buttons.)
     ---@param self UICustomLobbyInterface
     ---@param isHost boolean
     OnIsHostChanged = function(self, isHost)
+        self.StatusLabel:SetText(isHost and "You are the host." or "The host controls the game.")
         if isHost then
-            self.MapButton:Show()
-            self.OptionsButton:Show()
+            self.LaunchButton:Show()
         else
-            self.MapButton:Hide()
-            self.OptionsButton:Hide()
+            self.LaunchButton:Hide()
         end
+    end,
+
+    --- The local player's slot (the one this peer owns), or nil if they're an observer / unseated.
+    ---@param self UICustomLobbyInterface
+    ---@return number | nil
+    FindLocalSlot = function(self)
+        local launch = CustomLobbyLaunchModel.GetSingleton()
+        local localId = CustomLobbyLocalModel.GetSingleton().LocalPeerId()
+        for slot = 1, CustomLobbyLaunchModel.MaxSlots do
+            local player = launch.Players[slot]()
+            if player and player.OwnerID == localId then
+                return slot
+            end
+        end
+        return nil
     end,
 
     ---------------------------------------------------------------------------
