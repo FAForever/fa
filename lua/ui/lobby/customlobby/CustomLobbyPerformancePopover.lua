@@ -368,11 +368,22 @@ function Show(anchor, metrics, unitCap)
     local popover = GetInstance()
     popover:SetData(metrics, unitCap)
 
-    -- float to the right of the hovered control, vertically centred on it
-    Layouter(popover)
-        :AnchorToRight(anchor, 12)
-        :AtVerticalCenterIn(anchor)
-        :End()
+    local frame = GetFrame(0)
+
+    -- float beside the hovered control, vertically centred on it. If the control sits on the
+    -- right half of the screen, open to its LEFT so the popover doesn't run off the edge.
+    local builder = Layouter(popover):AtVerticalCenterIn(anchor)
+    local anchorCenter = (anchor.Left() + anchor.Right()) / 2
+    if anchorCenter > frame.Width() / 2 then
+        builder:AnchorToLeft(anchor, 12)
+    else
+        builder:AnchorToRight(anchor, 12)
+    end
+    builder:End()
+
+    -- overlay above everything else (lobby chrome, dialogs, …); child depths are bound to ours,
+    -- so lifting the popover lifts the whole chart with it
+    popover.Depth:Set(frame:GetTopmostDepth() + 1)
 
     popover:Show()
 end
