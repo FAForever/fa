@@ -93,6 +93,12 @@ function CloseChat()
     ChatController.CloseWindow()
 end
 
+---@deprecated use [ChatController.FindClients](chat/ChatController.lua) instead
+function FindClients(id)
+    _deprecate('FindClients', 'ChatController.FindClients')
+    return ChatController.FindClients(id)
+end
+
 --- @deprecated subscribe to [ChatConfigModel.GetSingleton().Committed](chat/config/ChatConfigModel.lua) via `LazyVarDerive` instead. Best-effort shim — fires the callback once with the current options so legacy callers see a value, then wires a one-way derived observer so subsequent changes propagate. Mods should migrate to a real `LazyVarDerive` they can destroy on teardown.
 function AddChatOptionSetCallback(callback, _)
     _deprecate('AddChatOptionSetCallback', 'LazyVarDerive(ChatConfigModel.GetSingleton().Committed, ...)')
@@ -137,30 +143,37 @@ function GetArmyData(army)
 end
 
 -------------------------------------------------------------------------------
--- Deprecated state tables
+-- Deprecated legacy API proxies
 --
--- The legacy file exposed `GUI` and `ChatLines` as live tables of MAUI
--- handles. There's no clean way to recreate that against the MVC tree —
--- the new view doesn't pin its controls to a globally-addressable
--- structure. Mods that read these tables directly were always coupled to
--- internals that could move.
+-- The legacy file exposed `GUI`, `ChatLines`, and `CreateChatEdit` as
+-- legacy chat API entry points. There's no clean way to recreate those
+-- against the MVC tree — the new view doesn't pin its controls to a
+-- globally-addressable structure. Mods that read or call these entries
+-- directly were always coupled to internals that could move.
 --
 -- We expose empty tables proxied through metatables so any access logs
--- a deprecation warning and returns nil. Existing `chat.GUI.bg` reads
--- still terminate eventually (with a clear log line) instead of pretending
--- the field exists.
+-- a deprecation warning and returns the proxy table. This preserves
+-- legacy reads and chained accesses without pretending the field exists.
+-- Function-style calls also log a deprecation warning and return the
+-- proxy, allowing old APIs to fail gracefully while steering mods toward
+-- the new chat MVC view tree.
 
-local function _stateProxy(name)
+local function _deprecationProxy(name)
     return setmetatable({}, {
-        __index = function(_, k)
+        __index = function(self, k)
             _deprecate(name .. '.' .. tostring(k), 'the new chat MVC view tree')
-            return nil
+            return self
         end,
         __newindex = function(_, k, _)
             _deprecate(name .. '.' .. tostring(k) .. ' (assignment)', 'the new chat MVC view tree')
         end,
+        __call = function(self)
+            _deprecate(name .. ' (function call)', 'the new chat MVC view tree')
+            return self
+        end,
     })
 end
 
-GUI = _stateProxy('GUI')
-ChatLines = _stateProxy('ChatLines')
+GUI = _deprecationProxy('GUI')
+ChatLines = _deprecationProxy('ChatLines')
+CreateChatEdit = _deprecationProxy('CreateChatEdit')
