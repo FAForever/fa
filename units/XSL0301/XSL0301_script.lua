@@ -108,7 +108,6 @@ XSL0301 = ClassUnit(CommandUnit) {
 
         local deathNuke = self:GetWeaponByLabel("DeathWeapon") --[[@as SCUDeathWeapon]]
         deathNuke:AddDamageMod(bp.DeathWeaponDamageAdd)
-        deathNuke:AddDamageRadiusMod(bp.DeathWeaponRadiusAdd)
     end,
 
     ---@param self XSL0301
@@ -121,7 +120,6 @@ XSL0301 = ClassUnit(CommandUnit) {
         local deathNuke = self:GetWeaponByLabel("DeathWeapon") --[[@as SCUDeathWeapon]]
         local baseBp = self.Blueprint.Enhancements["ResourceAllocation"]
         deathNuke:AddDamageMod(-baseBp.DeathWeaponDamageAdd)
-        deathNuke:AddDamageRadiusMod(-baseBp.DeathWeaponRadiusAdd)
     end,
 
     ---@param self XSL0301

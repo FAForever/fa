@@ -954,8 +954,6 @@
 ---
 --- Used by RAS SACU to add damage to their death weapon
 ---@field DeathWeaponDamageAdd number
---- Used by RAS SACU to add radius to their death weapon
----@field DeathWeaponRadiusAdd number
 
 
 
