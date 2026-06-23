@@ -189,6 +189,25 @@ CustomLobbyMessages = {
         end,
     },
 
+    -- The host tells everyone to launch with the final game configuration (players, options,
+    -- mods, scenario). On receipt each peer hands it straight to the engine.
+    LaunchGame = {
+        ---@class UICustomLobbyLaunchGameMessage : UILobbyReceivedMessage
+        ---@field GameConfig UILobbyLaunchConfiguration
+
+        ---@param data UICustomLobbyLaunchGameMessage
+        Validate = function(lobby, data)
+            return type(data.GameConfig) == 'table'
+        end,
+        Accept = function(lobby, data)
+            return IsFromHost(lobby, data)
+        end,
+        ---@param data UICustomLobbyLaunchGameMessage
+        Handler = function(lobby, data)
+            CustomLobbyController.ProcessLaunchGame(lobby, data)
+        end,
+    },
+
     -- A client reports its in-game sim-performance history (the rich benchmark).
     ReportCpuBenchmark = {
         ---@class UICustomLobbyReportCpuBenchmarkMessage : UILobbyReceivedMessage

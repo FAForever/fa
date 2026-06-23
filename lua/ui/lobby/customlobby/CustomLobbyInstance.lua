@@ -79,6 +79,18 @@ CustomLobbyInstance = Class(MohoLobbyMethods) {
         return MohoLobbyMethods.SendData(self, peerId, data)
     end,
 
+    --- Tells the server a seated player's army setting at launch (host-only). No-op unless we're
+    --- on the GPGNet path (the FAF client); a local test launch just skips it.
+    ---@param self UICustomLobbyInstance
+    ---@param peerId UILobbyPeerId
+    ---@param key 'Team' | 'Army' | 'StartSpot' | 'Faction'
+    ---@param value any
+    SendPlayerOptionToServer = function(self, peerId, key, value)
+        if self:IsHost() and GpgNetActive() then
+            GpgNetSend('PlayerOption', peerId, key, value)
+        end
+    end,
+
     --#endregion
 
     ---------------------------------------------------------------------------

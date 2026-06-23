@@ -67,7 +67,7 @@ Roles: **Host**, **Player** (human in a slot), **Observer**, **Joining client**
 - ✅ As a **host**, I want to be the single source of truth, so that all clients converge on one authoritative state. *(Host-authoritative: request → validate → broadcast snapshot.)*
 - 🟡 As a **player**, I want my own-slot changes applied optimistically and then confirmed by the host, so that the UI feels responsive but stays consistent. *(Round-trips through the host; not yet optimistic.)*
 - ⬜ As a **host**, I want option-changing buttons disabled while any human is not ready, so that settings can't shift after people commit.
-- ⬜ As a **host**, I want the launch button enabled only when everyone is ready (or single-player / I'm observing), so that I can't start prematurely.
+- 🟡 As a **host**, I want the launch button enabled only when everyone is ready (or single-player / I'm observing), so that I can't start prematurely. *(Launch works — `RequestLaunch` builds the config, broadcasts a `LaunchGame` message and calls the engine; it's validated on click (host + a map + ≥1 seat + every other human ready, the host exempt). Not yet reactively enabled/disabled, and the block reason is only logged.)*
 - ⬜ As a **system**, I want to ignore a move request if the player became ready in the meantime, so that races don't corrupt slot state.
 
 ## G. Game options (host)
@@ -88,7 +88,7 @@ Roles: **Host**, **Player** (human in a slot), **Observer**, **Joining client**
 - ⬜ As a **host**, I want manual AutoTeams by clicking map markers, so that I can hand-place teams on random spawn.
 - 🟡 As a **host**, I want spawn variants (fixed, random, balanced/flex/reveal, penguin-autobalance), so that start placement matches the desired fairness/secrecy. *(Selectable as a lobby option; placement is resolved at launch, which isn't wired.)*
 - ⬜ As a **host on an adaptive map**, I want per-slot spawn-mex, so that closed positions still contribute economy.
-- ⬜ As a **system**, I want random factions/start spots/AI names and the ratings/clan tables resolved at launch, so that the final config is complete and fair.
+- 🟡 As a **system**, I want random factions/start spots/AI names and the ratings/clan tables resolved at launch, so that the final config is complete and fair. *(At launch `BuildGameConfiguration` resolves random factions to a concrete one, assigns army numbers in slot order, and stamps the ratings/clan-tag tables into the game options; start-spot/AutoTeams resolution and AI names aren't done yet.)*
 
 ## I. Map selection (host)
 

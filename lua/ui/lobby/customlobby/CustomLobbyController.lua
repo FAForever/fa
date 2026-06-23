@@ -398,6 +398,13 @@ function ProcessSetCpuBenchmarks(instance, data)
     CustomLobbyLocalModel.GetSingleton().CpuBenchmarks:Set(data.CpuBenchmarks)
 end
 
+--- Everyone launches the game with the host's configuration (the engine takes over from here).
+---@param instance UICustomLobbyInstance
+---@param data UICustomLobbyLaunchGameMessage
+function ProcessLaunchGame(instance, data)
+    instance:LaunchGame(data.GameConfig)
+end
+
 --#endregion
 
 -------------------------------------------------------------------------------
@@ -620,6 +627,131 @@ function RequestResetGameOptions()
     CustomLobbyLaunchModel.SetGameOptions(launch, OptionUtil.SeedDefaults(options, {}))
     BroadcastLaunchInfo(instance)
 end
+
+-------------------------------------------------------------------------------
+--#region Launch
+
+--- Why the game can't launch right now, or nil when it can. Requires at least one seated player,
+--- a selected map, and every *other* human to be ready — the launching host is exempt, since
+--- clicking Launch is their commit.
+---@return string | nil
+local function LaunchBlockReason()
+    local launch = CustomLobbyLaunchModel.GetSingleton()
+    local localId = CustomLobbyLocalModel.GetSingleton().LocalPeerId()
+    local seated = 0
+    for slot = 1, CustomLobbyLaunchModel.MaxSlots do
+        local player = launch.Players[slot]()
+        if player then
+            seated = seated + 1
+            if player.Human and player.OwnerID ~= localId and not player.Ready then
+                return "not everyone is ready"
+            end
+        end
+    end
+    if seated == 0 then
+        return "no players are seated"
+    end
+    if not launch.ScenarioFile() then
+        return "no map is selected"
+    end
+    return nil
+end
+
+--- Builds the engine launch configuration from the launch model — mirrors the autolobby's
+--- `LaunchThread` and the legacy lobby's `LaunchGame`:
+---   * `GameOptions`: the host's values with lobby/scenario/mod defaults seeded over them, plus the
+---     scenario file and the ratings / clan-tag tables (sim + UI read those there);
+---   * `PlayerOptions`: the seated players (fresh copies; a random faction resolved to a concrete
+---     one), keyed by slot, with army numbers assigned in slot order and pushed to the server;
+---   * `GameMods` + `Observers` straight off the model.
+---@param instance UICustomLobbyInstance
+---@return UILobbyLaunchConfiguration
+local function BuildGameConfiguration(instance)
+    local OptionUtil = import("/lua/ui/optionutil.lua")
+    local Factions = import("/lua/factions.lua").Factions
+    local factionCount = table.getn(Factions)
+    local launch = CustomLobbyLaunchModel.GetSingleton()
+
+    -- the full option set: the host's chosen values, with defaults seeded for anything unset
+    local schema = {}
+    for _, option in OptionUtil.GetLobbyOptions() do table.insert(schema, option) end
+    for _, option in OptionUtil.GetScenarioOptions(launch.ScenarioFile()) do table.insert(schema, option) end
+    for _, option in OptionUtil.GetModOptions(launch.GameMods()) do table.insert(schema, option) end
+    local gameOptions = OptionUtil.SeedDefaults(schema, launch.GameOptions())
+    gameOptions.ScenarioFile = launch.ScenarioFile()
+
+    -- seated players (fresh copies; random faction resolved to a concrete one)
+    local playerOptions = {}
+    local ratings, clanTags = {}, {}
+    for slot = 1, CustomLobbyLaunchModel.MaxSlots do
+        local player = launch.Players[slot]()
+        if player then
+            local options = table.copy(player)
+            if (options.Faction or factionCount + 1) > factionCount then
+                options.Faction = Random(1, factionCount)
+            end
+            options.StartSpot = options.StartSpot or slot
+            playerOptions[slot] = options
+            if options.PL then ratings[options.PlayerName] = options.PL end
+            if options.PlayerClan then clanTags[options.PlayerName] = options.PlayerClan end
+        end
+    end
+    gameOptions.Ratings = ratings
+    gameOptions.ClanTags = clanTags
+
+    -- army numbers are assigned in slot order; tell the server each seated player's army settings
+    local slots = {}
+    for slot, _ in playerOptions do
+        table.insert(slots, slot)
+    end
+    table.sort(slots)
+    for armyIndex, slot in ipairs(slots) do
+        local player = playerOptions[slot]
+        instance:SendPlayerOptionToServer(player.OwnerID, 'Team', player.Team)
+        instance:SendPlayerOptionToServer(player.OwnerID, 'Army', armyIndex)
+        instance:SendPlayerOptionToServer(player.OwnerID, 'StartSpot', player.StartSpot)
+        instance:SendPlayerOptionToServer(player.OwnerID, 'Faction', player.Faction)
+    end
+
+    return {
+        -- the model holds the selected sim-mod uid set; the engine wants the resolved mod list
+        GameMods = import("/lua/mods.lua").GetGameMods(launch.GameMods()),
+        GameOptions = gameOptions,
+        PlayerOptions = playerOptions,
+        Observers = launch.Observers(),
+    }
+end
+
+--- The host launches the game. Host-only — backs the Launch button. Validates readiness, builds
+--- the launch configuration, broadcasts it so every peer launches with the same config, then
+--- launches locally. The engine takes over from here (see `OnGameLaunched`).
+---
+--- TODO: resolve AutoTeams (the mode lives in `GameOptions` but teams aren't applied at launch yet
+--- — see USER_STORIES.md H), and gate the button reactively / surface the block reason in the UI
+--- rather than only warning.
+function RequestLaunch()
+    local instance = LobbyInstance
+    if not instance then
+        return
+    end
+
+    if not CustomLobbyLocalModel.GetSingleton().IsHost() then
+        WARN("CustomLobby: only the host can launch the game")
+        return
+    end
+
+    local reason = LaunchBlockReason()
+    if reason then
+        WARN("CustomLobby: cannot launch — " .. reason)
+        return
+    end
+
+    local gameConfiguration = BuildGameConfiguration(instance)
+    instance:BroadcastData({ Type = 'LaunchGame', GameConfig = gameConfiguration })
+    instance:LaunchGame(gameConfiguration)
+end
+
+--#endregion
 
 --- The host swaps the contents of two slots. Host-only (a client request isn't
 --- offered) — backs a host-side drag/menu and a `/swap <a> <b>` chat command.

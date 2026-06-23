@@ -43,9 +43,9 @@ it get launched (becomes part of the game)?* See the `customlobby-model-choice` 
 | [CustomLobbyLocalModel.lua](CustomLobbyLocalModel.lua) | per-peer state, never synced: identity + CPU benchmarks. |
 | [CustomLobbyPerformancePopover.lua](CustomLobbyPerformancePopover.lua) | hover popover over the CPU column; hand-built bitmap bar chart of a peer's `PerformanceTrackingV2` history, with a yellow recommended-unit-cap line. |
 | [CustomLobbyInstance.lua](CustomLobbyInstance.lua) | thin `moho.lobby_methods` shell; validates/dispatches traffic, forwards callbacks to the controller. |
-| [CustomLobbyController.lua](CustomLobbyController.lua) | host-authority logic (free functions): seating, `Process*` handlers, intents (`RequestSetReady`, `RequestTakeSlot`, `RequestSwapSlots`, `RequestEject`, `RequestMoveToObserver`, `RequestSetScenario` — all keyed by slot/bool/file so a chat command can call them too; permission is gated separately), sharing the stored CPU benchmark. |
+| [CustomLobbyController.lua](CustomLobbyController.lua) | host-authority logic (free functions): seating, `Process*` handlers, intents (`RequestSetReady`, `RequestTakeSlot`, `RequestSwapSlots`, `RequestEject`, `RequestMoveToObserver`, `RequestSetScenario`, `RequestSetGameMods/Options`, `RequestResetGameOptions`, `RequestLaunch` — all keyed by slot/bool/file so a chat command can call them too; permission is gated separately), sharing the stored CPU benchmark. **Launch:** `RequestLaunch` (host-only, readiness-validated) → `BuildGameConfiguration` (seed option defaults + scenario, resolve random factions, assign army numbers + push to server, stamp ratings/clan tags, resolve sim mods via `Mods.GetGameMods`) → broadcast `LaunchGame` + `instance:LaunchGame`; clients run `ProcessLaunchGame`. |
 | [CustomLobbyRules.lua](CustomLobbyRules.lua) | game-rule derivations from lobby state (not view, not networking): `RecommendedUnitCap()` (per-player cap by map size, memoised scenario lookup). |
-| [CustomLobbyMessages.lua](CustomLobbyMessages.lua) | message registry: `AddPlayer`, `SetPlayers` (launch model: players + observers), `SentLaunchInfo` (launch model: scenario / options / mods / teams / spawn mex), `SetSessionState` (session model: slot count / closed slots), `SetReady`, `TakeSlot`, `DisconnectPeer`, `ReportCpuBenchmark`, `SetCpuBenchmarks`. |
+| [CustomLobbyMessages.lua](CustomLobbyMessages.lua) | message registry: `AddPlayer`, `SetPlayers` (launch model: players + observers), `SentLaunchInfo` (launch model: scenario / options / mods / teams / spawn mex), `SetSessionState` (session model: slot count / closed slots), `SetReady`, `TakeSlot`, `DisconnectPeer`, `LaunchGame` (host's final game config → `instance:LaunchGame`), `ReportCpuBenchmark`, `SetCpuBenchmarks`. |
 | [CustomLobbyContextMenu.lua](CustomLobbyContextMenu.lua) | generic framed floating menu; `Show(entries, x, y)` renders any `{label, action, enabled}` list, dismisses on item click / click-outside / Esc. Knows nothing about the lobby. |
 | [CustomLobbyMenus.lua](CustomLobbyMenus.lua) | declarative menu **definitions**: entry lists with `when(ctx)`/`action(ctx)` filtered by lobby state (`BuildSlotMenu`). Adding/state-gating an item is a one-liner here. |
 | [CustomLobbySlotInterface.lua](CustomLobbySlotInterface.lua) | one slot row; subscribes to its slot + CPU benchmarks; CPU column shows max units at +0 with a green→red cap-headroom square; left-click an open slot to take it / your own to toggle ready; right-click opens its context menu; the host can drag a row onto another to swap. |
@@ -74,7 +74,11 @@ stored sim-performance benchmark is shared (no live stress test), and a **Leave*
 (or Esc) disconnects and returns to the menu — a leaving client frees its slot for
 everyone via `OnPeerDisconnected`. The host can **pick the map** via a Change-Map button →
 the map-select dialog (searchable list + preview), which sets `ScenarioFile` through the
-`RequestSetScenario` intent and broadcasts it so every peer's preview updates. Launched via
+`RequestSetScenario` intent and broadcasts it so every peer's preview updates. The host can
+**launch the game** (Launch button → `RequestLaunch`): once a map is picked, ≥1 slot is seated
+and every other human is ready, it builds the game config, broadcasts `LaunchGame` and hands it to
+the engine, so all peers start together. (Lobby-UI teardown on launch and reactive enable/disable
+of the button are still TODO.) Launched via
 `scripts/LaunchCustomLobby.ps1`, or inspect UI only with
 `UI_Lua import("/lua/ui/lobby/customlobby/customlobbyinterface.lua").OpenDebug()`.
 

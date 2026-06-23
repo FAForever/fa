@@ -201,10 +201,9 @@ local CustomLobbyInterface = Class(Group) {
 
         self.LaunchButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/large/', "Launch")
         self.LaunchButton.OnClick = function(button, modifiers)
-            -- launch flow isn't wired up yet
+            CustomLobbyController.RequestLaunch()
         end
-        self.LaunchButton:Disable()
-        Tooltip.AddControlTooltipManual(self.LaunchButton, "Launch", "Launching isn't wired up yet.")
+        Tooltip.AddControlTooltipManual(self.LaunchButton, "Launch", "Start the game with the current setup (host only). Everyone else must be ready.")
         --#endregion
 
         local session = CustomLobbySessionModel.GetSingleton()
