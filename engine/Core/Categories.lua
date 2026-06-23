@@ -4,6 +4,7 @@
 ---@type EntityCategory
 local categoryValue
 
+---@type table<CategoryName | UnitId, EntityCategory>
 categories = {
     ABILITYBUTTON = categoryValue,
     ADVANCEDCOMBATPRESET = categoryValue,

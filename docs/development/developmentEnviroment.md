@@ -19,7 +19,7 @@ Fork the repository. Clone your fork to your system using your favourite Git too
 
 - `C:/ProgramData/FAForever/bin`
 
-Copy the contents of `repository/setup/bin` into the `bin` folder. Open `init_dev.lua` now found in the `bin` folder. At the top it states:
+Copy the contents of `repository/setup/bin` into the `bin` folder. Open `init_local_development.lua` now found in the `bin` folder. At the top it states:
 
 ```lua
 -- change this to the location of the repository on your disk. Note that `\` is used
@@ -131,13 +131,13 @@ _This step is optional and only required when you intend to investigate an excep
 With thanks to KionX we have a [debugger](https://github.com/FAForever/FADeepProbe). When an exception occurs it can trace the exception to a line of Lua code. A compiled executable is available in each [release](https://github.com/FAForever/FADeepProbe/releases). Store the executable in your `bin` folder. This is the same `bin` folder as defined earlier. We need to adapt the bat / bash files to use the debugger. As an example we change the bat file from:
 
 ```bat
-ForgedAlliance.exe /init "init_dev.lua" /EnableDiskWatch /showlog /log "dev.log"
+ForgedAlliance.exe /init "init_local_development.lua" /EnableDiskWatch /showlog /log "dev.log"
 ```
 
 To:
 
 ```bat
-FADeepProbe.exe /init "init_dev.lua" /EnableDiskWatch /showlog /log "dev.log"
+FADeepProbe.exe /init "init_local_development.lua" /EnableDiskWatch /showlog /log "dev.log"
 ```
 
 The arguments are passed along by the debugger. The change to the bash script is similar. When the game crashes the debugger will try and inform you in the log what happened.

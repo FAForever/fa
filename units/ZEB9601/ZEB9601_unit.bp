@@ -1,5 +1,5 @@
 UnitBlueprint{
-    Description = "<LOC zeb9601_desc>Suport Land Factory",
+    Description = "<LOC zeb9601_desc>Support Land Factory",
     AI = {
         TargetBones = {
             "Attachpoint",
