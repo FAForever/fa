@@ -319,8 +319,56 @@ local keyActionsDebugAI = {
     },
 }
 
+--- Bindings that exercise the in-game chat. Filed under the `chat` category
+--- (rather than `debug`) so the keybindings dialog groups them with the
+--- regular chat actions — they're harmless to bind in normal play.
+---@type table<string, UIKeyAction>
+local keyActionsDebugChat = {
+    ['debug_chat_window'] = {
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatInterface.lua").Toggle()',
+        category = 'chat',
+    },
+    ['debug_chat_config'] = {
+        action = 'UI_Lua import("/lua/ui/game/chat/config/ChatConfigInterface.lua").Toggle()',
+        category = 'chat',
+    },
+    ['debug_chat_append_system_message'] = {
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatDebug.lua").AppendSystemMessage()',
+        category = 'chat',
+    },
+    ['debug_chat_append_short_message'] = {
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatDebug.lua").AppendShortMessage()',
+        category = 'chat',
+    },
+    ['debug_chat_append_long_message'] = {
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatDebug.lua").AppendLongMessage()',
+        category = 'chat',
+    },
+    ['debug_chat_append_burst'] = {
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatDebug.lua").AppendBurst()',
+        category = 'chat',
+    },
+    ['debug_chat_append_camera_message'] = {
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatDebug.lua").AppendCameraMessage()',
+        category = 'chat',
+    },
+    ['debug_chat_set_recipient_all'] = {
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatDebug.lua").SetRecipientAll()',
+        category = 'chat',
+    },
+    ['debug_chat_set_recipient_allies'] = {
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatDebug.lua").SetRecipientAllies()',
+        category = 'chat',
+    },
+    ['debug_chat_clear_history'] = {
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatDebug.lua").ClearHistory()',
+        category = 'chat',
+    },
+}
+
 ---@type table<string, UIKeyAction>
 debugKeyActions = table.combine(
     keyActionsDebug,
-    keyActionsDebugAI
+    keyActionsDebugAI,
+    keyActionsDebugChat
 )
