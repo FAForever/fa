@@ -25,23 +25,25 @@
 -- slot's side comes from CustomLobbyRules.BuildSideResolver (start position for the positional
 -- modes, start-spot parity for pvsi).
 --
--- "Two columns, unresolved": for a positional mode whose map / start positions aren't loaded yet the
--- resolver can't place anyone, so we still show both columns but fill them by slot-index parity and
--- withhold the side labels (Left / Right / …); once positions resolve, a Relayout snaps the cards to
--- their true sides and reveals the labels.
+-- The CustomLobbyTeamScore widget sits in a strip across the top — it *is* the side indicator
+-- (`Left  3150  ·  3025  Right`), so it doubles as the columns' header. It self-hides for the
+-- "two columns, unresolved" case (a positional mode whose map / start positions aren't loaded yet),
+-- where we still show both columns but fill them by slot-index parity; once positions resolve a
+-- Relayout snaps the cards to their true sides and the score reappears. The strip is reserved either
+-- way, so the cards don't jump when it appears.
 --
--- It is a *layout body* under CustomLobbySlotsInterface: that selector owns the header and is the
--- rows' drag coordinator, so this body just builds the cards, places them by side, reveals the
--- active ones, and (with the module HeightForCount) reports how tall the taller column is. The
+-- It is a *layout body* under CustomLobbySlotsInterface: that selector owns the "Players" header and
+-- is the rows' drag coordinator, so this body just builds the cards, places them by side, reveals
+-- the active ones, and (with the module HeightForCount) reports how tall the taller column is. The
 -- selector passes itself as the cards' coordinator.
 
-local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
 local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/customlobbysessionmodel.lua")
 local CustomLobbyRules = import("/lua/ui/lobby/customlobby/customlobbyrules.lua")
+local CustomLobbyTeamScore = import("/lua/ui/lobby/customlobby/customlobbyteamscore.lua")
 local CustomLobbySlotCard = import("/lua/ui/lobby/customlobby/slots/twocolumn/customlobbyslotcard.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
@@ -50,15 +52,13 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 local CardHeight = 48
 local CardGap = 2
 local ColumnGap = 8               -- the gutter between the two columns
-local LabelHeight = 20            -- the per-column team label (shown only when resolved)
-local LabelColor = 'ff8a909a'
+local ScoreHeight = 26            -- the team-score strip across the top (the side indicator)
 
---- Assigns the visible slots (1..count) to the two team columns, in slot order. Returns `cols`
---- (`{ [1] = {slots…}, [2] = {slots…} }`) and `resolved` (false when a positional mode's start
---- positions aren't loaded — sides then fall back to slot-index parity and the labels are withheld).
+--- Assigns the visible slots (1..count) to the two team columns, in slot order. Sides come from the
+--- shared resolver; an unresolvable slot (a positional mode whose positions aren't loaded, or a slot
+--- past the map's start spots) falls back to slot-index parity so both columns still populate.
 ---@param count number
----@return table cols
----@return boolean resolved
+---@return table cols   # { [1] = {slots…}, [2] = {slots…} }
 local function ComputeColumns(count)
     local resolver, resolved = CustomLobbyRules.BuildSideResolver()
     local cols = { {}, {} }
@@ -69,15 +69,15 @@ local function ComputeColumns(count)
         end
         table.insert(cols[side], slot)
     end
-    return cols, resolved
+    return cols
 end
 
 ---@class UICustomLobbyTwoColumnSlots : Group
 ---@field Trash TrashBag
 ---@field Coordinator UICustomLobbySlotCoordinator
 ---@field Rows UICustomLobbySlotBase[]
----@field Columns Group[]              # [1] = side A container, [2] = side B
----@field Labels Text[]                # [1]/[2] per-column team labels
+---@field TeamScore UICustomLobbyTeamScore   # the side indicator strip atop the columns
+---@field Columns Group[]                    # [1] = side A container, [2] = side B
 ---@field Ready boolean
 ---@field SlotCountObserver LazyVar
 ---@field ScenarioObserver LazyVar
@@ -94,15 +94,11 @@ local CustomLobbyTwoColumnSlots = Class(Group) {
         self.Coordinator = coordinator
         self.Ready = false
 
+        -- the side indicator (Left/Top/Odd · ratings · Right/Bottom/Even); self-manages its content
+        -- and visibility (it hides when the sides can't be determined yet)
+        self.TeamScore = CustomLobbyTeamScore.Create(self)
+
         self.Columns = { Group(self, "Col1"), Group(self, "Col2") }
-        self.Labels = {
-            UIUtil.CreateText(self.Columns[1], "", 12, UIUtil.titleFont),
-            UIUtil.CreateText(self.Columns[2], "", 12, UIUtil.titleFont),
-        }
-        for _, label in self.Labels do
-            label:SetColor(LabelColor)
-            label:DisableHitTest()
-        end
 
         self.Rows = {}
         for slot = 1, CustomLobbyLaunchModel.MaxSlots do
@@ -124,52 +120,37 @@ local CustomLobbyTwoColumnSlots = Class(Group) {
 
     ---@param self UICustomLobbyTwoColumnSlots
     __post_init = function(self)
-        -- two columns split down the middle with a small gutter (a column is the positioning frame
-        -- the cards anchor into; the side label sits at its top)
-        Layouter(self.Columns[1]):AtLeftIn(self):AtTopIn(self):AtBottomIn(self):End()
+        -- the team-score strip spans the top; the two columns fill the rest, split down the middle
+        -- with a small gutter (a column is the positioning frame the cards anchor into)
+        Layouter(self.TeamScore):AtLeftIn(self):AtRightIn(self):AtTopIn(self):Height(ScoreHeight):End()
+
+        Layouter(self.Columns[1]):AtLeftIn(self):AnchorToBottom(self.TeamScore, 2):AtBottomIn(self):End()
         self.Columns[1].Right:Set(function() return self.Left() + 0.5 * self.Width() - LayoutHelpers.ScaleNumber(0.5 * ColumnGap) end)
-        Layouter(self.Columns[2]):AtRightIn(self):AtTopIn(self):AtBottomIn(self):End()
+        Layouter(self.Columns[2]):AtRightIn(self):AnchorToBottom(self.TeamScore, 2):AtBottomIn(self):End()
         self.Columns[2].Left:Set(function() return self.Left() + 0.5 * self.Width() + LayoutHelpers.ScaleNumber(0.5 * ColumnGap) end)
 
-        Layouter(self.Labels[1]):AtHorizontalCenterIn(self.Columns[1]):AtTopIn(self.Columns[1]):End()
-        Layouter(self.Labels[2]):AtHorizontalCenterIn(self.Columns[2]):AtTopIn(self.Columns[2]):End()
-
         self.Ready = true
+        self.TeamScore:Initialize()
         self:Relayout()
     end,
 
-    --- Splits the active slots into the two columns and stacks each column's cards; shows the side
-    --- labels only when the sides are resolved. Re-run whenever the mode / map / slot count changes.
+    --- Splits the active slots into the two columns and stacks each column's cards from its top;
+    --- re-run whenever the mode / map / slot count changes.
     ---@param self UICustomLobbyTwoColumnSlots
     Relayout = function(self)
         if not self.Ready then
             return
         end
         local count = CustomLobbySessionModel.GetSingleton().SlotCount()
-        local cols, resolved = ComputeColumns(count)
-        local labels = CustomLobbyRules.SideLabels(CustomLobbyRules.AutoTeamMode())
-        local labelled = resolved and labels ~= nil
+        local cols = ComputeColumns(count)
 
         for column = 1, 2 do
-            local label = self.Labels[column]
-            if labelled then
-                label:SetText(labels[column])
-                label:Show()
-            else
-                label:Hide()
-            end
-
-            -- stack this column's cards under the label (or the column top when unlabelled)
             local prev = nil
             for _, slot in cols[column] do
                 local card = self.Rows[slot]
                 local builder = Layouter(card):AtLeftIn(self.Columns[column]):AtRightIn(self.Columns[column]):Height(CardHeight)
                 if not prev then
-                    if labelled then
-                        builder:AnchorToBottom(label, 2)
-                    else
-                        builder:AtTopIn(self.Columns[column])
-                    end
+                    builder:AtTopIn(self.Columns[column])
                 else
                     builder:AnchorToBottom(prev, CardGap)
                 end
@@ -191,19 +172,16 @@ local CustomLobbyTwoColumnSlots = Class(Group) {
     end,
 }
 
---- The (scaled) height of the taller team column for `count` slots — the selector adds the header.
---- Mirrors Relayout's split so the area is sized to what's actually drawn (label + stacked cards).
+--- The (scaled) height of the score strip plus the taller team column for `count` slots — the
+--- selector adds the "Players" header. Mirrors Relayout's split so the area fits what's drawn.
 ---@param count number
 ---@return number
 HeightForCount = function(count)
-    local cols, resolved = ComputeColumns(count)
+    local cols = ComputeColumns(count)
     local rows = math.max(table.getn(cols[1]), table.getn(cols[2]))
-    local height = rows * LayoutHelpers.ScaleNumber(CardHeight)
+    local height = LayoutHelpers.ScaleNumber(ScoreHeight) + rows * LayoutHelpers.ScaleNumber(CardHeight)
     if rows > 1 then
         height = height + (rows - 1) * LayoutHelpers.ScaleNumber(CardGap)
-    end
-    if resolved then
-        height = height + LayoutHelpers.ScaleNumber(LabelHeight)
     end
     return height
 end

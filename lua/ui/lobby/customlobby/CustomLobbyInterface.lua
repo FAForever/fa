@@ -29,10 +29,10 @@
 -- module-level `Debug` flag to tint each so the regions are visible while iterating. Targeted at
 -- the 1024x768 minimum resolution:
 --
---   ┌ TitleArea ─ title · TEAM SCORE · leave ───────────────────────────────────┐
+--   ┌ TitleArea ─ title · leave ─────────────────────────────────────────────────┐
 --   ├──────────────────────────────────────┬─────────────────────────────────────┤
---   │ SlotsArea (slots — ONE column,        │ RightArea (the map preview + facts  │
---   │   top-left, up to 16)                 │   line + read-only options summary) │
+--   │ SlotsArea (slots — one or two team    │ RightArea (the map preview + facts  │
+--   │   columns, top-left, up to 16)        │   line + read-only options summary) │
 --   ├──────────────────────────────────────┤                                     │
 --   │ BottomLeftArea (Chat / Observers      │                                     │
 --   │   — tabs)                             │                                     │
@@ -40,13 +40,13 @@
 --   │ ActionArea (status · … · Settings · Launch) ─ full width                    │
 --   └────────────────────────────────────────────────────────────────────────────┘
 --
--- A one-column layout (the two-column variant was reverted by community request). The LEFT column
--- splits vertically: the slot rows on top (one column, up to 16), the chat/observers tabs
--- (CustomLobbyTabs) below. The RIGHT column is the map + options (CustomLobbyConfigInterface — a
--- bound map preview, a name/size/players/version facts line, and the read-only options summary). A
--- full-width action bar at the bottom holds the global actions (status + the generic Settings
--- button, which opens the options editor, + the host-only Launch). The accumulated team rating
--- (CustomLobbyTeamScore) sits in the title, shown only for the binary auto-team formations.
+-- The LEFT column splits vertically: the slots on top (CustomLobbySlotsInterface — one column, or
+-- two team columns for the binary auto-team modes, with the team-rating indicator atop the cards),
+-- the chat/observers tabs (CustomLobbyTabs) below. The RIGHT column is the map + options
+-- (CustomLobbyConfigInterface — a bound map preview, a name/size/players/version facts line, and the
+-- read-only options summary). A full-width action bar at the bottom holds the global actions (status
+-- + the generic Settings button, which opens the options editor, + the host-only Launch). The title
+-- bar is just the title + Leave.
 --
 -- The per-domain edit buttons (change-map, mod-select) are removed for now — only the generic
 -- Settings button remains — and will be reintegrated once the rework is complete.
@@ -64,7 +64,6 @@ local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocal
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 local CustomLobbySlotsInterface = import("/lua/ui/lobby/customlobby/slots/customlobbyslotsinterface.lua")
 local CustomLobbyConfigInterface = import("/lua/ui/lobby/customlobby/config/customlobbyconfiginterface.lua")
-local CustomLobbyTeamScore = import("/lua/ui/lobby/customlobby/customlobbyteamscore.lua")
 local CustomLobbyTabs = import("/lua/ui/lobby/customlobby/customlobbytabs.lua")
 local CustomLobbyChatPanel = import("/lua/ui/lobby/customlobby/social/customlobbychatpanel.lua")
 local CustomLobbyObserversPanel = import("/lua/ui/lobby/customlobby/social/customlobbyobserverspanel.lua")
@@ -110,7 +109,6 @@ end
 ---@field Content Group
 ---@field TitleArea Group
 ---@field Title Text
----@field TeamScore UICustomLobbyTeamScore
 ---@field LeaveButton Button
 ---@field SlotsArea Group
 ---@field Slots UICustomLobbySlotsInterface
@@ -147,11 +145,9 @@ local CustomLobbyInterface = Class(Group) {
         self.ActionArea = CreateArea(self.Content, "ActionArea", 'ff808080')
         --#endregion
 
-        --#region title bar (title · team score · leave)
+        --#region title bar (title · leave)
         self.Title = UIUtil.CreateText(self.TitleArea, "Custom game", 20, UIUtil.titleFont)
         self.Title:DisableHitTest()
-
-        self.TeamScore = CustomLobbyTeamScore.Create(self.TitleArea)
 
         self.LeaveButton = UIUtil.CreateButtonWithDropshadow(self.TitleArea, '/BUTTON/medium/', "Leave")
         self.LeaveButton.OnClick = function(button, modifiers)
@@ -244,13 +240,9 @@ local CustomLobbyInterface = Class(Group) {
         self.BottomLeftArea.Right:Set(function() return self.RightArea.Left() - LayoutHelpers.ScaleNumber(Pad) end)
         --#endregion
 
-        --#region title bar (title · team score · leave)
+        --#region title bar (title · leave)
         Layouter(self.Title):AtLeftIn(self.TitleArea, 8):AtVerticalCenterIn(self.TitleArea):End()
         Layouter(self.LeaveButton):AtRightIn(self.TitleArea):AtVerticalCenterIn(self.TitleArea):End()
-        Layouter(self.TeamScore)
-            :AnchorToRight(self.Title, Pad):AnchorToLeft(self.LeaveButton, Pad)
-            :AtTopIn(self.TitleArea):AtBottomIn(self.TitleArea)
-            :End()
         --#endregion
 
         --#region slots fill their area (the component stacks the rows + coordinates dragging)
@@ -273,7 +265,6 @@ local CustomLobbyInterface = Class(Group) {
 
         -- size-dependent children build their scrollbars / first render now that they're sized
         -- (three-phase init)
-        self.TeamScore:Initialize()
         self.BottomLeftTabs:Initialize()
         self.Config:Initialize()
     end,
