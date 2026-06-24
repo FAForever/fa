@@ -20,9 +20,10 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
--- Composition root for the custom-games lobby. It builds and lays out the children and holds only
--- the presentation observers it needs (slot count, is-host); each child subscribes to the model
--- itself (see /lua/ui/lobby/TARGET_ARCHITECTURE.md).
+-- Composition root for the custom-games lobby. It builds the area children and lays them out; each
+-- child component subscribes to the model itself (see /lua/ui/lobby/TARGET_ARCHITECTURE.md). The
+-- only model it reads directly is IsHost (for the action-bar buttons) and SlotCount (to size the
+-- slot area); the slot rows + their drag coordination live in CustomLobbySlotsInterface.
 --
 -- Layout is organised into labelled *areas* (Group containers), like the dialogs — flip the
 -- module-level `Debug` flag to tint each so the regions are visible while iterating. Targeted at
@@ -61,7 +62,7 @@ local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaun
 local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/customlobbysessionmodel.lua")
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
-local CustomLobbySlotInterface = import("/lua/ui/lobby/customlobby/customlobbyslotinterface.lua")
+local CustomLobbySlotsInterface = import("/lua/ui/lobby/customlobby/customlobbyslotsinterface.lua")
 local CustomLobbyConfigInterface = import("/lua/ui/lobby/customlobby/config/customlobbyconfiginterface.lua")
 local CustomLobbyTeamScore = import("/lua/ui/lobby/customlobby/customlobbyteamscore.lua")
 local CustomLobbyTabs = import("/lua/ui/lobby/customlobby/customlobbytabs.lua")
@@ -83,8 +84,6 @@ local LobbyWidth = 1024
 local LobbyHeight = 768
 
 local Pad = 8
-local SlotHeight = 24
-local SlotsHeaderHeight = 24     -- the "Players" header + gap above the single slot column
 local TitleHeight = 48
 local RightWidth = 360           -- the right column (map preview + options summary); the left fills the rest
 local ActionHeight = 52          -- the full-width action bar at the very bottom (status + Settings + launch)
@@ -105,7 +104,7 @@ local function CreateArea(parent, name, color)
     return area
 end
 
----@class UICustomLobbyInterface : Group, UICustomLobbySlotCoordinator
+---@class UICustomLobbyInterface : Group
 ---@field Trash TrashBag
 ---@field Background Bitmap
 ---@field Content Group
@@ -114,9 +113,7 @@ end
 ---@field TeamScore UICustomLobbyTeamScore
 ---@field LeaveButton Button
 ---@field SlotsArea Group
----@field SlotsHeader Text
----@field SlotsPanel Group
----@field Slots UICustomLobbySlotInterface[]
+---@field Slots UICustomLobbySlotsInterface
 ---@field BottomLeftArea Group
 ---@field BottomLeftTabs UICustomLobbyTabs
 ---@field RightArea Group
@@ -125,10 +122,7 @@ end
 ---@field StatusLabel Text
 ---@field SettingsButton Button
 ---@field LaunchButton Button
----@field SlotCountObserver LazyVar
 ---@field IsHostObserver LazyVar
----@field HighlightedSlot number | false   # slot currently shown as a drop target
----@field DragGhost Group | false          # floating label following the cursor mid-drag
 local CustomLobbyInterface = Class(Group) {
 
     ---@param self UICustomLobbyInterface
@@ -137,8 +131,6 @@ local CustomLobbyInterface = Class(Group) {
         Group.__init(self, parent, "CustomLobbyInterface")
 
         self.Trash = TrashBag()
-        self.HighlightedSlot = false
-        self.DragGhost = false
 
         self.Background = Bitmap(self)
         self.Background:SetSolidColor('ff0a0a0a')
@@ -169,19 +161,8 @@ local CustomLobbyInterface = Class(Group) {
         end
         --#endregion
 
-        --#region slots (top-left region — a single column of rows)
-        self.SlotsHeader = UIUtil.CreateText(self.SlotsArea, "Players", 14, UIUtil.titleFont)
-        self.SlotsHeader:SetColor('ff9aa0a8')
-        self.SlotsHeader:DisableHitTest()
-
-        self.SlotsPanel = Group(self.SlotsArea, "CustomLobbySlotsPanel")
-
-        -- One row per possible slot, stacked in a single column; the SlotCount observer reveals the
-        -- active ones.
-        self.Slots = {}
-        for slot = 1, CustomLobbyLaunchModel.MaxSlots do
-            self.Slots[slot] = CustomLobbySlotInterface.Create(self.SlotsPanel, slot, self)
-        end
+        --#region slots (top-left region — a single column of rows, owns its own drag coordination)
+        self.Slots = CustomLobbySlotsInterface.Create(self.SlotsArea)
         --#endregion
 
         --#region bottom-left: chat / observers tabs
@@ -216,12 +197,6 @@ local CustomLobbyInterface = Class(Group) {
         end
         Tooltip.AddControlTooltipManual(self.LaunchButton, "Launch", "Start the game with the current setup (host only). Everyone else must be ready.")
         --#endregion
-
-        local session = CustomLobbySessionModel.GetSingleton()
-        self.SlotCountObserver = self.Trash:Add(
-            LazyVarDerive(session.SlotCount, function(slotCountLazy)
-                self:OnSlotCountChanged(slotCountLazy())
-            end))
 
         local localModel = CustomLobbyLocalModel.GetSingleton()
         self.IsHostObserver = self.Trash:Add(
@@ -263,10 +238,7 @@ local CustomLobbyInterface = Class(Group) {
         -- stop at the left edge of the right column
         Layouter(self.SlotsArea):AtLeftIn(self.Content, Pad):AnchorToBottom(self.TitleArea, Pad):End()
         self.SlotsArea.Right:Set(function() return self.RightArea.Left() - LayoutHelpers.ScaleNumber(Pad) end)
-        self.SlotsArea.Height:Set(function()
-            local rows = math.max(session.SlotCount(), 1)
-            return LayoutHelpers.ScaleNumber(SlotsHeaderHeight) + rows * LayoutHelpers.ScaleNumber(SlotHeight)
-        end)
+        self.SlotsArea.Height:Set(function() return CustomLobbySlotsInterface.HeightForSlots(session.SlotCount()) end)
 
         Layouter(self.BottomLeftArea)
             :AtLeftIn(self.Content, Pad):AnchorToBottom(self.SlotsArea, Pad):AnchorToTop(self.ActionArea, Pad)
@@ -283,24 +255,8 @@ local CustomLobbyInterface = Class(Group) {
             :End()
         --#endregion
 
-        --#region slots (a single column; rows stack top-to-bottom)
-        Layouter(self.SlotsHeader):AtLeftIn(self.SlotsArea, 4):AtTopIn(self.SlotsArea):End()
-        Layouter(self.SlotsPanel)
-            :AtLeftIn(self.SlotsArea):AtRightIn(self.SlotsArea)
-            :AnchorToBottom(self.SlotsHeader, 4):AtBottomIn(self.SlotsArea)
-            :End()
-
-        -- stack the rows top-to-bottom (slot i sits under slot i-1)
-        for slot = 1, CustomLobbyLaunchModel.MaxSlots do
-            local row = self.Slots[slot]
-            local builder = Layouter(row):AtLeftIn(self.SlotsPanel):AtRightIn(self.SlotsPanel):Height(SlotHeight)
-            if slot == 1 then
-                builder:AtTopIn(self.SlotsPanel)
-            else
-                builder:AnchorToBottom(self.Slots[slot - 1], 0)
-            end
-            builder:End()
-        end
+        --#region slots fill their area (the component stacks the rows + coordinates dragging)
+        Layouter(self.Slots):Fill(self.SlotsArea):End()
         --#endregion
 
         --#region bottom-left tabs (chat / observers)
@@ -324,20 +280,6 @@ local CustomLobbyInterface = Class(Group) {
         self.Config:Initialize()
     end,
 
-    --- Shows the active slots (1..count) and hides the rest. The slots region's height tracks the
-    --- count (bound in __post_init), so the chat/observers panel below grows for smaller games.
-    ---@param self UICustomLobbyInterface
-    ---@param count number
-    OnSlotCountChanged = function(self, count)
-        for slot = 1, CustomLobbyLaunchModel.MaxSlots do
-            if slot <= count then
-                self.Slots[slot]:Show()
-            else
-                self.Slots[slot]:Hide()
-            end
-        end
-    end,
-
     --- Tracks host status: updates the status line and shows the host-only action-bar buttons
     --- (Settings + Launch) only to the host. (The options editor the Settings button opens is
     --- host-gated regardless; the right-column options summary stays read-only-visible to everyone.)
@@ -353,122 +295,6 @@ local CustomLobbyInterface = Class(Group) {
             end
         end
     end,
-
-    ---------------------------------------------------------------------------
-    --#region Slot drag coordination (UICustomLobbySlotCoordinator)
-    --
-    -- The slot rows raise the gesture; this container owns it because it's the only
-    -- thing that knows every row's rect. The "what's grabbed / where" state here is
-    -- purely visual — a drop resolves to the RequestSwapSlots intent, host-authoritative.
-
-    --- Only the host can drag, and only a slot that holds a player (you grab a token).
-    ---@param self UICustomLobbyInterface
-    ---@param slot number
-    ---@return boolean
-    CanDrag = function(self, slot)
-        if not CustomLobbyLocalModel.GetSingleton().IsHost() then
-            return false
-        end
-        return CustomLobbyLaunchModel.GetSingleton().Players[slot]() ~= false
-    end,
-
-    --- The active slot whose row contains the screen point, or nil.
-    ---@param self UICustomLobbyInterface
-    ---@param x number
-    ---@param y number
-    ---@return number | nil
-    SlotIndexAt = function(self, x, y)
-        local count = CustomLobbySessionModel.GetSingleton().SlotCount()
-        for slot = 1, count do
-            local row = self.Slots[slot]
-            if row and x >= row.Left() and x <= row.Right() and y >= row.Top() and y <= row.Bottom() then
-                return slot
-            end
-        end
-        return nil
-    end,
-
-    --- Mid-drag: follow the cursor with the ghost and highlight the row under it.
-    ---@param self UICustomLobbyInterface
-    ---@param source number
-    ---@param x number
-    ---@param y number
-    OnSlotDragMove = function(self, source, x, y)
-        if not self.DragGhost then
-            self.DragGhost = self:CreateDragGhost(source)
-        end
-        self.DragGhost.Left:Set(x + LayoutHelpers.ScaleNumber(12))
-        self.DragGhost.Top:Set(y + LayoutHelpers.ScaleNumber(8))
-        self:HighlightSlot(self:SlotIndexAt(x, y))
-    end,
-
-    --- Drop: swap the source slot with whatever row the cursor is over (a move if it's
-    --- empty). Dropping outside any row is a no-op.
-    ---@param self UICustomLobbyInterface
-    ---@param source number
-    ---@param x number
-    ---@param y number
-    OnSlotDrop = function(self, source, x, y)
-        local target = self:SlotIndexAt(x, y)
-        if target and target ~= source then
-            CustomLobbyController.RequestSwapSlots(source, target)
-        end
-    end,
-
-    --- Clears the transient drag visuals.
-    ---@param self UICustomLobbyInterface
-    OnSlotDragEnd = function(self)
-        self:HighlightSlot(nil)
-        if self.DragGhost then
-            self.DragGhost:Destroy()
-            self.DragGhost = false
-        end
-    end,
-
-    --- Moves the drop-target highlight to `slot` (nil clears it).
-    ---@param self UICustomLobbyInterface
-    ---@param slot number | nil
-    HighlightSlot = function(self, slot)
-        slot = slot or false
-        if self.HighlightedSlot == slot then
-            return
-        end
-        if self.HighlightedSlot and self.Slots[self.HighlightedSlot] then
-            self.Slots[self.HighlightedSlot]:SetDropHighlight(false)
-        end
-        self.HighlightedSlot = slot
-        if slot and self.Slots[slot] then
-            self.Slots[slot]:SetDropHighlight(true)
-        end
-    end,
-
-    --- Builds the floating drag label (the grabbed player's name) on the interface so
-    --- it draws above the rows. Destroyed in OnSlotDragEnd.
-    ---@param self UICustomLobbyInterface
-    ---@param source number
-    ---@return Group
-    CreateDragGhost = function(self, source)
-        local player = CustomLobbyLaunchModel.GetSingleton().Players[source]()
-        local name = (player and player.PlayerName) or ("Slot " .. tostring(source))
-
-        local ghost = Group(self, "CustomLobbyDragGhost")
-        ghost:DisableHitTest()
-
-        local bg = Bitmap(ghost)
-        bg:SetSolidColor('cc101418')
-        bg:DisableHitTest()
-
-        local label = UIUtil.CreateText(ghost, name, 14, UIUtil.bodyFont)
-        label:DisableHitTest()
-
-        Layouter(label):AtLeftTopIn(ghost, 6, 3):End()
-        Layouter(bg):Fill(ghost):End()
-        ghost.Width:Set(function() return label.Width() + LayoutHelpers.ScaleNumber(12) end)
-        ghost.Height:Set(function() return label.Height() + LayoutHelpers.ScaleNumber(6) end)
-        return ghost
-    end,
-
-    --#endregion
 
     ---@param self UICustomLobbyInterface
     OnDestroy = function(self)
