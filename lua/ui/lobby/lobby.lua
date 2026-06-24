@@ -39,6 +39,7 @@ local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaun
 local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/customlobbysessionmodel.lua")
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
 local CustomLobbyInterface = import("/lua/ui/lobby/customlobby/customlobbyinterface.lua")
+local CustomLobbySession = import("/lua/ui/lobby/customlobby/customlobbysession.lua")
 
 local maxConnections = 16
 
@@ -66,6 +67,10 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
     -- Hand the front-end's escape handler back so ours can take over.
     MenuCommon.MenuCleanup()
 
+    -- Clean slate: drop any residue from a previous lobby session (e.g. a re-host after leaving)
+    -- before we build this one. Frees everything registered in the session trash.
+    CustomLobbySession.Teardown()
+
     -- Models first, then the view (so its components subscribe to a live model),
     -- then the lobby object (whose callbacks write the model).
     -- TODO: derive SlotCount from the chosen map instead of a fixed default.
@@ -87,6 +92,9 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
             Instance = false
         end
         CustomLobbyInterface.CloseDebug()
+        -- Free everything registered in the session trash (the map catalog today; the models,
+        -- interface and instance follow as they are converted to the same pattern).
+        CustomLobbySession.Teardown()
         if exitBehavior then
             exitBehavior()
         end

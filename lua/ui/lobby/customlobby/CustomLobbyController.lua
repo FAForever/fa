@@ -40,6 +40,7 @@
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
 local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/customlobbysessionmodel.lua")
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
+local CustomLobbySession = import("/lua/ui/lobby/customlobby/customlobbysession.lua")
 
 --- The live lobby object, set by the first engine callback. UI-triggered intents
 --- (RequestSetReady, …) reach the network through it without threading it everywhere.
@@ -282,10 +283,13 @@ function OnPeerDisconnected(instance, peerName, uid)
     BroadcastPlayers(instance)
 end
 
---- Called when the game launches. Barebones: not wired yet.
+--- Called when the game launches. The engine has taken over in its own Lua state, so the lobby's
+--- front-end state can be released: free everything registered in the session trash (the map
+--- catalog today; the models, interface and instance follow as they are converted to the pattern).
 ---@param instance UICustomLobbyInstance
 function OnGameLaunched(instance)
-    LOG("CustomLobby: GameLaunched (launch flow not implemented yet)")
+    LOG("CustomLobby: GameLaunched — tearing down the lobby session")
+    CustomLobbySession.Teardown()
 end
 
 --#endregion
