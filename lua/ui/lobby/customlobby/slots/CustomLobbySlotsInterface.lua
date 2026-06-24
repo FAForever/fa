@@ -43,18 +43,26 @@ local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaun
 local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/customlobbysessionmodel.lua")
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
+local CustomLobbyRules = import("/lua/ui/lobby/customlobby/customlobbyrules.lua")
 local CustomLobbyOneColumnSlots = import("/lua/ui/lobby/customlobby/slots/onecolumn/customlobbyonecolumnslots.lua")
+local CustomLobbyTwoColumnSlots = import("/lua/ui/lobby/customlobby/slots/twocolumn/customlobbytwocolumnslots.lua")
 
+local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
 local HeaderHeight = 24           -- the "Players" header + gap above the layout body
 
+---@alias UICustomLobbySlotsBody UICustomLobbyOneColumnSlots | UICustomLobbyTwoColumnSlots
+
 ---@class UICustomLobbySlotsInterface : Group, UICustomLobbySlotCoordinator
 ---@field Trash TrashBag
 ---@field Header Text
----@field Body UICustomLobbyOneColumnSlots   # the active layout body
----@field HighlightedSlot number | false       # slot currently shown as a drop target
----@field DragGhost Group | false              # floating label following the cursor mid-drag
+---@field Body UICustomLobbySlotsBody | false   # the active layout body
+---@field LayoutKind "one" | "two" | false      # which layout Body currently is
+---@field Mounted boolean                        # true once __post_init has laid us out
+---@field GameOptionsObserver LazyVar
+---@field HighlightedSlot number | false         # slot currently shown as a drop target
+---@field DragGhost Group | false                # floating label following the cursor mid-drag
 local CustomLobbySlotsInterface = Class(Group) {
 
     ---@param self UICustomLobbySlotsInterface
@@ -65,32 +73,92 @@ local CustomLobbySlotsInterface = Class(Group) {
         self.Trash = TrashBag()
         self.HighlightedSlot = false
         self.DragGhost = false
+        self.Mounted = false
+        self.Body = false
+        self.LayoutKind = false
 
         self.Header = UIUtil.CreateText(self, "Players", 14, UIUtil.titleFont)
         self.Header:SetColor('ff9aa0a8')
         self.Header:DisableHitTest()
 
-        -- the active layout body; the selector is its rows' coordinator (passed as `self`)
-        self.Body = CustomLobbyOneColumnSlots.Create(self, self)
+        -- the active layout body, picked by the AutoTeams mode (created now, laid out on mount)
+        self:RebuildBody()
+
+        -- a binary AutoTeams mode (left/right, top/bottom, even/odd) swaps in the two-column layout;
+        -- everything else uses one column
+        self.GameOptionsObserver = self.Trash:Add(
+            LazyVarDerive(CustomLobbyLaunchModel.GetSingleton().GameOptions, function(lazy)
+                lazy()
+                self:OnAutoTeamsChanged()
+            end))
     end,
 
     ---@param self UICustomLobbySlotsInterface
     __post_init = function(self)
         Layouter(self.Header):AtLeftIn(self, 4):AtTopIn(self):End()
+        self.Mounted = true
+        self:LayoutBody()
+    end,
+
+    --- The layout kind the current AutoTeams mode calls for: "two" for a binary team mode, else "one".
+    ---@param self UICustomLobbySlotsInterface
+    ---@return "one" | "two"
+    KindForMode = function(self)
+        return CustomLobbyRules.AutoTeamMode() and "two" or "one"
+    end,
+
+    --- (Re)creates the layout body for the current mode, destroying the previous one. Lays it out
+    --- immediately when already mounted (a live mode switch); otherwise __post_init lays it out.
+    ---@param self UICustomLobbySlotsInterface
+    RebuildBody = function(self)
+        local kind = self:KindForMode()
+        self.LayoutKind = kind
+        if self.Body then
+            self.Body:Destroy()
+        end
+        -- the selector is the rows' coordinator regardless of layout (passed as `self`)
+        if kind == "two" then
+            self.Body = CustomLobbyTwoColumnSlots.Create(self, self)
+        else
+            self.Body = CustomLobbyOneColumnSlots.Create(self, self)
+        end
+        if self.Mounted then
+            self:LayoutBody()
+        end
+    end,
+
+    --- Fills the area below the header with the active body.
+    ---@param self UICustomLobbySlotsInterface
+    LayoutBody = function(self)
+        if not self.Body then
+            return
+        end
         Layouter(self.Body)
             :AtLeftIn(self):AtRightIn(self)
             :AnchorToBottom(self.Header, 4):AtBottomIn(self)
             :End()
     end,
 
-    --- The (scaled) height the slot area wants: the header plus the active layout's row block. The
-    --- composition root binds the slot area's height to this (it reads SlotCount, so it re-fires as
-    --- the lobby fills/empties).
+    --- The mode changed: swap the layout body if the kind (one vs two column) flipped. A change
+    --- within the same kind (e.g. lvsr→tvsb) is handled by the body's own re-layout.
+    ---@param self UICustomLobbySlotsInterface
+    OnAutoTeamsChanged = function(self)
+        if self:KindForMode() ~= self.LayoutKind then
+            self:RebuildBody()
+        end
+    end,
+
+    --- The (scaled) height the slot area wants: the header plus the active layout's column block.
+    --- Computed straight from the mode + model (not the live body) so it re-fires correctly on a mode
+    --- swap regardless of observer order. The composition root binds the slot area's height to this.
     ---@param self UICustomLobbySlotsInterface
     ---@return number
     PreferredHeight = function(self)
         local count = CustomLobbySessionModel.GetSingleton().SlotCount()
-        return LayoutHelpers.ScaleNumber(HeaderHeight) + CustomLobbyOneColumnSlots.HeightForCount(math.max(count, 1))
+        local body = self:KindForMode() == "two"
+            and CustomLobbyTwoColumnSlots.HeightForCount(count)
+            or CustomLobbyOneColumnSlots.HeightForCount(math.max(count, 1))
+        return LayoutHelpers.ScaleNumber(HeaderHeight) + body
     end,
 
     ---------------------------------------------------------------------------

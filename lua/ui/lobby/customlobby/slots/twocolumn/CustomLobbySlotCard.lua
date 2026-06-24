@@ -20,13 +20,17 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
--- The thin slot presentation: one full-width, single-line row used by the one-column layout —
+-- The fat slot presentation: a half-width, double-height card used by the two-column team layout.
+-- The same data as the thin row, reflowed onto two lines so it reads in a narrow column —
 --
---   1  ▣  PlayerName                          Cybran  ▢ 1.4k  T1  ready
+--   ┌──────────────────────────┐
+--   │ ▣  PlayerName       ready │   line 1: colour swatch · name · ready
+--   │ Cybran · T1       1.4k ▢  │   line 2: faction · team · cpu (+ headroom square)
+--   └──────────────────────────┘
 --
--- It is pure arrangement over CustomLobbySlotBase: it builds the widgets, lays them out in a row,
--- and assigns the base's normalised player / CPU views to them. All behaviour (subscriptions, CPU
--- math, drag-to-swap, intents) lives in the base.
+-- It is pure arrangement over CustomLobbySlotBase: it builds the standard named controls and lays
+-- them out; the base paints them and owns all behaviour (subscriptions, CPU math, drag-to-swap,
+-- intents).
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
@@ -36,34 +40,30 @@ local CustomLobbySlotBase = import("/lua/ui/lobby/customlobby/slots/customlobbys
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
----@class UICustomLobbySlotRow : UICustomLobbySlotBase
----@field SlotNumber Text
+---@class UICustomLobbySlotCard : UICustomLobbySlotBase
 ---@field ColorSwatch Bitmap
 ---@field Name Text
+---@field Ready Text
 ---@field Faction Text
+---@field Team Text
 ---@field Cpu Text
 ---@field CpuIndicator Bitmap
----@field Team Text
----@field Ready Text
 ---@field CpuHover Bitmap
-local CustomLobbySlotRow = Class(CustomLobbySlotBase) {
+local CustomLobbySlotCard = Class(CustomLobbySlotBase) {
 
-    ---@param self UICustomLobbySlotRow
+    ---@param self UICustomLobbySlotCard
     CreateContents = function(self)
-        self.SlotNumber = UIUtil.CreateText(self, tostring(self.SlotIndex), 14, UIUtil.bodyFont)
         self.ColorSwatch = Bitmap(self)
         self.ColorSwatch:SetSolidColor('00000000')
         self.Name = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
-        self.Faction = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
-        self.Cpu = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
-        -- a small square left of the CPU label: green when the machine sustains the
-        -- recommended unit cap at full speed, fading to red the more the sim must slow
+        self.Ready = UIUtil.CreateText(self, "", 12, UIUtil.bodyFont)
+        self.Faction = UIUtil.CreateText(self, "", 12, UIUtil.bodyFont)
+        self.Team = UIUtil.CreateText(self, "", 12, UIUtil.bodyFont)
+        self.Cpu = UIUtil.CreateText(self, "", 12, UIUtil.bodyFont)
         self.CpuIndicator = Bitmap(self)
         self.CpuIndicator:SetSolidColor('ff7ad97a')
         self.CpuIndicator:SetAlpha(0.0)
         self.CpuIndicator:DisableHitTest()
-        self.Team = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
-        self.Ready = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
 
         -- a hover zone over the CPU score; the base routes enter/exit/press
         self.CpuHover = Bitmap(self)
@@ -73,16 +73,18 @@ local CustomLobbySlotRow = Class(CustomLobbySlotBase) {
         end
     end,
 
-    ---@param self UICustomLobbySlotRow
+    ---@param self UICustomLobbySlotCard
     LayoutContents = function(self)
-        Layouter(self.SlotNumber):AtLeftIn(self, 6):AtVerticalCenterIn(self):End()
-        Layouter(self.ColorSwatch):AnchorToRight(self.SlotNumber, 8):AtVerticalCenterIn(self):Width(14):Height(14):End()
-        Layouter(self.Name):AnchorToRight(self.ColorSwatch, 8):AtVerticalCenterIn(self):End()
-        Layouter(self.Ready):AtRightIn(self, 8):AtVerticalCenterIn(self):End()
-        Layouter(self.Team):AnchorToLeft(self.Ready, 12):AtVerticalCenterIn(self):End()
-        Layouter(self.Cpu):AnchorToLeft(self.Team, 12):AtVerticalCenterIn(self):End()
-        Layouter(self.CpuIndicator):AnchorToLeft(self.Cpu, 5):AtVerticalCenterIn(self):Width(8):Height(12):End()
-        Layouter(self.Faction):AnchorToLeft(self.CpuIndicator, 10):AtVerticalCenterIn(self):End()
+        -- line 1 (top): swatch · name … ready
+        Layouter(self.ColorSwatch):AtLeftIn(self, 6):AtTopIn(self, 7):Width(14):Height(14):End()
+        Layouter(self.Name):AnchorToRight(self.ColorSwatch, 6):AtVerticalCenterIn(self.ColorSwatch):End()
+        Layouter(self.Ready):AtRightIn(self, 6):AtVerticalCenterIn(self.ColorSwatch):End()
+
+        -- line 2 (bottom): faction · team … [indicator] cpu
+        Layouter(self.Faction):AtLeftIn(self, 6):AtBottomIn(self, 7):End()
+        Layouter(self.Team):AnchorToRight(self.Faction, 8):AtVerticalCenterIn(self.Faction):End()
+        Layouter(self.Cpu):AtRightIn(self, 6):AtVerticalCenterIn(self.Faction):End()
+        Layouter(self.CpuIndicator):AnchorToLeft(self.Cpu, 5):AtVerticalCenterIn(self.Faction):Width(8):Height(12):End()
 
         Layouter(self.CpuHover):Fill(self.Cpu):Over(self, 20):End()
     end,
@@ -91,7 +93,7 @@ local CustomLobbySlotRow = Class(CustomLobbySlotBase) {
 ---@param parent Control
 ---@param slotIndex number
 ---@param coordinator UICustomLobbySlotCoordinator
----@return UICustomLobbySlotRow
+---@return UICustomLobbySlotCard
 Create = function(parent, slotIndex, coordinator)
-    return CustomLobbySlotRow(parent, slotIndex, coordinator)
+    return CustomLobbySlotCard(parent, slotIndex, coordinator)
 end

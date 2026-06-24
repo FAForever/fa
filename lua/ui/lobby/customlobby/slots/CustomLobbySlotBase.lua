@@ -28,16 +28,17 @@
 --   * the click / right-click / drag-to-swap gesture handling and the controller intents,
 --   * the layout-agnostic overlays (background, drop highlight, the full-row click catcher).
 --
--- A presentation subclasses this (`Class(import(...).SlotBase) { ... }`) and implements four hooks:
+-- A presentation subclasses this (`Class(import(...).SlotBase) { ... }`) and implements two hooks:
 --
 --   CreateContents(self)        build the visible widgets (+ the CPU hover zone, wired to
 --                               `self:HandleCpuHoverEvent`); called from this base's `__init`.
 --   LayoutContents(self)        lay them out; called from this base's `__post_init`.
---   RenderPlayer(self, view)    paint a player (or the empty state when `view` is nil) — `view` is a
---                               normalised table { colorHex, name, nameColor, faction, team, ready,
---                               readyColor } so all the formatting stays here, in one place.
---   RenderCpu(self, view)       paint the CPU column (or clear it when `view` is nil) — `view` is
---                               { text, textColor, indicatorColor?, showIndicator }.
+--
+-- A presentation just has to provide the standard named controls — `ColorSwatch`, `Name`, `Faction`,
+-- `Team`, `Ready`, `Cpu` (Texts) and `CpuIndicator` (Bitmap) — arranged however it likes; the base's
+-- `RenderPlayer` / `RenderCpu` paint those from the normalised player / CPU views, so the formatting
+-- (faction label, `T1`, ready/CPU colours, unit string) stays here, in one place. A presentation that
+-- needs a different mapping (e.g. a faction *icon*) can override `RenderPlayer` / `RenderCpu`.
 --
 -- This keeps the drag/CPU/intent logic single-sourced; the presentations are pure arrangement.
 
@@ -165,6 +166,14 @@ local DragThreshold = 5
 ---@field PlayerObserver LazyVar
 ---@field CpuObserver LazyVar
 ---@field CurrentPlayer UICustomLobbyPlayer | false
+-- the standard named controls a presentation must provide (the base's Render* paint these):
+---@field ColorSwatch Bitmap
+---@field Name Text
+---@field Faction Text
+---@field Team Text
+---@field Ready Text
+---@field Cpu Text
+---@field CpuIndicator Bitmap
 local CustomLobbySlotBase = Class(Group) {
 
     ---@param self UICustomLobbySlotBase
@@ -246,16 +255,48 @@ local CustomLobbySlotBase = Class(Group) {
     LayoutContents = function(self)
     end,
 
-    --- Paints a player, or the empty state when `view` is nil.
+    --- Paints a player (or the empty state when `view` is nil) onto the standard named controls.
+    --- Overridable for a presentation that maps the fields differently.
     ---@param self UICustomLobbySlotBase
     ---@param view UICustomLobbySlotPlayerView | nil
     RenderPlayer = function(self, view)
+        if not view then
+            self.ColorSwatch:SetSolidColor('00000000')
+            self.Name:SetText("- open -")
+            self.Name:SetColor('ff888888')
+            self.Faction:SetText("")
+            self.Team:SetText("")
+            self.Ready:SetText("")
+            return
+        end
+
+        self.ColorSwatch:SetSolidColor(view.colorHex)
+        self.Name:SetText(view.name)
+        self.Name:SetColor(view.nameColor)
+        self.Faction:SetText(view.faction)
+        self.Team:SetText(view.team)
+        self.Ready:SetText(view.ready)
+        self.Ready:SetColor(view.readyColor)
     end,
 
-    --- Paints the CPU column, or clears it when `view` is nil.
+    --- Paints the CPU column (or clears it when `view` is nil) onto the standard named controls.
     ---@param self UICustomLobbySlotBase
     ---@param view UICustomLobbySlotCpuView | nil
     RenderCpu = function(self, view)
+        if not view then
+            self.Cpu:SetText("")
+            self.CpuIndicator:SetAlpha(0.0)
+            return
+        end
+
+        self.Cpu:SetText(view.text)
+        self.Cpu:SetColor(view.textColor)
+        if view.showIndicator then
+            self.CpuIndicator:SetSolidColor(view.indicatorColor)
+            self.CpuIndicator:SetAlpha(1.0)
+        else
+            self.CpuIndicator:SetAlpha(0.0)
+        end
     end,
 
     --#endregion
