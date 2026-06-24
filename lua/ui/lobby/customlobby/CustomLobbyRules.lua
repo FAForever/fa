@@ -86,6 +86,82 @@ function RecommendedUnitCap()
 end
 
 -------------------------------------------------------------------------------
+--#region Auto-team sides
+
+-- The AutoTeams modes that resolve to exactly two sides; everything else (none / manual) has no
+-- binary split. The labels mirror how the modes actually resolve at launch.
+local BinaryModeLabels = {
+    tvsb = { "Top", "Bottom" },     -- by start-position Y
+    lvsr = { "Left", "Right" },     -- by start-position X
+    pvsi = { "Odd", "Even" },       -- by start-spot parity (needs no map)
+}
+
+--- The current AutoTeams mode when it forms two sides (tvsb / lvsr / pvsi), else nil.
+---@return string | nil
+function AutoTeamMode()
+    local mode = (CustomLobbyLaunchModel.GetSingleton().GameOptions() or {}).AutoTeams
+    return BinaryModeLabels[mode] and mode or nil
+end
+
+--- The two side labels for a binary mode (e.g. `{ "Left", "Right" }`), or nil for a non-binary mode.
+---@param mode string | nil
+---@return string[] | nil
+function SideLabels(mode)
+    return mode and BinaryModeLabels[mode] or nil
+end
+
+--- Builds a side resolver for the current binary AutoTeams mode: a function `startSpot -> 1|2|nil`
+--- (nil = "unresolved", i.e. a positional mode whose map/start positions aren't loaded yet). Returns
+--- `resolver, resolved`:
+---   * `resolver` is nil only when there is no binary mode;
+---   * `resolved` is false when the mode is positional but positions are unavailable — callers that
+---     need a definite split (e.g. the team score) hide in that case, while the two-column slot
+---     layout still renders both columns and just withholds the side labels until it flips true.
+--- Positional modes load the map start positions ONCE here, so a caller resolves all spots cheaply.
+---@return (fun(startSpot: number): number | nil) | nil resolver
+---@return boolean resolved
+function BuildSideResolver()
+    local mode = AutoTeamMode()
+    if not mode then
+        return nil, false
+    end
+
+    if mode == 'pvsi' then
+        return function(spot)
+            if not spot then return nil end
+            return (math.mod(spot, 2) == 1) and 1 or 2
+        end, true
+    end
+
+    -- positional: resolve each spot against the map centre (positions loaded once)
+    local MapUtil = import("/lua/ui/maputil.lua")
+    local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
+    local model = CustomLobbyLaunchModel.GetSingleton()
+    local scenarioFile = model.ScenarioFile()
+    local info = scenarioFile and CustomLobbyMapCatalog.LoadInfo(scenarioFile)
+    if type(info) ~= "table" or not info.size then
+        return function(spot) return nil end, false        -- mode set, positions unknown → unresolved
+    end
+
+    local positions = MapUtil.GetStartPositionsFromScenario(info, CustomLobbyMapCatalog.LoadSave(info))
+    if not positions then
+        return function(spot) return nil end, false
+    end
+    local centreX, centreZ = info.size[1] / 2, info.size[2] / 2
+    return function(spot)
+        local pos = spot and positions[spot]
+        if not pos then return nil end
+        if mode == 'tvsb' then
+            return (pos[2] < centreZ) and 1 or 2
+        else -- lvsr
+            return (pos[1] < centreX) and 1 or 2
+        end
+    end, true
+end
+
+--#endregion
+
+-------------------------------------------------------------------------------
 --#region Debugging
 
 function __moduleinfo.OnDirty()

@@ -36,22 +36,14 @@
 -- positions) and every slot's player (ratings). Reference data only — it never writes the model.
 
 local UIUtil = import("/lua/ui/uiutil.lua")
-local MapUtil = import("/lua/ui/maputil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
-local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
+local CustomLobbyRules = import("/lua/ui/lobby/customlobby/customlobbyrules.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 local Layouter = LayoutHelpers.ReusedLayoutFor
-
--- side labels per mode; absent modes (none / manual) hide the widget
-local ModeLabels = {
-    tvsb = { "Top", "Bottom" },
-    lvsr = { "Left", "Right" },
-    pvsi = { "Odd", "Even" },
-}
 
 ---@class UICustomLobbyTeamScore : Group
 ---@field Trash TrashBag
@@ -124,15 +116,14 @@ local CustomLobbyTeamScore = ClassUI(Group) {
         if not self.Ready then
             return
         end
-        local model = CustomLobbyLaunchModel.GetSingleton()
-        local mode = (model.GameOptions() or {}).AutoTeams
-        local labels = ModeLabels[mode]
+        local mode = CustomLobbyRules.AutoTeamMode()
+        local labels = CustomLobbyRules.SideLabels(mode)
         if not labels then
             self:Hide()
             return
         end
 
-        local totals = self:Totals(mode)
+        local totals = self:Totals()
         if not totals then
             self:Hide()
             return
@@ -145,36 +136,24 @@ local CustomLobbyTeamScore = ClassUI(Group) {
         self:Show()
     end,
 
-    --- The accumulated rating per side `{ a, b }` for `mode`, or nil if it can't be determined
-    --- (a positional mode with no map / start positions loaded yet).
+    --- The accumulated rating per side `{ a, b }`, or nil if the split can't be determined yet (a
+    --- positional mode with no map / start positions loaded). Each seated player is attributed by
+    --- the shared side resolver, keyed on its start spot.
     ---@param self UICustomLobbyTeamScore
-    ---@param mode string
     ---@return number[] | nil
-    Totals = function(self, mode)
-        local model = CustomLobbyLaunchModel.GetSingleton()
-
-        -- start positions (centre split) — only needed for the positional modes
-        local positions, centreX, centreZ
-        if mode == 'tvsb' or mode == 'lvsr' then
-            local scenarioFile = model.ScenarioFile()
-            local info = scenarioFile and CustomLobbyMapCatalog.LoadInfo(scenarioFile)
-            if type(info) ~= "table" or not info.size then
-                return nil
-            end
-            positions = MapUtil.GetStartPositionsFromScenario(info, CustomLobbyMapCatalog.LoadSave(info))
-            if not positions then
-                return nil
-            end
-            centreX = info.size[1] / 2
-            centreZ = info.size[2] / 2
+    Totals = function(self)
+        local resolver, resolved = CustomLobbyRules.BuildSideResolver()
+        if not (resolver and resolved) then
+            return nil
         end
 
+        local model = CustomLobbyLaunchModel.GetSingleton()
         local a, b = 0, 0
         for slot = 1, CustomLobbyLaunchModel.MaxSlots do
             local player = model.Players[slot]()
             if player then
                 local rating = player.PL or 0
-                local side = self:SideOf(mode, player, positions, centreX, centreZ)
+                local side = resolver(player.StartSpot)
                 if side == 1 then
                     a = a + rating
                 elseif side == 2 then
@@ -183,33 +162,6 @@ local CustomLobbyTeamScore = ClassUI(Group) {
             end
         end
         return { math.floor(a), math.floor(b) }
-    end,
-
-    --- Which side (1 or 2, else nil) a player falls on for `mode`. Positional modes read the
-    --- player's start spot against the map centre; pvsi uses the start spot's parity.
-    ---@param self UICustomLobbyTeamScore
-    ---@param mode string
-    ---@param player UICustomLobbyPlayer
-    ---@param positions? table<number, number[]>
-    ---@param centreX? number
-    ---@param centreZ? number
-    ---@return number | nil
-    SideOf = function(self, mode, player, positions, centreX, centreZ)
-        local spot = player.StartSpot
-        if mode == 'pvsi' then
-            if not spot then return nil end
-            return (math.mod(spot, 2) == 1) and 1 or 2
-        end
-
-        local pos = spot and positions and positions[spot]
-        if not pos then
-            return nil
-        end
-        if mode == 'tvsb' then
-            return (pos[2] < centreZ) and 1 or 2
-        else -- lvsr
-            return (pos[1] < centreX) and 1 or 2
-        end
     end,
 
     ---@param self UICustomLobbyTeamScore
