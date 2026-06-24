@@ -43,23 +43,127 @@
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 
 local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local CustomLobbyMapPreview = import("/lua/ui/lobby/customlobby/customlobbymappreview.lua")
 local CustomLobbyTabs = import("/lua/ui/lobby/customlobby/customlobbytabs.lua")
 local CustomLobbyOptionsPanel = import("/lua/ui/lobby/customlobby/config/customlobbyoptionspanel.lua")
 local CustomLobbyModsPanel = import("/lua/ui/lobby/customlobby/config/customlobbymodspanel.lua")
 local CustomLobbyUnitsPanel = import("/lua/ui/lobby/customlobby/config/customlobbyunitspanel.lua")
+local CustomLobbyMapSelect = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapselect.lua")
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
+local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
 local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
 local Inset = 6
-local PreviewMaxSize = 280           -- the square preview grows with the column width, capped here
 local NameMaxChars = 30
 local FactsColor = 'ff9aa0a8'
+
+-- the preview tool strip (to the right of the map): square icon buttons
+local ToolSize = 28
+local ToolGap = 6
+local ToolIconInset = 5
+local ToolIdle = 'ff141a20'
+local ToolHover = 'ff1f262e'
+local ToolActive = 'ff2c4a5e'        -- a lit toggle's background
+local ToolIconDim = 0.40             -- icon alpha when a toggle is off
+
+-- icon textures (skin-relative; resolved through UIFile). The army icon reuses the start-position
+-- commander silhouette; resources the mass icon; water a map pin; config an edit glyph.
+local ArmyIcon = '/dialogs/mapselect02/commander_alpha.dds'
+local ResourceIcon = '/game/build-ui/icon-mass_bmp.dds'
+local WaterIcon = '/game/camera-btn/pinned_btn_up.dds'
+local ConfigIcon = '/game/menu-btns/config_btn_up.dds'
+
+-- A small square icon button used in the preview tool strip. A toggle flips Active on click and
+-- calls `OnToggle(active)`; an action button (isToggle = false) just calls `OnPress`. The look is
+-- the tab convention: idle / hover / lit-when-active background, with the icon dimmed when off.
+---@class UICustomLobbyPreviewTool : Group
+---@field Bg Bitmap
+---@field Icon Bitmap
+---@field IsToggle boolean
+---@field Active boolean
+---@field Hovered boolean
+---@field OnToggle? fun(active: boolean)
+---@field OnPress? fun()
+local PreviewTool = ClassUI(Group) {
+
+    ---@param self UICustomLobbyPreviewTool
+    ---@param parent Control
+    ---@param texture FileName
+    ---@param isToggle boolean
+    __init = function(self, parent, texture, isToggle)
+        Group.__init(self, parent, "CustomLobbyPreviewTool")
+
+        self.IsToggle = isToggle or false
+        self.Active = true
+        self.Hovered = false
+
+        self.Bg = Bitmap(self)
+        self.Bg:SetSolidColor(ToolIdle)
+
+        self.Icon = UIUtil.CreateBitmap(self, texture)
+        self.Icon:DisableHitTest()
+
+        self.Bg.HandleEvent = function(control, event)
+            if event.Type == 'ButtonPress' then
+                if self.IsToggle then
+                    self.Active = not self.Active
+                    self:ApplyVisual()
+                    if self.OnToggle then
+                        self.OnToggle(self.Active)
+                    end
+                elseif self.OnPress then
+                    self.OnPress()
+                end
+                return true
+            elseif event.Type == 'MouseEnter' then
+                self.Hovered = true
+                self:ApplyVisual()
+                return true
+            elseif event.Type == 'MouseExit' then
+                self.Hovered = false
+                self:ApplyVisual()
+                return true
+            end
+            return false
+        end
+    end,
+
+    ---@param self UICustomLobbyPreviewTool
+    __post_init = function(self)
+        Layouter(self.Bg):Fill(self):End()
+        Layouter(self.Icon):AtCenterIn(self):Width(ToolSize - 2 * ToolIconInset):Height(ToolSize - 2 * ToolIconInset):End()
+        self:ApplyVisual()
+    end,
+
+    --- Repaints the background + icon for the current active/hover state.
+    ---@param self UICustomLobbyPreviewTool
+    ApplyVisual = function(self)
+        local bg = ToolIdle
+        if self.IsToggle and self.Active then
+            bg = ToolActive
+        elseif self.Hovered then
+            bg = ToolHover
+        end
+        self.Bg:SetSolidColor(bg)
+        local lit = (not self.IsToggle) or self.Active
+        self.Icon:SetAlpha(lit and 1.0 or ToolIconDim)
+    end,
+
+    --- Sets the toggle state without firing `OnToggle` (for syncing the initial visual).
+    ---@param self UICustomLobbyPreviewTool
+    ---@param active boolean
+    SetActive = function(self, active)
+        self.Active = active
+        self:ApplyVisual()
+    end,
+}
 
 --- Truncates `text` to `maxChars`, appending "…" when it had to cut. (Local copy — drift-fine, see
 --- ../CLAUDE.md "On sharing".)
@@ -91,8 +195,13 @@ end
 ---@field Preview UICustomLobbyMapPreview
 ---@field Name Text
 ---@field Info Text
+---@field ArmyToggle UICustomLobbyPreviewTool
+---@field ResourceToggle UICustomLobbyPreviewTool
+---@field WaterToggle UICustomLobbyPreviewTool
+---@field ConfigButton UICustomLobbyPreviewTool
 ---@field Tabs UICustomLobbyTabs
 ---@field ScenarioObserver LazyVar
+---@field IsHostObserver LazyVar
 local CustomLobbyConfigInterface = ClassUI(Group) {
 
     ---@param self UICustomLobbyConfigInterface
@@ -110,6 +219,29 @@ local CustomLobbyConfigInterface = ClassUI(Group) {
         self.Info:SetColor(FactsColor)
         self.Info:DisableHitTest()
 
+        --#region preview tool strip (to the right of the map): overlay toggles + change-scenario
+        local surface = self.Preview.Surface
+
+        self.ArmyToggle = PreviewTool(self, ArmyIcon, true)
+        self.ArmyToggle.OnToggle = function(active) surface:SetOverlayVisible('spawns', active) end
+        Tooltip.AddControlTooltipManual(self.ArmyToggle.Bg, "Army icons", "Show or hide the start-position army icons.")
+
+        self.ResourceToggle = PreviewTool(self, ResourceIcon, true)
+        self.ResourceToggle.OnToggle = function(active) surface:SetOverlayVisible('resources', active) end
+        Tooltip.AddControlTooltipManual(self.ResourceToggle.Bg, "Mass & hydrocarbon", "Show or hide the mass and hydrocarbon deposit icons.")
+
+        -- water defaults OFF (the surface's dummy mask starts hidden); sync the toggle's look
+        self.WaterToggle = PreviewTool(self, WaterIcon, true)
+        self.WaterToggle:SetActive(false)
+        self.WaterToggle.OnToggle = function(active) surface:SetOverlayVisible('water', active) end
+        Tooltip.AddControlTooltipManual(self.WaterToggle.Bg, "Water", "Show or hide the water (placeholder).")
+
+        -- host-only action: open the map-select dialog to change the scenario
+        self.ConfigButton = PreviewTool(self, ConfigIcon, false)
+        self.ConfigButton.OnPress = function() CustomLobbyMapSelect.Open(GetFrame(0)) end
+        Tooltip.AddControlTooltipManual(self.ConfigButton.Bg, "Change map", "Pick a different scenario (host only).")
+        --#endregion
+
         -- the read-only config tabs below the preview (created-on-select / destroyed-on-switch)
         self.Tabs = CustomLobbyTabs.Create(self, {
             Tabs = {
@@ -124,19 +256,36 @@ local CustomLobbyConfigInterface = ClassUI(Group) {
                 scenarioFileLazy()
                 self:RefreshFacts()
             end))
+        self.IsHostObserver = self.Trash:Add(
+            LazyVarDerive(CustomLobbyLocalModel.GetSingleton().IsHost, function(isHostLazy)
+                if isHostLazy() then
+                    self.ConfigButton:Show()
+                else
+                    self.ConfigButton:Hide()
+                end
+            end))
     end,
 
     ---@param self UICustomLobbyConfigInterface
     __post_init = function(self)
-        -- a centred square preview at the top, capped so it never crowds the tabs out
-        Layouter(self.Preview):AtHorizontalCenterIn(self):AtTopIn(self, Inset):End()
-        self.Preview.Width:Set(function()
-            return math.min(self.Width() - LayoutHelpers.ScaleNumber(2 * Inset), LayoutHelpers.ScaleNumber(PreviewMaxSize))
-        end)
+        -- the tool strip: a right-aligned vertical column of square buttons; the three toggles stack
+        -- from the top, the config button is pinned at the bottom (aligned with the preview's base)
+        local function placeTool(tool)
+            return Layouter(tool):AtRightIn(self, Inset):Width(ToolSize):Height(ToolSize)
+        end
+        placeTool(self.ArmyToggle):AtTopIn(self, Inset):End()
+        placeTool(self.ResourceToggle):AnchorToBottom(self.ArmyToggle, ToolGap):End()
+        placeTool(self.WaterToggle):AnchorToBottom(self.ResourceToggle, ToolGap):End()
+        placeTool(self.ConfigButton):End()
+        self.ConfigButton.Top:Set(function() return self.Preview.Bottom() - LayoutHelpers.ScaleNumber(ToolSize) end)
+
+        -- the square preview fills the column from the left inset up to the tool strip
+        Layouter(self.Preview):AtLeftIn(self, Inset):AtTopIn(self, Inset):End()
+        self.Preview.Right:Set(function() return self.ArmyToggle.Left() - LayoutHelpers.ScaleNumber(ToolGap) end)
         self.Preview.Height:Set(function() return self.Preview.Width() end)
 
-        Layouter(self.Name):AtHorizontalCenterIn(self):AnchorToBottom(self.Preview, 8):End()
-        Layouter(self.Info):AtHorizontalCenterIn(self):AnchorToBottom(self.Name, 2):End()
+        Layouter(self.Name):AtHorizontalCenterIn(self.Preview):AnchorToBottom(self.Preview, 8):End()
+        Layouter(self.Info):AtHorizontalCenterIn(self.Preview):AnchorToBottom(self.Name, 2):End()
 
         -- the tabs fill the rest of the column below the facts line
         Layouter(self.Tabs)

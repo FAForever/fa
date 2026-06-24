@@ -70,12 +70,14 @@ local SpawnDotSize = 18
 ---@field MassTemplate Bitmap                   # hidden; resource markers share its texture
 ---@field EnergyTemplate Bitmap
 ---@field WreckTemplate Bitmap
+---@field WaterMask Bitmap                       # DUMMY placeholder water tint (no real mask yet)
 ---@field SpawnIcons table<number, Control>
 ---@field ResourceIcons Control[]
 ---@field WreckIcons Control[]
 ---@field ShowSpawns boolean
 ---@field ShowResources boolean
 ---@field ShowWrecks boolean
+---@field ShowWater boolean
 ---@field ScenarioInfo? UILobbyScenarioInfo
 ---@field ScenarioSave? UIScenarioSaveFile
 ---@field SpawnData table<number, any>          # per-start-spot data handed to spawn icons' :Update
@@ -102,6 +104,7 @@ local CustomLobbyScenarioPreview = ClassUI(Group) {
         self.ShowSpawns = true
         self.ShowResources = true
         self.ShowWrecks = true
+        self.ShowWater = false
 
         self.ScenarioInfo = nil
         self.ScenarioSave = nil
@@ -114,6 +117,14 @@ local CustomLobbyScenarioPreview = ClassUI(Group) {
 
         self.Preview = MapPreview(self)
 
+        -- DUMMY water overlay: a translucent blue tint over the whole map until a real water mask
+        -- exists. Sits above the map texture but below the resource/wreck/spawn markers. Hidden by
+        -- default; the 'water' overlay toggle reveals it.
+        self.WaterMask = Bitmap(self)
+        self.WaterMask:SetSolidColor('66123a66')
+        self.WaterMask:DisableHitTest()
+        self.WaterMask:Hide()
+
         self.MassTemplate = self:CreateTemplateBitmap(MassIcon)
         self.EnergyTemplate = self:CreateTemplateBitmap(EnergyIcon)
         self.WreckTemplate = self:CreateTemplateBitmap(WreckIcon)
@@ -122,6 +133,8 @@ local CustomLobbyScenarioPreview = ClassUI(Group) {
     ---@param self UICustomLobbyScenarioPreview
     __post_init = function(self)
         Layouter(self.Preview):Fill(self):End()
+        Layouter(self.WaterMask):Fill(self.Preview):End()
+        self.WaterMask.Depth:Set(function() return self.Preview.Depth() + 1 end)
 
         -- our PARENT sizes us after this returns, so self.Preview.Width() isn't concrete yet;
         -- defer the first render a frame, then let SetScenario/SetSpawnData drive updates
@@ -169,7 +182,7 @@ local CustomLobbyScenarioPreview = ClassUI(Group) {
         end
     end,
 
-    --- Shows/hides an overlay group: 'spawns' | 'resources' | 'wrecks'.
+    --- Shows/hides an overlay group: 'spawns' | 'resources' | 'wrecks' | 'water'.
     ---@param self UICustomLobbyScenarioPreview
     ---@param kind string
     ---@param visible boolean
@@ -180,6 +193,8 @@ local CustomLobbyScenarioPreview = ClassUI(Group) {
             self.ShowResources = visible
         elseif kind == 'wrecks' then
             self.ShowWrecks = visible
+        elseif kind == 'water' then
+            self.ShowWater = visible
         end
         self:ApplyVisibility()
     end,
@@ -309,6 +324,11 @@ local CustomLobbyScenarioPreview = ClassUI(Group) {
         setVisible(self.SpawnIcons, self.ShowSpawns)
         setVisible(self.ResourceIcons, self.ShowResources)
         setVisible(self.WreckIcons, self.ShowWrecks)
+        if self.ShowWater then
+            self.WaterMask:Show()
+        else
+            self.WaterMask:Hide()
+        end
     end,
 
     --- The save's master-chain markers, or an empty table.
