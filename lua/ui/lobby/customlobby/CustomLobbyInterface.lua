@@ -28,20 +28,27 @@
 -- module-level `Debug` flag to tint each so the regions are visible while iterating. Targeted at
 -- the 1024x768 minimum resolution:
 --
---   ┌ TitleArea ─ title · TEAM SCORE · leave ─────────────────────────────┐
---   │ SlotsArea (slots ONLY — up to 16, two columns)                       │
---   ├──────────────────────────────┬───────────────────────────────────────┤
---   │ BottomLeftArea (Chat /        │ BottomRightArea (Map / Mods / Options │
---   │   Observers — tabs)           │   / Restrictions — tabs)              │
---   ├──────────────────────────────┴───────────────────────────────────────┤
---   │ ActionArea (status · … · launch) ─ full width                        │
---   └──────────────────────────────────────────────────────────────────────┘
+--   ┌ TitleArea ─ title · TEAM SCORE · leave ───────────────────────────────────┐
+--   ├──────────────────────────────────────┬─────────────────────────────────────┤
+--   │ SlotsArea (slots — ONE column,        │ RightArea (the map preview + facts  │
+--   │   top-left, up to 16)                 │   line + read-only options summary) │
+--   ├──────────────────────────────────────┤                                     │
+--   │ BottomLeftArea (Chat / Observers      │                                     │
+--   │   — tabs)                             │                                     │
+--   ├──────────────────────────────────────┴─────────────────────────────────────┤
+--   │ ActionArea (status · … · Settings · Launch) ─ full width                    │
+--   └────────────────────────────────────────────────────────────────────────────┘
 --
--- The top is dedicated to the slot rows (we expect up to 16). The middle splits in two tabbed
--- panels: the left is chat/observers (CustomLobbyTabs), the right is the config tab panel
--- (CustomLobbyConfigInterface — Map / Mods / Options / Restrictions). A full-width action bar at
--- the bottom holds the global actions (status + launch, and the like). The accumulated team rating
+-- A one-column layout (the two-column variant was reverted by community request). The LEFT column
+-- splits vertically: the slot rows on top (one column, up to 16), the chat/observers tabs
+-- (CustomLobbyTabs) below. The RIGHT column is the map + options (CustomLobbyConfigInterface — a
+-- bound map preview, a name/size/players/version facts line, and the read-only options summary). A
+-- full-width action bar at the bottom holds the global actions (status + the generic Settings
+-- button, which opens the options editor, + the host-only Launch). The accumulated team rating
 -- (CustomLobbyTeamScore) sits in the title, shown only for the binary auto-team formations.
+--
+-- The per-domain edit buttons (change-map, mod-select) are removed for now — only the generic
+-- Settings button remains — and will be reintegrated once the rework is complete.
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
@@ -60,6 +67,7 @@ local CustomLobbyTeamScore = import("/lua/ui/lobby/customlobby/customlobbyteamsc
 local CustomLobbyTabs = import("/lua/ui/lobby/customlobby/customlobbytabs.lua")
 local CustomLobbyChatPanel = import("/lua/ui/lobby/customlobby/social/customlobbychatpanel.lua")
 local CustomLobbyObserversPanel = import("/lua/ui/lobby/customlobby/social/customlobbyobserverspanel.lua")
+local CustomLobbyOptionSelect = import("/lua/ui/lobby/customlobby/optionselect/customlobbyoptionselect.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
@@ -76,10 +84,10 @@ local LobbyHeight = 768
 
 local Pad = 8
 local SlotHeight = 24
-local SlotsHeaderHeight = 24     -- the "Players" header + gap above the two slot columns
+local SlotsHeaderHeight = 24     -- the "Players" header + gap above the single slot column
 local TitleHeight = 48
-local BottomRightWidth = 560     -- config (map/mods/options/restrictions); the chat/obs panel fills the rest
-local ActionHeight = 52          -- the full-width action bar at the very bottom (status + launch)
+local RightWidth = 360           -- the right column (map preview + options summary); the left fills the rest
+local ActionHeight = 52          -- the full-width action bar at the very bottom (status + Settings + launch)
 
 --- Creates a layout area (an invisible Group with an optional debug tint).
 ---@param parent Control
@@ -108,14 +116,14 @@ end
 ---@field SlotsArea Group
 ---@field SlotsHeader Text
 ---@field SlotsPanel Group
----@field SlotColumns Group[]               # [1] = left column, [2] = right column
 ---@field Slots UICustomLobbySlotInterface[]
 ---@field BottomLeftArea Group
 ---@field BottomLeftTabs UICustomLobbyTabs
----@field BottomRightArea Group
----@field Config UICustomLobbyTabs
+---@field RightArea Group
+---@field Config UICustomLobbyConfigInterface
 ---@field ActionArea Group
 ---@field StatusLabel Text
+---@field SettingsButton Button
 ---@field LaunchButton Button
 ---@field SlotCountObserver LazyVar
 ---@field IsHostObserver LazyVar
@@ -143,7 +151,7 @@ local CustomLobbyInterface = Class(Group) {
         self.TitleArea = CreateArea(self.Content, "TitleArea", 'ffcc4040')
         self.SlotsArea = CreateArea(self.Content, "SlotsArea", 'ffcccc40')
         self.BottomLeftArea = CreateArea(self.Content, "BottomLeftArea", 'ff40cc60')
-        self.BottomRightArea = CreateArea(self.Content, "BottomRightArea", 'ff4060cc')
+        self.RightArea = CreateArea(self.Content, "RightArea", 'ff4060cc')
         self.ActionArea = CreateArea(self.Content, "ActionArea", 'ff808080')
         --#endregion
 
@@ -161,23 +169,18 @@ local CustomLobbyInterface = Class(Group) {
         end
         --#endregion
 
-        --#region slots (top region — two columns; odd slots left, even right)
+        --#region slots (top-left region — a single column of rows)
         self.SlotsHeader = UIUtil.CreateText(self.SlotsArea, "Players", 14, UIUtil.titleFont)
         self.SlotsHeader:SetColor('ff9aa0a8')
         self.SlotsHeader:DisableHitTest()
 
         self.SlotsPanel = Group(self.SlotsArea, "CustomLobbySlotsPanel")
-        self.SlotColumns = {
-            Group(self.SlotsPanel, "CustomLobbySlotsLeft"),
-            Group(self.SlotsPanel, "CustomLobbySlotsRight"),
-        }
 
-        -- One row per possible slot, placed in the left (odd) or right (even) column; the
-        -- SlotCount observer reveals the active ones.
+        -- One row per possible slot, stacked in a single column; the SlotCount observer reveals the
+        -- active ones.
         self.Slots = {}
         for slot = 1, CustomLobbyLaunchModel.MaxSlots do
-            local column = self.SlotColumns[math.mod(slot, 2) == 1 and 1 or 2]
-            self.Slots[slot] = CustomLobbySlotInterface.Create(column, slot, self)
+            self.Slots[slot] = CustomLobbySlotInterface.Create(self.SlotsPanel, slot, self)
         end
         --#endregion
 
@@ -190,14 +193,22 @@ local CustomLobbyInterface = Class(Group) {
         })
         --#endregion
 
-        --#region bottom-right: config tabs (map / mods / options / restrictions)
-        self.Config = CustomLobbyConfigInterface.Create(self.BottomRightArea)
+        --#region right column: the map preview + facts line + read-only options summary
+        self.Config = CustomLobbyConfigInterface.Create(self.RightArea)
         --#endregion
 
-        --#region action bar (full-width, bottom): status + launch and other global actions
+        --#region action bar (full-width, bottom): status + Settings + launch
         self.StatusLabel = UIUtil.CreateText(self.ActionArea, "", 13, UIUtil.bodyFont)
         self.StatusLabel:SetColor('ff9aa0a8')
         self.StatusLabel:DisableHitTest()
+
+        -- the single generic settings button (host-only); opens the options editor. The per-domain
+        -- edit buttons (change-map, mod-select) are removed until the rework is complete.
+        self.SettingsButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/medium/', "Settings")
+        self.SettingsButton.OnClick = function(button, modifiers)
+            CustomLobbyOptionSelect.Open(GetFrame(0))
+        end
+        Tooltip.AddControlTooltipManual(self.SettingsButton, "Settings", "Open the game options (host only).")
 
         self.LaunchButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/large/', "Launch")
         self.LaunchButton.OnClick = function(button, modifiers)
@@ -232,31 +243,35 @@ local CustomLobbyInterface = Class(Group) {
         Layouter(self.Content):AtCenterIn(self):End()
 
         --#region areas
+        local session = CustomLobbySessionModel.GetSingleton()
+
+        -- the title and the action bar span the full width, top and bottom
         Layouter(self.TitleArea):AtLeftIn(self.Content, Pad):AtRightIn(self.Content, Pad):AtTopIn(self.Content, Pad):Height(TitleHeight):End()
-
-        -- the slots region is sized to exactly fit its rows (two columns of MaxSlots/2 = 8); the
-        -- bottom row of tabbed panels then fills ALL the remaining vertical room below it
-        local slotRows = math.ceil(CustomLobbyLaunchModel.MaxSlots / 2)
-        Layouter(self.SlotsArea)
-            :AtLeftIn(self.Content, Pad):AtRightIn(self.Content, Pad)
-            :AnchorToBottom(self.TitleArea, Pad):Height(SlotsHeaderHeight + slotRows * SlotHeight)
-            :End()
-
-        -- the action bar spans the full width at the very bottom; the two tabbed panels fill the
-        -- room between the slots and it. The right (config) panel is a fixed width; the left
-        -- (chat/observers) fills the rest
         Layouter(self.ActionArea)
             :AtLeftIn(self.Content, Pad):AtRightIn(self.Content, Pad):AtBottomIn(self.Content, Pad)
             :Height(ActionHeight)
             :End()
-        Layouter(self.BottomRightArea)
-            :AtRightIn(self.Content, Pad):Width(BottomRightWidth)
-            :AnchorToBottom(self.SlotsArea, Pad):AnchorToTop(self.ActionArea, Pad)
+
+        -- the right column (map + options) is a fixed width filling the height between them
+        Layouter(self.RightArea)
+            :AtRightIn(self.Content, Pad):Width(RightWidth)
+            :AnchorToBottom(self.TitleArea, Pad):AnchorToTop(self.ActionArea, Pad)
             :End()
+
+        -- the left column splits vertically: slots on top, chat/observers below. The slots region
+        -- is sized to its visible rows (one column) so chat/observers grows for smaller games; both
+        -- stop at the left edge of the right column
+        Layouter(self.SlotsArea):AtLeftIn(self.Content, Pad):AnchorToBottom(self.TitleArea, Pad):End()
+        self.SlotsArea.Right:Set(function() return self.RightArea.Left() - LayoutHelpers.ScaleNumber(Pad) end)
+        self.SlotsArea.Height:Set(function()
+            local rows = math.max(session.SlotCount(), 1)
+            return LayoutHelpers.ScaleNumber(SlotsHeaderHeight) + rows * LayoutHelpers.ScaleNumber(SlotHeight)
+        end)
+
         Layouter(self.BottomLeftArea)
             :AtLeftIn(self.Content, Pad):AnchorToBottom(self.SlotsArea, Pad):AnchorToTop(self.ActionArea, Pad)
             :End()
-        self.BottomLeftArea.Right:Set(function() return self.BottomRightArea.Left() - LayoutHelpers.ScaleNumber(Pad) end)
+        self.BottomLeftArea.Right:Set(function() return self.RightArea.Left() - LayoutHelpers.ScaleNumber(Pad) end)
         --#endregion
 
         --#region title bar (title · team score · leave)
@@ -268,28 +283,21 @@ local CustomLobbyInterface = Class(Group) {
             :End()
         --#endregion
 
-        --#region slots (two columns; rows stack within each)
+        --#region slots (a single column; rows stack top-to-bottom)
         Layouter(self.SlotsHeader):AtLeftIn(self.SlotsArea, 4):AtTopIn(self.SlotsArea):End()
         Layouter(self.SlotsPanel)
             :AtLeftIn(self.SlotsArea):AtRightIn(self.SlotsArea)
             :AnchorToBottom(self.SlotsHeader, 4):AtBottomIn(self.SlotsArea)
             :End()
 
-        -- two columns split down the middle of the panel (a small gutter between)
-        Layouter(self.SlotColumns[1]):AtLeftIn(self.SlotsPanel):AtTopIn(self.SlotsPanel):AtBottomIn(self.SlotsPanel):End()
-        self.SlotColumns[1].Right:Set(function() return self.SlotsPanel.Left() + 0.5 * self.SlotsPanel.Width() - LayoutHelpers.ScaleNumber(6) end)
-        Layouter(self.SlotColumns[2]):AtRightIn(self.SlotsPanel):AtTopIn(self.SlotsPanel):AtBottomIn(self.SlotsPanel):End()
-        self.SlotColumns[2].Left:Set(function() return self.SlotsPanel.Left() + 0.5 * self.SlotsPanel.Width() + LayoutHelpers.ScaleNumber(6) end)
-
-        -- stack each column's rows top-to-bottom (slot i sits under slot i-2, its column-mate)
+        -- stack the rows top-to-bottom (slot i sits under slot i-1)
         for slot = 1, CustomLobbyLaunchModel.MaxSlots do
             local row = self.Slots[slot]
-            local column = self.SlotColumns[math.mod(slot, 2) == 1 and 1 or 2]
-            local builder = Layouter(row):AtLeftIn(column):AtRightIn(column):Height(SlotHeight)
-            if slot <= 2 then
-                builder:AtTopIn(column)
+            local builder = Layouter(row):AtLeftIn(self.SlotsPanel):AtRightIn(self.SlotsPanel):Height(SlotHeight)
+            if slot == 1 then
+                builder:AtTopIn(self.SlotsPanel)
             else
-                builder:AnchorToBottom(self.Slots[slot - 2], 0)
+                builder:AnchorToBottom(self.Slots[slot - 1], 0)
             end
             builder:End()
         end
@@ -299,13 +307,14 @@ local CustomLobbyInterface = Class(Group) {
         Layouter(self.BottomLeftTabs):Fill(self.BottomLeftArea):End()
         --#endregion
 
-        --#region bottom-right: config tabs fill the panel
-        Layouter(self.Config):Fill(self.BottomRightArea):End()
+        --#region right column: map preview + options summary fill the panel
+        Layouter(self.Config):Fill(self.RightArea):End()
         --#endregion
 
-        --#region action bar: status on the left, launch on the right
+        --#region action bar: status on the left, Settings + launch on the right
         Layouter(self.StatusLabel):AtLeftIn(self.ActionArea, 8):AtVerticalCenterIn(self.ActionArea):End()
         Layouter(self.LaunchButton):AtRightIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea):End()
+        Layouter(self.SettingsButton):AnchorToLeft(self.LaunchButton, 8):AtVerticalCenterIn(self.ActionArea):End()
         --#endregion
 
         -- size-dependent children build their scrollbars / first render now that they're sized
@@ -315,9 +324,8 @@ local CustomLobbyInterface = Class(Group) {
         self.Config:Initialize()
     end,
 
-    --- Shows the active slots (1..count) and hides the rest. The two columns are full-height, so
-    --- the rows simply stack from the top of each — no area resizing needed (the slots own the
-    --- whole top region regardless of count).
+    --- Shows the active slots (1..count) and hides the rest. The slots region's height tracks the
+    --- count (bound in __post_init), so the chat/observers panel below grows for smaller games.
     ---@param self UICustomLobbyInterface
     ---@param count number
     OnSlotCountChanged = function(self, count)
@@ -330,16 +338,19 @@ local CustomLobbyInterface = Class(Group) {
         end
     end,
 
-    --- Tracks host status: updates the status line and shows the launch button only to the host.
-    --- (The right-column config panel gates its own host-only buttons.)
+    --- Tracks host status: updates the status line and shows the host-only action-bar buttons
+    --- (Settings + Launch) only to the host. (The options editor the Settings button opens is
+    --- host-gated regardless; the right-column options summary stays read-only-visible to everyone.)
     ---@param self UICustomLobbyInterface
     ---@param isHost boolean
     OnIsHostChanged = function(self, isHost)
         self.StatusLabel:SetText(isHost and "You are the host." or "The host controls the game.")
-        if isHost then
-            self.LaunchButton:Show()
-        else
-            self.LaunchButton:Hide()
+        for _, button in { self.SettingsButton, self.LaunchButton } do
+            if isHost then
+                button:Show()
+            else
+                button:Hide()
+            end
         end
     end,
 

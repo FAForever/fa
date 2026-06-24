@@ -20,18 +20,20 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
--- The Options tab panel of the config interface: a read-only view of the current option values,
--- grouped into Lobby / Scenario / Mods sections, with a hide-defaults toggle, and host-only
--- "Options" (open the editor) + "Reset options" buttons.
+-- The Options tab of the config interface: a read-only view of the current option values, grouped
+-- into Lobby / Scenario / Mods sections, with a hide-defaults toggle. The grid fills the whole
+-- panel — the per-domain action buttons (open editor / reset) are gone; the interface's action-bar
+-- Settings button owns opening the options editor, and they'll be reconsidered when the config
+-- rework resumes.
 --
 -- Options that come from the map or a mod are flagged with a gold marker + tinted label; the
 -- marker's tooltip names the precise origin (`Map: …` / `Mod: …`). The schema is derived per-peer
 -- from the synced scenario + mods via `optionutil`; the values are the synced `GameOptions`.
 --
--- It is a config-interface tab panel: the host creates it when the Options tab is selected and
--- destroys it on switch, so it's the live/visible panel for its whole lifetime — model observers
--- just rebuild it. `Initialize` (called by the host after sizing it) builds the grid's scrollbar +
--- does the first render; the grid needs a concrete height by then.
+-- It is a tab panel: created when its tab is selected and destroyed on switch, so it's the
+-- live/visible panel for its whole lifetime — model observers just rebuild it. `Initialize` (called
+-- by the tabs container after sizing it) builds the grid's scrollbar + does the first render; the
+-- grid needs a concrete height by then.
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
@@ -42,10 +44,7 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Grid = import("/lua/maui/grid.lua").Grid
 
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
-local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
-local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
-local CustomLobbyOptionSelect = import("/lua/ui/lobby/customlobby/optionselect/customlobbyoptionselect.lua")
 local OptionUtil = import("/lua/ui/optionutil.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
@@ -55,7 +54,6 @@ local RowHeight = 22
 local ScrollGap = 18
 local GridContentWidth = 360 - 6 - ScrollGap
 local LabelMaxChars = 26
-local ActionHeight = 40                -- the bottom action sub-area that holds the tab's buttons
 
 local SpecialColor = 'ffd0a24c'      -- marker + label tint for a map/mod option
 local NormalColor = 'ffc8ccd0'
@@ -76,19 +74,14 @@ end
 ---@class UICustomLobbyOptionsPanel : Group
 ---@field Trash TrashBag
 ---@field Ready boolean
----@field IsHost boolean
 ---@field HideDefaults boolean
 ---@field HideDefaultsToggle Checkbox
 ---@field OptionsGrid Grid
 ---@field Scrollbar Scrollbar | false
 ---@field Empty Text
----@field ActionArea Group
----@field EditButton Button
----@field ResetButton Button
 ---@field ScenarioObserver LazyVar
 ---@field OptionsObserver LazyVar
 ---@field ModsObserver LazyVar
----@field IsHostObserver LazyVar
 local CustomLobbyOptionsPanel = ClassUI(Group) {
 
     ---@param self UICustomLobbyOptionsPanel
@@ -98,7 +91,6 @@ local CustomLobbyOptionsPanel = ClassUI(Group) {
 
         self.Trash = TrashBag()
         self.Ready = false
-        self.IsHost = false
         self.HideDefaults = true
         self.Scrollbar = false
 
@@ -117,19 +109,6 @@ local CustomLobbyOptionsPanel = ClassUI(Group) {
         self.Empty:DisableHitTest()
         self.Empty:Hide()
 
-        -- the tab's actions live in their own sub-area pinned to the bottom; the primary action
-        -- (open the editor) is right-aligned, the secondary (reset) sits to its left
-        self.ActionArea = Group(self, "CustomLobbyOptionsActions")
-        self.EditButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/medium/', "Options")
-        self.EditButton.OnClick = function(button, modifiers)
-            CustomLobbyOptionSelect.Open(GetFrame(0))
-        end
-        self.ResetButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/medium/', "Reset options")
-        self.ResetButton.OnClick = function(button, modifiers)
-            CustomLobbyController.RequestResetGameOptions()
-        end
-        Tooltip.AddControlTooltipManual(self.ResetButton, "Reset options", "Reset every option to its default value.")
-
         -- the panel is created/destroyed with its tab, so it's always the live/visible panel while
         -- it exists — observers just rebuild (Refresh is Ready-gated); no show/hide juggling
         local launch = CustomLobbyLaunchModel.GetSingleton()
@@ -139,37 +118,25 @@ local CustomLobbyOptionsPanel = ClassUI(Group) {
             LazyVarDerive(launch.GameOptions, function(lazy) lazy(); self:Refresh() end))
         self.ModsObserver = self.Trash:Add(
             LazyVarDerive(launch.GameMods, function(lazy) lazy(); self:Refresh() end))
-
-        local localModel = CustomLobbyLocalModel.GetSingleton()
-        self.IsHostObserver = self.Trash:Add(
-            LazyVarDerive(localModel.IsHost, function(isHostLazy)
-                self.IsHost = isHostLazy()
-                self:ApplyHostVisibility()
-            end))
     end,
 
     ---@param self UICustomLobbyOptionsPanel
     __post_init = function(self)
-        Layouter(self.ActionArea):AtLeftIn(self):AtRightIn(self):AtBottomIn(self):Height(ActionHeight):End()
-        Layouter(self.EditButton):AtRightIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea):End()
-        Layouter(self.ResetButton):AnchorToLeft(self.EditButton, 8):AtVerticalCenterIn(self.ActionArea):End()
-
         Layouter(self.HideDefaultsToggle):AtLeftIn(self, 6):AtTopIn(self, 4):End()
         Layouter(self.OptionsGrid)
             :AtLeftIn(self, 6):Width(GridContentWidth)
-            :AnchorToBottom(self.HideDefaultsToggle, 6):AnchorToTop(self.ActionArea, 8)
+            :AnchorToBottom(self.HideDefaultsToggle, 6):AtBottomIn(self, 4)
             :End()
         Layouter(self.Empty):AtHorizontalCenterIn(self.OptionsGrid):AtTopIn(self.OptionsGrid, 8):End()
     end,
 
-    --- Builds the grid's scrollbar + does the first render. Called by the host after it has sized
-    --- the panel (the grid needs a concrete height — three-phase init, /lua/ui/CLAUDE.md § 1).
+    --- Builds the grid's scrollbar + does the first render. Called by the tabs container after it
+    --- has sized the panel (the grid needs a concrete height — three-phase init, /lua/ui/CLAUDE.md § 1).
     ---@param self UICustomLobbyOptionsPanel
     Initialize = function(self)
         self.Ready = true
         self.Scrollbar = UIUtil.CreateVertScrollbarFor(self.OptionsGrid)
         self:Refresh()
-        self:ApplyHostVisibility()
     end,
 
     --- Rebuilds the read-only options grid, grouped into Lobby / Scenario / Mods sections with the
@@ -291,18 +258,6 @@ local CustomLobbyOptionsPanel = ClassUI(Group) {
         Layouter(value):AtRightIn(row, 4):AtVerticalCenterIn(row):End()
 
         return row
-    end,
-
-    --- The Options + Reset buttons are host-only.
-    ---@param self UICustomLobbyOptionsPanel
-    ApplyHostVisibility = function(self)
-        for _, button in { self.EditButton, self.ResetButton } do
-            if self.IsHost then
-                button:Show()
-            else
-                button:Hide()
-            end
-        end
     end,
 
     --- Shows the scrollbar only when the grid overflows.

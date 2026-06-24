@@ -21,13 +21,13 @@
 --******************************************************************************************************
 
 -- The Mods tab panel of the config interface: the enabled mods, grouped into Game mods (the
--- shared sim mods from the launch model) and UI mods (this peer's local choice from prefs), plus
--- a "Manage mods" button (available to everyone — UI mods are per-player).
+-- shared sim mods from the launch model) and UI mods (this peer's local choice from prefs). The
+-- grid fills the whole panel — the "Manage mods" button is gone for now (the per-domain edit
+-- buttons are removed during the layout rework and will be reconsidered when it resumes).
 --
--- It is a config-interface tab panel: the host creates it when the Mods tab is selected and
--- destroys it on switch, so it's the live/visible panel for its whole lifetime. UI mods are prefs,
--- not a reactive model field, so they're read on the first render (`Initialize`); the synced sim
--- mods additionally refresh it live.
+-- It is a tab panel: created when its tab is selected and destroyed on switch, so it's the
+-- live/visible panel for its whole lifetime. UI mods are prefs, not a reactive model field, so
+-- they're read on the first render (`Initialize`); the synced sim mods additionally refresh it live.
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
@@ -37,7 +37,6 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Grid = import("/lua/maui/grid.lua").Grid
 
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
-local CustomLobbyModSelect = import("/lua/ui/lobby/customlobby/modselect/customlobbymodselect.lua")
 local ModUtilities = import("/lua/ui/modutilities.lua")
 local Mods = import("/lua/mods.lua")
 
@@ -49,7 +48,6 @@ local ScrollGap = 18
 local GridContentWidth = 360 - 6 - ScrollGap
 local LabelMaxChars = 30
 local NormalColor = 'ffc8ccd0'
-local ActionHeight = 40                -- the bottom action sub-area that holds the tab's buttons
 
 --- Truncates `text` to `maxChars`, appending "…" when it had to cut.
 ---@param text string
@@ -69,8 +67,6 @@ end
 ---@field ModsGrid Grid
 ---@field Scrollbar Scrollbar | false
 ---@field Empty Text
----@field ActionArea Group
----@field ManageButton Button
 ---@field ModsObserver LazyVar
 local CustomLobbyModsPanel = ClassUI(Group) {
 
@@ -89,14 +85,6 @@ local CustomLobbyModsPanel = ClassUI(Group) {
         self.Empty:DisableHitTest()
         self.Empty:Hide()
 
-        -- the tab's actions live in their own sub-area pinned to the bottom; the primary action is
-        -- right-aligned
-        self.ActionArea = Group(self, "CustomLobbyModsActions")
-        self.ManageButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/medium/', "Manage mods")
-        self.ManageButton.OnClick = function(button, modifiers)
-            CustomLobbyModSelect.Open(GetFrame(0))
-        end
-
         -- only the shared sim mods are a model field; UI mods (prefs) are picked up on the first
         -- render (Initialize), since the panel is created fresh each time its tab is selected
         self.ModsObserver = self.Trash:Add(
@@ -108,11 +96,9 @@ local CustomLobbyModsPanel = ClassUI(Group) {
 
     ---@param self UICustomLobbyModsPanel
     __post_init = function(self)
-        Layouter(self.ActionArea):AtLeftIn(self):AtRightIn(self):AtBottomIn(self):Height(ActionHeight):End()
-        Layouter(self.ManageButton):AtRightIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea):End()
         Layouter(self.ModsGrid)
             :AtLeftIn(self, 6):Width(GridContentWidth)
-            :AtTopIn(self, 6):AnchorToTop(self.ActionArea, 8)
+            :AtTopIn(self, 6):AtBottomIn(self, 4)
             :End()
         Layouter(self.Empty):AtHorizontalCenterIn(self.ModsGrid):AtTopIn(self.ModsGrid, 8):End()
     end,
