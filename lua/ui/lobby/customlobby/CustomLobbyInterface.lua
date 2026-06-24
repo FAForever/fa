@@ -62,7 +62,7 @@ local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaun
 local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/customlobbysessionmodel.lua")
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
-local CustomLobbySlotsInterface = import("/lua/ui/lobby/customlobby/customlobbyslotsinterface.lua")
+local CustomLobbySlotsInterface = import("/lua/ui/lobby/customlobby/slots/customlobbyslotsinterface.lua")
 local CustomLobbyConfigInterface = import("/lua/ui/lobby/customlobby/config/customlobbyconfiginterface.lua")
 local CustomLobbyTeamScore = import("/lua/ui/lobby/customlobby/customlobbyteamscore.lua")
 local CustomLobbyTabs = import("/lua/ui/lobby/customlobby/customlobbytabs.lua")
@@ -218,8 +218,6 @@ local CustomLobbyInterface = Class(Group) {
         Layouter(self.Content):AtCenterIn(self):End()
 
         --#region areas
-        local session = CustomLobbySessionModel.GetSingleton()
-
         -- the title and the action bar span the full width, top and bottom
         Layouter(self.TitleArea):AtLeftIn(self.Content, Pad):AtRightIn(self.Content, Pad):AtTopIn(self.Content, Pad):Height(TitleHeight):End()
         Layouter(self.ActionArea)
@@ -238,7 +236,7 @@ local CustomLobbyInterface = Class(Group) {
         -- stop at the left edge of the right column
         Layouter(self.SlotsArea):AtLeftIn(self.Content, Pad):AnchorToBottom(self.TitleArea, Pad):End()
         self.SlotsArea.Right:Set(function() return self.RightArea.Left() - LayoutHelpers.ScaleNumber(Pad) end)
-        self.SlotsArea.Height:Set(function() return CustomLobbySlotsInterface.HeightForSlots(session.SlotCount()) end)
+        self.SlotsArea.Height:Set(function() return self.Slots:PreferredHeight() end)
 
         Layouter(self.BottomLeftArea)
             :AtLeftIn(self.Content, Pad):AnchorToBottom(self.SlotsArea, Pad):AnchorToTop(self.ActionArea, Pad)

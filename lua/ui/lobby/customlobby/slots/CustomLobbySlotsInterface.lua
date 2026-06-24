@@ -20,18 +20,19 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
--- The lobby's slot column: a "Players" header over a single column of slot rows (one
--- CustomLobbySlotInterface per possible slot). It subscribes to the session's SlotCount and reveals
--- the active rows (1..count), hiding the rest.
+-- The slot subsystem's entry point: the "Players" header over the active *layout body*, plus the
+-- shared drag coordinator. The composition root mounts this and fills its area with it.
 --
--- It is also the rows' **drag coordinator** (`UICustomLobbySlotCoordinator`): the slot rows raise
--- the drag gesture but this container owns it, because it is the only thing that knows every row's
--- rect. The "what's grabbed / where" state here is purely visual — a drop resolves to the
--- host-authoritative `RequestSwapSlots` intent.
+-- One layout is alive at a time, picked by the AutoTeams mode: the one-column layout
+-- ([onecolumn/CustomLobbyOneColumnSlots](onecolumn/CustomLobbyOneColumnSlots.lua)) for the non-team
+-- modes, and the two-column team layout for the binary modes (left/right, top/bottom, even/odd).
+-- (The two-column layout + the AutoTeams-driven swap land in the next step; for now it is always
+-- one-column.)
 --
--- The composition root fills its slot area with this component and sizes that area to the visible
--- rows via `HeightForSlots(count)` (kept here so the row height math has a single source), so the
--- chat/observers panel below grows for smaller games.
+-- This selector is the rows' **drag coordinator** (`UICustomLobbySlotCoordinator`) for *every*
+-- layout, because it alone needs to hit-test across the rows and float the drag ghost — so the
+-- layout bodies stay pure "build + place + reveal" and never duplicate the drag logic. Each body is
+-- handed this selector as its rows' coordinator and exposes its `Rows` for the hit-test.
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
@@ -42,22 +43,18 @@ local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaun
 local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/customlobbysessionmodel.lua")
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
-local CustomLobbySlotInterface = import("/lua/ui/lobby/customlobby/customlobbyslotinterface.lua")
+local CustomLobbyOneColumnSlots = import("/lua/ui/lobby/customlobby/slots/onecolumn/customlobbyonecolumnslots.lua")
 
-local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
-local SlotHeight = 24
-local HeaderHeight = 24           -- the "Players" header + gap above the rows
+local HeaderHeight = 24           -- the "Players" header + gap above the layout body
 
 ---@class UICustomLobbySlotsInterface : Group, UICustomLobbySlotCoordinator
 ---@field Trash TrashBag
 ---@field Header Text
----@field Panel Group
----@field Rows UICustomLobbySlotInterface[]
----@field SlotCountObserver LazyVar
----@field HighlightedSlot number | false   # slot currently shown as a drop target
----@field DragGhost Group | false          # floating label following the cursor mid-drag
+---@field Body UICustomLobbyOneColumnSlots   # the active layout body
+---@field HighlightedSlot number | false       # slot currently shown as a drop target
+---@field DragGhost Group | false              # floating label following the cursor mid-drag
 local CustomLobbySlotsInterface = Class(Group) {
 
     ---@param self UICustomLobbySlotsInterface
@@ -73,61 +70,34 @@ local CustomLobbySlotsInterface = Class(Group) {
         self.Header:SetColor('ff9aa0a8')
         self.Header:DisableHitTest()
 
-        self.Panel = Group(self, "CustomLobbySlotsPanel")
-
-        -- One row per possible slot, stacked in a single column; the SlotCount observer reveals the
-        -- active ones.
-        self.Rows = {}
-        for slot = 1, CustomLobbyLaunchModel.MaxSlots do
-            self.Rows[slot] = CustomLobbySlotInterface.Create(self.Panel, slot, self)
-        end
-
-        local session = CustomLobbySessionModel.GetSingleton()
-        self.SlotCountObserver = self.Trash:Add(
-            LazyVarDerive(session.SlotCount, function(slotCountLazy)
-                self:OnSlotCountChanged(slotCountLazy())
-            end))
+        -- the active layout body; the selector is its rows' coordinator (passed as `self`)
+        self.Body = CustomLobbyOneColumnSlots.Create(self, self)
     end,
 
     ---@param self UICustomLobbySlotsInterface
     __post_init = function(self)
         Layouter(self.Header):AtLeftIn(self, 4):AtTopIn(self):End()
-        Layouter(self.Panel)
+        Layouter(self.Body)
             :AtLeftIn(self):AtRightIn(self)
             :AnchorToBottom(self.Header, 4):AtBottomIn(self)
             :End()
-
-        -- stack the rows top-to-bottom (slot i sits under slot i-1)
-        for slot = 1, CustomLobbyLaunchModel.MaxSlots do
-            local row = self.Rows[slot]
-            local builder = Layouter(row):AtLeftIn(self.Panel):AtRightIn(self.Panel):Height(SlotHeight)
-            if slot == 1 then
-                builder:AtTopIn(self.Panel)
-            else
-                builder:AnchorToBottom(self.Rows[slot - 1], 0)
-            end
-            builder:End()
-        end
     end,
 
-    --- Shows the active slots (1..count) and hides the rest.
+    --- The (scaled) height the slot area wants: the header plus the active layout's row block. The
+    --- composition root binds the slot area's height to this (it reads SlotCount, so it re-fires as
+    --- the lobby fills/empties).
     ---@param self UICustomLobbySlotsInterface
-    ---@param count number
-    OnSlotCountChanged = function(self, count)
-        for slot = 1, CustomLobbyLaunchModel.MaxSlots do
-            if slot <= count then
-                self.Rows[slot]:Show()
-            else
-                self.Rows[slot]:Hide()
-            end
-        end
+    ---@return number
+    PreferredHeight = function(self)
+        local count = CustomLobbySessionModel.GetSingleton().SlotCount()
+        return LayoutHelpers.ScaleNumber(HeaderHeight) + CustomLobbyOneColumnSlots.HeightForCount(math.max(count, 1))
     end,
 
     ---------------------------------------------------------------------------
     --#region Slot drag coordination (UICustomLobbySlotCoordinator)
     --
     -- A drop resolves to the RequestSwapSlots intent, host-authoritative; the state here is purely
-    -- visual.
+    -- visual. Rows belong to the active layout body, reached via `self.Body.Rows`.
 
     --- Only the host can drag, and only a slot that holds a player (you grab a token).
     ---@param self UICustomLobbySlotsInterface
@@ -148,7 +118,7 @@ local CustomLobbySlotsInterface = Class(Group) {
     SlotIndexAt = function(self, x, y)
         local count = CustomLobbySessionModel.GetSingleton().SlotCount()
         for slot = 1, count do
-            local row = self.Rows[slot]
+            local row = self.Body.Rows[slot]
             if row and x >= row.Left() and x <= row.Right() and y >= row.Top() and y <= row.Bottom() then
                 return slot
             end
@@ -201,12 +171,12 @@ local CustomLobbySlotsInterface = Class(Group) {
         if self.HighlightedSlot == slot then
             return
         end
-        if self.HighlightedSlot and self.Rows[self.HighlightedSlot] then
-            self.Rows[self.HighlightedSlot]:SetDropHighlight(false)
+        if self.HighlightedSlot and self.Body.Rows[self.HighlightedSlot] then
+            self.Body.Rows[self.HighlightedSlot]:SetDropHighlight(false)
         end
         self.HighlightedSlot = slot
-        if slot and self.Rows[slot] then
-            self.Rows[slot]:SetDropHighlight(true)
+        if slot and self.Body.Rows[slot] then
+            self.Body.Rows[slot]:SetDropHighlight(true)
         end
     end,
 
@@ -243,15 +213,6 @@ local CustomLobbySlotsInterface = Class(Group) {
         self.Trash:Destroy()
     end,
 }
-
---- The (scaled) height needed to show `count` slot rows plus the header — the composition root sizes
---- the slot area with this so the rows fit exactly and the panel below floats up.
----@param count number
----@return number
-HeightForSlots = function(count)
-    local rows = math.max(count or 0, 1)
-    return LayoutHelpers.ScaleNumber(HeaderHeight) + rows * LayoutHelpers.ScaleNumber(SlotHeight)
-end
 
 ---@param parent Control
 ---@return UICustomLobbySlotsInterface

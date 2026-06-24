@@ -20,10 +20,26 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
--- A single slot row. Subscribes to its own slot LazyVar (`model.Players[slot]`) and
--- renders it; a change to one slot re-fires only this row. Read-only for now —
--- interactive controls (faction/colour/team/ready) call controller intents in a
--- later slice. See /lua/ui/lobby/TARGET_ARCHITECTURE.md § 6.
+-- The behaviour of a single slot, shared by every presentation (the thin CustomLobbySlotRow and the
+-- fat CustomLobbySlotCard). It owns *everything except the visible widgets and their layout*:
+--
+--   * the model subscription (`model.Players[slot]`) + the CPU-benchmark subscription,
+--   * the CPU-cap math (most-played category, +0 unit count, green→red headroom step),
+--   * the click / right-click / drag-to-swap gesture handling and the controller intents,
+--   * the layout-agnostic overlays (background, drop highlight, the full-row click catcher).
+--
+-- A presentation subclasses this (`Class(import(...).SlotBase) { ... }`) and implements four hooks:
+--
+--   CreateContents(self)        build the visible widgets (+ the CPU hover zone, wired to
+--                               `self:HandleCpuHoverEvent`); called from this base's `__init`.
+--   LayoutContents(self)        lay them out; called from this base's `__post_init`.
+--   RenderPlayer(self, view)    paint a player (or the empty state when `view` is nil) — `view` is a
+--                               normalised table { colorHex, name, nameColor, faction, team, ready,
+--                               readyColor } so all the formatting stays here, in one place.
+--   RenderCpu(self, view)       paint the CPU column (or clear it when `view` is nil) — `view` is
+--                               { text, textColor, indicatorColor?, showIndicator }.
+--
+-- This keeps the drag/CPU/intent logic single-sourced; the presentations are pure arrangement.
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
@@ -122,28 +138,36 @@ local DragThreshold = 5
 ---@field OnSlotDrop fun(self: UICustomLobbySlotCoordinator, source: number, x: number, y: number)
 ---@field OnSlotDragEnd fun(self: UICustomLobbySlotCoordinator)
 
----@class UICustomLobbySlotInterface : Group
+--- A presentation-supplied view of a seated player (nil = the empty state).
+---@class UICustomLobbySlotPlayerView
+---@field colorHex string
+---@field name string
+---@field nameColor string
+---@field faction string
+---@field team string
+---@field ready string
+---@field readyColor string
+
+--- A presentation-supplied view of the CPU column (nil = no data, clear it).
+---@class UICustomLobbySlotCpuView
+---@field text string
+---@field textColor string
+---@field indicatorColor? Color
+---@field showIndicator boolean
+
+---@class UICustomLobbySlotBase : Group
 ---@field Trash TrashBag
 ---@field SlotIndex number
 ---@field Coordinator UICustomLobbySlotCoordinator
 ---@field Background Bitmap
 ---@field DropHighlight Bitmap
 ---@field ClickArea Bitmap
----@field CpuHover Bitmap
----@field SlotNumber Text
----@field ColorSwatch Bitmap
----@field Name Text
----@field Faction Text
----@field Cpu Text
----@field CpuIndicator Bitmap
----@field Team Text
----@field Ready Text
 ---@field PlayerObserver LazyVar
 ---@field CpuObserver LazyVar
 ---@field CurrentPlayer UICustomLobbyPlayer | false
-local CustomLobbySlotInterface = Class(Group) {
+local CustomLobbySlotBase = Class(Group) {
 
-    ---@param self UICustomLobbySlotInterface
+    ---@param self UICustomLobbySlotBase
     ---@param parent Control
     ---@param slotIndex number
     ---@param coordinator UICustomLobbySlotCoordinator
@@ -165,23 +189,7 @@ local CustomLobbySlotInterface = Class(Group) {
         self.DropHighlight:SetAlpha(0.0)
         self.DropHighlight:DisableHitTest()
 
-        self.SlotNumber = UIUtil.CreateText(self, tostring(slotIndex), 14, UIUtil.bodyFont)
-        self.ColorSwatch = Bitmap(self)
-        self.ColorSwatch:SetSolidColor('00000000')
-        self.Name = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
-        self.Faction = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
-        self.Cpu = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
-        -- a small square left of the CPU label: green when the machine sustains the
-        -- recommended unit cap at full speed, fading to red the more the sim must slow
-        self.CpuIndicator = Bitmap(self)
-        self.CpuIndicator:SetSolidColor('ff7ad97a')
-        self.CpuIndicator:SetAlpha(0.0)
-        self.CpuIndicator:DisableHitTest()
-        self.Team = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
-        self.Ready = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
-
-        -- transparent overlay that catches clicks on the whole row; for now a click
-        -- on your own slot toggles ready (the one interactive message this far)
+        -- transparent overlay that catches clicks on the whole row (take / ready / context / drag)
         self.ClickArea = Bitmap(self)
         self.ClickArea:SetSolidColor('00000000')
         self.ClickArea.HandleEvent = function(control, event)
@@ -196,26 +204,8 @@ local CustomLobbySlotInterface = Class(Group) {
             return false
         end
 
-        -- a hover zone over the CPU score; entering it pops the performance chart
-        self.CpuHover = Bitmap(self)
-        self.CpuHover:SetSolidColor('00000000')
-        self.CpuHover.HandleEvent = function(control, event)
-            if event.Type == 'MouseEnter' then
-                self:OnCpuHoverEnter()
-                return true
-            elseif event.Type == 'MouseExit' then
-                CustomLobbyPerformancePopover.Hide()
-                return true
-            elseif event.Type == 'ButtonPress' then
-                if event.Modifiers.Right then
-                    self:OnRowContext(event)
-                else
-                    self:OnRowPress(event)
-                end
-                return true
-            end
-            return false
-        end
+        -- the presentation builds its visible widgets (+ the CPU hover zone)
+        self:CreateContents()
 
         local model = CustomLobbyLaunchModel.GetSingleton()
         self.PlayerObserver = self.Trash:Add(
@@ -232,63 +222,78 @@ local CustomLobbySlotInterface = Class(Group) {
             end))
     end,
 
-    ---@param self UICustomLobbySlotInterface
+    ---@param self UICustomLobbySlotBase
     ---@param parent Control
     __post_init = function(self, parent)
         Layouter(self.Background):Fill(self):End()
         Layouter(self.DropHighlight):Fill(self):End()
         Layouter(self.ClickArea):Fill(self):Over(self, 10):End()
-        Layouter(self.CpuHover):Fill(self.Cpu):Over(self, 20):End()
 
-        Layouter(self.SlotNumber):AtLeftIn(self, 6):AtVerticalCenterIn(self):End()
-        Layouter(self.ColorSwatch):AnchorToRight(self.SlotNumber, 8):AtVerticalCenterIn(self):Width(14):Height(14):End()
-        Layouter(self.Name):AnchorToRight(self.ColorSwatch, 8):AtVerticalCenterIn(self):End()
-        Layouter(self.Ready):AtRightIn(self, 8):AtVerticalCenterIn(self):End()
-        Layouter(self.Team):AnchorToLeft(self.Ready, 12):AtVerticalCenterIn(self):End()
-        Layouter(self.Cpu):AnchorToLeft(self.Team, 12):AtVerticalCenterIn(self):End()
-        Layouter(self.CpuIndicator):AnchorToLeft(self.Cpu, 5):AtVerticalCenterIn(self):Width(8):Height(12):End()
-        Layouter(self.Faction):AnchorToLeft(self.CpuIndicator, 10):AtVerticalCenterIn(self):End()
+        -- the presentation lays out its widgets (its CPU hover zone sits above ClickArea, Over 20)
+        self:LayoutContents()
     end,
 
-    --- Renders the slot from its player (or the empty state).
-    ---@param self UICustomLobbySlotInterface
+    ---------------------------------------------------------------------------
+    --#region Presentation hooks (implemented by the subclass)
+
+    --- Builds the visible widgets + the CPU hover zone (wired to `self:HandleCpuHoverEvent`).
+    ---@param self UICustomLobbySlotBase
+    CreateContents = function(self)
+    end,
+
+    --- Lays out the widgets built in CreateContents.
+    ---@param self UICustomLobbySlotBase
+    LayoutContents = function(self)
+    end,
+
+    --- Paints a player, or the empty state when `view` is nil.
+    ---@param self UICustomLobbySlotBase
+    ---@param view UICustomLobbySlotPlayerView | nil
+    RenderPlayer = function(self, view)
+    end,
+
+    --- Paints the CPU column, or clears it when `view` is nil.
+    ---@param self UICustomLobbySlotBase
+    ---@param view UICustomLobbySlotCpuView | nil
+    RenderCpu = function(self, view)
+    end,
+
+    --#endregion
+
+    ---------------------------------------------------------------------------
+    --#region Rendering (computes the view, defers painting to the hooks)
+
+    --- Normalises the slot's player into a view and hands it to the presentation.
+    ---@param self UICustomLobbySlotBase
     ---@param player UICustomLobbyPlayer | false
     OnPlayerChanged = function(self, player)
         self.CurrentPlayer = player
         self:RefreshCpu()
 
         if not player then
-            self.ColorSwatch:SetSolidColor('00000000')
-            self.Name:SetText("- open -")
-            self.Name:SetColor('ff888888')
-            self.Faction:SetText("")
-            self.Team:SetText("")
-            self.Ready:SetText("")
+            self:RenderPlayer(nil)
             return
         end
 
-        local colorHex = GameColors.PlayerColors[player.PlayerColor] or 'ffffffff'
-        self.ColorSwatch:SetSolidColor(colorHex)
-
-        self.Name:SetText(player.PlayerName or "?")
-        self.Name:SetColor(player.Human and 'ffffffff' or 'ffd9c97a')
-
-        self.Faction:SetText(FactionLabel(player.Faction))
-        self.Team:SetText(player.Team and player.Team > 1 and ("T" .. (player.Team - 1)) or "-")
-        self.Ready:SetText(player.Ready and "ready" or "")
-        self.Ready:SetColor(player.Ready and 'ff7ad97a' or 'ff888888')
+        self:RenderPlayer({
+            colorHex = GameColors.PlayerColors[player.PlayerColor] or 'ffffffff',
+            name = player.PlayerName or "?",
+            nameColor = player.Human and 'ffffffff' or 'ffd9c97a',
+            faction = FactionLabel(player.Faction),
+            team = (player.Team and player.Team > 1) and ("T" .. (player.Team - 1)) or "-",
+            ready = player.Ready and "ready" or "",
+            readyColor = player.Ready and 'ff7ad97a' or 'ff888888',
+        })
     end,
 
-    --- Renders the CPU column from this slot player's shared sim-performance benchmark:
-    --- the label is the max units the machine handled at full speed (+0), and the square
-    --- is green if that already covers the recommended cap, fading to red the further the
-    --- sim has to slow down (down to -4) to reach it.
-    ---@param self UICustomLobbySlotInterface
+    --- Computes the CPU view from this slot player's shared sim-performance benchmark: the label is
+    --- the max units the machine handled at full speed (+0), and the indicator is green if that
+    --- already covers the recommended cap, fading to red the further the sim must slow (down to -4).
+    ---@param self UICustomLobbySlotBase
     RefreshCpu = function(self)
         local player = self.CurrentPlayer
         if not player then
-            self.Cpu:SetText("")
-            self.CpuIndicator:SetAlpha(0.0)
+            self:RenderCpu(nil)
             return
         end
 
@@ -296,42 +301,66 @@ local CustomLobbySlotInterface = Class(Group) {
         local category = PickCategory(metrics)
         local atZero = category and category[BucketForRate(0)]
         if not (atZero and atZero.UnitCount) then
-            self.Cpu:SetText("—")
-            self.Cpu:SetColor('ff9aa0a8')
-            self.CpuIndicator:SetAlpha(0.0)
+            self:RenderCpu({ text = "—", textColor = 'ff9aa0a8', showIndicator = false })
             return
         end
 
         local maxAtZero = atZero.UnitCount.Max or 0
-        self.Cpu:SetText(FormatUnits(maxAtZero))
-        self.Cpu:SetColor('ff9aa0a8')
+        local view = { text = FormatUnits(maxAtZero), textColor = 'ff9aa0a8', showIndicator = false }
 
         local cap = CustomLobbyRules.RecommendedUnitCap()
-        if not cap or cap <= 0 then
-            self.CpuIndicator:SetAlpha(0.0)
-            return
-        end
-
-        -- how many sim-rate steps below +0 are needed before the machine sustains the
-        -- cap (0 = fine at +0); worst case (red) if even -4 falls short
-        local step = 0
-        if maxAtZero < cap then
-            step = 4
-            for s = 1, 4 do
-                local bucket = category[BucketForRate(-s)]
-                if bucket and bucket.UnitCount and (bucket.UnitCount.Max or 0) >= cap then
-                    step = s
-                    break
+        if cap and cap > 0 then
+            -- how many sim-rate steps below +0 are needed before the machine sustains the
+            -- cap (0 = fine at +0); worst case (red) if even -4 falls short
+            local step = 0
+            if maxAtZero < cap then
+                step = 4
+                for s = 1, 4 do
+                    local bucket = category[BucketForRate(-s)]
+                    if bucket and bucket.UnitCount and (bucket.UnitCount.Max or 0) >= cap then
+                        step = s
+                        break
+                    end
                 end
             end
+            view.indicatorColor = StepColor(step)
+            view.showIndicator = true
         end
 
-        self.CpuIndicator:SetSolidColor(StepColor(step))
-        self.CpuIndicator:SetAlpha(1.0)
+        self:RenderCpu(view)
     end,
 
-    --- Mouse entered the CPU score: show this player's sim-performance popover.
-    ---@param self UICustomLobbySlotInterface
+    --#endregion
+
+    ---------------------------------------------------------------------------
+    --#region Interaction
+
+    --- Routes the CPU hover zone's events: enter shows the popover, exit hides it, a press is a
+    --- click / context like the rest of the row. The presentation attaches this to its hover bitmap.
+    ---@param self UICustomLobbySlotBase
+    ---@param event KeyEvent
+    ---@return boolean
+    HandleCpuHoverEvent = function(self, event)
+        if event.Type == 'MouseEnter' then
+            self:OnCpuHoverEnter()
+            return true
+        elseif event.Type == 'MouseExit' then
+            CustomLobbyPerformancePopover.Hide()
+            return true
+        elseif event.Type == 'ButtonPress' then
+            if event.Modifiers.Right then
+                self:OnRowContext(event)
+            else
+                self:OnRowPress(event)
+            end
+            return true
+        end
+        return false
+    end,
+
+    --- Mouse entered the CPU score: show this player's sim-performance popover. The presentation
+    --- passes the control to anchor the popover to (its CPU label).
+    ---@param self UICustomLobbySlotBase
     OnCpuHoverEnter = function(self)
         local player = self.CurrentPlayer
         if not player then
@@ -339,12 +368,20 @@ local CustomLobbySlotInterface = Class(Group) {
             return
         end
         local benchmark = CustomLobbyLocalModel.GetSingleton().CpuBenchmarks()[player.OwnerID]
-        CustomLobbyPerformancePopover.Show(self.Cpu, benchmark, CustomLobbyRules.RecommendedUnitCap())
+        CustomLobbyPerformancePopover.Show(self:CpuAnchor(), benchmark, CustomLobbyRules.RecommendedUnitCap())
+    end,
+
+    --- The control the performance popover anchors to (the CPU label). Overridable; defaults to the
+    --- whole row if a presentation has no dedicated CPU control.
+    ---@param self UICustomLobbySlotBase
+    ---@return Control
+    CpuAnchor = function(self)
+        return self.Cpu or self
     end,
 
     --- A press on the row: if the coordinator allows dragging this slot (host, holding
     --- a player) start a drag-to-swap; otherwise it's a plain click.
-    ---@param self UICustomLobbySlotInterface
+    ---@param self UICustomLobbySlotBase
     ---@param event KeyEvent
     OnRowPress = function(self, event)
         if self.Coordinator and self.Coordinator:CanDrag(self.SlotIndex) then
@@ -356,7 +393,7 @@ local CustomLobbySlotInterface = Class(Group) {
 
     --- Right-click: open this slot's context menu (entries depend on lobby state —
     --- see CustomLobbyMenus). Empty menus simply don't show.
-    ---@param self UICustomLobbySlotInterface
+    ---@param self UICustomLobbySlotBase
     ---@param event KeyEvent
     OnRowContext = function(self, event)
         CustomLobbyPerformancePopover.Hide()
@@ -367,7 +404,7 @@ local CustomLobbySlotInterface = Class(Group) {
     --- travels past DragThreshold — under it, the release is treated as a click, so
     --- take/ready still work. Movement + drop are routed to the coordinator (it owns
     --- the hit-test across rows); a drop resolves to RequestSwapSlots.
-    ---@param self UICustomLobbySlotInterface
+    ---@param self UICustomLobbySlotBase
     ---@param event KeyEvent
     BeginDrag = function(self, event)
         -- the press may have started on the CPU hover zone; the captured mouse won't
@@ -405,7 +442,7 @@ local CustomLobbySlotInterface = Class(Group) {
     end,
 
     --- Toggles the drop-target highlight (called by the coordinator during a drag).
-    ---@param self UICustomLobbySlotInterface
+    ---@param self UICustomLobbySlotBase
     ---@param on boolean
     SetDropHighlight = function(self, on)
         self.DropHighlight:SetAlpha(on and 0.15 or 0.0)
@@ -413,7 +450,7 @@ local CustomLobbySlotInterface = Class(Group) {
 
     --- Click on the row (a controller intent — the host applies and broadcasts it):
     --- an open slot is taken by the local player; your own slot toggles ready.
-    ---@param self UICustomLobbySlotInterface
+    ---@param self UICustomLobbySlotBase
     OnClicked = function(self)
         local player = self.CurrentPlayer
         if not player then
@@ -425,16 +462,13 @@ local CustomLobbySlotInterface = Class(Group) {
         end
     end,
 
-    ---@param self UICustomLobbySlotInterface
+    --#endregion
+
+    ---@param self UICustomLobbySlotBase
     OnDestroy = function(self)
         self.Trash:Destroy()
     end,
 }
 
----@param parent Control
----@param slotIndex number
----@param coordinator UICustomLobbySlotCoordinator
----@return UICustomLobbySlotInterface
-Create = function(parent, slotIndex, coordinator)
-    return CustomLobbySlotInterface(parent, slotIndex, coordinator)
-end
+-- exported for the presentations to subclass (`Class(import(...).SlotBase) { ... }`)
+SlotBase = CustomLobbySlotBase
