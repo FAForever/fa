@@ -75,7 +75,7 @@ end
 ---@class UICustomLobbyTwoColumnSlots : Group
 ---@field Trash TrashBag
 ---@field Coordinator UICustomLobbySlotCoordinator
----@field Rows UICustomLobbySlotBase[]
+---@field Rows UICustomLobbySlotCard[]
 ---@field TeamScore UICustomLobbyTeamScore   # the side indicator strip atop the columns
 ---@field Columns Group[]                    # [1] = side A container, [2] = side B
 ---@field Ready boolean
@@ -148,6 +148,7 @@ local CustomLobbyTwoColumnSlots = Class(Group) {
             local prev = nil
             for _, slot in cols[column] do
                 local card = self.Rows[slot]
+                card:SetMirrored(column == 2)   -- the right column faces inward (mirrored)
                 local builder = Layouter(card):AtLeftIn(self.Columns[column]):AtRightIn(self.Columns[column]):Height(CardHeight)
                 if not prev then
                     builder:AtTopIn(self.Columns[column])
