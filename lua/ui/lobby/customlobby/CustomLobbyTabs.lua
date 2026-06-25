@@ -335,7 +335,6 @@ local CustomLobbyTabs = ClassUI(Group) {
             badge.Text = UIUtil.CreateText(badge, "", 11, UIUtil.bodyFont)
             badge.Text:SetColor(BadgeTextColor)
             badge.Text:DisableHitTest()
-            badge:Hide()
             button.Badge = badge
 
             -- the badge Derive fires synchronously on creation (before TabButtons[index] is set),
@@ -394,35 +393,35 @@ local CustomLobbyTabs = ClassUI(Group) {
         end
     end,
 
-    --- Updates a count pill from its Badge LazyVar: shows the pill with `text`, or hides it (and
-    --- clears the text so the cluster re-centres on the bare label) when empty. Private.
+    --- Updates a count pill from its Badge LazyVar by setting its text. An empty string collapses
+    --- the pill to width 0 (its `Width` binding returns 0 when the text has no width), so the cluster
+    --- re-centres on the bare label and the grey `Bg` paints nothing.
+    ---
+    --- Drives *only* the text, never `Hide()`/`Show()`: the badge is often empty at construction
+    --- (the model populates after) and a control hidden before it is laid out doesn't reliably come
+    --- back on `Show()` — the hide-before-layout gotcha (see SetActionVisible / /lua/ui/CLAUDE.md).
+    --- Private.
     ---@param self UICustomLobbyTabs
     ---@param badge UICustomLobbyTabBadge
     ---@param text string
     SetBadge = function(self, badge, text)
-        if text == "" then
-            badge.Text:SetText("")
-            badge:Hide()
-        else
-            badge.Text:SetText(text)
-            badge:Show()
-        end
+        badge.Text:SetText(text)
     end,
 
-    --- Shows or hides an action button. Hiding sets its width to 0 so the label/pill cluster
-    --- re-centres as if the action weren't there (used to drop a host-only action for clients).
-    --- Private.
+    --- Shows or hides an action button by collapsing its width to 0 (the label/pill cluster then
+    --- re-centres as if the action weren't there) — used to drop a host-only action for clients.
+    ---
+    --- Deliberately drives *only* the width, never `Hide()`/`Show()`: this derive fires once at
+    --- construction (in a real lobby `IsHost` is still false then, before `__post_init` lays the
+    --- button out) and again when `IsHost` flips true. A `Button` hidden before it is laid out does
+    --- not reliably come back on `Show()` (the Hide/Show-before-layout gotcha — see /lua/ui/CLAUDE.md),
+    --- so the gear stayed invisible for the host. A 0-width button renders nothing and can't be
+    --- clicked, so width alone is a complete collapse. Private.
     ---@param self UICustomLobbyTabs
     ---@param action Control
     ---@param shown boolean
     SetActionVisible = function(self, action, shown)
-        if shown then
-            action:Show()
-            action.Width:Set(LayoutHelpers.ScaleNumber(ActionSize))
-        else
-            action:Hide()
-            action.Width:Set(0)
-        end
+        action.Width:Set(shown and LayoutHelpers.ScaleNumber(ActionSize) or 0)
     end,
 
     ---@param self UICustomLobbyTabs

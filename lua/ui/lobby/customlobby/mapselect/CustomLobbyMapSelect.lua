@@ -620,8 +620,9 @@ local CustomLobbyMapSelect = ClassUI(Group) {
 
         -- the description's left/right are fixed here so its Width can be bound in Initialize (the
         -- TextArea reflows on the Width bind, which reads Left/Right); top/bottom set by LayoutSections
-        Layouter(self.Description):AtLeftIn(self.PreviewArea, 6):AtRightIn(self.PreviewArea, 24):End()
+        Layouter(self.Description):AtLeftIn(self.PreviewArea, 6):AtRightIn(self.PreviewArea, 32):End()
         self.DescriptionScrollbar = UIUtil.CreateVertScrollbarFor(self.Description)
+        UIUtil.ForwardWheelToScroll(self.Description, self.Description)
         --#endregion
 
         --#region actions

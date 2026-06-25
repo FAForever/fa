@@ -67,7 +67,7 @@ local ActionHeight = 48
 
 -- three equal columns spanning the inner width, each reserving room on its right for a scrollbar
 local ColTotalWidth = math.floor((DialogWidth - 2 * Pad - 2 * ColGap) / 3)
-local ColContentWidth = ColTotalWidth - 20
+local ColContentWidth = ColTotalWidth - 32   -- reserve the standard 32px scrollbar gutter
 
 local PrefsKey = "customlobby_optionselect"
 

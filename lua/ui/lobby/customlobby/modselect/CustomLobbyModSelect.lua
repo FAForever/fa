@@ -513,11 +513,13 @@ local CustomLobbyModSelect = ClassUI(Group) {
             :End()
         Layouter(self.DetailsLabel):AtLeftIn(self.PreviewArea, 6):AnchorToTop(self.DetailsText, 2):End()
         self.DetailsScrollbar = UIUtil.CreateVertScrollbarFor(self.DetailsText)
+        UIUtil.ForwardWheelToScroll(self.DetailsText, self.DetailsText)
 
         -- Description: left/right + height fixed here (width is bound in Initialize); its top + the
         -- Author section above it are placed by LayoutDetail so Author can collapse when absent
         Layouter(self.Description):AtLeftIn(self.PreviewArea, 6):AtRightIn(self.PreviewArea, 32):Height(120):End()
         self.DescriptionScrollbar = UIUtil.CreateVertScrollbarFor(self.Description)
+        UIUtil.ForwardWheelToScroll(self.Description, self.Description)
 
         -- Dependencies: fills the gap between the description and the details block; scrolls
         Layouter(self.DepsLabel):AtLeftIn(self.PreviewArea, 6):AnchorToBottom(self.Description, 10):End()
@@ -526,6 +528,7 @@ local CustomLobbyModSelect = ClassUI(Group) {
             :AnchorToBottom(self.DepsLabel, 4):AnchorToTop(self.DetailsLabel, 8)
             :End()
         self.DepsScrollbar = UIUtil.CreateVertScrollbarFor(self.DepsText)
+        UIUtil.ForwardWheelToScroll(self.DepsText, self.DepsText)
         --#endregion
 
         --#region actions

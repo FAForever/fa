@@ -48,7 +48,7 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 
 local HeaderHeight = 24
 local RowHeight = 30
-local ScrollbarGap = 20      -- space reserved on the column's right for the scrollbar
+local ScrollbarGap = 32      -- space reserved on the column's right for the scrollbar (standard lobby gutter)
 local ComboWidth = 116
 local MarkerWidth = 14
 
@@ -143,6 +143,7 @@ local CustomLobbyOptionColumn = ClassUI(Group) {
             return
         end
         self.Scrollbar = UIUtil.CreateVertScrollbarFor(self.Grid)
+        UIUtil.ForwardWheelToScroll(self.Grid, self.Grid)
     end,
 
     --- Rebuilds the visible rows applying the search + hide-defaults filter, updates the count and

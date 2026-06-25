@@ -980,6 +980,31 @@ function CreateLobbyVertScrollbar(attachto, offset_right, offset_bottom, offset_
     return CreateVertScrollbarFor(attachto, offset_right, "/SCROLLBAR_VERT/", offset_bottom, offset_top)
 end
 
+--- Makes the mouse wheel scroll a region when the cursor is over its **content**, not just over the
+--- scrollbar (the engine only routes wheel events to the bar itself). Forwards `WheelRotation` on
+--- `control` to `scrollable:ScrollLines` — `scrollable` is whatever the scrollbar drives (a `Grid`,
+--- `ItemList`, `TextArea`, or a custom control implementing `ScrollLines(axis, delta)`); usually the
+--- same control. Chains any existing `HandleEvent` so it is safe to add on top of click handling.
+---@param control Control          # the control whose wheel events to capture (the content / its container)
+---@param scrollable Control       # the scrollable the scrollbar drives (often `control` itself)
+---@param linesPerNotch? number    # lines to scroll per wheel notch (default 3)
+function ForwardWheelToScroll(control, scrollable, linesPerNotch)
+    linesPerNotch = linesPerNotch or 3
+    local previous = control.HandleEvent
+    control.HandleEvent = function(c, event)
+        if event.Type == 'WheelRotation' then
+            -- pass the explicit "Vert" axis: the native Grid indexes its state by axis (a nil axis
+            -- errors in grid.lua); single-axis scrollables ignore the argument
+            scrollable:ScrollLines("Vert", event.WheelRotation > 0 and -linesPerNotch or linesPerNotch)
+            return true
+        end
+        if previous then
+            return previous(c, event)
+        end
+        return false
+    end
+end
+
 -- cause a dialog to get input focus, optional functions to perform when the user hits enter or escape
 -- functions signature is: function()
 function MakeInputModal(control, onEnterFunc, onEscFunc)

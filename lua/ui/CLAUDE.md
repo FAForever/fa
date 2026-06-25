@@ -224,6 +224,30 @@ self.SomeLine.Top:Set(scaled(20))
 
 If you find yourself reaching for `ScaleNumber` a lot, that's usually a sign you should be using `Layouter` instead.
 
+### Scrollbars — reserve the gutter on the content, not the bar
+
+`UIUtil.CreateVertScrollbarFor(content, offset_right)` sets `bar.Left = content.Right + offset_right` (`AnchorToRight`). The convention here: **inset the content's right edge by the gutter and attach the bar at offset 0** — the bar then sits in that reserved strip.
+
+```lua
+Layouter(self.Content):AtLeftIn(self, 6):AtRightIn(self, 32):End()  -- 32px gutter on the right
+self.Scrollbar = UIUtil.CreateVertScrollbarFor(self.Content)        -- offset 0 → bar sits in it
+```
+
+The standard gutter is **32px** (`/lua/ui/lobby/customlobby` is aligned to this). For a fixed-width grid the same reservation goes into the width math (`width = panelW - leftInset - 32`); right-aligned cell content (a value dropdown) then clears the bar automatically.
+
+- **Don't double-reserve.** Use *either* a content inset *or* a negative `offset_right` (e.g. `-32` on a full-width control), never both — combined they push the bar over the content.
+- **Pooled/virtualised lists** that attach the bar to themselves (`CreateVertScrollbarFor(self)`, rows full-width) put the bar just *outside* the list's right edge instead — a deliberate different idiom; a negative `offset_right` is the only way to inset those.
+- **TextArea**: bind `Width` in `Initialize` (post-mount), not `__post_init` — see the TextArea gotcha in the lobby CLAUDE.md.
+
+**The wheel only scrolls over the bar by default.** The engine routes `WheelRotation` to the scrollbar itself, so spinning the wheel over the *content* does nothing unless the content forwards it. Use `UIUtil.ForwardWheelToScroll(content, scrollable)` (chains any existing `HandleEvent`) right after creating the bar:
+
+```lua
+self.Scrollbar = UIUtil.CreateVertScrollbarFor(self.Grid)
+UIUtil.ForwardWheelToScroll(self.Grid, self.Grid)   -- wheel over the rows now scrolls too
+```
+
+It forwards with the explicit `"Vert"` axis: a native `Grid` indexes its scroll state by axis (a `nil` axis errors in [grid.lua](../maui/grid.lua) `ScrollLines`); single-axis scrollables (`ItemList`/`TextArea`, custom lists) ignore the argument. Wheel events bubble from rows/cells to the parent `Grid`/`ItemList`, so attaching to the scrollable itself is enough — and a child that consumes the wheel (e.g. a `Combo` adjusting its value) still wins, which is what you want.
+
 ### Reusing layout files
 
 `LayoutHelpers.*RelativeTo` reads positions from a layout `.lua` table — used by older skinned screens. New code generally prefers fluent anchors against siblings; reach for layout files only when matching an existing skinned design.

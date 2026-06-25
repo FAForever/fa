@@ -44,7 +44,7 @@ local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
 local RowHeight = 22
-local ScrollGap = 18
+local ScrollGap = 32       -- standard lobby scrollbar gutter (see ModSelect)
 local GridContentWidth = 360 - 6 - ScrollGap
 local LabelMaxChars = 30
 local NormalColor = 'ffc8ccd0'
@@ -109,6 +109,7 @@ local CustomLobbyModsPanel = ClassUI(Group) {
     Initialize = function(self)
         self.Ready = true
         self.Scrollbar = UIUtil.CreateVertScrollbarFor(self.ModsGrid)
+        UIUtil.ForwardWheelToScroll(self.ModsGrid, self.ModsGrid)
         self:Refresh()
     end,
 
