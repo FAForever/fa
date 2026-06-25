@@ -1,6 +1,6 @@
 # Preset select
 
-The custom lobby's **setup-presets dialog** — named full-setup snapshots (map / options / mods /
+The custom lobby's **setup-presets dialog** — named setup snapshots (map / options / mods /
 restrictions) the host can Load / Save / Rename / Delete. The customlobby-native rebuild of the
 legacy [`/lua/ui/lobby/presets.lua`](../../presets.lua) dialog (which keyed `LobbyPresets`), built
 to the same shape as the [`../mapselect/`](../mapselect/CLAUDE.md) / [`../modselect/`](../modselect/CLAUDE.md)
@@ -34,12 +34,12 @@ intents.
   `ApplyGameSettings` → single `UpdateGame`.
 - **Delete / Rename** → straight to `CustomLobbyPresets` (host-local prefs; no sync).
 
-## Players & rehost are deferred (§ O)
+## Setup-only — no players (§ O)
 
-The snapshot **captures** players (trimmed: `PlayerName` + seating/faction/colour, no `OwnerID`/rating)
-and observers, but **`ApplySetup` does not reseat them** — restoring players/AIs needs infra the new
-lobby doesn't have yet (no AI-add, no per-player faction/colour/team intents — roadmap slice #3). The
-launch auto-saves the reserved `lastGame` preset (so the data is there), but the rehost **restore**
-(an in-lobby "Rehost last game" button + `/rehost` command-line detection at `CreateLobby`, matching
-the FAF client) is part of that later slice. `PlayerName` is stored as the stable key the future
-reseat will match returning humans on.
+A preset stores **only** the setup: scenario / game options / sim mods / restrictions. Players,
+observers and the (not-yet-applied) auto-teams / spawn-mex are **not** captured — a preset
+reconfigures a lobby, it doesn't restore a roster. The launch still auto-saves the reserved
+`lastGame` preset, so the *configuration* of the last game can be reapplied, but it carries no
+roster. The future rehost reseat (§ O.4 — reseat returning players, in-lobby "Rehost last game"
+button + `/rehost` detection at `CreateLobby`) is a separate slice that will need its **own** player
+capture, not these presets (and the missing AI-add / per-player slot intents — roadmap slice #3).

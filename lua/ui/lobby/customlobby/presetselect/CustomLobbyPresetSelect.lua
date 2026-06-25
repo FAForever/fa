@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
--- The setup-presets dialog: a host-only list of named full-setup snapshots (map / options / mods /
+-- The setup-presets dialog: a host-only list of named setup snapshots (map / options / mods /
 -- restrictions) you can Load / Save / Rename / Delete — the customlobby-native rebuild of the legacy
 -- `/lua/ui/lobby/presets.lua` dialog. Built to the map/mod-select shape (areas layout, three-phase
 -- init, Popup singleton).
@@ -29,10 +29,10 @@
 -- CustomLobbyPresets (pure prefs); applying a preset to the synced launch state is host-authoritative
 -- and goes through the controller intents (`RequestLoadSetupPreset` / `RequestSaveSetupPreset`).
 --
--- Scope note (§ O): a preset captures the *players* too, but loading does NOT reseat them yet —
--- restoring players/AIs needs infra the new lobby doesn't have (no AI-add, no per-player intents).
--- The reserved `lastGame` preset (auto-saved at launch) is shown as a pinned "Last game" entry; the
--- future rehost feature loads it. See ../CLAUDE.md.
+-- Scope note (§ O): a preset is **setup-only** — scenario / options / mods / restrictions. Players,
+-- observers and auto-teams / spawn-mex are not stored (a preset reconfigures a lobby, it doesn't
+-- restore a roster). The reserved `lastGame` preset (auto-saved at launch) is shown as a pinned
+-- "Last game" entry; the future rehost reseat needs its own roster capture. See ../CLAUDE.md.
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
@@ -51,10 +51,11 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 -- flip to tint each layout area so the regions are visible while iterating
 local Debug = false
 
--- five action buttons (Load / Save / Rename / Delete · Close) sit in one row; each `/BUTTON/small/`
--- is 152×40 unscaled (see /textures/texture-dimensions.csv), so the dialog is sized to hold
--- 5×152 + the inter-button gaps + padding without overlap.
-local DialogWidth = 820
+-- the five action buttons (Load / Save / Rename / Delete · Close) sit in one row, each a
+-- `/BUTTON/medium/` (132×44 unscaled — the same standard button the lobby's Leave/Launch use; the
+-- `/BUTTON/` tree isn't in texture-dimensions.csv, these dims are from the DDS headers). The dialog
+-- is sized to hold 5×132 + the inter-button gaps + padding without overlap.
+local DialogWidth = 720
 local DialogHeight = 470
 local Pad = 12
 local ColumnGap = 20
@@ -62,7 +63,7 @@ local ListWidth = 250
 local ScrollbarInset = 20
 local TitleHeight = 32
 local ButtonGap = 8
-local ActionHeight = 48
+local ActionHeight = 52
 
 local LabelColor = 'ffc8ccd0'
 
@@ -92,19 +93,6 @@ local function DisplayName(name)
     return name
 end
 
---- The number of seated players a snapshot captured.
----@param setup UICustomLobbySetupSnapshot
----@return number
-local function CountPlayers(setup)
-    local n = 0
-    for _, player in setup.Players or {} do
-        if player then
-            n = n + 1
-        end
-    end
-    return n
-end
-
 --- The map's display name for a snapshot, or "(none)" / the raw file when it can't be read.
 ---@param setup UICustomLobbySetupSnapshot
 ---@return string
@@ -130,7 +118,6 @@ local function FactsFor(setup)
         "Map:  " .. MapNameOf(setup),
         "Mods:  " .. table.getsize(setup.GameMods or {}),
         "Restrictions:  " .. table.getn(setup.Restrictions or {}),
-        "Players:  " .. CountPlayers(setup),
     }
 end
 
@@ -204,32 +191,32 @@ local CustomLobbyPresetSelect = ClassUI(Group) {
         --#endregion
 
         --#region actions
-        self.LoadButton = UIUtil.CreateButtonStd(self.ActionArea, '/BUTTON/small/', "<LOC _Load>Load", 14, 2)
+        self.LoadButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/medium/', "<LOC _Load>Load")
         self.LoadButton.OnClick = function(button, modifiers)
             self:LoadSelected()
         end
         Tooltip.AddControlTooltipManual(self.LoadButton, "Load preset",
             "Apply the selected preset's map, options, mods and restrictions to the lobby.")
 
-        self.SaveButton = UIUtil.CreateButtonStd(self.ActionArea, '/BUTTON/small/', "<LOC _Save>Save", 14, 2)
+        self.SaveButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/medium/', "<LOC _Save>Save")
         self.SaveButton.OnClick = function(button, modifiers)
             self:PromptSave()
         end
         Tooltip.AddControlTooltipManual(self.SaveButton, "Save preset", "Save the current lobby setup as a named preset.")
 
-        self.RenameButton = UIUtil.CreateButtonStd(self.ActionArea, '/BUTTON/small/', "Rename", 14, 2)
+        self.RenameButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/medium/', "Rename")
         self.RenameButton.OnClick = function(button, modifiers)
             self:PromptRename()
         end
         Tooltip.AddControlTooltipManual(self.RenameButton, "Rename preset", "Rename the selected preset.")
 
-        self.DeleteButton = UIUtil.CreateButtonStd(self.ActionArea, '/BUTTON/small/', "<LOC _Delete>Delete", 14, 2)
+        self.DeleteButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/medium/', "<LOC _Delete>Delete")
         self.DeleteButton.OnClick = function(button, modifiers)
             self:DeleteSelected()
         end
         Tooltip.AddControlTooltipManual(self.DeleteButton, "Delete preset", "Delete the selected preset.")
 
-        self.CloseButton = UIUtil.CreateButtonStd(self.ActionArea, '/BUTTON/small/', "<LOC _Close>Close", 14, 2)
+        self.CloseButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/medium/', "<LOC _Close>Close")
         self.CloseButton.OnClick = function(button, modifiers)
             self.OnCloseCb()
         end
@@ -266,7 +253,7 @@ local CustomLobbyPresetSelect = ClassUI(Group) {
         self.DetailList.Right:Set(function() return self.DetailArea.Right() - LayoutHelpers.ScaleNumber(ScrollbarInset) end)
         --#endregion
 
-        --#region actions: Load / Save / Rename / Delete on the left, Close on the right
+        --#region actions: Load / Save / Rename / Delete cluster on the left, Close on the right
         Layouter(self.LoadButton):AtLeftIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea):End()
         Layouter(self.SaveButton):AnchorToRight(self.LoadButton, ButtonGap):AtVerticalCenterIn(self.ActionArea):End()
         Layouter(self.RenameButton):AnchorToRight(self.SaveButton, ButtonGap):AtVerticalCenterIn(self.ActionArea):End()

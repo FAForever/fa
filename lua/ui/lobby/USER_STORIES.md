@@ -142,10 +142,10 @@ Roles: **Host**, **Player** (human in a slot), **Observer**, **Joining client**
 
 ## O. Presets & rehost
 
-- 🟡 As a **host**, I want to save the current setup (map, options, mods, restrictions, players) as a named preset, so that I can reuse it. *(Save/load of map, options, mods and restrictions works via the action-bar **Presets** dialog; players are captured in the snapshot but **not reseated on load yet** — that needs AI-add + per-player slot intents.)*
+- 🟡 As a **host**, I want to save the current setup (map, options, mods, restrictions, players) as a named preset, so that I can reuse it. *(Save/load of map, options, mods and restrictions works via the action-bar **Presets** dialog; presets are **setup-only by design** — players/observers are not stored.)*
 - ✅ As a **host**, I want to load/delete/rename presets, so that I can manage reusable configurations. *(The Presets dialog loads/deletes/renames; loading applies the setup host-authoritatively and reconciles options to the current map+mods.)*
-- 🟡 As a **system**, I want the last game auto-saved as a preset at launch, so that rehost can restore it. *(Launch auto-saves the reserved `lastGame` snapshot; the rehost **restore** (in-lobby button + `/rehost` arg) is deferred with player reseating.)*
-- ⬜ As a **host**, I want rehost to reseat returning players to their prior slots (displacing AIs/others as needed), so that a replay setup reconstitutes quickly. *(Blocked on AI-add + per-player slot intents; the `lastGame` snapshot stores player login names for the future match.)*
+- 🟡 As a **system**, I want the last game auto-saved as a preset at launch, so that rehost can restore it. *(Launch auto-saves the reserved `lastGame` setup; the rehost **restore** (in-lobby button + `/rehost` arg) is deferred. Note the auto-save carries no roster — reseating needs a separate player capture.)*
+- ⬜ As a **host**, I want rehost to reseat returning players to their prior slots (displacing AIs/others as needed), so that a replay setup reconstitutes quickly. *(Blocked on AI-add + per-player slot intents; also needs its own roster capture — setup presets deliberately don't store players.)*
 
 ## P. Lobby preferences (per user)
 

@@ -253,13 +253,18 @@ If you find yourself reaching for `ScaleNumber` a lot, that's usually a sign you
 ### Standard asset sizes — look them up, don't guess
 
 A `Button` (and most textured controls) sizes to its art by default, so the texture's width *is* the
-control width unless you override it. Don't eyeball these. Every texture's native (unscaled) pixel
-size is dumped in [`/textures/texture-dimensions.csv`](/textures/texture-dimensions.csv)
-(`RelativePath, Width, Height, Format`) — grep it for the resolved path. `SkinnableFile` maps
-`/BUTTON/` → `ui/common/widgets/`; `CreateButtonStd`/`CreateButtonWithDropshadow` append
-`_btn_{up,…}.dds`. Common standard buttons (unscaled W × H): `/BUTTON/large/` **392 × 92**,
-`/BUTTON/medium/` **276 × 72**, `/BUTTON/small/` **152 × 40**, `/scx_menu/small-btn/small`
-**200 × 72**, gear/close menu-btns **24 × 24**. Remember these are pre-scale — multiply by the UI scale.
+control width unless you override it. Don't eyeball these. Most textures' native (unscaled) sizes are
+dumped in [`/textures/texture-dimensions.csv`](/textures/texture-dimensions.csv)
+(`RelativePath, Width, Height, Format`) — grep it for the resolved path. **The `/BUTTON/` tree is not
+in that CSV**; read those from the DDS header instead (`od -An -t u4 -j 12 -N 8 <file>` → `height width`).
+`SkinnableFile` resolves `/BUTTON/`, `/scx_menu/`, `/dialogs/` to the active **faction** skin (`common`
+is only the fallback, and loads differently); `CreateButtonStd`/`CreateButtonWithDropshadow` append
+`_btn_{up,…}.dds`. Verified standard buttons (unscaled W × H): `/BUTTON/large/` **296 × 80**,
+`/BUTTON/medium/` **132 × 44** (these two are the lobby's Launch/Leave buttons — **there is no
+`/BUTTON/small/`**, referencing it makes the button invisible), `/scx_menu/small-btn/small` **200 × 72**
+(the map/mod dialogs' button), `/dialogs/close_btn/close` and gear menu-btns **24 × 24**. Don't confuse
+`/BUTTON/<size>/` with the separate `widgets/<size>_btn` family in the CSV (392/276/152 wide). Pre-scale —
+multiply by the UI scale.
 
 ### Scrollbars — reserve the gutter on the content, not the bar
 

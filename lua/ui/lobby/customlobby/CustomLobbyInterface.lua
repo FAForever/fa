@@ -252,7 +252,7 @@ local CustomLobbyInterface = Class(Group) {
             CustomLobbyController.RequestLaunch()
         end
 
-        -- host-only: save / load named full-setup presets (map, options, mods, restrictions)
+        -- host-only: save / load named setup presets (map, options, mods, restrictions)
         self.PresetsButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/medium/', "Presets")
         self.PresetsButton.OnClick = function(button, modifiers)
             CustomLobbyPresetSelect.Open(GetFrame(0))

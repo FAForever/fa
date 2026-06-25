@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
--- Named full-setup presets for the custom lobby — the customlobby-native rebuild of the legacy
+-- Named setup presets for the custom lobby — the customlobby-native rebuild of the legacy
 -- `/lua/ui/lobby/presets.lua` (which keyed `LobbyPresets`). Pure persistence: this module only
 -- reads and writes the prefs; it never touches the lobby models or the network. Capturing the
 -- current setup into a snapshot and applying a snapshot back are host-authoritative and live in
@@ -40,17 +40,14 @@ local PrefsKey = "customlobby_setup_presets"
 --- pinned "Last game" entry rather than a normal named preset.
 LastGamePresetName = "lastGame"
 
---- A serializable snapshot of the launch setup (written to disk). Players are captured for a future
---- rehost reseat but are not applied on a normal load (see the deferred slice in CLAUDE.md).
+--- A serializable snapshot of the launch setup (written to disk). **Setup-only** — players,
+--- observers and auto-teams / spawn-mex are deliberately not stored (a preset reconfigures a lobby,
+--- it doesn't restore a roster).
 ---@class UICustomLobbySetupSnapshot
 ---@field ScenarioFile FileName | false
 ---@field GameOptions  table                 # the host's option values, minus per-player Ratings/ClanTags
 ---@field GameMods      table<string, true>   # sim-mod uid set
 ---@field Restrictions  string[]              # unit-restriction preset keys
----@field AutoTeams     table<number, number> # best-effort (no host setter yet)
----@field SpawnMex      table<number, boolean># best-effort
----@field Players        table                # [slot] = trimmed player or false (captured, not yet applied)
----@field Observers      table                # trimmed observer list
 
 --- All saved presets, in creation order (the `lastGame` entry included).
 ---@return { Name: string, Setup: UICustomLobbySetupSnapshot }[]
