@@ -54,10 +54,14 @@ CustomLobbyInstance = Class(MohoLobbyMethods) {
         local message = CustomLobbyMessages[data.Type]
         if not message then
             WARN("CustomLobby: blocked broadcast of unknown message type " .. tostring(data.Type))
+            CustomLobbyLog.Broadcast(data, "unknown message type")
             return
         end
-        if not message.Validate(self, data) then
-            WARN("CustomLobby: blocked broadcast of malformed message " .. tostring(data.Type))
+        local ok, reason = message.Validate(self, data)
+        if not ok then
+            reason = reason or "malformed message"
+            WARN("CustomLobby: blocked broadcast of message " .. tostring(data.Type) .. " — " .. reason)
+            CustomLobbyLog.Broadcast(data, reason)
             return
         end
         CustomLobbyLog.Broadcast(data)
@@ -72,10 +76,14 @@ CustomLobbyInstance = Class(MohoLobbyMethods) {
         local message = CustomLobbyMessages[data.Type]
         if not message then
             WARN("CustomLobby: blocked send of unknown message type " .. tostring(data.Type))
+            CustomLobbyLog.Send(peerId, data, "unknown message type")
             return
         end
-        if not message.Validate(self, data) then
-            WARN("CustomLobby: blocked send of malformed message " .. tostring(data.Type))
+        local ok, reason = message.Validate(self, data)
+        if not ok then
+            reason = reason or "malformed message"
+            WARN("CustomLobby: blocked send of message " .. tostring(data.Type) .. " — " .. reason)
+            CustomLobbyLog.Send(peerId, data, reason)
             return
         end
         CustomLobbyLog.Send(peerId, data)
@@ -166,17 +174,24 @@ CustomLobbyInstance = Class(MohoLobbyMethods) {
         local message = CustomLobbyMessages[data.Type]
         if not message then
             WARN("CustomLobby: ignoring unknown message type " .. tostring(data.Type) .. " from " .. tostring(data.SenderID))
+            CustomLobbyLog.Received(data, "unknown message type")
+            return
+        end
+        local valid, validReason = message.Validate(self, data)
+        if not valid then
+            validReason = validReason or "malformed message"
+            WARN("CustomLobby: ignoring message " .. tostring(data.Type) .. " from " .. tostring(data.SenderID) .. " — " .. validReason)
+            CustomLobbyLog.Received(data, validReason)
+            return
+        end
+        local accepted, acceptReason = message.Accept(self, data)
+        if not accepted then
+            acceptReason = acceptReason or "rejected"
+            WARN("CustomLobby: rejected message " .. tostring(data.Type) .. " from " .. tostring(data.SenderID) .. " — " .. acceptReason)
+            CustomLobbyLog.Received(data, acceptReason)
             return
         end
         CustomLobbyLog.Received(data)
-        if not message.Validate(self, data) then
-            WARN("CustomLobby: ignoring malformed message " .. tostring(data.Type) .. " from " .. tostring(data.SenderID))
-            return
-        end
-        if not message.Accept(self, data) then
-            WARN("CustomLobby: rejected message " .. tostring(data.Type) .. " from " .. tostring(data.SenderID))
-            return
-        end
         message.Handler(self, data)
     end,
 

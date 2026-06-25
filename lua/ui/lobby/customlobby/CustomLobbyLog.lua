@@ -46,6 +46,7 @@ local MaxEntries = 200
 ---@field Type string                 # the message Type (e.g. "SetPlayers")
 ---@field Peer? UILobbyPeerId          # the other peer (send target / receive sender); nil for a broadcast
 ---@field Time number                  # seconds since the log started (for a relative clock)
+---@field Error? string                # set when the message was malformed / unauthorised — the reason
 
 -------------------------------------------------------------------------------
 --#region Reactive store
@@ -93,7 +94,8 @@ end
 ---@param kind UICustomLobbyLogKind
 ---@param messageType? string
 ---@param peer? UILobbyPeerId
-local function Append(kind, messageType, peer)
+---@param error? string
+local function Append(kind, messageType, peer, error)
     local model = GetSingleton()
     local entries = table.copy(model.Entries())
     table.insert(entries, {
@@ -101,6 +103,7 @@ local function Append(kind, messageType, peer)
         Type = messageType or "?",
         Peer = peer,
         Time = GetSystemTimeSeconds() - (StartTime or GetSystemTimeSeconds()),
+        Error = error,
     })
     while table.getn(entries) > MaxEntries do
         table.remove(entries, 1)
@@ -108,23 +111,26 @@ local function Append(kind, messageType, peer)
     model.Entries:Set(entries)
 end
 
---- Logs an outgoing broadcast to every peer.
+--- Logs an outgoing broadcast to every peer (`error` set when it was blocked as malformed).
 ---@param data table # the message ({ Type = ... })
-function Broadcast(data)
-    Append('broadcast', data and data.Type, nil)
+---@param error? string
+function Broadcast(data, error)
+    Append('broadcast', data and data.Type, nil, error)
 end
 
---- Logs an outgoing send to a single peer.
+--- Logs an outgoing send to a single peer (`error` set when it was blocked as malformed).
 ---@param peerId UILobbyPeerId
 ---@param data table
-function Send(peerId, data)
-    Append('send', data and data.Type, peerId)
+---@param error? string
+function Send(peerId, data, error)
+    Append('send', data and data.Type, peerId, error)
 end
 
---- Logs an incoming message (its sender is `data.SenderID`).
+--- Logs an incoming message (its sender is `data.SenderID`; `error` set when it was rejected).
 ---@param data table
-function Received(data)
-    Append('recv', data and data.Type, data and data.SenderID)
+---@param error? string
+function Received(data, error)
+    Append('recv', data and data.Type, data and data.SenderID, error)
 end
 
 --- Empties the log entirely and restarts the relative clock (called when a lobby is exited, so the
@@ -136,30 +142,8 @@ end
 
 --#endregion
 
--------------------------------------------------------------------------------
---#region Debugging
-
---- Hot-reload hook: rebuilds the singleton and copies the entries across.
----
---- NOTE: the instance ([CustomLobbyInstance.lua]) holds its import of this module from load time and
---- does not hot-reload, so after reloading *this* file new traffic logs into the previous singleton
---- until the lobby is recreated. Dev-only; restart the lobby if the feed goes quiet after an edit.
----@param newModule any
-function __moduleinfo.OnReload(newModule)
-    if ModelInstance then
-        local handle = newModule.SetupSingleton()
-        handle.Entries:Set(ModelInstance.Entries())
-    end
-end
-
---- Hot-reload hook: re-imports this module after a couple of frames.
-function __moduleinfo.OnDirty()
-    ForkThread(
-        function()
-            WaitFrames(2)
-            import(__moduleinfo.name)
-        end
-    )
-end
-
---#endregion
+-- NOTE: this module deliberately has **no hot-reload hooks**. It is fed by the lobby instance
+-- ([CustomLobbyInstance.lua]), which holds its import from load time and never hot-reloads — so the
+-- store has to be a single stable singleton that survives UI hot-reloads (interface / tabs / panel),
+-- or the instance would keep writing into a replaced singleton and the panel would stop updating.
+-- The cost is that edits to *this* file need a game restart to take effect.

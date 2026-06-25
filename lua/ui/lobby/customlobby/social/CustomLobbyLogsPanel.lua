@@ -20,34 +20,57 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
--- The Logs tab of the lobby's bottom-left tabbed panel: a live, scrolling view of this peer's
--- network traffic (every message it broadcasts / sends / receives), fed by `CustomLobbyLog`. Each
--- line is `mm:ss  <arrow> Type [→/← peer]` — outgoing broadcasts (»»), single sends (»), and
--- incoming messages («). Because each peer logs only its own traffic, the host's and a client's
--- views differ naturally.
+-- The Logs tab of the lobby's bottom-left tabbed panel: a live view of this peer's network traffic
+-- (every message it broadcasts / sends / receives), fed by `CustomLobbyLog`. It is a **tail view** —
+-- the most recent entries that fit the panel height, newest at the bottom — rebuilt as traffic
+-- arrives. (No scroll-back; the store keeps the last `MaxEntries`, this shows the tail.)
+--
+-- Each row is laid out in columns, **fixed-width columns first then the flexible name** so the names
+-- line up:  `time · kind · ⚠ · name`. A malformed / unauthorised message (its Validate or Accept
+-- returned a reason) tints the name and fills the ⚠ slot with a warning icon whose tooltip is the
+-- reason.
 --
 -- A bottom-left tab content component: created when its tab is selected and destroyed on switch (see
 -- ../CustomLobbyTabs.lua), so it's the live panel for its whole lifetime — the model observer just
--- rebuilds it (Refresh is Ready-gated). `Initialize` (called by the tabs container after sizing it)
--- builds the scrollbar + does the first render (the list needs a concrete height — three-phase init).
+-- rebuilds it (Refresh is Ready-gated).
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 
 local Group = import("/lua/maui/group.lua").Group
-local ItemList = import("/lua/maui/itemlist.lua").ItemList
 
 local CustomLobbyLog = import("/lua/ui/lobby/customlobby/customlobbylog.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
-local Inset = 4
-local TextColor = 'ffb0b6be'
-local Transparent = '00000000'
+local RowHeight = 17
+local Pad = 4
+local ColGap = 3
 
--- per-kind arrow prefix (no colour — ItemList colours are list-wide, so the glyph carries direction)
-local KindPrefix = {
+-- fixed column widths (left → right); the name column is flexible and fills whatever is left
+local TimeWidth = 30
+local KindWidth = 16
+local IconSize = 13
+local NameMax = 28
+
+-- left edges of each column, accumulated so every row's name starts at the same x (aligned)
+local TimeLeft = Pad
+local KindLeft = TimeLeft + TimeWidth + ColGap
+local WarnLeft = KindLeft + KindWidth + ColGap
+local NameLeft = WarnLeft + IconSize + ColGap
+
+local TimeColor = 'ff6a707a'
+local OutColor = 'ff7aa6c8'       -- outgoing kind glyph (broadcast / send)
+local RecvColor = 'ff8ac88a'      -- incoming kind glyph (recv)
+local NameColor = 'ffc8ccd0'
+local ErrorColor = 'ffd0824c'     -- name tint when the message was bad
+
+local WarnIcon = '/MODS/mod_type_warning.dds'
+
+-- the kind glyph (its own column, so the name aligns regardless of direction)
+local KindGlyph = {
     broadcast = "»»",
     send = "»",
     recv = "«",
@@ -61,26 +84,22 @@ local function FormatClock(seconds)
     return string.format("%02d:%02d", math.floor(whole / 60), math.mod(whole, 60))
 end
 
---- One log line: `mm:ss  <arrow> Type [→/← peer]`.
----@param entry UICustomLobbyLogEntry
+--- Truncates `text` to `maxChars`, appending "…" when it had to cut.
+---@param text string
+---@param maxChars number
 ---@return string
-local function FormatEntry(entry)
-    local line = FormatClock(entry.Time) .. "  " .. (KindPrefix[entry.Kind] or "·") .. " " .. entry.Type
-    if entry.Peer then
-        if entry.Kind == 'recv' then
-            line = line .. "  ← " .. tostring(entry.Peer)
-        elseif entry.Kind == 'send' then
-            line = line .. "  → " .. tostring(entry.Peer)
-        end
+local function Truncate(text, maxChars)
+    text = text or ""
+    if string.len(text) > maxChars then
+        return string.sub(text, 1, maxChars - 1) .. "…"
     end
-    return line
+    return text
 end
 
 ---@class UICustomLobbyLogsPanel : Group
 ---@field Trash TrashBag
 ---@field Ready boolean
----@field List ItemList
----@field Scrollbar Scrollbar | false
+---@field Rows Group[]
 ---@field Empty Text
 ---@field EntriesObserver LazyVar
 local CustomLobbyLogsPanel = ClassUI(Group) {
@@ -92,13 +111,7 @@ local CustomLobbyLogsPanel = ClassUI(Group) {
 
         self.Trash = TrashBag()
         self.Ready = false
-        self.Scrollbar = false
-
-        self.List = ItemList(self, "CustomLobbyLogList")
-        self.List:SetFont(UIUtil.bodyFont, 12)
-        -- foreground only; background / selection / mouseover transparent (read-only feed)
-        self.List:SetColors(TextColor, Transparent, TextColor, Transparent, TextColor, Transparent)
-        self.List:DeleteAllItems()
+        self.Rows = {}
 
         self.Empty = UIUtil.CreateText(self, "No messages yet", 13, UIUtil.bodyFont)
         self.Empty:SetColor('ff5a606a')
@@ -106,7 +119,7 @@ local CustomLobbyLogsPanel = ClassUI(Group) {
         self.Empty:Hide()
 
         -- created/destroyed with its tab, so always the live panel while it exists — the observer
-        -- just rebuilds (Refresh is Ready-gated until Initialize sizes the list)
+        -- just rebuilds (Refresh is Ready-gated until Initialize sizes the panel)
         self.EntriesObserver = self.Trash:Add(
             LazyVarDerive(CustomLobbyLog.GetSingleton().Entries, function(entriesLazy)
                 entriesLazy()
@@ -116,40 +129,97 @@ local CustomLobbyLogsPanel = ClassUI(Group) {
 
     ---@param self UICustomLobbyLogsPanel
     __post_init = function(self)
-        Layouter(self.List)
-            :AtLeftIn(self, Inset):AtTopIn(self, Inset):AtBottomIn(self, Inset)
-            :End()
-        -- leave room for the scrollbar on the right
-        self.List.Right:Set(function() return self.Right() - LayoutHelpers.ScaleNumber(Inset + 14) end)
         Layouter(self.Empty):AtHorizontalCenterIn(self):AtTopIn(self, 8):End()
     end,
 
-    --- Builds the scrollbar + does the first render. Called by the tabs container after it has sized
-    --- the panel (the list needs a concrete height — three-phase init, /lua/ui/CLAUDE.md § 1).
+    --- Does the first render once the panel has a concrete height (three-phase init).
     ---@param self UICustomLobbyLogsPanel
     Initialize = function(self)
         self.Ready = true
-        self.Scrollbar = UIUtil.CreateVertScrollbarFor(self.List)
         self:Refresh()
     end,
 
-    --- Rebuilds the list from the current log entries and scrolls to the newest.
+    --- Rebuilds the tail: the most recent entries that fit the panel height, oldest-visible at the
+    --- top, newest at the bottom.
     ---@param self UICustomLobbyLogsPanel
     Refresh = function(self)
         if not self.Ready then
             return
         end
+
+        for _, row in self.Rows do
+            row:Destroy()
+        end
+        self.Rows = {}
+
         local entries = CustomLobbyLog.GetSingleton().Entries()
-        self.List:DeleteAllItems()
-        for _, entry in entries do
-            self.List:AddItem(FormatEntry(entry))
-        end
-        if table.getn(entries) > 0 then
-            self.Empty:Hide()
-            self.List:ScrollToBottom()
-        else
+        local total = table.getn(entries)
+        if total == 0 then
             self.Empty:Show()
+            return
         end
+        self.Empty:Hide()
+
+        local rowHeight = LayoutHelpers.ScaleNumber(RowHeight)
+        local available = self.Height() - LayoutHelpers.ScaleNumber(2 * Pad)
+        local capacity = math.max(1, math.floor(available / rowHeight))
+        local first = math.max(1, total - capacity + 1)
+
+        ---@type Group | false
+        local previous = false
+        for i = first, total do
+            local row = self:CreateRow(entries[i])
+            local builder = Layouter(row):AtLeftIn(self, Pad):AtRightIn(self, Pad):Height(RowHeight)
+            if previous then
+                builder:AnchorToBottom(previous)
+            else
+                builder:AtTopIn(self, Pad)
+            end
+            builder:End()
+            previous = row
+            table.insert(self.Rows, row)
+        end
+    end,
+
+    --- Builds one log row: time · kind · (warn) · name. The warn icon only appears for a bad
+    --- message; its column slot is still reserved (a fixed width before the flexible name) so names
+    --- stay aligned. Private.
+    ---@param self UICustomLobbyLogsPanel
+    ---@param entry UICustomLobbyLogEntry
+    ---@return Group
+    CreateRow = function(self, entry)
+        local row = Group(self, "CustomLobbyLogRow")
+
+        local time = UIUtil.CreateText(row, FormatClock(entry.Time), 11, UIUtil.bodyFont)
+        time:SetColor(TimeColor)
+        time:DisableHitTest()
+        Layouter(time):AtLeftIn(row, TimeLeft):AtVerticalCenterIn(row):End()
+
+        local kind = UIUtil.CreateText(row, KindGlyph[entry.Kind] or "·", 12, UIUtil.titleFont)
+        kind:SetColor(entry.Kind == 'recv' and RecvColor or OutColor)
+        kind:DisableHitTest()
+        Layouter(kind):AtLeftIn(row, KindLeft):AtVerticalCenterIn(row):End()
+
+        local label = entry.Type
+        if entry.Peer then
+            label = label .. (entry.Kind == 'recv' and "  ← " or "  → ") .. tostring(entry.Peer)
+        end
+        local name = UIUtil.CreateText(row, Truncate(label, NameMax), 12, UIUtil.bodyFont)
+        name:SetColor(entry.Error and ErrorColor or NameColor)
+        name:DisableHitTest()
+        Layouter(name):AtLeftIn(row, NameLeft):AtRightIn(row, Pad):AtVerticalCenterIn(row):End()
+
+        if entry.Error then
+            local warn = UIUtil.CreateBitmap(row, WarnIcon)
+            warn:DisableHitTest()
+            Layouter(warn):AtLeftIn(row, WarnLeft):AtVerticalCenterIn(row):Width(IconSize):Height(IconSize):End()
+            -- a hit-test-enabled overlay so the tooltip (the failure reason) shows on hover
+            local hover = Group(row, "CustomLobbyLogWarnHover")
+            Layouter(hover):AtLeftIn(row, WarnLeft):AtVerticalCenterIn(row):Width(IconSize):Height(IconSize):End()
+            Tooltip.AddControlTooltipManual(hover, "Invalid message", entry.Error)
+        end
+
+        return row
     end,
 
     ---@param self UICustomLobbyLogsPanel

@@ -55,9 +55,11 @@ local HeaderHeight = 24           -- the "Players" header + gap above the layout
 
 -- the header tool buttons (right of the "Players" label): small square icon buttons, the same
 -- idle/hover/lit look as the config column's preview tools (drift-fine local copy — see CLAUDE.md).
-local ToolSize = 18
+-- The icon (ToolSize - 2*ToolIconInset = 18px) matches the config strip; these textures are full
+-- title-bar button glyphs, so anything smaller renders the pin tiny.
+local ToolSize = 22
 local ToolGap = 4
-local ToolIconInset = 3
+local ToolIconInset = 2
 local ToolIdle = 'ff141a20'
 local ToolHover = 'ff1f262e'
 local ToolActive = 'ff2c4a5e'        -- a lit toggle's background (pin on)

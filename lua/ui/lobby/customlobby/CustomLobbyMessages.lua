@@ -25,28 +25,43 @@
 -- unauthorised) and Handler (route to the controller). The instance's DataReceived /
 -- BroadcastData / SendData run these before anything happens.
 --
+-- **Validate / Accept return `true` when the message is fine, or `false, reason` when it is not** —
+-- a human-readable reason string explaining why (never a bare `false` — always say *why*). The
+-- instance logs that reason against the message (see CustomLobbyLog / the Logs tab) and the UI
+-- surfaces it as a tooltip, so a bad or unauthorised message is explained rather than silently dropped.
+--
 -- Each message's payload is typed via a `---@class … : UILobbyReceivedMessage` so the
 -- handlers (and any future tooling) know its exact shape.
 
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
 
+--- Authorisation check: passes only for the host.
 ---@param lobby UICustomLobbyInstance
----@return boolean
-local function AmHost(lobby)
-    return lobby:IsHost()
+---@return boolean ok
+---@return string? reason
+local function RequireHost(lobby)
+    if lobby:IsHost() then
+        return true
+    end
+    return false, "only the host may act on this message"
 end
 
+--- Authorisation check: passes only when the message came from the host.
 ---@param lobby UICustomLobbyInstance
 ---@param data UILobbyReceivedMessage
----@return boolean
-local function IsFromHost(lobby, data)
-    return data.SenderID == CustomLobbyLocalModel.GetSingleton().HostID()
+---@return boolean ok
+---@return string? reason
+local function RequireFromHost(lobby, data)
+    if data.SenderID == CustomLobbyLocalModel.GetSingleton().HostID() then
+        return true
+    end
+    return false, "message did not come from the host"
 end
 
 ---@class UICustomLobbyMessageHandler
----@field Validate fun(lobby: UICustomLobbyInstance, data: UILobbyReceivedMessage): boolean
----@field Accept fun(lobby: UICustomLobbyInstance, data: UILobbyReceivedMessage): boolean
+---@field Validate fun(lobby: UICustomLobbyInstance, data: UILobbyReceivedMessage): boolean, string?
+---@field Accept fun(lobby: UICustomLobbyInstance, data: UILobbyReceivedMessage): boolean, string?
 ---@field Handler fun(lobby: UICustomLobbyInstance, data: UILobbyReceivedMessage)
 
 ---@type table<string, UICustomLobbyMessageHandler>
@@ -59,10 +74,13 @@ CustomLobbyMessages = {
 
         ---@param data UICustomLobbyAddPlayerMessage
         Validate = function(lobby, data)
-            return data.PlayerOptions ~= nil
+            if data.PlayerOptions == nil then
+                return false, "AddPlayer is missing its PlayerOptions"
+            end
+            return true
         end,
         Accept = function(lobby, data)
-            return AmHost(lobby)
+            return RequireHost(lobby)
         end,
         ---@param data UICustomLobbyAddPlayerMessage
         Handler = function(lobby, data)
@@ -78,10 +96,13 @@ CustomLobbyMessages = {
 
         ---@param data UICustomLobbySetPlayersMessage
         Validate = function(lobby, data)
-            return type(data.Players) == 'table'
+            if type(data.Players) ~= 'table' then
+                return false, "SetPlayers has no Players array"
+            end
+            return true
         end,
         Accept = function(lobby, data)
-            return IsFromHost(lobby, data)
+            return RequireFromHost(lobby, data)
         end,
         ---@param data UICustomLobbySetPlayersMessage
         Handler = function(lobby, data)
@@ -102,10 +123,13 @@ CustomLobbyMessages = {
 
         ---@param data UICustomLobbySentLaunchInfoMessage
         Validate = function(lobby, data)
-            return type(data.GameOptions) == 'table' and type(data.GameMods) == 'table'
+            if type(data.GameOptions) ~= 'table' or type(data.GameMods) ~= 'table' then
+                return false, "SentLaunchInfo is missing its GameOptions / GameMods"
+            end
+            return true
         end,
         Accept = function(lobby, data)
-            return IsFromHost(lobby, data)
+            return RequireFromHost(lobby, data)
         end,
         ---@param data UICustomLobbySentLaunchInfoMessage
         Handler = function(lobby, data)
@@ -123,10 +147,13 @@ CustomLobbyMessages = {
 
         ---@param data UICustomLobbySetSessionStateMessage
         Validate = function(lobby, data)
-            return type(data.SlotCount) == 'number'
+            if type(data.SlotCount) ~= 'number' then
+                return false, "SetSessionState has no SlotCount"
+            end
+            return true
         end,
         Accept = function(lobby, data)
-            return IsFromHost(lobby, data)
+            return RequireFromHost(lobby, data)
         end,
         ---@param data UICustomLobbySetSessionStateMessage
         Handler = function(lobby, data)
@@ -141,10 +168,13 @@ CustomLobbyMessages = {
 
         ---@param data UICustomLobbySetReadyMessage
         Validate = function(lobby, data)
-            return type(data.Ready) == 'boolean'
+            if type(data.Ready) ~= 'boolean' then
+                return false, "SetReady has no Ready flag"
+            end
+            return true
         end,
         Accept = function(lobby, data)
-            return AmHost(lobby)
+            return RequireHost(lobby)
         end,
         ---@param data UICustomLobbySetReadyMessage
         Handler = function(lobby, data)
@@ -160,10 +190,13 @@ CustomLobbyMessages = {
 
         ---@param data UICustomLobbyTakeSlotMessage
         Validate = function(lobby, data)
-            return type(data.Slot) == 'number'
+            if type(data.Slot) ~= 'number' then
+                return false, "TakeSlot has no Slot number"
+            end
+            return true
         end,
         Accept = function(lobby, data)
-            return AmHost(lobby)
+            return RequireHost(lobby)
         end,
         ---@param data UICustomLobbyTakeSlotMessage
         Handler = function(lobby, data)
@@ -179,10 +212,13 @@ CustomLobbyMessages = {
 
         ---@param data UICustomLobbyDisconnectPeerMessage
         Validate = function(lobby, data)
-            return data.PeerID ~= nil
+            if data.PeerID == nil then
+                return false, "DisconnectPeer is missing its PeerID"
+            end
+            return true
         end,
         Accept = function(lobby, data)
-            return IsFromHost(lobby, data)
+            return RequireFromHost(lobby, data)
         end,
         ---@param data UICustomLobbyDisconnectPeerMessage
         Handler = function(lobby, data)
@@ -198,10 +234,13 @@ CustomLobbyMessages = {
 
         ---@param data UICustomLobbyLaunchGameMessage
         Validate = function(lobby, data)
-            return type(data.GameConfig) == 'table'
+            if type(data.GameConfig) ~= 'table' then
+                return false, "LaunchGame has no GameConfig"
+            end
+            return true
         end,
         Accept = function(lobby, data)
-            return IsFromHost(lobby, data)
+            return RequireFromHost(lobby, data)
         end,
         ---@param data UICustomLobbyLaunchGameMessage
         Handler = function(lobby, data)
@@ -216,10 +255,13 @@ CustomLobbyMessages = {
 
         ---@param data UICustomLobbyReportCpuBenchmarkMessage
         Validate = function(lobby, data)
-            return type(data.CpuBenchmark) == 'table'
+            if type(data.CpuBenchmark) ~= 'table' then
+                return false, "ReportCpuBenchmark has no CpuBenchmark"
+            end
+            return true
         end,
         Accept = function(lobby, data)
-            return AmHost(lobby)
+            return RequireHost(lobby)
         end,
         ---@param data UICustomLobbyReportCpuBenchmarkMessage
         Handler = function(lobby, data)
@@ -234,10 +276,13 @@ CustomLobbyMessages = {
 
         ---@param data UICustomLobbySetCpuBenchmarksMessage
         Validate = function(lobby, data)
-            return type(data.CpuBenchmarks) == 'table'
+            if type(data.CpuBenchmarks) ~= 'table' then
+                return false, "SetCpuBenchmarks has no CpuBenchmarks table"
+            end
+            return true
         end,
         Accept = function(lobby, data)
-            return IsFromHost(lobby, data)
+            return RequireFromHost(lobby, data)
         end,
         ---@param data UICustomLobbySetCpuBenchmarksMessage
         Handler = function(lobby, data)
