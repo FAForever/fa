@@ -30,13 +30,18 @@
 -- An optional `OnSelect(index, label)` fires on every switch — used when a persistent sibling (e.g.
 -- the map preview, which can't be churned) must be shown/hidden alongside a tab.
 --
--- The tabs **divide the strip evenly** across the available width. A tab may carry an optional
--- `Badge` LazyVar (a string): when non-empty it renders a small grey count pill to the right of the
--- label; and an optional `Action` (`{ Create, Visible? }`): a small button the owner builds **inside
--- the tab, left of the label** (e.g. a config gear that opens that tab's editor). Its `Visible`
--- LazyVar hides it (and collapses it out of the layout) when it doesn't apply — e.g. for non-hosts.
--- The action, label and pill are centred together as one cluster, so nothing collides with the tab
--- edge. The container only observes the LazyVars — the owner decides what the count + action mean.
+-- The **flexible** tabs divide the strip evenly across the available width. A tab may instead be
+-- `Compact = true`: a fixed narrow width, excluded from the division (the flexible tabs share what's
+-- left) — for a small utility tab. A tab may show an `Icon` (a texture) centred *instead* of its
+-- label (paired with Compact, a tidy icon-only tab with no distracting text).
+--
+-- A flexible tab may carry an optional `Badge` LazyVar (a string): when non-empty it renders a small
+-- grey count pill to the right of the label; and an optional `Action` (`{ Create, Visible? }`): a
+-- small button the owner builds **inside the tab, left of the label** (e.g. a config gear that opens
+-- that tab's editor). Its `Visible` LazyVar hides it (and collapses it out of the layout) when it
+-- doesn't apply — e.g. for non-hosts. The action, label and pill are centred together as one
+-- cluster, so nothing collides with the tab edge. The container only observes the LazyVars — the
+-- owner decides what the count + action mean.
 --
 -- The parent sizes this control and calls `Initialize()` after mounting (so the first panel reads a
 -- concrete height — three-phase init, /lua/ui/CLAUDE.md § 1).
@@ -68,6 +73,10 @@ local BadgeTextColor = 'ffd0d4d8'
 -- the per-tab action button (e.g. a config gear), square, sitting left of the label
 local ActionSize = 18
 
+-- a compact (utility) tab: fixed narrow width, and the size of its centred icon
+local CompactWidth = 28
+local TabIconSize = 16
+
 ---@class UICustomLobbyTabAction
 ---@field Create fun(parent: Control): Control # builds the action control (the owner wires its click)
 ---@field Visible? LazyVar # boolean; false hides the action + collapses it from the cluster (default: always shown)
@@ -77,6 +86,8 @@ local ActionSize = 18
 ---@field Create fun(parent: Control): Control
 ---@field Badge? LazyVar # optional count-badge text (a string; "" hides the pill)
 ---@field Action? UICustomLobbyTabAction # optional button inside the tab, left of the label
+---@field Icon? FileName # optional centred icon (a UIFile path) shown instead of the label (tidy with Compact)
+---@field Compact? boolean # fixed narrow width, excluded from the even division (a utility tab)
 
 ---@class UICustomLobbyTabsOptions
 ---@field Tabs UICustomLobbyTab[]
@@ -88,7 +99,8 @@ local ActionSize = 18
 
 ---@class UICustomLobbyTabButton : Group
 ---@field Bg Bitmap
----@field Label Text
+---@field Label? Text # present only for a text tab (absent when the tab uses an Icon)
+---@field Icon? Bitmap # present only when the tab defines an Icon
 ---@field Badge? UICustomLobbyTabBadge # present only when the tab defines a Badge LazyVar
 ---@field Action? Control # present only when the tab defines an Action
 
@@ -112,7 +124,15 @@ local CustomLobbyTabs = ClassUI(Group) {
         self.Trash = TrashBag()
         self.Tabs = options.Tabs
         self.OnSelectCb = options.OnSelect
+        -- open on the first non-compact tab — a compact utility tab (e.g. Logs) shouldn't be the
+        -- default view just because it sits leftmost
         self.ActiveTab = 1
+        for index = 1, table.getn(self.Tabs) do
+            if not self.Tabs[index].Compact then
+                self.ActiveTab = index
+                break
+            end
+        end
         self.CurrentPanel = false
 
         self.TabStripArea = Group(self, "CustomLobbyTabsStrip")
@@ -132,21 +152,42 @@ local CustomLobbyTabs = ClassUI(Group) {
             :AnchorToBottom(self.TabStripArea, 6):AtBottomIn(self)
             :End()
 
-        -- the tabs divide the strip evenly: each is (stripWidth - gaps) / count wide, pinned at its
-        -- own slot. Width/Left are bound to the strip so they re-flow with the column.
+        -- compact tabs take a fixed narrow width; the flexible tabs share what's left of the strip
+        -- evenly. Width/Left are bound to the strip so they re-flow with the column.
         local count = table.getn(self.TabButtons)
+        local flexCount = 0
+        for index = 1, count do
+            if not self.Tabs[index].Compact then
+                flexCount = flexCount + 1
+            end
+        end
+
+        -- the width of one flexible tab: the strip minus all gaps and all compact tabs, split evenly
+        local function flexWidth()
+            local gap = LayoutHelpers.ScaleNumber(TabGap)
+            local compactW = LayoutHelpers.ScaleNumber(CompactWidth)
+            local remaining = self.TabStripArea.Width() - gap * (count - 1) - compactW * (count - flexCount)
+            if flexCount <= 0 then
+                return 0
+            end
+            return remaining / flexCount
+        end
+        local function widthOf(index)
+            return self.Tabs[index].Compact and LayoutHelpers.ScaleNumber(CompactWidth) or flexWidth()
+        end
+
         for index = 1, count do
             local button = self.TabButtons[index]
             local slot = index
             Layouter(button):AtTopIn(self.TabStripArea):Height(TabHeight):End()
-            button.Width:Set(function()
-                local gap = LayoutHelpers.ScaleNumber(TabGap)
-                return (self.TabStripArea.Width() - gap * (count - 1)) / count
-            end)
+            button.Width:Set(function() return widthOf(slot) end)
             button.Left:Set(function()
                 local gap = LayoutHelpers.ScaleNumber(TabGap)
-                local width = (self.TabStripArea.Width() - gap * (count - 1)) / count
-                return self.TabStripArea.Left() + (slot - 1) * (width + gap)
+                local x = self.TabStripArea.Left()
+                for j = 1, slot - 1 do
+                    x = x + widthOf(j) + gap
+                end
+                return x
             end)
             Layouter(button.Bg):Fill(button):End()
             self:LayoutButtonContent(button)
@@ -161,6 +202,12 @@ local CustomLobbyTabs = ClassUI(Group) {
     ---@param self UICustomLobbyTabs
     ---@param button UICustomLobbyTabButton
     LayoutButtonContent = function(self, button)
+        -- an icon tab is just a centred glyph (no label/action/pill cluster)
+        if button.Icon then
+            Layouter(button.Icon):AtCenterIn(button):Width(TabIconSize):Height(TabIconSize):End()
+            return
+        end
+
         local action = button.Action
         local badge = button.Badge
 
@@ -258,10 +305,19 @@ local CustomLobbyTabs = ClassUI(Group) {
     ---@param index number
     ---@return UICustomLobbyTabButton
     CreateTabButton = function(self, label, index)
+        local tab = self.Tabs[index]
         local button = Group(self.TabStripArea, "CustomLobbyTabButton")
 
         button.Bg = Bitmap(button)
         button.Bg:SetSolidColor(TabIdleColor)
+
+        if tab.Icon then
+            -- an icon tab: a centred glyph instead of the text label (and no badge/action cluster)
+            button.Icon = UIUtil.CreateBitmap(button, tab.Icon)
+            button.Icon:DisableHitTest()
+            button.Bg.HandleEvent = self:MakeTabEvent(button, index)
+            return button
+        end
 
         button.Label = UIUtil.CreateText(button, label, 13, UIUtil.titleFont)
         button.Label:SetColor('ffc8ccd0')
@@ -307,7 +363,19 @@ local CustomLobbyTabs = ClassUI(Group) {
             end
         end
 
-        button.Bg.HandleEvent = function(control, event)
+        button.Bg.HandleEvent = self:MakeTabEvent(button, index)
+
+        return button
+    end,
+
+    --- The tab background's event handler: click selects the tab, hover tints it (unless active).
+    --- Shared by text and icon tabs. Private.
+    ---@param self UICustomLobbyTabs
+    ---@param button UICustomLobbyTabButton
+    ---@param index number
+    ---@return fun(control: Control, event: KeyEvent): boolean
+    MakeTabEvent = function(self, button, index)
+        return function(control, event)
             if event.Type == 'ButtonPress' then
                 self:SelectTab(index)
                 return true
@@ -324,8 +392,6 @@ local CustomLobbyTabs = ClassUI(Group) {
             end
             return false
         end
-
-        return button
     end,
 
     --- Updates a count pill from its Badge LazyVar: shows the pill with `text`, or hides it (and

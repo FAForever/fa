@@ -33,6 +33,7 @@ local MohoLobbyMethods = moho.lobby_methods
 
 local CustomLobbyMessages = import("/lua/ui/lobby/customlobby/customlobbymessages.lua").CustomLobbyMessages
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
+local CustomLobbyLog = import("/lua/ui/lobby/customlobby/customlobbylog.lua")
 
 ---@class UICustomLobbyInstance : moho.lobby_methods
 ---@field Trash TrashBag
@@ -59,6 +60,7 @@ CustomLobbyInstance = Class(MohoLobbyMethods) {
             WARN("CustomLobby: blocked broadcast of malformed message " .. tostring(data.Type))
             return
         end
+        CustomLobbyLog.Broadcast(data)
         return MohoLobbyMethods.BroadcastData(self, data)
     end,
 
@@ -76,6 +78,7 @@ CustomLobbyInstance = Class(MohoLobbyMethods) {
             WARN("CustomLobby: blocked send of malformed message " .. tostring(data.Type))
             return
         end
+        CustomLobbyLog.Send(peerId, data)
         return MohoLobbyMethods.SendData(self, peerId, data)
     end,
 
@@ -165,6 +168,7 @@ CustomLobbyInstance = Class(MohoLobbyMethods) {
             WARN("CustomLobby: ignoring unknown message type " .. tostring(data.Type) .. " from " .. tostring(data.SenderID))
             return
         end
+        CustomLobbyLog.Received(data)
         if not message.Validate(self, data) then
             WARN("CustomLobby: ignoring malformed message " .. tostring(data.Type) .. " from " .. tostring(data.SenderID))
             return

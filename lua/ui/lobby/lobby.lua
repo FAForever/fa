@@ -40,6 +40,7 @@ local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/customlobbyses
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
 local CustomLobbyInterface = import("/lua/ui/lobby/customlobby/customlobbyinterface.lua")
 local CustomLobbySession = import("/lua/ui/lobby/customlobby/customlobbysession.lua")
+local CustomLobbyLog = import("/lua/ui/lobby/customlobby/customlobbylog.lua")
 
 local maxConnections = 16
 
@@ -95,6 +96,8 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
         -- Free everything registered in the session trash (the map catalog today; the models,
         -- interface and instance follow as they are converted to the same pattern).
         CustomLobbySession.Teardown()
+        -- Wipe the network traffic log so the next lobby starts with a clean feed.
+        CustomLobbyLog.Clear()
         if exitBehavior then
             exitBehavior()
         end

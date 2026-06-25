@@ -61,21 +61,25 @@ local ToolIconInset = 3
 local ToolIdle = 'ff141a20'
 local ToolHover = 'ff1f262e'
 local ToolActive = 'ff2c4a5e'        -- a lit toggle's background (pin on)
-local ToolIconDim = 0.45             -- icon alpha when a toggle is off
 
--- icon textures (skin-relative, resolved through CreateBitmap). Pin reuses the camera pin glyph,
--- balance the lobby auto-balance button art, reopen the circular recall ("refresh") icon.
-local PinIcon = '/game/camera-btn/pinned_btn_up.dds'
+-- icon textures (skin-relative, resolved through UIFile). The pin uses the window pin-button glyphs
+-- (unpinned vs pinned, same as window.lua's title-bar pin); balance the lobby auto-balance button
+-- art; reopen the circular recall ("refresh") icon.
+local PinIcon = '/game/menu-btns/pin_btn_up.dds'         -- unpinned (toggle off)
+local PinnedIcon = '/game/menu-btns/pinned_btn_up.dds'   -- pinned (toggle on / the lock-notice glyph)
 local BalanceIcon = '/BUTTON/autobalance/_btn_up.dds'
 local ReopenIcon = '/game/recall-panel/icon-recall_bmp.dds'
 
 --- A small square icon button for the header tool strip: a solid background that lights on hover,
---- plus an `Active` state (driven externally for the pin toggle) that lights it the "on" colour and
---- un-dims the icon. Clicking calls `OnPress`; the owner decides what that means (fire an intent,
---- flip a synced flag, …). Mirrors the config column's `PreviewTool`.
+--- plus an `Active` state (driven externally for the pin toggle) that lights it the "on" colour. A
+--- toggle can pass a second `activeTexture` so the icon glyph swaps while active (the pin shows the
+--- unpinned vs pinned art, like the window title-bar pin). Clicking calls `OnPress`; the owner decides
+--- what that means (fire an intent, flip a synced flag, …). Mirrors the config column's `PreviewTool`.
 ---@class UICustomLobbySlotTool : Group
 ---@field Bg Bitmap
 ---@field Icon Bitmap
+---@field IdleTexture FileName
+---@field ActiveTexture FileName | nil
 ---@field Active boolean
 ---@field Hovered boolean
 ---@field OnPress? fun()
@@ -83,12 +87,15 @@ local SlotTool = Class(Group) {
 
     ---@param self UICustomLobbySlotTool
     ---@param parent Control
-    ---@param texture FileName
-    __init = function(self, parent, texture)
+    ---@param texture FileName            # the icon (idle / toggle-off)
+    ---@param activeTexture? FileName     # glyph swapped in while Active (toggle-on); omit for plain actions
+    __init = function(self, parent, texture, activeTexture)
         Group.__init(self, parent, "CustomLobbySlotTool")
 
         self.Active = false
         self.Hovered = false
+        self.IdleTexture = texture
+        self.ActiveTexture = activeTexture
 
         self.Bg = Bitmap(self)
         self.Bg:SetSolidColor(ToolIdle)
@@ -122,7 +129,8 @@ local SlotTool = Class(Group) {
         self:ApplyVisual()
     end,
 
-    --- Repaints the background + icon for the current active/hover state.
+    --- Repaints the background (idle / hover / lit-when-active) and, for a toggle with an
+    --- `ActiveTexture`, swaps the icon glyph for the active/inactive state.
     ---@param self UICustomLobbySlotTool
     ApplyVisual = function(self)
         local bg = ToolIdle
@@ -132,7 +140,9 @@ local SlotTool = Class(Group) {
             bg = ToolHover
         end
         self.Bg:SetSolidColor(bg)
-        self.Icon:SetAlpha(self.Active and 1.0 or ToolIconDim)
+        if self.ActiveTexture then
+            self.Icon:SetTexture(UIUtil.UIFile(self.Active and self.ActiveTexture or self.IdleTexture))
+        end
     end,
 
     --- Sets the lit/active state (the pin toggle drives this from the synced model).
@@ -149,6 +159,8 @@ local SlotTool = Class(Group) {
 ---@class UICustomLobbySlotsInterface : Group, UICustomLobbySlotCoordinator
 ---@field Trash TrashBag
 ---@field Header Text
+---@field LockIcon Bitmap                         # lock glyph shown (with LockLabel) while seating is pinned
+---@field LockLabel Text                          # "Locked" notice, visible to everyone while pinned
 ---@field Tools Group                            # host-only tool strip (right of the header)
 ---@field PinButton UICustomLobbySlotTool
 ---@field BalanceButton UICustomLobbySlotTool
@@ -179,11 +191,22 @@ local CustomLobbySlotsInterface = Class(Group) {
         self.Header:SetColor('ff9aa0a8')
         self.Header:DisableHitTest()
 
+        -- lock notice (right of the "Players" label): shown to everyone while seating is pinned, so a
+        -- client can see seating is host-controlled before it clicks an open slot to no effect. The
+        -- host also has the lit pin button; this reinforces the state for both.
+        self.LockIcon = UIUtil.CreateBitmap(self, PinnedIcon)
+        self.LockIcon:DisableHitTest()
+        self.LockIcon:Hide()
+        self.LockLabel = UIUtil.CreateText(self, "Locked", 12, UIUtil.bodyFont)
+        self.LockLabel:SetColor('ffd9c97a')
+        self.LockLabel:DisableHitTest()
+        self.LockLabel:Hide()
+
         -- host-only tool strip, right-aligned in the header band: pin seating · auto-balance ·
         -- reopen closed slots. Grouped so a single Show/Hide gates them all on host status.
         self.Tools = Group(self, "CustomLobbySlotTools")
 
-        self.PinButton = SlotTool(self.Tools, PinIcon)
+        self.PinButton = SlotTool(self.Tools, PinIcon, PinnedIcon)
         self.PinButton.OnPress = function()
             CustomLobbyController.RequestSetSlotsPinned(not CustomLobbySessionModel.GetSingleton().SlotsPinned())
         end
@@ -214,10 +237,19 @@ local CustomLobbySlotsInterface = Class(Group) {
                 end
             end))
 
-        -- light the pin button while seating is pinned (synced session state)
+        -- light the host's pin button and show the (everyone-visible) lock notice while seating is
+        -- pinned (synced session state)
         self.SlotsPinnedObserver = self.Trash:Add(
             LazyVarDerive(CustomLobbySessionModel.GetSingleton().SlotsPinned, function(pinnedLazy)
-                self.PinButton:SetActive(pinnedLazy())
+                local pinned = pinnedLazy()
+                self.PinButton:SetActive(pinned)
+                if pinned then
+                    self.LockIcon:Show()
+                    self.LockLabel:Show()
+                else
+                    self.LockIcon:Hide()
+                    self.LockLabel:Hide()
+                end
             end))
 
         -- the active layout body, picked by the AutoTeams mode (created now, laid out on mount)
@@ -235,6 +267,10 @@ local CustomLobbySlotsInterface = Class(Group) {
     ---@param self UICustomLobbySlotsInterface
     __post_init = function(self)
         Layouter(self.Header):AtLeftIn(self, 4):AtTopIn(self):End()
+
+        -- the lock notice, just right of the "Players" label (hidden unless seating is pinned)
+        Layouter(self.LockIcon):CenteredRightOf(self.Header, 8):Width(ToolSize):Height(ToolSize):End()
+        Layouter(self.LockLabel):CenteredRightOf(self.LockIcon, 3):End()
 
         -- the tool strip: a fixed-width band pinned top-right, the three square buttons inside it
         -- laid out right-to-left (Pin · Balance · Reopen, reading left-to-right), centred on the header

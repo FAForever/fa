@@ -68,6 +68,7 @@ local CustomLobbyConfigInterface = import("/lua/ui/lobby/customlobby/config/cust
 local CustomLobbyTabs = import("/lua/ui/lobby/customlobby/customlobbytabs.lua")
 local CustomLobbyChatPanel = import("/lua/ui/lobby/customlobby/social/customlobbychatpanel.lua")
 local CustomLobbyObserversPanel = import("/lua/ui/lobby/customlobby/social/customlobbyobserverspanel.lua")
+local CustomLobbyLogsPanel = import("/lua/ui/lobby/customlobby/social/customlobbylogspanel.lua")
 local CustomLobbyOptionSelect = import("/lua/ui/lobby/customlobby/optionselect/customlobbyoptionselect.lua")
 
 local LazyVarCreate = import("/lua/lazyvar.lua").Create
@@ -83,6 +84,10 @@ local GearTextures = {
     over = UIUtil.SkinnableFile('/game/menu-btns/config_btn_over.dds'),
     dis = UIUtil.SkinnableFile('/game/menu-btns/config_btn_dis.dds'),
 }
+
+-- the icon for the compact Logs tab (the game's "log" button glyph; a plain UIFile path like the
+-- config column's PreviewTool icons, not a skinnable callable — CreateBitmap resolves it via UIFile)
+local LogsIcon = '/BUTTON/log/_btn_up.dds'
 
 --- Builds a tab `Action` (a config gear) for `CustomLobbyTabs`: a skinned button that runs `onOpen`
 --- on click, with a tooltip. (The chat/observer settings dialogs don't exist yet — these are
@@ -208,6 +213,9 @@ local CustomLobbyInterface = Class(Group) {
 
         self.BottomLeftTabs = CustomLobbyTabs.Create(self.BottomLeftArea, {
             Tabs = {
+                -- a compact, icon-only tab: a live feed of this peer's network traffic (host and
+                -- clients each see their own broadcasts / sends / receives)
+                { Label = "Logs", Create = CustomLobbyLogsPanel.Create, Icon = LogsIcon, Compact = true },
                 {
                     Label = "Chat", Create = CustomLobbyChatPanel.Create, Badge = self.ChatBadge,
                     Action = GearAction(function() end, "Chat settings", "Chat settings — coming soon."),
