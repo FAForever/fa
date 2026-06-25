@@ -111,8 +111,8 @@ CustomLobbyMessages = {
     },
 
     -- The host's launch configuration — the launch-state fields that aren't the player
-    -- list (scenario, options, mods, teams, spawn mex). Broadcast on any change and to
-    -- each peer as it joins; the whole snapshot is sent rather than per-field deltas.
+    -- list (scenario, options, mods, teams, spawn mex, unit restrictions). Broadcast on any
+    -- change and to each peer as it joins; the whole snapshot is sent rather than per-field deltas.
     SentLaunchInfo = {
         ---@class UICustomLobbySentLaunchInfoMessage : UILobbyReceivedMessage
         ---@field ScenarioFile FileName | false
@@ -120,6 +120,7 @@ CustomLobbyMessages = {
         ---@field GameMods table
         ---@field AutoTeams table<number, number>
         ---@field SpawnMex table<number, boolean>
+        ---@field Restrictions string[]
 
         ---@param data UICustomLobbySentLaunchInfoMessage
         Validate = function(lobby, data)

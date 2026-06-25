@@ -414,6 +414,7 @@ function ProcessSentLaunchInfo(instance, data)
     launch.GameMods:Set(data.GameMods or {})
     launch.AutoTeams:Set(data.AutoTeams or {})
     launch.SpawnMex:Set(data.SpawnMex or {})
+    launch.Restrictions:Set(data.Restrictions or {})
 end
 
 --- Everyone applies the host's session state (slot count / closed slots) — lobby-room
@@ -500,6 +501,7 @@ function BroadcastLaunchInfo(instance)
         GameMods = launch.GameMods(),
         AutoTeams = launch.AutoTeams(),
         SpawnMex = launch.SpawnMex(),
+        Restrictions = launch.Restrictions(),
     })
 end
 
@@ -657,6 +659,26 @@ function RequestSetGameMods(gameMods)
     BroadcastLaunchInfo(instance)
 end
 
+--- The host sets the unit restrictions. Host-only — backs the unit-select dialog and a
+--- `/restrict <key>` chat command. Stores the preset-key list in the launch model and broadcasts,
+--- so every peer sees the same restrictions. The keys are folded into the launch config's
+--- `GameOptions.RestrictedCategories` at launch (`BuildGameConfiguration`); the sim expands them.
+---@param keys string[]
+function RequestSetRestrictions(keys)
+    local instance = LobbyInstance
+    if not instance then
+        return
+    end
+
+    if not CustomLobbyLocalModel.GetSingleton().IsHost() then
+        WARN("CustomLobby: only the host can change the unit restrictions")
+        return
+    end
+
+    CustomLobbyLaunchModel.SetRestrictions(CustomLobbyLaunchModel.GetSingleton(), keys)
+    BroadcastLaunchInfo(instance)
+end
+
 --- The host sets the game options. Host-only — backs the options dialog. Replaces the whole
 --- `GameOptions` value table in the launch model and broadcasts so every peer sees the same
 --- options. The dialog already seeds defaults + drops stale keys, so this is the reconciled set.
@@ -759,6 +781,9 @@ local function BuildGameConfiguration(instance)
     for _, option in OptionUtil.GetModOptions(launch.GameMods()) do table.insert(schema, option) end
     local gameOptions = OptionUtil.SeedDefaults(schema, launch.GameOptions())
     gameOptions.ScenarioFile = launch.ScenarioFile()
+    -- the unit restrictions live in their own launch-model field (so the options dialog can't wipe
+    -- them); fold them in here as the preset-key array the sim expands (see simInit.lua)
+    gameOptions.RestrictedCategories = launch.Restrictions() or {}
 
     -- seated players (fresh copies; random faction resolved to a concrete one)
     local playerOptions = {}

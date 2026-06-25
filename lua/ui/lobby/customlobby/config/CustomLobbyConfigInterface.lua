@@ -56,6 +56,7 @@ local CustomLobbyUnitsPanel = import("/lua/ui/lobby/customlobby/config/customlob
 local CustomLobbyMapSelect = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapselect.lua")
 local CustomLobbyOptionSelect = import("/lua/ui/lobby/customlobby/optionselect/customlobbyoptionselect.lua")
 local CustomLobbyModSelect = import("/lua/ui/lobby/customlobby/modselect/customlobbymodselect.lua")
+local CustomLobbyUnitSelect = import("/lua/ui/lobby/customlobby/unitselect/customlobbyunitselect.lua")
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
 local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
@@ -306,16 +307,18 @@ local CustomLobbyConfigInterface = ClassUI(Group) {
             return sim .. " / " .. ui
         end)
 
-        -- TODO: unit restrictions aren't modelled yet (the Restrictions panel is a placeholder);
-        -- point this at the restriction count once that slice lands. Empty → no pill for now.
+        -- the count of active unit restrictions (preset keys in the launch model's Restrictions)
         self.RestrictionsBadge = self.Trash:Add(LazyVarCreate())
-        self.RestrictionsBadge:Set("")
+        self.RestrictionsBadge:Set(function()
+            local count = table.getn(launch.Restrictions())
+            return count > 0 and tostring(count) or ""
+        end)
 
         -- the read-only config tabs below the preview (created-on-select / destroyed-on-switch),
         -- each with a config gear (inside the tab, left of the label) opening that tab's editor.
-        -- Options is host-only — its gear hides for clients (the host gate is the IsHost LazyVar);
-        -- Mods is open to everyone (UI mods are local, the sim portion is host-gated in the dialog);
-        -- Restrictions has no editor yet, so no gear.
+        -- Options + Restrictions are host-only — their gears hide for clients (the host gate is the
+        -- IsHost LazyVar); Mods is open to everyone (UI mods are local, the sim portion is host-gated
+        -- in the dialog).
         local isHost = CustomLobbyLocalModel.GetSingleton().IsHost
         self.Tabs = CustomLobbyTabs.Create(self, {
             Tabs = {
@@ -329,7 +332,11 @@ local CustomLobbyConfigInterface = ClassUI(Group) {
                     Action = GearAction(function() CustomLobbyModSelect.Open(GetFrame(0)) end,
                         "Manage mods", "Pick the game's sim mods (host) and your own UI mods."),
                 },
-                { Label = "Restrictions", Create = CustomLobbyUnitsPanel.Create, Badge = self.RestrictionsBadge },
+                {
+                    Label = "Restrictions", Create = CustomLobbyUnitsPanel.Create, Badge = self.RestrictionsBadge,
+                    Action = GearAction(function() CustomLobbyUnitSelect.Open(GetFrame(0)) end,
+                        "Edit restrictions", "Pick the units and presets to restrict (host only).", isHost),
+                },
             },
         })
 

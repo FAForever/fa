@@ -77,6 +77,7 @@ MaxSlots = 16
 ---@field AutoTeams    LazyVar<table<number, number>>
 ---@field GameOptions  LazyVar<table>
 ---@field GameMods     LazyVar<table>
+---@field Restrictions LazyVar<string[]>                                # unit-restriction preset keys (folded into GameOptions.RestrictedCategories at launch)
 ---@field ScenarioFile LazyVar<FileName | false>
 
 ---@type UICustomLobbyLaunchModel | nil
@@ -98,6 +99,7 @@ function SetupSingleton()
         AutoTeams    = Create({}),
         GameOptions  = Create({}),
         GameMods     = Create({}),
+        Restrictions = Create({}),
         ScenarioFile = Create(false),
     }
 
@@ -185,6 +187,14 @@ function SetGameMods(model, gameMods)
     model.GameMods:Set(table.copy(gameMods))
 end
 
+--- Sets the unit-restriction preset keys (a list of strings). Folded into the launch config's
+--- `GameOptions.RestrictedCategories` at launch (the sim expands the keys — see simInit.lua).
+---@param model UICustomLobbyLaunchModel
+---@param keys string[]
+function SetRestrictions(model, keys)
+    model.Restrictions:Set(table.copy(keys))
+end
+
 --- Appends a player to the observer list (copy-then-Set).
 ---@param model UICustomLobbyLaunchModel
 ---@param player UICustomLobbyPlayer
@@ -235,6 +245,7 @@ function __moduleinfo.OnReload(newModule)
         handle.AutoTeams:Set(ModelInstance.AutoTeams())
         handle.GameOptions:Set(ModelInstance.GameOptions())
         handle.GameMods:Set(ModelInstance.GameMods())
+        handle.Restrictions:Set(ModelInstance.Restrictions())
         handle.ScenarioFile:Set(ModelInstance.ScenarioFile())
     end
 end
