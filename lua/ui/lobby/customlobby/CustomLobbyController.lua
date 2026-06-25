@@ -47,6 +47,9 @@ local CustomLobbySession = import("/lua/ui/lobby/customlobby/customlobbysession.
 ---@type UICustomLobbyInstance | false
 local LobbyInstance = false
 
+-- delay between the close-assert and the open broadcast in RequestReopenClosedSlots
+local ReopenClosedSlotsDelay = 0.5
+
 -------------------------------------------------------------------------------
 --#region Helpers
 
@@ -197,12 +200,74 @@ local function SwapSlots(instance, slotA, slotB)
     BroadcastPlayers(instance)
 end
 
+--- Reads a numeric command-line argument (e.g. `/mean 1500`), falling back to the default
+--- when it is absent or unparseable.
+---@param key string
+---@param default number
+---@return number
+local function GetCommandLineNumber(key, default)
+    local arg = GetCommandLineArg(key, 1)
+    if arg and arg[1] then
+        return tonumber(arg[1]) or default
+    end
+    return default
+end
+
+--- Reads a string command-line argument (e.g. `/clan Yps`), falling back to the default when
+--- it is absent.
+---@param key string
+---@param default string
+---@return string
+local function GetCommandLineString(key, default)
+    local arg = GetCommandLineArg(key, 1)
+    if arg and arg[1] then
+        return tostring(arg[1])
+    end
+    return default
+end
+
+--- Reads the faction from the flag args (`/uef` `/aeon` `/cybran` `/seraphim`), falling back to
+--- the default when none is present. Mirrors the autolobby's CreateLocalPlayer.
+---@param default number
+---@return number
+local function GetCommandLineFaction(default)
+    for index, faction in import("/lua/factions.lua").Factions do
+        if HasCommandLineArg("/" .. faction.Key) then
+            return index
+        end
+    end
+    return default
+end
+
 --- Builds the local player's options from the profile / engine name.
 ---@param instance UICustomLobbyInstance
 ---@return UICustomLobbyPlayer
 function CreateLocalPlayer(instance)
     local name = instance:GetLocalPlayerName() or import("/lua/user/prefs.lua").GetFromCurrentProfile('Name') or "Player"
-    return import("/lua/ui/lobby/lobbycomm.lua").GetDefaultPlayerOptions(name)
+    local player = import("/lua/ui/lobby/lobbycomm.lua").GetDefaultPlayerOptions(name)
+
+    -- player info from the command line: the FAF client passes the player's real values, and the
+    -- dev launch script (scripts/LaunchCustomLobby.ps1) seeds random ones. Mirrors the autolobby's
+    -- CreateLocalPlayer and the legacy lobby's GetLocalPlayerData. The host preserves all of these
+    -- when it seats a joining peer (it only reassigns StartSpot / colors) — see ProcessAddPlayer.
+
+    -- rating + game count
+    player.MEAN = GetCommandLineNumber("/mean", 1500)
+    player.DEV = GetCommandLineNumber("/deviation", 500)
+    player.NG = GetCommandLineNumber("/numgames", 0)
+    player.PL = math.floor(player.MEAN - 3 * player.DEV)
+
+    -- faction + team
+    player.Faction = GetCommandLineFaction(player.Faction)
+    player.Team = GetCommandLineNumber("/team", player.Team)
+
+    -- identity + league standing
+    player.PlayerClan = GetCommandLineString("/clan", player.PlayerClan or "")
+    player.Country = GetCommandLineString("/country", player.Country or "")
+    player.DIV = GetCommandLineString("/division", player.DIV or "")
+    player.SUBDIV = GetCommandLineString("/subdivision", player.SUBDIV or "")
+
+    return player
 end
 
 --#endregion
@@ -359,6 +424,7 @@ function ProcessSetSessionState(instance, data)
     local session = CustomLobbySessionModel.GetSingleton()
     session.SlotCount:Set(data.SlotCount or session.SlotCount())
     session.ClosedSlots:Set(data.ClosedSlots or {})
+    session.SlotsPinned:Set(data.SlotsPinned and true or false)
 end
 
 --- Host flips a peer's ready flag and re-broadcasts.
@@ -372,10 +438,15 @@ function ProcessSetReady(instance, data)
     end
 end
 
---- Host moves a requesting client into the open slot it asked for.
+--- Host moves a requesting client into the open slot it asked for. Ignored while seating
+--- is pinned — only the host may change slots then (the host's own take goes through
+--- RequestTakeSlot, which is exempt).
 ---@param instance UICustomLobbyInstance
 ---@param data UICustomLobbyTakeSlotMessage
 function ProcessTakeSlot(instance, data)
+    if CustomLobbySessionModel.GetSingleton().SlotsPinned() then
+        return
+    end
     TakeSlot(instance, data.SenderID, data.Slot)
 end
 
@@ -440,6 +511,7 @@ function BroadcastSessionState(instance)
         Type = 'SetSessionState',
         SlotCount = session.SlotCount(),
         ClosedSlots = session.ClosedSlots(),
+        SlotsPinned = session.SlotsPinned(),
     })
 end
 
@@ -509,6 +581,10 @@ function RequestTakeSlot(slot)
     if localModel.IsHost() then
         TakeSlot(instance, localModel.LocalPeerId(), slot)
     else
+        -- pinned seating is host-only: don't bother the host with a request it will reject
+        if CustomLobbySessionModel.GetSingleton().SlotsPinned() then
+            return
+        end
         instance:SendData(localModel.HostID(), { Type = 'TakeSlot', Slot = slot })
     end
 end
@@ -772,6 +848,86 @@ function RequestSwapSlots(slotA, slotB)
         return
     end
     SwapSlots(instance, slotA, slotB)
+end
+
+--- The host pins or unpins seating. Host-only — backs the slots header's pin button. While
+--- pinned, the host rejects client slot-takes (ProcessTakeSlot), so only the host can change
+--- who sits where; the host itself is unaffected. Synced via the session-state snapshot.
+---@param pinned boolean
+function RequestSetSlotsPinned(pinned)
+    local instance = LobbyInstance
+    if not instance then
+        return
+    end
+
+    if not CustomLobbyLocalModel.GetSingleton().IsHost() then
+        WARN("CustomLobby: only the host can pin the slots")
+        return
+    end
+
+    CustomLobbySessionModel.SetSlotsPinned(CustomLobbySessionModel.GetSingleton(), pinned)
+    BroadcastSessionState(instance)
+end
+
+--- The host asks the lobby to auto-balance the seated players across teams. Host-only —
+--- backs the slots header's auto-balance button.
+---
+--- TODO: implement the balancer (group seated players into even teams by rating, re-seat /
+--- set Team via the launch model, then BroadcastPlayers). Stubbed for now.
+function RequestAutoBalance()
+    local instance = LobbyInstance
+    if not instance then
+        return
+    end
+
+    if not CustomLobbyLocalModel.GetSingleton().IsHost() then
+        WARN("CustomLobby: only the host can auto-balance")
+        return
+    end
+
+    LOG("CustomLobby: RequestAutoBalance — not implemented yet")
+end
+
+--- Re-broadcasts the closed slots, then after a short delay opens every one of them. The
+--- close→open pulse pushes two fresh session snapshots so a client that drifted out of sync
+--- re-renders its closed slots correctly. Host-only — backs the slots header's reopen button.
+function RequestReopenClosedSlots()
+    local instance = LobbyInstance
+    if not instance then
+        return
+    end
+
+    if not CustomLobbyLocalModel.GetSingleton().IsHost() then
+        WARN("CustomLobby: only the host can reopen the closed slots")
+        return
+    end
+
+    local session = CustomLobbySessionModel.GetSingleton()
+    local closed = {}
+    for slot, isClosed in session.ClosedSlots() do
+        if isClosed then
+            table.insert(closed, slot)
+        end
+    end
+    if table.empty(closed) then
+        return
+    end
+
+    instance.Trash:Add(ForkThread(function()
+        -- re-assert the closed state to everyone
+        BroadcastSessionState(instance)
+        WaitSeconds(ReopenClosedSlotsDelay)
+        if IsDestroyed(instance) then
+            return
+        end
+        -- then open the slots that were closed
+        local opened = table.copy(session.ClosedSlots())
+        for _, slot in closed do
+            opened[slot] = nil
+        end
+        session.ClosedSlots:Set(opened)
+        BroadcastSessionState(instance)
+    end))
 end
 
 --- Ejects the player in `slot`: a human is dropped from the network (the resulting

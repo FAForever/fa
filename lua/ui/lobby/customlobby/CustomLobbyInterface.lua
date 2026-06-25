@@ -29,7 +29,7 @@
 -- module-level `Debug` flag to tint each so the regions are visible while iterating. Targeted at
 -- the 1024x768 minimum resolution:
 --
---   ┌ TitleArea ─ title · leave ─────────────────────────────────────────────────┐
+--   ┌ TitleArea ─ title ─────────────────────────────────────────────────────────┐
 --   ├──────────────────────────────────────┬─────────────────────────────────────┤
 --   │ SlotsArea (slots — one or two team    │ RightArea (the map preview + facts  │
 --   │   columns, top-left, up to 16)        │   line + read-only options summary) │
@@ -37,16 +37,16 @@
 --   │ BottomLeftArea (Chat / Observers      │                                     │
 --   │   — tabs)                             │                                     │
 --   ├──────────────────────────────────────┴─────────────────────────────────────┤
---   │ ActionArea (status · … · Settings · Launch) ─ full width                    │
+--   │ ActionArea (Leave · status · … · Settings · Launch) ─ full width            │
 --   └────────────────────────────────────────────────────────────────────────────┘
 --
 -- The LEFT column splits vertically: the slots on top (CustomLobbySlotsInterface — one column, or
 -- two team columns for the binary auto-team modes, with the team-rating indicator atop the cards),
 -- the chat/observers tabs (CustomLobbyTabs) below. The RIGHT column is the map + options
 -- (CustomLobbyConfigInterface — a bound map preview, a name/size/players/version facts line, and the
--- read-only options summary). A full-width action bar at the bottom holds the global actions (status
--- + the generic Settings button, which opens the options editor, + the host-only Launch). The title
--- bar is just the title + Leave.
+-- read-only options summary). A full-width action bar at the bottom holds the global actions: Leave
+-- + status on the left, the generic Settings button (opens the options editor) + the host-only
+-- Launch on the right. The title bar is just the title.
 --
 -- The per-domain edit buttons (change-map, mod-select) are removed for now — only the generic
 -- Settings button remains — and will be reintegrated once the rework is complete.
@@ -58,6 +58,7 @@ local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Button = import("/lua/maui/button.lua").Button
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
 local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/customlobbysessionmodel.lua")
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
@@ -69,9 +70,39 @@ local CustomLobbyChatPanel = import("/lua/ui/lobby/customlobby/social/customlobb
 local CustomLobbyObserversPanel = import("/lua/ui/lobby/customlobby/social/customlobbyobserverspanel.lua")
 local CustomLobbyOptionSelect = import("/lua/ui/lobby/customlobby/optionselect/customlobbyoptionselect.lua")
 
+local LazyVarCreate = import("/lua/lazyvar.lua").Create
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
+
+-- the per-tab config gear (inside the tab, left of the label) — skinned button (up/down/over/dis).
+-- Local copy of the config column's gear (drift-is-fine; see ../CLAUDE.md "On sharing").
+local GearTextures = {
+    up = UIUtil.SkinnableFile('/game/menu-btns/config_btn_up.dds'),
+    down = UIUtil.SkinnableFile('/game/menu-btns/config_btn_down.dds'),
+    over = UIUtil.SkinnableFile('/game/menu-btns/config_btn_over.dds'),
+    dis = UIUtil.SkinnableFile('/game/menu-btns/config_btn_dis.dds'),
+}
+
+--- Builds a tab `Action` (a config gear) for `CustomLobbyTabs`: a skinned button that runs `onOpen`
+--- on click, with a tooltip. (The chat/observer settings dialogs don't exist yet — these are
+--- placeholders, so `onOpen` is a no-op for now.)
+---@param onOpen fun()
+---@param title string
+---@param body string
+---@return UICustomLobbyTabAction
+local function GearAction(onOpen, title, body)
+    return {
+        Create = function(parent)
+            local gear = Button(parent, GearTextures.up, GearTextures.down, GearTextures.over, GearTextures.dis)
+            gear.OnClick = function(button, modifiers)
+                onOpen()
+            end
+            Tooltip.AddControlTooltipManual(gear, title, body)
+            return gear
+        end,
+    }
+end
 
 -- flip to tint each layout area so the regions are visible while iterating
 local Debug = true
@@ -114,6 +145,8 @@ end
 ---@field Slots UICustomLobbySlotsInterface
 ---@field BottomLeftArea Group
 ---@field BottomLeftTabs UICustomLobbyTabs
+---@field ChatBadge LazyVar        # dummy count pill for the Chat tab (until the chat slice lands)
+---@field ObserversBadge LazyVar   # observer count pill for the Observers tab
 ---@field RightArea Group
 ---@field Config UICustomLobbyConfigInterface
 ---@field ActionArea Group
@@ -145,27 +178,44 @@ local CustomLobbyInterface = Class(Group) {
         self.ActionArea = CreateArea(self.Content, "ActionArea", 'ff808080')
         --#endregion
 
-        --#region title bar (title · leave)
+        --#region title bar (title)
         self.Title = UIUtil.CreateText(self.TitleArea, "Custom game", 20, UIUtil.titleFont)
         self.Title:DisableHitTest()
+        --#endregion
 
-        self.LeaveButton = UIUtil.CreateButtonWithDropshadow(self.TitleArea, '/BUTTON/medium/', "Leave")
+        -- Leave lives in the action bar (bottom-left, beside the status text); created here so it's
+        -- always available regardless of host status
+        self.LeaveButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/medium/', "Leave")
         self.LeaveButton.OnClick = function(button, modifiers)
             -- leaving disconnects + returns to the menu via the escape handler lobby.lua
             -- registered (one teardown, shared with the Esc key)
             EscapeHandler.HandleEsc(false)
         end
-        --#endregion
 
         --#region slots (top-left region — a single column of rows, owns its own drag coordination)
         self.Slots = CustomLobbySlotsInterface.Create(self.SlotsArea)
         --#endregion
 
         --#region bottom-left: chat / observers tabs
+        -- each tab gets a config gear (left) + a count pill (right), mirroring the config column.
+        -- Chat's count is a dummy until the chat slice lands; Observers shows the live observer count.
+        self.ChatBadge = self.Trash:Add(LazyVarCreate("0"))     -- TODO: real unread count with the chat slice
+        self.ObserversBadge = self.Trash:Add(LazyVarCreate())
+        self.ObserversBadge:Set(function()
+            local count = table.getn(CustomLobbyLaunchModel.GetSingleton().Observers())
+            return count > 0 and tostring(count) or ""
+        end)
+
         self.BottomLeftTabs = CustomLobbyTabs.Create(self.BottomLeftArea, {
             Tabs = {
-                { Label = "Chat",      Create = CustomLobbyChatPanel.Create },
-                { Label = "Observers", Create = CustomLobbyObserversPanel.Create },
+                {
+                    Label = "Chat", Create = CustomLobbyChatPanel.Create, Badge = self.ChatBadge,
+                    Action = GearAction(function() end, "Chat settings", "Chat settings — coming soon."),
+                },
+                {
+                    Label = "Observers", Create = CustomLobbyObserversPanel.Create, Badge = self.ObserversBadge,
+                    Action = GearAction(function() end, "Observer settings", "Observer settings — coming soon."),
+                },
             },
         })
         --#endregion
@@ -240,9 +290,8 @@ local CustomLobbyInterface = Class(Group) {
         self.BottomLeftArea.Right:Set(function() return self.RightArea.Left() - LayoutHelpers.ScaleNumber(Pad) end)
         --#endregion
 
-        --#region title bar (title · leave)
+        --#region title bar (title)
         Layouter(self.Title):AtLeftIn(self.TitleArea, 8):AtVerticalCenterIn(self.TitleArea):End()
-        Layouter(self.LeaveButton):AtRightIn(self.TitleArea):AtVerticalCenterIn(self.TitleArea):End()
         --#endregion
 
         --#region slots fill their area (the component stacks the rows + coordinates dragging)
@@ -257,8 +306,9 @@ local CustomLobbyInterface = Class(Group) {
         Layouter(self.Config):Fill(self.RightArea):End()
         --#endregion
 
-        --#region action bar: status on the left, Settings + launch on the right
-        Layouter(self.StatusLabel):AtLeftIn(self.ActionArea, 8):AtVerticalCenterIn(self.ActionArea):End()
+        --#region action bar: Leave + status on the left, Settings + launch on the right
+        Layouter(self.LeaveButton):AtLeftIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea):End()
+        Layouter(self.StatusLabel):AnchorToRight(self.LeaveButton, 8):AtVerticalCenterIn(self.ActionArea):End()
         Layouter(self.LaunchButton):AtRightIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea):End()
         Layouter(self.SettingsButton):AnchorToLeft(self.LaunchButton, 8):AtVerticalCenterIn(self.ActionArea):End()
         --#endregion

@@ -119,6 +119,7 @@ CustomLobbyMessages = {
         ---@class UICustomLobbySetSessionStateMessage : UILobbyReceivedMessage
         ---@field SlotCount number
         ---@field ClosedSlots table<number, boolean>
+        ---@field SlotsPinned boolean
 
         ---@param data UICustomLobbySetSessionStateMessage
         Validate = function(lobby, data)

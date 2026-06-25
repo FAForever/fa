@@ -241,6 +241,29 @@ function ValueLabels(option)
     return labels
 end
 
+--- Counts the options across all three sources (lobby + scenario + selected mods) whose current
+--- value differs from its default — i.e. how many options the host has changed. This is the same
+--- union the options dialog / Options panel render (mod options are deduped by key); it backs the
+--- Options tab's count badge.
+---@param scenarioFile FileName | false
+---@param gameMods table<string, true>
+---@param values table<string, any>
+---@return number
+function CountNonDefault(scenarioFile, gameMods, values)
+    local count = 0
+    local function tally(options)
+        for _, option in options do
+            if not IsDefault(option, values) then
+                count = count + 1
+            end
+        end
+    end
+    tally(GetLobbyOptions())
+    tally(GetScenarioOptions(scenarioFile))
+    tally(GetModOptions(gameMods))
+    return count
+end
+
 --- Fills `values` (a copy) with the default for every option in `options` that has no value yet,
 --- so the result is a complete set ready to launch with. Returns the copy.
 ---@param options ScenarioOption[]

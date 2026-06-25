@@ -36,6 +36,7 @@
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
@@ -52,15 +53,112 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 
 local HeaderHeight = 24           -- the "Players" header + gap above the layout body
 
+-- the header tool buttons (right of the "Players" label): small square icon buttons, the same
+-- idle/hover/lit look as the config column's preview tools (drift-fine local copy — see CLAUDE.md).
+local ToolSize = 18
+local ToolGap = 4
+local ToolIconInset = 3
+local ToolIdle = 'ff141a20'
+local ToolHover = 'ff1f262e'
+local ToolActive = 'ff2c4a5e'        -- a lit toggle's background (pin on)
+local ToolIconDim = 0.45             -- icon alpha when a toggle is off
+
+-- icon textures (skin-relative, resolved through CreateBitmap). Pin reuses the camera pin glyph,
+-- balance the lobby auto-balance button art, reopen the circular recall ("refresh") icon.
+local PinIcon = '/game/camera-btn/pinned_btn_up.dds'
+local BalanceIcon = '/BUTTON/autobalance/_btn_up.dds'
+local ReopenIcon = '/game/recall-panel/icon-recall_bmp.dds'
+
+--- A small square icon button for the header tool strip: a solid background that lights on hover,
+--- plus an `Active` state (driven externally for the pin toggle) that lights it the "on" colour and
+--- un-dims the icon. Clicking calls `OnPress`; the owner decides what that means (fire an intent,
+--- flip a synced flag, …). Mirrors the config column's `PreviewTool`.
+---@class UICustomLobbySlotTool : Group
+---@field Bg Bitmap
+---@field Icon Bitmap
+---@field Active boolean
+---@field Hovered boolean
+---@field OnPress? fun()
+local SlotTool = Class(Group) {
+
+    ---@param self UICustomLobbySlotTool
+    ---@param parent Control
+    ---@param texture FileName
+    __init = function(self, parent, texture)
+        Group.__init(self, parent, "CustomLobbySlotTool")
+
+        self.Active = false
+        self.Hovered = false
+
+        self.Bg = Bitmap(self)
+        self.Bg:SetSolidColor(ToolIdle)
+
+        self.Icon = UIUtil.CreateBitmap(self, texture)
+        self.Icon:DisableHitTest()
+
+        self.Bg.HandleEvent = function(control, event)
+            if event.Type == 'ButtonPress' then
+                if self.OnPress then
+                    self.OnPress()
+                end
+                return true
+            elseif event.Type == 'MouseEnter' then
+                self.Hovered = true
+                self:ApplyVisual()
+                return true
+            elseif event.Type == 'MouseExit' then
+                self.Hovered = false
+                self:ApplyVisual()
+                return true
+            end
+            return false
+        end
+    end,
+
+    ---@param self UICustomLobbySlotTool
+    __post_init = function(self)
+        Layouter(self.Bg):Fill(self):End()
+        Layouter(self.Icon):AtCenterIn(self):Width(ToolSize - 2 * ToolIconInset):Height(ToolSize - 2 * ToolIconInset):End()
+        self:ApplyVisual()
+    end,
+
+    --- Repaints the background + icon for the current active/hover state.
+    ---@param self UICustomLobbySlotTool
+    ApplyVisual = function(self)
+        local bg = ToolIdle
+        if self.Active then
+            bg = ToolActive
+        elseif self.Hovered then
+            bg = ToolHover
+        end
+        self.Bg:SetSolidColor(bg)
+        self.Icon:SetAlpha(self.Active and 1.0 or ToolIconDim)
+    end,
+
+    --- Sets the lit/active state (the pin toggle drives this from the synced model).
+    ---@param self UICustomLobbySlotTool
+    ---@param active boolean
+    SetActive = function(self, active)
+        self.Active = active
+        self:ApplyVisual()
+    end,
+}
+
 ---@alias UICustomLobbySlotsBody UICustomLobbyOneColumnSlots | UICustomLobbyTwoColumnSlots
 
 ---@class UICustomLobbySlotsInterface : Group, UICustomLobbySlotCoordinator
 ---@field Trash TrashBag
 ---@field Header Text
+---@field Tools Group                            # host-only tool strip (right of the header)
+---@field PinButton UICustomLobbySlotTool
+---@field BalanceButton UICustomLobbySlotTool
+---@field ReopenButton UICustomLobbySlotTool
 ---@field Body UICustomLobbySlotsBody | false   # the active layout body
 ---@field LayoutKind "one" | "two" | false      # which layout Body currently is
 ---@field Mounted boolean                        # true once __post_init has laid us out
 ---@field GameOptionsObserver LazyVar
+---@field IsHostObserver LazyVar
+---@field SlotsPinnedObserver LazyVar
 ---@field HighlightedSlot number | false         # slot currently shown as a drop target
 ---@field DragGhost Group | false                # floating label following the cursor mid-drag
 local CustomLobbySlotsInterface = Class(Group) {
@@ -81,6 +179,47 @@ local CustomLobbySlotsInterface = Class(Group) {
         self.Header:SetColor('ff9aa0a8')
         self.Header:DisableHitTest()
 
+        -- host-only tool strip, right-aligned in the header band: pin seating · auto-balance ·
+        -- reopen closed slots. Grouped so a single Show/Hide gates them all on host status.
+        self.Tools = Group(self, "CustomLobbySlotTools")
+
+        self.PinButton = SlotTool(self.Tools, PinIcon)
+        self.PinButton.OnPress = function()
+            CustomLobbyController.RequestSetSlotsPinned(not CustomLobbySessionModel.GetSingleton().SlotsPinned())
+        end
+        Tooltip.AddControlTooltipManual(self.PinButton.Bg, "Pin slots",
+            "Lock seating so only you (the host) can move players between slots.")
+
+        self.BalanceButton = SlotTool(self.Tools, BalanceIcon)
+        self.BalanceButton.OnPress = function()
+            CustomLobbyController.RequestAutoBalance()
+        end
+        Tooltip.AddControlTooltipManual(self.BalanceButton.Bg, "Auto balance",
+            "Balance the seated players across the teams.")
+
+        self.ReopenButton = SlotTool(self.Tools, ReopenIcon)
+        self.ReopenButton.OnPress = function()
+            CustomLobbyController.RequestReopenClosedSlots()
+        end
+        Tooltip.AddControlTooltipManual(self.ReopenButton.Bg, "Reopen closed slots",
+            "Close, then re-open every closed slot to refresh the lobby for everyone.")
+
+        -- the tool strip is a host action set; hide it for clients
+        self.IsHostObserver = self.Trash:Add(
+            LazyVarDerive(CustomLobbyLocalModel.GetSingleton().IsHost, function(isHostLazy)
+                if isHostLazy() then
+                    self.Tools:Show()
+                else
+                    self.Tools:Hide()
+                end
+            end))
+
+        -- light the pin button while seating is pinned (synced session state)
+        self.SlotsPinnedObserver = self.Trash:Add(
+            LazyVarDerive(CustomLobbySessionModel.GetSingleton().SlotsPinned, function(pinnedLazy)
+                self.PinButton:SetActive(pinnedLazy())
+            end))
+
         -- the active layout body, picked by the AutoTeams mode (created now, laid out on mount)
         self:RebuildBody()
 
@@ -96,6 +235,21 @@ local CustomLobbySlotsInterface = Class(Group) {
     ---@param self UICustomLobbySlotsInterface
     __post_init = function(self)
         Layouter(self.Header):AtLeftIn(self, 4):AtTopIn(self):End()
+
+        -- the tool strip: a fixed-width band pinned top-right, the three square buttons inside it
+        -- laid out right-to-left (Pin · Balance · Reopen, reading left-to-right), centred on the header
+        Layouter(self.Tools)
+            :AtRightIn(self, 4)
+            :AtVerticalCenterIn(self.Header)
+            :Width(3 * ToolSize + 2 * ToolGap):Height(ToolSize)
+            :End()
+        local function placeTool(tool)
+            return Layouter(tool):AtTopIn(self.Tools):Width(ToolSize):Height(ToolSize)
+        end
+        placeTool(self.ReopenButton):AtRightIn(self.Tools):End()
+        placeTool(self.BalanceButton):LeftOf(self.ReopenButton, ToolGap):End()
+        placeTool(self.PinButton):LeftOf(self.BalanceButton, ToolGap):End()
+
         self.Mounted = true
         self:LayoutBody()
     end,

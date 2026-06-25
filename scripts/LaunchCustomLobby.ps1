@@ -63,6 +63,44 @@ $hostProtocol = "udp"
 $hostPlayerName = "HostPlayer_1"
 $gameName = "DevLobby"
 
+# Random pools to draw per-player info from (mirrors scripts\LaunchFAInstances.ps1).
+$factions = @("uef", "aeon", "cybran", "seraphim")
+$clans = @("Yps", "Nom", "Cly", "Mad", "Gol", "Kur", "Row", "Jip", "Bal", "She")
+$countries = @("us", "gb", "de", "fr", "nl", "ru", "ca", "au", "br", "pl")
+$divisions = @("bronze", "silver", "gold", "diamond", "master", "grandmaster", "unlisted")
+$subdivisions = @("I", "II", "III", "IV", "V")
+
+# Returns a randomised set of per-player arguments, mirroring what the FAF client passes for a
+# real player. The custom lobby reads these when it builds the local player (see
+# CustomLobbyController.CreateLocalPlayer). The host preserves them when seating a joining peer.
+#   * rating: the displayed rating (PL) is derived as mean - 3 * deviation; the ranges below keep
+#     it positive and realistic for a FAF player.
+#   * faction: a flag arg (/uef, /aeon, …) — no value.
+#   * team: 2 or 3 (shown as T1 / T2), so the team-aware layouts have a split to render.
+#   * grandmaster/unlisted have no subdivision (mirrors LaunchFAInstances).
+function Get-PlayerArgs {
+    $mean = Get-Random -Minimum 800 -Maximum 2400
+    $deviation = Get-Random -Minimum 50 -Maximum 250
+    $numGames = Get-Random -Minimum 0 -Maximum 2000
+    $team = Get-Random -Minimum 2 -Maximum 4
+
+    $playerArgs = @(
+        "/mean", $mean, "/deviation", $deviation, "/numgames", $numGames,
+        "/$($factions | Get-Random)",
+        "/team", $team,
+        "/clan", ($clans | Get-Random),
+        "/country", ($countries | Get-Random)
+    )
+
+    $division = $divisions | Get-Random
+    $playerArgs += @("/division", $division)
+    if ($division -ne "unlisted" -and $division -ne "grandmaster") {
+        $playerArgs += @("/subdivision", ($subdivisions | Get-Random))
+    }
+
+    return $playerArgs
+}
+
 # Arguments shared by every instance. Note: NO `/players` argument — that is what keeps us
 # on the regular lobby instead of the autolobby.
 $commonArgs = @(
@@ -104,7 +142,7 @@ function Launch-LobbyInstance {
 $hostArgs = @(
     "/log", "host_lobby_1.log",
     "/hostgame", $hostProtocol, $port, $hostPlayerName, $gameName, $map
-) + $commonArgs
+) + $commonArgs + (Get-PlayerArgs)
 Launch-LobbyInstance -instanceNumber 1 -xPos 0 -yPos 0 -arguments $hostArgs
 
 # Joining client instances. Positional order for /joingame is protocol, address, name.
@@ -118,7 +156,7 @@ for ($i = 1; $i -lt $players; $i++) {
     $clientArgs = @(
         "/log", "client_lobby_$($i + 1).log",
         "/joingame", $hostProtocol, "localhost:$port", $clientName
-    ) + $commonArgs
+    ) + $commonArgs + (Get-PlayerArgs)
     Launch-LobbyInstance -instanceNumber ($i + 1) -xPos $xPos -yPos $yPos -arguments $clientArgs
 }
 

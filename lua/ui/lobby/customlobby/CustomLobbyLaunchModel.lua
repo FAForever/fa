@@ -58,6 +58,8 @@ MaxSlots = 16
 ---@field MEAN? number
 ---@field DEV? number
 ---@field NG? number              # number of games
+---@field DIV? string             # league division (e.g. "gold")
+---@field SUBDIV? string          # league subdivision (e.g. "III")
 ---@field PlayerClan? string
 ---@field Country? string
 ---@field AIPersonality? string

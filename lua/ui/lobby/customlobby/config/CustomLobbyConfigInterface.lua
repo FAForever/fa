@@ -47,16 +47,22 @@ local Tooltip = import("/lua/ui/game/tooltip.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Button = import("/lua/maui/button.lua").Button
 local CustomLobbyMapPreview = import("/lua/ui/lobby/customlobby/customlobbymappreview.lua")
 local CustomLobbyTabs = import("/lua/ui/lobby/customlobby/customlobbytabs.lua")
 local CustomLobbyOptionsPanel = import("/lua/ui/lobby/customlobby/config/customlobbyoptionspanel.lua")
 local CustomLobbyModsPanel = import("/lua/ui/lobby/customlobby/config/customlobbymodspanel.lua")
 local CustomLobbyUnitsPanel = import("/lua/ui/lobby/customlobby/config/customlobbyunitspanel.lua")
 local CustomLobbyMapSelect = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapselect.lua")
+local CustomLobbyOptionSelect = import("/lua/ui/lobby/customlobby/optionselect/customlobbyoptionselect.lua")
+local CustomLobbyModSelect = import("/lua/ui/lobby/customlobby/modselect/customlobbymodselect.lua")
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
 local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
+local OptionUtil = import("/lua/ui/optionutil.lua")
+local ModUtilities = import("/lua/ui/modutilities.lua")
 
+local LazyVarCreate = import("/lua/lazyvar.lua").Create
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
@@ -79,6 +85,37 @@ local ArmyIcon = '/dialogs/mapselect02/commander_alpha.dds'
 local ResourceIcon = '/game/build-ui/icon-mass_bmp.dds'
 local WaterIcon = '/game/camera-btn/pinned_btn_up.dds'
 local ConfigIcon = '/game/menu-btns/config_btn_up.dds'
+
+-- the per-tab config gear (inside the tab, left of the label): a fully-skinned button
+-- (up/down/over/dis) that opens that tab's editor dialog
+local GearTextures = {
+    up = UIUtil.SkinnableFile('/game/menu-btns/config_btn_up.dds'),
+    down = UIUtil.SkinnableFile('/game/menu-btns/config_btn_down.dds'),
+    over = UIUtil.SkinnableFile('/game/menu-btns/config_btn_over.dds'),
+    dis = UIUtil.SkinnableFile('/game/menu-btns/config_btn_dis.dds'),
+}
+
+--- Builds a tab `Action` (a config gear) for `CustomLobbyTabs`: a skinned button that opens
+--- `onOpen` on click, with a tooltip. `visibleLazy` (optional) hides the gear when it doesn't apply
+--- — e.g. the host-only Options gear is hidden for clients (the tab's label re-centres).
+---@param onOpen fun()
+---@param title string
+---@param body string
+---@param visibleLazy? LazyVar
+---@return UICustomLobbyTabAction
+local function GearAction(onOpen, title, body, visibleLazy)
+    return {
+        Create = function(parent)
+            local gear = Button(parent, GearTextures.up, GearTextures.down, GearTextures.over, GearTextures.dis)
+            gear.OnClick = function(button, modifiers)
+                onOpen()
+            end
+            Tooltip.AddControlTooltipManual(gear, title, body)
+            return gear
+        end,
+        Visible = visibleLazy,
+    }
+end
 
 -- A small square icon button used in the preview tool strip. A toggle flips Active on click and
 -- calls `OnToggle(active)`; an action button (isToggle = false) just calls `OnPress`. The look is
@@ -200,6 +237,9 @@ end
 ---@field WaterToggle UICustomLobbyPreviewTool
 ---@field ConfigButton UICustomLobbyPreviewTool
 ---@field Tabs UICustomLobbyTabs
+---@field OptionsBadge LazyVar    # count of non-default options (Options tab pill)
+---@field ModsBadge LazyVar       # "sim / ui" mod counts (Mods tab pill)
+---@field RestrictionsBadge LazyVar # restriction count (Restrictions tab pill)
 ---@field ScenarioObserver LazyVar
 ---@field IsHostObserver LazyVar
 local CustomLobbyConfigInterface = ClassUI(Group) {
@@ -242,12 +282,54 @@ local CustomLobbyConfigInterface = ClassUI(Group) {
         Tooltip.AddControlTooltipManual(self.ConfigButton.Bg, "Change map", "Pick a different scenario (host only).")
         --#endregion
 
-        -- the read-only config tabs below the preview (created-on-select / destroyed-on-switch)
+        -- count badges for the tab strip: computed LazyVars over the launch model (the tabs
+        -- container observes them and renders the grey pills). Built before the tabs so each
+        -- button can subscribe at creation.
+        local launch = CustomLobbyLaunchModel.GetSingleton()
+
+        self.OptionsBadge = self.Trash:Add(LazyVarCreate())
+        self.OptionsBadge:Set(function()
+            local count = OptionUtil.CountNonDefault(launch.ScenarioFile(), launch.GameMods(), launch.GameOptions())
+            return count > 0 and tostring(count) or ""
+        end)
+
+        -- "sim / ui" — sim mods are the synced GameMods; UI mods are this peer's prefs (not a
+        -- reactive field, so the count refreshes whenever the sim mods change, which is good enough
+        -- until the mod-select dialog is rewired).
+        self.ModsBadge = self.Trash:Add(LazyVarCreate())
+        self.ModsBadge:Set(function()
+            local sim = table.getsize(launch.GameMods())
+            local ui = table.getsize(ModUtilities.GetSelectedUIMods())
+            if sim == 0 and ui == 0 then
+                return ""
+            end
+            return sim .. " / " .. ui
+        end)
+
+        -- TODO: unit restrictions aren't modelled yet (the Restrictions panel is a placeholder);
+        -- point this at the restriction count once that slice lands. Empty → no pill for now.
+        self.RestrictionsBadge = self.Trash:Add(LazyVarCreate())
+        self.RestrictionsBadge:Set("")
+
+        -- the read-only config tabs below the preview (created-on-select / destroyed-on-switch),
+        -- each with a config gear (inside the tab, left of the label) opening that tab's editor.
+        -- Options is host-only — its gear hides for clients (the host gate is the IsHost LazyVar);
+        -- Mods is open to everyone (UI mods are local, the sim portion is host-gated in the dialog);
+        -- Restrictions has no editor yet, so no gear.
+        local isHost = CustomLobbyLocalModel.GetSingleton().IsHost
         self.Tabs = CustomLobbyTabs.Create(self, {
             Tabs = {
-                { Label = "Options",      Create = CustomLobbyOptionsPanel.Create },
-                { Label = "Mods",         Create = CustomLobbyModsPanel.Create },
-                { Label = "Restrictions", Create = CustomLobbyUnitsPanel.Create },
+                {
+                    Label = "Options", Create = CustomLobbyOptionsPanel.Create, Badge = self.OptionsBadge,
+                    Action = GearAction(function() CustomLobbyOptionSelect.Open(GetFrame(0)) end,
+                        "Edit options", "Open the game options editor (host only).", isHost),
+                },
+                {
+                    Label = "Mods", Create = CustomLobbyModsPanel.Create, Badge = self.ModsBadge,
+                    Action = GearAction(function() CustomLobbyModSelect.Open(GetFrame(0)) end,
+                        "Manage mods", "Pick the game's sim mods (host) and your own UI mods."),
+                },
+                { Label = "Restrictions", Create = CustomLobbyUnitsPanel.Create, Badge = self.RestrictionsBadge },
             },
         })
 
@@ -256,6 +338,7 @@ local CustomLobbyConfigInterface = ClassUI(Group) {
                 scenarioFileLazy()
                 self:RefreshFacts()
             end))
+        -- the change-map button is host-only (the gears are gated per-tab via their Visible LazyVar)
         self.IsHostObserver = self.Trash:Add(
             LazyVarDerive(CustomLobbyLocalModel.GetSingleton().IsHost, function(isHostLazy)
                 if isHostLazy() then

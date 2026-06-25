@@ -41,6 +41,7 @@ local Create = import("/lua/lazyvar.lua").Create
 ---@class UICustomLobbySessionModel
 ---@field SlotCount   LazyVar<number>                    # player slots the current map supports
 ---@field ClosedSlots LazyVar<table<number, boolean>>
+---@field SlotsPinned LazyVar<boolean>                   # host locked seating: only the host may change slots
 
 ---@type UICustomLobbySessionModel | nil
 local ModelInstance = nil
@@ -53,6 +54,7 @@ function SetupSingleton(slotCount)
     local model = {
         SlotCount   = Create(slotCount or 8),
         ClosedSlots = Create({}),
+        SlotsPinned = Create(false),
     }
 
     ModelInstance = model
@@ -90,6 +92,13 @@ function SetClosed(model, slot, closed)
     model.ClosedSlots:Set(closedSlots)
 end
 
+--- Sets whether seating is pinned (only the host may change slots while on).
+---@param model UICustomLobbySessionModel
+---@param pinned boolean
+function SetSlotsPinned(model, pinned)
+    model.SlotsPinned:Set(pinned and true or false)
+end
+
 --#endregion
 
 -------------------------------------------------------------------------------
@@ -103,6 +112,7 @@ function __moduleinfo.OnReload(newModule)
     if ModelInstance then
         local handle = newModule.SetupSingleton(ModelInstance.SlotCount())
         handle.ClosedSlots:Set(ModelInstance.ClosedSlots())
+        handle.SlotsPinned:Set(ModelInstance.SlotsPinned())
     end
 end
 
