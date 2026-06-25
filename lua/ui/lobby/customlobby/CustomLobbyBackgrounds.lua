@@ -32,8 +32,13 @@
 local Prefs = import("/lua/user/prefs.lua")
 local LazyVarCreate = import("/lua/lazyvar.lua").Create
 
---- The directory scanned for background images (repo-root absolute).
+--- The directory of the stock background images shipped with the game.
 BackgroundsDir = '/textures/ui/common/lobby/backgrounds'
+
+--- An optional override directory (mounted from gamedata/custom-lobby-backgrounds — see
+--- init_fafdevelop.lua). When it holds any image, it *replaces* the stock set entirely; otherwise
+--- the stock set is used.
+CustomBackgroundsDir = '/textures/ui/common/lobby/custom-backgrounds'
 
 --- The prefs key the chosen background path is stored under (this machine only).
 local PrefsKey = "customlobby_background"
@@ -57,16 +62,28 @@ local function DisplayName(path)
     return name
 end
 
---- All background images on disk as `{ Path, Name }`, sorted by path. Empty when the folder holds
---- none. Re-scanned on each call (cheap — a handful of files).
+--- All `*.png` in `dir` as `{ Path, Name }`, sorted by path.
+---@param dir FileName
 ---@return { Path: FileName, Name: string }[]
-function Discover()
+local function ScanDir(dir)
     local backgrounds = {}
-    for _, path in DiskFindFiles(BackgroundsDir, '*.png') do
+    for _, path in DiskFindFiles(dir, '*.png') do
         table.insert(backgrounds, { Path = path, Name = DisplayName(path) })
     end
     table.sort(backgrounds, function(a, b) return a.Path < b.Path end)
     return backgrounds
+end
+
+--- All background images on disk as `{ Path, Name }`, sorted by path. The custom override folder
+--- takes precedence: if it holds any image, only those are offered; otherwise the stock set is used.
+--- Empty only when neither folder has any. Re-scanned on each call (cheap — a handful of files).
+---@return { Path: FileName, Name: string }[]
+function Discover()
+    local custom = ScanDir(CustomBackgroundsDir)
+    if next(custom) then
+        return custom
+    end
+    return ScanDir(BackgroundsDir)
 end
 
 --- The selected-path LazyVar, created + seeded on first call. Subscribe with `Derive` to react to

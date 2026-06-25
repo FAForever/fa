@@ -659,4 +659,4 @@ MountDirectory(fa_path .. "/maps", '/maps')
 MountDirectory(fa_path .. "/fonts", '/fonts')
 
 -- support for custom backgrounds in the lobby
-MountDirectory(InitFileDir .. '/../gamedata/custom-lobby-backgrounds', '/textures/ui/common/lobby/backgrounds')
+MountDirectory(InitFileDir .. '/../gamedata/custom-lobby-backgrounds', '/textures/ui/common/lobby/custom-backgrounds')
