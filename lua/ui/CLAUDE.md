@@ -250,6 +250,17 @@ self.SomeLine.Top:Set(scaled(20))
 
 If you find yourself reaching for `ScaleNumber` a lot, that's usually a sign you should be using `Layouter` instead.
 
+### Standard asset sizes — look them up, don't guess
+
+A `Button` (and most textured controls) sizes to its art by default, so the texture's width *is* the
+control width unless you override it. Don't eyeball these. Every texture's native (unscaled) pixel
+size is dumped in [`/textures/texture-dimensions.csv`](/textures/texture-dimensions.csv)
+(`RelativePath, Width, Height, Format`) — grep it for the resolved path. `SkinnableFile` maps
+`/BUTTON/` → `ui/common/widgets/`; `CreateButtonStd`/`CreateButtonWithDropshadow` append
+`_btn_{up,…}.dds`. Common standard buttons (unscaled W × H): `/BUTTON/large/` **392 × 92**,
+`/BUTTON/medium/` **276 × 72**, `/BUTTON/small/` **152 × 40**, `/scx_menu/small-btn/small`
+**200 × 72**, gear/close menu-btns **24 × 24**. Remember these are pre-scale — multiply by the UI scale.
+
 ### Scrollbars — reserve the gutter on the content, not the bar
 
 `UIUtil.CreateVertScrollbarFor(content, offset_right)` sets `bar.Left = content.Right + offset_right` (`AnchorToRight`). The convention here: **inset the content's right edge by the gutter and attach the bar at offset 0** — the bar then sits in that reserved strip.
