@@ -41,6 +41,7 @@ local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaun
 local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/customlobbysessionmodel.lua")
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
 local CustomLobbySession = import("/lua/ui/lobby/customlobby/customlobbysession.lua")
+local CustomLobbyPresets = import("/lua/ui/lobby/customlobby/customlobbypresets.lua")
 
 --- The live lobby object, set by the first engine callback. UI-triggered intents
 --- (RequestSetReady, …) reach the network through it without threading it everywhere.
@@ -859,9 +860,157 @@ function RequestLaunch()
         return
     end
 
+    -- auto-save the launched setup as the reserved "last game" preset, so a rehost can restore it
+    -- (USER_STORIES.md § O); failure to persist must not block the launch
+    local ok, err = pcall(function()
+        CustomLobbyPresets.SavePreset(CustomLobbyPresets.LastGamePresetName, BuildSetupSnapshot())
+    end)
+    if not ok then
+        WARN("CustomLobby: failed to auto-save the last-game preset — " .. tostring(err))
+    end
+
     local gameConfiguration = BuildGameConfiguration(instance)
     instance:BroadcastData({ Type = 'LaunchGame', GameConfig = gameConfiguration })
     instance:LaunchGame(gameConfiguration)
+end
+
+--#endregion
+
+-------------------------------------------------------------------------------
+--#region Setup presets (save / load named full-setup snapshots; § O)
+--
+-- Persistence is in CustomLobbyPresets (pure prefs). Capturing the live launch state into a
+-- snapshot and applying one back touch the synced model + network, so they live here (the host
+-- is the only writer). Players are captured for a future rehost reseat but are NOT applied on a
+-- normal load — restoring players/AIs needs infra the new lobby doesn't have yet (no AI-add, no
+-- per-player faction/colour/team intents). See the deferred slice in CLAUDE.md.
+
+--- The player fields a preset captures. `OwnerID` / `Ready` / rating fields are deliberately
+--- dropped (connection-specific or recomputed); `PlayerName` is kept as the stable key a future
+--- rehost reseat matches returning humans on.
+local PlayerPresetFields = {
+    'PlayerName', 'Human', 'Faction', 'Team', 'PlayerColor', 'ArmyColor', 'StartSpot', 'AIPersonality',
+}
+
+--- A serializable copy of a player, trimmed to the preset fields.
+---@param player UICustomLobbyPlayer
+---@return table
+local function TrimPlayerForPreset(player)
+    local trimmed = {}
+    for _, key in PlayerPresetFields do
+        trimmed[key] = player[key]
+    end
+    return trimmed
+end
+
+--- Reads the current launch state into a plain serializable setup snapshot. Used both by the
+--- save-preset intent and the launch auto-save. Pure read — never mutates the model.
+---@return UICustomLobbySetupSnapshot
+function BuildSetupSnapshot()
+    local launch = CustomLobbyLaunchModel.GetSingleton()
+
+    local players = {}
+    for slot = 1, CustomLobbyLaunchModel.MaxSlots do
+        local player = launch.Players[slot]()
+        players[slot] = player and TrimPlayerForPreset(player) or false
+    end
+
+    local observers = {}
+    for _, observer in launch.Observers() do
+        table.insert(observers, TrimPlayerForPreset(observer))
+    end
+
+    -- per-player Ratings / ClanTags are stamped fresh at launch; drop them from the saved options
+    local options = table.deepcopy(launch.GameOptions())
+    options.Ratings = nil
+    options.ClanTags = nil
+
+    return {
+        ScenarioFile = launch.ScenarioFile(),
+        GameOptions = options,
+        GameMods = table.deepcopy(launch.GameMods()),
+        Restrictions = table.deepcopy(launch.Restrictions()),
+        AutoTeams = table.deepcopy(launch.AutoTeams()),
+        SpawnMex = table.deepcopy(launch.SpawnMex()),
+        Players = players,
+        Observers = observers,
+    }
+end
+
+--- Host-side: applies a setup snapshot to the launch model and broadcasts it. Sets the scenario
+--- (re-sizing the lobby room), sim mods, restrictions and teams/spawn-mex, then reconciles the
+--- game options against the now-current scenario+mods (drop stale keys, seed defaults) — the same
+--- reconcile the options dialog / reset use — and broadcasts once. Players are left untouched
+--- (see the region note). Mirrors the legacy `ApplyGameSettings` → single `UpdateGame`.
+---@param setup UICustomLobbySetupSnapshot
+function ApplySetup(setup)
+    local instance = LobbyInstance
+    if not instance then
+        WARN("CustomLobby: ApplySetup ignored — no lobby instance (UI-only, or the controller was "
+            .. "hot-reloaded; re-host to restore it)")
+        return
+    end
+
+    if not CustomLobbyLocalModel.GetSingleton().IsHost() then
+        WARN("CustomLobby: only the host can load a setup preset")
+        return
+    end
+
+    if not setup then
+        WARN("CustomLobby: ApplySetup ignored — empty setup")
+        return
+    end
+
+    local launch = CustomLobbyLaunchModel.GetSingleton()
+
+    -- scenario first: it sizes the lobby room and drives the option schema below
+    local scenario = setup.ScenarioFile or false
+    CustomLobbyLaunchModel.SetScenario(launch, scenario)
+    local count = ScenarioSlotCount(scenario)
+    if count > 0 then
+        local session = CustomLobbySessionModel.GetSingleton()
+        session.SlotCount:Set(math.min(count, CustomLobbyLaunchModel.MaxSlots))
+        BroadcastSessionState(instance)
+    end
+
+    CustomLobbyLaunchModel.SetGameMods(launch, setup.GameMods or {})
+    CustomLobbyLaunchModel.SetRestrictions(launch, setup.Restrictions or {})
+    launch.AutoTeams:Set(table.deepcopy(setup.AutoTeams or {}))
+    launch.SpawnMex:Set(table.deepcopy(setup.SpawnMex or {}))
+
+    -- reconcile the saved option values against the current scenario+mods schema
+    local OptionUtil = import("/lua/ui/optionutil.lua")
+    local schema = {}
+    for _, option in OptionUtil.GetLobbyOptions() do table.insert(schema, option) end
+    for _, option in OptionUtil.GetScenarioOptions(scenario) do table.insert(schema, option) end
+    for _, option in OptionUtil.GetModOptions(launch.GameMods()) do table.insert(schema, option) end
+    CustomLobbyLaunchModel.SetGameOptions(launch, OptionUtil.SeedDefaults(schema, setup.GameOptions or {}))
+
+    BroadcastLaunchInfo(instance)
+end
+
+--- Saves the current setup under `name` (host-local prefs). Reads the live model, so a client may
+--- also capture the host-dictated setup to reuse later; the save itself never mutates the lobby.
+---@param name string
+function RequestSaveSetupPreset(name)
+    if not name or name == "" then
+        WARN("CustomLobby: RequestSaveSetupPreset ignored — empty name")
+        return
+    end
+    CustomLobbyPresets.SavePreset(name, BuildSetupSnapshot())
+    LOG("CustomLobby: setup preset saved (" .. name .. ")")
+end
+
+--- Loads the named setup preset and applies it. Host-only (enforced in `ApplySetup`).
+---@param name string
+function RequestLoadSetupPreset(name)
+    local setup = CustomLobbyPresets.GetPreset(name)
+    if not setup then
+        WARN("CustomLobby: no setup preset named " .. tostring(name))
+        return
+    end
+    ApplySetup(setup)
+    LOG("CustomLobby: setup preset loaded (" .. tostring(name) .. ")")
 end
 
 --#endregion

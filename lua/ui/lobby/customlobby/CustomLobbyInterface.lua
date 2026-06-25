@@ -68,6 +68,7 @@ local CustomLobbyTabs = import("/lua/ui/lobby/customlobby/customlobbytabs.lua")
 local CustomLobbyChatPanel = import("/lua/ui/lobby/customlobby/social/customlobbychatpanel.lua")
 local CustomLobbyObserversPanel = import("/lua/ui/lobby/customlobby/social/customlobbyobserverspanel.lua")
 local CustomLobbyLogsPanel = import("/lua/ui/lobby/customlobby/social/customlobbylogspanel.lua")
+local CustomLobbyPresetSelect = import("/lua/ui/lobby/customlobby/presetselect/customlobbypresetselect.lua")
 
 local LazyVarCreate = import("/lua/lazyvar.lua").Create
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
@@ -155,6 +156,7 @@ end
 ---@field ActionArea Group
 ---@field StatusLabel Text
 ---@field LaunchButton Button
+---@field PresetsButton Button   # host-only: opens the setup-presets dialog
 ---@field IsHostObserver LazyVar
 local CustomLobbyInterface = Class(Group) {
 
@@ -237,6 +239,14 @@ local CustomLobbyInterface = Class(Group) {
         self.LaunchButton.OnClick = function(button, modifiers)
             CustomLobbyController.RequestLaunch()
         end
+
+        -- host-only: save / load named full-setup presets (map, options, mods, restrictions)
+        self.PresetsButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/medium/', "Presets")
+        self.PresetsButton.OnClick = function(button, modifiers)
+            CustomLobbyPresetSelect.Open(GetFrame(0))
+        end
+        Tooltip.AddControlTooltipManual(self.PresetsButton, "Presets",
+            "Save the current setup as a named preset, or load a saved one (host only).")
         Tooltip.AddControlTooltipManual(self.LaunchButton, "Launch", "Start the game with the current setup (host only). Everyone else must be ready.")
         --#endregion
 
@@ -306,6 +316,7 @@ local CustomLobbyInterface = Class(Group) {
         Layouter(self.LeaveButton):AtLeftIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea):End()
         Layouter(self.StatusLabel):AnchorToRight(self.LeaveButton, 8):AtVerticalCenterIn(self.ActionArea):End()
         Layouter(self.LaunchButton):AtRightIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea):End()
+        Layouter(self.PresetsButton):AnchorToLeft(self.LaunchButton, 8):AtVerticalCenterIn(self.LaunchButton):End()
         --#endregion
 
         -- size-dependent children build their scrollbars / first render now that they're sized
@@ -323,8 +334,10 @@ local CustomLobbyInterface = Class(Group) {
         self.StatusLabel:SetText(isHost and "You are the host." or "The host controls the game.")
         if isHost then
             self.LaunchButton:Show()
+            self.PresetsButton:Show()
         else
             self.LaunchButton:Hide()
+            self.PresetsButton:Hide()
         end
     end,
 
