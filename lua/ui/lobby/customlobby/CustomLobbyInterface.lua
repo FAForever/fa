@@ -204,8 +204,7 @@ local CustomLobbyInterface = Class(Group) {
         self.ChatBadge = self.Trash:Add(LazyVarCreate("0"))     -- TODO: real unread count with the chat slice
         self.ObserversBadge = self.Trash:Add(LazyVarCreate())
         self.ObserversBadge:Set(function()
-            local count = table.getn(CustomLobbyLaunchModel.GetSingleton().Observers())
-            return count > 0 and tostring(count) or ""
+            return tostring(table.getn(CustomLobbyLaunchModel.GetSingleton().Observers()))
         end)
 
         self.BottomLeftTabs = CustomLobbyTabs.Create(self.BottomLeftArea, {

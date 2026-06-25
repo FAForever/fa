@@ -358,7 +358,7 @@ local FactionTab = ClassUI(Group) {
     ---@param self UICustomLobbyFactionTab
     ---@param count number
     SetBadge = function(self, count)
-        self.Badge:SetText(count > 0 and ("(" .. count .. ")") or "")
+        self.Badge:SetText("(" .. count .. ")")
     end,
 }
 

@@ -63,9 +63,9 @@ local TabHoverColor = 'ff1f262e'
 local TabActiveColor = 'ff2c3e48'
 
 -- the count badge: a grey pill (rounded-look solid) with a number, sitting to the right of a label
-local BadgeHeight = 16
-local BadgeMinWidth = 18         -- keeps a single digit roughly square
-local BadgePadH = 6              -- horizontal text padding inside the pill
+local BadgeHeight = 13
+local BadgeMinWidth = 14         -- keeps a single digit roughly square
+local BadgePadH = 4              -- horizontal text padding inside the pill
 local BadgeGap = 5               -- between cluster items (action / label / pill)
 local BadgeColor = 'ff454c56'
 local BadgeTextColor = 'ffd0d4d8'
@@ -88,6 +88,7 @@ local TabIconSize = 16
 ---@field Action? UICustomLobbyTabAction # optional button inside the tab, left of the label
 ---@field Icon? FileName # optional centred icon (a UIFile path) shown instead of the label (tidy with Compact)
 ---@field Compact? boolean # fixed narrow width, excluded from the even division (a utility tab)
+---@field Weight? number # flexible tabs share width in proportion to this (default 1); ignored for Compact
 
 ---@class UICustomLobbyTabsOptions
 ---@field Tabs UICustomLobbyTab[]
@@ -155,27 +156,35 @@ local CustomLobbyTabs = ClassUI(Group) {
             :End()
 
         -- compact tabs take a fixed narrow width; the flexible tabs share what's left of the strip
-        -- evenly. Width/Left are bound to the strip so they re-flow with the column.
+        -- in proportion to their `Weight` (default 1) — so a tab can claim more room than its peers.
+        -- Width/Left are bound to the strip so they re-flow with the column.
         local count = table.getn(self.TabButtons)
-        local flexCount = 0
+        local flexWeight = 0
+        local compactCount = 0
         for index = 1, count do
-            if not self.Tabs[index].Compact then
-                flexCount = flexCount + 1
+            if self.Tabs[index].Compact then
+                compactCount = compactCount + 1
+            else
+                flexWeight = flexWeight + (self.Tabs[index].Weight or 1)
             end
         end
 
-        -- the width of one flexible tab: the strip minus all gaps and all compact tabs, split evenly
-        local function flexWidth()
+        -- the width of one unit of weight: the strip minus all gaps and all compact tabs, split by
+        -- total flexible weight
+        local function flexUnit()
             local gap = LayoutHelpers.ScaleNumber(TabGap)
             local compactW = LayoutHelpers.ScaleNumber(CompactWidth)
-            local remaining = self.TabStripArea.Width() - gap * (count - 1) - compactW * (count - flexCount)
-            if flexCount <= 0 then
+            local remaining = self.TabStripArea.Width() - gap * (count - 1) - compactW * compactCount
+            if flexWeight <= 0 then
                 return 0
             end
-            return remaining / flexCount
+            return remaining / flexWeight
         end
         local function widthOf(index)
-            return self.Tabs[index].Compact and LayoutHelpers.ScaleNumber(CompactWidth) or flexWidth()
+            if self.Tabs[index].Compact then
+                return LayoutHelpers.ScaleNumber(CompactWidth)
+            end
+            return flexUnit() * (self.Tabs[index].Weight or 1)
         end
 
         for index = 1, count do

@@ -288,10 +288,10 @@ local CustomLobbyConfigInterface = ClassUI(Group) {
         -- button can subscribe at creation.
         local launch = CustomLobbyLaunchModel.GetSingleton()
 
+        -- the badges always render, even at 0 (an empty string would collapse the pill)
         self.OptionsBadge = self.Trash:Add(LazyVarCreate())
         self.OptionsBadge:Set(function()
-            local count = OptionUtil.CountNonDefault(launch.ScenarioFile(), launch.GameMods(), launch.GameOptions())
-            return count > 0 and tostring(count) or ""
+            return tostring(OptionUtil.CountNonDefault(launch.ScenarioFile(), launch.GameMods(), launch.GameOptions()))
         end)
 
         -- "sim / ui" — sim mods are the synced GameMods; UI mods are this peer's prefs (not a
@@ -301,17 +301,13 @@ local CustomLobbyConfigInterface = ClassUI(Group) {
         self.ModsBadge:Set(function()
             local sim = table.getsize(launch.GameMods())
             local ui = table.getsize(ModUtilities.GetSelectedUIMods())
-            if sim == 0 and ui == 0 then
-                return ""
-            end
             return sim .. " / " .. ui
         end)
 
         -- the count of active unit restrictions (preset keys in the launch model's Restrictions)
         self.RestrictionsBadge = self.Trash:Add(LazyVarCreate())
         self.RestrictionsBadge:Set(function()
-            local count = table.getn(launch.Restrictions())
-            return count > 0 and tostring(count) or ""
+            return tostring(table.getn(launch.Restrictions()))
         end)
 
         -- the read-only config tabs below the preview (created-on-select / destroyed-on-switch),
@@ -334,6 +330,8 @@ local CustomLobbyConfigInterface = ClassUI(Group) {
                 },
                 {
                     Label = "Restrictions", Create = CustomLobbyUnitsPanel.Create, Badge = self.RestrictionsBadge,
+                    -- the longest label (+ gear + badge); give it more of the strip than Options/Mods
+                    Weight = 1.4,
                     Action = GearAction(function() CustomLobbyUnitSelect.Open(GetFrame(0)) end,
                         "Edit restrictions", "Pick the units and presets to restrict (host only).", isHost),
                 },
