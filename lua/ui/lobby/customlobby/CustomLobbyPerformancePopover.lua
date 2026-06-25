@@ -370,11 +370,12 @@ function Show(anchor, metrics, unitCap)
 
     local frame = GetFrame(0)
 
-    -- float beside the hovered control, vertically centred on it. If the control sits on the
-    -- right half of the screen, open to its LEFT so the popover doesn't run off the edge.
+    -- float beside the hovered control, vertically centred on it. Prefer opening to its RIGHT, but
+    -- flip to the LEFT when the popover's own width would run it off the right screen edge (the old
+    -- screen-centre test ignored the popover width, so it clipped — worse at higher ui_scale).
     local builder = Layouter(popover):AtVerticalCenterIn(anchor)
-    local anchorCenter = (anchor.Left() + anchor.Right()) / 2
-    if anchorCenter > frame.Width() / 2 then
+    local pad = LayoutHelpers.ScaleNumber(12)
+    if anchor.Right() + pad + popover.Width() > frame.Width() then
         builder:AnchorToLeft(anchor, 12)
     else
         builder:AnchorToRight(anchor, 12)

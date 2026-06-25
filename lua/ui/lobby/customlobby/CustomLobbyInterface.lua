@@ -37,7 +37,7 @@
 --   │ BottomLeftArea (Chat / Observers      │                                     │
 --   │   — tabs)                             │                                     │
 --   ├──────────────────────────────────────┴─────────────────────────────────────┤
---   │ ActionArea (Leave · status · … · Settings · Launch) ─ full width            │
+--   │ ActionArea (Leave · status · … · Launch) ─ full width                       │
 --   └────────────────────────────────────────────────────────────────────────────┘
 --
 -- The LEFT column splits vertically: the slots on top (CustomLobbySlotsInterface — one column, or
@@ -45,11 +45,10 @@
 -- the chat/observers tabs (CustomLobbyTabs) below. The RIGHT column is the map + options
 -- (CustomLobbyConfigInterface — a bound map preview, a name/size/players/version facts line, and the
 -- read-only options summary). A full-width action bar at the bottom holds the global actions: Leave
--- + status on the left, the generic Settings button (opens the options editor) + the host-only
--- Launch on the right. The title bar is just the title.
+-- + status on the left, the host-only Launch on the right. The title bar is just the title.
 --
--- The per-domain edit buttons (change-map, mod-select) are removed for now — only the generic
--- Settings button remains — and will be reintegrated once the rework is complete.
+-- Options/mods are edited from the per-tab config gears in the right column; the action bar's old
+-- generic Settings button (and the per-domain change-map / mod-select buttons) are gone.
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
@@ -69,7 +68,6 @@ local CustomLobbyTabs = import("/lua/ui/lobby/customlobby/customlobbytabs.lua")
 local CustomLobbyChatPanel = import("/lua/ui/lobby/customlobby/social/customlobbychatpanel.lua")
 local CustomLobbyObserversPanel = import("/lua/ui/lobby/customlobby/social/customlobbyobserverspanel.lua")
 local CustomLobbyLogsPanel = import("/lua/ui/lobby/customlobby/social/customlobbylogspanel.lua")
-local CustomLobbyOptionSelect = import("/lua/ui/lobby/customlobby/optionselect/customlobbyoptionselect.lua")
 
 local LazyVarCreate = import("/lua/lazyvar.lua").Create
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
@@ -121,7 +119,7 @@ local LobbyHeight = 768
 local Pad = 8
 local TitleHeight = 48
 local RightWidth = 360           -- the right column (map preview + options summary); the left fills the rest
-local ActionHeight = 52          -- the full-width action bar at the very bottom (status + Settings + launch)
+local ActionHeight = 52          -- the full-width action bar at the very bottom (status + launch)
 
 --- Creates a layout area (an invisible Group with an optional debug tint).
 ---@param parent Control
@@ -156,7 +154,6 @@ end
 ---@field Config UICustomLobbyConfigInterface
 ---@field ActionArea Group
 ---@field StatusLabel Text
----@field SettingsButton Button
 ---@field LaunchButton Button
 ---@field IsHostObserver LazyVar
 local CustomLobbyInterface = Class(Group) {
@@ -232,18 +229,10 @@ local CustomLobbyInterface = Class(Group) {
         self.Config = CustomLobbyConfigInterface.Create(self.RightArea)
         --#endregion
 
-        --#region action bar (full-width, bottom): status + Settings + launch
+        --#region action bar (full-width, bottom): status + launch
         self.StatusLabel = UIUtil.CreateText(self.ActionArea, "", 13, UIUtil.bodyFont)
         self.StatusLabel:SetColor('ff9aa0a8')
         self.StatusLabel:DisableHitTest()
-
-        -- the single generic settings button (host-only); opens the options editor. The per-domain
-        -- edit buttons (change-map, mod-select) are removed until the rework is complete.
-        self.SettingsButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/medium/', "Settings")
-        self.SettingsButton.OnClick = function(button, modifiers)
-            CustomLobbyOptionSelect.Open(GetFrame(0))
-        end
-        Tooltip.AddControlTooltipManual(self.SettingsButton, "Settings", "Open the game options (host only).")
 
         self.LaunchButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/large/', "Launch")
         self.LaunchButton.OnClick = function(button, modifiers)
@@ -314,11 +303,10 @@ local CustomLobbyInterface = Class(Group) {
         Layouter(self.Config):Fill(self.RightArea):End()
         --#endregion
 
-        --#region action bar: Leave + status on the left, Settings + launch on the right
+        --#region action bar: Leave + status on the left, launch on the right
         Layouter(self.LeaveButton):AtLeftIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea):End()
         Layouter(self.StatusLabel):AnchorToRight(self.LeaveButton, 8):AtVerticalCenterIn(self.ActionArea):End()
         Layouter(self.LaunchButton):AtRightIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea):End()
-        Layouter(self.SettingsButton):AnchorToLeft(self.LaunchButton, 8):AtVerticalCenterIn(self.ActionArea):End()
         --#endregion
 
         -- size-dependent children build their scrollbars / first render now that they're sized
@@ -327,19 +315,17 @@ local CustomLobbyInterface = Class(Group) {
         self.Config:Initialize()
     end,
 
-    --- Tracks host status: updates the status line and shows the host-only action-bar buttons
-    --- (Settings + Launch) only to the host. (The options editor the Settings button opens is
-    --- host-gated regardless; the right-column options summary stays read-only-visible to everyone.)
+    --- Tracks host status: updates the status line and shows the host-only Launch button only to the
+    --- host. (Options editing lives on the right-column config gears, host-gated there; the
+    --- right-column options summary stays read-only-visible to everyone.)
     ---@param self UICustomLobbyInterface
     ---@param isHost boolean
     OnIsHostChanged = function(self, isHost)
         self.StatusLabel:SetText(isHost and "You are the host." or "The host controls the game.")
-        for _, button in { self.SettingsButton, self.LaunchButton } do
-            if isHost then
-                button:Show()
-            else
-                button:Hide()
-            end
+        if isHost then
+            self.LaunchButton:Show()
+        else
+            self.LaunchButton:Hide()
         end
     end,
 
