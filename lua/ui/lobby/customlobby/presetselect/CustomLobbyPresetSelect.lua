@@ -51,14 +51,18 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 -- flip to tint each layout area so the regions are visible while iterating
 local Debug = false
 
-local DialogWidth = 620
+-- five action buttons (Load / Save / Rename / Delete · Close) sit in one row; each `/BUTTON/small/`
+-- is 152×40 unscaled (see /textures/texture-dimensions.csv), so the dialog is sized to hold
+-- 5×152 + the inter-button gaps + padding without overlap.
+local DialogWidth = 820
 local DialogHeight = 470
 local Pad = 12
 local ColumnGap = 20
 local ListWidth = 250
 local ScrollbarInset = 20
 local TitleHeight = 32
-local ActionHeight = 44
+local ButtonGap = 8
+local ActionHeight = 48
 
 local LabelColor = 'ffc8ccd0'
 
@@ -200,32 +204,32 @@ local CustomLobbyPresetSelect = ClassUI(Group) {
         --#endregion
 
         --#region actions
-        self.LoadButton = UIUtil.CreateButtonStd(self.ActionArea, '/scx_menu/small-btn/small', "<LOC _Load>Load", 16, 2)
+        self.LoadButton = UIUtil.CreateButtonStd(self.ActionArea, '/BUTTON/small/', "<LOC _Load>Load", 14, 2)
         self.LoadButton.OnClick = function(button, modifiers)
             self:LoadSelected()
         end
         Tooltip.AddControlTooltipManual(self.LoadButton, "Load preset",
             "Apply the selected preset's map, options, mods and restrictions to the lobby.")
 
-        self.SaveButton = UIUtil.CreateButtonStd(self.ActionArea, '/scx_menu/small-btn/small', "<LOC _Save>Save", 16, 2)
+        self.SaveButton = UIUtil.CreateButtonStd(self.ActionArea, '/BUTTON/small/', "<LOC _Save>Save", 14, 2)
         self.SaveButton.OnClick = function(button, modifiers)
             self:PromptSave()
         end
         Tooltip.AddControlTooltipManual(self.SaveButton, "Save preset", "Save the current lobby setup as a named preset.")
 
-        self.RenameButton = UIUtil.CreateButtonStd(self.ActionArea, '/scx_menu/small-btn/small', "Rename", 16, 2)
+        self.RenameButton = UIUtil.CreateButtonStd(self.ActionArea, '/BUTTON/small/', "Rename", 14, 2)
         self.RenameButton.OnClick = function(button, modifiers)
             self:PromptRename()
         end
         Tooltip.AddControlTooltipManual(self.RenameButton, "Rename preset", "Rename the selected preset.")
 
-        self.DeleteButton = UIUtil.CreateButtonStd(self.ActionArea, '/scx_menu/small-btn/small', "<LOC _Delete>Delete", 16, 2)
+        self.DeleteButton = UIUtil.CreateButtonStd(self.ActionArea, '/BUTTON/small/', "<LOC _Delete>Delete", 14, 2)
         self.DeleteButton.OnClick = function(button, modifiers)
             self:DeleteSelected()
         end
         Tooltip.AddControlTooltipManual(self.DeleteButton, "Delete preset", "Delete the selected preset.")
 
-        self.CloseButton = UIUtil.CreateButtonStd(self.ActionArea, '/scx_menu/small-btn/small', "<LOC _Close>Close", 16, 2)
+        self.CloseButton = UIUtil.CreateButtonStd(self.ActionArea, '/BUTTON/small/', "<LOC _Close>Close", 14, 2)
         self.CloseButton.OnClick = function(button, modifiers)
             self.OnCloseCb()
         end
@@ -264,9 +268,9 @@ local CustomLobbyPresetSelect = ClassUI(Group) {
 
         --#region actions: Load / Save / Rename / Delete on the left, Close on the right
         Layouter(self.LoadButton):AtLeftIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea):End()
-        Layouter(self.SaveButton):AnchorToRight(self.LoadButton, 8):AtVerticalCenterIn(self.ActionArea):End()
-        Layouter(self.RenameButton):AnchorToRight(self.SaveButton, 8):AtVerticalCenterIn(self.ActionArea):End()
-        Layouter(self.DeleteButton):AnchorToRight(self.RenameButton, 8):AtVerticalCenterIn(self.ActionArea):End()
+        Layouter(self.SaveButton):AnchorToRight(self.LoadButton, ButtonGap):AtVerticalCenterIn(self.ActionArea):End()
+        Layouter(self.RenameButton):AnchorToRight(self.SaveButton, ButtonGap):AtVerticalCenterIn(self.ActionArea):End()
+        Layouter(self.DeleteButton):AnchorToRight(self.RenameButton, ButtonGap):AtVerticalCenterIn(self.ActionArea):End()
         Layouter(self.CloseButton):AtRightIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea):End()
         --#endregion
     end,

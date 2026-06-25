@@ -58,6 +58,9 @@ local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Button = import("/lua/maui/button.lua").Button
+local Combo = import("/lua/ui/controls/combo.lua").Combo
+local CustomLobbyBackground = import("/lua/ui/lobby/customlobby/customlobbybackground.lua")
+local CustomLobbyBackgrounds = import("/lua/ui/lobby/customlobby/customlobbybackgrounds.lua")
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
 local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/customlobbysessionmodel.lua")
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
@@ -140,10 +143,12 @@ end
 
 ---@class UICustomLobbyInterface : Group
 ---@field Trash TrashBag
----@field Background Bitmap
+---@field Background UICustomLobbyBackground
 ---@field Content Group
 ---@field TitleArea Group
 ---@field Title Text
+---@field BackgroundCombo Combo
+---@field BackgroundPaths (FileName | false)[]   # parallel to the combo items; [1] is "(None)"
 ---@field LeaveButton Button
 ---@field SlotsArea Group
 ---@field Slots UICustomLobbySlotsInterface
@@ -167,9 +172,9 @@ local CustomLobbyInterface = Class(Group) {
 
         self.Trash = TrashBag()
 
-        self.Background = Bitmap(self)
-        self.Background:SetSolidColor('ff0a0a0a')
-        self.Background:DisableHitTest()
+        -- full-window background image (cover-fit, keeps aspect ratio); subscribes to the per-peer
+        -- selection itself. A solid backdrop shows through when no image is chosen.
+        self.Background = CustomLobbyBackground.Create(self)
 
         -- everything below lives in a centered, size-capped content group (see __post_init)
         self.Content = Group(self, "CustomLobbyContent")
@@ -182,9 +187,16 @@ local CustomLobbyInterface = Class(Group) {
         self.ActionArea = CreateArea(self.Content, "ActionArea", 'ff808080')
         --#endregion
 
-        --#region title bar (title)
+        --#region title bar (title + background picker)
         self.Title = UIUtil.CreateText(self.TitleArea, "Custom game", 20, UIUtil.titleFont)
         self.Title:DisableHitTest()
+
+        -- a basic background picker: a combo of every *.png in the backgrounds folder (plus a
+        -- leading "(None)"). The choice is local + cosmetic, persisted via CustomLobbyBackgrounds.
+        self.BackgroundCombo = Combo(self.TitleArea, 14, 8, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
+        self:PopulateBackgrounds()
+        Tooltip.AddControlTooltipManual(self.BackgroundCombo, "Background",
+            "Choose the lobby background image (a local, cosmetic choice).")
         --#endregion
 
         -- Leave lives in the action bar (bottom-left, beside the status text); created here so it's
@@ -261,7 +273,7 @@ local CustomLobbyInterface = Class(Group) {
     ---@param parent Control
     __post_init = function(self, parent)
         Layouter(self):Fill(parent):End()
-        Layouter(self.Background):Fill(self):End()
+        -- self.Background lays itself out cover-fit against this root (see CustomLobbyBackground)
 
         -- centred content, capped at the 1024x768 design size (fills the frame at the minimum
         -- resolution; centred with a backdrop border on anything larger)
@@ -296,8 +308,11 @@ local CustomLobbyInterface = Class(Group) {
         self.BottomLeftArea.Right:Set(function() return self.RightArea.Left() - LayoutHelpers.ScaleNumber(Pad) end)
         --#endregion
 
-        --#region title bar (title)
+        --#region title bar (title + background picker)
         Layouter(self.Title):AtLeftIn(self.TitleArea, 8):AtVerticalCenterIn(self.TitleArea):End()
+        Layouter(self.BackgroundCombo)
+            :AtRightIn(self.TitleArea, 8):AtVerticalCenterIn(self.TitleArea):Width(180)
+            :End()
         --#endregion
 
         --#region slots fill their area (the component stacks the rows + coordinates dragging)
@@ -338,6 +353,35 @@ local CustomLobbyInterface = Class(Group) {
         else
             self.LaunchButton:Hide()
             self.PresetsButton:Hide()
+        end
+    end,
+
+    --- Fills the background picker from the *.png files on disk, with a leading "(None)" entry, and
+    --- selects the one currently chosen. The combo writes the choice back through
+    --- CustomLobbyBackgrounds.Select; the Background surface reacts on its own.
+    ---@param self UICustomLobbyInterface
+    PopulateBackgrounds = function(self)
+        local labels = { "(None)" }
+        local paths = { false }
+        for _, background in CustomLobbyBackgrounds.Discover() do
+            table.insert(labels, background.Name)
+            table.insert(paths, background.Path)
+        end
+        self.BackgroundPaths = paths
+
+        local selected = CustomLobbyBackgrounds.GetSelected()
+        local selectedIndex = 1
+        for index, path in paths do
+            if path == selected then
+                selectedIndex = index
+                break
+            end
+        end
+
+        self.BackgroundCombo:ClearItems()
+        self.BackgroundCombo:AddItems(labels, selectedIndex)
+        self.BackgroundCombo.OnClick = function(combo, index, text)
+            CustomLobbyBackgrounds.Select(self.BackgroundPaths[index] or false)
         end
     end,
 

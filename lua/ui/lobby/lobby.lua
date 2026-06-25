@@ -92,7 +92,6 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
             Instance:Destroy()
             Instance = false
         end
-        CustomLobbyInterface.CloseDebug()
         -- Free everything registered in the session trash (the map catalog today; the models,
         -- interface and instance follow as they are converted to the same pattern).
         CustomLobbySession.Teardown()
