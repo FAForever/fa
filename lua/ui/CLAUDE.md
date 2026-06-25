@@ -184,6 +184,32 @@ end,
 
 `TrashBag` is a weak table for values, so an item already destroyed elsewhere drops out automatically — `Destroy()` should always be idempotent. See [trashbag.lua:30-50](../system/trashbag.lua#L1-L50) for the contract.
 
+### ⚠️ A `Trash:Add(Derive(...))` with no strong reference gets garbage-collected
+
+This is the load-bearing reason the canonical pattern assigns to `self.Observer` **and** passes through `Trash:Add` — the two references do different jobs:
+
+- `self.Observer = …` is the **strong** reference that keeps the derived LazyVar alive.
+- `self.Trash:Add(…)` registers it for **teardown**, nothing more.
+
+`Trash:Add` does **not** keep its contents alive: `TrashBag` is `__mode = 'v'` (weak *values*, [trashbag.lua:40](../system/trashbag.lua#L40)), and a LazyVar's `used_by` (the subscriber list a source walks on `:Set`) is `__mode = 'k'` (weak *keys*, [lazyvar.lua:306](../lazyvar.lua#L306)). So a derived observer reachable **only** through those two tables has no strong referrer and is eligible for collection.
+
+```lua
+-- ❌ BUG: nothing holds the derived LazyVar strongly. It fires once on creation,
+--    then a GC pass collects it and it silently stops reacting to source changes.
+self.Trash:Add(LazyVarDerive(model.IsHost, function(isHostLazy)
+    self:OnHostChanged(isHostLazy())
+end))
+
+-- ✅ CORRECT: the self field is the strong ref; Trash:Add still handles teardown.
+self.IsHostObserver = self.Trash:Add(LazyVarDerive(model.IsHost, function(isHostLazy)
+    self:OnHostChanged(isHostLazy())
+end))
+```
+
+The failure mode is nasty because it's **timing-dependent and silent**: the observer's first synchronous fire works (before any GC), so initial render looks correct; only a *later* `source:Set` — after a GC cycle — fails to propagate, with no error. (Real example: a tab's host-only gear that stayed hidden because its visibility observer was collected before `IsHost` flipped to `true` at hosting time. The source's own `OnDirty` still fired — the source was strongly held by its model singleton — but the orphaned derived observer was already gone.)
+
+If you build observers in a loop (per row / per tab) and have no natural `self.X` name for each, keep them in a strong list field — `self.Observers = self.Observers or {}; table.insert(self.Observers, self.Trash:Add(Derive(...)))` — so the list holds them and the `Trash` still tears them down.
+
 ---
 
 ## 4. Layout — Fluent Layouter

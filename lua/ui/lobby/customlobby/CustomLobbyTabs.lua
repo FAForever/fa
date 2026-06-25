@@ -102,7 +102,9 @@ local TabIconSize = 16
 ---@field Label? Text # present only for a text tab (absent when the tab uses an Icon)
 ---@field Icon? Bitmap # present only when the tab defines an Icon
 ---@field Badge? UICustomLobbyTabBadge # present only when the tab defines a Badge LazyVar
+---@field BadgeObserver? LazyVar # strong ref to the badge observer (kept alive; see /lua/ui/CLAUDE.md § 3)
 ---@field Action? Control # present only when the tab defines an Action
+---@field ActionObserver? LazyVar # strong ref to the action-visibility observer (kept alive)
 
 ---@class UICustomLobbyTabs : Group
 ---@field Trash TrashBag
@@ -338,8 +340,10 @@ local CustomLobbyTabs = ClassUI(Group) {
             button.Badge = badge
 
             -- the badge Derive fires synchronously on creation (before TabButtons[index] is set),
-            -- so operate on the captured `badge`, not a lookup by index
-            self.Trash:Add(LazyVarDerive(badgeLazy, function(badgeTextLazy)
+            -- so operate on the captured `badge`, not a lookup by index. Stored on the button (a
+            -- strong ref) so the observer isn't garbage-collected — Trash:Add alone is weak, see
+            -- /lua/ui/CLAUDE.md § 3.
+            button.BadgeObserver = self.Trash:Add(LazyVarDerive(badgeLazy, function(badgeTextLazy)
                 self:SetBadge(badge, badgeTextLazy() or "")
             end))
         end
@@ -353,8 +357,10 @@ local CustomLobbyTabs = ClassUI(Group) {
             button.Action = action
             if actionDef.Visible then
                 -- fires synchronously on creation (before TabButtons[index] is set) — operate on
-                -- the captured `action`, not a lookup by index
-                self.Trash:Add(LazyVarDerive(actionDef.Visible, function(visibleLazy)
+                -- the captured `action`, not a lookup by index. Stored on the button (a strong ref)
+                -- so the observer isn't garbage-collected — Trash:Add alone is weak, see
+                -- /lua/ui/CLAUDE.md § 3.
+                button.ActionObserver = self.Trash:Add(LazyVarDerive(actionDef.Visible, function(visibleLazy)
                     self:SetActionVisible(action, visibleLazy() and true or false)
                 end))
             else

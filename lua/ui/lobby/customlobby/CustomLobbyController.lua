@@ -278,13 +278,18 @@ end
 --- Called when we become the host.
 ---@param instance UICustomLobbyInstance
 function OnHosting(instance)
+    LOG("OnHosting")
     LobbyInstance = instance
 
     local localModel = CustomLobbyLocalModel.GetSingleton()
     local id = instance:GetLocalPlayerID()
     localModel.LocalPeerId:Set(id)
     localModel.HostID:Set(id)
+    localModel.IsHost.OnDirty = function()
+        LOG("CustomLobby: IsHost changed to " .. tostring(localModel.IsHost()))
+    end
     localModel.IsHost:Set(true)
+
 
     local launch = CustomLobbyLaunchModel.GetSingleton()
     local player = CreateLocalPlayer(instance)
@@ -667,6 +672,8 @@ end
 function RequestSetRestrictions(keys)
     local instance = LobbyInstance
     if not instance then
+        WARN("CustomLobby: RequestSetRestrictions ignored — no lobby instance (UI-only, or the "
+            .. "controller was hot-reloaded; re-host to restore it)")
         return
     end
 
@@ -676,6 +683,7 @@ function RequestSetRestrictions(keys)
     end
 
     CustomLobbyLaunchModel.SetRestrictions(CustomLobbyLaunchModel.GetSingleton(), keys)
+    LOG("CustomLobby: restrictions set (" .. table.getn(keys) .. ")")
     BroadcastLaunchInfo(instance)
 end
 
