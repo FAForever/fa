@@ -24,9 +24,11 @@
 -- shared CustomLobbyScenarioPreview surface, plus the faction spawn icon (the local
 -- `MapPreviewSpawn`). Both preview consumers use this one component, so they look identical:
 --
---   * In the lobby — created with `Bound = true`. It subscribes to the launch model and renders the
---     committed `ScenarioFile` automatically (load via the catalog, hand to the surface, show/hide),
---     with per-slot faction-icon spawns refreshed as players take/swap/recolour (no map reload).
+--   * In the lobby — created with `Bound = true`. It subscribes to the derived scenario model
+--     (CustomLobbyScenarioDerivedModel) and renders the resolved scenario automatically (hand info + markers
+--     to the surface, show/hide). The model loads + dedups, so a launch-info rebroadcast of the same
+--     map doesn't reload; per-slot faction-icon spawns refresh as players take/swap/recolour (no map
+--     reload).
 --
 --   * In the map-select dialog — created unbound (the default). No model wiring, numbered-dot spawns
 --     (the surface default); the owner drives the preview itself through `self.Surface`
@@ -46,7 +48,7 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local CustomLobbyScenarioPreview = import("/lua/ui/lobby/customlobby/customlobbyscenariopreview.lua")
-local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
+local CustomLobbyScenarioDerivedModel = import("/lua/ui/lobby/customlobby/derived/customlobbyscenarioderivedmodel.lua")
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
@@ -174,16 +176,17 @@ local CustomLobbyMapPreview = ClassUI(Group) {
         self.Glow = UIUtil.CreateBitmap(self, GlowTexture)
         self.Glow:DisableHitTest()
 
-        -- bound: the launch model drives the preview. The scenario file renders the whole map; each
-        -- slot drives only the spawn icons (against the already-loaded scenario, so take/swap/faction
-        -- changes don't reload the map). Unbound: the owner drives self.Surface directly.
+        -- bound: the derived scenario model drives the preview. The resolved scenario renders the whole
+        -- map; each slot drives only the spawn icons (against the already-loaded scenario, so take/swap/
+        -- faction changes don't reload the map). The model dedups by file, so a launch-info rebroadcast
+        -- of the same map doesn't re-fire here either. Unbound: the owner drives self.Surface directly.
         if self.Bound then
-            local model = CustomLobbyLaunchModel.GetSingleton()
             self.ScenarioObserver = self.Trash:Add(
-                LazyVarDerive(model.ScenarioFile, function(scenarioFileLazy)
-                    self:OnScenarioFileChanged(scenarioFileLazy())
+                LazyVarDerive(CustomLobbyScenarioDerivedModel.GetScenarioVar(), function(scenarioLazy)
+                    self:OnScenarioChanged(scenarioLazy())
                 end))
 
+            local model = CustomLobbyLaunchModel.GetSingleton()
             self.PlayerObservers = {}
             for slot = 1, CustomLobbyLaunchModel.MaxSlots do
                 self.PlayerObservers[slot] = self.Trash:Add(
@@ -211,24 +214,18 @@ local CustomLobbyMapPreview = ClassUI(Group) {
         self.Trash:Destroy()
     end,
 
-    --- (Bound only) Loads the scenario and hands it to the surface; hides the preview when unset.
+    --- (Bound only) Hands the already-resolved scenario to the surface; hides the preview when there
+    --- is none. The derived model did the loading + dedup, so this just renders what it's given.
     ---@param self UICustomLobbyMapPreview
-    ---@param scenarioFile FileName | false
-    OnScenarioFileChanged = function(self, scenarioFile)
-        if not scenarioFile then
+    ---@param scenario UICustomLobbyScenario | false
+    OnScenarioChanged = function(self, scenario)
+        if not scenario then
             self.Surface:Clear()
             self:Hide()
             return
         end
 
-        local scenarioInfo = CustomLobbyMapCatalog.LoadInfo(scenarioFile)
-        if not scenarioInfo then
-            self.Surface:Clear()
-            self:Hide()
-            return
-        end
-
-        self.Surface:SetScenario(scenarioInfo, CustomLobbyMapCatalog.LoadSave(scenarioInfo))
+        self.Surface:SetScenario(scenario.Info, scenario.Markers)
         self.Surface:SetSpawnData(self:GatherSpawnData())
         self:Show()
     end,

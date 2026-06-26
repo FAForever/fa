@@ -42,7 +42,6 @@
 -- spots while numbered dots (no Update/Reset) stay shown.
 
 local UIUtil = import("/lua/ui/uiutil.lua")
-local MapUtil = import("/lua/ui/maputil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local Group = import("/lua/maui/group.lua").Group
@@ -79,7 +78,7 @@ local SpawnDotSize = 18
 ---@field ShowWrecks boolean
 ---@field ShowWater boolean
 ---@field ScenarioInfo? UILobbyScenarioInfo
----@field ScenarioSave? UIScenarioSaveFile
+---@field Markers? UICustomLobbyScenarioMarkers  # extracted save bits (spawns + mass/hydro/wreck points)
 ---@field SpawnData table<number, any>          # per-start-spot data handed to spawn icons' :Update
 ---@field CreateSpawnIcon fun(surface: Control, index: number): Control
 ---@field Ready boolean                         # true once laid out by the parent; gates geometry reads
@@ -107,7 +106,7 @@ local CustomLobbyScenarioPreview = ClassUI(Group) {
         self.ShowWater = false
 
         self.ScenarioInfo = nil
-        self.ScenarioSave = nil
+        self.Markers = nil
         self.SpawnData = {}
         self.Ready = false
 
@@ -158,14 +157,15 @@ local CustomLobbyScenarioPreview = ClassUI(Group) {
     ---------------------------------------------------------------------------
     --#region Public API
 
-    --- Renders a scenario: map texture + resource/wreck/spawn overlays. Pass already-loaded
-    --- info + save (the owner / catalog does the disk read). A nil info clears the surface.
+    --- Renders a scenario: map texture + resource/wreck/spawn overlays. Pass the already-loaded info
+    --- and the extracted markers (the owner gets them from the catalog / scenario model — the surface
+    --- never touches the raw save). A nil info clears the surface.
     ---@param self UICustomLobbyScenarioPreview
     ---@param scenarioInfo? UILobbyScenarioInfo
-    ---@param scenarioSave? UIScenarioSaveFile
-    SetScenario = function(self, scenarioInfo, scenarioSave)
+    ---@param markers? UICustomLobbyScenarioMarkers
+    SetScenario = function(self, scenarioInfo, markers)
         self.ScenarioInfo = scenarioInfo
-        self.ScenarioSave = scenarioSave
+        self.Markers = markers
         if self.Ready then
             self:Render()
         end
@@ -177,7 +177,7 @@ local CustomLobbyScenarioPreview = ClassUI(Group) {
     ---@param spawnData table<number, any>
     SetSpawnData = function(self, spawnData)
         self.SpawnData = spawnData or {}
-        if self.Ready and self.ScenarioInfo and self.ScenarioSave then
+        if self.Ready and self.ScenarioInfo and self.Markers then
             self:RenderSpawns()
         end
     end,
@@ -203,7 +203,7 @@ local CustomLobbyScenarioPreview = ClassUI(Group) {
     ---@param self UICustomLobbyScenarioPreview
     Clear = function(self)
         self.ScenarioInfo = nil
-        self.ScenarioSave = nil
+        self.Markers = nil
         self.MarkerTrash:Destroy()
         self.SpawnTrash:Destroy()
         self.SpawnIcons = {}
@@ -235,7 +235,7 @@ local CustomLobbyScenarioPreview = ClassUI(Group) {
             self.Preview:SetTextureFromMap(info.map)
         end
 
-        if self.ScenarioSave and info.size then
+        if self.Markers and info.size then
             self:BuildResources()
             self:BuildWrecks()
         end
@@ -250,11 +250,11 @@ local CustomLobbyScenarioPreview = ClassUI(Group) {
         self.SpawnIcons = {}
 
         local info = self.ScenarioInfo
-        if not (info and self.ScenarioSave and info.size) then
+        if not (info and self.Markers and info.size) then
             return
         end
 
-        local positions = MapUtil.GetStartPositionsFromScenario(info, self.ScenarioSave)
+        local positions = self.Markers.Spawns
         if not positions then
             return
         end
@@ -279,32 +279,29 @@ local CustomLobbyScenarioPreview = ClassUI(Group) {
         end
     end,
 
-    --- Places mass + hydrocarbon icons from the save's master-chain markers.
+    --- Places mass + hydrocarbon icons from the extracted resource points.
     ---@param self UICustomLobbyScenarioPreview
     BuildResources = function(self)
         local info = self.ScenarioInfo
-        for _, marker in self:Markers() do
-            local template = (marker.type == "Mass" and self.MassTemplate)
-                or (marker.type == "Hydrocarbon" and self.EnergyTemplate)
-                or false
-            if template and marker.position then
+        local function place(points, template)
+            for _, point in points do
                 local icon = self.MarkerTrash:Add(self:CreateMarkerIcon(template, ResourceIconSize))
-                self:PlaceMarker(icon, info.size[1], info.size[2], marker.position[1], marker.position[3])
+                self:PlaceMarker(icon, info.size[1], info.size[2], point[1], point[2])
                 table.insert(self.ResourceIcons, icon)
             end
         end
+        place(self.Markers.MassPoints, self.MassTemplate)
+        place(self.Markers.HydroPoints, self.EnergyTemplate)
     end,
 
-    --- Best-effort wreck icons: maps that expose prebuilt wreckage as save markers.
+    --- Best-effort wreck icons: maps that expose prebuilt wreckage (extracted as wreck points).
     ---@param self UICustomLobbyScenarioPreview
     BuildWrecks = function(self)
         local info = self.ScenarioInfo
-        for _, marker in self:Markers() do
-            if marker.type and marker.position and string.find(string.lower(marker.type), 'wreck') then
-                local icon = self.MarkerTrash:Add(self:CreateMarkerIcon(self.WreckTemplate, WreckIconSize))
-                self:PlaceMarker(icon, info.size[1], info.size[2], marker.position[1], marker.position[3])
-                table.insert(self.WreckIcons, icon)
-            end
+        for _, point in self.Markers.Wrecks do
+            local icon = self.MarkerTrash:Add(self:CreateMarkerIcon(self.WreckTemplate, WreckIconSize))
+            self:PlaceMarker(icon, info.size[1], info.size[2], point[1], point[2])
+            table.insert(self.WreckIcons, icon)
         end
     end,
 
@@ -329,14 +326,6 @@ local CustomLobbyScenarioPreview = ClassUI(Group) {
         else
             self.WaterMask:Hide()
         end
-    end,
-
-    --- The save's master-chain markers, or an empty table.
-    ---@param self UICustomLobbyScenarioPreview
-    ---@return table
-    Markers = function(self)
-        local masterChain = self.ScenarioSave.MasterChain and self.ScenarioSave.MasterChain['_MASTERCHAIN_']
-        return (masterChain and masterChain.Markers) or {}
     end,
 
     --#endregion

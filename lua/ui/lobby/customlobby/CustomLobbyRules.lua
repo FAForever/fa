@@ -25,10 +25,7 @@
 -- model the source of truth; this layer only derives.
 
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
-
--- Scenario file -> largest map dimension (ogrids). Loading a scenario is I/O, so the
--- result is memoised per file (a map rarely changes, and the key changes if it does).
-local MapDimensionCache = {}
+local CustomLobbyScenarioDerivedModel = import("/lua/ui/lobby/customlobby/derived/customlobbyscenarioderivedmodel.lua")
 
 --- Units-per-player tier from the map's largest dimension (51.2 ogrids = 1 km), i.e.
 --- 250 / 375 / 500 for 5x5 / 10x10 / 20x20-or-larger. Unknown size (0) → the top tier.
@@ -43,27 +40,12 @@ local function UnitsPerPlayer(maxDimension)
     return 500                                      -- 20x20 or larger / not yet known
 end
 
---- Largest dimension (ogrids) of the current scenario, or 0 when no map is set.
----@param model UICustomLobbyLaunchModel
+--- Largest dimension (ogrids) of the current scenario, or 0 when no map is set. Read straight from
+--- the derived scenario model, which already resolved + cached it (no disk read here).
 ---@return number
-local function CurrentMapDimension(model)
-    local scenarioFile = model.ScenarioFile()
-    if not scenarioFile then
-        return 0
-    end
-
-    local cached = MapDimensionCache[scenarioFile]
-    if cached ~= nil then
-        return cached
-    end
-
-    local dimension = 0
-    local scenarioInfo = import("/lua/ui/maputil.lua").LoadScenario(scenarioFile)
-    if scenarioInfo and scenarioInfo.size then
-        dimension = math.max(scenarioInfo.size[1] or 0, scenarioInfo.size[2] or 0)
-    end
-    MapDimensionCache[scenarioFile] = dimension
-    return dimension
+local function CurrentMapDimension()
+    local scenario = CustomLobbyScenarioDerivedModel.GetScenario()
+    return scenario and scenario.MaxDimension or 0
 end
 
 --- The recommended total-unit ceiling for the current map and seated-player count.
@@ -82,7 +64,7 @@ function RecommendedUnitCap()
         return nil
     end
 
-    return UnitsPerPlayer(CurrentMapDimension(model)) * players
+    return UnitsPerPlayer(CurrentMapDimension()) * players
 end
 
 -------------------------------------------------------------------------------
@@ -117,7 +99,8 @@ end
 ---   * `resolved` is false when the mode is positional but positions are unavailable — callers that
 ---     need a definite split (e.g. the team score) hide in that case, while the two-column slot
 ---     layout still renders both columns and just withholds the side labels until it flips true.
---- Positional modes load the map start positions ONCE here, so a caller resolves all spots cheaply.
+--- Positional modes read the start spots from the derived scenario model (already loaded), so a
+--- caller resolves all spots cheaply.
 ---@return (fun(startSpot: number): number | nil) | nil resolver
 ---@return boolean resolved
 function BuildSideResolver()
@@ -133,21 +116,18 @@ function BuildSideResolver()
         end, true
     end
 
-    -- positional: resolve each spot against the map centre (positions loaded once)
-    local MapUtil = import("/lua/ui/maputil.lua")
-    local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
-    local model = CustomLobbyLaunchModel.GetSingleton()
-    local scenarioFile = model.ScenarioFile()
-    local info = scenarioFile and CustomLobbyMapCatalog.LoadInfo(scenarioFile)
-    if type(info) ~= "table" or not info.size then
+    -- positional: resolve each spot against the map centre, using the derived scenario's start spots
+    -- (the model already loaded + extracted them — no disk read here)
+    local scenario = CustomLobbyScenarioDerivedModel.GetScenario()
+    if not (scenario and scenario.Size) then
         return function(spot) return nil end, false        -- mode set, positions unknown → unresolved
     end
 
-    local positions = MapUtil.GetStartPositionsFromScenario(info, CustomLobbyMapCatalog.LoadSave(info))
-    if not positions then
+    local positions = scenario.Markers.Spawns
+    if not positions or table.empty(positions) then
         return function(spot) return nil end, false
     end
-    local centreX, centreZ = info.size[1] / 2, info.size[2] / 2
+    local centreX, centreZ = scenario.Size[1] / 2, scenario.Size[2] / 2
     return function(spot)
         local pos = spot and positions[spot]
         if not pos then return nil end

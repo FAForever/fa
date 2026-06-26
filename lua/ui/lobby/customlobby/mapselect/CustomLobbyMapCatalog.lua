@@ -22,11 +22,11 @@
 
 -- The map catalog: the custom lobby's list of playable skirmish maps.
 --
--- This is the custom lobby's OWN enumeration — it does not call MapUtil's
--- `EnumerateSkirmishScenarios` (which eagerly loads each map's options + strings and blocks
--- while it reads the whole `/maps` tree). We're slowly moving off MapUtil: the only thing we
--- still borrow is `LoadScenarioInfoFile` — the `doscript` loader for one `_scenario.lua` — and
--- even that is a candidate to inline later.
+-- This is the custom lobby's OWN scenario layer — it does **not** depend on MapUtil at all. It
+-- neither calls `EnumerateSkirmishScenarios` (which eagerly loads each map's options + strings and
+-- blocks while it reads the whole `/maps` tree) nor borrows MapUtil's file loaders: the `doscript`
+-- loaders for `_scenario.lua` / `_save.lua` and the start-spot derivation are re-implemented below
+-- (they are tiny), so the catalog is the lobby's single source of truth for what a scenario is.
 --
 -- Two differences from the legacy enumerator:
 --   * **lighter** — we load only the scenario *info* (name / map / preview / size /
@@ -51,11 +51,14 @@
 local Create = import("/lua/lazyvar.lua").Create
 local CustomLobbySession = import("/lua/ui/lobby/customlobby/customlobbysession.lua")
 
--- The catalog is the lobby's single point of contact with MapUtil's `doscript` file loaders
--- (info + save) — so no other custom-lobby module imports MapUtil. Everything above that
--- (enumeration, filtering, caching) is ours.
-local MapUtil = import("/lua/ui/maputil.lua")
-local LoadScenarioInfoFile = MapUtil.LoadScenarioInfoFile
+--- The *interesting* bits extracted from a scenario's save — what the preview overlays and the
+--- rules read, so nothing downstream has to know the raw save's shape. Points are 2-element `{x, z}`
+--- map coordinates (ogrids). Produced by `LoadMarkers`.
+---@class UICustomLobbyScenarioMarkers
+---@field Spawns      Vector2[]   # start spots, one {x, z} per army (army order)
+---@field MassPoints  Vector2[]   # mass deposit positions
+---@field HydroPoints Vector2[]   # hydrocarbon deposit positions
+---@field Wrecks      Vector2[]   # prebuilt-wreckage positions (maps that define any)
 
 -- maps loaded per frame-slice before yielding — keeps the open responsive on big vaults
 local BatchSize = 5
@@ -69,6 +72,100 @@ local SaveCacheMax = 24
 -- `Destroy`.
 ---@type UICustomLobbyMapCatalog | nil
 local Instance = nil
+
+-------------------------------------------------------------------------------
+--#region Scenario file loaders (pure; no instance state)
+--
+-- Our own `doscript` loaders, so the catalog doesn't depend on MapUtil. A scenario's files are Lua
+-- scripts that, when run, populate globals (`ScenarioInfo`, `Scenario`, …); we run them into a fresh
+-- sandbox table seeded with `dataInit` rather than into `_G`.
+
+--- Runs a scenario-family file (`_scenario.lua` / `_save.lua`) into a fresh sandbox table, so its
+--- globals land there instead of polluting `_G`. Returns the populated table, or nil if the file is
+--- absent. The `doscript`s are the expensive part — callers cache the results.
+---@param path FileName
+---@return table | nil
+local function LoadScenarioFile(path)
+    if not DiskGetFileInfo(path) then
+        return nil
+    end
+    local data = {}
+    doscript('/lua/dataInit.lua', data)
+    doscript(path, data)
+    return data
+end
+
+--- Loads a scenario's info from its `_scenario.lua` (the `ScenarioInfo` table), handling the legacy
+--- v1 shape where the info lived at the top level. nil if the file is missing.
+---@param path FileName
+---@return UIScenarioInfoFile | nil
+local function LoadScenarioInfoFile(path)
+    local data = LoadScenarioFile(path)
+    if not data then
+        return nil
+    end
+    if data.version == 1 then       -- legacy: the info table WAS the top-level data
+        return data --[[@as UIScenarioInfoFile]]
+    end
+    return data.ScenarioInfo
+end
+
+--- Loads a scenario's save (the `Scenario` table) from its `_save.lua`. nil if the file is missing.
+--- Expensive (`doscript`) — `LoadSave` memoises the result.
+---@param path FileName
+---@return UIScenarioSaveFile | nil
+local function LoadScenarioSaveFile(path)
+    local data = LoadScenarioFile(path)
+    return data and data.Scenario
+end
+
+--- The playable armies of a scenario (`{ 'ARMY_1', 'ARMY_2', … }`), or nil when malformed. Reads the
+--- `standard` FFA team config — the same shape `IsPlayableSkirmish` requires for a map to be listed.
+---@param scenarioInfo UIScenarioInfoFile
+---@return string[] | nil
+local function GetArmies(scenarioInfo)
+    local standard = scenarioInfo.Configurations and scenarioInfo.Configurations.standard
+    local teams = standard and standard.teams
+    if not teams then
+        return nil
+    end
+    for _, teamConfig in teams do
+        if teamConfig.name == 'FFA' then
+            return teamConfig.armies
+        end
+    end
+    return nil
+end
+
+--- The start spots of a scenario as `{x, z}` per army (army order), read from the save's master-chain
+--- markers (each army has a like-named marker). nil when armies / markers are missing; a `{0, 0}`
+--- placeholder keeps the array aligned with the army list for any army that lacks a marker.
+---@param scenarioInfo UIScenarioInfoFile
+---@param scenarioSave UIScenarioSaveFile
+---@return Vector2[] | nil
+local function GetStartPositions(scenarioInfo, scenarioSave)
+    local armies = GetArmies(scenarioInfo)
+    if not armies then
+        return nil
+    end
+    local masterChain = scenarioSave.MasterChain and scenarioSave.MasterChain['_MASTERCHAIN_']
+    local markers = masterChain and masterChain.Markers
+    if not markers then
+        return nil
+    end
+    local output = {}
+    for _, army in armies do
+        local marker = markers[army]
+        if marker and marker.position then
+            table.insert(output, { marker.position[1], marker.position[3] })
+        else
+            table.insert(output, { 0, 0 })
+        end
+    end
+    return output
+end
+
+--#endregion
 
 -------------------------------------------------------------------------------
 --#region Enumeration helpers (pure; no instance state)
@@ -251,10 +348,7 @@ local Catalog = ClassSimple {
         end
 
         ---@type UIScenarioSaveFile | false
-        local save = false
-        if DiskGetFileInfo(scenarioInfo.save) then
-            save = MapUtil.LoadScenarioSaveFile(scenarioInfo.save) or false
-        end
+        local save = LoadScenarioSaveFile(scenarioInfo.save) or false
 
         self.SaveCache[key] = save
         table.insert(self.SaveCacheOrder, key)
@@ -264,6 +358,46 @@ local Catalog = ClassSimple {
         end
 
         return save or nil
+    end,
+
+    --- Extracts the *interesting* bits of a scenario's save — the things the preview overlays and the
+    --- rules actually read — so callers never touch the raw save shape. Loads the (memoised) save once
+    --- and returns the start spots plus mass / hydrocarbon / wreck point lists, each normalised to a
+    --- 2-element `{x, z}` (the save's resource markers carry a 3D `position`, so we take `[1]` and
+    --- `[3]`). Always returns a table — empty lists when the save is missing / unreadable — so callers
+    --- can read its fields unguarded.
+    ---@param self UICustomLobbyMapCatalog
+    ---@param scenarioInfo UILobbyScenarioInfo
+    ---@return UICustomLobbyScenarioMarkers
+    LoadMarkers = function(self, scenarioInfo)
+        ---@type UICustomLobbyScenarioMarkers
+        local markers = { Spawns = {}, MassPoints = {}, HydroPoints = {}, Wrecks = {} }
+
+        local save = self:LoadSave(scenarioInfo)
+        if not save then
+            return markers
+        end
+
+        -- start spots: one {x, z} per army, in army order
+        markers.Spawns = GetStartPositions(scenarioInfo, save) or {}
+
+        -- resource + wreck deposits: walk the master-chain markers once, bucket by type
+        local masterChain = save.MasterChain and save.MasterChain['_MASTERCHAIN_']
+        local raw = (masterChain and masterChain.Markers) or {}
+        for _, marker in raw do
+            local position = marker.position
+            if position then
+                if marker.type == "Mass" then
+                    table.insert(markers.MassPoints, { position[1], position[3] })
+                elseif marker.type == "Hydrocarbon" then
+                    table.insert(markers.HydroPoints, { position[1], position[3] })
+                elseif marker.type and string.find(string.lower(marker.type), 'wreck') then
+                    table.insert(markers.Wrecks, { position[1], position[3] })
+                end
+            end
+        end
+
+        return markers
     end,
 
     --- Drops everything so the next `EnsureLoaded` re-reads from disk (e.g. maps changed on disk).
@@ -375,6 +509,14 @@ end
 ---@return UIScenarioSaveFile | nil
 function LoadSave(scenarioInfo)
     return GetSingleton():LoadSave(scenarioInfo)
+end
+
+--- Extracts a scenario's interesting save markers (spawns + mass / hydro / wreck points) so callers
+--- read structured points instead of fishing through the raw save. See the method.
+---@param scenarioInfo UILobbyScenarioInfo
+---@return UICustomLobbyScenarioMarkers
+function LoadMarkers(scenarioInfo)
+    return GetSingleton():LoadMarkers(scenarioInfo)
 end
 
 --- Drops everything so the next `EnsureLoaded` re-reads from disk (e.g. maps changed on disk).

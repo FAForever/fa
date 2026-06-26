@@ -59,7 +59,7 @@ local CustomLobbyModSelect = import("/lua/ui/lobby/customlobby/modselect/customl
 local CustomLobbyUnitSelect = import("/lua/ui/lobby/customlobby/unitselect/customlobbyunitselect.lua")
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
-local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
+local CustomLobbyScenarioDerivedModel = import("/lua/ui/lobby/customlobby/derived/customlobbyscenarioderivedmodel.lua")
 local OptionUtil = import("/lua/ui/optionutil.lua")
 local ModUtilities = import("/lua/ui/modutilities.lua")
 
@@ -216,18 +216,6 @@ local function Truncate(text, maxChars)
     return text
 end
 
---- Number of start spots a scenario declares, or 0.
----@param scenario UILobbyScenarioInfo
----@return number
-local function ArmyCount(scenario)
-    local armies = scenario.Configurations
-        and scenario.Configurations.standard
-        and scenario.Configurations.standard.teams
-        and scenario.Configurations.standard.teams[1]
-        and scenario.Configurations.standard.teams[1].armies
-    return armies and table.getsize(armies) or 0
-end
-
 ---@class UICustomLobbyConfigInterface : Group
 ---@field Trash TrashBag
 ---@field Preview UICustomLobbyMapPreview
@@ -338,9 +326,11 @@ local CustomLobbyConfigInterface = ClassUI(Group) {
             },
         })
 
+        -- the derived scenario model already loaded + deduped the map; we just re-render the facts
+        -- when the resolved scenario actually changes (a same-map rebroadcast won't re-fire this)
         self.ScenarioObserver = self.Trash:Add(
-            LazyVarDerive(CustomLobbyLaunchModel.GetSingleton().ScenarioFile, function(scenarioFileLazy)
-                scenarioFileLazy()
+            LazyVarDerive(CustomLobbyScenarioDerivedModel.GetScenarioVar(), function(scenarioLazy)
+                scenarioLazy()
                 self:RefreshFacts()
             end))
         -- the change-map button is host-only (the gears are gated per-tab via their Visible LazyVar)
@@ -390,27 +380,27 @@ local CustomLobbyConfigInterface = ClassUI(Group) {
         self.Tabs:Initialize()
     end,
 
-    --- Renders the map name + the size · players · version facts line for the current scenario.
+    --- Renders the map name + the size · players · version facts line — straight from the derived
+    --- scenario model (no disk read here; the model already fished the values out).
     ---@param self UICustomLobbyConfigInterface
     RefreshFacts = function(self)
-        local scenarioFile = CustomLobbyLaunchModel.GetSingleton().ScenarioFile()
-        local info = scenarioFile and CustomLobbyMapCatalog.LoadInfo(scenarioFile)
-        if type(info) == "table" then
-            self.Name:SetText(Truncate(LOC(info.name) or "?", NameMaxChars))
+        local scenario = CustomLobbyScenarioDerivedModel.GetScenario()
+        if scenario then
+            self.Name:SetText(Truncate(scenario.Name, NameMaxChars))
             local parts = {}
-            if info.size then
-                table.insert(parts, string.format("%dkm", math.floor(info.size[1] / 50)))
+            if scenario.Size then
+                table.insert(parts, string.format("%dkm", math.floor(scenario.Size[1] / 50)))
             end
-            local players = ArmyCount(info)
-            if players > 0 then
-                table.insert(parts, players .. " players")
+            if scenario.ArmyCount > 0 then
+                table.insert(parts, scenario.ArmyCount .. " players")
             end
-            if info.map_version then
-                table.insert(parts, "v" .. tostring(info.map_version))
+            if scenario.Version then
+                table.insert(parts, "v" .. tostring(scenario.Version))
             end
             self.Info:SetText(table.concat(parts, "   ·   "))
         else
-            self.Name:SetText(scenarioFile and "Unknown map" or "No map selected")
+            local hasFile = CustomLobbyLaunchModel.GetSingleton().ScenarioFile()
+            self.Name:SetText(hasFile and "Unknown map" or "No map selected")
             self.Info:SetText("")
         end
     end,

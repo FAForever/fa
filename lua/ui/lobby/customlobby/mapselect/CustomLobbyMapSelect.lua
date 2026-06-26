@@ -843,8 +843,8 @@ local CustomLobbyMapSelect = ClassUI(Group) {
         end
 
         -- the catalog owns scenario loading + caching (the save doscript is expensive and we
-        -- re-inspect the same maps as you browse)
-        self.Surface:SetScenario(scenario, CustomLobbyMapCatalog.LoadSave(scenario))
+        -- re-inspect the same maps as you browse); it also extracts the markers the surface renders
+        self.Surface:SetScenario(scenario, CustomLobbyMapCatalog.LoadMarkers(scenario))
         self:UpdateInfo(scenario)
         self.RandomButton:Enable()
 
