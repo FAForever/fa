@@ -22,8 +22,8 @@
 
 -- The two-column slot layout: the binary AutoTeams modes (left/right, top/bottom, even/odd) split
 -- the slots into two team columns of half-width, double-height CustomLobbySlotCard cards. Each
--- slot's side comes from CustomLobbyRules.BuildSideResolver (start position for the positional
--- modes, start-spot parity for pvsi).
+-- slot's side is read straight from the slots derived model (`entry.Side`), which resolves it once
+-- (via CustomLobbyRules.BuildSideResolver) — this body no longer re-derives the split itself.
 --
 -- The CustomLobbyTeamScore widget sits in a strip across the top — it *is* the side indicator
 -- (`Left  3150  ·  3025  Right`), so it doubles as the columns' header. It self-hides for the
@@ -42,7 +42,7 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Group = import("/lua/maui/group.lua").Group
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
 local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/customlobbysessionmodel.lua")
-local CustomLobbyRules = import("/lua/ui/lobby/customlobby/customlobbyrules.lua")
+local CustomLobbySlotsDerivedModel = import("/lua/ui/lobby/customlobby/derived/customlobbyslotsderivedmodel.lua")
 local CustomLobbyTeamScore = import("/lua/ui/lobby/customlobby/customlobbyteamscore.lua")
 local CustomLobbySlotCard = import("/lua/ui/lobby/customlobby/slots/twocolumn/customlobbyslotcard.lua")
 
@@ -54,16 +54,18 @@ local CardGap = 2
 local ColumnGap = 8               -- the gutter between the two columns
 local ScoreHeight = 26            -- the team-score strip across the top (the side indicator)
 
---- Assigns the visible slots (1..count) to the two team columns, in slot order. Sides come from the
---- shared resolver; an unresolvable slot (a positional mode whose positions aren't loaded, or a slot
---- past the map's start spots) falls back to slot-index parity so both columns still populate.
+--- Assigns the visible slots (1..count) to the two team columns, in slot order. Each seat's side is
+--- read straight from the slots derived model (`entry.Side`, resolved once there); an unresolved seat
+--- (a positional mode whose positions aren't loaded, or a slot past the map's start spots) is `false`
+--- and falls back to slot-index parity so both columns still populate.
 ---@param count number
 ---@return table cols   # { [1] = {slots…}, [2] = {slots…} }
 local function ComputeColumns(count)
-    local resolver, resolved = CustomLobbyRules.BuildSideResolver()
+    local slots = CustomLobbySlotsDerivedModel.GetSlots()
     local cols = { {}, {} }
     for slot = 1, count do
-        local side = resolved and resolver and resolver(slot) or nil
+        local entry = slots[slot]
+        local side = entry and entry.Side
         if side ~= 1 and side ~= 2 then
             side = (math.mod(slot, 2) == 1) and 1 or 2
         end
@@ -80,8 +82,7 @@ end
 ---@field Columns Group[]                    # [1] = side A container, [2] = side B
 ---@field Ready boolean
 ---@field SlotCountObserver LazyVar
----@field ScenarioObserver LazyVar
----@field GameOptionsObserver LazyVar
+---@field SlotsObserver LazyVar
 local CustomLobbyTwoColumnSlots = Class(Group) {
 
     ---@param self UICustomLobbyTwoColumnSlots
@@ -105,12 +106,11 @@ local CustomLobbyTwoColumnSlots = Class(Group) {
             self.Rows[slot] = CustomLobbySlotCard.Create(self, slot, coordinator)
         end
 
-        -- the side split depends on the mode + the map's start positions, so re-place on any of them
-        local launch = CustomLobbyLaunchModel.GetSingleton()
-        self.GameOptionsObserver = self.Trash:Add(
-            LazyVarDerive(launch.GameOptions, function(lazy) lazy(); self:Relayout() end))
-        self.ScenarioObserver = self.Trash:Add(
-            LazyVarDerive(launch.ScenarioFile, function(lazy) lazy(); self:Relayout() end))
+        -- each seat's side is resolved in the slots derived model, so re-place whenever that table
+        -- changes (a seat's side flips when the mode / map / start positions change); the reveal count
+        -- is session state, so watch it too
+        self.SlotsObserver = self.Trash:Add(
+            LazyVarDerive(CustomLobbySlotsDerivedModel.GetSlotsVar(), function(lazy) lazy(); self:Relayout() end))
         self.SlotCountObserver = self.Trash:Add(
             LazyVarDerive(CustomLobbySessionModel.GetSingleton().SlotCount, function(lazy)
                 lazy()

@@ -32,15 +32,15 @@
 -- mirrors how auto-teams actually resolve at launch (start position), so the score reads true to
 -- the map; the positional modes hide until a map (with start spots) is selected.
 --
--- Self-subscribes to the model: `GameOptions` (the `AutoTeams` mode), `ScenarioFile` (start
--- positions) and every slot's player (ratings). Reference data only — it never writes the model.
+-- It reads the resolved split from the slots derived model's **team aggregate** (`GetTeams`): mode,
+-- side labels, whether the split is resolved, and the per-side rating totals — all computed once
+-- there. So this widget is a single subscription with no logic of its own; it never writes the model.
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local Group = import("/lua/maui/group.lua").Group
-local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
-local CustomLobbyRules = import("/lua/ui/lobby/customlobby/customlobbyrules.lua")
+local CustomLobbySlotsDerivedModel = import("/lua/ui/lobby/customlobby/derived/customlobbyslotsderivedmodel.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 local Layouter = LayoutHelpers.ReusedLayoutFor
@@ -53,9 +53,7 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 ---@field ScoreB Text
 ---@field LabelB Text
 ---@field Ready boolean
----@field GameOptionsObserver LazyVar
----@field ScenarioObserver LazyVar
----@field PlayerObservers LazyVar[]
+---@field TeamsObserver LazyVar
 local CustomLobbyTeamScore = ClassUI(Group) {
 
     ---@param self UICustomLobbyTeamScore
@@ -80,16 +78,10 @@ local CustomLobbyTeamScore = ClassUI(Group) {
         self.LabelB:SetColor('ff9aa0a8')
         self.LabelB:DisableHitTest()
 
-        local model = CustomLobbyLaunchModel.GetSingleton()
-        self.GameOptionsObserver = self.Trash:Add(
-            LazyVarDerive(model.GameOptions, function(lazy) lazy() self:Refresh() end))
-        self.ScenarioObserver = self.Trash:Add(
-            LazyVarDerive(model.ScenarioFile, function(lazy) lazy() self:Refresh() end))
-        self.PlayerObservers = {}
-        for slot = 1, CustomLobbyLaunchModel.MaxSlots do
-            self.PlayerObservers[slot] = self.Trash:Add(
-                LazyVarDerive(model.Players[slot], function(lazy) lazy() self:Refresh() end))
-        end
+        -- one subscription: the slots derived model's team aggregate already resolved the side split
+        -- and summed the per-side ratings (and re-fires only when those move)
+        self.TeamsObserver = self.Trash:Add(
+            LazyVarDerive(CustomLobbySlotsDerivedModel.GetTeamsVar(), function(lazy) lazy() self:Refresh() end))
     end,
 
     ---@param self UICustomLobbyTeamScore
@@ -109,59 +101,24 @@ local CustomLobbyTeamScore = ClassUI(Group) {
         self:Refresh()
     end,
 
-    --- Recomputes the two side totals for the current auto-team mode, or hides the widget when the
+    --- Paints the two side totals from the slots model's team aggregate, or hides the widget when the
     --- mode has no 2-side split (none / manual) or the sides can't be determined yet (no map).
     ---@param self UICustomLobbyTeamScore
     Refresh = function(self)
         if not self.Ready then
             return
         end
-        local mode = CustomLobbyRules.AutoTeamMode()
-        local labels = CustomLobbyRules.SideLabels(mode)
-        if not labels then
+        local teams = CustomLobbySlotsDerivedModel.GetTeams()
+        if not (teams.Labels and teams.Resolved) then
             self:Hide()
             return
         end
 
-        local totals = self:Totals()
-        if not totals then
-            self:Hide()
-            return
-        end
-
-        self.LabelA:SetText(labels[1])
-        self.ScoreA:SetText(tostring(totals[1]))
-        self.LabelB:SetText(labels[2])
-        self.ScoreB:SetText(tostring(totals[2]))
+        self.LabelA:SetText(teams.Labels[1])
+        self.ScoreA:SetText(tostring(teams.Totals[1]))
+        self.LabelB:SetText(teams.Labels[2])
+        self.ScoreB:SetText(tostring(teams.Totals[2]))
         self:Show()
-    end,
-
-    --- The accumulated rating per side `{ a, b }`, or nil if the split can't be determined yet (a
-    --- positional mode with no map / start positions loaded). Each seated player is attributed by
-    --- the shared side resolver, keyed on its start spot.
-    ---@param self UICustomLobbyTeamScore
-    ---@return number[] | nil
-    Totals = function(self)
-        local resolver, resolved = CustomLobbyRules.BuildSideResolver()
-        if not (resolver and resolved) then
-            return nil
-        end
-
-        local model = CustomLobbyLaunchModel.GetSingleton()
-        local a, b = 0, 0
-        for slot = 1, CustomLobbyLaunchModel.MaxSlots do
-            local player = model.Players[slot]()
-            if player then
-                local rating = player.PL or 0
-                local side = resolver(player.StartSpot)
-                if side == 1 then
-                    a = a + rating
-                elseif side == 2 then
-                    b = b + rating
-                end
-            end
-        end
-        return { math.floor(a), math.floor(b) }
     end,
 
     ---@param self UICustomLobbyTeamScore

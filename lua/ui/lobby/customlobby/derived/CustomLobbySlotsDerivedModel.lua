@@ -37,9 +37,17 @@
 --     *where* on the map this seat sits, plus the per-player unit cap the map size implies;
 --   * the **closed** flag (session model, synced lobby-room state, not launched);
 --   * the **CPU benchmark** (local model, per-peer, never synced and *not part of the game*) — the
---     sim-performance projection the slot shows as a unit count + green→red headroom indicator.
+--     sim-performance projection the slot shows as a unit count + green→red headroom indicator;
+--   * the **binary auto-team side** (1/2/false) the seat resolves to, applied once from the rule in
+--     `CustomLobbyRules` so the two-column layout reads `entry.Side` instead of re-resolving it.
 -- The slot/faction/CPU formatting that used to live in each slot control now lives here, once, so the
 -- presentations (the thin row + the fat card) are pure arrangement over a resolved view.
+--
+-- **Two read faces.** Per-seat `Slots` (the rows/cards) and the board's binary auto-team aggregate
+-- `Teams` (the team-score strip — side labels + per-side rating totals). Each is deduped by its own
+-- signature, so a player's *rating* change re-fires only `Teams` (a total moved) without re-rendering
+-- the rows, and a mode/map change that moves the split re-fires both. The side rule itself stays in
+-- `CustomLobbyRules` (the controller will reuse it at launch); this model only *applies* it once.
 --
 -- **Why one table, not a var per slot.** The CPU indicator's colour depends on the recommended unit
 -- cap, which depends on the *total seated count* — so a seat filling anywhere restyles every other
@@ -94,10 +102,20 @@ local MaxSlots = CustomLobbyLaunchModel.MaxSlots
 ---@field Closed     boolean                           # session: seat closed (no army at launch)
 ---@field StartSpot  number | false                    # the player's chosen start spot
 ---@field Position   table | false                     # {x, z} of that start spot on the map, or false
+---@field Side       1 | 2 | false                     # binary auto-team side (keyed on start spot, else slot), false when none/unresolved
 ---@field PlayerView UICustomLobbySlotPlayerView | false
 ---@field CpuView    UICustomLobbySlotCpuView | false
 ---@field Benchmark  UIPerformanceMetrics | false      # raw metrics for the owner (the hover popover reads this)
 ---@field UnitCap    number | false                    # recommended cap used for the indicator (popover reads this)
+
+--- The board's binary auto-team aggregate (the team-score strip reads this). Derived once from
+--- `CustomLobbyRules` (the rule's home) over the resolved per-seat `Side`. `Labels` is false unless the
+--- mode forms two well-defined sides; `Resolved` is false for a positional mode whose map isn't loaded.
+---@class UICustomLobbyTeams
+---@field Mode     string | false             # the binary AutoTeams mode (tvsb/lvsr/pvsi), or false
+---@field Labels   table | false              # the two side labels {a, b}, or false for a non-binary mode
+---@field Resolved boolean                     # whether the split is determined (false: positional mode, no map yet)
+---@field Totals   table                       # accumulated rating per side {a, b}
 
 --#endregion
 
@@ -225,8 +243,12 @@ end
 --#region Derived model
 
 --- Reactive derived-slots singleton. **Read-only** — no write helpers; the controller never touches it.
+--- Two read faces over the same board: per-seat `Slots` (the row/card paint these) and the binary
+--- auto-team aggregate `Teams` (the team-score strip), each deduped independently so a rating-only
+--- change re-fires `Teams` but not `Slots`.
 ---@class UICustomLobbySlotsDerivedModel
 ---@field Slots LazyVar<UICustomLobbySlot[]>   # the lookup table, indexed 1..MaxSlots
+---@field Teams LazyVar<UICustomLobbyTeams>    # the binary auto-team aggregate (side labels + per-side rating totals)
 ---@field Observers LazyVar[]                  # internal: the source subscriptions; pinned so they aren't GC'd
 
 ---@type UICustomLobbySlotsDerivedModel | nil
@@ -237,6 +259,12 @@ local ModelInstance = nil
 ---@type string | false
 local LoadedSignature = false
 
+--- A signature of the currently-published `Teams` aggregate — its own de-dup key, so a rating change
+--- re-fires `Teams` (totals moved) without re-rendering the rows, and an option tweak that doesn't move
+--- the split re-fires neither face.
+---@type string | false
+local LoadedTeamsSignature = false
+
 --- Builds one slot entry by joining every model for that seat.
 ---@param slot number
 ---@param player UICustomLobbyPlayer | false
@@ -244,12 +272,13 @@ local LoadedSignature = false
 ---@param benchmarks table<UILobbyPeerId, UIPerformanceMetrics>
 ---@param spawns table | nil       # scenario start-spot -> {x, z}
 ---@param cap number | nil         # recommended unit cap (seated-count × per-player tier)
+---@param side 1 | 2 | false       # resolved binary auto-team side for this seat
 ---@return UICustomLobbySlot
-local function BuildSlot(slot, player, closed, benchmarks, spawns, cap)
+local function BuildSlot(slot, player, closed, benchmarks, spawns, cap, side)
     if not player then
         return {
             Slot = slot, Player = false, Closed = closed,
-            StartSpot = false, Position = false,
+            StartSpot = false, Position = false, Side = side,
             PlayerView = false, CpuView = false, Benchmark = false, UnitCap = false,
         }
     end
@@ -262,6 +291,7 @@ local function BuildSlot(slot, player, closed, benchmarks, spawns, cap)
         Closed = closed,
         StartSpot = startSpot,
         Position = (spawns and startSpot and spawns[startSpot]) or false,
+        Side = side,
         PlayerView = BuildPlayerView(player),
         CpuView = BuildCpuView(benchmark or nil, cap),
         Benchmark = benchmark,
@@ -288,8 +318,20 @@ local function Signature(slots)
             .. "|" .. (cv and (cv.text .. cv.textColor .. (cv.showIndicator and tostring(cv.indicatorColor) or "0")) or "-")
             .. "|" .. tostring(entry.StartSpot)
             .. "|" .. (pos and (tostring(pos[1]) .. ":" .. tostring(pos[2])) or "-")
+            .. "|" .. tostring(entry.Side)
     end
     return table.concat(parts, "/")
+end
+
+--- A compact signature of the `Teams` aggregate (mode + labels + resolved + the two totals), so the
+--- rebuild only re-publishes `Teams` when the split or a side total actually moved.
+---@param teams UICustomLobbyTeams
+---@return string
+local function TeamsSignature(teams)
+    return tostring(teams.Mode)
+        .. "|" .. (teams.Labels and (teams.Labels[1] .. "/" .. teams.Labels[2]) or "-")
+        .. "|" .. tostring(teams.Resolved)
+        .. "|" .. tostring(teams.Totals[1]) .. "/" .. tostring(teams.Totals[2])
 end
 
 --- Rebuilds the whole lookup table from the current launch / session / local / scenario state and
@@ -304,17 +346,48 @@ local function Recompute(model)
     local spawns = scenario and scenario.Markers and scenario.Markers.Spawns or nil
     local cap = CustomLobbyRules.RecommendedUnitCap()
 
+    -- the binary auto-team split, applied once here (the rule lives in CustomLobbyRules). A seat's side
+    -- is keyed on its start spot, falling back to the slot index when empty so empty cards still place;
+    -- `resolved` is false for a positional mode whose map/start spots aren't loaded yet.
+    local mode = CustomLobbyRules.AutoTeamMode()
+    local labels = CustomLobbyRules.SideLabels(mode)
+    local resolver, resolved = CustomLobbyRules.BuildSideResolver()
+
     local slots = {}
+    local totalA, totalB = 0, 0
     for slot = 1, MaxSlots do
-        slots[slot] = BuildSlot(slot, launch.Players[slot](), closedSlots[slot] and true or false, benchmarks, spawns, cap)
+        local player = launch.Players[slot]()
+        local spot = (player and player.StartSpot) or slot
+        local side = (resolved and resolver and resolver(spot)) or false
+        slots[slot] = BuildSlot(slot, player, closedSlots[slot] and true or false, benchmarks, spawns, cap, side)
+        if player then
+            if side == 1 then
+                totalA = totalA + (player.PL or 0)
+            elseif side == 2 then
+                totalB = totalB + (player.PL or 0)
+            end
+        end
     end
 
+    -- per-seat face (rows/cards): re-publish only when a rendered field or a seat's side changed
     local signature = Signature(slots)
-    if signature == LoadedSignature then
-        return
+    if signature ~= LoadedSignature then
+        LoadedSignature = signature
+        model.Slots:Set(slots)
     end
-    LoadedSignature = signature
-    model.Slots:Set(slots)
+
+    -- aggregate face (team-score strip): re-publish only when the split or a total moved
+    local teams = {
+        Mode = mode or false,
+        Labels = labels or false,
+        Resolved = resolved,
+        Totals = { math.floor(totalA), math.floor(totalB) },
+    }
+    local teamsSignature = TeamsSignature(teams)
+    if teamsSignature ~= LoadedTeamsSignature then
+        LoadedTeamsSignature = teamsSignature
+        model.Teams:Set(teams)
+    end
 end
 
 --- Allocates a fresh slots-model singleton and subscribes its internal observers to every source that
@@ -326,10 +399,12 @@ function SetupSingleton()
     ---@type UICustomLobbySlotsDerivedModel
     local model = {
         Slots = Create({}),
+        Teams = Create({ Mode = false, Labels = false, Resolved = false, Totals = { 0, 0 } }),
         Observers = {},
     }
     ModelInstance = model
     LoadedSignature = false
+    LoadedTeamsSignature = false
 
     local function subscribe(source)
         table.insert(model.Observers, Derive(source, function(lazy)
@@ -345,6 +420,9 @@ function SetupSingleton()
     subscribe(CustomLobbySessionModel.GetSingleton().ClosedSlots)
     subscribe(CustomLobbyLocalModel.GetSingleton().CpuBenchmarks)
     subscribe(CustomLobbyScenarioDerivedModel.GetScenarioVar())
+    -- GameOptions feeds the AutoTeams mode (the side split); the per-face dedup keeps an unrelated
+    -- option tweak from re-firing either var
+    subscribe(launch.GameOptions)
 
     return model
 end
@@ -380,6 +458,19 @@ end
 ---@return UICustomLobbySlot
 function GetSlot(slot)
     return GetSingleton().Slots()[slot]
+end
+
+--- The reactive team aggregate var — subscribe to it (via `Derive`) to react when the side split or a
+--- side's rating total changes (the team-score strip's single source).
+---@return LazyVar<UICustomLobbyTeams>
+function GetTeamsVar()
+    return GetSingleton().Teams
+end
+
+--- The current binary auto-team aggregate (mode / labels / resolved / per-side totals).
+---@return UICustomLobbyTeams
+function GetTeams()
+    return GetSingleton().Teams()
 end
 
 --#endregion
