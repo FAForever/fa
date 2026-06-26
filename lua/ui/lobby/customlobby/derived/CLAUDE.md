@@ -35,6 +35,13 @@ layer between the compact synced fields and the views.
 | File | Derives | From | Read by |
 |------|---------|------|---------|
 | [CustomLobbyScenarioDerivedModel.lua](CustomLobbyScenarioDerivedModel.lua) | the resolved `Scenario` (info for the texture + extracted save markers `Spawns`/`MassPoints`/`HydroPoints`/`Wrecks` + `MaxDimension`/`ArmyCount`/`Name`/`Size`/`Version`) | the launch model's `ScenarioFile` | the bound [`../CustomLobbyMapPreview`](../CustomLobbyMapPreview.lua), the [`../config/CustomLobbyConfigInterface`](../config/CustomLobbyConfigInterface.lua) facts line, [`../CustomLobbyRules`](../CustomLobbyRules.lua) (map size + start spots) |
+| [CustomLobbyOptionsDerivedModel.lua](CustomLobbyOptionsDerivedModel.lua) | the `Options` view: options split into **Categories** lobby / scenario / mods, each option **enriched** (label, help, chosen value-key + display, `IsDefault`, origin), plus `NonDefaultCount` | the launch model's `GameOptions` + `GameMods` and the scenario derived model (map file + name); the scenario `_options.lua` schema via the catalog's `LoadOptions`, the lobby/mod schema + value interpretation via [`/lua/ui/optionutil.lua`](/lua/ui/optionutil.lua) | the [`../config/CustomLobbyOptionsPanel`](../config/CustomLobbyOptionsPanel.lua) and the Options tab badge in [`../config/CustomLobbyConfigInterface`](../config/CustomLobbyConfigInterface.lua) |
+
+The options model also shows a second trait worth copying: it **caches the expensive part**. Gathering
+the option schema is disk work (the map's `_options.lua` `doscript`, mod option files) and only changes
+when the scenario / mod set changes, so it is rebuilt only when those inputs change (keyed) — a value
+edit just re-enriches the cached schema. (Composing derived models is fine too: it reads the scenario
+*from the scenario derived model*, not by re-resolving the file.)
 
 **Planned siblings** (same shape): a mods derived model (UUID set → full mod info via
 [`../modselect/`](../modselect/CLAUDE.md) / `/lua/ui/modutilities.lua`), a restrictions derived model

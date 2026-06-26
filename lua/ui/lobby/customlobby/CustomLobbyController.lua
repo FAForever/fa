@@ -722,13 +722,14 @@ function RequestResetGameOptions()
     end
 
     local OptionUtil = import("/lua/ui/optionutil.lua")
+    local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
     local launch = CustomLobbyLaunchModel.GetSingleton()
 
     local options = {}
     for _, option in OptionUtil.GetLobbyOptions() do
         table.insert(options, option)
     end
-    for _, option in OptionUtil.GetScenarioOptions(launch.ScenarioFile()) do
+    for _, option in CustomLobbyMapCatalog.LoadOptions(launch.ScenarioFile()) do
         table.insert(options, option)
     end
     for _, option in OptionUtil.GetModOptions(launch.GameMods()) do
@@ -779,6 +780,7 @@ end
 ---@return UILobbyLaunchConfiguration
 local function BuildGameConfiguration(instance)
     local OptionUtil = import("/lua/ui/optionutil.lua")
+    local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
     local Factions = import("/lua/factions.lua").Factions
     local factionCount = table.getn(Factions)
     local launch = CustomLobbyLaunchModel.GetSingleton()
@@ -786,7 +788,7 @@ local function BuildGameConfiguration(instance)
     -- the full option set: the host's chosen values, with defaults seeded for anything unset
     local schema = {}
     for _, option in OptionUtil.GetLobbyOptions() do table.insert(schema, option) end
-    for _, option in OptionUtil.GetScenarioOptions(launch.ScenarioFile()) do table.insert(schema, option) end
+    for _, option in CustomLobbyMapCatalog.LoadOptions(launch.ScenarioFile()) do table.insert(schema, option) end
     for _, option in OptionUtil.GetModOptions(launch.GameMods()) do table.insert(schema, option) end
     local gameOptions = OptionUtil.SeedDefaults(schema, launch.GameOptions())
     gameOptions.ScenarioFile = launch.ScenarioFile()
@@ -947,9 +949,10 @@ function ApplySetup(setup)
 
     -- reconcile the saved option values against the current scenario+mods schema
     local OptionUtil = import("/lua/ui/optionutil.lua")
+    local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
     local schema = {}
     for _, option in OptionUtil.GetLobbyOptions() do table.insert(schema, option) end
-    for _, option in OptionUtil.GetScenarioOptions(scenario) do table.insert(schema, option) end
+    for _, option in CustomLobbyMapCatalog.LoadOptions(scenario) do table.insert(schema, option) end
     for _, option in OptionUtil.GetModOptions(launch.GameMods()) do table.insert(schema, option) end
     CustomLobbyLaunchModel.SetGameOptions(launch, OptionUtil.SeedDefaults(schema, setup.GameOptions or {}))
 

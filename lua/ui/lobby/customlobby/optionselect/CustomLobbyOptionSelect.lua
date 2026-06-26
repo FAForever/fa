@@ -48,6 +48,7 @@ local Edit = import("/lua/maui/edit.lua").Edit
 local Popup = import("/lua/ui/controls/popups/popup.lua").Popup
 
 local OptionUtil = import("/lua/ui/optionutil.lua")
+local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
 local CustomLobbyOptionColumn = import("/lua/ui/lobby/customlobby/optionselect/customlobbyoptioncolumn.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
@@ -141,7 +142,7 @@ local CustomLobbyOptionSelect = ClassUI(Group) {
 
         -- the schema, derived per-column from the selected scenario + mods (reference data)
         self.LobbyOptions = OptionUtil.GetLobbyOptions()
-        self.ScenarioOptions = OptionUtil.GetScenarioOptions(options.scenarioFile)
+        self.ScenarioOptions = CustomLobbyMapCatalog.LoadOptions(options.scenarioFile)
         self.ModOptions = OptionUtil.GetModOptions(options.gameMods)
 
         local saved = import("/lua/user/prefs.lua").GetFromCurrentProfile(PrefsKey) or {}

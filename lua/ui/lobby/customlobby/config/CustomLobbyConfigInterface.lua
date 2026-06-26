@@ -60,7 +60,7 @@ local CustomLobbyUnitSelect = import("/lua/ui/lobby/customlobby/unitselect/custo
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
 local CustomLobbyScenarioDerivedModel = import("/lua/ui/lobby/customlobby/derived/customlobbyscenarioderivedmodel.lua")
-local OptionUtil = import("/lua/ui/optionutil.lua")
+local CustomLobbyOptionsDerivedModel = import("/lua/ui/lobby/customlobby/derived/customlobbyoptionsderivedmodel.lua")
 local ModUtilities = import("/lua/ui/modutilities.lua")
 
 local LazyVarCreate = import("/lua/lazyvar.lua").Create
@@ -279,7 +279,7 @@ local CustomLobbyConfigInterface = ClassUI(Group) {
         -- the badges always render, even at 0 (an empty string would collapse the pill)
         self.OptionsBadge = self.Trash:Add(LazyVarCreate())
         self.OptionsBadge:Set(function()
-            return tostring(OptionUtil.CountNonDefault(launch.ScenarioFile(), launch.GameMods(), launch.GameOptions()))
+            return tostring(CustomLobbyOptionsDerivedModel.GetOptionsVar()().NonDefaultCount)
         end)
 
         -- "sim / ui" — sim mods are the synced GameMods; UI mods are this peer's prefs (not a

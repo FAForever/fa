@@ -165,6 +165,39 @@ local function GetStartPositions(scenarioInfo, scenarioSave)
     return output
 end
 
+--- The path to a scenario's `_options.lua`, derived from its `_scenario.lua` path — the reference
+--- isn't stored in the info file. Mirrors MapUtil: strip the trailing "scenario.lua" and append
+--- "options.lua" (`/maps/x/x_scenario.lua` -> `/maps/x/x_options.lua`).
+---@param scenarioFile FileName
+---@return FileName
+local function OptionsPathFor(scenarioFile)
+    return string.sub(scenarioFile, 1, string.len(scenarioFile) - string.len("scenario.lua")) .. "options.lua"
+end
+
+--- Repairs malformed `default` indices in an options list *in place* (a `default` is a 1-based index
+--- into `values`, not a value). The common mistake is storing the wanted value-key as the default; we
+--- recover by finding that key's index. Untrusted disk data, so callers pcall this.
+---@param options ScenarioOption[]
+local function ValidateOptions(options)
+    for _, option in options do
+        local values = option.values
+        if type(values) == "table" then
+            local default = option.default
+            if type(default) ~= "number" or default <= 0 or default > table.getn(values) then
+                local replacement = 1
+                for index, value in values do
+                    local valueKey = (type(value) == "table") and value.key or value
+                    if valueKey == default then
+                        replacement = index
+                        break
+                    end
+                end
+                option.default = replacement
+            end
+        end
+    end
+end
+
 --#endregion
 
 -------------------------------------------------------------------------------
@@ -400,6 +433,28 @@ local Catalog = ClassSimple {
         return markers
     end,
 
+    --- Loads (and validates) a scenario's own lobby options from its `_options.lua` — the option
+    --- *schema* the map contributes (separate from the synced option values). Most maps declare none →
+    --- an empty list. The load + validate are pcall'd (untrusted disk `doscript` / malformed options).
+    --- Not cached here — the only caller (the options derived model) caches the gathered schema itself.
+    ---@param self UICustomLobbyMapCatalog
+    ---@param scenarioFile FileName | false
+    ---@return ScenarioOption[]
+    LoadOptions = function(self, scenarioFile)
+        if not scenarioFile then
+            return {}
+        end
+        local ok, options = pcall(function()
+            local data = LoadScenarioFile(OptionsPathFor(scenarioFile))
+            return data and data.options
+        end)
+        if not ok or type(options) ~= "table" then
+            return {}
+        end
+        pcall(ValidateOptions, options)
+        return options
+    end,
+
     --- Drops everything so the next `EnsureLoaded` re-reads from disk (e.g. maps changed on disk).
     --- Kills any in-flight load thread and resets the cached list *in place* (same LazyVar) so
     --- existing subscribers stay valid — this is a reset, not a teardown.
@@ -517,6 +572,13 @@ end
 ---@return UICustomLobbyScenarioMarkers
 function LoadMarkers(scenarioInfo)
     return GetSingleton():LoadMarkers(scenarioInfo)
+end
+
+--- Loads (and validates) a scenario's own lobby options from its `_options.lua`. See the method.
+---@param scenarioFile FileName | false
+---@return ScenarioOption[]
+function LoadOptions(scenarioFile)
+    return GetSingleton():LoadOptions(scenarioFile)
 end
 
 --- Drops everything so the next `EnsureLoaded` re-reads from disk (e.g. maps changed on disk).

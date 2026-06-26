@@ -26,8 +26,9 @@ The option **schema** is derived per-peer from the synced `ScenarioFile` + `Game
 *reference data*, not a model (like the map/mod catalogs). The three sources:
 
 - **lobby** — the static base options (team ∪ global ∪ AI) from [`../../lobbyOptions.lua`](../../lobbyOptions.lua);
-- **scenario** — the selected map's `_options.lua`, via `MapUtil.LoadScenarioOptionsFile`
-  (the `_options.lua` name mirrors `_scenario.lua` / `mod_info.lua`);
+- **scenario** — the selected map's `_options.lua`, via the map catalog's `LoadOptions`
+  ([`../mapselect/CustomLobbyMapCatalog.lua`](../mapselect/CustomLobbyMapCatalog.lua) — the lobby's
+  one reader of scenario files; the `_options.lua` name mirrors `_scenario.lua` / `mod_info.lua`);
 - **mods** — each selected sim mod's `/lua/AI/LobbyOptions/lobbyoptions.lua` (`AIOpts`).
 
 Only the option **values** sync: the host edits them here and they ride in the launch model's

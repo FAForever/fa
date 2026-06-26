@@ -27,8 +27,9 @@
 -- rework resumes.
 --
 -- Options that come from the map or a mod are flagged with a gold marker + tinted label; the
--- marker's tooltip names the precise origin (`Map: …` / `Mod: …`). The schema is derived per-peer
--- from the synced scenario + mods via `optionutil`; the values are the synced `GameOptions`.
+-- marker's tooltip names the precise origin (`Map: …` / `Mod: …`), and an option's help shows as a
+-- tooltip on its label. All of this is read straight from the **options derived model** (categorized,
+-- enriched, schema-cached) — the panel does no schema gathering or value interpretation itself.
 --
 -- It is a tab panel: created when its tab is selected and destroyed on switch, so it's the
 -- live/visible panel for its whole lifetime — model observers just rebuild it. `Initialize` (called
@@ -43,9 +44,7 @@ local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Grid = import("/lua/maui/grid.lua").Grid
 
-local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
-local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
-local OptionUtil = import("/lua/ui/optionutil.lua")
+local CustomLobbyOptionsDerivedModel = import("/lua/ui/lobby/customlobby/derived/customlobbyoptionsderivedmodel.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 local Layouter = LayoutHelpers.ReusedLayoutFor
@@ -53,7 +52,8 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 local RowHeight = 22
 local ScrollGap = 32       -- standard lobby scrollbar gutter (see ModSelect)
 local GridContentWidth = 360 - 6 - ScrollGap
-local LabelMaxChars = 26
+local LabelMaxChars = 22
+local ValueMaxChars = 22
 
 local SpecialColor = 'ffd0a24c'      -- marker + label tint for a map/mod option
 local NormalColor = 'ffc8ccd0'
@@ -79,9 +79,7 @@ end
 ---@field OptionsGrid Grid
 ---@field Scrollbar Scrollbar | false
 ---@field Empty Text
----@field ScenarioObserver LazyVar
 ---@field OptionsObserver LazyVar
----@field ModsObserver LazyVar
 local CustomLobbyOptionsPanel = ClassUI(Group) {
 
     ---@param self UICustomLobbyOptionsPanel
@@ -110,14 +108,10 @@ local CustomLobbyOptionsPanel = ClassUI(Group) {
         self.Empty:Hide()
 
         -- the panel is created/destroyed with its tab, so it's always the live/visible panel while
-        -- it exists — observers just rebuild (Refresh is Ready-gated); no show/hide juggling
-        local launch = CustomLobbyLaunchModel.GetSingleton()
-        self.ScenarioObserver = self.Trash:Add(
-            LazyVarDerive(launch.ScenarioFile, function(lazy) lazy(); self:Refresh() end))
+        -- it exists — the observer just rebuilds (Refresh is Ready-gated); no show/hide juggling. One
+        -- subscription: the derived model already joins scenario + mods + values into the bundle.
         self.OptionsObserver = self.Trash:Add(
-            LazyVarDerive(launch.GameOptions, function(lazy) lazy(); self:Refresh() end))
-        self.ModsObserver = self.Trash:Add(
-            LazyVarDerive(launch.GameMods, function(lazy) lazy(); self:Refresh() end))
+            LazyVarDerive(CustomLobbyOptionsDerivedModel.GetOptionsVar(), function(lazy) lazy(); self:Refresh() end))
     end,
 
     ---@param self UICustomLobbyOptionsPanel
@@ -140,55 +134,27 @@ local CustomLobbyOptionsPanel = ClassUI(Group) {
         self:Refresh()
     end,
 
-    --- Rebuilds the read-only options grid, grouped into Lobby / Scenario / Mods sections with the
-    --- hide-defaults filter applied.
+    --- Rebuilds the read-only options grid from the derived model's categories, with the hide-defaults
+    --- filter applied. The bundle is already split + enriched, so the panel only filters + lays out.
     ---@param self UICustomLobbyOptionsPanel
     Refresh = function(self)
         if not self.Ready then
             return
         end
-        local launch = CustomLobbyLaunchModel.GetSingleton()
-        local scenarioFile = launch.ScenarioFile()
-        local gameMods = launch.GameMods()
-        local values = launch.GameOptions()
-
-        -- visible (hide-defaults-filtered) entries for one source
-        local function collect(options, origin)
-            local entries = {}
-            for _, option in options do
-                if not (self.HideDefaults and OptionUtil.IsDefault(option, values)) then
-                    table.insert(entries, {
-                        Option = option,
-                        Origin = origin,
-                        ValueKey = OptionUtil.GetCurrentValueKey(option, values),
-                    })
-                end
-            end
-            return entries
-        end
-
-        local info = scenarioFile and CustomLobbyMapCatalog.LoadInfo(scenarioFile)
-        local mapName = (info and LOC(info.name)) or "the map"
-
-        local modEntries = {}
-        for _, group in OptionUtil.GetModOptionsByMod(gameMods) do
-            for _, entry in collect(group.options, "Mod: " .. group.name) do
-                table.insert(modEntries, entry)
-            end
-        end
-
-        local sections = {
-            { Title = "Lobby",    Entries = collect(OptionUtil.GetLobbyOptions(), false) },
-            { Title = "Scenario", Entries = collect(OptionUtil.GetScenarioOptions(scenarioFile), "Map: " .. mapName) },
-            { Title = "Mods",     Entries = modEntries },
-        }
+        local options = CustomLobbyOptionsDerivedModel.GetOptions()
 
         local rows = {}
-        for _, section in sections do
-            if table.getn(section.Entries) > 0 then
-                table.insert(rows, { Header = section.Title })
-                for _, entry in section.Entries do
-                    table.insert(rows, { Entry = entry })
+        for _, category in options.Categories do
+            local visible = {}
+            for _, option in category.Options do
+                if not (self.HideDefaults and option.IsDefault) then
+                    table.insert(visible, option)
+                end
+            end
+            if table.getn(visible) > 0 then
+                table.insert(rows, { Header = category.Title })
+                for _, option in visible do
+                    table.insert(rows, { Option = option })
                 end
             end
         end
@@ -199,7 +165,7 @@ local CustomLobbyOptionsPanel = ClassUI(Group) {
             self.OptionsGrid:AppendCols(1, true)
             self.OptionsGrid:AppendRows(table.getn(rows), true)
             for index, row in rows do
-                local control = row.Header and self:CreateSectionHeader(row.Header) or self:CreateOptionRow(row.Entry)
+                local control = row.Header and self:CreateSectionHeader(row.Header) or self:CreateOptionRow(row.Option)
                 self.OptionsGrid:SetItem(control, 1, index, true)
             end
             self.OptionsGrid:EndBatch()
@@ -230,32 +196,44 @@ local CustomLobbyOptionsPanel = ClassUI(Group) {
         return row
     end,
 
-    --- Builds one read-only option row: origin marker (special only) + label + current value.
+    --- Builds one read-only option row from an enriched option: origin marker (special only) + label
+    --- (help as a tooltip) + current value. Everything is pre-resolved on the bundle.
     ---@param self UICustomLobbyOptionsPanel
-    ---@param entry { Option: ScenarioOption, Origin: string|false, ValueKey: any }
+    ---@param option UICustomLobbyOption
     ---@return Group
-    CreateOptionRow = function(self, entry)
-        local option = entry.Option
+    CreateOptionRow = function(self, option)
         local row = Group(self.OptionsGrid)
         LayoutHelpers.SetDimensions(row, GridContentWidth, RowHeight)
 
         local labelLeft = 4
-        if entry.Origin then
+        if option.Origin then
             local marker = Bitmap(row)
             marker:SetSolidColor(SpecialColor)
             Layouter(marker):AtLeftIn(row, 4):AtVerticalCenterIn(row):Width(8):Height(8):End()
-            Tooltip.AddControlTooltipManual(marker, "Source", entry.Origin)
+            local prefix = (option.Origin.Kind == 'scenario') and "Map: " or "Mod: "
+            Tooltip.AddControlTooltipManual(marker, "Source", prefix .. option.Origin.Name)
             labelLeft = 18
         end
 
-        local label = UIUtil.CreateText(row, Truncate(LOC(option.label) or option.key, LabelMaxChars), 13, UIUtil.bodyFont)
-        label:SetColor(entry.Origin and SpecialColor or NormalColor)
-        label:DisableHitTest()
+        local label = UIUtil.CreateText(row, Truncate(option.Label, LabelMaxChars), 13, UIUtil.bodyFont)
+        label:SetColor(option.Origin and SpecialColor or NormalColor)
+        -- the option's help reads as a tooltip on its label (hit-test stays on for that); no help → inert
+        if option.Help then
+            Tooltip.AddControlTooltipManual(label, option.Label, option.Help)
+        else
+            label:DisableHitTest()
+        end
         Layouter(label):AtLeftIn(row, labelLeft):AtVerticalCenterIn(row):End()
 
-        local value = UIUtil.CreateText(row, OptionUtil.ValueDisplay(option, entry.ValueKey), 13, UIUtil.bodyFont)
+        local value = UIUtil.CreateText(row, Truncate(option.ValueText, ValueMaxChars), 13, UIUtil.bodyFont)
         value:SetColor(ValueColor)
-        value:DisableHitTest()
+        -- the chosen value's help reads as a tooltip (titled with the full value text, in case it was
+        -- truncated); no help → inert
+        if option.ValueHelp then
+            Tooltip.AddControlTooltipManual(value, option.ValueText, option.ValueHelp)
+        else
+            value:DisableHitTest()
+        end
         Layouter(value):AtRightIn(row, 4):AtVerticalCenterIn(row):End()
 
         return row
