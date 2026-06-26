@@ -24,7 +24,7 @@ The snippet file should be named `balance.<PR Number>.md`.
 - Blueprint ID: Blueprint ID of the unit. If the change is an enhancement, the Blueprint ID is enhancements/faction/name. You can find out the correct name by looking into the [enhancements icon folder](https://github.com/FAForever/fa/tree/develop/docs/assets/icons/enhancements).
 - Category: A subheader to categorize parameters. Usually a blueprint subtable name (ex: Physics) or a weapon name.
 - Parameter Name: The name for the value that was changed. It doesn't need to be the exact blueprint field name; it should be a name that players can understand.
-- Value before/after: The value before/after the change. If relevant, derived values like DPS can be put in parentheses after the value as such: `<damage> (<dps>) --> <damage> (<dps>)`.
+- Value before/after: The value before/after the change. If relevant, derived values like DPS can be put in parentheses after the value as such: `<damage> (<dps>) -> <damage> (<dps>)`.
 
 When the same change has been applied to multiple units, you can just write the group in the title. The unitID still loads the unit icon, so choose a unit that is most representative. (UEF when all factions are affected).
 Alternatively, or when a balance change affects multiple units in different ways, you can also put the description text first and then list the affected units with their changed stats.
