@@ -177,3 +177,4 @@ end
 GUI = _deprecationProxy('GUI')
 ChatLines = _deprecationProxy('ChatLines')
 CreateChatEdit = _deprecationProxy('CreateChatEdit')
+CreateChat = _deprecationProxy('CreateChat')
