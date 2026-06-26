@@ -1,1 +1,1 @@
-- (#7149) Fix missing share condition default causing a score board UI loading error when the game was launched using the single player command line launch option.
+- Fix missing share condition default causing a score board UI loading error when the game was launched using the single player command line launch option (#7149).

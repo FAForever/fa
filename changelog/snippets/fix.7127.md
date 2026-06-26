@@ -1,1 +1,1 @@
-- (#7127) Fix French locale for Selen's toggle incorrectly saying that it toggles the Selen's cloak, when it actually only toggles selection priority, and the cloak always activates when stationary. 
+- Fix French locale for Selen's toggle incorrectly saying that it toggles the Selen's cloak, when it actually only toggles selection priority, and the cloak always activates when stationary (#7127).
