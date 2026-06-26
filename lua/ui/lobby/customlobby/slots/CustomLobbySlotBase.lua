@@ -23,8 +23,8 @@
 -- The behaviour of a single slot, shared by every presentation (the thin CustomLobbySlotRow and the
 -- fat CustomLobbySlotCard). It owns *everything except the visible widgets and their layout*:
 --
---   * the model subscription (`model.Players[slot]`) + the CPU-benchmark subscription,
---   * the CPU-cap math (most-played category, +0 unit count, green→red headroom step),
+--   * one subscription to the derived slots model (the lookup table that already merged this seat's
+--     player / placement / closed flag / CPU benchmark into a ready-to-paint entry),
 --   * the click / right-click / drag-to-swap gesture handling and the controller intents,
 --   * the layout-agnostic overlays (background, drop highlight, the full-row click catcher).
 --
@@ -36,95 +36,29 @@
 --
 -- A presentation just has to provide the standard named controls — `ColorSwatch`, `Name`, `Faction`,
 -- `Team`, `Ready`, `Cpu` (Texts) and `CpuIndicator` (Bitmap) — arranged however it likes; the base's
--- `RenderPlayer` / `RenderCpu` paint those from the normalised player / CPU views, so the formatting
--- (faction label, `T1`, ready/CPU colours, unit string) stays here, in one place. A presentation that
--- needs a different mapping (e.g. a faction *icon*) can override `RenderPlayer` / `RenderCpu`.
+-- `RenderPlayer` / `RenderCpu` paint those from the entry's resolved player / CPU views. The formatting
+-- (faction label, `T1`, ready/CPU colours, unit string, the green→red headroom step) lives in the
+-- derived model now — see derived/CustomLobbySlotsDerivedModel.lua — so it is single-sourced and the
+-- CPU bar restyles consistently across every seat when the unit cap moves. A presentation that needs a
+-- different mapping (e.g. a faction *icon*) can override `RenderPlayer` / `RenderCpu`.
 --
--- This keeps the drag/CPU/intent logic single-sourced; the presentations are pure arrangement.
+-- This keeps the drag/intent logic single-sourced; the presentations are pure arrangement.
 
-local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
-local GameColors = import("/lua/gamecolors.lua").GameColors
-local Color = import("/lua/shared/color.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Dragger = import("/lua/maui/dragger.lua").Dragger
-local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
 local CustomLobbyPerformancePopover = import("/lua/ui/lobby/customlobby/customlobbyperformancepopover.lua")
 local CustomLobbyContextMenu = import("/lua/ui/lobby/customlobby/customlobbycontextmenu.lua")
 local CustomLobbyMenus = import("/lua/ui/lobby/customlobby/customlobbymenus.lua")
-local CustomLobbyRules = import("/lua/ui/lobby/customlobby/customlobbyrules.lua")
+local CustomLobbySlotsDerivedModel = import("/lua/ui/lobby/customlobby/derived/customlobbyslotsderivedmodel.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
-
---- Short faction label for a faction index (5 = Random has no factions.lua entry).
----@param faction number
----@return string
-local function FactionLabel(faction)
-    local factions = import("/lua/factions.lua").Factions
-    local data = factions[faction]
-    if data then
-        return data.DisplayName or data.Key or tostring(faction)
-    end
-    return "Random"
-end
-
---- The sim-rate categories tracked in PerformanceTrackingV2, ordered for the
---- "most-played" pick (matches the popover).
-local PerformanceCategories = { 'Skirmish', 'SkirmishWithAI', 'Campaign' }
-
---- The bucket index for a sim rate (index k holds rate k - 11, so +0 -> 11, -4 -> 7).
----@param rate number
----@return number
-local function BucketForRate(rate)
-    return rate + 11
-end
-
---- The most-played category in a benchmark, by sample count, or nil if none.
----@param metrics UIPerformanceMetrics | nil
----@return table | nil
-local function PickCategory(metrics)
-    if not metrics then
-        return nil
-    end
-    local best, bestSamples = nil, -1
-    for _, key in PerformanceCategories do
-        local c = metrics[key]
-        if c and (c.Samples or 0) > bestSamples then
-            bestSamples = c.Samples or 0
-            best = c
-        end
-    end
-    if not best or bestSamples <= 0 then
-        return nil
-    end
-    return best
-end
-
---- Compact unit count for the slot label (e.g. 1421 -> "1.4k").
----@param value number
----@return string
-local function FormatUnits(value)
-    if value >= 1000 then
-        return string.format("%.1fk", value / 1000)
-    end
-    return tostring(math.floor(value + 0.5))
-end
-
---- Indicator colour for how far the sim has to slow down to sustain the cap: green
---- when +0 already suffices (step 0), fading to red at -4 or worse (step 4).
----@param step number   # sim-rate steps below +0 needed to reach the cap (0..4)
----@return Color
-local function StepColor(step)
-    local t = math.clamp(step / 4, 0.0, 1.0)
-    local hue = (1.0 - t) * 0.333   -- 0.333 turns = green, 0 = red
-    return Color.ColorHSV(hue, 1.0, 0.85, 1.0)
-end
 
 -- cursor travel (screen px) before a press becomes a drag instead of a click
 local DragThreshold = 5
@@ -163,8 +97,8 @@ local DragThreshold = 5
 ---@field Background Bitmap
 ---@field DropHighlight Bitmap
 ---@field ClickArea Bitmap
----@field PlayerObserver LazyVar
----@field CpuObserver LazyVar
+---@field SlotObserver LazyVar
+---@field CurrentEntry UICustomLobbySlot | nil      # the seat's last resolved entry (interaction reads it)
 ---@field CurrentPlayer UICustomLobbyPlayer | false
 -- the standard named controls a presentation must provide (the base's Render* paint these):
 ---@field ColorSwatch Bitmap
@@ -216,18 +150,13 @@ local CustomLobbySlotBase = Class(Group) {
         -- the presentation builds its visible widgets (+ the CPU hover zone)
         self:CreateContents()
 
-        local model = CustomLobbyLaunchModel.GetSingleton()
-        self.PlayerObserver = self.Trash:Add(
-            LazyVarDerive(model.Players[slotIndex], function(playerLazy)
-                self:OnPlayerChanged(playerLazy())
-            end))
-
-        self.CpuObserver = self.Trash:Add(
-            LazyVarDerive(CustomLobbyLocalModel.GetSingleton().CpuBenchmarks, function(benchmarksLazy)
-                -- read the lazy so the dependency edge (re)forms; the value itself
-                -- is read from the model inside RefreshCpu
-                benchmarksLazy()
-                self:RefreshCpu()
+        -- one subscription to the derived slots table: it already merged this seat's player,
+        -- placement, closed flag and CPU benchmark into a resolved entry. The table is rebuilt whole, so
+        -- this fires for every seat whenever the unit cap (seated count) moves — exactly when a CPU bar
+        -- needs restyling — not only when *this* seat's player changes.
+        self.SlotObserver = self.Trash:Add(
+            LazyVarDerive(CustomLobbySlotsDerivedModel.GetSlotsVar(), function(slotsLazy)
+                self:OnSlotChanged(slotsLazy()[slotIndex])
             end))
     end,
 
@@ -302,73 +231,17 @@ local CustomLobbySlotBase = Class(Group) {
     --#endregion
 
     ---------------------------------------------------------------------------
-    --#region Rendering (computes the view, defers painting to the hooks)
+    --#region Rendering (paints the resolved entry; the derived model did the formatting)
 
-    --- Normalises the slot's player into a view and hands it to the presentation.
+    --- The seat's resolved entry changed: keep the raw refs interaction needs (the player for
+    --- click/drag, the whole entry for the CPU popover) and paint the pre-resolved player + CPU views.
     ---@param self UICustomLobbySlotBase
-    ---@param player UICustomLobbyPlayer | false
-    OnPlayerChanged = function(self, player)
-        self.CurrentPlayer = player
-        self:RefreshCpu()
-
-        if not player then
-            self:RenderPlayer(nil)
-            return
-        end
-
-        self:RenderPlayer({
-            colorHex = GameColors.PlayerColors[player.PlayerColor] or 'ffffffff',
-            name = player.PlayerName or "?",
-            nameColor = player.Human and 'ffffffff' or 'ffd9c97a',
-            faction = FactionLabel(player.Faction),
-            team = (player.Team and player.Team > 1) and ("T" .. (player.Team - 1)) or "-",
-            ready = player.Ready and "ready" or "",
-            readyColor = player.Ready and 'ff7ad97a' or 'ff888888',
-        })
-    end,
-
-    --- Computes the CPU view from this slot player's shared sim-performance benchmark: the label is
-    --- the max units the machine handled at full speed (+0), and the indicator is green if that
-    --- already covers the recommended cap, fading to red the further the sim must slow (down to -4).
-    ---@param self UICustomLobbySlotBase
-    RefreshCpu = function(self)
-        local player = self.CurrentPlayer
-        if not player then
-            self:RenderCpu(nil)
-            return
-        end
-
-        local metrics = CustomLobbyLocalModel.GetSingleton().CpuBenchmarks()[player.OwnerID]
-        local category = PickCategory(metrics)
-        local atZero = category and category[BucketForRate(0)]
-        if not (atZero and atZero.UnitCount) then
-            self:RenderCpu({ text = "—", textColor = 'ff9aa0a8', showIndicator = false })
-            return
-        end
-
-        local maxAtZero = atZero.UnitCount.Max or 0
-        local view = { text = FormatUnits(maxAtZero), textColor = 'ff9aa0a8', showIndicator = false }
-
-        local cap = CustomLobbyRules.RecommendedUnitCap()
-        if cap and cap > 0 then
-            -- how many sim-rate steps below +0 are needed before the machine sustains the
-            -- cap (0 = fine at +0); worst case (red) if even -4 falls short
-            local step = 0
-            if maxAtZero < cap then
-                step = 4
-                for s = 1, 4 do
-                    local bucket = category[BucketForRate(-s)]
-                    if bucket and bucket.UnitCount and (bucket.UnitCount.Max or 0) >= cap then
-                        step = s
-                        break
-                    end
-                end
-            end
-            view.indicatorColor = StepColor(step)
-            view.showIndicator = true
-        end
-
-        self:RenderCpu(view)
+    ---@param entry UICustomLobbySlot
+    OnSlotChanged = function(self, entry)
+        self.CurrentEntry = entry
+        self.CurrentPlayer = entry.Player
+        self:RenderPlayer(entry.PlayerView or nil)
+        self:RenderCpu(entry.CpuView or nil)
     end,
 
     --#endregion
@@ -403,13 +276,13 @@ local CustomLobbySlotBase = Class(Group) {
     --- passes the control to anchor the popover to (its CPU label).
     ---@param self UICustomLobbySlotBase
     OnCpuHoverEnter = function(self)
-        local player = self.CurrentPlayer
-        if not player then
+        local entry = self.CurrentEntry
+        if not (entry and entry.Player) then
             CustomLobbyPerformancePopover.Hide()
             return
         end
-        local benchmark = CustomLobbyLocalModel.GetSingleton().CpuBenchmarks()[player.OwnerID]
-        CustomLobbyPerformancePopover.Show(self:CpuAnchor(), benchmark, CustomLobbyRules.RecommendedUnitCap())
+        -- the entry already carries the owner's raw benchmark + the unit cap the indicator was sized to
+        CustomLobbyPerformancePopover.Show(self:CpuAnchor(), entry.Benchmark or nil, entry.UnitCap or nil)
     end,
 
     --- The control the performance popover anchors to (the CPU label). Overridable; defaults to the
