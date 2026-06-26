@@ -24,24 +24,26 @@
 -- restrictions. A config-interface tab panel — the host creates it when the Units tab is selected
 -- and destroys it on switch, and calls `Initialize` after sizing it (same interface as the others).
 --
--- It subscribes to the launch model's `Restrictions` (the preset-key list, host-dictated + synced)
--- and lists each restriction's name. Editing happens in the host-only `CustomLobbyUnitSelect` dialog
--- behind this tab's config gear (see CustomLobbyConfigInterface). Step 1 lists names only; the
--- preset icons land with the dialog's icon grid.
+-- It reads the **restrictions derived model** (the active restrictions, each already enriched with its
+-- preset name / icon / tooltip) and lists each one with its preset icon + name. Editing happens in the
+-- host-only `CustomLobbyUnitSelect` dialog behind this tab's config gear (see CustomLobbyConfigInterface).
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 
 local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Grid = import("/lua/maui/grid.lua").Grid
 
-local UnitsRestrictions = import("/lua/ui/lobby/unitsrestrictions.lua")
-local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
+local CustomLobbyRestrictionsDerivedModel = import("/lua/ui/lobby/customlobby/derived/customlobbyrestrictionsderivedmodel.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
-local RowHeight = 24
+-- taller rows than a plain text list so each restriction's preset icon reads clearly
+local RowHeight = 34
+local IconSize = 26
 local ScrollbarGap = 32
 local LabelColor = 'ffc8ccd0'
 local DimColor = 'ff8a909a'
@@ -76,7 +78,7 @@ local CustomLobbyUnitsPanel = ClassUI(Group) {
         -- gated behind Ready so the immediate fire on creation (hot-reload, model already populated)
         -- doesn't rebuild rows before the parent has sized us — see ../CLAUDE.md layout gotchas
         self.RestrictionsObserver = self.Trash:Add(
-            LazyVarDerive(CustomLobbyLaunchModel.GetSingleton().Restrictions, function(restrictionsLazy)
+            LazyVarDerive(CustomLobbyRestrictionsDerivedModel.GetRestrictionsVar(), function(restrictionsLazy)
                 restrictionsLazy()
                 if self.Ready then
                     self:Refresh()
@@ -103,16 +105,15 @@ local CustomLobbyUnitsPanel = ClassUI(Group) {
         self:Refresh()
     end,
 
-    --- Rebuilds the list of active restriction names from the launch model.
+    --- Rebuilds the list of active restrictions (icon + name) from the derived model.
     ---@param self UICustomLobbyUnitsPanel
     Refresh = function(self)
-        local presets = UnitsRestrictions.GetPresetsData()
-        local keys = CustomLobbyLaunchModel.GetSingleton().Restrictions()
-        local count = table.getn(keys)
+        local restrictions = CustomLobbyRestrictionsDerivedModel.GetRestrictions()
+        local items = restrictions.Items
 
         self.Grid:DeleteAndDestroyAll(true)
 
-        if count == 0 then
+        if restrictions.Count == 0 then
             self.Empty:Show()
             self:UpdateScrollbar()
             return
@@ -120,29 +121,41 @@ local CustomLobbyUnitsPanel = ClassUI(Group) {
         self.Empty:Hide()
 
         self.Grid:AppendCols(1, true)
-        self.Grid:AppendRows(count, true)
-        for row, key in keys do
-            local preset = presets[key]
-            local name = (preset and preset.name and LOC(preset.name)) or key
-            self.Grid:SetItem(self:CreateRow(name), 1, row, true)
+        self.Grid:AppendRows(restrictions.Count, true)
+        for row, item in items do
+            self.Grid:SetItem(self:CreateRow(item), 1, row, true)
         end
         self.Grid:EndBatch()
         self:UpdateScrollbar()
     end,
 
-    --- Builds one read-only row: the restriction's name. Private.
+    --- Builds one read-only row: the restriction's preset icon + name (the icon's tooltip is the
+    --- preset's description). Private.
     ---@param self UICustomLobbyUnitsPanel
-    ---@param name string
+    ---@param item UICustomLobbyRestriction
     ---@return Group
-    CreateRow = function(self, name)
+    CreateRow = function(self, item)
         local row = Group(self.Grid)
         LayoutHelpers.SetDimensions(row, 10, RowHeight)
         row.Width:Set(function() return self.Grid.Width() end)
 
-        local label = UIUtil.CreateText(row, name, 13, UIUtil.bodyFont)
+        local labelLeft = 4
+        if item.Icon then
+            local icon = Bitmap(row)
+            icon:SetTexture(item.Icon)
+            Layouter(icon):AtLeftIn(row, 4):AtVerticalCenterIn(row):Width(IconSize):Height(IconSize):End()
+            if item.Tooltip then
+                Tooltip.AddControlTooltipManual(icon, item.Name, item.Tooltip)
+            else
+                icon:DisableHitTest()
+            end
+            labelLeft = 4 + IconSize + 8
+        end
+
+        local label = UIUtil.CreateText(row, item.Name, 13, UIUtil.bodyFont)
         label:SetColor(LabelColor)
         label:DisableHitTest()
-        Layouter(label):AtLeftIn(row, 4):AtVerticalCenterIn(row):End()
+        Layouter(label):AtLeftIn(row, labelLeft):AtVerticalCenterIn(row):End()
         return row
     end,
 

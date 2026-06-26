@@ -61,7 +61,8 @@ local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaun
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
 local CustomLobbyScenarioDerivedModel = import("/lua/ui/lobby/customlobby/derived/customlobbyscenarioderivedmodel.lua")
 local CustomLobbyOptionsDerivedModel = import("/lua/ui/lobby/customlobby/derived/customlobbyoptionsderivedmodel.lua")
-local ModUtilities = import("/lua/ui/modutilities.lua")
+local CustomLobbyRestrictionsDerivedModel = import("/lua/ui/lobby/customlobby/derived/customlobbyrestrictionsderivedmodel.lua")
+local CustomLobbyModsDerivedModel = import("/lua/ui/lobby/customlobby/derived/customlobbymodsderivedmodel.lua")
 
 local LazyVarCreate = import("/lua/lazyvar.lua").Create
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
@@ -271,10 +272,9 @@ local CustomLobbyConfigInterface = ClassUI(Group) {
         Tooltip.AddControlTooltipManual(self.ConfigButton.Bg, "Change map", "Pick a different scenario (host only).")
         --#endregion
 
-        -- count badges for the tab strip: computed LazyVars over the launch model (the tabs
+        -- count badges for the tab strip: computed LazyVars over the derived models (the tabs
         -- container observes them and renders the grey pills). Built before the tabs so each
         -- button can subscribe at creation.
-        local launch = CustomLobbyLaunchModel.GetSingleton()
 
         -- the badges always render, even at 0 (an empty string would collapse the pill)
         self.OptionsBadge = self.Trash:Add(LazyVarCreate())
@@ -282,20 +282,17 @@ local CustomLobbyConfigInterface = ClassUI(Group) {
             return tostring(CustomLobbyOptionsDerivedModel.GetOptionsVar()().NonDefaultCount)
         end)
 
-        -- "sim / ui" — sim mods are the synced GameMods; UI mods are this peer's prefs (not a
-        -- reactive field, so the count refreshes whenever the sim mods change, which is good enough
-        -- until the mod-select dialog is rewired).
+        -- "sim / ui" — game (sim) mods and this peer's UI mods, from the mods derived model
         self.ModsBadge = self.Trash:Add(LazyVarCreate())
         self.ModsBadge:Set(function()
-            local sim = table.getsize(launch.GameMods())
-            local ui = table.getsize(ModUtilities.GetSelectedUIMods())
-            return sim .. " / " .. ui
+            local mods = CustomLobbyModsDerivedModel.GetModsVar()()
+            return mods.GameCount .. " / " .. mods.UiCount
         end)
 
-        -- the count of active unit restrictions (preset keys in the launch model's Restrictions)
+        -- the count of active unit restrictions (from the restrictions derived model)
         self.RestrictionsBadge = self.Trash:Add(LazyVarCreate())
         self.RestrictionsBadge:Set(function()
-            return tostring(table.getn(launch.Restrictions()))
+            return tostring(CustomLobbyRestrictionsDerivedModel.GetRestrictionsVar()().Count)
         end)
 
         -- the read-only config tabs below the preview (created-on-select / destroyed-on-switch),

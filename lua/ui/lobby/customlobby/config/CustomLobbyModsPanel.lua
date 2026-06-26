@@ -21,32 +21,35 @@
 --******************************************************************************************************
 
 -- The Mods tab panel of the config interface: the enabled mods, grouped into Game mods (the
--- shared sim mods from the launch model) and UI mods (this peer's local choice from prefs). The
--- grid fills the whole panel — the "Manage mods" button is gone for now (the per-domain edit
--- buttons are removed during the layout rework and will be reconsidered when it resumes).
+-- shared sim mods) and UI mods (this peer's local choice), each row showing the mod's **icon + name**
+-- with author/version on hover. The grid fills the whole panel — the "Manage mods" button is gone
+-- for now (the per-domain edit buttons are removed during the layout rework).
 --
--- It is a tab panel: created when its tab is selected and destroyed on switch, so it's the
--- live/visible panel for its whole lifetime. UI mods are prefs, not a reactive model field, so
--- they're read on the first render (`Initialize`); the synced sim mods additionally refresh it live.
+-- It reads the **mods derived model** (the enabled mods, already split into groups and enriched with
+-- name / icon / author / version), so the panel does no uid resolution or formatting itself. It is a
+-- tab panel: created when its tab is selected and destroyed on switch, so it's the live/visible panel
+-- for its whole lifetime; the (synced) sim mods refresh it live (UI-mod prefs aren't reactive — same
+-- caveat as before, the model re-reads them whenever the sim mods change).
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Grid = import("/lua/maui/grid.lua").Grid
 
-local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
-local ModUtilities = import("/lua/ui/modutilities.lua")
-local Mods = import("/lua/mods.lua")
+local CustomLobbyModsDerivedModel = import("/lua/ui/lobby/customlobby/derived/customlobbymodsderivedmodel.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
-local RowHeight = 22
+-- taller rows than a plain text list so each mod's icon reads clearly (like the Restrictions panel)
+local RowHeight = 34
+local IconSize = 26
 local ScrollGap = 32       -- standard lobby scrollbar gutter (see ModSelect)
 local GridContentWidth = 360 - 6 - ScrollGap
-local LabelMaxChars = 30
+local LabelMaxChars = 28
 local NormalColor = 'ffc8ccd0'
 
 --- Truncates `text` to `maxChars`, appending "…" when it had to cut.
@@ -85,10 +88,10 @@ local CustomLobbyModsPanel = ClassUI(Group) {
         self.Empty:DisableHitTest()
         self.Empty:Hide()
 
-        -- only the shared sim mods are a model field; UI mods (prefs) are picked up on the first
-        -- render (Initialize), since the panel is created fresh each time its tab is selected
+        -- the derived model already split + enriched the enabled mods; one subscription rebuilds the
+        -- panel when they change (Refresh is Ready-gated for the immediate fire on creation)
         self.ModsObserver = self.Trash:Add(
-            LazyVarDerive(CustomLobbyLaunchModel.GetSingleton().GameMods, function(lazy)
+            LazyVarDerive(CustomLobbyModsDerivedModel.GetModsVar(), function(lazy)
                 lazy()
                 self:Refresh()
             end))
@@ -113,38 +116,20 @@ local CustomLobbyModsPanel = ClassUI(Group) {
         self:Refresh()
     end,
 
-    --- Rebuilds the enabled-mods grid: a Game mods section (shared sim mods) + a UI mods section
-    --- (this peer's local mods), each name resolved + sorted.
+    --- Rebuilds the enabled-mods grid from the derived model's groups: a Game mods section + a UI mods
+    --- section, each mod shown as icon + name. The bundle is already split + enriched + sorted.
     ---@param self UICustomLobbyModsPanel
     Refresh = function(self)
         if not self.Ready then
             return
         end
-        local allMods = Mods.AllMods()
-
-        local function names(uidSet)
-            local list = {}
-            for uid in uidSet do
-                local mod = allMods[uid]
-                if mod then
-                    table.insert(list, mod.name or uid)
-                end
-            end
-            table.sort(list)
-            return list
-        end
-
-        local sections = {
-            { Title = "Game mods", Names = names(CustomLobbyLaunchModel.GetSingleton().GameMods()) },
-            { Title = "UI mods",   Names = names(ModUtilities.GetSelectedUIMods()) },
-        }
 
         local rows = {}
-        for _, section in sections do
-            if table.getn(section.Names) > 0 then
-                table.insert(rows, { Header = section.Title })
-                for _, name in section.Names do
-                    table.insert(rows, { Name = name })
+        for _, group in CustomLobbyModsDerivedModel.GetMods().Groups do
+            if table.getn(group.Mods) > 0 then
+                table.insert(rows, { Header = group.Title })
+                for _, mod in group.Mods do
+                    table.insert(rows, { Mod = mod })
                 end
             end
         end
@@ -155,7 +140,7 @@ local CustomLobbyModsPanel = ClassUI(Group) {
             self.ModsGrid:AppendCols(1, true)
             self.ModsGrid:AppendRows(table.getn(rows), true)
             for index, row in rows do
-                local control = row.Header and self:CreateSectionHeader(row.Header) or self:CreateModRow(row.Name)
+                local control = row.Header and self:CreateSectionHeader(row.Header) or self:CreateModRow(row.Mod)
                 self.ModsGrid:SetItem(control, 1, index, true)
             end
             self.ModsGrid:EndBatch()
@@ -186,18 +171,26 @@ local CustomLobbyModsPanel = ClassUI(Group) {
         return row
     end,
 
-    --- Builds one enabled-mod row (name only — the section header conveys sim vs. UI).
+    --- Builds one enabled-mod row: the mod's icon + name, with author/version on hover (the section
+    --- header conveys sim vs. UI).
     ---@param self UICustomLobbyModsPanel
-    ---@param name string
+    ---@param mod UICustomLobbyMod
     ---@return Group
-    CreateModRow = function(self, name)
+    CreateModRow = function(self, mod)
         local row = Group(self.ModsGrid)
         LayoutHelpers.SetDimensions(row, GridContentWidth, RowHeight)
 
-        local label = UIUtil.CreateText(row, Truncate(name, LabelMaxChars), 13, UIUtil.bodyFont)
+        local icon = Bitmap(row)
+        icon:SetTexture(mod.Icon)
+        Layouter(icon):AtLeftIn(row, 4):AtVerticalCenterIn(row):Width(IconSize):Height(IconSize):End()
+        -- author · version on hover (titled with the mod's full name, in case it was truncated)
+        local facts = mod.Version ~= "" and (mod.Author .. "   ·   " .. mod.Version) or mod.Author
+        Tooltip.AddControlTooltipManual(icon, mod.Name, facts)
+
+        local label = UIUtil.CreateText(row, Truncate(mod.Name, LabelMaxChars), 13, UIUtil.bodyFont)
         label:SetColor(NormalColor)
         label:DisableHitTest()
-        Layouter(label):AtLeftIn(row, 4):AtVerticalCenterIn(row):End()
+        Layouter(label):AtLeftIn(row, 4 + IconSize + 8):AtVerticalCenterIn(row):End()
 
         return row
     end,
