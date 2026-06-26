@@ -84,7 +84,7 @@ jobs:
           git commit -m "Bump game version to ${{ steps.version.outputs.version }}"
 
       - name: Download changelog artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: changelog-faf
           path: changelog/snippets
@@ -125,7 +125,7 @@ jobs:
         # The push also triggers docs-synchronize-changelog.yaml
 
       - name: Create Pull Request
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const version = "${{ steps.version.outputs.version }}";
