@@ -849,6 +849,25 @@ local function BuildGameConfiguration(instance)
     gameOptions.Ratings = ratings
     gameOptions.ClanTags = clanTags
 
+    -- AutoTeams: under a binary positional mode (top/bottom, left/right, odd/even) the team is decided
+    -- by the start position, not the player's picked team — so resolve each seated player's `Team` from
+    -- its spot here. This is the lobby's position->team step (the balancer only re-seats; the team
+    -- falls out of position). Non-binary / manual teams are left untouched.
+    local CustomLobbyRules = import("/lua/ui/lobby/customlobby/customlobbyrules.lua")
+    local mode = CustomLobbyRules.AutoTeamMode(gameOptions)
+    if mode then
+        local CustomLobbyScenarioDerivedModel = import("/lua/ui/lobby/customlobby/models/derived/customlobbyscenarioderivedmodel.lua")
+        local resolver, resolved = CustomLobbyRules.BuildSideResolver(mode, CustomLobbyScenarioDerivedModel.GetScenario())
+        if resolved and resolver then
+            for _, options in playerOptions do
+                local side = resolver(options.StartSpot)
+                if side == 1 or side == 2 then
+                    options.Team = side + 1     -- backend numbering: side 1 -> team 2, side 2 -> team 3
+                end
+            end
+        end
+    end
+
     -- army numbers are assigned in slot order; tell the server each seated player's army settings
     local slots = {}
     for slot, _ in playerOptions do
@@ -876,9 +895,10 @@ end
 --- the launch configuration, broadcasts it so every peer launches with the same config, then
 --- launches locally. The engine takes over from here (see `OnGameLaunched`).
 ---
---- TODO: resolve AutoTeams (the mode lives in `GameOptions` but teams aren't applied at launch yet
---- — see USER_STORIES.md H), and gate the button reactively / surface the block reason in the UI
---- rather than only warning.
+--- TODO: gate the button reactively / surface the block reason in the UI rather than only warning.
+--- (The binary AutoTeams modes now resolve team-from-position in `BuildGameConfiguration`; the
+--- remaining AutoTeams work — the `manual` marker mode and the spawn-variant resolution — is the
+--- broader USER_STORIES § H slice.)
 function RequestLaunch()
     local instance = LobbyInstance
     if not instance then

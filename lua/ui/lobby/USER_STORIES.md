@@ -84,11 +84,11 @@ Roles: **Host**, **Player** (human in a slot), **Observer**, **Joining client**
 
 ## H. Auto-teams & spawn
 
-- 🟡 As a **host**, I want AutoTeams modes (top/bottom, left/right, odd/even, manual), so that teams are assigned by position without manual fiddling. *(Selectable as a lobby option; the actual auto-teaming/launch resolution isn't wired.)*
+- 🟡 As a **host**, I want AutoTeams modes (top/bottom, left/right, odd/even, manual), so that teams are assigned by position without manual fiddling. *(Selectable as a lobby option; the **binary positional modes** (top/bottom, left/right, odd/even) now resolve team-from-position at launch in `BuildGameConfiguration` — and drive the two-column display + auto-balance. The `manual` marker mode isn't wired.)*
 - ⬜ As a **host**, I want manual AutoTeams by clicking map markers, so that I can hand-place teams on random spawn.
 - 🟡 As a **host**, I want spawn variants (fixed, random, balanced/flex/reveal, penguin-autobalance), so that start placement matches the desired fairness/secrecy. *(Selectable as a lobby option; placement is resolved at launch, which isn't wired.)*
 - ⬜ As a **host on an adaptive map**, I want per-slot spawn-mex, so that closed positions still contribute economy.
-- 🟡 As a **system**, I want random factions/start spots/AI names and the ratings/clan tables resolved at launch, so that the final config is complete and fair. *(At launch `BuildGameConfiguration` resolves random factions to a concrete one, assigns army numbers in slot order, and stamps the ratings/clan-tag tables into the game options; start-spot/AutoTeams resolution and AI names aren't done yet.)*
+- 🟡 As a **system**, I want random factions/start spots/AI names and the ratings/clan tables resolved at launch, so that the final config is complete and fair. *(At launch `BuildGameConfiguration` resolves random factions to a concrete one, assigns army numbers in slot order, stamps the ratings/clan-tag tables, and resolves team-from-position for the binary AutoTeams modes; random start-spot assignment and AI names aren't done yet.)*
 
 ## I. Map selection (host)
 
