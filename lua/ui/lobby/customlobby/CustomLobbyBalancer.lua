@@ -20,89 +20,78 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
--- The auto-balance **kernel**: a pure function that proposes a balanced re-seating of the lobby. It
--- reads no models — the caller passes a snapshot in — so it can be reasoned about and tested in
--- isolation, like CustomLobbyRules (the side rule it reuses lives there). The controller applies the
--- result host-authoritatively (CustomLobbyController.RequestApplyBalance); the preview renders it
--- before the host commits (CustomLobbySlotsInterface / CustomLobbyBalancePreview).
+-- The auto-balance **kernel**: a pure function that builds a balance *plan* from the lobby snapshot.
+-- It reads no models — the caller passes the slots derived model's already-resolved state — so it can
+-- be reasoned about and tested in isolation, like CustomLobbyRules.
 --
--- What it does (a port of the legacy PenguinAutoBalance, lobby-old.lua, onto the MVC models):
---   1. Split the players into two sides. Positional modes assign players to the side's seats (from
---      the passed `sideResolver`, built from CustomLobbyRules.BuildSideResolver) — side sizes are
---      fixed by the map. Manual / none modes reassign Team freely toward EVEN sizes (the current team
---      split doesn't constrain the result), keeping each player in its seat.
---   2. Hold LOCKED players in their exact seat (they still count toward their side's totals); only
---      the unlocked players are redistributed. An odd roster leaves the lowest-rated unlocked player
---      in place (never ejected) so the rest pair up.
---   3. Search player→side combinations minimising a cheap rating-imbalance heuristic
---      (|Σdev−goal|·1.2 + |Σmean−goal|, as the legacy did — trueskill is too costly per combination).
---   4. (Positional only) shuffle the seat assignment as mirrored pairs so equivalent positions across
---      the two sides move together. (Manual mode doesn't move seats, so it doesn't shuffle.)
---   5. Score the chosen split ONCE with trueskill `computeQuality` for the preview (— if AI/unrated).
+-- **Positional only.** Auto-balance is offered only for binary AutoTeams modes (top/bottom,
+-- left/right, odd/even), which guarantees exactly two sides. Under AutoTeams the **position decides
+-- the team**, so this kernel never touches `Team`: it decides the two balanced teams + the pairing
+-- and expresses the result as a **player -> slot arrangement**. The lobby applies the arrangement by
+-- re-seating, and position -> team is resolved at launch (BuildGameConfiguration).
+--
+-- The plan is built in three phases (USER_STORIES § R):
+--   1. TEAMS — split the free players into two even sides minimising a cheap rating-imbalance
+--      heuristic (|Σdev−goal|·1.2 + |Σmean−goal|, as the legacy did — trueskill is too costly per
+--      combination). Locked players are held on their position's side; an odd roster leaves the
+--      lowest-rated unlocked player in place (never ejected).
+--   2. PAIRS — rank-match across the teams: the strongest of side A faces the strongest of side B,
+--      etc. Who faces whom is decided by rating, never at random.
+--   3. POSITIONS — `ShufflePairsIntoSeats` scatters the pairs across the free mirror rows, so each
+--      pair's *position* is random while the *pairing* stays fixed. Locked players keep their seat.
+-- Then the chosen split is scored once with trueskill `computeQuality` for the preview.
 --
 -- Ratings: the search + quality use MEAN / DEV; the per-side display totals use PL (matching the
--- team-score strip). Team numbering is the model's backend form throughout (1 = no team, 2 = team 1,
--- 3 = team 2); only the display translates.
+-- team-score strip).
 
 local Trueskill = import("/lua/ui/lobby/trueskill.lua")
 
 -- safety cap on the combination search (C(16,8) = 12870 worst case, comfortably under this)
 local MaxBalanceEvaluations = 20000
 
--- side index (1/2) -> model backend Team number
-local TeamForSide = { [1] = 2, [2] = 3 }
+--- A player reduced to just what balancing needs (projected from a slots-derived-model entry).
+---@class UICustomLobbyBalancePlayer
+---@field ownerId UILobbyPeerId
+---@field name    string
+---@field pl      number          # display rating (per-side totals + rank sort)
+---@field mean    number          # trueskill mean (search + quality)
+---@field dev     number          # trueskill deviation
+---@field locked  boolean         # the host pinned this seat
+---@field side    1 | 2           # the seat's resolved auto-team side (current)
+---@field slot    number          # current seat
 
----@param player UICustomLobbyPlayer
----@return number
-local function MeanOf(player)
-    return player.MEAN or 1500
+--- A proposed balance.
+---@class UICustomLobbyBalancePlan
+---@field labels       string[]                              # the two side labels, for the preview
+---@field sides        UICustomLobbyBalancePlayer[][]        # the two teams, rank-sorted (row k = a pair)
+---@field totals       number[]                              # per-side PL totals
+---@field lockedOwners table<UILobbyPeerId, boolean>         # user-locked players (the preview marks them)
+---@field unassigned   UICustomLobbyBalancePlayer | false    # the odd one left in place, if any
+---@field feasible     boolean                               # false = nothing to apply (Apply disabled)
+---@field reason       string | nil                          # why it can't / didn't balance, for the preview
+---@field quality      number | false                        # trueskill match quality %, or false
+---@field arrangement  table<number, UILobbyPeerId>          # the lobby update: slot -> ownerId (no team)
+
+--- Sorts players strongest-first by display rating, so two rating-sorted sides line up rank for rank.
+---@param a UICustomLobbyBalancePlayer
+---@param b UICustomLobbyBalancePlayer
+---@return boolean
+local function ByRatingDesc(a, b)
+    return a.pl > b.pl
 end
-
----@param player UICustomLobbyPlayer
----@return number
-local function DevOf(player)
-    return player.DEV or 500
-end
-
---- The input snapshot for a balance computation. All data is passed in — the kernel reads no models.
----@class UICustomLobbyBalanceInput
----@field players      table<number, UICustomLobbyPlayer>   # occupied slots only (slot -> player)
----@field lockedSlots  table<number, boolean>               # seats whose player is pinned in place
----@field slotCount    number                               # active slots on the current map
----@field closedSlots  table<number, boolean>
----@field sideResolver (fun(startSpot: number): number | nil) | nil  # positional split; nil = manual
----@field resolved     boolean                              # positional map loaded (false hides positional)
----@field labels       string[] | nil                       # the two side labels, for the preview
-
---- One seat in a proposed arrangement.
----@class UICustomLobbyBalanceSeat
----@field OwnerId UILobbyPeerId
----@field Team    number | nil   # set only in manual mode (positional teams resolve from position at launch)
-
---- The proposed balance.
----@class UICustomLobbyBalanceResult
----@field feasible    boolean                                   # false = nothing to apply (Apply disabled)
----@field reason      string | nil                              # why it can't / didn't balance, for the preview
----@field arrangement table<number, UICustomLobbyBalanceSeat>   # the full target board (slot -> seat)
----@field sides        UICustomLobbyPlayer[][]                   # the two proposed sides, for the preview
----@field totals       number[]                                 # per-side PL totals, for the preview
----@field labels       string[] | nil
----@field unassigned   UICustomLobbyPlayer | false              # the odd one left in place, if any
----@field quality      number | false                           # trueskill match quality %, or false
 
 --- Scores a proposed two-side split with trueskill match quality. Returns false for AI / unrated
---- players (MEAN 0) or a degenerate matrix — the preview then shows "—".
----@param sides UICustomLobbyPlayer[][]
+--- players (mean 0) or a degenerate matrix — the preview then shows "—".
+---@param sides UICustomLobbyBalancePlayer[][]
 ---@return number | false
 local function ComputeQuality(sides)
     local teams = Trueskill.Teams.create()
     for side = 1, 2 do
-        for _, player in ipairs(sides[side]) do
-            if not player.MEAN or player.MEAN == 0 then
+        for _, bp in ipairs(sides[side]) do
+            if not bp.mean or bp.mean == 0 then
                 return false
             end
-            teams:addPlayer(side, Trueskill.Player.create(
-                player.PlayerName or "?", Trueskill.Rating.create(player.MEAN, player.DEV or 0)))
+            teams:addPlayer(side, Trueskill.Player.create(bp.name, Trueskill.Rating.create(bp.mean, bp.dev)))
         end
     end
     if table.getn(teams:getTeams()) ~= 2 then
@@ -116,154 +105,191 @@ local function ComputeQuality(sides)
     return quality
 end
 
---- Computes a proposed balanced re-seating. Pure — see UICustomLobbyBalanceInput. Always returns a
---- result; `feasible` is false (with a `reason`) when there is nothing to apply.
----@param input UICustomLobbyBalanceInput
----@return UICustomLobbyBalanceResult
-function ComputeBalance(input)
-    ---@type UICustomLobbyBalanceResult
-    local result = {
-        feasible = false,
-        reason = nil,
-        arrangement = {},
+--- Phase 3 — seats already-formed rank-matched pairs at randomly-chosen mirror rows: `pairsA[i]` vs
+--- `pairsB[i]` is the i-th pair (formed by rating in phase 2), and it lands at the same free row on
+--- both sides, so WHO faces whom stays fixed while the POSITION is random. `seatsA`/`seatsB` are the
+--- free seats per side, paired by order into mirror rows (locked seats are excluded by the caller, so
+--- locked players don't move). Invokes `place(slot, player)` for each seated player; any leftover
+--- players — when the two sides have unequal free counts (asymmetric locks) — fill the remaining
+--- seats so none are dropped.
+---@param pairsA UICustomLobbyBalancePlayer[]
+---@param pairsB UICustomLobbyBalancePlayer[]
+---@param seatsA number[]
+---@param seatsB number[]
+---@param place fun(slot: number, player: UICustomLobbyBalancePlayer)
+function ShufflePairsIntoSeats(pairsA, pairsB, seatsA, seatsB, place)
+    local rowCount = math.min(table.getn(seatsA), table.getn(seatsB))
+    local rowOrder = {}
+    for k = 1, rowCount do
+        rowOrder[k] = k
+    end
+    for k = rowCount, 2, -1 do
+        local j = Random(1, k)
+        rowOrder[k], rowOrder[j] = rowOrder[j], rowOrder[k]
+    end
+
+    local usedA, usedB = {}, {}
+    local pairCount = math.min(table.getn(pairsA), table.getn(pairsB), rowCount)
+    for i = 1, pairCount do
+        local row = rowOrder[i]
+        place(seatsA[row], pairsA[i])
+        place(seatsB[row], pairsB[i])
+        usedA[row], usedB[row] = true, true
+    end
+
+    local function seatRest(players, seats, used, fromIndex)
+        local free = {}
+        for k = 1, table.getn(seats) do
+            if not used[k] then
+                table.insert(free, k)
+            end
+        end
+        local r = 1
+        for i = fromIndex, table.getn(players) do
+            if not free[r] then
+                break
+            end
+            place(seats[free[r]], players[i])
+            r = r + 1
+        end
+    end
+    seatRest(pairsA, seatsA, usedA, pairCount + 1)
+    seatRest(pairsB, seatsB, usedB, pairCount + 1)
+end
+
+--- Builds a balance plan from the slots derived model's resolved snapshot: `slots` is its `Slots`
+--- table (per-seat Player / Side / Locked / Closed), `teams` its `Teams` aggregate (Mode / Labels /
+--- Resolved). Pure — reads no models. Always returns a plan; `feasible` is false (with a `reason`)
+--- when there is nothing to apply.
+---@param slots UICustomLobbySlot[]
+---@param teams UICustomLobbyTeams
+---@return UICustomLobbyBalancePlan
+function BuildPlan(slots, teams)
+    ---@type UICustomLobbyBalancePlan
+    local plan = {
+        labels = (teams and teams.Labels) or { "Team 1", "Team 2" },
         sides = { {}, {} },
         totals = { 0, 0 },
-        labels = input.labels,
+        lockedOwners = {},
         unassigned = false,
+        feasible = false,
+        reason = nil,
         quality = false,
+        arrangement = {},
     }
 
-    -- a positional split needs a loaded map; without it there are no sides to balance into
-    if input.sideResolver and not input.resolved then
-        result.reason = "Pick a map first — the team sides aren't determined yet."
-        return result
+    -- the feature is gated to a binary AutoTeams mode with a resolved split; bail defensively otherwise
+    if not (teams and teams.Mode) or not teams.Resolved then
+        plan.reason = "Auto-balance needs an AutoTeams mode with a loaded map."
+        return plan
     end
 
-    -- total roster (locked + free) drives the balance goal and the odd-one-out rule
-    local totalMean, totalDev, occupiedCount = 0, 0, 0
-    for slot = 1, input.slotCount do
-        local player = input.players[slot]
-        if player then
-            totalMean = totalMean + MeanOf(player)
-            totalDev = totalDev + DevOf(player)
-            occupiedCount = occupiedCount + 1
-        end
-    end
-    if occupiedCount < 2 then
-        result.reason = "Need at least two players to balance."
-        return result
-    end
-
-    -- odd roster: leave the lowest-rated UNLOCKED player in place (never ejected) so the rest pair
-    -- up. Treat its seat as pinned for the rest of the computation.
-    local effectiveLocked = table.copy(input.lockedSlots)
-    if math.mod(occupiedCount, 2) == 1 then
-        local oddSlot, oddRating
-        for slot = 1, input.slotCount do
-            local player = input.players[slot]
-            if player and not input.lockedSlots[slot] then
-                local rating = MeanOf(player) - DevOf(player) * 2.2
-                if not oddRating or rating < oddRating then
-                    oddRating = rating
-                    oddSlot = slot
-                end
-            end
-        end
-        if oddSlot then
-            effectiveLocked[oddSlot] = true
-            result.unassigned = input.players[oddSlot]
-        end
-    end
-
-    local manual = input.sideResolver == nil
-
-    -- A locked (or odd-one-out) player's side. Positional: its seat's resolved side. Manual: its
-    -- current Team (2 -> side 1, 3 -> side 2); nil when on no team.
-    local function lockedNaturalSide(slot)
-        if manual then
-            local team = input.players[slot].Team
-            if team == 2 then return 1 elseif team == 3 then return 2 end
-            return nil
-        end
-        return input.sideResolver(slot)
-    end
-
-    -- Pin the locked / odd-one-out players to a side (never moved); the rest are the free pool the
-    -- search splits. A locked manual player with no team is dropped onto the lighter side.
-    local lockedRecords = { {}, {} }     -- pinned player records per side
-    local lockedSeats = { {}, {} }       -- their seats (kept as-is)
-    local freeUnits = {}                 -- { player =, slot = } for the movable players
-    for slot = 1, input.slotCount do
-        local player = input.players[slot]
-        if player then
-            if effectiveLocked[slot] then
-                local side = lockedNaturalSide(slot)
-                    or ((table.getn(lockedRecords[1]) <= table.getn(lockedRecords[2])) and 1 or 2)
-                table.insert(lockedRecords[side], player)
-                table.insert(lockedSeats[side], slot)
-            else
-                table.insert(freeUnits, { player = player, slot = slot })
-            end
-        end
-    end
-    local freeCount = table.getn(freeUnits)
-
-    -- Free seats available per side. Manual reassigns teams (not seats), so capacity is flexible and
-    -- the target is simply even sizes. Positional places players into the side's open, non-locked
-    -- seats (including empty ones), so capacity is that seat count — a real map property.
+    -- project each seat into the minimal info balancing needs, and collect the free seats per side
+    -- (open, non-locked-occupied — empty open seats count, so players can move into vacant positions)
+    local players = {}
     local freeSeats = { {}, {} }
-    local capA, capB
-    if manual then
-        capA, capB = freeCount, freeCount
-    else
-        for slot = 1, input.slotCount do
-            if not input.closedSlots[slot] and not (effectiveLocked[slot] and input.players[slot]) then
-                local side = input.sideResolver(slot)
-                if side == 1 or side == 2 then
-                    table.insert(freeSeats[side], slot)
-                end
+    for _, entry in ipairs(slots) do
+        local side = entry.Side
+        if side == 1 or side == 2 then
+            if entry.Player then
+                table.insert(players, {
+                    ownerId = entry.Player.OwnerID,
+                    name = entry.Player.PlayerName or "?",
+                    pl = entry.Player.PL or 0,
+                    mean = entry.Player.MEAN or 1500,
+                    dev = entry.Player.DEV or 500,
+                    locked = entry.Locked and true or false,
+                    side = side,
+                    slot = entry.Slot,
+                })
+            end
+            if not entry.Closed and not (entry.Locked and entry.Player) then
+                table.insert(freeSeats[side], entry.Slot)
             end
         end
-        capA, capB = table.getn(freeSeats[1]), table.getn(freeSeats[2])
     end
 
-    -- locked ratings still count toward each side's balance target
-    local lockedMean, lockedDev = { 0, 0 }, { 0, 0 }
-    for side = 1, 2 do
-        for _, player in ipairs(lockedRecords[side]) do
-            lockedMean[side] = lockedMean[side] + MeanOf(player)
-            lockedDev[side] = lockedDev[side] + DevOf(player)
+    local occupiedCount = table.getn(players)
+    if occupiedCount < 2 then
+        plan.reason = "Need at least two players to balance."
+        return plan
+    end
+
+    -- pinned = the host-locked players + (odd roster) the lowest-rated unlocked player, left in place
+    -- so the rest pair up (never ejected). Pinned players hold their exact seat and side.
+    local pinned = {}
+    for _, bp in ipairs(players) do
+        if bp.locked then
+            pinned[bp.ownerId] = true
+            plan.lockedOwners[bp.ownerId] = true
+        end
+    end
+    if math.mod(occupiedCount, 2) == 1 then
+        local odd
+        for _, bp in ipairs(players) do
+            if not pinned[bp.ownerId] and (not odd or (bp.mean - bp.dev * 2.2) < (odd.mean - odd.dev * 2.2)) then
+                odd = bp
+            end
+        end
+        if odd then
+            pinned[odd.ownerId] = true
+            plan.unassigned = odd
         end
     end
 
-    -- how many free players go to side A: aim for equal final side sizes, clamped to capacity. An
-    -- empty feasible range means the locks can't fit the team layout.
+    -- partition into pinned (held on their position's side) and the free pool the search splits
+    local lockedRecords = { {}, {} }
+    local freePool = {}
+    local totalMean, totalDev = 0, 0
+    for _, bp in ipairs(players) do
+        totalMean = totalMean + bp.mean
+        totalDev = totalDev + bp.dev
+        if pinned[bp.ownerId] then
+            table.insert(lockedRecords[bp.side], bp)
+            plan.arrangement[bp.slot] = bp.ownerId       -- stays exactly where it is
+        else
+            table.insert(freePool, bp)
+        end
+    end
+    local freeCount = table.getn(freePool)
+
+    -- shuffle the free pool so re-running varies which equally-good split / seating is picked
+    for i = freeCount, 2, -1 do
+        local j = Random(1, i)
+        freePool[i], freePool[j] = freePool[j], freePool[i]
+    end
+
+    -- how many free players go to side A: aim for equal final sizes, clamped to each side's free seats
     local lockedCountA = table.getn(lockedRecords[1])
     local lockedCountB = table.getn(lockedRecords[2])
+    local capA, capB = table.getn(freeSeats[1]), table.getn(freeSeats[2])
     local placedA = math.floor((freeCount + lockedCountB - lockedCountA) / 2 + 0.5)
     local minA = math.max(0, freeCount - capB)
     local maxA = math.min(freeCount, capA)
     if minA > maxA then
-        result.reason = "The locked players don't fit the team layout."
-        return result
+        plan.reason = "The locked players don't fit the team layout."
+        return plan
     end
     if placedA < minA then placedA = minA end
     if placedA > maxA then placedA = maxA end
 
-    -- search: choose `placedA` of the free players for side A, minimising rating imbalance against
-    -- the half-totals (the cheap heuristic the legacy used — never trueskill, which is too costly here)
-    local goalMean = totalMean / 2
-    local goalDev = totalDev / 2
+    -- search: choose placedA free players for side A, minimising the cheap rating-imbalance heuristic
+    local goalMean, goalDev = totalMean / 2, totalDev / 2
+    local lockedMeanA, lockedDevA = 0, 0
+    for _, bp in ipairs(lockedRecords[1]) do
+        lockedMeanA = lockedMeanA + bp.mean
+        lockedDevA = lockedDevA + bp.dev
+    end
+
     local best = { value = nil, chosen = nil }
     local evaluations = 0
     local current = {}
-
     local function evaluate()
-        local meanA, devA = lockedMean[1], lockedDev[1]
+        local meanA, devA = lockedMeanA, lockedDevA
         for i = 1, table.getn(current) do
-            local player = freeUnits[current[i]].player
-            meanA = meanA + MeanOf(player)
-            devA = devA + DevOf(player)
+            local bp = freePool[current[i]]
+            meanA = meanA + bp.mean
+            devA = devA + bp.dev
         end
         local value = math.abs(devA - goalDev) * 1.2 + math.abs(meanA - goalMean)
         if not best.value or value < best.value then
@@ -272,7 +298,6 @@ function ComputeBalance(input)
         end
         evaluations = evaluations + 1
     end
-
     local function choose(startIndex, remaining)
         if evaluations >= MaxBalanceEvaluations then
             return
@@ -290,10 +315,9 @@ function ComputeBalance(input)
             end
         end
     end
-
     choose(1, placedA)
 
-    -- partition the free units into the two sides per the best split
+    -- split the free pool into the two sides per the best result
     local chosen = {}
     if best.chosen then
         for _, index in ipairs(best.chosen) do
@@ -302,55 +326,42 @@ function ComputeBalance(input)
     end
     local freeA, freeB = {}, {}
     for i = 1, freeCount do
-        table.insert(chosen[i] and freeA or freeB, freeUnits[i])
+        table.insert(chosen[i] and freeA or freeB, freePool[i])
     end
 
-    -- record one seat into the arrangement + the preview list
-    local function record(slot, player, side, team)
-        result.arrangement[slot] = { OwnerId = player.OwnerID, Team = team }
-        table.insert(result.sides[side], player)
-    end
+    -- phase 2 + 3: rank-match the free players, scatter the pairs across the free mirror rows
+    table.sort(freeA, ByRatingDesc)
+    table.sort(freeB, ByRatingDesc)
+    ShufflePairsIntoSeats(freeA, freeB, freeSeats[1], freeSeats[2],
+        function(slot, bp) plan.arrangement[slot] = bp.ownerId end)
 
-    -- locked players keep their seat; in manual mode their Team is (re)stamped to their side
-    for side = 1, 2 do
-        for i = 1, table.getn(lockedRecords[side]) do
-            record(lockedSeats[side][i], lockedRecords[side][i], side, manual and TeamForSide[side] or nil)
-        end
-    end
-
-    if manual then
-        -- teams are reassigned in place: each free player keeps its seat, its Team set to its side.
-        -- No positional shuffle — seats don't determine team here.
-        for _, unit in ipairs(freeA) do record(unit.slot, unit.player, 1, TeamForSide[1]) end
-        for _, unit in ipairs(freeB) do record(unit.slot, unit.player, 2, TeamForSide[2]) end
-    else
-        -- positional: place players into the side's free seats, with a mirrored-pair shuffle so
-        -- equivalent positions across the two sides move together; team follows the seat at launch
-        local playersA, playersB = {}, {}
-        for _, unit in ipairs(freeA) do table.insert(playersA, unit.player) end
-        for _, unit in ipairs(freeB) do table.insert(playersB, unit.player) end
-        local pairCount = math.min(table.getn(playersA), table.getn(playersB))
-        for i = 1, pairCount do
-            local r = Random(i, pairCount)
-            playersA[i], playersA[r] = playersA[r], playersA[i]
-            playersB[i], playersB[r] = playersB[r], playersB[i]
-        end
-        for i = 1, table.getn(playersA) do record(freeSeats[1][i], playersA[i], 1, nil) end
-        for i = 1, table.getn(playersB) do record(freeSeats[2][i], playersB[i], 2, nil) end
-    end
-
+    -- the two teams, rank-sorted for display (row k = the k-th strongest of each side — who face off)
+    for _, bp in ipairs(lockedRecords[1]) do table.insert(plan.sides[1], bp) end
+    for _, bp in ipairs(freeA) do table.insert(plan.sides[1], bp) end
+    for _, bp in ipairs(lockedRecords[2]) do table.insert(plan.sides[2], bp) end
+    for _, bp in ipairs(freeB) do table.insert(plan.sides[2], bp) end
+    table.sort(plan.sides[1], ByRatingDesc)
+    table.sort(plan.sides[2], ByRatingDesc)
     for side = 1, 2 do
         local total = 0
-        for _, player in ipairs(result.sides[side]) do
-            total = total + (player.PL or 0)
+        for _, bp in ipairs(plan.sides[side]) do
+            total = total + bp.pl
         end
-        result.totals[side] = total
+        plan.totals[side] = total
     end
 
-    result.quality = ComputeQuality(result.sides)
-    result.feasible = freeCount > 0
+    plan.quality = ComputeQuality(plan.sides)
+    plan.feasible = freeCount > 0
     if freeCount == 0 then
-        result.reason = "Every player is locked in place — nothing to rearrange."
+        plan.reason = "Every player is locked in place — nothing to rearrange."
     end
-    return result
+    return plan
+end
+
+--- The lobby update for a plan: the player -> slot arrangement to apply. `Team` is intentionally
+--- absent — under AutoTeams the position decides the team (resolved at launch).
+---@param plan UICustomLobbyBalancePlan
+---@return table<number, UILobbyPeerId>
+function ToArrangement(plan)
+    return plan.arrangement
 end

@@ -36,10 +36,7 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Popup = import("/lua/ui/controls/popups/popup.lua").Popup
 local ItemList = import("/lua/maui/itemlist.lua").ItemList
 
-local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/models/customlobbylaunchmodel.lua")
-local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/models/customlobbysessionmodel.lua")
-local CustomLobbyScenarioDerivedModel = import("/lua/ui/lobby/customlobby/models/derived/customlobbyscenarioderivedmodel.lua")
-local CustomLobbyRules = import("/lua/ui/lobby/customlobby/customlobbyrules.lua")
+local CustomLobbySlotsDerivedModel = import("/lua/ui/lobby/customlobby/models/derived/customlobbyslotsderivedmodel.lua")
 local CustomLobbyBalancer = import("/lua/ui/lobby/customlobby/customlobbybalancer.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 
@@ -77,48 +74,30 @@ end
 
 --- Gathers the current lobby snapshot and runs the balancer. Reads the models (a transient picker
 --- may); the kernel itself stays pure.
----@return UICustomLobbyBalanceResult
+---@return UICustomLobbyBalancePlan
 local function ComputeForCurrentLobby()
-    local launch = CustomLobbyLaunchModel.GetSingleton()
-    local session = CustomLobbySessionModel.GetSingleton()
-
-    local players = {}
-    for slot = 1, CustomLobbyLaunchModel.MaxSlots do
-        local player = launch.Players[slot]()
-        if player then
-            players[slot] = player
-        end
-    end
-
-    local mode = CustomLobbyRules.AutoTeamMode(launch.GameOptions())
-    local resolver, resolved = CustomLobbyRules.BuildSideResolver(mode, CustomLobbyScenarioDerivedModel.GetScenario())
-
-    return CustomLobbyBalancer.ComputeBalance({
-        players = players,
-        lockedSlots = session.LockedSlots(),
-        slotCount = session.SlotCount(),
-        closedSlots = session.ClosedSlots(),
-        sideResolver = resolver,
-        resolved = resolved,
-        labels = CustomLobbyRules.SideLabels(mode) or { "Team 1", "Team 2" },
-    })
+    -- the slots derived model already resolved every seat (player / side / locked / closed) and the
+    -- team aggregate (mode / labels / resolved), so the balancer reads that snapshot directly
+    return CustomLobbyBalancer.BuildPlan(
+        CustomLobbySlotsDerivedModel.GetSlots(),
+        CustomLobbySlotsDerivedModel.GetTeams())
 end
 
---- One player's row in a team column: "name · rating" (rating omitted for AI / unrated).
----@param player UICustomLobbyPlayer
+--- One player's row in a team column: "name · rating", with a lock marker for a user-locked seat.
+--- The two columns are rating-sorted, so row k of each is the rank-matched pair that faces off.
+---@param player UICustomLobbyBalancePlayer
+---@param locked boolean
 ---@return string
-local function PlayerRow(player)
-    local name = player.PlayerName or "?"
-    if player.PL then
-        return name .. "  ·  " .. tostring(player.PL)
-    end
-    return name
+local function PlayerRow(player, locked)
+    local rating = player.pl > 0 and ("  ·  " .. tostring(player.pl)) or ""
+    local lock = locked and "   [locked]" or ""
+    return player.name .. rating .. lock
 end
 
 ---@class UICustomLobbyBalancePreview : Group
 ---@field Trash TrashBag
 ---@field OnCloseCb fun()
----@field Result UICustomLobbyBalanceResult
+---@field Result UICustomLobbyBalancePlan
 ---@field TitleArea Group
 ---@field ColumnAArea Group
 ---@field ColumnBArea Group
@@ -131,6 +110,7 @@ end
 ---@field ListB ItemList
 ---@field Status Text
 ---@field ApplyButton Button
+---@field RetryButton Button
 ---@field CancelButton Button
 ---@field Ready boolean
 local CustomLobbyBalancePreview = ClassUI(Group) {
@@ -183,6 +163,13 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
             self:ApplyAndClose()
         end
 
+        -- re-roll the proposal: the balance is randomised (tie-breaks, and the positional mirrored-pair
+        -- seating), so Retry recomputes for a different equally-good arrangement without committing
+        self.RetryButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/medium/', "Retry")
+        self.RetryButton.OnClick = function()
+            self:Retry()
+        end
+
         self.CancelButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/medium/', "<LOC _Cancel>Cancel")
         self.CancelButton.OnClick = function()
             self.OnCloseCb()
@@ -223,6 +210,7 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
 
         Layouter(self.CancelButton):AtRightIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea):End()
         Layouter(self.ApplyButton):AnchorToLeft(self.CancelButton, ButtonGap):AtVerticalCenterIn(self.ActionArea):End()
+        Layouter(self.RetryButton):AnchorToLeft(self.ApplyButton, ButtonGap):AtVerticalCenterIn(self.ActionArea):End()
     end,
 
     --- Post-mount render (the opener calls this after Popup centres the dialog, so the lists read
@@ -243,13 +231,14 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         self.HeaderA:SetText(labels[1] .. "   " .. tostring(result.totals[1]))
         self.HeaderB:SetText(labels[2] .. "   " .. tostring(result.totals[2]))
 
+        local locked = result.lockedOwners or {}
         self.ListA:DeleteAllItems()
         for _, player in ipairs(result.sides[1]) do
-            self.ListA:AddItem(PlayerRow(player))
+            self.ListA:AddItem(PlayerRow(player, locked[player.ownerId]))
         end
         self.ListB:DeleteAllItems()
         for _, player in ipairs(result.sides[2]) do
-            self.ListB:AddItem(PlayerRow(player))
+            self.ListB:AddItem(PlayerRow(player, locked[player.ownerId]))
         end
 
         -- status line: the reason it can't balance, else the match quality (+ any odd one left out)
@@ -262,22 +251,31 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
             status = "Match quality: —"
         end
         if result.unassigned then
-            status = status .. "   ·   " .. (result.unassigned.PlayerName or "?") .. " stays put (odd count)"
+            status = status .. "   ·   " .. result.unassigned.name .. " stays put (odd count)"
         end
         self.Status:SetText(status)
 
         if result.feasible then
             self.ApplyButton:Enable()
+            self.RetryButton:Enable()
         else
             self.ApplyButton:Disable()
+            self.RetryButton:Disable()
         end
+    end,
+
+    --- Re-rolls the proposal (the balance is randomised) and re-renders, without committing.
+    ---@param self UICustomLobbyBalancePreview
+    Retry = function(self)
+        self.Result = ComputeForCurrentLobby()
+        self:Render()
     end,
 
     --- Commits the proposed arrangement (host-authoritative) and closes.
     ---@param self UICustomLobbyBalancePreview
     ApplyAndClose = function(self)
         if self.Result.feasible then
-            CustomLobbyController.RequestApplyBalance(self.Result.arrangement)
+            CustomLobbyController.RequestApplyBalance(CustomLobbyBalancer.ToArrangement(self.Result))
         end
         self.OnCloseCb()
     end,

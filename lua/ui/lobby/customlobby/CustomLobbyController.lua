@@ -1076,12 +1076,12 @@ function RequestSetSlotLocked(slot, locked)
 end
 
 --- The host applies a balanced re-seating, after confirming it in the preview. Host-only — backs
---- the auto-balance preview's Apply button. `arrangement` (slot -> { OwnerId, Team }) comes from
---- CustomLobbyBalancer.ComputeBalance; it only says *where* each player sits (and, in manual mode,
---- their team), never *what* they are, so it can't smuggle edited ratings/factions. The whole board
---- is rewritten from one snapshot — read by owner, moved to the target seat — then broadcast once
---- (re-seating via the model directly, not N pairwise swaps).
----@param arrangement table<number, UICustomLobbyBalanceSeat>
+--- the auto-balance preview's Apply button. `arrangement` (slot -> ownerId) comes from
+--- CustomLobbyBalancer; it only says *where* each player sits, never *what* they are (no rating /
+--- faction / team — under AutoTeams the position decides the team), so it can't smuggle edits. The
+--- whole board is rewritten from one snapshot — read by owner, moved to the target seat — then
+--- broadcast once (re-seating via the model directly, not N pairwise swaps).
+---@param arrangement table<number, UILobbyPeerId>
 function RequestApplyBalance(arrangement)
     local instance = LobbyInstance
     if not instance then
@@ -1114,8 +1114,8 @@ function RequestApplyBalance(arrangement)
     -- account for exactly the seated players (a stale preview)
     local newPlayers = {}
     local placedCount = 0
-    for slot, seat in arrangement do
-        local source = byOwner[seat.OwnerId]
+    for slot, ownerId in arrangement do
+        local source = byOwner[ownerId]
         if not source then
             WARN("CustomLobby: balance arrangement references an unseated player; ignoring")
             return
@@ -1123,9 +1123,6 @@ function RequestApplyBalance(arrangement)
         local player = table.copy(source)
         player.StartSpot = slot
         player.Ready = false                   -- (re)seating resets readiness, as a manual move does
-        if seat.Team then
-            player.Team = seat.Team
-        end
         newPlayers[slot] = player
         placedCount = placedCount + 1
     end

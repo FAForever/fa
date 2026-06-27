@@ -45,7 +45,6 @@ local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/models/customl
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/models/customlobbylocalmodel.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 local CustomLobbyRules = import("/lua/ui/lobby/customlobby/customlobbyrules.lua")
-local CustomLobbyScenarioDerivedModel = import("/lua/ui/lobby/customlobby/models/derived/customlobbyscenarioderivedmodel.lua")
 local CustomLobbySlotsDerivedModel = import("/lua/ui/lobby/customlobby/models/derived/customlobbyslotsderivedmodel.lua")
 local CustomLobbyBalancePreview = import("/lua/ui/lobby/customlobby/customlobbybalancepreview.lua")
 local CustomLobbyOneColumnSlots = import("/lua/ui/lobby/customlobby/slots/onecolumn/customlobbyonecolumnslots.lua")
@@ -273,12 +272,12 @@ local CustomLobbySlotsInterface = Class(Group) {
                 end
             end))
 
-        -- gate the auto-balance button: it needs exactly two sides (see CanAutoBalance). The slots
-        -- derived model re-fires on any seating / team / mode / map change, so one subscription covers
-        -- every input the gate depends on.
+        -- gate the auto-balance button: it needs a resolved binary AutoTeams split, which is exactly
+        -- the slots derived model's team aggregate — so one subscription to it covers the gate (it
+        -- re-fires when the mode or the resolved-ness changes).
         self.BalanceGateObserver = self.Trash:Add(
-            LazyVarDerive(CustomLobbySlotsDerivedModel.GetSlotsVar(), function(slotsLazy)
-                slotsLazy()
+            LazyVarDerive(CustomLobbySlotsDerivedModel.GetTeamsVar(), function(teamsLazy)
+                teamsLazy()
                 self:UpdateBalanceGate()
             end))
 
@@ -326,25 +325,14 @@ local CustomLobbySlotsInterface = Class(Group) {
         self.BalanceButton:SetEnabled(self:CanAutoBalance())
     end,
 
-    --- Auto-balance needs exactly two sides: a binary AutoTeams mode (with its map loaded, for the
-    --- positional ones), or — in manual seating — at most two teams in use (no seated player on a
-    --- third team, i.e. model Team >= 4). Mirrors the legacy gate.
+    --- Auto-balance is offered only when there are exactly two sides — i.e. a binary AutoTeams mode
+    --- whose split is resolved (a map loaded, for the positional ones; odd/even needs none). That's
+    --- exactly the slots derived model's `Teams` aggregate, so the gate reads it directly.
     ---@param self UICustomLobbySlotsInterface
     ---@return boolean
     CanAutoBalance = function(self)
-        local launch = CustomLobbyLaunchModel.GetSingleton()
-        local mode = CustomLobbyRules.AutoTeamMode(launch.GameOptions())
-        if mode then
-            local _, resolved = CustomLobbyRules.BuildSideResolver(mode, CustomLobbyScenarioDerivedModel.GetScenario())
-            return resolved
-        end
-        for slot = 1, CustomLobbyLaunchModel.MaxSlots do
-            local player = launch.Players[slot]()
-            if player and player.Team and player.Team >= 4 then
-                return false
-            end
-        end
-        return true
+        local teams = CustomLobbySlotsDerivedModel.GetTeams()
+        return (teams.Mode and teams.Resolved) and true or false
     end,
 
     --- The layout kind the current AutoTeams mode calls for: "two" for a binary team mode, else "one".
