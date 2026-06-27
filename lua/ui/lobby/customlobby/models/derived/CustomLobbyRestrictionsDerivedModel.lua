@@ -75,32 +75,11 @@ local UnitsRestrictions = import("/lua/ui/lobby/unitsrestrictions.lua")
 ---@type UICustomLobbyRestrictionsDerivedModel | nil
 local ModelInstance = nil
 
---- The preset keys the bundle was last built from — the de-dup baseline, or false before the first
---- build. Restrictions are a *set*, so this is compared order-independently (see `SameKeys`).
----@type string[] | false
-local LoadedKeys = false
-
---- Whether two preset-key lists describe the same *set* — equal length, then equal once both are
---- sorted (so a pure reorder of the same restrictions doesn't count as a change). Restrictions are
---- short lists of strings, so sorting copies each time is cheap.
----@param a string[]
----@param b string[]
----@return boolean
-local function SameKeys(a, b)
-    if table.getn(a) ~= table.getn(b) then
-        return false
-    end
-    local sortedA = table.copy(a)
-    local sortedB = table.copy(b)
-    table.sort(sortedA)
-    table.sort(sortedB)
-    for i = 1, table.getn(sortedA) do
-        if sortedA[i] ~= sortedB[i] then
-            return false
-        end
-    end
-    return true
-end
+--- Signature of the preset-key set the bundle was last built from — the de-dup baseline, or false
+--- before the first build. Restrictions are a *set*, so this is an order-independent signature (the
+--- keys sorted + joined); a pure reorder of the same restrictions doesn't count as a change.
+---@type string | false
+local LoadedSignature = false
 
 --- Resolves one restriction key into an enriched item — a preset (the common case), else a specific
 --- unit blueprint, else an unknown key shown as-is.
@@ -143,10 +122,12 @@ end
 ---@param model UICustomLobbyRestrictionsDerivedModel
 local function Recompute(model)
     local keys = CustomLobbyLaunchModel.GetSingleton().Restrictions()
-    if LoadedKeys and SameKeys(keys, LoadedKeys) then
+    -- order-independent signature of the active keys (sorted, joined) — a reorder isn't a change
+    local signature = table.concat(table.sorted(keys), "\1")
+    if signature == LoadedSignature then
         return
     end
-    LoadedKeys = keys
+    LoadedSignature = signature
     model.Restrictions:Set(BuildRestrictions(keys))
 end
 
@@ -155,7 +136,7 @@ end
 --- synchronously on creation) it resolves the current restrictions immediately.
 ---@return UICustomLobbyRestrictionsDerivedModel
 function SetupSingleton()
-    LoadedKeys = false
+    LoadedSignature = false
 
     ---@type UICustomLobbyRestrictionsDerivedModel
     local model = {

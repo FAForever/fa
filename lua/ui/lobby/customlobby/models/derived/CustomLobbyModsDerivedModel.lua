@@ -43,10 +43,17 @@
 -- over a big vault leaks (see modselect/CLAUDE.md). Here we only ever show the **enabled** mods (a
 -- handful), and re-rendering reuses the engine's by-name texture cache, so the icon count is bounded —
 -- the same bounded trickle the single map preview accepts.
+--
+-- LIFETIME. It is a `ClassSimple` singleton implementing `Destroyable`, registered in the session
+-- trash bag (see CustomLobbySession) on first access, so one `CustomLobbySession.Teardown()` frees its
+-- `Mods` LazyVar and severs its launch-model subscription instead of leaking them for the whole match.
+-- The module functions are thin facades. See the scenario derived model + the map catalog for the
+-- pattern.
 
 local Create = import("/lua/lazyvar.lua").Create
 local Derive = import("/lua/lazyvar.lua").Derive
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/models/customlobbylaunchmodel.lua")
+local CustomLobbySession = import("/lua/ui/lobby/customlobby/customlobbysession.lua")
 local ModUtilities = import("/lua/ui/modutilities.lua")
 local Mods = import("/lua/mods.lua")
 
@@ -82,13 +89,10 @@ local FallbackIcon = '/textures/ui/common/dialogs/mod-manager/generic-icon_bmp.d
 -------------------------------------------------------------------------------
 --#region Derived model
 
---- Reactive derived-mods singleton. **Read-only** — no write helpers; the controller never touches it.
----@class UICustomLobbyModsDerivedModel
----@field Mods LazyVar<UICustomLobbyMods>
----@field Observer LazyVar
-
+-- The singleton, forward-declared above the class so the class methods (`Destroy`) capture it as an
+-- upvalue. Assigned in `SetupSingleton`, cleared in `Destroy`.
 ---@type UICustomLobbyModsDerivedModel | nil
-local ModelInstance = nil
+local Instance = nil
 
 --- Enriches one mod uid against the all-mods table; returns a minimal entry for an unknown uid.
 ---@param uid string
@@ -145,41 +149,85 @@ local function BuildMods(gameMods, uiMods)
     }
 end
 
---- Re-derives the mods bundle from the current launch state + UI-mod prefs and publishes it.
---- NOTE: UI mods are prefs, not a reactive field, so they're re-read here whenever the (reactive) sim
---- mods change — the same "good enough until the mod dialog is rewired" caveat the panel/badge had.
----@param model UICustomLobbyModsDerivedModel
-local function Recompute(model)
-    model.Mods:Set(BuildMods(CustomLobbyLaunchModel.GetSingleton().GameMods(), ModUtilities.GetSelectedUIMods()))
-end
+--- Reactive derived-mods singleton — a `ClassSimple` implementing `Destroyable`, registered in the
+--- session trash so one `CustomLobbySession.Teardown()` frees it. **Read-only** — no write helpers;
+--- the controller never touches it. It re-derives from the launch model's `GameMods` (+ UI-mod prefs).
+---@class UICustomLobbyModsDerivedModel : Destroyable
+---@field Trash          TrashBag                # owns the Mods var + the observer (freed on Destroy)
+---@field Mods           LazyVar<UICustomLobbyMods>
+---@field Observer       LazyVar                  # internal: re-derives on GameMods change
+---@field LoadedSignature string | false          # signature of the last-published game+ui sets — the de-dup key
+---@field Destroyed      boolean
+local ModsModel = ClassSimple {
 
---- Allocates a fresh mods-model singleton and wires its observer to the launch model's `GameMods`.
---- The observer is pinned on the model so it isn't GC'd, and (because `Derive` fires synchronously on
---- creation) it resolves the current mods immediately.
+    ---@param self UICustomLobbyModsDerivedModel
+    __init = function(self)
+        self.Trash = TrashBag()
+        self.Mods = self.Trash:Add(Create({ Groups = {}, GameCount = 0, UiCount = 0 }))
+        self.LoadedSignature = false
+        self.Destroyed = false
+
+        -- re-derive now and whenever the (reactive) sim mods change (`Derive` fires synchronously on
+        -- creation). Pinned on `self.Observer` AND in the trash, so it isn't GC'd and Destroy frees it.
+        local launch = CustomLobbyLaunchModel.GetSingleton()
+        self.Observer = self.Trash:Add(Derive(launch.GameMods, function(lazy)
+            lazy()
+            self:Recompute()
+        end))
+    end,
+
+    --- Re-derives the mods bundle from the current launch state + UI-mod prefs and publishes it —
+    --- unless the enabled game+ui sets are unchanged, in which case it's a no-op (the de-dup): the host
+    --- re-sets `GameMods` to an equal value on every launch-info rebroadcast, so without this the Mods
+    --- panel would rebuild its icon rows on every unrelated option change.
+    --- NOTE: UI mods are prefs, not a reactive field, so they're re-read here whenever the (reactive)
+    --- sim mods change — the "good enough until the mod dialog is rewired" caveat the panel/badge had.
+    ---@param self UICustomLobbyModsDerivedModel
+    Recompute = function(self)
+        local gameMods = CustomLobbyLaunchModel.GetSingleton().GameMods()
+        local uiMods = ModUtilities.GetSelectedUIMods()
+        -- order-independent signature of the enabled game + ui sets (sorted uids joined); "\1" between
+        -- uids and "\2" between the two sets so {game={A}} and {ui={A}} can't share a signature
+        local signature = table.concatkeys(gameMods, "\1") .. "\2" .. table.concatkeys(uiMods, "\1")
+        if signature == self.LoadedSignature then
+            return
+        end
+        self.LoadedSignature = signature
+        self.Mods:Set(BuildMods(gameMods, uiMods))
+    end,
+
+    --- `Destroyable`: frees the `Mods` var + the observer subscription and clears the module singleton,
+    --- so the next access rebuilds and re-registers in the next session's trash. Idempotent.
+    ---@param self UICustomLobbyModsDerivedModel
+    Destroy = function(self)
+        if self.Destroyed then
+            return
+        end
+        self.Destroyed = true
+        self.Trash:Destroy()       -- frees the Mods LazyVar + the launch-model subscription
+        if Instance == self then
+            Instance = nil
+        end
+    end,
+}
+
+--- Allocates a fresh mods-model singleton and registers it in the session trash. (Because `Derive`
+--- fires synchronously on creation, the current mods resolve immediately.)
 ---@return UICustomLobbyModsDerivedModel
 function SetupSingleton()
-    ---@type UICustomLobbyModsDerivedModel
-    local model = {
-        Mods = Create({ Groups = {}, GameCount = 0, UiCount = 0 }),
-    }
-    ModelInstance = model
-
-    local launch = CustomLobbyLaunchModel.GetSingleton()
-    model.Observer = Derive(launch.GameMods, function(lazy)
-        lazy()
-        Recompute(model)
-    end)
-
-    return model
+    Instance = ModsModel()
+    CustomLobbySession.GetTrash():Add(Instance)
+    return Instance
 end
 
---- Returns the mods-model singleton, creating (and deriving the current mods) on first access.
+--- Returns the mods-model singleton, creating (and registering) it on first access — including after
+--- a teardown, so it is reusable across lobby sessions.
 ---@return UICustomLobbyModsDerivedModel
 function GetSingleton()
-    if not ModelInstance then
+    if not Instance then
         SetupSingleton()
     end
-    return ModelInstance --[[@as UICustomLobbyModsDerivedModel]]
+    return Instance --[[@as UICustomLobbyModsDerivedModel]]
 end
 
 --#endregion
@@ -204,11 +252,13 @@ end
 -------------------------------------------------------------------------------
 --#region Debugging
 
---- Hot-reload hook: rebuild the singleton so its observer re-subscribes and re-derives. The bundle is
---- fully derived from the launch model + prefs, so there is no state to copy across.
+--- Hot-reload hook: destroy the old singleton (severing its subscription) and rebuild via the new
+--- module so its observer re-subscribes and re-derives. The bundle is fully derived from the launch
+--- model + prefs, so there is no state to copy across.
 ---@param newModule any
 function __moduleinfo.OnReload(newModule)
-    if ModelInstance then
+    if Instance then
+        Instance:Destroy()
         newModule.SetupSingleton()
     end
 end
