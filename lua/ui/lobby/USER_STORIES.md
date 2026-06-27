@@ -122,7 +122,6 @@ Roles: **Host**, **Player** (human in a slot), **Observer**, **Joining client**
 - ⬜ As a **player**, I want join/leave/connection notices in chat, so that I'm aware of lobby changes.
 - ⬜ As a **player**, I want to click a name in chat to prefill a whisper, so that replying is quick.
 - ⬜ As a **player**, I want command history (up/down) and auto-scroll with a "new message" indicator, so that chatting is comfortable.
-- ⬜ As a **player**, I want ratings shown alongside names, so that I gauge the lobby's skill.
 
 ## M. Connectivity & health
 
@@ -186,3 +185,6 @@ Roles: **Host**, **Player** (human in a slot), **Observer**, **Joining client**
 - ⬜ As a **player**, I want "disable all sim / UI / all mods" buttons, so that I can clear mods in one click.
 - ⬜ As a **player**, I want the mod manager's dependency-related UI updates fixed, so that enabling/disabling reflects dependencies correctly.
 - ⬜ As a **developer**, I want mod-dependency management reworked in the lobby frontend so it no longer keys off singular version UUIDs, so that the dependency system is fixed at the source.
+- ⬜ As a **player**, I want a button to show where civilians are on map preview.
+- ⬜ As a **player**, I want a small team number (and slot?) on the map preview. to show where civilians are on map. 
+- ⬜ As a **player**, I want the logs of the custom lobby traffic to go to disk.

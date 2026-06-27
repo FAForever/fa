@@ -26,6 +26,13 @@
 -- synced state: it reads the current lobby snapshot, runs the pure CustomLobbyBalancer kernel, and on
 -- Apply hands the proposed arrangement to the host-authoritative `RequestApplyBalance` intent.
 --
+-- The body is rendered as **rank-matched pair rows** (row k = the k-th strongest of each side, who
+-- face off), so the host reads the proposal the way the game plays out: each row shows the two players
+-- and the rating gap between them (colour-coded), with players that *move* from their current seat in
+-- gold and host-*locked* players in blue. The summary reports per-team average + total, the match
+-- quality "before -> after", the predicted win split, and the rating delta — enough to judge a balance
+-- at a glance and re-roll (Retry) until it reads well.
+--
 -- Built to the preset dialog's shape (areas layout, three-phase init, Popup singleton).
 
 local UIUtil = import("/lua/ui/uiutil.lua")
@@ -34,7 +41,6 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Popup = import("/lua/ui/controls/popups/popup.lua").Popup
-local ItemList = import("/lua/maui/itemlist.lua").ItemList
 
 local CustomLobbySlotsDerivedModel = import("/lua/ui/lobby/customlobby/models/derived/customlobbyslotsderivedmodel.lua")
 local CustomLobbyBalancer = import("/lua/ui/lobby/customlobby/customlobbybalancer.lua")
@@ -44,18 +50,26 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 
 local Debug = false
 
-local DialogWidth = 520
+local DialogWidth = 540
 local DialogHeight = 420
 local Pad = 12
-local ColumnGap = 16
 local TitleHeight = 30
+local HeaderHeight = 22
 local StatusHeight = 24
 local ActionHeight = 52
-local ScrollbarInset = 20
+local RowHeight = 22
+local MaxRows = 8           -- binary AutoTeams on a 16-spawn map is at most 8 per side
 local ButtonGap = 8
 
-local LabelColor = 'ffc8ccd0'
+local LabelColor = 'ffc8ccd0'  -- a player that stays where it is
+local MoveColor = 'ffe6c64f'   -- a player the balance moves (gold)
+local LockColor = 'ff7fb2ff'   -- a host-locked player, pinned in place (blue)
 local HeaderColor = 'ffd9c97a'
+local MutedColor = 'ff8c9096'
+
+local GapLowColor = 'ff66bb66'   -- a close pair
+local GapMidColor = 'ffd9c97a'   -- a noticeable gap
+local GapHighColor = 'ffcc6666'  -- a lopsided pair
 
 --- Creates an invisible layout area (tinted while Debug is on).
 ---@param parent Control
@@ -83,31 +97,66 @@ local function ComputeForCurrentLobby()
         CustomLobbySlotsDerivedModel.GetTeams())
 end
 
---- One player's row in a team column: "name · rating", with a lock marker for a user-locked seat.
---- The two columns are rating-sorted, so row k of each is the rank-matched pair that faces off.
+--- "Name  ·  1850" for a player (rating omitted when unrated / AI). `mirror` reverses it to
+--- "1850  ·  Name" so the right column faces the left — the name stays on the outer edge and the
+--- rating reads inward toward the centre gap, exactly like the mirrored slot cards.
 ---@param player UICustomLobbyBalancePlayer
----@param locked boolean
+---@param mirror boolean
 ---@return string
-local function PlayerRow(player, locked)
-    local rating = player.pl > 0 and ("  ·  " .. tostring(player.pl)) or ""
-    local lock = locked and "   [locked]" or ""
-    return player.name .. rating .. lock
+local function FormatPlayer(player, mirror)
+    if player.pl > 0 then
+        if mirror then
+            return tostring(player.pl) .. "  ·  " .. player.name
+        end
+        return player.name .. "  ·  " .. tostring(player.pl)
+    end
+    return player.name
 end
+
+--- The display colour for a player row: blue = host-locked (pinned), gold = moved by the balance,
+--- grey = unchanged. Locked wins (a locked player never moves, so it can't also read as a mover).
+---@param player UICustomLobbyBalancePlayer
+---@return string
+local function PlayerColor(player)
+    if player.locked then
+        return LockColor
+    elseif player.moved then
+        return MoveColor
+    end
+    return LabelColor
+end
+
+--- Colour for a pair's rating gap: green close, amber noticeable, red lopsided.
+---@param gap number
+---@return string
+local function GapColor(gap)
+    if gap < 100 then
+        return GapLowColor
+    elseif gap < 250 then
+        return GapMidColor
+    end
+    return GapHighColor
+end
+
+---@class UICustomLobbyBalanceRow
+---@field Group  Group
+---@field Left   Text
+---@field Center Text
+---@field Right  Text
 
 ---@class UICustomLobbyBalancePreview : Group
 ---@field Trash TrashBag
 ---@field OnCloseCb fun()
 ---@field Result UICustomLobbyBalancePlan
 ---@field TitleArea Group
----@field ColumnAArea Group
----@field ColumnBArea Group
+---@field HeaderArea Group
+---@field RowsArea Group
 ---@field StatusArea Group
 ---@field ActionArea Group
 ---@field Title Text
 ---@field HeaderA Text
 ---@field HeaderB Text
----@field ListA ItemList
----@field ListB ItemList
+---@field Rows UICustomLobbyBalanceRow[]
 ---@field Status Text
 ---@field ApplyButton Button
 ---@field RetryButton Button
@@ -129,8 +178,8 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         self.Result = ComputeForCurrentLobby()
 
         self.TitleArea = CreateArea(self, "TitleArea", 'ffcc4040')
-        self.ColumnAArea = CreateArea(self, "ColumnAArea", 'ff4060cc')
-        self.ColumnBArea = CreateArea(self, "ColumnBArea", 'ff40cc60')
+        self.HeaderArea = CreateArea(self, "HeaderArea", 'ff4060cc')
+        self.RowsArea = CreateArea(self, "RowsArea", 'ff406060')
         self.StatusArea = CreateArea(self, "StatusArea", 'ffcc40cc')
         self.ActionArea = CreateArea(self, "ActionArea", 'ff808080')
 
@@ -138,21 +187,26 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         self.Title:DisableHitTest()
 
         local labels = self.Result.labels or { "Team 1", "Team 2" }
-        self.HeaderA = UIUtil.CreateText(self.ColumnAArea, labels[1], 14, UIUtil.titleFont)
+        self.HeaderA = UIUtil.CreateText(self.HeaderArea, labels[1], 14, UIUtil.titleFont)
         self.HeaderA:SetColor(HeaderColor)
         self.HeaderA:DisableHitTest()
-        self.HeaderB = UIUtil.CreateText(self.ColumnBArea, labels[2], 14, UIUtil.titleFont)
+        self.HeaderB = UIUtil.CreateText(self.HeaderArea, labels[2], 14, UIUtil.titleFont)
         self.HeaderB:SetColor(HeaderColor)
         self.HeaderB:DisableHitTest()
 
-        self.ListA = ItemList(self.ColumnAArea)
-        self.ListA:SetFont(UIUtil.bodyFont, 14)
-        self.ListA:SetColors(LabelColor, "00000000")
-        self.ListA:DisableHitTest()
-        self.ListB = ItemList(self.ColumnBArea)
-        self.ListB:SetFont(UIUtil.bodyFont, 14)
-        self.ListB:SetColors(LabelColor, "00000000")
-        self.ListB:DisableHitTest()
+        -- a fixed pool of pair rows; Render shows/hides + fills them from the proposal
+        self.Rows = {}
+        for i = 1, MaxRows do
+            local row = Group(self.RowsArea, "BalanceRow" .. i)
+            local left = UIUtil.CreateText(row, "", 14, UIUtil.bodyFont)
+            left:DisableHitTest()
+            local center = UIUtil.CreateText(row, "", 12, UIUtil.bodyFont)
+            center:SetColor(MutedColor)
+            center:DisableHitTest()
+            local right = UIUtil.CreateText(row, "", 14, UIUtil.bodyFont)
+            right:DisableHitTest()
+            self.Rows[i] = { Group = row, Left = left, Center = center, Right = right }
+        end
 
         self.Status = UIUtil.CreateText(self.StatusArea, "", 14, UIUtil.bodyFont)
         self.Status:SetColor(LabelColor)
@@ -182,29 +236,32 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         self.Height:Set(LayoutHelpers.ScaleNumber(DialogHeight))
 
         Layouter(self.TitleArea):AtLeftIn(self, Pad):AtRightIn(self, Pad):AtTopIn(self, Pad):Height(TitleHeight):End()
+        Layouter(self.HeaderArea):AtLeftIn(self, Pad):AtRightIn(self, Pad):AnchorToBottom(self.TitleArea, Pad):Height(HeaderHeight):End()
         Layouter(self.ActionArea):AtLeftIn(self, Pad):AtRightIn(self, Pad):AtBottomIn(self, Pad):Height(ActionHeight):End()
         Layouter(self.StatusArea):AtLeftIn(self, Pad):AtRightIn(self, Pad):AnchorToTop(self.ActionArea, Pad):Height(StatusHeight):End()
-
-        -- two equal columns between the title and the status line
-        local columnWidth = function() return (self.Width() - LayoutHelpers.ScaleNumber(2 * Pad + ColumnGap)) / 2 end
-        Layouter(self.ColumnAArea)
-            :AtLeftIn(self, Pad):Width(columnWidth)
-            :AnchorToBottom(self.TitleArea, Pad):AnchorToTop(self.StatusArea, Pad)
-            :End()
-        Layouter(self.ColumnBArea)
-            :AtRightIn(self, Pad):Width(columnWidth)
-            :AnchorToBottom(self.TitleArea, Pad):AnchorToTop(self.StatusArea, Pad)
+        Layouter(self.RowsArea)
+            :AtLeftIn(self, Pad):AtRightIn(self, Pad)
+            :AnchorToBottom(self.HeaderArea, Pad):AnchorToTop(self.StatusArea, Pad)
             :End()
 
         Layouter(self.Title):AtHorizontalCenterIn(self.TitleArea):AtVerticalCenterIn(self.TitleArea):End()
 
-        Layouter(self.HeaderA):AtLeftIn(self.ColumnAArea):AtTopIn(self.ColumnAArea):End()
-        Layouter(self.HeaderB):AtLeftIn(self.ColumnBArea):AtTopIn(self.ColumnBArea):End()
+        Layouter(self.HeaderA):AtLeftIn(self.HeaderArea):AtVerticalCenterIn(self.HeaderArea):End()
+        Layouter(self.HeaderB):AtRightIn(self.HeaderArea):AtVerticalCenterIn(self.HeaderArea):End()
 
-        Layouter(self.ListA):AtLeftIn(self.ColumnAArea):AnchorToBottom(self.HeaderA, 4):AtBottomIn(self.ColumnAArea):End()
-        self.ListA.Right:Set(function() return self.ColumnAArea.Right() - LayoutHelpers.ScaleNumber(ScrollbarInset) end)
-        Layouter(self.ListB):AtLeftIn(self.ColumnBArea):AnchorToBottom(self.HeaderB, 4):AtBottomIn(self.ColumnBArea):End()
-        self.ListB.Right:Set(function() return self.ColumnBArea.Right() - LayoutHelpers.ScaleNumber(ScrollbarInset) end)
+        -- stack the pair rows from the top of the rows area
+        for i = 1, MaxRows do
+            local row = self.Rows[i]
+            Layouter(row.Group):AtLeftIn(self.RowsArea):AtRightIn(self.RowsArea):Height(RowHeight):End()
+            if i == 1 then
+                Layouter(row.Group):AtTopIn(self.RowsArea):End()
+            else
+                Layouter(row.Group):AnchorToBottom(self.Rows[i - 1].Group, 0):End()
+            end
+            Layouter(row.Left):AtLeftIn(row.Group):AtVerticalCenterIn(row.Group):End()
+            Layouter(row.Center):AtHorizontalCenterIn(row.Group):AtVerticalCenterIn(row.Group):End()
+            Layouter(row.Right):AtRightIn(row.Group):AtVerticalCenterIn(row.Group):End()
+        end
 
         Layouter(self.Status):AtLeftIn(self.StatusArea):AtVerticalCenterIn(self.StatusArea):End()
 
@@ -213,7 +270,7 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         Layouter(self.RetryButton):AnchorToLeft(self.ApplyButton, ButtonGap):AtVerticalCenterIn(self.ActionArea):End()
     end,
 
-    --- Post-mount render (the opener calls this after Popup centres the dialog, so the lists read
+    --- Post-mount render (the opener calls this after Popup centres the dialog, so the rows read
     --- concrete geometry).
     ---@param self UICustomLobbyBalancePreview
     Initialize = function(self)
@@ -221,39 +278,73 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         self:Render()
     end,
 
-    --- Paints the two columns + status line from the computed proposal, and enables Apply only when
+    --- The per-team header: "label   total (avg avg)", mirrored on the right side ("total (avg avg)
+    --- label") so the team label stays on the outer edge of its column.
+    ---@param self UICustomLobbyBalancePreview
+    ---@param side 1 | 2
+    ---@return string
+    SideHeader = function(self, side)
+        local result = self.Result
+        local labels = result.labels or { "Team 1", "Team 2" }
+        local count = table.getn(result.sides[side])
+        local total = result.totals[side]
+        local avg = count > 0 and math.floor(total / count + 0.5) or 0
+        local stats = tostring(total) .. " (" .. tostring(avg) .. " avg)"
+        if side == 2 then
+            return stats .. "   " .. labels[side]
+        end
+        return labels[side] .. "   " .. stats
+    end,
+
+    --- Fills one pair row from the k-th players of each side (either may be absent on an uneven split).
+    ---@param self UICustomLobbyBalancePreview
+    ---@param row UICustomLobbyBalanceRow
+    ---@param a UICustomLobbyBalancePlayer | nil
+    ---@param b UICustomLobbyBalancePlayer | nil
+    FillRow = function(self, row, a, b)
+        row.Group:Show()
+        if a then
+            row.Left:SetText(FormatPlayer(a, false))
+            row.Left:SetColor(PlayerColor(a))
+        else
+            row.Left:SetText("")
+        end
+        if b then
+            row.Right:SetText(FormatPlayer(b, true))
+            row.Right:SetColor(PlayerColor(b))
+        else
+            row.Right:SetText("")
+        end
+        -- the pair's rating gap, only when both players are rated
+        if a and b and a.pl > 0 and b.pl > 0 then
+            local gap = math.abs(a.pl - b.pl)
+            row.Center:SetText("+" .. tostring(gap))
+            row.Center:SetColor(GapColor(gap))
+        else
+            row.Center:SetText("")
+        end
+    end,
+
+    --- Paints the pair rows + the summary line from the computed proposal, and enables Apply only when
     --- there is something to apply.
     ---@param self UICustomLobbyBalancePreview
     Render = function(self)
         local result = self.Result
-        local labels = result.labels or { "Team 1", "Team 2" }
 
-        self.HeaderA:SetText(labels[1] .. "   " .. tostring(result.totals[1]))
-        self.HeaderB:SetText(labels[2] .. "   " .. tostring(result.totals[2]))
+        self.HeaderA:SetText(self:SideHeader(1))
+        self.HeaderB:SetText(self:SideHeader(2))
 
-        local locked = result.lockedOwners or {}
-        self.ListA:DeleteAllItems()
-        for _, player in ipairs(result.sides[1]) do
-            self.ListA:AddItem(PlayerRow(player, locked[player.ownerId]))
-        end
-        self.ListB:DeleteAllItems()
-        for _, player in ipairs(result.sides[2]) do
-            self.ListB:AddItem(PlayerRow(player, locked[player.ownerId]))
+        local rowCount = math.max(table.getn(result.sides[1]), table.getn(result.sides[2]))
+        for i = 1, MaxRows do
+            local row = self.Rows[i]
+            if i <= rowCount then
+                self:FillRow(row, result.sides[1][i], result.sides[2][i])
+            else
+                row.Group:Hide()
+            end
         end
 
-        -- status line: the reason it can't balance, else the match quality (+ any odd one left out)
-        local status
-        if result.reason then
-            status = result.reason
-        elseif result.quality then
-            status = "Match quality: " .. tostring(result.quality) .. "%"
-        else
-            status = "Match quality: —"
-        end
-        if result.unassigned then
-            status = status .. "   ·   " .. result.unassigned.name .. " stays put (odd count)"
-        end
-        self.Status:SetText(status)
+        self.Status:SetText(self:StatusLine())
 
         if result.feasible then
             self.ApplyButton:Enable()
@@ -262,6 +353,37 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
             self.ApplyButton:Disable()
             self.RetryButton:Disable()
         end
+    end,
+
+    --- The summary: the reason it can't balance, else "Quality before -> after · Win a/b · Δ delta",
+    --- plus any odd one left out.
+    ---@param self UICustomLobbyBalancePreview
+    ---@return string
+    StatusLine = function(self)
+        local result = self.Result
+        if result.reason then
+            return result.reason
+        end
+
+        -- match quality, as "current -> proposed" when both are known
+        local quality
+        if result.quality and result.currentQuality then
+            quality = "Quality " .. tostring(result.currentQuality) .. "% -> " .. tostring(result.quality) .. "%"
+        elseif result.quality then
+            quality = "Quality " .. tostring(result.quality) .. "%"
+        else
+            quality = "Quality n/a"
+        end
+
+        local status = quality
+        if result.winChance then
+            status = status .. "   ·   Win " .. tostring(result.winChance[1]) .. "% / " .. tostring(result.winChance[2]) .. "%"
+        end
+        status = status .. "   ·   Gap " .. tostring(math.abs(result.totals[1] - result.totals[2]))
+        if result.unassigned then
+            status = status .. "   ·   " .. result.unassigned.name .. " stays put (odd count)"
+        end
+        return status
     end,
 
     --- Re-rolls the proposal (the balance is randomised) and re-renders, without committing.
@@ -318,7 +440,7 @@ function Open(parent)
     end
     Instance = popup
 
-    -- Popup has mounted + centred the content; now it's safe to populate the lists
+    -- Popup has mounted + centred the content; now it's safe to populate the rows
     content:Initialize()
 end
 

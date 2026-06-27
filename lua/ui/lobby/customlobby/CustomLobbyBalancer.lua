@@ -59,6 +59,7 @@ local MaxBalanceEvaluations = 20000
 ---@field locked  boolean         # the host pinned this seat
 ---@field side    1 | 2           # the seat's resolved auto-team side (current)
 ---@field slot    number          # current seat
+---@field moved   boolean         # this player's proposed seat differs from its current seat (preview highlight)
 
 --- A proposed balance.
 ---@class UICustomLobbyBalancePlan
@@ -69,7 +70,9 @@ local MaxBalanceEvaluations = 20000
 ---@field unassigned   UICustomLobbyBalancePlayer | false    # the odd one left in place, if any
 ---@field feasible     boolean                               # false = nothing to apply (Apply disabled)
 ---@field reason       string | nil                          # why it can't / didn't balance, for the preview
----@field quality      number | false                        # trueskill match quality %, or false
+---@field quality      number | false                        # trueskill match quality % of the proposal, or false
+---@field currentQuality number | false                      # trueskill match quality % of the CURRENT seating, for "before -> after"
+---@field winChance    number[] | false                      # predicted win % per side {a, b} for the proposal, or false
 ---@field arrangement  table<number, UILobbyPeerId>          # the lobby update: slot -> ownerId (no team)
 
 --- Sorts players strongest-first by display rating, so two rating-sorted sides line up rank for rank.
@@ -103,6 +106,53 @@ local function ComputeQuality(sides)
         return false
     end
     return quality
+end
+
+-- trueskill's per-player performance variance (beta); matches the 250 baked into computeQuality.
+local Beta = 250
+
+--- Gauss error function (Abramowitz & Stegun 7.1.26) — max abs error ~1.5e-7, plenty for a display %.
+---@param x number
+---@return number
+local function Erf(x)
+    local sign = x < 0 and -1 or 1
+    x = math.abs(x)
+    local t = 1 / (1 + 0.3275911 * x)
+    local y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592)
+        * t * math.exp(-x * x)
+    return sign * y
+end
+
+--- Predicted win split for a two-side proposal, as integer percentages {winA, winB} summing to 100.
+--- This is the probabilistic counterpart to the symmetric match quality: quality says "how close",
+--- this says "which way". P(A beats B) = Phi(Δμ / sqrt(N·β² + Σσ²)) over both sides' players. Returns
+--- false for AI / unrated players (mean 0) or an empty side — the preview then shows "—".
+---@param sides UICustomLobbyBalancePlayer[][]
+---@return number[] | false
+local function ComputeWinChance(sides)
+    if table.getn(sides[1]) == 0 or table.getn(sides[2]) == 0 then
+        return false
+    end
+    local sumMean = { 0, 0 }
+    local sumVar = { 0, 0 }
+    local count = 0
+    for side = 1, 2 do
+        for _, bp in ipairs(sides[side]) do
+            if not bp.mean or bp.mean == 0 then
+                return false
+            end
+            sumMean[side] = sumMean[side] + bp.mean
+            sumVar[side] = sumVar[side] + bp.dev * bp.dev
+            count = count + 1
+        end
+    end
+    local denom = math.sqrt(count * Beta * Beta + sumVar[1] + sumVar[2])
+    if denom <= 0 then
+        return false
+    end
+    local pA = 0.5 * (1 + Erf((sumMean[1] - sumMean[2]) / (denom * math.sqrt(2))))
+    local a = math.floor(pA * 100 + 0.5)
+    return { a, 100 - a }
 end
 
 --- Phase 3 — seats already-formed rank-matched pairs at randomly-chosen mirror rows: `pairsA[i]` vs
@@ -175,6 +225,8 @@ function BuildPlan(slots, teams)
         feasible = false,
         reason = nil,
         quality = false,
+        currentQuality = false,
+        winChance = false,
         arrangement = {},
     }
 
@@ -214,6 +266,14 @@ function BuildPlan(slots, teams)
         plan.reason = "Need at least two players to balance."
         return plan
     end
+
+    -- score the CURRENT seating too, so the preview can show "before -> after" and the host can tell
+    -- whether re-balancing is even worth applying
+    local currentSides = { {}, {} }
+    for _, bp in ipairs(players) do
+        table.insert(currentSides[bp.side], bp)
+    end
+    plan.currentQuality = ComputeQuality(currentSides)
 
     -- pinned = the host-locked players + (odd roster) the lowest-rated unlocked player, left in place
     -- so the rest pair up (never ejected). Pinned players hold their exact seat and side.
@@ -350,7 +410,18 @@ function BuildPlan(slots, teams)
         plan.totals[side] = total
     end
 
+    -- flag who actually moves vs. the current seating, so the preview can highlight the changes (locked
+    -- and unassigned players map to their own seat, so they read as not moved)
+    local assignedSlot = {}
+    for slot, ownerId in plan.arrangement do
+        assignedSlot[ownerId] = slot
+    end
+    for _, bp in ipairs(players) do
+        bp.moved = assignedSlot[bp.ownerId] ~= bp.slot
+    end
+
     plan.quality = ComputeQuality(plan.sides)
+    plan.winChance = ComputeWinChance(plan.sides)
     plan.feasible = freeCount > 0
     if freeCount == 0 then
         plan.reason = "Every player is locked in place — nothing to rearrange."
