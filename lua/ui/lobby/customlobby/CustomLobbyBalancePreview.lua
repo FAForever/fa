@@ -50,7 +50,7 @@
 --   * **Click a player's lock** → pin / unpin them, which **regenerates** the candidates around that
 --     constraint (the locked player held at its seat, the rest re-balanced).
 -- Moved players are gold, locked players blue. The status line carries only situational notes (the odd
--- one left in place, or why it can't balance).
+-- one left in place, or why it can't balance). Every value / control has a hover tooltip (see `Help`).
 --
 -- Built to the preset dialog's shape (areas layout, three-phase init, Popup singleton).
 
@@ -61,6 +61,7 @@ local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Dragger = import("/lua/maui/dragger.lua").Dragger
 local Popup = import("/lua/ui/controls/popups/popup.lua").Popup
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 
 local CustomLobbySlotsDerivedModel = import("/lua/ui/lobby/customlobby/models/derived/customlobbyslotsderivedmodel.lua")
 local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/models/customlobbysessionmodel.lua")
@@ -98,6 +99,35 @@ local SelectColor = 'ffffffff' -- swap-selection + drop-target highlight (low al
 local GapLowColor = 'ff66bb66'   -- a close pair
 local GapMidColor = 'ffd9c97a'   -- a noticeable gap
 local GapHighColor = 'ffcc6666'  -- a lopsided pair
+
+-- hover tooltips explaining each value / control { title, body }
+local Help = {
+    Win = { "Win chance",
+        "The chance this team wins. It comes from the player ratings. The two teams add up to 100%." },
+    Quality = { "Match quality",
+        "How even the two teams are. A higher number means a closer match." },
+    Gap = { "Rating gap",
+        "How far apart the two teams are in rating. The arrow points to the stronger team. A smaller number is more balanced." },
+    Total = { "Team rating",
+        "The team's total rating. It is the sum of the players' ratings." },
+    Deviation = { "Rating uncertainty",
+        "How unsure we are about the team's rating. It is the sum of the players' deviations. A higher number means the ratings are less certain." },
+    Player = { "Player rating",
+        "The player's rating. The number in brackets is the deviation, which is how unsure we are about that rating. Click two players to swap them. Drag the row to move the pair to another spot." },
+    Lock = { "Lock in place",
+        "Pin this player to their seat. Auto-balance keeps locked players where they are. Only the other players get moved." },
+    Candidate = { "Other balances",
+        "Step through the other balanced line-ups. The best one is shown first." },
+}
+
+--- Attaches an explanatory hover tooltip to a control (re-enabling hit testing, since the value texts
+--- are hit-disabled so the row's click / drag passes through to the catcher beneath them).
+---@param control Control
+---@param help string[]   # { title, body }
+local function AddHelp(control, help)
+    control:EnableHitTest()
+    Tooltip.AddControlTooltipManual(control, help[1], help[2])
+end
 
 --- Creates an invisible layout area (tinted while Debug is on).
 ---@param parent Control
@@ -298,7 +328,9 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         -- the bottom line of the header: each team's predicted win % (under its total) + the match
         -- quality (under the gap). HeaderTop / HeaderBottom are vertical-reference bands only.
         self.HeaderTop = Group(self.HeaderArea, "BalanceHeaderTop")
+        self.HeaderTop:DisableHitTest()
         self.HeaderBottom = Group(self.HeaderArea, "BalanceHeaderBottom")
+        self.HeaderBottom:DisableHitTest()
         self.TeamWinA = UIUtil.CreateText(self.HeaderArea, "", 14, UIUtil.titleFont)
         self.TeamWinA:SetColor(HeaderColor)
         self.TeamWinA:DisableHitTest()
@@ -308,6 +340,16 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         self.HeaderQuality = UIUtil.CreateText(self.HeaderCenterArea, "", 12, UIUtil.bodyFont)
         self.HeaderQuality:SetColor(HeaderColor)
         self.HeaderQuality:DisableHitTest()
+
+        -- explanatory hover tooltips on the header values
+        AddHelp(self.TeamWinA, Help.Win)
+        AddHelp(self.TeamWinB, Help.Win)
+        AddHelp(self.HeaderQuality, Help.Quality)
+        AddHelp(self.HeaderGap, Help.Gap)
+        AddHelp(self.TeamTotalA, Help.Total)
+        AddHelp(self.TeamTotalB, Help.Total)
+        AddHelp(self.TeamDevA, Help.Deviation)
+        AddHelp(self.TeamDevB, Help.Deviation)
 
         -- a fixed pool of interactive position rows; Render shows/hides + fills them from the proposal
         self.Rows = {}
@@ -429,6 +471,13 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
             return false
         end
 
+        -- hover tooltips: the click/drag halves explain the player values + interaction, the dots the lock
+        -- (AddControlTooltipManual chains the existing handlers, so click / drag / toggle still fire)
+        AddHelp(row.LeftSelect, Help.Player)
+        AddHelp(row.RightSelect, Help.Player)
+        AddHelp(row.LeftLock, Help.Lock)
+        AddHelp(row.RightLock, Help.Lock)
+
         return row
     end,
 
@@ -454,6 +503,7 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         label:DisableHitTest()
         Layouter(label):AtHorizontalCenterIn(arrow):AtVerticalCenterIn(arrow):End()
         arrow.Label = label
+        AddHelp(arrow, Help.Candidate)
         return arrow
     end,
 
@@ -551,8 +601,8 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         Layouter(self.NavNext):AnchorToRight(self.NavLabel, 6):AtVerticalCenterIn(self.ActionArea)
             :Width(NavSize):Height(NavSize):End()
 
-        Layouter(self.CancelButton):AtRightIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea):End()
-        Layouter(self.ApplyButton):AnchorToLeft(self.CancelButton, ButtonGap):AtVerticalCenterIn(self.ActionArea):End()
+        Layouter(self.ApplyButton):AtRightIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea):End()
+        Layouter(self.CancelButton):AnchorToLeft(self.ApplyButton, ButtonGap):AtVerticalCenterIn(self.ActionArea):End()
     end,
 
     --- Post-mount render (the opener calls this after Popup centres the dialog, so the rows read

@@ -111,6 +111,18 @@ function FindNameForOwner(ownerId)
     end
     return tostring(ownerId)
 end
+
+--- A set (`key -> true`) from a list of keys, so an order-independent `table.equal` can compare two
+--- key lists (the restrictions list is order-independent, like the mods/options keyed tables already are).
+---@param keys string[]
+---@return table<string, boolean>
+local function KeySet(keys)
+    local set = {}
+    for _, key in keys do
+        set[key] = true
+    end
+    return set
+end
 ---@return table
 local function GatherPlayers()
     local launch = CustomLobbyLaunchModel.GetSingleton()
@@ -758,7 +770,9 @@ function RequestSetScenario(scenarioFile)
         return
     end
 
-    CustomLobbyLaunchModel.SetScenario(CustomLobbyLaunchModel.GetSingleton(), scenarioFile)
+    local launch = CustomLobbyLaunchModel.GetSingleton()
+    local changed = scenarioFile ~= launch.ScenarioFile()
+    CustomLobbyLaunchModel.SetScenario(launch, scenarioFile)
 
     -- size the lobby room to the map's start spots, so all of its slots show (capped at MaxSlots)
     local count = ScenarioSlotCount(scenarioFile)
@@ -770,9 +784,12 @@ function RequestSetScenario(scenarioFile)
 
     BroadcastLaunchInfo(instance)
 
-    -- the scenario derived model resolved the new map synchronously (its observer fired on the Set above)
-    local scenario = import("/lua/ui/lobby/customlobby/models/derived/customlobbyscenarioderivedmodel.lua").GetScenario()
-    BroadcastSystemNotice(instance, "Host changed the map to " .. ((scenario and scenario.Name) or "a new map") .. ".")
+    -- announce only a real map change (re-selecting the same map is a no-op for the derived state)
+    if changed then
+        -- the scenario derived model resolved the new map synchronously (its observer fired on the Set)
+        local scenario = import("/lua/ui/lobby/customlobby/models/derived/customlobbyscenarioderivedmodel.lua").GetScenario()
+        BroadcastSystemNotice(instance, "Host changed the map to " .. ((scenario and scenario.Name) or "a new map") .. ".")
+    end
 end
 
 --- The host sets the active sim mods. Host-only — backs the mod-select dialog. Sets `GameMods`
@@ -790,9 +807,14 @@ function RequestSetGameMods(gameMods)
         return
     end
 
-    CustomLobbyLaunchModel.SetGameMods(CustomLobbyLaunchModel.GetSingleton(), gameMods)
+    local launch = CustomLobbyLaunchModel.GetSingleton()
+    -- a set (uuid -> true): table.equal is order-independent, matching the mods derived model's dedup
+    local changed = not table.equal(gameMods, launch.GameMods())
+    CustomLobbyLaunchModel.SetGameMods(launch, gameMods)
     BroadcastLaunchInfo(instance)
-    BroadcastSystemNotice(instance, "Host changed the game mods (" .. table.getsize(gameMods) .. " active).")
+    if changed then
+        BroadcastSystemNotice(instance, "Host changed the game mods (" .. table.getsize(gameMods) .. " active).")
+    end
 end
 
 --- The host sets the unit restrictions. Host-only — backs the unit-select dialog and a
@@ -813,10 +835,16 @@ function RequestSetRestrictions(keys)
         return
     end
 
-    CustomLobbyLaunchModel.SetRestrictions(CustomLobbyLaunchModel.GetSingleton(), keys)
+    local launch = CustomLobbyLaunchModel.GetSingleton()
+    -- key the lists into sets so table.equal is order-independent (restrictions is a list, unlike the
+    -- mods/options keyed tables) — a mere reorder of the same keys is not a change
+    local changed = not table.equal(KeySet(keys), KeySet(launch.Restrictions()))
+    CustomLobbyLaunchModel.SetRestrictions(launch, keys)
     LOG("CustomLobby: restrictions set (" .. table.getn(keys) .. ")")
     BroadcastLaunchInfo(instance)
-    BroadcastSystemNotice(instance, "Host changed the unit restrictions (" .. table.getn(keys) .. ").")
+    if changed then
+        BroadcastSystemNotice(instance, "Host changed the unit restrictions (" .. table.getn(keys) .. ").")
+    end
 end
 
 --- The host sets the game options. Host-only — backs the options dialog. Replaces the whole
@@ -834,9 +862,15 @@ function RequestSetGameOptions(options)
         return
     end
 
-    CustomLobbyLaunchModel.SetGameOptions(CustomLobbyLaunchModel.GetSingleton(), options)
+    local launch = CustomLobbyLaunchModel.GetSingleton()
+    -- compare the value tables (matching the options derived model's publish dedup); a no-op apply
+    -- (the host opened the dialog and clicked OK without changing anything) announces nothing
+    local changed = not table.equal(options, launch.GameOptions())
+    CustomLobbyLaunchModel.SetGameOptions(launch, options)
     BroadcastLaunchInfo(instance)
-    BroadcastSystemNotice(instance, "Host changed the game options.")
+    if changed then
+        BroadcastSystemNotice(instance, "Host changed the game options.")
+    end
 end
 
 --- The host resets every game option to its default. Host-only — backs the lobby's "Reset

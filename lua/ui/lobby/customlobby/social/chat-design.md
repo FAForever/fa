@@ -80,14 +80,18 @@ the same mechanism either way.
   snapshot. Host-broadcast is one symmetric path with no diff and no baseline-flag.
   - Wired: **join** (`ProcessAddPlayer`), **leave** (`OnPeerDisconnected`), **kick** (`RequestEject` adds
     "Host removed X."; a human kick also produces the disconnect's "left" line — two lines is fine),
-    **map / mods / options / restrictions** changes (the `RequestSet*` intents, which fire
+    **map / mods / options / restrictions** changes — each `RequestSet*` intent compares the incoming
+    value against the current launch-model value (the same inputs the derived models dedup on: file /
+    mod set / option values / order-independent restriction keys) and announces **only on a real
+    change**, so a no-op apply (open the dialog, click OK, nothing changed) is silent. They fire
     once per action — *not* on snapshot rebroadcasts, so no spam), **seat swap / move** (`SwapSlots`,
     covering host-initiated and any client-requested swap), **move-to-observers**
     (`RequestMoveToObserver`), and **auto-balance applied** (`RequestApplyBalance`).
   - Not yet emitted (deliberately, as noise-prone): ready toggles, slot takes, faction/colour picks.
     Per-option diffs ("changed Unit Cap to 1000") would read better than the generic "changed the game
     options" but need an old-vs-new compare in the intent.
-- **Refinements.** Multi-line wrapping (slice 1 truncates one line per row — the in-game
-  [`ChatLinesInterface`](/lua/ui/game/chat/ChatLinesInterface.lua) is the reference); unread-since-last-view
-  badge count (slice 1 shows the total line count).
+- **Refinements.** Multi-line wrapping is **done** — `CustomLobbyChatPanel.BuildLines`/`WrapLine` wrap
+  each entry's label to the message-column width (via [`/lua/maui/text.lua`](/lua/maui/text.lua)
+  `WrapText`, measured by a hidden font-matched text) and emit one fixed-height grid row per wrapped line.
+  Still open: unread-since-last-view badge count (the badge shows the total line count).
 ```

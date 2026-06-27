@@ -74,6 +74,31 @@ local PinnedIcon = '/game/menu-btns/pinned_btn_up.dds'   -- pinned (toggle on / 
 local BalanceIcon = '/BUTTON/autobalance/_btn_up.dds'
 local ReopenIcon = '/game/recall-panel/icon-recall_bmp.dds'
 
+-- the auto-teams quick-cycle button steps through these modes in order (matches the options dropdown);
+-- its glyph is the faction-skinned per-mode art the legacy lobby used (/BUTTON/autoteam/<mode>/).
+local AutoTeamOrder = { 'none', 'tvsb', 'lvsr', 'pvsi', 'manual' }
+
+--- The button glyph for an auto-teams mode.
+---@param mode string
+---@return FileName
+local function AutoTeamIcon(mode)
+    return '/BUTTON/autoteam/' .. mode .. '/_btn_up.dds'
+end
+
+--- The next mode in the cycle after `current` (wraps).
+---@param current string
+---@return string
+local function NextAutoTeam(current)
+    local index = 1
+    for i, mode in ipairs(AutoTeamOrder) do
+        if mode == current then
+            index = i
+            break
+        end
+    end
+    return AutoTeamOrder[math.mod(index, table.getn(AutoTeamOrder)) + 1]
+end
+
 --- A small square icon button for the header tool strip: a solid background that lights on hover,
 --- plus an `Active` state (driven externally for the pin toggle) that lights it the "on" colour. A
 --- toggle can pass a second `activeTexture` so the icon glyph swaps while active (the pin shows the
@@ -171,6 +196,15 @@ local SlotTool = Class(Group) {
         self.Enabled = enabled and true or false
         self:ApplyVisual()
     end,
+
+    --- Swaps the icon glyph (for a cycling action like the auto-teams button, whose glyph reflects the
+    --- current mode). Plain actions don't paint the icon in ApplyVisual, so this is safe to drive externally.
+    ---@param self UICustomLobbySlotTool
+    ---@param texture FileName
+    SetIcon = function(self, texture)
+        self.IdleTexture = texture
+        self.Icon:SetTexture(UIUtil.UIFile(texture))
+    end,
 }
 
 ---@alias UICustomLobbySlotsBody UICustomLobbyOneColumnSlots | UICustomLobbyTwoColumnSlots
@@ -182,6 +216,7 @@ local SlotTool = Class(Group) {
 ---@field LockLabel Text                          # "Locked" notice, visible to everyone while pinned
 ---@field Tools Group                            # host-only tool strip (right of the header)
 ---@field PinButton UICustomLobbySlotTool
+---@field AutoTeamsButton UICustomLobbySlotTool
 ---@field BalanceButton UICustomLobbySlotTool
 ---@field ReopenButton UICustomLobbySlotTool
 ---@field Body UICustomLobbySlotsBody | false   # the active layout body
@@ -232,6 +267,17 @@ local CustomLobbySlotsInterface = Class(Group) {
         end
         Tooltip.AddControlTooltipManual(self.PinButton.Bg, "Pin slots",
             "Lock seating so only you (the host) can move players between slots.")
+
+        -- cycles the AutoTeams mode; its glyph shows the current mode and the slot layout follows
+        self.AutoTeamsButton = SlotTool(self.Tools, AutoTeamIcon('none'))
+        self.AutoTeamsButton.OnPress = function()
+            local launch = CustomLobbyLaunchModel.GetSingleton()
+            local options = table.copy(launch.GameOptions())
+            options.AutoTeams = NextAutoTeam(options.AutoTeams or 'none')
+            CustomLobbyController.RequestSetGameOptions(options)
+        end
+        Tooltip.AddControlTooltipManual(self.AutoTeamsButton.Bg, "Auto teams",
+            "Choose how teams form from the start spots. Click to step through: None, Top vs Bottom, Left vs Right, Odd vs Even, Manual.")
 
         self.BalanceButton = SlotTool(self.Tools, BalanceIcon)
         self.BalanceButton.OnPress = function()
@@ -306,14 +352,16 @@ local CustomLobbySlotsInterface = Class(Group) {
         Layouter(self.Tools)
             :AtRightIn(self, 4)
             :AtVerticalCenterIn(self.Header)
-            :Width(3 * ToolSize + 2 * ToolGap):Height(ToolSize)
+            :Width(4 * ToolSize + 3 * ToolGap):Height(ToolSize)
             :End()
         local function placeTool(tool)
             return Layouter(tool):AtTopIn(self.Tools):Width(ToolSize):Height(ToolSize)
         end
+        -- reading left to right: Pin · Auto teams · Balance · Reopen
         placeTool(self.ReopenButton):AtRightIn(self.Tools):End()
         placeTool(self.BalanceButton):LeftOf(self.ReopenButton, ToolGap):End()
-        placeTool(self.PinButton):LeftOf(self.BalanceButton, ToolGap):End()
+        placeTool(self.AutoTeamsButton):LeftOf(self.BalanceButton, ToolGap):End()
+        placeTool(self.PinButton):LeftOf(self.AutoTeamsButton, ToolGap):End()
 
         self.Mounted = true
         self:LayoutBody()
@@ -378,6 +426,9 @@ local CustomLobbySlotsInterface = Class(Group) {
     --- within the same kind (e.g. lvsr→tvsb) is handled by the body's own re-layout.
     ---@param self UICustomLobbySlotsInterface
     OnAutoTeamsChanged = function(self)
+        -- keep the quick-cycle button's glyph in sync with the mode (also catches changes from the
+        -- options dialog or a reset, not just the button itself)
+        self.AutoTeamsButton:SetIcon(AutoTeamIcon(CustomLobbyLaunchModel.GetSingleton().GameOptions().AutoTeams or 'none'))
         if self:KindForMode() ~= self.LayoutKind then
             self:RebuildBody()
         end
