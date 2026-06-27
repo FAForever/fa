@@ -59,6 +59,12 @@
 -- (re-setting every `Players[slot]` to an equal value) on any option tweak. So the rebuild compares a
 -- signature of the rendered fields and only re-publishes `Slots` when something visible actually
 -- changed — a rebroadcast of an unchanged board is a no-op, not 16 needless re-renders per seat.
+--
+-- LIFETIME. It is a `ClassSimple` implementing `Destroyable`, registered in the session trash bag (see
+-- CustomLobbySession) on first access. So one `CustomLobbySession.Teardown()` frees its `Slots` +
+-- `Teams` LazyVars and severs *all* its subscriptions (every slot's player, closed slots, CPU
+-- benchmarks, the scenario, game options) — instead of leaking ~20 observers for the whole match. The
+-- module functions are thin facades. See the scenario / mods / restrictions models for the pattern.
 
 local Create = import("/lua/lazyvar.lua").Create
 local Derive = import("/lua/lazyvar.lua").Derive
@@ -71,6 +77,7 @@ local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/models/customl
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/models/customlobbylocalmodel.lua")
 local CustomLobbyScenarioDerivedModel = import("/lua/ui/lobby/customlobby/models/derived/customlobbyscenarioderivedmodel.lua")
 local CustomLobbyRules = import("/lua/ui/lobby/customlobby/customlobbyrules.lua")
+local CustomLobbySession = import("/lua/ui/lobby/customlobby/customlobbysession.lua")
 
 local MaxSlots = CustomLobbyLaunchModel.MaxSlots
 
@@ -242,28 +249,10 @@ end
 -------------------------------------------------------------------------------
 --#region Derived model
 
---- Reactive derived-slots singleton. **Read-only** — no write helpers; the controller never touches it.
---- Two read faces over the same board: per-seat `Slots` (the row/card paint these) and the binary
---- auto-team aggregate `Teams` (the team-score strip), each deduped independently so a rating-only
---- change re-fires `Teams` but not `Slots`.
----@class UICustomLobbySlotsDerivedModel
----@field Slots LazyVar<UICustomLobbySlot[]>   # the lookup table, indexed 1..MaxSlots
----@field Teams LazyVar<UICustomLobbyTeams>    # the binary auto-team aggregate (side labels + per-side rating totals)
----@field Observers LazyVar[]                  # internal: the source subscriptions; pinned so they aren't GC'd
-
+-- The singleton, forward-declared above the class so the class methods (`Destroy`) capture it as an
+-- upvalue. Assigned in `SetupSingleton`, cleared in `Destroy`.
 ---@type UICustomLobbySlotsDerivedModel | nil
-local ModelInstance = nil
-
---- A signature of the currently-published table's rendered fields — the de-dup key. Re-set only when
---- the signature changes, so a rebroadcast of an unchanged board re-fires nothing.
----@type string | false
-local LoadedSignature = false
-
---- A signature of the currently-published `Teams` aggregate — its own de-dup key, so a rating change
---- re-fires `Teams` (totals moved) without re-rendering the rows, and an option tweak that doesn't move
---- the split re-fires neither face.
----@type string | false
-local LoadedTeamsSignature = false
+local Instance = nil
 
 --- Builds one slot entry by joining every model for that seat.
 ---@param slot number
@@ -334,116 +323,152 @@ local function TeamsSignature(teams)
         .. "|" .. tostring(teams.Totals[1]) .. "/" .. tostring(teams.Totals[2])
 end
 
---- Rebuilds the whole lookup table from the current launch / session / local / scenario state and
---- publishes it — but only when its signature changed (the de-dup).
----@param model UICustomLobbySlotsDerivedModel
-local function Recompute(model)
-    local launch = CustomLobbyLaunchModel.GetSingleton()
-    local closedSlots = CustomLobbySessionModel.GetSingleton().ClosedSlots()
-    local benchmarks = CustomLobbyLocalModel.GetSingleton().CpuBenchmarks()
+--- Reactive derived-slots singleton — a `ClassSimple` implementing `Destroyable`, registered in the
+--- session trash so one `CustomLobbySession.Teardown()` frees it. **Read-only** — no write helpers; the
+--- controller never touches it. Two read faces over the same board: per-seat `Slots` (the row/card
+--- paint these) and the binary auto-team aggregate `Teams` (the team-score strip), each deduped
+--- independently so a rating-only change re-fires `Teams` but not `Slots`.
+---@class UICustomLobbySlotsDerivedModel : Destroyable
+---@field Trash                TrashBag                       # owns the Slots/Teams vars + every observer (freed on Destroy)
+---@field Slots                LazyVar<UICustomLobbySlot[]>   # the lookup table, indexed 1..MaxSlots
+---@field Teams                LazyVar<UICustomLobbyTeams>    # the binary auto-team aggregate (side labels + per-side rating totals)
+---@field Observers            LazyVar[]                       # internal: the source subscriptions (strong refs; also in Trash)
+---@field LoadedSignature      string | false                  # de-dup key for the Slots face
+---@field LoadedTeamsSignature string | false                  # de-dup key for the Teams face
+---@field Destroyed            boolean
+local SlotsModel = ClassSimple {
 
-    local scenario = CustomLobbyScenarioDerivedModel.GetScenario()
-    local spawns = scenario and scenario.Markers and scenario.Markers.Spawns or nil
-    local maxDimension = scenario and scenario.MaxDimension or 0
+    ---@param self UICustomLobbySlotsDerivedModel
+    __init = function(self)
+        self.Trash = TrashBag()
+        self.Slots = self.Trash:Add(Create({}))
+        self.Teams = self.Trash:Add(Create({ Mode = false, Labels = false, Resolved = false, Totals = { 0, 0 } }))
+        self.Observers = {}
+        self.LoadedSignature = false
+        self.LoadedTeamsSignature = false
+        self.Destroyed = false
 
-    -- the recommended cap scales by seated count (same for every seat), so count once up front; we feed
-    -- the inputs to the pure rule (CustomLobbyRules reads no models itself)
-    local seatedCount = 0
-    for slot = 1, MaxSlots do
-        if launch.Players[slot]() then
-            seatedCount = seatedCount + 1
+        -- subscribe to every source that feeds a seat. Each observer is kept strongly on self.Observers
+        -- (the trash is weak-valued, so the trash alone wouldn't keep it alive) AND added to the trash,
+        -- so Destroy severs them all. `Derive` fires synchronously on creation → the table resolves now.
+        local function subscribe(source)
+            table.insert(self.Observers, self.Trash:Add(Derive(source, function(lazy)
+                lazy()
+                self:Recompute()
+            end)))
         end
-    end
-    local cap = CustomLobbyRules.RecommendedUnitCap(seatedCount, maxDimension)
 
-    -- the binary auto-team split, applied once here (the rule lives in CustomLobbyRules). A seat's side
-    -- is keyed on its start spot, falling back to the slot index when empty so empty cards still place;
-    -- `resolved` is false for a positional mode whose map/start spots aren't loaded yet.
-    local mode = CustomLobbyRules.AutoTeamMode(launch.GameOptions())
-    local labels = CustomLobbyRules.SideLabels(mode)
-    local resolver, resolved = CustomLobbyRules.BuildSideResolver(mode, scenario)
+        local launch = CustomLobbyLaunchModel.GetSingleton()
+        for slot = 1, MaxSlots do
+            subscribe(launch.Players[slot])
+        end
+        subscribe(CustomLobbySessionModel.GetSingleton().ClosedSlots)
+        subscribe(CustomLobbyLocalModel.GetSingleton().CpuBenchmarks)
+        subscribe(CustomLobbyScenarioDerivedModel.GetScenarioVar())
+        -- GameOptions feeds the AutoTeams mode (the side split); the per-face dedup keeps an unrelated
+        -- option tweak from re-firing either var
+        subscribe(launch.GameOptions)
+    end,
 
-    local slots = {}
-    local totalA, totalB = 0, 0
-    for slot = 1, MaxSlots do
-        local player = launch.Players[slot]()
-        local spot = (player and player.StartSpot) or slot
-        local side = (resolved and resolver and resolver(spot)) or false
-        slots[slot] = BuildSlot(slot, player, closedSlots[slot] and true or false, benchmarks, spawns, cap, side)
-        if player then
-            if side == 1 then
-                totalA = totalA + (player.PL or 0)
-            elseif side == 2 then
-                totalB = totalB + (player.PL or 0)
+    --- Rebuilds the whole lookup table + team aggregate from the current launch / session / local /
+    --- scenario state and publishes each — but only when its own signature changed (the de-dup).
+    ---@param self UICustomLobbySlotsDerivedModel
+    Recompute = function(self)
+        local launch = CustomLobbyLaunchModel.GetSingleton()
+        local closedSlots = CustomLobbySessionModel.GetSingleton().ClosedSlots()
+        local benchmarks = CustomLobbyLocalModel.GetSingleton().CpuBenchmarks()
+
+        local scenario = CustomLobbyScenarioDerivedModel.GetScenario()
+        local spawns = scenario and scenario.Markers and scenario.Markers.Spawns or nil
+        local maxDimension = scenario and scenario.MaxDimension or 0
+
+        -- the recommended cap scales by seated count (same for every seat), so count once up front; we
+        -- feed the inputs to the pure rule (CustomLobbyRules reads no models itself)
+        local seatedCount = 0
+        for slot = 1, MaxSlots do
+            if launch.Players[slot]() then
+                seatedCount = seatedCount + 1
             end
         end
-    end
+        local cap = CustomLobbyRules.RecommendedUnitCap(seatedCount, maxDimension)
 
-    -- per-seat face (rows/cards): re-publish only when a rendered field or a seat's side changed
-    local signature = Signature(slots)
-    if signature ~= LoadedSignature then
-        LoadedSignature = signature
-        model.Slots:Set(slots)
-    end
+        -- the binary auto-team split, applied once here (the rule lives in CustomLobbyRules). A seat's
+        -- side is keyed on its start spot, falling back to the slot index when empty so empty cards still
+        -- place; `resolved` is false for a positional mode whose map/start spots aren't loaded yet.
+        local mode = CustomLobbyRules.AutoTeamMode(launch.GameOptions())
+        local labels = CustomLobbyRules.SideLabels(mode)
+        local resolver, resolved = CustomLobbyRules.BuildSideResolver(mode, scenario)
 
-    -- aggregate face (team-score strip): re-publish only when the split or a total moved
-    local teams = {
-        Mode = mode or false,
-        Labels = labels or false,
-        Resolved = resolved,
-        Totals = { math.floor(totalA), math.floor(totalB) },
-    }
-    local teamsSignature = TeamsSignature(teams)
-    if teamsSignature ~= LoadedTeamsSignature then
-        LoadedTeamsSignature = teamsSignature
-        model.Teams:Set(teams)
-    end
-end
+        local slots = {}
+        local totalA, totalB = 0, 0
+        for slot = 1, MaxSlots do
+            local player = launch.Players[slot]()
+            local spot = (player and player.StartSpot) or slot
+            local side = (resolved and resolver and resolver(spot)) or false
+            slots[slot] = BuildSlot(slot, player, closedSlots[slot] and true or false, benchmarks, spawns, cap, side)
+            if player then
+                if side == 1 then
+                    totalA = totalA + (player.PL or 0)
+                elseif side == 2 then
+                    totalB = totalB + (player.PL or 0)
+                end
+            end
+        end
 
---- Allocates a fresh slots-model singleton and subscribes its internal observers to every source that
---- feeds a seat: each slot's player, the closed slots, the CPU benchmarks and the derived scenario
---- (placement + the size-driven unit cap). The observers are pinned on the model so they aren't GC'd,
---- and (because `Derive` fires synchronously on creation) the table resolves immediately.
+        -- per-seat face (rows/cards): re-publish only when a rendered field or a seat's side changed
+        local signature = Signature(slots)
+        if signature ~= self.LoadedSignature then
+            self.LoadedSignature = signature
+            self.Slots:Set(slots)
+        end
+
+        -- aggregate face (team-score strip): re-publish only when the split or a total moved
+        local teams = {
+            Mode = mode or false,
+            Labels = labels or false,
+            Resolved = resolved,
+            Totals = { math.floor(totalA), math.floor(totalB) },
+        }
+        local teamsSignature = TeamsSignature(teams)
+        if teamsSignature ~= self.LoadedTeamsSignature then
+            self.LoadedTeamsSignature = teamsSignature
+            self.Teams:Set(teams)
+        end
+    end,
+
+    --- `Destroyable`: frees the Slots/Teams vars + every source subscription (so they stop firing) and
+    --- clears the module singleton, so the next access rebuilds and re-registers in the next session's
+    --- trash. Idempotent.
+    ---@param self UICustomLobbySlotsDerivedModel
+    Destroy = function(self)
+        if self.Destroyed then
+            return
+        end
+        self.Destroyed = true
+        self.Trash:Destroy()       -- frees the Slots/Teams LazyVars + all observer subscriptions
+        if Instance == self then
+            Instance = nil
+        end
+    end,
+}
+
+--- Allocates a fresh slots-model singleton and registers it in the session trash. (Because `Derive`
+--- fires synchronously on creation, the table resolves immediately.)
 ---@return UICustomLobbySlotsDerivedModel
 function SetupSingleton()
-    ---@type UICustomLobbySlotsDerivedModel
-    local model = {
-        Slots = Create({}),
-        Teams = Create({ Mode = false, Labels = false, Resolved = false, Totals = { 0, 0 } }),
-        Observers = {},
-    }
-    ModelInstance = model
-    LoadedSignature = false
-    LoadedTeamsSignature = false
-
-    local function subscribe(source)
-        table.insert(model.Observers, Derive(source, function(lazy)
-            lazy()
-            Recompute(model)
-        end))
-    end
-
-    local launch = CustomLobbyLaunchModel.GetSingleton()
-    for slot = 1, MaxSlots do
-        subscribe(launch.Players[slot])
-    end
-    subscribe(CustomLobbySessionModel.GetSingleton().ClosedSlots)
-    subscribe(CustomLobbyLocalModel.GetSingleton().CpuBenchmarks)
-    subscribe(CustomLobbyScenarioDerivedModel.GetScenarioVar())
-    -- GameOptions feeds the AutoTeams mode (the side split); the per-face dedup keeps an unrelated
-    -- option tweak from re-firing either var
-    subscribe(launch.GameOptions)
-
-    return model
+    Instance = SlotsModel()
+    CustomLobbySession.GetTrash():Add(Instance)
+    return Instance
 end
 
---- Returns the slots-model singleton, creating (and resolving the current table) on first access.
+--- Returns the slots-model singleton, creating (and registering) it on first access — including after
+--- a teardown, so it is reusable across lobby sessions.
 ---@return UICustomLobbySlotsDerivedModel
 function GetSingleton()
-    if not ModelInstance then
+    if not Instance then
         SetupSingleton()
     end
-    return ModelInstance --[[@as UICustomLobbySlotsDerivedModel]]
+    return Instance --[[@as UICustomLobbySlotsDerivedModel]]
 end
 
 --#endregion
@@ -488,11 +513,12 @@ end
 -------------------------------------------------------------------------------
 --#region Debugging
 
---- Hot-reload hook: rebuild the singleton so its observers re-subscribe and re-derive. The table is
---- fully derived from the source models, so there is no state to copy across.
+--- Hot-reload hook: destroy the old singleton (severing all its subscriptions) and rebuild via the new
+--- module. The table is fully derived from the source models, so there is no state to copy across.
 ---@param newModule any
 function __moduleinfo.OnReload(newModule)
-    if ModelInstance then
+    if Instance then
+        Instance:Destroy()
         newModule.SetupSingleton()
     end
 end

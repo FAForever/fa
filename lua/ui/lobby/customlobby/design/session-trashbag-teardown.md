@@ -100,15 +100,18 @@ implementation. `UICustomLobbyMapCatalog : Destroyable`:
 ## Rollout order (proposed)
 
 1. ✅ Map catalog (done — reference implementation).
-2. ✅ Scenario derived model (done — the worked example for the **derived layer**, now under
-   [`models/derived/CustomLobbyScenarioDerivedModel.lua`](../models/derived/CustomLobbyScenarioDerivedModel.lua)):
-   a `ClassSimple : Destroyable` whose own `Trash` owns the `Scenario` LazyVar + the launch-model
-   subscription, registered in the session bag on first access, with an idempotent `Destroy` that
-   severs the subscription and nils the module singleton. Its de-dup key moved off a module local onto
-   the instance (`self.LoadedFile`). The other four derived models mirror it (no write helpers to worry
-   about — they're read-only projections).
-3. The three models (low-risk; per open decision #3 their write helpers stay free functions — the
-   `ClassSimple` just adds an own `Trash` + a `Destroy` that frees the LazyVars and nils the singleton).
+2. ✅ **All five derived models** ([`models/derived/`](../models/derived/CLAUDE.md)) — done. Each is a
+   `ClassSimple : Destroyable` whose own `Trash` owns its published LazyVar(s) + its observer(s),
+   registered in the session bag on first access, with an idempotent `Destroy` that severs the
+   subscriptions and nils the module singleton; `OnReload` destroys-then-rebuilds. Per-session state
+   that used to be module-locals moved onto the instance: scenario `self.LoadedFile`; restrictions
+   `self.LoadedSignature`; mods `self.LoadedSignature` (it gained the dedup it lacked, via
+   `table.concatkeys`); slots `self.LoadedSignature` + `self.LoadedTeamsSignature` + `self.Observers`;
+   options `self.Schema` + `self.SchemaKey` (the cached schema). The set-based dedup uses stock
+   `utils.lua` (`table.concatkeys` / `table.sorted` + `table.concat`) — no bespoke helper.
+3. The three authoritative models (low-risk; per open decision #3 their write helpers stay free
+   functions — the `ClassSimple` just adds an own `Trash` + a `Destroy` that frees the LazyVars and
+   nils the singleton).
 4. The mod catalog (mirror the map catalog).
 5. ~~`CustomLobbyRules` map-dimension cache.~~ — N/A: `CustomLobbyRules` is now a **pure, stateless** kernel (all inputs passed in; the cached map-dimension lookup is gone), so it holds nothing to tear down.
 6. The interface + performance popover — **after** the ordering decision (#1 above).

@@ -50,12 +50,19 @@
 --
 -- It reads the scenario from the scenario derived model (already deduped), and the mod set + values
 -- from the launch model. Reference data, never on the wire — every peer derives its own.
+--
+-- LIFETIME. It is a `ClassSimple` implementing `Destroyable`, registered in the session trash bag (see
+-- CustomLobbySession) on first access, so one `CustomLobbySession.Teardown()` frees its `Options`
+-- LazyVar, severs its 3 subscriptions and drops the cached schema — instead of leaking them for the
+-- whole match. The schema cache lives on the instance, so a new session re-gathers it fresh. See the
+-- scenario / mods / restrictions / slots models for the pattern.
 
 local Create = import("/lua/lazyvar.lua").Create
 local Derive = import("/lua/lazyvar.lua").Derive
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/models/customlobbylaunchmodel.lua")
 local CustomLobbyScenarioDerivedModel = import("/lua/ui/lobby/customlobby/models/derived/customlobbyscenarioderivedmodel.lua")
 local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
+local CustomLobbySession = import("/lua/ui/lobby/customlobby/customlobbysession.lua")
 local OptionUtil = import("/lua/ui/optionutil.lua")
 
 -------------------------------------------------------------------------------
@@ -94,23 +101,11 @@ local OptionUtil = import("/lua/ui/optionutil.lua")
 -------------------------------------------------------------------------------
 --#region Derived model
 
---- Reactive derived-options singleton. **Read-only** — no write helpers; the controller never touches
---- it. It re-derives from the launch model's `GameOptions` / `GameMods` and the scenario derived model.
----@class UICustomLobbyOptionsDerivedModel
----@field Options LazyVar<UICustomLobbyOptions>
----@field ScenarioObserver LazyVar
----@field ModsObserver LazyVar
----@field OptionsObserver LazyVar
-
+-- The singleton, forward-declared above the class so the class methods (`Destroy`) capture it as an
+-- upvalue. Assigned in `SetupSingleton`, cleared in `Destroy`. The schema cache lives on the instance
+-- (`self.Schema` / `self.SchemaKey`), so it resets with each new session's model.
 ---@type UICustomLobbyOptionsDerivedModel | nil
-local ModelInstance = nil
-
--- The cached option schema and the key it was gathered for, so a value change re-enriches without
--- re-reading the map / mod option files. `SchemaKey` = scenario file + sorted mod uids.
----@type string | false
-local SchemaKey = false
----@type { Lobby: ScenarioOption[], Scenario: ScenarioOption[], ScenarioName: string|false, ModGroups: table[] } | false
-local Schema = false
+local Instance = nil
 
 --- An empty (no-options) bundle — the initial value, before the first derivation runs.
 ---@return UICustomLobbyOptions
@@ -139,17 +134,18 @@ local function SchemaKeyFor(scenarioFile, gameMods)
 end
 
 --- (Re)gathers the option schema if the scenario / mod set changed since last time; otherwise keeps
---- the cache. This is the only disk-touching step, so it is deduped by `SchemaKey`.
+--- the cache. This is the only disk-touching step, so it is deduped by `self.SchemaKey`.
+---@param self UICustomLobbyOptionsDerivedModel
 ---@param scenario UICustomLobbyScenario | false
 ---@param gameMods table<string, true>
-local function EnsureSchema(scenario, gameMods)
+local function EnsureSchema(self, scenario, gameMods)
     local scenarioFile = scenario and scenario.File or false
     local key = SchemaKeyFor(scenarioFile, gameMods)
-    if Schema and key == SchemaKey then
+    if self.Schema and key == self.SchemaKey then
         return
     end
-    SchemaKey = key
-    Schema = {
+    self.SchemaKey = key
+    self.Schema = {
         Lobby = OptionUtil.GetLobbyOptions(),
         Scenario = CustomLobbyMapCatalog.LoadOptions(scenarioFile),
         ScenarioName = scenario and scenario.Name or false,
@@ -181,27 +177,28 @@ local function EnrichOption(option, values, origin)
 end
 
 --- Builds the full enriched, categorized options bundle for the current schema + values.
+---@param self UICustomLobbyOptionsDerivedModel
 ---@param scenario UICustomLobbyScenario | false
 ---@param gameMods table<string, true>
 ---@param values table<string, any>
 ---@return UICustomLobbyOptions
-local function BuildOptions(scenario, gameMods, values)
-    EnsureSchema(scenario, gameMods)
+local function BuildOptions(self, scenario, gameMods, values)
+    EnsureSchema(self, scenario, gameMods)
     values = values or {}
 
     local lobby = {}
-    for _, option in Schema.Lobby do
+    for _, option in self.Schema.Lobby do
         table.insert(lobby, EnrichOption(option, values, false))
     end
 
-    local scenarioOrigin = { Kind = 'scenario', Name = Schema.ScenarioName or "the map" }
+    local scenarioOrigin = { Kind = 'scenario', Name = self.Schema.ScenarioName or "the map" }
     local scenarioOpts = {}
-    for _, option in Schema.Scenario do
+    for _, option in self.Schema.Scenario do
         table.insert(scenarioOpts, EnrichOption(option, values, scenarioOrigin))
     end
 
     local mods = {}
-    for _, group in Schema.ModGroups do
+    for _, group in self.Schema.ModGroups do
         local origin = { Kind = 'mod', Name = group.name }
         for _, option in group.options do
             table.insert(mods, EnrichOption(option, values, origin))
@@ -231,52 +228,87 @@ local function BuildOptions(scenario, gameMods, values)
     }
 end
 
---- Re-derives the options bundle from the current sources and publishes it.
----@param model UICustomLobbyOptionsDerivedModel
-local function Recompute(model)
-    local scenario = CustomLobbyScenarioDerivedModel.GetScenario()
-    local launch = CustomLobbyLaunchModel.GetSingleton()
-    model.Options:Set(BuildOptions(scenario, launch.GameMods(), launch.GameOptions()))
-end
+--- Reactive derived-options singleton — a `ClassSimple` implementing `Destroyable`, registered in the
+--- session trash so one `CustomLobbySession.Teardown()` frees it. **Read-only** — no write helpers; the
+--- controller never touches it. It re-derives from the launch model's `GameOptions` / `GameMods` and
+--- the scenario derived model, caching the disk-gathered option schema on the instance.
+---@class UICustomLobbyOptionsDerivedModel : Destroyable
+---@field Trash     TrashBag                       # owns the Options var + the 3 observers (freed on Destroy)
+---@field Options   LazyVar<UICustomLobbyOptions>
+---@field Observers LazyVar[]                       # internal: scenario/mods/options subscriptions (strong refs; also in Trash)
+---@field Schema    table | false                   # cached option schema (lobby/scenario/mod), keyed by SchemaKey
+---@field SchemaKey string | false                  # scenario file + sorted mod uids the Schema was gathered for
+---@field Destroyed boolean
+local OptionsModel = ClassSimple {
 
---- Allocates a fresh options-model singleton and wires its observers. The scenario is read through
---- the scenario derived model (so a same-map rebroadcast doesn't re-gather the scenario options);
---- the mod set + values are the launch model's. Observers are pinned on the model so they aren't GC'd.
+    ---@param self UICustomLobbyOptionsDerivedModel
+    __init = function(self)
+        self.Trash = TrashBag()
+        self.Options = self.Trash:Add(Create(EmptyOptions()))
+        self.Observers = {}
+        self.Schema = false
+        self.SchemaKey = false
+        self.Destroyed = false
+
+        -- re-derive on a scenario / mod-set / option-value change. Each observer is kept strongly on
+        -- self.Observers (the trash is weak-valued) AND added to the trash, so it isn't GC'd and Destroy
+        -- severs all three. `Derive` fires synchronously on creation → the options resolve now.
+        local function subscribe(source)
+            table.insert(self.Observers, self.Trash:Add(Derive(source, function(lazy)
+                lazy()
+                self:Recompute()
+            end)))
+        end
+
+        local launch = CustomLobbyLaunchModel.GetSingleton()
+        subscribe(CustomLobbyScenarioDerivedModel.GetScenarioVar())
+        subscribe(launch.GameMods)
+        subscribe(launch.GameOptions)
+    end,
+
+    --- Re-derives the options bundle from the current scenario + mods + values and publishes it. The
+    --- schema is re-gathered (disk) only when the scenario / mod set changed (the `SchemaKey` cache);
+    --- a value-only change just re-enriches the cached schema.
+    ---@param self UICustomLobbyOptionsDerivedModel
+    Recompute = function(self)
+        local scenario = CustomLobbyScenarioDerivedModel.GetScenario()
+        local launch = CustomLobbyLaunchModel.GetSingleton()
+        self.Options:Set(BuildOptions(self, scenario, launch.GameMods(), launch.GameOptions()))
+    end,
+
+    --- `Destroyable`: frees the `Options` var + the 3 subscriptions (so they stop firing) and clears the
+    --- module singleton, so the next access rebuilds and re-registers in the next session's trash. The
+    --- cached schema dies with the instance. Idempotent.
+    ---@param self UICustomLobbyOptionsDerivedModel
+    Destroy = function(self)
+        if self.Destroyed then
+            return
+        end
+        self.Destroyed = true
+        self.Trash:Destroy()       -- frees the Options LazyVar + all observer subscriptions
+        if Instance == self then
+            Instance = nil
+        end
+    end,
+}
+
+--- Allocates a fresh options-model singleton and registers it in the session trash. (Because `Derive`
+--- fires synchronously on creation, the options resolve immediately.)
 ---@return UICustomLobbyOptionsDerivedModel
 function SetupSingleton()
-    SchemaKey = false
-    Schema = false
-
-    ---@type UICustomLobbyOptionsDerivedModel
-    local model = {
-        Options = Create(EmptyOptions()),
-    }
-    ModelInstance = model
-
-    local launch = CustomLobbyLaunchModel.GetSingleton()
-    model.ScenarioObserver = Derive(CustomLobbyScenarioDerivedModel.GetScenarioVar(), function(lazy)
-        lazy()
-        Recompute(model)
-    end)
-    model.ModsObserver = Derive(launch.GameMods, function(lazy)
-        lazy()
-        Recompute(model)
-    end)
-    model.OptionsObserver = Derive(launch.GameOptions, function(lazy)
-        lazy()
-        Recompute(model)
-    end)
-
-    return model
+    Instance = OptionsModel()
+    CustomLobbySession.GetTrash():Add(Instance)
+    return Instance
 end
 
---- Returns the options-model singleton, creating (and deriving the current options) on first access.
+--- Returns the options-model singleton, creating (and registering) it on first access — including
+--- after a teardown, so it is reusable across lobby sessions.
 ---@return UICustomLobbyOptionsDerivedModel
 function GetSingleton()
-    if not ModelInstance then
+    if not Instance then
         SetupSingleton()
     end
-    return ModelInstance --[[@as UICustomLobbyOptionsDerivedModel]]
+    return Instance --[[@as UICustomLobbyOptionsDerivedModel]]
 end
 
 --#endregion
@@ -301,11 +333,13 @@ end
 -------------------------------------------------------------------------------
 --#region Debugging
 
---- Hot-reload hook: rebuild the singleton so its observers re-subscribe and re-derive. The bundle is
---- fully derived from the launch model + scenario model, so there is no state to copy across.
+--- Hot-reload hook: destroy the old singleton (severing its subscriptions + dropping its schema cache)
+--- and rebuild via the new module. The bundle is fully derived from the launch + scenario models, so
+--- there is no state to copy across.
 ---@param newModule any
 function __moduleinfo.OnReload(newModule)
-    if ModelInstance then
+    if Instance then
+        Instance:Destroy()
         newModule.SetupSingleton()
     end
 end

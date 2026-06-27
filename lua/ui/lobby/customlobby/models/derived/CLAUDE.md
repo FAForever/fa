@@ -27,8 +27,16 @@ layer between the compact synced fields and the views.
 - **Naming.** File **and** class carry the `DerivedModel` suffix
   (`CustomLobby<Thing>DerivedModel`), and the file lives here in `models/derived/`, so it is unmistakable at
   the import site and in the type that this is derived state — not something a controller writes.
-- **Lifetime.** A module-level `ModelInstance` singleton (auto-created in `GetSingleton`) with the
-  standard hot-reload hooks. The internal observer is pinned on the model table so it isn't GC'd.
+- **Lifetime.** Each is a `ClassSimple` implementing `Destroyable`, registered in the session trash
+  (see [`../../CustomLobbySession`](/lua/ui/lobby/customlobby/customlobbysession.lua)) on first access,
+  so one `CustomLobbySession.Teardown()` frees its LazyVar(s) and severs its subscriptions instead of
+  leaking them into the persistent front-end state for the whole match. Each owns a `Trash` that holds
+  its published LazyVar(s) **and** its observer(s); `Destroy` is idempotent (`Destroyed` guard),
+  `Trash:Destroy()`s, and nils the module `Instance` so the next access rebuilds. Observers are pinned
+  on the instance (`self.Observer` / `self.Observers`) *and* added to the trash — the trash is
+  weak-valued, so the trash alone wouldn't keep them alive. The map catalog
+  ([`../../mapselect/CustomLobbyMapCatalog`](/lua/ui/lobby/customlobby/mapselect/CustomLobbyMapCatalog.lua))
+  is the original worked example; see [`../../design/session-trashbag-teardown.md`](/lua/ui/lobby/customlobby/design/session-trashbag-teardown.md).
 
 ## Files
 
