@@ -107,6 +107,7 @@ local MaxSlots = CustomLobbyLaunchModel.MaxSlots
 ---@field Slot       number                            # slot index 1..MaxSlots
 ---@field Player     UICustomLobbyPlayer | false       # the seated player (raw), false when empty — for intents/drag
 ---@field Closed     boolean                           # session: seat closed (no army at launch)
+---@field Locked     boolean                           # session: seat pinned in place for auto-balance
 ---@field StartSpot  number | false                    # the player's chosen start spot
 ---@field Position   table | false                     # {x, z} of that start spot on the map, or false
 ---@field Side       1 | 2 | false                     # binary auto-team side (keyed on start spot, else slot), false when none/unresolved
@@ -258,15 +259,16 @@ local Instance = nil
 ---@param slot number
 ---@param player UICustomLobbyPlayer | false
 ---@param closed boolean
+---@param locked boolean
 ---@param benchmarks table<UILobbyPeerId, UIPerformanceMetrics>
 ---@param spawns table | nil       # scenario start-spot -> {x, z}
 ---@param cap number | nil         # recommended unit cap (seated-count × per-player tier)
 ---@param side 1 | 2 | false       # resolved binary auto-team side for this seat
 ---@return UICustomLobbySlot
-local function BuildSlot(slot, player, closed, benchmarks, spawns, cap, side)
+local function BuildSlot(slot, player, closed, locked, benchmarks, spawns, cap, side)
     if not player then
         return {
-            Slot = slot, Player = false, Closed = closed,
+            Slot = slot, Player = false, Closed = closed, Locked = locked,
             StartSpot = false, Position = false, Side = side,
             PlayerView = false, CpuView = false, Benchmark = false, UnitCap = false,
         }
@@ -278,6 +280,7 @@ local function BuildSlot(slot, player, closed, benchmarks, spawns, cap, side)
         Slot = slot,
         Player = player,
         Closed = closed,
+        Locked = locked,
         StartSpot = startSpot,
         Position = (spawns and startSpot and spawns[startSpot]) or false,
         Side = side,
@@ -303,6 +306,7 @@ local function Signature(slots)
         -- rejects non-string elements
         parts[slot] = tostring(slot)
             .. "|" .. (entry.Closed and "C" or "_")
+            .. (entry.Locked and "L" or "_")
             .. "|" .. (pv and (pv.colorHex .. pv.name .. pv.nameColor .. pv.faction .. pv.team .. pv.ready .. pv.readyColor) or "-")
             .. "|" .. (cv and (cv.text .. cv.textColor .. (cv.showIndicator and tostring(cv.indicatorColor) or "0")) or "-")
             .. "|" .. tostring(entry.StartSpot)
@@ -363,6 +367,7 @@ local SlotsModel = ClassSimple {
             subscribe(launch.Players[slot])
         end
         subscribe(CustomLobbySessionModel.GetSingleton().ClosedSlots)
+        subscribe(CustomLobbySessionModel.GetSingleton().LockedSlots)
         subscribe(CustomLobbyLocalModel.GetSingleton().CpuBenchmarks)
         subscribe(CustomLobbyScenarioDerivedModel.GetScenarioVar())
         -- GameOptions feeds the AutoTeams mode (the side split); the per-face dedup keeps an unrelated
@@ -375,7 +380,9 @@ local SlotsModel = ClassSimple {
     ---@param self UICustomLobbySlotsDerivedModel
     Recompute = function(self)
         local launch = CustomLobbyLaunchModel.GetSingleton()
-        local closedSlots = CustomLobbySessionModel.GetSingleton().ClosedSlots()
+        local session = CustomLobbySessionModel.GetSingleton()
+        local closedSlots = session.ClosedSlots()
+        local lockedSlots = session.LockedSlots()
         local benchmarks = CustomLobbyLocalModel.GetSingleton().CpuBenchmarks()
 
         local scenario = CustomLobbyScenarioDerivedModel.GetScenario()
@@ -405,7 +412,8 @@ local SlotsModel = ClassSimple {
             local player = launch.Players[slot]()
             local spot = (player and player.StartSpot) or slot
             local side = (resolved and resolver and resolver(spot)) or false
-            slots[slot] = BuildSlot(slot, player, closedSlots[slot] and true or false, benchmarks, spawns, cap, side)
+            slots[slot] = BuildSlot(slot, player, closedSlots[slot] and true or false,
+                lockedSlots[slot] and true or false, benchmarks, spawns, cap, side)
             if player then
                 if side == 1 then
                     totalA = totalA + (player.PL or 0)

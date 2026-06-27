@@ -139,11 +139,12 @@ CustomLobbyMessages = {
     },
 
     -- The host's session state — lobby-room management that is NOT launched (slot count,
-    -- closed slots). A separate snapshot from the launch config so each stays focused.
+    -- closed slots, locked slots). A separate snapshot from the launch config so each stays focused.
     SetSessionState = {
         ---@class UICustomLobbySetSessionStateMessage : UILobbyReceivedMessage
         ---@field SlotCount number
         ---@field ClosedSlots table<number, boolean>
+        ---@field LockedSlots table<number, boolean>
         ---@field SlotsPinned boolean
 
         ---@param data UICustomLobbySetSessionStateMessage

@@ -125,6 +125,21 @@ local function IsOpenSlot(slot)
     return not CustomLobbyLaunchModel.GetSingleton().Players[slot]() and not session.ClosedSlots()[slot]
 end
 
+--- Host-side: drops any auto-balance lock pinning `slot`. A lock belongs to the player seated there,
+--- so it must not outlive them and pin whoever takes the seat next (see CustomLobbyBalancer). Does
+--- NOT broadcast — returns whether a lock was actually cleared so the caller can fold a session-state
+--- snapshot into its existing broadcast only when something changed.
+---@param slot number
+---@return boolean # true if a lock was cleared
+local function ClearSlotLock(slot)
+    local session = CustomLobbySessionModel.GetSingleton()
+    if not session.LockedSlots()[slot] then
+        return false
+    end
+    CustomLobbySessionModel.SetLocked(session, slot, false)
+    return true
+end
+
 --- Host-side: moves the player owned by `ownerId` into an open `slot` (or seats it from
 --- the observer list), forcing it unready and keeping StartSpot mirrored to the seat.
 --- Broadcasts the new snapshot. A no-op if the move isn't valid — the host is the gate.
@@ -145,6 +160,10 @@ local function TakeSlot(instance, ownerId, slot)
         end
         player = table.copy(launch.Players[from]())
         CustomLobbyLaunchModel.ClearPlayer(launch, from)
+        -- the player relocated; the seat it left must not stay locked (the lock was theirs)
+        if ClearSlotLock(from) then
+            BroadcastSessionState(instance)
+        end
     else
         -- not in a slot: an observer joining a slot (the reverse of Move to observers)
         local observer = CustomLobbyLaunchModel.RemoveObserver(launch, ownerId)
@@ -188,17 +207,25 @@ local function SwapSlots(instance, slotA, slotB)
         b.Ready = false
     end
 
+    -- a seat that ends up empty must shed its lock (the lock belonged to the player who left it),
+    -- so a later occupant isn't silently pinned
+    local lockChanged = false
     if b then
         CustomLobbyLaunchModel.SetPlayer(launch, slotA, b)
     else
         CustomLobbyLaunchModel.ClearPlayer(launch, slotA)
+        lockChanged = ClearSlotLock(slotA) or lockChanged
     end
     if a then
         CustomLobbyLaunchModel.SetPlayer(launch, slotB, a)
     else
         CustomLobbyLaunchModel.ClearPlayer(launch, slotB)
+        lockChanged = ClearSlotLock(slotB) or lockChanged
     end
     BroadcastPlayers(instance)
+    if lockChanged then
+        BroadcastSessionState(instance)
+    end
 end
 
 --- Reads a numeric command-line argument (e.g. `/mean 1500`), falling back to the default
@@ -348,10 +375,15 @@ function OnPeerDisconnected(instance, peerName, uid)
     instance:BroadcastData({ Type = 'DisconnectPeer', PeerID = uid })
 
     local slot = FindSlotForOwner(uid)
+    local lockChanged = false
     if slot then
         CustomLobbyLaunchModel.ClearPlayer(CustomLobbyLaunchModel.GetSingleton(), slot)
+        lockChanged = ClearSlotLock(slot)
     end
     BroadcastPlayers(instance)
+    if lockChanged then
+        BroadcastSessionState(instance)
+    end
 end
 
 --- Called when the game launches. The engine has taken over in its own Lua state, so the lobby's
@@ -431,6 +463,7 @@ function ProcessSetSessionState(instance, data)
     local session = CustomLobbySessionModel.GetSingleton()
     session.SlotCount:Set(data.SlotCount or session.SlotCount())
     session.ClosedSlots:Set(data.ClosedSlots or {})
+    session.LockedSlots:Set(data.LockedSlots or {})
     session.SlotsPinned:Set(data.SlotsPinned and true or false)
 end
 
@@ -519,6 +552,7 @@ function BroadcastSessionState(instance)
         Type = 'SetSessionState',
         SlotCount = session.SlotCount(),
         ClosedSlots = session.ClosedSlots(),
+        LockedSlots = session.LockedSlots(),
         SlotsPinned = session.SlotsPinned(),
     })
 end
@@ -1021,12 +1055,34 @@ function RequestSetSlotsPinned(pinned)
     BroadcastSessionState(instance)
 end
 
---- The host asks the lobby to auto-balance the seated players across teams. Host-only —
---- backs the slots header's auto-balance button.
----
---- TODO: implement the balancer (group seated players into even teams by rating, re-seat /
---- set Team via the launch model, then BroadcastPlayers). Stubbed for now.
-function RequestAutoBalance()
+--- The host locks or unlocks a single seat. Host-only — backs the slot context menu's "Lock in
+--- slot" toggle. A locked seat's player is held in place by auto-balance (only the unlocked players
+--- are rearranged); see CustomLobbyBalancer. Synced via the session-state snapshot.
+---@param slot number
+---@param locked boolean
+function RequestSetSlotLocked(slot, locked)
+    local instance = LobbyInstance
+    if not instance then
+        return
+    end
+
+    if not CustomLobbyLocalModel.GetSingleton().IsHost() then
+        WARN("CustomLobby: only the host can lock slots")
+        return
+    end
+
+    CustomLobbySessionModel.SetLocked(CustomLobbySessionModel.GetSingleton(), slot, locked and true or false)
+    BroadcastSessionState(instance)
+end
+
+--- The host applies a balanced re-seating, after confirming it in the preview. Host-only — backs
+--- the auto-balance preview's Apply button. `arrangement` (slot -> { OwnerId, Team }) comes from
+--- CustomLobbyBalancer.ComputeBalance; it only says *where* each player sits (and, in manual mode,
+--- their team), never *what* they are, so it can't smuggle edited ratings/factions. The whole board
+--- is rewritten from one snapshot — read by owner, moved to the target seat — then broadcast once
+--- (re-seating via the model directly, not N pairwise swaps).
+---@param arrangement table<number, UICustomLobbyBalanceSeat>
+function RequestApplyBalance(arrangement)
     local instance = LobbyInstance
     if not instance then
         return
@@ -1036,8 +1092,57 @@ function RequestAutoBalance()
         WARN("CustomLobby: only the host can auto-balance")
         return
     end
+    if type(arrangement) ~= 'table' then
+        return
+    end
 
-    LOG("CustomLobby: RequestAutoBalance — not implemented yet")
+    local launch = CustomLobbyLaunchModel.GetSingleton()
+
+    -- snapshot the seated players by owner: lets us move players between seats safely, and validate
+    -- the arrangement against who is actually seated *now* (a player may have left since the preview)
+    local byOwner = {}
+    local seatedCount = 0
+    for slot = 1, CustomLobbyLaunchModel.MaxSlots do
+        local player = launch.Players[slot]()
+        if player then
+            byOwner[player.OwnerID] = player
+            seatedCount = seatedCount + 1
+        end
+    end
+
+    -- build the target board; bail if the arrangement references someone no longer seated or doesn't
+    -- account for exactly the seated players (a stale preview)
+    local newPlayers = {}
+    local placedCount = 0
+    for slot, seat in arrangement do
+        local source = byOwner[seat.OwnerId]
+        if not source then
+            WARN("CustomLobby: balance arrangement references an unseated player; ignoring")
+            return
+        end
+        local player = table.copy(source)
+        player.StartSpot = slot
+        player.Ready = false                   -- (re)seating resets readiness, as a manual move does
+        if seat.Team then
+            player.Team = seat.Team
+        end
+        newPlayers[slot] = player
+        placedCount = placedCount + 1
+    end
+    if placedCount ~= seatedCount then
+        WARN("CustomLobby: balance arrangement doesn't match the seated players; ignoring")
+        return
+    end
+
+    -- write the new occupants and clear any seat that emptied, then broadcast once
+    for slot = 1, CustomLobbyLaunchModel.MaxSlots do
+        if newPlayers[slot] then
+            CustomLobbyLaunchModel.SetPlayer(launch, slot, newPlayers[slot])
+        elseif launch.Players[slot]() then
+            CustomLobbyLaunchModel.ClearPlayer(launch, slot)
+        end
+    end
+    BroadcastPlayers(instance)
 end
 
 --- Re-broadcasts the closed slots, then after a short delay opens every one of them. The
@@ -1103,10 +1208,14 @@ function RequestEject(slot)
         return
     end
     if player.Human then
+        -- the resulting PeerDisconnected clears the slot (and its lock) and re-broadcasts
         instance:EjectPeer(player.OwnerID, "KickedByHost")
     else
         CustomLobbyLaunchModel.ClearPlayer(CustomLobbyLaunchModel.GetSingleton(), slot)
         BroadcastPlayers(instance)
+        if ClearSlotLock(slot) then
+            BroadcastSessionState(instance)
+        end
     end
 end
 
@@ -1133,6 +1242,10 @@ function RequestMoveToObserver(slot)
     CustomLobbyLaunchModel.AddObserver(launch, player)
     CustomLobbyLaunchModel.ClearPlayer(launch, slot)
     BroadcastPlayers(instance)
+    -- the seat is now empty; drop any lock so the next occupant isn't pinned
+    if ClearSlotLock(slot) then
+        BroadcastSessionState(instance)
+    end
 end
 
 --- The local player toggles their ready flag. Host applies + broadcasts; a client

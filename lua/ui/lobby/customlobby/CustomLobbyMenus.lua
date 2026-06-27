@@ -34,6 +34,7 @@
 
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/models/customlobbylaunchmodel.lua")
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/models/customlobbylocalmodel.lua")
+local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/models/customlobbysessionmodel.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 
 -------------------------------------------------------------------------------
@@ -47,6 +48,7 @@ local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontr
 ---@field isYou boolean
 ---@field isOpen boolean
 ---@field localIsObserver boolean   # the local player is currently spectating (no slot)
+---@field locked boolean            # this seat is pinned in place for auto-balance
 
 --- A declarative slot-menu entry.
 ---@class UICustomLobbySlotMenuEntry
@@ -81,6 +83,18 @@ local SlotMenu = {
     },
 
     -- Host actions:
+    {
+        -- pin a seated player so auto-balance keeps them where they are (e.g. to hold a premade
+        -- pair on the same team); only the unlocked players are rearranged
+        label = "Lock in slot",
+        when = function(ctx) return ctx.isHost and ctx.player and not ctx.locked end,
+        action = function(ctx) CustomLobbyController.RequestSetSlotLocked(ctx.slot, true) end,
+    },
+    {
+        label = "Unlock slot",
+        when = function(ctx) return ctx.isHost and ctx.player and ctx.locked end,
+        action = function(ctx) CustomLobbyController.RequestSetSlotLocked(ctx.slot, false) end,
+    },
     {
         label = "Move to observers",
         when = function(ctx) return ctx.isHost and ctx.player and ctx.player.Human end,
@@ -122,6 +136,7 @@ local function SlotContext(slot)
         isYou = (player and player.OwnerID == localId) and true or false,
         isOpen = not player,
         localIsObserver = IsObserver(launch, localId),
+        locked = CustomLobbySessionModel.GetSingleton().LockedSlots()[slot] and true or false,
     }
 end
 

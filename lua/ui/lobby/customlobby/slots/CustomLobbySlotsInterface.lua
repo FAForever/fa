@@ -45,6 +45,9 @@ local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/models/customl
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/models/customlobbylocalmodel.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 local CustomLobbyRules = import("/lua/ui/lobby/customlobby/customlobbyrules.lua")
+local CustomLobbyScenarioDerivedModel = import("/lua/ui/lobby/customlobby/models/derived/customlobbyscenarioderivedmodel.lua")
+local CustomLobbySlotsDerivedModel = import("/lua/ui/lobby/customlobby/models/derived/customlobbyslotsderivedmodel.lua")
+local CustomLobbyBalancePreview = import("/lua/ui/lobby/customlobby/customlobbybalancepreview.lua")
 local CustomLobbyOneColumnSlots = import("/lua/ui/lobby/customlobby/slots/onecolumn/customlobbyonecolumnslots.lua")
 local CustomLobbyTwoColumnSlots = import("/lua/ui/lobby/customlobby/slots/twocolumn/customlobbytwocolumnslots.lua")
 
@@ -83,6 +86,7 @@ local ReopenIcon = '/game/recall-panel/icon-recall_bmp.dds'
 ---@field IdleTexture FileName
 ---@field ActiveTexture FileName | nil
 ---@field Active boolean
+---@field Enabled boolean
 ---@field Hovered boolean
 ---@field OnPress? fun()
 local SlotTool = Class(Group) {
@@ -95,6 +99,7 @@ local SlotTool = Class(Group) {
         Group.__init(self, parent, "CustomLobbySlotTool")
 
         self.Active = false
+        self.Enabled = true
         self.Hovered = false
         self.IdleTexture = texture
         self.ActiveTexture = activeTexture
@@ -107,7 +112,7 @@ local SlotTool = Class(Group) {
 
         self.Bg.HandleEvent = function(control, event)
             if event.Type == 'ButtonPress' then
-                if self.OnPress then
+                if self.Enabled and self.OnPress then
                     self.OnPress()
                 end
                 return true
@@ -136,12 +141,16 @@ local SlotTool = Class(Group) {
     ---@param self UICustomLobbySlotTool
     ApplyVisual = function(self)
         local bg = ToolIdle
-        if self.Active then
-            bg = ToolActive
-        elseif self.Hovered then
-            bg = ToolHover
+        if self.Enabled then
+            if self.Active then
+                bg = ToolActive
+            elseif self.Hovered then
+                bg = ToolHover
+            end
         end
         self.Bg:SetSolidColor(bg)
+        -- a disabled action reads as greyed: dim its glyph and don't light on hover
+        self.Icon:SetAlpha(self.Enabled and 1 or 0.3)
         if self.ActiveTexture then
             self.Icon:SetTexture(UIUtil.UIFile(self.Active and self.ActiveTexture or self.IdleTexture))
         end
@@ -152,6 +161,15 @@ local SlotTool = Class(Group) {
     ---@param active boolean
     SetActive = function(self, active)
         self.Active = active
+        self:ApplyVisual()
+    end,
+
+    --- Enables or disables the button: a disabled button ignores presses and reads greyed. The
+    --- balance button drives this from the seated teams (auto-balance needs exactly two).
+    ---@param self UICustomLobbySlotTool
+    ---@param enabled boolean
+    SetEnabled = function(self, enabled)
+        self.Enabled = enabled and true or false
         self:ApplyVisual()
     end,
 }
@@ -173,6 +191,7 @@ local SlotTool = Class(Group) {
 ---@field GameOptionsObserver LazyVar
 ---@field IsHostObserver LazyVar
 ---@field SlotsPinnedObserver LazyVar
+---@field BalanceGateObserver LazyVar
 ---@field HighlightedSlot number | false         # slot currently shown as a drop target
 ---@field DragGhost Group | false                # floating label following the cursor mid-drag
 local CustomLobbySlotsInterface = Class(Group) {
@@ -217,10 +236,10 @@ local CustomLobbySlotsInterface = Class(Group) {
 
         self.BalanceButton = SlotTool(self.Tools, BalanceIcon)
         self.BalanceButton.OnPress = function()
-            CustomLobbyController.RequestAutoBalance()
+            CustomLobbyBalancePreview.Open()
         end
         Tooltip.AddControlTooltipManual(self.BalanceButton.Bg, "Auto balance",
-            "Balance the seated players across the teams.")
+            "Preview a balanced two-team split before applying it. Locked players stay put.")
 
         self.ReopenButton = SlotTool(self.Tools, ReopenIcon)
         self.ReopenButton.OnPress = function()
@@ -252,6 +271,15 @@ local CustomLobbySlotsInterface = Class(Group) {
                     self.LockIcon:Hide()
                     self.LockLabel:Hide()
                 end
+            end))
+
+        -- gate the auto-balance button: it needs exactly two sides (see CanAutoBalance). The slots
+        -- derived model re-fires on any seating / team / mode / map change, so one subscription covers
+        -- every input the gate depends on.
+        self.BalanceGateObserver = self.Trash:Add(
+            LazyVarDerive(CustomLobbySlotsDerivedModel.GetSlotsVar(), function(slotsLazy)
+                slotsLazy()
+                self:UpdateBalanceGate()
             end))
 
         -- the active layout body, picked by the AutoTeams mode (created now, laid out on mount)
@@ -290,6 +318,33 @@ local CustomLobbySlotsInterface = Class(Group) {
 
         self.Mounted = true
         self:LayoutBody()
+    end,
+
+    --- Re-evaluates whether auto-balance is offered and (en/dis)ables the button.
+    ---@param self UICustomLobbySlotsInterface
+    UpdateBalanceGate = function(self)
+        self.BalanceButton:SetEnabled(self:CanAutoBalance())
+    end,
+
+    --- Auto-balance needs exactly two sides: a binary AutoTeams mode (with its map loaded, for the
+    --- positional ones), or — in manual seating — at most two teams in use (no seated player on a
+    --- third team, i.e. model Team >= 4). Mirrors the legacy gate.
+    ---@param self UICustomLobbySlotsInterface
+    ---@return boolean
+    CanAutoBalance = function(self)
+        local launch = CustomLobbyLaunchModel.GetSingleton()
+        local mode = CustomLobbyRules.AutoTeamMode(launch.GameOptions())
+        if mode then
+            local _, resolved = CustomLobbyRules.BuildSideResolver(mode, CustomLobbyScenarioDerivedModel.GetScenario())
+            return resolved
+        end
+        for slot = 1, CustomLobbyLaunchModel.MaxSlots do
+            local player = launch.Players[slot]()
+            if player and player.Team and player.Team >= 4 then
+                return false
+            end
+        end
+        return true
     end,
 
     --- The layout kind the current AutoTeams mode calls for: "two" for a binary team mode, else "one".

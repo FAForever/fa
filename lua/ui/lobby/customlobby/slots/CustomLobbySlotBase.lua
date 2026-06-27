@@ -96,6 +96,7 @@ local DragThreshold = 5
 ---@field Coordinator UICustomLobbySlotCoordinator
 ---@field Background Bitmap
 ---@field DropHighlight Bitmap
+---@field LockStripe Bitmap                          # left-edge accent shown while this seat is locked
 ---@field ClickArea Bitmap
 ---@field SlotObserver LazyVar
 ---@field CurrentEntry UICustomLobbySlot | nil      # the seat's last resolved entry (interaction reads it)
@@ -132,6 +133,14 @@ local CustomLobbySlotBase = Class(Group) {
         self.DropHighlight:SetAlpha(0.0)
         self.DropHighlight:DisableHitTest()
 
+        -- left-edge accent shown while this seat is locked for auto-balance (same gold as the header's
+        -- "Locked" notice); hidden otherwise. Layout-agnostic, so it never overlaps a presentation's
+        -- content.
+        self.LockStripe = Bitmap(self)
+        self.LockStripe:SetSolidColor('ffd9c97a')
+        self.LockStripe:SetAlpha(0.0)
+        self.LockStripe:DisableHitTest()
+
         -- transparent overlay that catches clicks on the whole row (take / ready / context / drag)
         self.ClickArea = Bitmap(self)
         self.ClickArea:SetSolidColor('00000000')
@@ -165,6 +174,7 @@ local CustomLobbySlotBase = Class(Group) {
     __post_init = function(self, parent)
         Layouter(self.Background):Fill(self):End()
         Layouter(self.DropHighlight):Fill(self):End()
+        Layouter(self.LockStripe):AtLeftIn(self):AtTopIn(self):AtBottomIn(self):Width(3):Over(self, 15):End()
         Layouter(self.ClickArea):Fill(self):Over(self, 10):End()
 
         -- the presentation lays out its widgets (its CPU hover zone sits above ClickArea, Over 20)
@@ -242,6 +252,8 @@ local CustomLobbySlotBase = Class(Group) {
         self.CurrentPlayer = entry.Player
         self:RenderPlayer(entry.PlayerView or nil)
         self:RenderCpu(entry.CpuView or nil)
+        -- a locked seat (only meaningful when occupied) shows the gold left-edge accent
+        self.LockStripe:SetAlpha((entry.Locked and entry.Player) and 1.0 or 0.0)
     end,
 
     --#endregion

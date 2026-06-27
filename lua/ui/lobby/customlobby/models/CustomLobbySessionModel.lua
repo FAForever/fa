@@ -52,6 +52,7 @@ local Instance = nil
 ---@class UICustomLobbySessionModel : Destroyable
 ---@field SlotCount   LazyVar<number>                    # player slots the current map supports
 ---@field ClosedSlots LazyVar<table<number, boolean>>
+---@field LockedSlots LazyVar<table<number, boolean>>    # host pinned a seat: its player is held in place by auto-balance
 ---@field SlotsPinned LazyVar<boolean>                   # host locked seating: only the host may change slots
 ---@field Destroyed   boolean
 local SessionModel = ClassSimple {
@@ -61,6 +62,7 @@ local SessionModel = ClassSimple {
     __init = function(self, slotCount)
         self.SlotCount   = Create(slotCount or 8)
         self.ClosedSlots = Create({})
+        self.LockedSlots = Create({})
         self.SlotsPinned = Create(false)
         self.Destroyed   = false
     end,
@@ -119,6 +121,17 @@ function SetClosed(model, slot, closed)
     model.ClosedSlots:Set(closedSlots)
 end
 
+--- Sets the locked flag for a slot (copy-then-Set). A locked seat's player is held in place by
+--- auto-balance — see CustomLobbyBalancer.
+---@param model UICustomLobbySessionModel
+---@param slot number
+---@param locked boolean
+function SetLocked(model, slot, locked)
+    local lockedSlots = table.copy(model.LockedSlots())
+    lockedSlots[slot] = locked or nil
+    model.LockedSlots:Set(lockedSlots)
+end
+
 --- Sets whether seating is pinned (only the host may change slots while on).
 ---@param model UICustomLobbySessionModel
 ---@param pinned boolean
@@ -139,6 +152,7 @@ function __moduleinfo.OnReload(newModule)
     if Instance then
         local handle = newModule.SetupSingleton(Instance.SlotCount())
         handle.ClosedSlots:Set(Instance.ClosedSlots())
+        handle.LockedSlots:Set(Instance.LockedSlots())
         handle.SlotsPinned:Set(Instance.SlotsPinned())
     end
 end
