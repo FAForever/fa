@@ -236,9 +236,12 @@ end
 ---@field Trash     TrashBag                       # owns the Options var + the 3 observers (freed on Destroy)
 ---@field Options   LazyVar<UICustomLobbyOptions>
 ---@field Observers LazyVar[]                       # internal: scenario/mods/options subscriptions (strong refs; also in Trash)
----@field Schema    table | false                   # cached option schema (lobby/scenario/mod), keyed by SchemaKey
----@field SchemaKey string | false                  # scenario file + sorted mod uids the Schema was gathered for
----@field Destroyed boolean
+---@field Schema       table | false                # cached option schema (lobby/scenario/mod), keyed by SchemaKey — the *disk* dedup
+---@field SchemaKey    string | false               # scenario file + sorted mod uids the Schema was gathered for
+---@field LoadedFile   FileName | false             # publish-dedup: the scenario file of the last published bundle
+---@field LoadedMods   table | false                # publish-dedup: the sim-mod set of the last published bundle (held snapshot)
+---@field LoadedValues table | false                # publish-dedup: the option values of the last published bundle (false until first publish)
+---@field Destroyed    boolean
 local OptionsModel = ClassSimple {
 
     ---@param self UICustomLobbyOptionsDerivedModel
@@ -248,6 +251,9 @@ local OptionsModel = ClassSimple {
         self.Observers = {}
         self.Schema = false
         self.SchemaKey = false
+        self.LoadedFile = false
+        self.LoadedMods = false
+        self.LoadedValues = false   -- false until the first publish (the "have we published" guard)
         self.Destroyed = false
 
         -- re-derive on a scenario / mod-set / option-value change. Each observer is kept strongly on
@@ -273,7 +279,24 @@ local OptionsModel = ClassSimple {
     Recompute = function(self)
         local scenario = CustomLobbyScenarioDerivedModel.GetScenario()
         local launch = CustomLobbyLaunchModel.GetSingleton()
-        self.Options:Set(BuildOptions(self, scenario, launch.GameMods(), launch.GameOptions()))
+        local file = scenario and scenario.File or false
+        local gameMods, values = launch.GameMods(), launch.GameOptions()
+
+        -- publish-dedup: the bundle is a pure function of (scenario file, sim-mod set, option values),
+        -- so skip the re-publish *and* the enrichment when all three are unchanged. `table.equal` is the
+        -- cheap count + per-value compare; copy-then-Set means the held tables are stable snapshots.
+        -- `self.LoadedValues` is false until the first publish, which forces that first build. (This is
+        -- separate from the SchemaKey cache, which dedups the *disk* read inside BuildOptions.)
+        if self.LoadedValues
+            and file == self.LoadedFile
+            and table.equal(gameMods, self.LoadedMods)
+            and table.equal(values, self.LoadedValues) then
+            return
+        end
+        self.LoadedFile = file
+        self.LoadedMods = gameMods
+        self.LoadedValues = values
+        self.Options:Set(BuildOptions(self, scenario, gameMods, values))
     end,
 
     --- `Destroyable`: frees the `Options` var + the 3 subscriptions (so they stop firing) and clears the
