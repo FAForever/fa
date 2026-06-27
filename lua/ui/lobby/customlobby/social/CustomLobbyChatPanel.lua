@@ -31,8 +31,9 @@
 -- reconciles the line to Confirmed (see CustomLobbyChatModel). A line's Status tints it: Pending dim,
 -- Rejected greyed, system lines in a muted colour.
 --
--- Slice 1: each row is a single, truncated line ("Name: text"). Multi-line wrapping is a later
--- refinement (the in-game chat's ChatLinesInterface is the reference if/when we want it).
+-- Long messages **wrap**: each entry's "Name: text" label is word-wrapped to the message-column width
+-- (BuildLines + WrapLine, via /lua/maui/text.lua WrapText measured by a hidden font-matched text), and
+-- each wrapped line becomes one fixed-height grid row — the time stamp rides only the entry's first line.
 --
 -- A bottom-left tab content component: created when its tab is selected and destroyed on switch (see
 -- ../CustomLobbyTabs.lua), so it's the live panel for its whole lifetime — the model observer just
@@ -52,6 +53,7 @@ local Debug = false
 local CustomLobbyChatModel = import("/lua/ui/lobby/customlobby/social/customlobbychatmodel.lua")
 local CustomLobbyChatController = import("/lua/ui/lobby/customlobby/social/customlobbychatcontroller.lua")
 
+local WrapText = import("/lua/maui/text.lua").WrapText
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
@@ -64,7 +66,6 @@ local Pad = 4
 local EditHeight = 20
 local EditGap = 6
 local RowFont = 13
-local NameMax = 90               -- truncate the rendered line so it can't bleed past the row (no clip in MAUI)
 
 -- the input field: a bordered, filled box at the bottom so it's clear where to type
 local FieldHeight = 24
@@ -95,19 +96,8 @@ local function FormatClock(seconds)
     return string.format("%02d:%02d", math.floor(whole / 60), math.mod(whole, 60))
 end
 
---- Truncates `text` to `maxChars`, appending "…" when it had to cut.
----@param text string
----@param maxChars number
----@return string
-local function Truncate(text, maxChars)
-    text = text or ""
-    if string.len(text) > maxChars then
-        return string.sub(text, 1, maxChars - 1) .. "…"
-    end
-    return text
-end
-
---- The rendered one-line label + colour for an entry, by kind and status.
+--- The rendered label + colour for an entry, by kind and status. The label is wrapped to the message
+--- column width (see WrapLines), so the whole "Name: text" string flows across as many rows as it needs.
 ---@param entry UICustomLobbyChatEntry
 ---@return string label
 ---@return string color
@@ -135,6 +125,7 @@ end
 ---@field EditBox Edit
 ---@field Prompt Text              # dim "type a message" placeholder, shown while the box is empty
 ---@field Empty Text
+---@field Measure Text             # hidden, font-matched text used only to measure widths for wrapping
 ---@field EntriesObserver LazyVar
 ---@field DebugPanel? Bitmap
 ---@field DebugEdit? Bitmap
@@ -155,6 +146,12 @@ local CustomLobbyChatPanel = ClassUI(Group) {
         self.Empty:SetColor('ff5a606a')
         self.Empty:DisableHitTest()
         self.Empty:Hide()
+
+        -- a hidden, font-matched text whose :GetStringAdvance measures wrap widths (same font/size as a
+        -- row's message text, so the measurement matches what's rendered)
+        self.Measure = UIUtil.CreateText(self, "", RowFont, UIUtil.bodyFont)
+        self.Measure:DisableHitTest()
+        self.Measure:Hide()
 
         -- a bordered, filled input field at the bottom so it's clear where to type. Created before the
         -- edit box (and prompt) so they render on top of it (sibling depth follows creation order).
@@ -226,6 +223,7 @@ local CustomLobbyChatPanel = ClassUI(Group) {
         Layouter(self.Prompt):AtLeftIn(self.EditField, FieldInset):AtVerticalCenterIn(self.EditField):End()
 
         Layouter(self.Empty):AtHorizontalCenterIn(self):AtTopIn(self, Pad):End()
+        Layouter(self.Measure):AtLeftTopIn(self, 0):End()   -- hidden; only its font metrics are used
 
         if Debug then
             -- whole panel (drawn under the grid tint added in Initialize) + the edit box region
@@ -298,12 +296,13 @@ local CustomLobbyChatPanel = ClassUI(Group) {
             return
         end
 
-        local entries = CustomLobbyChatModel.GetSingleton().Entries()
-        local total = table.getn(entries)
-
         -- recompute the row width from the (now-settled) panel width so rows size correctly even if the
         -- first Initialize ran before the layout settled
         self.RowWidth = self:ComputeRowWidth()
+
+        -- flatten entries into visual lines (one per wrapped line); a long message spans several rows
+        local lines = self:BuildLines(CustomLobbyChatModel.GetSingleton().Entries())
+        local total = table.getn(lines)
 
         -- Bottom-align the feed (chat grows upward from the input box). A Grid renders rows top-down, so
         -- a few lines would otherwise float at the top of the tall area, far from the edit box. Pin the
@@ -330,8 +329,8 @@ local CustomLobbyChatPanel = ClassUI(Group) {
 
         self.Grid:AppendCols(1, true)
         self.Grid:AppendRows(total, true)
-        for index, entry in entries do
-            self.Grid:SetItem(self:CreateRow(entry), 1, index, true)
+        for index, line in lines do
+            self.Grid:SetItem(self:CreateRow(line), 1, index, true)
         end
         self.Grid:EndBatch()
 
@@ -339,6 +338,48 @@ local CustomLobbyChatPanel = ClassUI(Group) {
             self.Grid:ScrollSetTop("Vert", total)
         end
         self:UpdateScrollbar()
+    end,
+
+    --- Flattens the entries into renderable lines: each entry's "Name: text" label is wrapped to the
+    --- message-column width, yielding one descriptor per wrapped line. The time stamp rides the first
+    --- line of each entry; continuation lines align under the message column with no stamp.
+    ---@param self UICustomLobbyChatPanel
+    ---@param entries UICustomLobbyChatEntry[]
+    ---@return { Stamp: string | false, Text: string, Color: string }[]
+    BuildLines = function(self, entries)
+        local width = LayoutHelpers.ScaleNumber(self.RowWidth - NameLeft - Pad)
+        local start = CustomLobbyChatModel.GetStartTime()
+        local lines = {}
+        for _, entry in entries do
+            local label, color = RenderEntry(entry)
+            local stamp = FormatClock(entry.Time - start)
+            local wrapped = self:WrapLine(label, width)
+            for i, text in wrapped do
+                table.insert(lines, {
+                    Stamp = (i == 1) and stamp or false,
+                    Text = text,
+                    Color = color,
+                })
+            end
+        end
+        return lines
+    end,
+
+    --- Wraps `label` to `width` (actual pixels) via the hidden measuring text. Never returns empty.
+    ---@param self UICustomLobbyChatPanel
+    ---@param label string
+    ---@param width number
+    ---@return string[]
+    WrapLine = function(self, label, width)
+        if width < 1 then
+            return { label }
+        end
+        local measure = self.Measure
+        local lines = WrapText(label, width, function(chunk) return measure:GetStringAdvance(chunk) end)
+        if table.empty(lines) then
+            lines = { label }
+        end
+        return lines
     end,
 
     --- Shows the scrollbar only when the list overflows.
@@ -354,26 +395,26 @@ local CustomLobbyChatPanel = ClassUI(Group) {
         end
     end,
 
-    --- Builds one chat row: a single truncated line, tinted by status/kind. Private.
+    --- Builds one rendered row: the wrapped text in the message column, tinted by status/kind, with the
+    --- mm:ss stamp at the left only on an entry's first line (continuation lines have no stamp). Private.
     ---@param self UICustomLobbyChatPanel
-    ---@param entry UICustomLobbyChatEntry
+    ---@param line { Stamp: string | false, Text: string, Color: string }
     ---@return Group
-    CreateRow = function(self, entry)
+    CreateRow = function(self, line)
         local row = Group(self.Grid, "CustomLobbyChatRow")
         LayoutHelpers.SetDimensions(row, self.RowWidth, RowHeight)
 
-        -- a relative mm:ss stamp at the left (entries store absolute time; the feed's start is the baseline)
-        local time = UIUtil.CreateText(row,
-            FormatClock(entry.Time - CustomLobbyChatModel.GetStartTime()), TimeFont, UIUtil.bodyFont)
-        time:SetColor(TimeColor)
-        time:DisableHitTest()
-        Layouter(time):AtLeftIn(row, TimeLeft):AtVerticalCenterIn(row):End()
+        if line.Stamp then
+            local time = UIUtil.CreateText(row, line.Stamp, TimeFont, UIUtil.bodyFont)
+            time:SetColor(TimeColor)
+            time:DisableHitTest()
+            Layouter(time):AtLeftIn(row, TimeLeft):AtVerticalCenterIn(row):End()
+        end
 
-        local label, color = RenderEntry(entry)
-        local line = UIUtil.CreateText(row, Truncate(label, NameMax), RowFont, UIUtil.bodyFont)
-        line:SetColor(color)
-        line:DisableHitTest()
-        Layouter(line):AtLeftIn(row, NameLeft):AtRightIn(row, Pad):AtVerticalCenterIn(row):End()
+        local text = UIUtil.CreateText(row, line.Text, RowFont, UIUtil.bodyFont)
+        text:SetColor(line.Color)
+        text:DisableHitTest()
+        Layouter(text):AtLeftIn(row, NameLeft):AtRightIn(row, Pad):AtVerticalCenterIn(row):End()
 
         return row
     end,
