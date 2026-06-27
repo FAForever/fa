@@ -46,11 +46,19 @@
 --
 -- Scenario is the first derived model. Mods (compact UUIDs → full mod info), restrictions and the slot
 -- info are the planned siblings; they follow this same shape (see the folder's CLAUDE.md).
+--
+-- LIFETIME. It is a `ClassSimple` singleton implementing `Destroyable`, registered in the session
+-- trash bag (see CustomLobbySession) on first access. So one `CustomLobbySession.Teardown()` frees its
+-- `Scenario` LazyVar and severs its launch-model subscription, instead of leaking them into the
+-- persistent front-end Lua state for the whole match. The module functions are thin facades over the
+-- singleton. This is the first derived model converted to the singleton-teardown pattern; the catalog
+-- (mapselect/CustomLobbyMapCatalog) is the original worked example.
 
 local Create = import("/lua/lazyvar.lua").Create
 local Derive = import("/lua/lazyvar.lua").Derive
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/models/customlobbylaunchmodel.lua")
 local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
+local CustomLobbySession = import("/lua/ui/lobby/customlobby/customlobbysession.lua")
 
 -------------------------------------------------------------------------------
 --#region Shape
@@ -72,18 +80,10 @@ local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/custom
 -------------------------------------------------------------------------------
 --#region Derived model
 
---- Reactive derived-scenario singleton. **Read-only** — no write helpers; the controller never
---- touches it. It re-derives itself from the launch model's `ScenarioFile`.
----@class UICustomLobbyScenarioDerivedModel
----@field Scenario LazyVar<UICustomLobbyScenario | false>  # the resolved scenario, or false when none / unreadable
----@field Observer LazyVar                                 # internal: resolves ScenarioFile (deduped); pins itself
-
+-- The singleton, forward-declared above the class so the class methods (`Destroy`) capture it as an
+-- upvalue rather than resolving it as a global. Assigned in `SetupSingleton`, cleared in `Destroy`.
 ---@type UICustomLobbyScenarioDerivedModel | nil
-local ModelInstance = nil
-
---- The file currently resolved into `Scenario` — the de-dup key (lowercased), or false when none.
----@type string | false
-local LoadedFile = false
+local Instance = nil
 
 --- Number of start spots a scenario declares, from its standard configuration (0 if none).
 ---@param info UILobbyScenarioInfo
@@ -125,52 +125,83 @@ local function Resolve(file)
     }
 end
 
---- The internal observer's body: resolve `file` into the bundle, but skip the work (and the re-fire)
---- when it is the same scenario we already hold — that is the de-dup.
----@param model UICustomLobbyScenarioDerivedModel
----@param file FileName | false
-local function OnScenarioFileChanged(model, file)
-    local key = (type(file) == "string") and string.lower(file) or false
-    if key == LoadedFile then
-        return
-    end
-    LoadedFile = key
+--- Reactive derived-scenario singleton — a `ClassSimple` implementing `Destroyable`, registered in
+--- the session trash so one `CustomLobbySession.Teardown()` frees it. **Read-only** — no write
+--- helpers; the controller never touches it. It re-derives from the launch model's `ScenarioFile`.
+---@class UICustomLobbyScenarioDerivedModel : Destroyable
+---@field Trash      TrashBag                                  # owns the Scenario var + the observer (freed on Destroy)
+---@field Scenario   LazyVar<UICustomLobbyScenario | false>    # the resolved scenario, or false when none / unreadable
+---@field Observer   LazyVar                                   # internal: resolves ScenarioFile (deduped)
+---@field LoadedFile string | false                            # the file currently resolved (lowercased) — the de-dup key
+---@field Destroyed  boolean
+local ScenarioModel = ClassSimple {
 
-    if not file then
-        model.Scenario:Set(false)
-        return
-    end
-    model.Scenario:Set(Resolve(file) or false)
-end
+    ---@param self UICustomLobbyScenarioDerivedModel
+    __init = function(self)
+        self.Trash = TrashBag()
+        self.Scenario = self.Trash:Add(Create(false))
+        self.LoadedFile = false
+        self.Destroyed = false
 
---- Allocates a fresh scenario-model singleton, replacing any existing instance, and wires its internal
---- observer to the launch model's `ScenarioFile`. The observer is stored on the model so it isn't
---- garbage-collected, and (because `Derive` fires synchronously on creation) it resolves the current
---- scenario immediately.
+        -- resolve the current scenario now and on every change (`Derive` fires synchronously on
+        -- creation). Pinned on `self.Observer` AND in the trash, so it isn't GC'd and Destroy frees it.
+        local launch = CustomLobbyLaunchModel.GetSingleton()
+        self.Observer = self.Trash:Add(Derive(launch.ScenarioFile, function(scenarioFileLazy)
+            self:OnScenarioFileChanged(scenarioFileLazy())
+        end))
+    end,
+
+    --- Resolves `file` into the bundle, but skips the work (and the re-fire) when it is the same
+    --- scenario we already hold — that is the de-dup.
+    ---@param self UICustomLobbyScenarioDerivedModel
+    ---@param file FileName | false
+    OnScenarioFileChanged = function(self, file)
+        local key = (type(file) == "string") and string.lower(file) or false
+        if key == self.LoadedFile then
+            return
+        end
+        self.LoadedFile = key
+
+        if not file then
+            self.Scenario:Set(false)
+            return
+        end
+        self.Scenario:Set(Resolve(file) or false)
+    end,
+
+    --- `Destroyable`: frees the `Scenario` var + the observer subscription (so it stops firing) and
+    --- clears the module singleton, so the next access rebuilds a fresh model and re-registers it in
+    --- the next session's trash. Idempotent. Called by the session trash on `Teardown()`.
+    ---@param self UICustomLobbyScenarioDerivedModel
+    Destroy = function(self)
+        if self.Destroyed then
+            return
+        end
+        self.Destroyed = true
+        self.Trash:Destroy()       -- frees the Scenario LazyVar + the launch-model subscription
+        if Instance == self then
+            Instance = nil
+        end
+    end,
+}
+
+--- Allocates a fresh scenario-model singleton and registers it in the session trash. (Because `Derive`
+--- fires synchronously on creation, the current scenario resolves immediately.)
 ---@return UICustomLobbyScenarioDerivedModel
 function SetupSingleton()
-    ---@type UICustomLobbyScenarioDerivedModel
-    local model = {
-        Scenario = Create(false),
-    }
-    ModelInstance = model
-    LoadedFile = false
-
-    local launch = CustomLobbyLaunchModel.GetSingleton()
-    model.Observer = Derive(launch.ScenarioFile, function(scenarioFileLazy)
-        OnScenarioFileChanged(model, scenarioFileLazy())
-    end)
-
-    return model
+    Instance = ScenarioModel()
+    CustomLobbySession.GetTrash():Add(Instance)
+    return Instance
 end
 
---- Returns the scenario-model singleton, creating (and resolving the current scenario) on first access.
+--- Returns the scenario-model singleton, creating (and registering) it on first access — including
+--- after a teardown, so it is reusable across lobby sessions.
 ---@return UICustomLobbyScenarioDerivedModel
 function GetSingleton()
-    if not ModelInstance then
+    if not Instance then
         SetupSingleton()
     end
-    return ModelInstance --[[@as UICustomLobbyScenarioDerivedModel]]
+    return Instance --[[@as UICustomLobbyScenarioDerivedModel]]
 end
 
 --#endregion
@@ -195,11 +226,13 @@ end
 -------------------------------------------------------------------------------
 --#region Debugging
 
---- Hot-reload hook: rebuild the singleton so its observer re-subscribes and re-resolves the current
---- scenario. The bundle is fully derived from `ScenarioFile`, so there is no state to copy across.
+--- Hot-reload hook: destroy the old singleton (severing its subscription) and rebuild via the new
+--- module so its observer re-subscribes and re-resolves the current scenario. The bundle is fully
+--- derived from `ScenarioFile`, so there is no state to copy across.
 ---@param newModule any
 function __moduleinfo.OnReload(newModule)
-    if ModelInstance then
+    if Instance then
+        Instance:Destroy()
         newModule.SetupSingleton()
     end
 end

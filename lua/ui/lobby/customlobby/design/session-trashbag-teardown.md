@@ -100,8 +100,16 @@ implementation. `UICustomLobbyMapCatalog : Destroyable`:
 ## Rollout order (proposed)
 
 1. ✅ Map catalog (done — reference implementation).
-2. The three models (low-risk, thin `Destroy`).
-3. The mod catalog (mirror the map catalog).
-4. ~~`CustomLobbyRules` map-dimension cache.~~ — N/A: `CustomLobbyRules` is now a **pure, stateless** kernel (all inputs passed in; the cached map-dimension lookup is gone), so it holds nothing to tear down.
-5. The interface + performance popover — **after** the ordering decision (#1 above).
-6. Track the lobby instance in the session bag (drop the manual `Instance:Destroy()` in lobby.lua).
+2. ✅ Scenario derived model (done — the worked example for the **derived layer**, now under
+   [`models/derived/CustomLobbyScenarioDerivedModel.lua`](../models/derived/CustomLobbyScenarioDerivedModel.lua)):
+   a `ClassSimple : Destroyable` whose own `Trash` owns the `Scenario` LazyVar + the launch-model
+   subscription, registered in the session bag on first access, with an idempotent `Destroy` that
+   severs the subscription and nils the module singleton. Its de-dup key moved off a module local onto
+   the instance (`self.LoadedFile`). The other four derived models mirror it (no write helpers to worry
+   about — they're read-only projections).
+3. The three models (low-risk; per open decision #3 their write helpers stay free functions — the
+   `ClassSimple` just adds an own `Trash` + a `Destroy` that frees the LazyVars and nils the singleton).
+4. The mod catalog (mirror the map catalog).
+5. ~~`CustomLobbyRules` map-dimension cache.~~ — N/A: `CustomLobbyRules` is now a **pure, stateless** kernel (all inputs passed in; the cached map-dimension lookup is gone), so it holds nothing to tear down.
+6. The interface + performance popover — **after** the ordering decision (#1 above).
+7. Track the lobby instance in the session bag (drop the manual `Instance:Destroy()` in lobby.lua).
