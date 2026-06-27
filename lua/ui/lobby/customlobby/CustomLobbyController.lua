@@ -244,6 +244,17 @@ local function SwapSlots(instance, slotA, slotB)
     if lockChanged then
         BroadcastSessionState(instance)
     end
+
+    -- announce the swap/move (the host performs every swap, whether it started the drag or a client did)
+    local aName = a and a.PlayerName
+    local bName = b and b.PlayerName
+    if aName and bName then
+        BroadcastSystemNotice(instance, aName .. " and " .. bName .. " swapped seats.")
+    elseif aName then
+        BroadcastSystemNotice(instance, aName .. " moved to seat " .. slotB .. ".")
+    elseif bName then
+        BroadcastSystemNotice(instance, bName .. " moved to seat " .. slotA .. ".")
+    end
 end
 
 --- Reads a numeric command-line argument (e.g. `/mean 1500`), falling back to the default
@@ -409,7 +420,8 @@ function OnPeerDisconnected(instance, peerName, uid)
         BroadcastSessionState(instance)
     end
 
-    -- announce the leave in chat (the leaver is gone; the remaining peers + host see it)
+    -- announce the leave in chat (the leaver is gone; the remaining peers + host see it). A host kick
+    -- also produces a separate "Host removed X." line from RequestEject — two lines for a kick is fine.
     BroadcastSystemNotice(instance, name .. " left.")
 end
 
@@ -757,6 +769,10 @@ function RequestSetScenario(scenarioFile)
     end
 
     BroadcastLaunchInfo(instance)
+
+    -- the scenario derived model resolved the new map synchronously (its observer fired on the Set above)
+    local scenario = import("/lua/ui/lobby/customlobby/models/derived/customlobbyscenarioderivedmodel.lua").GetScenario()
+    BroadcastSystemNotice(instance, "Host changed the map to " .. ((scenario and scenario.Name) or "a new map") .. ".")
 end
 
 --- The host sets the active sim mods. Host-only — backs the mod-select dialog. Sets `GameMods`
@@ -776,6 +792,7 @@ function RequestSetGameMods(gameMods)
 
     CustomLobbyLaunchModel.SetGameMods(CustomLobbyLaunchModel.GetSingleton(), gameMods)
     BroadcastLaunchInfo(instance)
+    BroadcastSystemNotice(instance, "Host changed the game mods (" .. table.getsize(gameMods) .. " active).")
 end
 
 --- The host sets the unit restrictions. Host-only — backs the unit-select dialog and a
@@ -799,6 +816,7 @@ function RequestSetRestrictions(keys)
     CustomLobbyLaunchModel.SetRestrictions(CustomLobbyLaunchModel.GetSingleton(), keys)
     LOG("CustomLobby: restrictions set (" .. table.getn(keys) .. ")")
     BroadcastLaunchInfo(instance)
+    BroadcastSystemNotice(instance, "Host changed the unit restrictions (" .. table.getn(keys) .. ").")
 end
 
 --- The host sets the game options. Host-only — backs the options dialog. Replaces the whole
@@ -818,6 +836,7 @@ function RequestSetGameOptions(options)
 
     CustomLobbyLaunchModel.SetGameOptions(CustomLobbyLaunchModel.GetSingleton(), options)
     BroadcastLaunchInfo(instance)
+    BroadcastSystemNotice(instance, "Host changed the game options.")
 end
 
 --- The host resets every game option to its default. Host-only — backs the lobby's "Reset
@@ -1239,6 +1258,7 @@ function RequestApplyBalance(arrangement)
         end
     end
     BroadcastPlayers(instance)
+    BroadcastSystemNotice(instance, "Host balanced the teams.")
 end
 
 --- Re-broadcasts the closed slots, then after a short delay opens every one of them. The
@@ -1303,8 +1323,10 @@ function RequestEject(slot)
     if not player then
         return
     end
+    BroadcastSystemNotice(instance, "Host removed " .. (player.PlayerName or "a player") .. ".")
     if player.Human then
-        -- the resulting PeerDisconnected clears the slot (and its lock) and re-broadcasts
+        -- the resulting PeerDisconnected clears the slot (and its lock), re-broadcasts, and adds its own
+        -- "X left." line — two lines for a kick is fine
         instance:EjectPeer(player.OwnerID, "KickedByHost")
     else
         CustomLobbyLaunchModel.ClearPlayer(CustomLobbyLaunchModel.GetSingleton(), slot)
@@ -1342,6 +1364,7 @@ function RequestMoveToObserver(slot)
     if ClearSlotLock(slot) then
         BroadcastSessionState(instance)
     end
+    BroadcastSystemNotice(instance, (player.PlayerName or "A player") .. " moved to observers.")
 end
 
 --- The local player toggles their ready flag. Host applies + broadcasts; a client

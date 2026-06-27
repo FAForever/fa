@@ -39,17 +39,18 @@
 --
 -- The body renders as **mirror positions** (row k = the k-th seat on each side, who face off; the
 -- right column is mirrored so the teams face each other): each row puts the name on the outer edge and
--- the rating in a column hugging the centre (with the mean muted beside it) + the pair's rating gap in
--- the centre, a "<" / ">" arrow pointing to the higher-rated side. The header is the same shape — team
--- label (outer), average (column) + total (muted), and the gap total (with the same direction arrow)
--- in the centre band atop the per-row gaps. Three gestures tune the shown candidate:
+-- the **mean** rating in a column hugging the centre (with the deviation muted as "(±N)" beside it) +
+-- the pair's mean gap in the centre, a "<" / ">" arrow pointing to the higher-rated side. The header is
+-- a two-line summary on the same columns: TOP — team label (outer) + each team's predicted win % (column)
+-- + the match quality in the centre; BOTTOM — total mean (column, "(±N)" summed deviation muted) + the
+-- gap total (direction arrow) in the centre. Three gestures tune the shown candidate:
 --   * **Drag a row** onto another → swap those two positions' pairs (both players move together),
 --     so the host arranges which pair spawns where ("D -> A").
 --   * **Click a player, then another** → swap just those two (`ScoreArrangement` re-scores, no solve).
 --   * **Click a player's lock** → pin / unpin them, which **regenerates** the candidates around that
 --     constraint (the locked player held at its seat, the rest re-balanced).
--- Moved players are gold, locked players blue. The status line reports quality before -> after and the
--- predicted win split.
+-- Moved players are gold, locked players blue. The status line carries only situational notes (the odd
+-- one left in place, or why it can't balance).
 --
 -- Built to the preset dialog's shape (areas layout, three-phase init, Popup singleton).
 
@@ -71,11 +72,11 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 local Debug = false
 
 local DialogWidth = 540
-local DialogHeight = 452
+local DialogHeight = 470
 local Pad = 12
 local TitleHeight = 28
 local HintHeight = 16
-local HeaderHeight = 22
+local HeaderHeight = 40     -- two lines: total (+dev) / win% per team, gap / quality in the centre
 local StatusHeight = 24
 local ActionHeight = 52
 local RowHeight = 24
@@ -152,14 +153,14 @@ end
 ---@field RightSelect   Bitmap
 ---@field PosLabel      Text            # the position index (1..N)
 ---@field LeftName      Text            # outer edge
----@field LeftMean      Text            # muted mean, just outside the rating
----@field LeftRating    Text            # display rating, aligned in a column beside the centre
+---@field LeftDev       Text            # muted deviation "(±N)", just outside the rating
+---@field LeftRating    Text            # mean rating, aligned in a column beside the centre
 ---@field CenterArea    Group           # fixed-width centre band (holds the gap number)
 ---@field Center        Text            # the pair's rating gap (magnitude, centred)
 ---@field CenterArrowL  Text            # "<" shown when the left player is higher-rated
 ---@field CenterArrowR  Text            # ">" shown when the right player is higher-rated
 ---@field RightRating   Text
----@field RightMean     Text
+---@field RightDev      Text
 ---@field RightName     Text
 ---@field LeftLock      Bitmap          # left player's lock toggle
 ---@field RightLock     Bitmap
@@ -182,6 +183,8 @@ end
 ---@field TitleArea Group
 ---@field HintArea Group
 ---@field HeaderArea Group
+---@field HeaderTop Group        # top line of the header (win % + quality) — vertical reference
+---@field HeaderBottom Group     # bottom line of the header (totals + gap) — vertical reference
 ---@field RowsArea Group
 ---@field StatusArea Group
 ---@field ActionArea Group
@@ -189,14 +192,17 @@ end
 ---@field Hint Text
 ---@field TeamLabelA Text        # team label, outer edge (like a player name)
 ---@field TeamLabelB Text
----@field TeamAvgA Text          # team average, centre column (aligned above the player ratings)
----@field TeamAvgB Text
----@field TeamTotalA Text        # team total, muted, just outside the average (like a player mean)
+---@field TeamTotalA Text        # team total (sum of means), centre column (aligned above the player ratings)
 ---@field TeamTotalB Text
----@field HeaderCenterArea Group # centre band (holds the gap total), aligned above the rows' centre band
----@field HeaderGap Text         # the total rating gap between the teams (magnitude, centred)
+---@field TeamDevA Text          # team total deviation "(±N)", muted, just outside the total
+---@field TeamDevB Text
+---@field TeamWinA Text          # team A predicted win %, top line of its column
+---@field TeamWinB Text
+---@field HeaderCenterArea Group # centre band (holds the gap total + quality), aligned above the rows' centre band
+---@field HeaderGap Text         # the total rating gap between the teams (magnitude, centred, bottom line)
 ---@field HeaderArrowL Text      # "<" shown when the left team has the higher total
 ---@field HeaderArrowR Text      # ">" shown when the right team has the higher total
+---@field HeaderQuality Text     # match quality %, centred on the top line (above the gap)
 ---@field Rows UICustomLobbyBalanceRow[]
 ---@field Status Text
 ---@field NavPrev Bitmap          # browse to the previous candidate ("<")
@@ -254,8 +260,8 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         self.Hint:SetColor(MutedColor)
         self.Hint:DisableHitTest()
 
-        -- the team summary mirrors a player row: label (outer), total (muted) + average (centre column,
-        -- above the player ratings), and the gap total in the centre band above the per-row gaps
+        -- the team summary mirrors a player row: label (outer) + total (centre column, above the player
+        -- ratings), and the gap total in the centre band above the per-row gaps
         local labels = self.Result.labels or { "Team 1", "Team 2" }
         self.TeamLabelA = UIUtil.CreateText(self.HeaderArea, labels[1], 14, UIUtil.titleFont)
         self.TeamLabelA:SetColor(HeaderColor)
@@ -264,19 +270,19 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         self.TeamLabelB:SetColor(HeaderColor)
         self.TeamLabelB:DisableHitTest()
 
-        self.TeamAvgA = UIUtil.CreateText(self.HeaderArea, "", 14, UIUtil.titleFont)
-        self.TeamAvgA:SetColor(HeaderColor)
-        self.TeamAvgA:DisableHitTest()
-        self.TeamAvgB = UIUtil.CreateText(self.HeaderArea, "", 14, UIUtil.titleFont)
-        self.TeamAvgB:SetColor(HeaderColor)
-        self.TeamAvgB:DisableHitTest()
-
-        self.TeamTotalA = UIUtil.CreateText(self.HeaderArea, "", 11, UIUtil.bodyFont)
-        self.TeamTotalA:SetColor(MutedColor)
+        self.TeamTotalA = UIUtil.CreateText(self.HeaderArea, "", 14, UIUtil.titleFont)
+        self.TeamTotalA:SetColor(HeaderColor)
         self.TeamTotalA:DisableHitTest()
-        self.TeamTotalB = UIUtil.CreateText(self.HeaderArea, "", 11, UIUtil.bodyFont)
-        self.TeamTotalB:SetColor(MutedColor)
+        self.TeamTotalB = UIUtil.CreateText(self.HeaderArea, "", 14, UIUtil.titleFont)
+        self.TeamTotalB:SetColor(HeaderColor)
         self.TeamTotalB:DisableHitTest()
+
+        self.TeamDevA = UIUtil.CreateText(self.HeaderArea, "", 11, UIUtil.bodyFont)
+        self.TeamDevA:SetColor(MutedColor)
+        self.TeamDevA:DisableHitTest()
+        self.TeamDevB = UIUtil.CreateText(self.HeaderArea, "", 11, UIUtil.bodyFont)
+        self.TeamDevB:SetColor(MutedColor)
+        self.TeamDevB:DisableHitTest()
 
         self.HeaderCenterArea = Group(self.HeaderArea, "BalanceHeaderCenter")
         self.HeaderGap = UIUtil.CreateText(self.HeaderCenterArea, "", 12, UIUtil.bodyFont)
@@ -288,6 +294,20 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         self.HeaderArrowR = UIUtil.CreateText(self.HeaderCenterArea, "", 12, UIUtil.bodyFont)
         self.HeaderArrowR:SetColor(HeaderColor)
         self.HeaderArrowR:DisableHitTest()
+
+        -- the bottom line of the header: each team's predicted win % (under its total) + the match
+        -- quality (under the gap). HeaderTop / HeaderBottom are vertical-reference bands only.
+        self.HeaderTop = Group(self.HeaderArea, "BalanceHeaderTop")
+        self.HeaderBottom = Group(self.HeaderArea, "BalanceHeaderBottom")
+        self.TeamWinA = UIUtil.CreateText(self.HeaderArea, "", 14, UIUtil.titleFont)
+        self.TeamWinA:SetColor(HeaderColor)
+        self.TeamWinA:DisableHitTest()
+        self.TeamWinB = UIUtil.CreateText(self.HeaderArea, "", 14, UIUtil.titleFont)
+        self.TeamWinB:SetColor(HeaderColor)
+        self.TeamWinB:DisableHitTest()
+        self.HeaderQuality = UIUtil.CreateText(self.HeaderCenterArea, "", 12, UIUtil.bodyFont)
+        self.HeaderQuality:SetColor(HeaderColor)
+        self.HeaderQuality:DisableHitTest()
 
         -- a fixed pool of interactive position rows; Render shows/hides + fills them from the proposal
         self.Rows = {}
@@ -364,9 +384,9 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         -- beside the centre band; the gap number lives in the centre band so the rating columns line up
         row.LeftName = UIUtil.CreateText(row.Group, "", 14, UIUtil.bodyFont)
         row.LeftName:DisableHitTest()
-        row.LeftMean = UIUtil.CreateText(row.Group, "", 11, UIUtil.bodyFont)
-        row.LeftMean:SetColor(MutedColor)
-        row.LeftMean:DisableHitTest()
+        row.LeftDev = UIUtil.CreateText(row.Group, "", 11, UIUtil.bodyFont)
+        row.LeftDev:SetColor(MutedColor)
+        row.LeftDev:DisableHitTest()
         row.LeftRating = UIUtil.CreateText(row.Group, "", 14, UIUtil.bodyFont)
         row.LeftRating:DisableHitTest()
 
@@ -381,9 +401,9 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
 
         row.RightRating = UIUtil.CreateText(row.Group, "", 14, UIUtil.bodyFont)
         row.RightRating:DisableHitTest()
-        row.RightMean = UIUtil.CreateText(row.Group, "", 11, UIUtil.bodyFont)
-        row.RightMean:SetColor(MutedColor)
-        row.RightMean:DisableHitTest()
+        row.RightDev = UIUtil.CreateText(row.Group, "", 11, UIUtil.bodyFont)
+        row.RightDev:SetColor(MutedColor)
+        row.RightDev:DisableHitTest()
         row.RightName = UIUtil.CreateText(row.Group, "", 14, UIUtil.bodyFont)
         row.RightName:DisableHitTest()
 
@@ -455,19 +475,30 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         Layouter(self.Title):AtHorizontalCenterIn(self.TitleArea):AtVerticalCenterIn(self.TitleArea):End()
         Layouter(self.Hint):AtHorizontalCenterIn(self.HintArea):AtVerticalCenterIn(self.HintArea):End()
 
-        -- team summary, laid out on the same columns as the player rows below it
+        -- team summary, on the same columns as the player rows: two stacked lines (HeaderTop = totals +
+        -- gap, HeaderBottom = win % + quality). The centre band spans both lines.
+        Layouter(self.HeaderTop):AtLeftIn(self.HeaderArea):AtRightIn(self.HeaderArea)
+            :AtTopIn(self.HeaderArea):Height(HeaderHeight / 2):End()
+        Layouter(self.HeaderBottom):AtLeftIn(self.HeaderArea):AtRightIn(self.HeaderArea)
+            :AnchorToBottom(self.HeaderTop, 0):AtBottomIn(self.HeaderArea):End()
         Layouter(self.HeaderCenterArea):AtHorizontalCenterIn(self.HeaderArea):AtTopIn(self.HeaderArea)
             :AtBottomIn(self.HeaderArea):Width(CenterWidth):End()
-        Layouter(self.HeaderGap):AtHorizontalCenterIn(self.HeaderCenterArea):AtVerticalCenterIn(self.HeaderCenterArea):End()
-        Layouter(self.HeaderArrowL):AnchorToLeft(self.HeaderGap, 3):AtVerticalCenterIn(self.HeaderCenterArea):End()
-        Layouter(self.HeaderArrowR):AnchorToRight(self.HeaderGap, 3):AtVerticalCenterIn(self.HeaderCenterArea):End()
 
-        Layouter(self.TeamLabelA):AtLeftIn(self.HeaderArea):AtVerticalCenterIn(self.HeaderArea):End()
-        Layouter(self.TeamAvgA):AnchorToLeft(self.HeaderCenterArea, 8):AtVerticalCenterIn(self.HeaderArea):End()
-        Layouter(self.TeamTotalA):AnchorToLeft(self.TeamAvgA, 5):AtVerticalCenterIn(self.HeaderArea):End()
-        Layouter(self.TeamLabelB):AtRightIn(self.HeaderArea):AtVerticalCenterIn(self.HeaderArea):End()
-        Layouter(self.TeamAvgB):AnchorToRight(self.HeaderCenterArea, 8):AtVerticalCenterIn(self.HeaderArea):End()
-        Layouter(self.TeamTotalB):AnchorToRight(self.TeamAvgB, 5):AtVerticalCenterIn(self.HeaderArea):End()
+        -- top line: team label (outer) + per-team win % (column) and the match quality in the centre
+        Layouter(self.HeaderQuality):AtHorizontalCenterIn(self.HeaderCenterArea):AtVerticalCenterIn(self.HeaderTop):End()
+        Layouter(self.TeamLabelA):AtLeftIn(self.HeaderArea):AtVerticalCenterIn(self.HeaderTop):End()
+        Layouter(self.TeamWinA):AnchorToLeft(self.HeaderCenterArea, 8):AtVerticalCenterIn(self.HeaderTop):End()
+        Layouter(self.TeamLabelB):AtRightIn(self.HeaderArea):AtVerticalCenterIn(self.HeaderTop):End()
+        Layouter(self.TeamWinB):AnchorToRight(self.HeaderCenterArea, 8):AtVerticalCenterIn(self.HeaderTop):End()
+
+        -- bottom line: per-team total (+dev, under the win %) and the gap total in the centre
+        Layouter(self.HeaderGap):AtHorizontalCenterIn(self.HeaderCenterArea):AtVerticalCenterIn(self.HeaderBottom):End()
+        Layouter(self.HeaderArrowL):AnchorToLeft(self.HeaderGap, 3):AtVerticalCenterIn(self.HeaderBottom):End()
+        Layouter(self.HeaderArrowR):AnchorToRight(self.HeaderGap, 3):AtVerticalCenterIn(self.HeaderBottom):End()
+        Layouter(self.TeamTotalA):AnchorToLeft(self.HeaderCenterArea, 8):AtVerticalCenterIn(self.HeaderBottom):End()
+        Layouter(self.TeamDevA):AnchorToLeft(self.TeamTotalA, 5):AtVerticalCenterIn(self.HeaderBottom):End()
+        Layouter(self.TeamTotalB):AnchorToRight(self.HeaderCenterArea, 8):AtVerticalCenterIn(self.HeaderBottom):End()
+        Layouter(self.TeamDevB):AnchorToRight(self.TeamTotalB, 5):AtVerticalCenterIn(self.HeaderBottom):End()
 
         -- stack the position rows from the top of the rows area
         for i = 1, MaxRows do
@@ -497,10 +528,10 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
             -- ratings: a column hugging the centre band (left right-aligned, right left-aligned); the
             -- muted mean sits just outside each rating; names run from the outer edge
             Layouter(row.LeftRating):AnchorToLeft(row.CenterArea, 8):AtVerticalCenterIn(row.Group):End()
-            Layouter(row.LeftMean):AnchorToLeft(row.LeftRating, 5):AtVerticalCenterIn(row.Group):End()
+            Layouter(row.LeftDev):AnchorToLeft(row.LeftRating, 5):AtVerticalCenterIn(row.Group):End()
             Layouter(row.LeftName):AnchorToRight(row.LeftLock, 6):AtVerticalCenterIn(row.Group):End()
             Layouter(row.RightRating):AnchorToRight(row.CenterArea, 8):AtVerticalCenterIn(row.Group):End()
-            Layouter(row.RightMean):AnchorToRight(row.RightRating, 5):AtVerticalCenterIn(row.Group):End()
+            Layouter(row.RightDev):AnchorToRight(row.RightRating, 5):AtVerticalCenterIn(row.Group):End()
             Layouter(row.RightName):AnchorToLeft(row.RightLock, 6):AtVerticalCenterIn(row.Group):End()
 
             -- the swap-click / drag halves sit above the drop tint but below the texts (which ignore
@@ -804,20 +835,6 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
     ---------------------------------------------------------------------------
     --#region Rendering
 
-    --- Sets one team's header column — average (centre column) + total (muted) — from the plan.
-    ---@param self UICustomLobbyBalancePreview
-    ---@param avgText Text
-    ---@param totalText Text
-    ---@param side 1 | 2
-    SetTeamHeader = function(self, avgText, totalText, side)
-        local result = self.Result
-        local count = table.getn(result.sides[side])
-        local total = result.totals[side]
-        local avg = count > 0 and math.floor(total / count + 0.5) or 0
-        avgText:SetText(tostring(avg))
-        totalText:SetText("(" .. tostring(total) .. ")")
-    end,
-
     --- Fills one position row from a `UICustomLobbyBalancePosition` (either player may be absent on an
     --- uneven split), and records its slots/owners for the click + drag handlers.
     ---@param self UICustomLobbyBalancePreview
@@ -828,18 +845,20 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         row.Group:Show()
         row.PosLabel:SetText(tostring(index))
         local a, b = position.a, position.b
-        self:FillHalf(row.LeftName, row.LeftRating, row.LeftMean, row.LeftLock, row.LeftSelect, a, position.slotA)
-        self:FillHalf(row.RightName, row.RightRating, row.RightMean, row.RightLock, row.RightSelect, b, position.slotB)
+        self:FillHalf(row.LeftName, row.LeftRating, row.LeftDev, row.LeftLock, row.LeftSelect, a, position.slotA)
+        self:FillHalf(row.RightName, row.RightRating, row.RightDev, row.RightLock, row.RightSelect, b, position.slotB)
         row.LeftOwner = a and a.ownerId or nil
         row.LeftSlot = position.slotA
         row.RightOwner = b and b.ownerId or nil
         row.RightSlot = position.slotB
 
-        -- the pair's rating gap, only when both players are rated — the magnitude is centred and a
+        -- the pair's mean gap, only when both players are rated — the magnitude is centred and a
         -- "<" / ">" arrow points to the higher-rated side
         if a and b and a.pl > 0 and b.pl > 0 then
-            self:SetDirectionalGap(row.Center, row.CenterArrowL, row.CenterArrowR, a.pl, b.pl,
-                GapColor(math.abs(a.pl - b.pl)))
+            local meanA = math.floor(a.mean + 0.5)
+            local meanB = math.floor(b.mean + 0.5)
+            self:SetDirectionalGap(row.Center, row.CenterArrowL, row.CenterArrowR, meanA, meanB,
+                GapColor(math.abs(meanA - meanB)))
         else
             row.Center:SetText("")
             row.CenterArrowL:SetText("")
@@ -867,21 +886,21 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         arrowR:SetColor(color)
     end,
 
-    --- Paints one half of a row — name (outer), display rating (centre column) + muted mean, the lock
-    --- dot and the selection highlight — for a player, or clears it when the half is empty.
+    --- Paints one half of a row — name (outer), mean rating (centre column) + muted deviation "(±N)",
+    --- the lock dot and the selection highlight — for a player, or clears it when the half is empty.
     ---@param self UICustomLobbyBalancePreview
     ---@param name Text
     ---@param rating Text
-    ---@param mean Text
+    ---@param dev Text
     ---@param lock Bitmap
     ---@param select Bitmap
     ---@param player UICustomLobbyBalancePlayer | nil
     ---@param slot number | nil
-    FillHalf = function(self, name, rating, mean, lock, select, player, slot)
+    FillHalf = function(self, name, rating, dev, lock, select, player, slot)
         if not player then
             name:SetText("")
             rating:SetText("")
-            mean:SetText("")
+            dev:SetText("")
             lock:SetAlpha(0.0)
             select:SetAlpha(0.0)
             return
@@ -889,14 +908,14 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         local color = PlayerColor(player)
         name:SetText(player.name)
         name:SetColor(color)
-        -- rating + mean only for rated players (an unrated / AI player's mean is a placeholder)
+        -- mean + deviation only for rated players (an unrated / AI player's mean is a placeholder)
         if player.pl > 0 then
-            rating:SetText(tostring(player.pl))
+            rating:SetText(tostring(math.floor(player.mean + 0.5)))
             rating:SetColor(color)
-            mean:SetText("(" .. tostring(math.floor(player.mean + 0.5)) .. ")")
+            dev:SetText("(±" .. tostring(math.floor(player.dev + 0.5)) .. ")")
         else
             rating:SetText("")
-            mean:SetText("")
+            dev:SetText("")
         end
         -- the lock dot: solid blue when pinned, faint when not (a click toggles it)
         lock:SetSolidColor(player.locked and LockColor or SelectColor)
@@ -911,10 +930,22 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
     Render = function(self)
         local result = self.Result
 
-        self:SetTeamHeader(self.TeamAvgA, self.TeamTotalA, 1)
-        self:SetTeamHeader(self.TeamAvgB, self.TeamTotalB, 2)
+        self.TeamTotalA:SetText(tostring(math.floor(result.totals[1] + 0.5)))
+        self.TeamTotalB:SetText(tostring(math.floor(result.totals[2] + 0.5)))
+        self.TeamDevA:SetText("(±" .. tostring(math.floor(result.devTotals[1] + 0.5)) .. ")")
+        self.TeamDevB:SetText("(±" .. tostring(math.floor(result.devTotals[2] + 0.5)) .. ")")
         self:SetDirectionalGap(self.HeaderGap, self.HeaderArrowL, self.HeaderArrowR,
-            result.totals[1], result.totals[2], HeaderColor)
+            math.floor(result.totals[1] + 0.5), math.floor(result.totals[2] + 0.5), HeaderColor)
+
+        -- bottom line: each team's predicted win % (under its total) + the match quality (under the gap)
+        if result.winChance then
+            self.TeamWinA:SetText(tostring(result.winChance[1]) .. "%")
+            self.TeamWinB:SetText(tostring(result.winChance[2]) .. "%")
+        else
+            self.TeamWinA:SetText("")
+            self.TeamWinB:SetText("")
+        end
+        self.HeaderQuality:SetText(result.quality and (tostring(math.floor(result.quality + 0.5)) .. "%") or "n/a")
 
         local positions = result.positions or {}
         local rowCount = table.getn(positions)
@@ -956,8 +987,8 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         self:SetNavArrow(self.NavNext, multiple and self.CandidateIndex < count)
     end,
 
-    --- The summary: the reason it can't balance, else "Quality before -> after · Win a/b · Gap g",
-    --- plus any odd one left out.
+    --- The status line now carries only situational notes — why it can't balance, or the odd one left
+    --- in place. Quality / win / totals live in the header.
     ---@param self UICustomLobbyBalancePreview
     ---@return string
     StatusLine = function(self)
@@ -965,27 +996,10 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         if result.reason then
             return result.reason
         end
-
-        -- match quality, as "current -> proposed" when both are known (whole percent — the trueskill
-        -- value carries two decimals we don't need on screen)
-        local quality
-        if result.quality and result.currentQuality then
-            quality = "Quality " .. tostring(math.floor(result.currentQuality + 0.5))
-                .. "% -> " .. tostring(math.floor(result.quality + 0.5)) .. "%"
-        elseif result.quality then
-            quality = "Quality " .. tostring(math.floor(result.quality + 0.5)) .. "%"
-        else
-            quality = "Quality n/a"
-        end
-
-        local status = quality
-        if result.winChance then
-            status = status .. "   ·   Win " .. tostring(result.winChance[1]) .. "% / " .. tostring(result.winChance[2]) .. "%"
-        end
         if result.unassigned then
-            status = status .. "   ·   " .. result.unassigned.name .. " stays put (odd count)"
+            return result.unassigned.name .. " stays put (odd count)"
         end
-        return status
+        return ""
     end,
 
     --#endregion

@@ -72,13 +72,21 @@ the same mechanism either way.
   connection handshake, so it must be evaluated per-invocation. `Send`'s `/` branch dispatches here.
 - **Slice 3 — whisper.** `RequestChat` carries a `Recipient`; `ProcessRequestChat` `SendData`s to
   sender+target instead of `BroadcastData`. Same chokepoint.
-- **Slice 4 — join/leave notices (done).** The host emits a `SystemNotice` (a senderless system line)
-  on join (`ProcessAddPlayer`) and leave (`OnPeerDisconnected`); `BroadcastSystemNotice` broadcasts it
-  and shows it on the host too (the broadcast doesn't loop back). Chosen over the originally-sketched
-  "each peer diffs the roster locally" because (a) the host doesn't run `ProcessSetPlayers` on itself,
-  so a local diff would skip the host, and (b) a joining peer would otherwise spam "X joined" for the
-  whole existing roster on its first snapshot. Host-broadcast is one symmetric path with no diff and no
-  baseline-flag, and the leaver simply isn't there to receive its own "left" line.
+- **Slice 4 — system notices (done).** The host emits a `SystemNotice` (a senderless system line) at
+  its authoritative change sites; `BroadcastSystemNotice` broadcasts it **and** shows it on the host too
+  (the broadcast doesn't loop back). Chosen over the originally-sketched "each peer diffs the roster
+  locally" because (a) the host doesn't run `ProcessSetPlayers` on itself, so a local diff would skip the
+  host, and (b) a joining peer would otherwise spam "X joined" for the whole existing roster on its first
+  snapshot. Host-broadcast is one symmetric path with no diff and no baseline-flag.
+  - Wired: **join** (`ProcessAddPlayer`), **leave** (`OnPeerDisconnected`), **kick** (`RequestEject` adds
+    "Host removed X."; a human kick also produces the disconnect's "left" line — two lines is fine),
+    **map / mods / options / restrictions** changes (the `RequestSet*` intents, which fire
+    once per action — *not* on snapshot rebroadcasts, so no spam), **seat swap / move** (`SwapSlots`,
+    covering host-initiated and any client-requested swap), **move-to-observers**
+    (`RequestMoveToObserver`), and **auto-balance applied** (`RequestApplyBalance`).
+  - Not yet emitted (deliberately, as noise-prone): ready toggles, slot takes, faction/colour picks.
+    Per-option diffs ("changed Unit Cap to 1000") would read better than the generic "changed the game
+    options" but need an old-vs-new compare in the intent.
 - **Refinements.** Multi-line wrapping (slice 1 truncates one line per row — the in-game
   [`ChatLinesInterface`](/lua/ui/game/chat/ChatLinesInterface.lua) is the reference); unread-since-last-view
   badge count (slice 1 shows the total line count).

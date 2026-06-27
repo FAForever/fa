@@ -41,8 +41,8 @@
 --      pair's *position* is random while the *pairing* stays fixed. Locked players keep their seat.
 -- Then the chosen split is scored once with trueskill `computeQuality` for the preview.
 --
--- Ratings: the search + quality use MEAN / DEV; the per-side display totals use PL (matching the
--- team-score strip).
+-- Ratings: the search + quality use MEAN / DEV; the preview shows MEAN +/- DEV per player, and the
+-- per-side display `totals` are the sum of the players' MEAN.
 
 local Trueskill = import("/lua/ui/lobby/trueskill.lua")
 
@@ -75,7 +75,8 @@ local MaxBalanceEvaluations = 20000
 ---@field labels       string[]                              # the two side labels, for the preview
 ---@field sides        UICustomLobbyBalancePlayer[][]        # the two teams, rank-sorted (totals / quality)
 ---@field positions    UICustomLobbyBalancePosition[]        # ordered mirror rows (k-th seat each side), for the preview
----@field totals       number[]                              # per-side PL totals
+---@field totals       number[]                              # per-side total mean (sum of the players' means)
+---@field devTotals    number[]                              # per-side total deviation (sum of the players' deviations)
 ---@field lockedOwners table<UILobbyPeerId, boolean>         # user-locked players (the preview marks them)
 ---@field unassigned   UICustomLobbyBalancePlayer | false    # the odd one left in place, if any
 ---@field feasible     boolean                               # false = nothing to apply (Apply disabled)
@@ -282,6 +283,7 @@ local function NewPlan(teams)
         sides = { {}, {} },
         positions = {},
         totals = { 0, 0 },
+        devTotals = { 0, 0 },
         lockedOwners = {},
         unassigned = false,
         feasible = false,
@@ -294,7 +296,7 @@ local function NewPlan(teams)
 end
 
 --- Scores a concrete `arrangement` (slot -> ownerId) into `plan`: the two rank-sorted sides, the
---- per-side PL totals, the moved flags (vs. each player's current lobby seat), the current-seating
+--- per-side total mean, the moved flags (vs. each player's current lobby seat), the current-seating
 --- quality, and the proposed quality + win split. Pure display computation — it moves no one.
 --- `players` / `seatSide` come from Project.
 ---@param plan UICustomLobbyBalancePlan
@@ -331,10 +333,13 @@ local function ScorePlan(plan, players, seatSide, arrangement)
     table.sort(plan.sides[2], ByRatingDesc)
     for side = 1, 2 do
         local total = 0
+        local devTotal = 0
         for _, bp in ipairs(plan.sides[side]) do
-            total = total + bp.pl
+            total = total + bp.mean
+            devTotal = devTotal + bp.dev
         end
         plan.totals[side] = total
+        plan.devTotals[side] = devTotal
     end
 
     plan.quality = ComputeQuality(plan.sides)
