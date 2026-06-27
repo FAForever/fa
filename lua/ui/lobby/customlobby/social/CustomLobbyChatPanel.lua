@@ -47,7 +47,7 @@ local Grid = import("/lua/maui/grid.lua").Grid
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 
 -- flip to true to tint this panel's sections (the feed grid vs. the edit box) — see /lua/ui/CLAUDE.md § 7.1
-local Debug = true
+local Debug = false
 
 local CustomLobbyChatModel = import("/lua/ui/lobby/customlobby/social/customlobbychatmodel.lua")
 local CustomLobbyChatController = import("/lua/ui/lobby/customlobby/social/customlobbychatcontroller.lua")
@@ -65,6 +65,13 @@ local EditHeight = 20
 local EditGap = 6
 local RowFont = 13
 local NameMax = 90               -- truncate the rendered line so it can't bleed past the row (no clip in MAUI)
+
+-- the input field: a bordered, filled box at the bottom so it's clear where to type
+local FieldHeight = 24
+local FieldInset = 5             -- horizontal text padding inside the field
+local FieldColor = 'ff10151b'        -- field fill
+local FieldBorderColor = 'ff2b333d'  -- field 1px border
+local PromptColor = 'ff5a606a'       -- the dim "type a message" placeholder
 
 -- line colours by status / kind
 local ChatColor = 'ffc8ccd0'     -- a confirmed chat line
@@ -107,7 +114,10 @@ end
 ---@field Grid Grid | false
 ---@field RowWidth number          # unscaled row width (recomputed each Refresh from the panel width)
 ---@field Scrollbar Scrollbar | false
+---@field EditFrame Bitmap         # input-field border
+---@field EditField Bitmap         # input-field fill (inset 1px inside the border)
 ---@field EditBox Edit
+---@field Prompt Text              # dim "type a message" placeholder, shown while the box is empty
 ---@field Empty Text
 ---@field EntriesObserver LazyVar
 ---@field DebugPanel? Bitmap
@@ -130,6 +140,15 @@ local CustomLobbyChatPanel = ClassUI(Group) {
         self.Empty:DisableHitTest()
         self.Empty:Hide()
 
+        -- a bordered, filled input field at the bottom so it's clear where to type. Created before the
+        -- edit box (and prompt) so they render on top of it (sibling depth follows creation order).
+        self.EditFrame = Bitmap(self)
+        self.EditFrame:SetSolidColor(FieldBorderColor)
+        self.EditFrame:DisableHitTest()
+        self.EditField = Bitmap(self)
+        self.EditField:SetSolidColor(FieldColor)
+        self.EditField:DisableHitTest()
+
         self.EditBox = Edit(self)
         -- `SetupEditStd` reads the control's bounds before `__post_init` runs; seed placeholder values
         -- so it doesn't trip the default circular Left/Right/Width chain (see /lua/ui/CLAUDE.md § 1).
@@ -139,11 +158,25 @@ local CustomLobbyChatPanel = ClassUI(Group) {
             UIUtil.highlightColor, UIUtil.bodyFont, 14, 200)
         self.EditBox:ShowBackground(false)
         self.EditBox:SetText('')
+
+        -- a dim placeholder shown while the box is empty (hidden as soon as there's text)
+        self.Prompt = UIUtil.CreateText(self, "Type a message…", RowFont, UIUtil.bodyFont)
+        self.Prompt:SetColor(PromptColor)
+        self.Prompt:DisableHitTest()
+
         self.EditBox.OnEnterPressed = function(_, text)
             if text and text ~= '' then
                 CustomLobbyChatController.Send(text)
             end
             self.EditBox:SetText('')
+            self.Prompt:Show()
+        end
+        self.EditBox.OnTextChanged = function(_, newText)
+            if newText and newText ~= '' then
+                self.Prompt:Hide()
+            else
+                self.Prompt:Show()
+            end
         end
 
         -- created/destroyed with its tab, so always the live panel while it exists — the observer just
@@ -157,14 +190,25 @@ local CustomLobbyChatPanel = ClassUI(Group) {
 
     ---@param self UICustomLobbyChatPanel
     __post_init = function(self)
-        -- The `__init` placeholder pinned Left/Top/Width/Height (so SetupEditStd could read bounds).
-        -- Override every one here, and ResetWidth/ResetTop to drop the placeholder's concrete Width(200)
-        -- and Top(0) — otherwise Top stays 0 (frame top) and the grid, whose bottom anchors to the edit
-        -- box's top, gets dragged up out of the panel.
-        Layouter(self.EditBox)
-            :AtLeftIn(self, Pad):AtRightIn(self, Pad):ResetWidth()
-            :AtBottomIn(self, Pad):Height(EditHeight):ResetTop()
+        -- the input field (border + inset fill) pinned to the bottom
+        Layouter(self.EditFrame)
+            :AtLeftIn(self, Pad):AtRightIn(self, Pad)
+            :AtBottomIn(self, Pad):Height(FieldHeight)
             :End()
+        Layouter(self.EditField)
+            :AtLeftIn(self.EditFrame, 1):AtRightIn(self.EditFrame, 1)
+            :AtTopIn(self.EditFrame, 1):AtBottomIn(self.EditFrame, 1)
+            :End()
+
+        -- The `__init` placeholder pinned Left/Top/Width/Height (so SetupEditStd could read bounds).
+        -- Override every one here, and ResetWidth to drop the placeholder's concrete Width(200);
+        -- AtVerticalCenterIn re-sets Top (off the placeholder's 0), centring the box in the field.
+        Layouter(self.EditBox)
+            :AtLeftIn(self.EditField, FieldInset):AtRightIn(self.EditField, FieldInset):ResetWidth()
+            :Height(EditHeight):AtVerticalCenterIn(self.EditField)
+            :End()
+        Layouter(self.Prompt):AtLeftIn(self.EditField, FieldInset):AtVerticalCenterIn(self.EditField):End()
+
         Layouter(self.Empty):AtHorizontalCenterIn(self):AtTopIn(self, Pad):End()
 
         if Debug then
@@ -188,16 +232,21 @@ local CustomLobbyChatPanel = ClassUI(Group) {
         self.Ready = true
 
         -- Chat is the default tab, so this can run during the initial mount before the panel's width
-        -- has settled. So anchor the grid's right edge **reactively** into the panel (reserving the
-        -- scrollbar gutter) rather than baking a fixed width from a possibly-stale `self.Width()` — the
-        -- scrollbar attaches to `grid.Right`, so a stale right edge throws the bar way off. The itemWidth
-        -- ctor arg only drives horizontal column count (we have one column); vertical scrolling keys off
-        -- itemHeight, so a best-effort width is fine and the row widths are recomputed in Refresh.
+        -- has settled. So anchor the grid's edges **reactively** into the panel (left+right insets,
+        -- reserving the scrollbar gutter) rather than baking a fixed width from a possibly-stale
+        -- `self.Width()` — the scrollbar attaches to `grid.Right`, so a stale right edge throws the bar
+        -- way off.
+        --
+        -- The Grid hides any item outside its visible window; the visible **column** count is
+        -- `floor(gridWidth / itemWidth)`, so if itemWidth ever exceeds the grid's content width the count
+        -- is 0 and EVERY row is hidden (rows present, nothing drawn). This is a single-column list, so the
+        -- column stride is irrelevant — pass itemWidth = 1 to guarantee ≥ 1 visible column regardless of
+        -- width/timing; the rows are sized from the real content width in Refresh.
         self.RowWidth = self:ComputeRowWidth()
-        self.Grid = Grid(self, self.RowWidth, RowHeight)
+        self.Grid = Grid(self, 1, RowHeight)
         Layouter(self.Grid)
             :AtLeftIn(self, Pad):AtRightIn(self, ScrollGap)
-            :AtTopIn(self, Pad):AnchorToTop(self.EditBox, EditGap)
+            :AtTopIn(self, Pad):AnchorToTop(self.EditFrame, EditGap)
             :End()
         self.Scrollbar = UIUtil.CreateVertScrollbarFor(self.Grid)
         self.Scrollbar:Hide()   -- shown by UpdateScrollbar only when the feed overflows
@@ -215,13 +264,14 @@ local CustomLobbyChatPanel = ClassUI(Group) {
         self:Refresh()
     end,
 
-    --- The current content width (panel width minus the scrollbar gutter), unscaled for row sizing.
-    --- Clamped to a sane minimum so an early/unsettled read can't produce a negative width.
+    --- The grid's content width (panel width minus the left pad and the scrollbar gutter), unscaled,
+    --- for row sizing. Matches the grid's `:AtLeftIn(self, Pad):AtRightIn(self, ScrollGap)` insets so a
+    --- row spans exactly the visible feed. Clamped so an early/unsettled read can't go negative.
     ---@param self UICustomLobbyChatPanel
     ---@return number
     ComputeRowWidth = function(self)
         local scale = LayoutHelpers.GetPixelScaleFactor()
-        return math.max(32, math.floor(self.Width() / scale) - ScrollGap)
+        return math.max(32, math.floor(self.Width() / scale) - Pad - ScrollGap)
     end,
 
     --- Rebuilds the list from the current entries, keeping the view pinned to the newest line unless

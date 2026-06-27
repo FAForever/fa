@@ -113,7 +113,7 @@ local function GearAction(onOpen, title, body)
 end
 
 -- flip to tint each layout area so the regions are visible while iterating
-local Debug = true
+local Debug = false
 
 -- the lobby content is designed for the 1024x768 floor; the root fills the frame (full-screen
 -- backdrop) but the content is centered and capped to this size, so it never stretches on a
