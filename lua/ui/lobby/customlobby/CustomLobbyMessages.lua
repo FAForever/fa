@@ -206,6 +206,63 @@ CustomLobbyMessages = {
         end,
     },
 
+    -- A client asks the host to broadcast a chat line. Any connected peer may ask; the host is the
+    -- single chokepoint that decides whether to relay it (future filtering/muting/rate-limiting lives
+    -- in ProcessRequestChat). The host's own lines short-circuit straight to that handler.
+    RequestChat = {
+        ---@class UICustomLobbyRequestChatMessage : UILobbyReceivedMessage
+        ---@field Text string
+        ---@field Id string   # the sender's client-stamped id, echoed back so the sender can reconcile
+
+        ---@param data UICustomLobbyRequestChatMessage
+        Validate = function(lobby, data)
+            if type(data.Text) ~= 'string' or data.Text == '' then
+                return false, "RequestChat has no Text"
+            end
+            if type(data.Id) ~= 'string' then
+                return false, "RequestChat has no Id"
+            end
+            return true
+        end,
+        Accept = function(lobby, data)
+            -- any connected peer may request a chat line — the host filters in ProcessRequestChat
+            return true
+        end,
+        ---@param data UICustomLobbyRequestChatMessage
+        Handler = function(lobby, data)
+            CustomLobbyController.ProcessRequestChat(lobby, data)
+        end,
+    },
+
+    -- The host's authoritative broadcast of an accepted chat line (with the sender's name resolved
+    -- host-side). Every peer appends it; the originating peer reconciles its optimistic Pending line by
+    -- the echoed Id. Sent to everyone (a whisper, slice 3, will send to a subset instead).
+    ChatMessage = {
+        ---@class UICustomLobbyChatMessageMessage : UILobbyReceivedMessage
+        ---@field Id string
+        ---@field SenderID UILobbyPeerId
+        ---@field SenderName string
+        ---@field Text string
+
+        ---@param data UICustomLobbyChatMessageMessage
+        Validate = function(lobby, data)
+            if type(data.Text) ~= 'string' or data.Text == '' then
+                return false, "ChatMessage has no Text"
+            end
+            if type(data.Id) ~= 'string' then
+                return false, "ChatMessage has no Id"
+            end
+            return true
+        end,
+        Accept = function(lobby, data)
+            return RequireFromHost(lobby, data)
+        end,
+        ---@param data UICustomLobbyChatMessageMessage
+        Handler = function(lobby, data)
+            CustomLobbyController.ProcessChatMessage(lobby, data)
+        end,
+    },
+
     -- The host tells everyone still connected to drop their direct link to a peer
     -- that left, so the mesh is cleaned up (the player state follows via SetPlayers).
     DisconnectPeer = {

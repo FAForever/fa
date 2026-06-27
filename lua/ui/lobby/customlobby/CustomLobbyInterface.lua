@@ -69,6 +69,7 @@ local CustomLobbySlotsInterface = import("/lua/ui/lobby/customlobby/slots/custom
 local CustomLobbyConfigInterface = import("/lua/ui/lobby/customlobby/config/customlobbyconfiginterface.lua")
 local CustomLobbyTabs = import("/lua/ui/lobby/customlobby/customlobbytabs.lua")
 local CustomLobbyChatPanel = import("/lua/ui/lobby/customlobby/social/customlobbychatpanel.lua")
+local CustomLobbyChatModel = import("/lua/ui/lobby/customlobby/social/customlobbychatmodel.lua")
 local CustomLobbyObserversPanel = import("/lua/ui/lobby/customlobby/social/customlobbyobserverspanel.lua")
 local CustomLobbyLogsPanel = import("/lua/ui/lobby/customlobby/social/customlobbylogspanel.lua")
 local CustomLobbyPresetSelect = import("/lua/ui/lobby/customlobby/presetselect/customlobbypresetselect.lua")
@@ -215,7 +216,13 @@ local CustomLobbyInterface = Class(Group) {
         --#region bottom-left: chat / observers tabs
         -- each tab gets a config gear (left) + a count pill (right), mirroring the config column.
         -- Chat's count is a dummy until the chat slice lands; Observers shows the live observer count.
-        self.ChatBadge = self.Trash:Add(LazyVarCreate("0"))     -- TODO: real unread count with the chat slice
+        -- reacts to the chat feed; shows the line count (empty when none). TODO: unread-since-last-view
+        -- count once the chat slice tracks a last-seen marker.
+        self.ChatBadge = self.Trash:Add(LazyVarCreate())
+        self.ChatBadge:Set(function()
+            local count = table.getn(CustomLobbyChatModel.GetSingleton().Entries())
+            return count > 0 and tostring(count) or ""
+        end)
         self.ObserversBadge = self.Trash:Add(LazyVarCreate())
         self.ObserversBadge:Set(function()
             return tostring(table.getn(CustomLobbyLaunchModel.GetSingleton().Observers()))

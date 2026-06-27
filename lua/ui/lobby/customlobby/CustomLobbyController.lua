@@ -42,6 +42,7 @@ local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/models/customl
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/models/customlobbylocalmodel.lua")
 local CustomLobbySession = import("/lua/ui/lobby/customlobby/customlobbysession.lua")
 local CustomLobbyPresets = import("/lua/ui/lobby/customlobby/customlobbypresets.lua")
+local CustomLobbyChatModel = import("/lua/ui/lobby/customlobby/social/customlobbychatmodel.lua")
 
 --- The live lobby object, set by the first engine callback. UI-triggered intents
 --- (RequestSetReady, …) reach the network through it without threading it everywhere.
@@ -92,7 +93,24 @@ local function PlayerInSlot(slot)
     return CustomLobbyLaunchModel.GetSingleton().Players[slot]() or nil
 end
 
---- A plain per-slot snapshot of all players (false for empty), for the wire.
+--- The display name of the peer that owns `ownerId` — its seated player's `PlayerName`, else its
+--- observer entry's, else the raw peer id. The host uses this to stamp chat lines authoritatively
+--- (clients don't get to spoof a name); the chat send pipeline uses it for the optimistic echo.
+---@param ownerId UILobbyPeerId
+---@return string
+function FindNameForOwner(ownerId)
+    local slot = FindSlotForOwner(ownerId)
+    local player = slot and PlayerInSlot(slot)
+    if player then
+        return player.PlayerName
+    end
+    for _, observer in CustomLobbyLaunchModel.GetSingleton().Observers() do
+        if observer.OwnerID == ownerId then
+            return observer.PlayerName
+        end
+    end
+    return tostring(ownerId)
+end
 ---@return table
 local function GatherPlayers()
     local launch = CustomLobbyLaunchModel.GetSingleton()
@@ -518,6 +536,38 @@ end
 ---@param data UICustomLobbyLaunchGameMessage
 function ProcessLaunchGame(instance, data)
     instance:LaunchGame(data.GameConfig)
+end
+
+--- Everyone applies the host's authoritative chat line: appends it, or reconciles the sender's own
+--- optimistic Pending line by the echoed Id (see CustomLobbyChatModel.Receive).
+---@param instance UICustomLobbyInstance
+---@param data UICustomLobbyChatMessageMessage
+function ProcessChatMessage(instance, data)
+    CustomLobbyChatModel.Receive(CustomLobbyChatModel.GetSingleton(), {
+        Id = data.Id,
+        SenderId = data.SenderID,
+        SenderName = data.SenderName,
+        Text = data.Text,
+    })
+end
+
+--- Host relays an accepted chat line — **the single chat chokepoint**. Resolves the sender's name
+--- authoritatively (clients don't get to spoof it), broadcasts the line to everyone, and shows it in
+--- the host's own feed (a broadcast doesn't loop back to the sender). Future mute / rate-limit /
+--- slow-mode filtering lives right here: inspect `data` and return early to drop it.
+---@param instance UICustomLobbyInstance
+---@param data UICustomLobbyRequestChatMessage
+function ProcessRequestChat(instance, data)
+    local message = {
+        Type = 'ChatMessage',
+        Id = data.Id,
+        SenderID = data.SenderID,
+        SenderName = FindNameForOwner(data.SenderID),
+        Text = data.Text,
+    }
+    instance:BroadcastData(message)
+    -- the broadcast doesn't echo back to us, so display it in the host's own feed directly
+    ProcessChatMessage(instance, message)
 end
 
 --#endregion
@@ -1283,6 +1333,26 @@ function RequestSetReady(ready)
         end
     else
         instance:SendData(localModel.HostID(), { Type = 'SetReady', Ready = ready and true or false })
+    end
+end
+
+--- The local player sends a chat line. The host short-circuits straight to its relay chokepoint; a
+--- client asks the host. `id` is the sender's client-stamped id (CustomLobbyChatModel.NextId), echoed
+--- back in the broadcast so the sender's optimistic Pending line can reconcile. See
+--- CustomLobbyChatController for the send pipeline that calls this.
+---@param text string
+---@param id string
+function RequestChat(text, id)
+    local instance = LobbyInstance
+    if not instance then
+        return
+    end
+
+    local localModel = CustomLobbyLocalModel.GetSingleton()
+    if localModel.IsHost() then
+        ProcessRequestChat(instance, { SenderID = localModel.LocalPeerId(), Text = text, Id = id })
+    else
+        instance:SendData(localModel.HostID(), { Type = 'RequestChat', Text = text, Id = id })
     end
 end
 
