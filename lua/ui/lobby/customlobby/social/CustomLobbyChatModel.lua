@@ -47,6 +47,11 @@ local MaxEntries = 200
 --- be unique within this peer's session; the peer-id prefix keeps them unique across peers).
 local SendCounter = 0
 
+--- The baseline for the relative clock (set when the feed is created). Entries store absolute
+--- `GetSystemTimeSeconds()`; subtract this to render a `mm:ss` stamp like the traffic log.
+---@type number | nil
+local StartTime = nil
+
 ---@alias UICustomLobbyChatStatus
 ---| 'Pending'   # an outgoing line shown optimistically, awaiting the host's echo
 ---| 'Confirmed' # the host broadcast it (authoritative)
@@ -111,8 +116,16 @@ local ChatModel = ClassSimple {
 ---@return UICustomLobbyChatModel
 function SetupSingleton()
     Instance = ChatModel()
+    StartTime = GetSystemTimeSeconds()
     CustomLobbySession.GetTrash():Add(Instance)
     return Instance
+end
+
+--- The relative-clock baseline (when this feed started). Subtract from an entry's `Time` to render a
+--- `mm:ss` stamp, the same way the traffic log does.
+---@return number
+function GetStartTime()
+    return StartTime or GetSystemTimeSeconds()
 end
 
 --- Returns the chat-model singleton, creating (and registering) it on first access — including after a
@@ -153,6 +166,23 @@ function Append(model, entry)
         table.remove(entries, 1)
     end
     model.Entries:Set(entries)
+end
+
+--- Appends a system notice (a senderless `Confirmed` line — command feedback, join/leave, …). The one
+--- place the system-entry shape is built, so the chat controller (local notices) and the lobby
+--- controller (host-broadcast join/leave) stay in step.
+---@param model UICustomLobbyChatModel
+---@param text string
+function AppendSystem(model, text)
+    Append(model, {
+        Id = false,
+        SenderId = false,
+        SenderName = "System",
+        Text = text,
+        Status = 'Confirmed',
+        Kind = 'system',
+        Time = GetSystemTimeSeconds(),
+    })
 end
 
 --- Applies an authoritative chat message from the host. If we already hold a `Pending` entry with the

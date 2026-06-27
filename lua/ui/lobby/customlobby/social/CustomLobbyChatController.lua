@@ -44,15 +44,7 @@ local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/models/customlob
 --- Appends a local-only system line (command feedback). Local to this peer; nothing is sent.
 ---@param text string
 function AppendLocalSystem(text)
-    CustomLobbyChatModel.Append(CustomLobbyChatModel.GetSingleton(), {
-        Id = false,
-        SenderId = false,
-        SenderName = "System",
-        Text = text,
-        Status = 'Confirmed',
-        Kind = 'system',
-        Time = GetSystemTimeSeconds(),
-    })
+    CustomLobbyChatModel.AppendSystem(CustomLobbyChatModel.GetSingleton(), text)
 end
 
 --- Sends a chat line. A slash line is a command (handled locally, never broadcast); anything else is

@@ -263,6 +263,29 @@ CustomLobbyMessages = {
         end,
     },
 
+    -- The host's authoritative lobby notice — a senderless system line shown in chat (a peer joined /
+    -- left, etc.). The host is the single source so every peer shows the same notice with no per-peer
+    -- roster diffing; the leaver simply isn't there to receive its own "left" line.
+    SystemNotice = {
+        ---@class UICustomLobbySystemNoticeMessage : UILobbyReceivedMessage
+        ---@field Text string
+
+        ---@param data UICustomLobbySystemNoticeMessage
+        Validate = function(lobby, data)
+            if type(data.Text) ~= 'string' or data.Text == '' then
+                return false, "SystemNotice has no Text"
+            end
+            return true
+        end,
+        Accept = function(lobby, data)
+            return RequireFromHost(lobby, data)
+        end,
+        ---@param data UICustomLobbySystemNoticeMessage
+        Handler = function(lobby, data)
+            CustomLobbyController.ProcessSystemNotice(lobby, data)
+        end,
+    },
+
     -- The host tells everyone still connected to drop their direct link to a peer
     -- that left, so the mesh is cleaned up (the player state follows via SetPlayers).
     DisconnectPeer = {

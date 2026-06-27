@@ -73,11 +73,27 @@ local FieldColor = 'ff10151b'        -- field fill
 local FieldBorderColor = 'ff2b333d'  -- field 1px border
 local PromptColor = 'ff5a606a'       -- the dim "type a message" placeholder
 
+-- the time column (a relative mm:ss stamp at the left of each row, like the Logs tab)
+local TimeFont = 11
+local TimeWidth = 30             -- fits "mm:ss"
+local TimeGap = 4
+local TimeColor = 'ff6a707a'
+local TimeLeft = Pad
+local NameLeft = TimeLeft + TimeWidth + TimeGap   -- the message text starts after the time column
+
 -- line colours by status / kind
 local ChatColor = 'ffc8ccd0'     -- a confirmed chat line
 local PendingColor = 'ff7e848c'  -- our own line, awaiting the host's echo (dimmed)
 local RejectedColor = 'ff8a5a52'  -- the host dropped it (greyed-red, sender only)
 local SystemColor = 'ff8a909a'   -- a local system notice
+
+--- `mm:ss` from a seconds offset (Lua 5.0 — no `%`, use `math.mod`). Mirrors the Logs tab.
+---@param seconds number
+---@return string
+local function FormatClock(seconds)
+    local whole = math.floor(seconds)
+    return string.format("%02d:%02d", math.floor(whole / 60), math.mod(whole, 60))
+end
 
 --- Truncates `text` to `maxChars`, appending "…" when it had to cut.
 ---@param text string
@@ -346,11 +362,18 @@ local CustomLobbyChatPanel = ClassUI(Group) {
         local row = Group(self.Grid, "CustomLobbyChatRow")
         LayoutHelpers.SetDimensions(row, self.RowWidth, RowHeight)
 
+        -- a relative mm:ss stamp at the left (entries store absolute time; the feed's start is the baseline)
+        local time = UIUtil.CreateText(row,
+            FormatClock(entry.Time - CustomLobbyChatModel.GetStartTime()), TimeFont, UIUtil.bodyFont)
+        time:SetColor(TimeColor)
+        time:DisableHitTest()
+        Layouter(time):AtLeftIn(row, TimeLeft):AtVerticalCenterIn(row):End()
+
         local label, color = RenderEntry(entry)
         local line = UIUtil.CreateText(row, Truncate(label, NameMax), RowFont, UIUtil.bodyFont)
         line:SetColor(color)
         line:DisableHitTest()
-        Layouter(line):AtLeftIn(row, Pad):AtRightIn(row, Pad):AtVerticalCenterIn(row):End()
+        Layouter(line):AtLeftIn(row, NameLeft):AtRightIn(row, Pad):AtVerticalCenterIn(row):End()
 
         return row
     end,

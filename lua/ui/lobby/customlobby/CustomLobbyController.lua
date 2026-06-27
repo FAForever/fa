@@ -392,6 +392,12 @@ function OnPeerDisconnected(instance, peerName, uid)
     -- tell the remaining peers to tear down their direct connection to the leaver
     instance:BroadcastData({ Type = 'DisconnectPeer', PeerID = uid })
 
+    -- resolve the leaver's name before its slot is cleared (engine peerName as the fallback)
+    local name = FindNameForOwner(uid)
+    if name == tostring(uid) and peerName and peerName ~= '' then
+        name = peerName
+    end
+
     local slot = FindSlotForOwner(uid)
     local lockChanged = false
     if slot then
@@ -402,6 +408,9 @@ function OnPeerDisconnected(instance, peerName, uid)
     if lockChanged then
         BroadcastSessionState(instance)
     end
+
+    -- announce the leave in chat (the leaver is gone; the remaining peers + host see it)
+    BroadcastSystemNotice(instance, name .. " left.")
 end
 
 --- Called when the game launches. The engine has taken over in its own Lua state, so the lobby's
@@ -444,6 +453,9 @@ function ProcessAddPlayer(instance, data)
     -- them the map preview / slot grid have nothing to render
     BroadcastLaunchInfo(instance)
     BroadcastSessionState(instance)
+
+    -- announce the join in chat (reaches everyone, including the peer that just joined)
+    BroadcastSystemNotice(instance, (player.PlayerName or "A player") .. " joined.")
 end
 
 --- Everyone applies the host's player + observer snapshot (launch state).
@@ -551,6 +563,13 @@ function ProcessChatMessage(instance, data)
     })
 end
 
+--- Everyone shows the host's lobby notice as a system line in chat (a peer joined / left, …).
+---@param instance UICustomLobbyInstance
+---@param data UICustomLobbySystemNoticeMessage
+function ProcessSystemNotice(instance, data)
+    CustomLobbyChatModel.AppendSystem(CustomLobbyChatModel.GetSingleton(), data.Text)
+end
+
 --- Host relays an accepted chat line — **the single chat chokepoint**. Resolves the sender's name
 --- authoritatively (clients don't get to spoof it), broadcasts the line to everyone, and shows it in
 --- the host's own feed (a broadcast doesn't loop back to the sender). Future mute / rate-limit /
@@ -568,6 +587,16 @@ function ProcessRequestChat(instance, data)
     instance:BroadcastData(message)
     -- the broadcast doesn't echo back to us, so display it in the host's own feed directly
     ProcessChatMessage(instance, message)
+end
+
+--- Host emits a lobby notice (a senderless system line) to everyone and shows it locally too (the
+--- broadcast doesn't loop back). Host-only; call it from the join/leave hooks.
+---@param instance UICustomLobbyInstance
+---@param text string
+function BroadcastSystemNotice(instance, text)
+    local message = { Type = 'SystemNotice', Text = text }
+    instance:BroadcastData(message)
+    ProcessSystemNotice(instance, message)
 end
 
 --#endregion
