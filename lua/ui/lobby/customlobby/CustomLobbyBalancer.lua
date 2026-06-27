@@ -390,30 +390,38 @@ function ScoreArrangement(slots, teams, arrangement, locks)
     return plan
 end
 
---- Re-solves the UNLOCKED players into a balanced two-side split, keeping locked players (and, for an
---- odd roster, the lowest-rated unlocked player) pinned at their seat in `arrangement` — so a balance
---- honours where the host has already locked people, even when those seats differ from the lobby (e.g.
---- a player the balance itself moved, then the host locked). Used for the first proposal (from the
---- identity arrangement) and for Retry. `locks` is the working lock set (see Project).
+-- how many candidate splits the search keeps (caller asks for `count`; we collect a wider pool so that
+-- after discarding mirror-equivalent splits there are still enough genuinely-different ones)
+local DefaultCandidateCount = 5
+
+--- Builds up to `count` candidate balance plans — the best distinct team splits, each a complete,
+--- scored plan — best-first by match quality. The host browses them in the preview. Re-solves the
+--- UNLOCKED players, keeping locked players (and, for an odd roster, the lowest-rated unlocked player)
+--- pinned at their seat in `arrangement` — so a balance honours where the host has already locked
+--- people, even when those seats differ from the lobby. Each candidate gets its own random position
+--- shuffle. Always returns a non-empty list; an infeasible case is a single plan carrying the reason.
 ---@param slots UICustomLobbySlot[]
 ---@param teams UICustomLobbyTeams
 ---@param arrangement table<number, UILobbyPeerId>     # current seats (pinned players are read from here)
 ---@param locks table<UILobbyPeerId, boolean> | nil
----@return UICustomLobbyBalancePlan
-function Rebalance(slots, teams, arrangement, locks)
-    local plan = NewPlan(teams)
+---@param count? number                                # how many candidates to return (default 5)
+---@return UICustomLobbyBalancePlan[]
+function BuildCandidates(slots, teams, arrangement, locks, count)
+    count = count or DefaultCandidateCount
 
     -- the feature is gated to a binary AutoTeams mode with a resolved split; bail defensively otherwise
     if not (teams and teams.Mode) or not teams.Resolved then
+        local plan = NewPlan(teams)
         plan.reason = "Auto-balance needs an AutoTeams mode with a loaded map."
-        return plan
+        return { plan }
     end
 
     local players, seatSide, seatClosed = Project(slots, locks)
     local occupiedCount = table.getn(players)
     if occupiedCount < 2 then
+        local plan = NewPlan(teams)
         plan.reason = "Need at least two players to balance."
-        return plan
+        return { plan }
     end
 
     -- where each player currently sits (its seat in the working arrangement, or its lobby seat if it
@@ -427,6 +435,8 @@ function Rebalance(slots, teams, arrangement, locks)
     -- pinned = locked players + (odd roster) the lowest-rated unlocked player, left in place so the rest
     -- pair up (never ejected)
     local pinned = {}
+    ---@type UICustomLobbyBalancePlayer | false
+    local unassigned = false
     for _, bp in ipairs(players) do
         if bp.locked then
             pinned[bp.ownerId] = true
@@ -441,12 +451,12 @@ function Rebalance(slots, teams, arrangement, locks)
         end
         if odd then
             pinned[odd.ownerId] = true
-            plan.unassigned = odd
+            unassigned = odd
         end
     end
 
     -- pinned players hold their current seat (off-limits to the search); everyone else is the free pool
-    local solved = {}
+    local solvedBase = {}
     local pinnedSlots = {}
     local lockedMean = { 0, 0 }
     local lockedDev = { 0, 0 }
@@ -459,7 +469,7 @@ function Rebalance(slots, teams, arrangement, locks)
         if pinned[bp.ownerId] then
             local seat = slotOf[bp.ownerId] or bp.slot
             local side = seatSide[seat] or bp.side
-            solved[seat] = bp.ownerId
+            solvedBase[seat] = bp.ownerId
             pinnedSlots[seat] = true
             lockedMean[side] = lockedMean[side] + bp.mean
             lockedDev[side] = lockedDev[side] + bp.dev
@@ -488,24 +498,76 @@ function Rebalance(slots, teams, arrangement, locks)
         freePool[i], freePool[j] = freePool[j], freePool[i]
     end
 
+    --- Builds + scores one plan from a chosen side-A index set (a position shuffle per call).
+    ---@param chosenList number[]
+    ---@return UICustomLobbyBalancePlan
+    local function PlanFor(chosenList)
+        local chosen = {}
+        for _, index in ipairs(chosenList) do
+            chosen[index] = true
+        end
+        local freeA, freeB = {}, {}
+        for i = 1, freeCount do
+            table.insert(chosen[i] and freeA or freeB, freePool[i])
+        end
+        table.sort(freeA, ByRatingDesc)
+        table.sort(freeB, ByRatingDesc)
+        local arr = table.copy(solvedBase)
+        ShufflePairsIntoSeats(freeA, freeB, freeSeats[1], freeSeats[2],
+            function(slot, bp) arr[slot] = bp.ownerId end)
+        local plan = NewPlan(teams)
+        plan.unassigned = unassigned
+        ScorePlan(plan, players, seatSide, arr)
+        plan.feasible = freeCount > 0
+        return plan
+    end
+
+    -- nothing to rearrange (everyone pinned): one plan showing the pinned board
+    if freeCount == 0 then
+        local plan = PlanFor({})
+        plan.feasible = false
+        plan.reason = "Every player is locked in place — nothing to rearrange."
+        return { plan }
+    end
+
     -- how many free players go to side A: aim for equal final sizes, clamped to each side's free seats
     local capA, capB = table.getn(freeSeats[1]), table.getn(freeSeats[2])
     local placedA = math.floor((freeCount + lockedCount[2] - lockedCount[1]) / 2 + 0.5)
     local minA = math.max(0, freeCount - capB)
     local maxA = math.min(freeCount, capA)
     if minA > maxA then
+        local plan = NewPlan(teams)
         plan.reason = "The locked players don't fit the team layout."
-        ScorePlan(plan, players, seatSide, solved)       -- still show the pinned players
-        return plan
+        ScorePlan(plan, players, seatSide, solvedBase)   -- still show the pinned players
+        return { plan }
     end
     if placedA < minA then placedA = minA end
     if placedA > maxA then placedA = maxA end
 
-    -- search: choose placedA free players for side A, minimising the cheap rating-imbalance heuristic
+    -- search: enumerate side-A choices, keeping the top `poolSize` by the cheap rating-imbalance
+    -- heuristic (a wider pool than `count`, so mirror-equivalent splits can be dropped below)
     local goalMean, goalDev = totalMean / 2, totalDev / 2
-    local best = { value = nil, chosen = nil }
+    local poolSize = math.max(count * 4, 12)
+    local kept = {}                                       -- {value, chosen}, sorted ascending by value
     local evaluations = 0
     local current = {}
+    local function consider(value)
+        local n = table.getn(kept)
+        if n >= poolSize and value >= kept[n].value then
+            return
+        end
+        local pos = n + 1
+        for i = 1, n do
+            if value < kept[i].value then
+                pos = i
+                break
+            end
+        end
+        table.insert(kept, pos, { value = value, chosen = table.copy(current) })
+        if table.getn(kept) > poolSize then
+            table.remove(kept)
+        end
+    end
     local function evaluate()
         local meanA, devA = lockedMean[1], lockedDev[1]
         for i = 1, table.getn(current) do
@@ -513,11 +575,7 @@ function Rebalance(slots, teams, arrangement, locks)
             meanA = meanA + bp.mean
             devA = devA + bp.dev
         end
-        local value = math.abs(devA - goalDev) * 1.2 + math.abs(meanA - goalMean)
-        if not best.value or value < best.value then
-            best.value = value
-            best.chosen = table.copy(current)
-        end
+        consider(math.abs(devA - goalDev) * 1.2 + math.abs(meanA - goalMean))
         evaluations = evaluations + 1
     end
     local function choose(startIndex, remaining)
@@ -539,41 +597,60 @@ function Rebalance(slots, teams, arrangement, locks)
     end
     choose(1, placedA)
 
-    -- split the free pool into the two sides per the best result
-    local chosen = {}
-    if best.chosen then
-        for _, index in ipairs(best.chosen) do
-            chosen[index] = true
+    -- build the best distinct splits, skipping mirror-equivalent ones (side A = the complement of an
+    -- already-taken split is the same matchup with the teams flipped)
+    local plans = {}
+    local seen = {}
+    for _, entry in ipairs(kept) do
+        if table.getn(plans) >= count then
+            break
+        end
+        local inA = {}
+        for _, index in ipairs(entry.chosen) do
+            inA[index] = true
+        end
+        local sigA, sigB = "", ""
+        for i = 1, freeCount do
+            if inA[i] then
+                sigA = sigA .. tostring(i) .. ","
+            else
+                sigB = sigB .. tostring(i) .. ","
+            end
+        end
+        local signature = (sigA < sigB) and (sigA .. "|" .. sigB) or (sigB .. "|" .. sigA)
+        if not seen[signature] then
+            seen[signature] = true
+            table.insert(plans, PlanFor(entry.chosen))
         end
     end
-    local freeA, freeB = {}, {}
-    for i = 1, freeCount do
-        table.insert(chosen[i] and freeA or freeB, freePool[i])
-    end
 
-    -- phase 2 + 3: rank-match the free players, scatter the pairs across the free mirror rows
-    table.sort(freeA, ByRatingDesc)
-    table.sort(freeB, ByRatingDesc)
-    ShufflePairsIntoSeats(freeA, freeB, freeSeats[1], freeSeats[2],
-        function(slot, bp) solved[slot] = bp.ownerId end)
-
-    ScorePlan(plan, players, seatSide, solved)
-    plan.feasible = freeCount > 0
-    if freeCount == 0 then
-        plan.reason = "Every player is locked in place — nothing to rearrange."
-    end
-    return plan
+    -- present the most balanced first (by the displayed metric — match quality)
+    table.sort(plans, function(p, q)
+        return (p.quality or 0) > (q.quality or 0)
+    end)
+    return plans
 end
 
---- Builds the first balance plan from the lobby's current seating — a fresh solve honouring `locks`
---- (the preview's working lock set; nil = the seats' own Locked flags). A convenience wrapper over
---- Rebalance from the identity arrangement.
+--- Re-solves into a single best balance plan — the first of BuildCandidates. Used where one plan is
+--- enough (Retry's re-roll picks among the candidate set in the preview).
+---@param slots UICustomLobbySlot[]
+---@param teams UICustomLobbyTeams
+---@param arrangement table<number, UILobbyPeerId>
+---@param locks table<UILobbyPeerId, boolean> | nil
+---@return UICustomLobbyBalancePlan
+function Rebalance(slots, teams, arrangement, locks)
+    return BuildCandidates(slots, teams, arrangement, locks, 1)[1]
+end
+
+--- Builds the candidate balance plans from the lobby's current seating — a fresh solve honouring
+--- `locks` (the preview's working lock set; nil = the seats' own Locked flags).
 ---@param slots UICustomLobbySlot[]
 ---@param teams UICustomLobbyTeams
 ---@param locks? table<UILobbyPeerId, boolean>
----@return UICustomLobbyBalancePlan
-function BuildPlan(slots, teams, locks)
-    return Rebalance(slots, teams, IdentityArrangement(slots), locks)
+---@param count? number
+---@return UICustomLobbyBalancePlan[]
+function BuildPlan(slots, teams, locks, count)
+    return BuildCandidates(slots, teams, IdentityArrangement(slots), locks, count)
 end
 
 --- The lobby update for a plan: the player -> slot arrangement to apply. `Team` is intentionally

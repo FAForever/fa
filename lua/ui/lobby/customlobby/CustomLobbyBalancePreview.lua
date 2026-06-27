@@ -30,16 +30,21 @@
 --                     kept preview-local: toggling one here is just a balancing constraint, never
 --                     written back (Cancel discards everything; Apply commits only the seating).
 --
+-- The host first **browses the candidate balances** — the kernel returns the top-N distinct splits
+-- (`BuildCandidates`), shown one at a time with a "< i / N >" browser; stepping through adopts each.
+--
 -- The body renders as **mirror positions** (row k = the k-th seat on each side, who face off; the
--- right column is mirrored so the teams face each other). Each row shows both players + the rating gap.
--- Three gestures drive it:
+-- right column is mirrored so the teams face each other): each row puts the name on the outer edge and
+-- the rating in a column hugging the centre (with the mean muted beside it) + the pair's gap in the
+-- centre. The header is the same shape — team label (outer), average (column) + total (muted), and the
+-- gap total in the centre band atop the per-row gaps. Three gestures tune the shown candidate:
 --   * **Drag a row** onto another → swap those two positions' pairs (both players move together),
 --     so the host arranges which pair spawns where ("D -> A").
 --   * **Click a player, then another** → swap just those two (`ScoreArrangement` re-scores, no solve).
---   * **Click a player's lock** → pin / unpin them (the next Retry holds them in place).
--- **Retry** re-solves the unlocked players around the locked ones (`Rebalance`). Moved players are
--- gold, locked players blue. The summary reports per-team total + average, the quality before -> after,
--- the predicted win split and the rating gap.
+--   * **Click a player's lock** → pin / unpin them, which **regenerates** the candidates around that
+--     constraint (the locked player held at its seat, the rest re-balanced).
+-- Moved players are gold, locked players blue. The status line reports quality before -> after and the
+-- predicted win split.
 --
 -- Built to the preset dialog's shape (areas layout, three-phase init, Popup singleton).
 
@@ -71,6 +76,8 @@ local RowHeight = 24
 local MaxRows = 8           -- binary AutoTeams on a 16-spawn map is at most 8 per side
 local LockSize = 12
 local PosLabelWidth = 16
+local CenterWidth = 54     -- fixed centre band (the gap number) so the rating columns line up across rows
+local NavSize = 22
 local ButtonGap = 8
 local DragThreshold = 5     -- cursor travel (screen px) before a press becomes a drag, not a click
 
@@ -107,22 +114,6 @@ local function CurrentSnapshot()
     return CustomLobbySlotsDerivedModel.GetSlots(), CustomLobbySlotsDerivedModel.GetTeams()
 end
 
---- "Name  ·  1850" for a player (rating omitted when unrated / AI). `mirror` reverses it to
---- "1850  ·  Name" so the right column faces the left — the name stays on the outer edge and the
---- rating reads inward toward the centre gap, exactly like the mirrored slot cards.
----@param player UICustomLobbyBalancePlayer
----@param mirror boolean
----@return string
-local function FormatPlayer(player, mirror)
-    if player.pl > 0 then
-        if mirror then
-            return tostring(player.pl) .. "  ·  " .. player.name
-        end
-        return player.name .. "  ·  " .. tostring(player.pl)
-    end
-    return player.name
-end
-
 --- The display colour for a player: blue = host-locked (pinned), gold = moved by the balance, grey =
 --- unchanged. Locked wins (a locked player never moves, so it can't also read as a mover).
 ---@param player UICustomLobbyBalancePlayer
@@ -154,9 +145,14 @@ end
 ---@field LeftSelect    Bitmap          # left half: swap-click / drag target + selection highlight
 ---@field RightSelect   Bitmap
 ---@field PosLabel      Text            # the position index (1..N)
----@field Left          Text
----@field Center        Text
----@field Right         Text
+---@field LeftName      Text            # outer edge
+---@field LeftMean      Text            # muted mean, just outside the rating
+---@field LeftRating    Text            # display rating, aligned in a column beside the centre
+---@field CenterArea    Group           # fixed-width centre band (holds the gap number)
+---@field Center        Text            # the pair's rating gap
+---@field RightRating   Text
+---@field RightMean     Text
+---@field RightName     Text
 ---@field LeftLock      Bitmap          # left player's lock toggle
 ---@field RightLock     Bitmap
 ---@field LeftOwner     UILobbyPeerId | nil   # who is on each half right now (set by Render)
@@ -168,6 +164,8 @@ end
 ---@field Trash TrashBag
 ---@field OnCloseCb fun()
 ---@field Result UICustomLobbyBalancePlan
+---@field Candidates UICustomLobbyBalancePlan[]           # the browsable top-N balances (best-first)
+---@field CandidateIndex number                           # which candidate is shown (1-based)
 ---@field Arrangement table<number, UILobbyPeerId>        # working seating (slot -> ownerId)
 ---@field Locks table<UILobbyPeerId, boolean>             # working lock set (preview-local)
 ---@field SelectedSlot number | nil                       # first half clicked for a swap
@@ -181,12 +179,20 @@ end
 ---@field ActionArea Group
 ---@field Title Text
 ---@field Hint Text
----@field HeaderA Text
----@field HeaderB Text
+---@field TeamLabelA Text        # team label, outer edge (like a player name)
+---@field TeamLabelB Text
+---@field TeamAvgA Text          # team average, centre column (aligned above the player ratings)
+---@field TeamAvgB Text
+---@field TeamTotalA Text        # team total, muted, just outside the average (like a player mean)
+---@field TeamTotalB Text
+---@field HeaderCenterArea Group # centre band (holds the gap total), aligned above the rows' centre band
+---@field HeaderGap Text         # the total rating gap between the teams
 ---@field Rows UICustomLobbyBalanceRow[]
 ---@field Status Text
+---@field NavPrev Bitmap          # browse to the previous candidate ("<")
+---@field NavNext Bitmap          # browse to the next candidate (">")
+---@field NavLabel Text           # "i / N"
 ---@field ApplyButton Button
----@field RetryButton Button
 ---@field CancelButton Button
 ---@field Ready boolean
 local CustomLobbyBalancePreview = ClassUI(Group) {
@@ -204,13 +210,15 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         self.SelectedOwner = nil
         self.DragGhost = false
 
-        -- seed the working state from the lobby: a fresh solve honouring the lobby's existing locks
-        -- (locks nil -> the kernel reads each seat's own Locked flag), then keep those locks local
+        -- seed the working state from the lobby: the candidate balances honouring the lobby's existing
+        -- locks (locks nil -> the kernel reads each seat's own Locked flag), then keep those locks local
         local slots, teams = CurrentSnapshot()
-        local plan = CustomLobbyBalancer.BuildPlan(slots, teams)
-        self.Result = plan
-        self.Arrangement = plan.arrangement
-        self.Locks = table.copy(plan.lockedOwners)
+        local candidates = CustomLobbyBalancer.BuildPlan(slots, teams)
+        self.Candidates = candidates
+        self.CandidateIndex = 1
+        self.Result = candidates[1]
+        self.Arrangement = self.Result.arrangement
+        self.Locks = table.copy(self.Result.lockedOwners)
 
         self.TitleArea = CreateArea(self, "TitleArea", 'ffcc4040')
         self.HintArea = CreateArea(self, "HintArea", 'ff404040')
@@ -227,13 +235,34 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         self.Hint:SetColor(MutedColor)
         self.Hint:DisableHitTest()
 
+        -- the team summary mirrors a player row: label (outer), total (muted) + average (centre column,
+        -- above the player ratings), and the gap total in the centre band above the per-row gaps
         local labels = self.Result.labels or { "Team 1", "Team 2" }
-        self.HeaderA = UIUtil.CreateText(self.HeaderArea, labels[1], 14, UIUtil.titleFont)
-        self.HeaderA:SetColor(HeaderColor)
-        self.HeaderA:DisableHitTest()
-        self.HeaderB = UIUtil.CreateText(self.HeaderArea, labels[2], 14, UIUtil.titleFont)
-        self.HeaderB:SetColor(HeaderColor)
-        self.HeaderB:DisableHitTest()
+        self.TeamLabelA = UIUtil.CreateText(self.HeaderArea, labels[1], 14, UIUtil.titleFont)
+        self.TeamLabelA:SetColor(HeaderColor)
+        self.TeamLabelA:DisableHitTest()
+        self.TeamLabelB = UIUtil.CreateText(self.HeaderArea, labels[2], 14, UIUtil.titleFont)
+        self.TeamLabelB:SetColor(HeaderColor)
+        self.TeamLabelB:DisableHitTest()
+
+        self.TeamAvgA = UIUtil.CreateText(self.HeaderArea, "", 14, UIUtil.titleFont)
+        self.TeamAvgA:SetColor(HeaderColor)
+        self.TeamAvgA:DisableHitTest()
+        self.TeamAvgB = UIUtil.CreateText(self.HeaderArea, "", 14, UIUtil.titleFont)
+        self.TeamAvgB:SetColor(HeaderColor)
+        self.TeamAvgB:DisableHitTest()
+
+        self.TeamTotalA = UIUtil.CreateText(self.HeaderArea, "", 11, UIUtil.bodyFont)
+        self.TeamTotalA:SetColor(MutedColor)
+        self.TeamTotalA:DisableHitTest()
+        self.TeamTotalB = UIUtil.CreateText(self.HeaderArea, "", 11, UIUtil.bodyFont)
+        self.TeamTotalB:SetColor(MutedColor)
+        self.TeamTotalB:DisableHitTest()
+
+        self.HeaderCenterArea = Group(self.HeaderArea, "BalanceHeaderCenter")
+        self.HeaderGap = UIUtil.CreateText(self.HeaderCenterArea, "", 12, UIUtil.bodyFont)
+        self.HeaderGap:SetColor(HeaderColor)
+        self.HeaderGap:DisableHitTest()
 
         -- a fixed pool of interactive position rows; Render shows/hides + fills them from the proposal
         self.Rows = {}
@@ -245,16 +274,16 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         self.Status:SetColor(LabelColor)
         self.Status:DisableHitTest()
 
+        -- candidate browser (left of the action buttons): "<  i / N  >" to step through the top balances
+        self.NavPrev = self:CreateNavArrow("<", function() self:ShowCandidate(self.CandidateIndex - 1) end)
+        self.NavLabel = UIUtil.CreateText(self.ActionArea, "", 13, UIUtil.bodyFont)
+        self.NavLabel:SetColor(LabelColor)
+        self.NavLabel:DisableHitTest()
+        self.NavNext = self:CreateNavArrow(">", function() self:ShowCandidate(self.CandidateIndex + 1) end)
+
         self.ApplyButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/medium/', "Apply")
         self.ApplyButton.OnClick = function()
             self:ApplyAndClose()
-        end
-
-        -- re-roll: re-solve the unlocked players around the locked ones, for a different equally-good
-        -- arrangement, without committing
-        self.RetryButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/medium/', "Retry")
-        self.RetryButton.OnClick = function()
-            self:Reroll()
         end
 
         self.CancelButton = UIUtil.CreateButtonWithDropshadow(self.ActionArea, '/BUTTON/medium/', "<LOC _Cancel>Cancel")
@@ -306,13 +335,28 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         row.PosLabel:SetColor(MutedColor)
         row.PosLabel:DisableHitTest()
 
-        row.Left = UIUtil.CreateText(row.Group, "", 14, UIUtil.bodyFont)
-        row.Left:DisableHitTest()
-        row.Center = UIUtil.CreateText(row.Group, "", 12, UIUtil.bodyFont)
+        -- per half: the name on the outer edge, then the muted mean, then the rating in a fixed column
+        -- beside the centre band; the gap number lives in the centre band so the rating columns line up
+        row.LeftName = UIUtil.CreateText(row.Group, "", 14, UIUtil.bodyFont)
+        row.LeftName:DisableHitTest()
+        row.LeftMean = UIUtil.CreateText(row.Group, "", 11, UIUtil.bodyFont)
+        row.LeftMean:SetColor(MutedColor)
+        row.LeftMean:DisableHitTest()
+        row.LeftRating = UIUtil.CreateText(row.Group, "", 14, UIUtil.bodyFont)
+        row.LeftRating:DisableHitTest()
+
+        row.CenterArea = Group(row.Group, "BalanceRowCenter")
+        row.Center = UIUtil.CreateText(row.CenterArea, "", 12, UIUtil.bodyFont)
         row.Center:SetColor(MutedColor)
         row.Center:DisableHitTest()
-        row.Right = UIUtil.CreateText(row.Group, "", 14, UIUtil.bodyFont)
-        row.Right:DisableHitTest()
+
+        row.RightRating = UIUtil.CreateText(row.Group, "", 14, UIUtil.bodyFont)
+        row.RightRating:DisableHitTest()
+        row.RightMean = UIUtil.CreateText(row.Group, "", 11, UIUtil.bodyFont)
+        row.RightMean:SetColor(MutedColor)
+        row.RightMean:DisableHitTest()
+        row.RightName = UIUtil.CreateText(row.Group, "", 14, UIUtil.bodyFont)
+        row.RightName:DisableHitTest()
 
         row.LeftLock = Bitmap(row.Group)
         row.LeftLock:SetSolidColor(LockColor)
@@ -339,6 +383,31 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         return row
     end,
 
+    --- Builds a candidate-browser arrow ("<" / ">") — a faint clickable chip with a centred glyph.
+    --- `SetNavArrow` lights/dims it; clicking runs `onClick`.
+    ---@param self UICustomLobbyBalancePreview
+    ---@param glyph string
+    ---@param onClick fun()
+    ---@return Bitmap
+    CreateNavArrow = function(self, glyph, onClick)
+        local arrow = Bitmap(self.ActionArea)
+        arrow:SetSolidColor(SelectColor)
+        arrow:SetAlpha(0.0)
+        arrow.HandleEvent = function(control, event)
+            if event.Type == 'ButtonPress' and not event.Modifiers.Right then
+                onClick()
+                return true
+            end
+            return false
+        end
+        local label = UIUtil.CreateText(arrow, glyph, 16, UIUtil.bodyFont)
+        label:SetColor(LabelColor)
+        label:DisableHitTest()
+        Layouter(label):AtHorizontalCenterIn(arrow):AtVerticalCenterIn(arrow):End()
+        arrow.Label = label
+        return arrow
+    end,
+
     ---@param self UICustomLobbyBalancePreview
     __post_init = function(self)
         self.Width:Set(LayoutHelpers.ScaleNumber(DialogWidth))
@@ -357,8 +426,17 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         Layouter(self.Title):AtHorizontalCenterIn(self.TitleArea):AtVerticalCenterIn(self.TitleArea):End()
         Layouter(self.Hint):AtHorizontalCenterIn(self.HintArea):AtVerticalCenterIn(self.HintArea):End()
 
-        Layouter(self.HeaderA):AtLeftIn(self.HeaderArea):AtVerticalCenterIn(self.HeaderArea):End()
-        Layouter(self.HeaderB):AtRightIn(self.HeaderArea):AtVerticalCenterIn(self.HeaderArea):End()
+        -- team summary, laid out on the same columns as the player rows below it
+        Layouter(self.HeaderCenterArea):AtHorizontalCenterIn(self.HeaderArea):AtTopIn(self.HeaderArea)
+            :AtBottomIn(self.HeaderArea):Width(CenterWidth):End()
+        Layouter(self.HeaderGap):AtHorizontalCenterIn(self.HeaderCenterArea):AtVerticalCenterIn(self.HeaderCenterArea):End()
+
+        Layouter(self.TeamLabelA):AtLeftIn(self.HeaderArea):AtVerticalCenterIn(self.HeaderArea):End()
+        Layouter(self.TeamAvgA):AnchorToLeft(self.HeaderCenterArea, 8):AtVerticalCenterIn(self.HeaderArea):End()
+        Layouter(self.TeamTotalA):AnchorToLeft(self.TeamAvgA, 5):AtVerticalCenterIn(self.HeaderArea):End()
+        Layouter(self.TeamLabelB):AtRightIn(self.HeaderArea):AtVerticalCenterIn(self.HeaderArea):End()
+        Layouter(self.TeamAvgB):AnchorToRight(self.HeaderCenterArea, 8):AtVerticalCenterIn(self.HeaderArea):End()
+        Layouter(self.TeamTotalB):AnchorToRight(self.TeamAvgB, 5):AtVerticalCenterIn(self.HeaderArea):End()
 
         -- stack the position rows from the top of the rows area
         for i = 1, MaxRows do
@@ -378,23 +456,39 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
             Layouter(row.RightLock):AtRightIn(row.Group):AtVerticalCenterIn(row.Group)
                 :Width(LockSize):Height(LockSize):Over(row.Group, 10):End()
 
-            Layouter(row.Center):AtHorizontalCenterIn(row.Group):AtVerticalCenterIn(row.Group):End()
-            Layouter(row.Left):AnchorToRight(row.LeftLock, 6):AtVerticalCenterIn(row.Group):End()
-            Layouter(row.Right):AnchorToLeft(row.RightLock, 6):AtVerticalCenterIn(row.Group):End()
+            -- fixed-width centre band (so the rating columns either side line up across every row)
+            Layouter(row.CenterArea):AtHorizontalCenterIn(row.Group):AtTopIn(row.Group):AtBottomIn(row.Group)
+                :Width(CenterWidth):End()
+            Layouter(row.Center):AtHorizontalCenterIn(row.CenterArea):AtVerticalCenterIn(row.CenterArea):End()
+
+            -- ratings: a column hugging the centre band (left right-aligned, right left-aligned); the
+            -- muted mean sits just outside each rating; names run from the outer edge
+            Layouter(row.LeftRating):AnchorToLeft(row.CenterArea, 8):AtVerticalCenterIn(row.Group):End()
+            Layouter(row.LeftMean):AnchorToLeft(row.LeftRating, 5):AtVerticalCenterIn(row.Group):End()
+            Layouter(row.LeftName):AnchorToRight(row.LeftLock, 6):AtVerticalCenterIn(row.Group):End()
+            Layouter(row.RightRating):AnchorToRight(row.CenterArea, 8):AtVerticalCenterIn(row.Group):End()
+            Layouter(row.RightMean):AnchorToRight(row.RightRating, 5):AtVerticalCenterIn(row.Group):End()
+            Layouter(row.RightName):AnchorToLeft(row.RightLock, 6):AtVerticalCenterIn(row.Group):End()
 
             -- the swap-click / drag halves sit above the drop tint but below the texts (which ignore
-            -- hits) and stop short of the centre gap; the lock bitmaps sit above them (Over)
+            -- hits) and stop short of the centre band; the lock bitmaps sit above them (Over)
             Layouter(row.LeftSelect):AtTopIn(row.Group):AtBottomIn(row.Group)
-                :AtLeftIn(row.Group):AnchorToLeft(row.Center, 4):End()
+                :AtLeftIn(row.Group):AnchorToLeft(row.CenterArea, 2):End()
             Layouter(row.RightSelect):AtTopIn(row.Group):AtBottomIn(row.Group)
-                :AtRightIn(row.Group):AnchorToRight(row.Center, 4):End()
+                :AtRightIn(row.Group):AnchorToRight(row.CenterArea, 2):End()
         end
 
         Layouter(self.Status):AtLeftIn(self.StatusArea):AtVerticalCenterIn(self.StatusArea):End()
 
+        -- candidate browser on the left of the action row
+        Layouter(self.NavPrev):AtLeftIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea)
+            :Width(NavSize):Height(NavSize):End()
+        Layouter(self.NavLabel):AnchorToRight(self.NavPrev, 6):AtVerticalCenterIn(self.ActionArea):End()
+        Layouter(self.NavNext):AnchorToRight(self.NavLabel, 6):AtVerticalCenterIn(self.ActionArea)
+            :Width(NavSize):Height(NavSize):End()
+
         Layouter(self.CancelButton):AtRightIn(self.ActionArea):AtVerticalCenterIn(self.ActionArea):End()
         Layouter(self.ApplyButton):AnchorToLeft(self.CancelButton, ButtonGap):AtVerticalCenterIn(self.ActionArea):End()
-        Layouter(self.RetryButton):AnchorToLeft(self.ApplyButton, ButtonGap):AtVerticalCenterIn(self.ActionArea):End()
     end,
 
     --- Post-mount render (the opener calls this after Popup centres the dialog, so the rows read
@@ -568,9 +662,9 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         self:Rescore()
     end,
 
-    --- A player's lock was clicked: toggle it in the working set and re-score. The player stays put;
-    --- locking just pins them so the next Retry holds them in place (and recolours them blue). Clears
-    --- any pending swap selection, since the pinning changed.
+    --- A player's lock was clicked: toggle it in the working set and regenerate the candidates around
+    --- the new constraint (the locked player is pinned at its current seat; the rest re-balance). Blue
+    --- marks a locked player.
     ---@param self UICustomLobbyBalancePreview
     ---@param ownerId UILobbyPeerId | nil
     OnLockToggled = function(self, ownerId)
@@ -580,16 +674,32 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         local locks = table.copy(self.Locks)
         locks[ownerId] = (not locks[ownerId]) or nil
         self.Locks = locks
-        self.SelectedSlot = nil
-        self.SelectedOwner = nil
-        self:Rescore()
+        self:Regenerate(self.Arrangement)
     end,
 
-    --- Re-solves the unlocked players around the locked ones (Retry), adopting a fresh arrangement.
+    --- Regenerates the candidate balances around the current locks, pinning locked players at their
+    --- seats in `arrangement`, and shows the best one. Used by open / Retry / a lock toggle.
     ---@param self UICustomLobbyBalancePreview
-    Reroll = function(self)
+    ---@param arrangement table<number, UILobbyPeerId>
+    Regenerate = function(self, arrangement)
         local slots, teams = CurrentSnapshot()
-        self:Adopt(CustomLobbyBalancer.Rebalance(slots, teams, self.Arrangement, self.Locks))
+        self.Candidates = CustomLobbyBalancer.BuildCandidates(slots, teams, arrangement, self.Locks)
+        self.CandidateIndex = 1
+        self:Adopt(self.Candidates[1])
+    end,
+
+    --- Browses to candidate `index` (clamped), discarding any unsaved manual swap on the shown one.
+    ---@param self UICustomLobbyBalancePreview
+    ---@param index number
+    ShowCandidate = function(self, index)
+        local count = table.getn(self.Candidates)
+        if index < 1 then
+            index = 1
+        elseif index > count then
+            index = count
+        end
+        self.CandidateIndex = index
+        self:Adopt(self.Candidates[index])
     end,
 
     --- Re-scores the current working arrangement in place (after a swap / drag / lock toggle) — no
@@ -661,22 +771,18 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
     ---------------------------------------------------------------------------
     --#region Rendering
 
-    --- The per-team header: "label   total (avg avg)", mirrored on the right side ("total (avg avg)
-    --- label") so the team label stays on the outer edge of its column.
+    --- Sets one team's header column — average (centre column) + total (muted) — from the plan.
     ---@param self UICustomLobbyBalancePreview
+    ---@param avgText Text
+    ---@param totalText Text
     ---@param side 1 | 2
-    ---@return string
-    SideHeader = function(self, side)
+    SetTeamHeader = function(self, avgText, totalText, side)
         local result = self.Result
-        local labels = result.labels or { "Team 1", "Team 2" }
         local count = table.getn(result.sides[side])
         local total = result.totals[side]
         local avg = count > 0 and math.floor(total / count + 0.5) or 0
-        local stats = tostring(total) .. " (" .. tostring(avg) .. " avg)"
-        if side == 2 then
-            return stats .. "   " .. labels[side]
-        end
-        return labels[side] .. "   " .. stats
+        avgText:SetText(tostring(avg))
+        totalText:SetText("(" .. tostring(total) .. ")")
     end,
 
     --- Fills one position row from a `UICustomLobbyBalancePosition` (either player may be absent on an
@@ -689,8 +795,8 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         row.Group:Show()
         row.PosLabel:SetText(tostring(index))
         local a, b = position.a, position.b
-        self:FillHalf(row.Left, row.LeftLock, row.LeftSelect, a, position.slotA, false)
-        self:FillHalf(row.Right, row.RightLock, row.RightSelect, b, position.slotB, true)
+        self:FillHalf(row.LeftName, row.LeftRating, row.LeftMean, row.LeftLock, row.LeftSelect, a, position.slotA)
+        self:FillHalf(row.RightName, row.RightRating, row.RightMean, row.RightLock, row.RightSelect, b, position.slotB)
         row.LeftOwner = a and a.ownerId or nil
         row.LeftSlot = position.slotA
         row.RightOwner = b and b.ownerId or nil
@@ -706,24 +812,37 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         end
     end,
 
-    --- Paints one half of a row (its text + lock dot + selection highlight) for a player, or clears it
-    --- when the half is empty.
+    --- Paints one half of a row — name (outer), display rating (centre column) + muted mean, the lock
+    --- dot and the selection highlight — for a player, or clears it when the half is empty.
     ---@param self UICustomLobbyBalancePreview
-    ---@param text Text
+    ---@param name Text
+    ---@param rating Text
+    ---@param mean Text
     ---@param lock Bitmap
     ---@param select Bitmap
     ---@param player UICustomLobbyBalancePlayer | nil
     ---@param slot number | nil
-    ---@param mirror boolean
-    FillHalf = function(self, text, lock, select, player, slot, mirror)
+    FillHalf = function(self, name, rating, mean, lock, select, player, slot)
         if not player then
-            text:SetText("")
+            name:SetText("")
+            rating:SetText("")
+            mean:SetText("")
             lock:SetAlpha(0.0)
             select:SetAlpha(0.0)
             return
         end
-        text:SetText(FormatPlayer(player, mirror))
-        text:SetColor(PlayerColor(player))
+        local color = PlayerColor(player)
+        name:SetText(player.name)
+        name:SetColor(color)
+        -- rating + mean only for rated players (an unrated / AI player's mean is a placeholder)
+        if player.pl > 0 then
+            rating:SetText(tostring(player.pl))
+            rating:SetColor(color)
+            mean:SetText("(" .. tostring(math.floor(player.mean + 0.5)) .. ")")
+        else
+            rating:SetText("")
+            mean:SetText("")
+        end
         -- the lock dot: solid blue when pinned, faint when not (a click toggles it)
         lock:SetSolidColor(player.locked and LockColor or SelectColor)
         lock:SetAlpha(player.locked and 1.0 or 0.25)
@@ -731,14 +850,15 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         select:SetAlpha(slot == self.SelectedSlot and 0.12 or 0.0)
     end,
 
-    --- Paints the position rows + the summary line from the working plan, and enables Apply / Retry
-    --- only when there is something to apply.
+    --- Paints the position rows + the summary line from the working plan, and enables Apply only when
+    --- there is something to apply.
     ---@param self UICustomLobbyBalancePreview
     Render = function(self)
         local result = self.Result
 
-        self.HeaderA:SetText(self:SideHeader(1))
-        self.HeaderB:SetText(self:SideHeader(2))
+        self:SetTeamHeader(self.TeamAvgA, self.TeamTotalA, 1)
+        self:SetTeamHeader(self.TeamAvgB, self.TeamTotalB, 2)
+        self.HeaderGap:SetText("+" .. tostring(math.abs(result.totals[1] - result.totals[2])))
 
         local positions = result.positions or {}
         local rowCount = table.getn(positions)
@@ -752,14 +872,32 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         end
 
         self.Status:SetText(self:StatusLine())
+        self:UpdateNav()
 
         if result.feasible then
             self.ApplyButton:Enable()
-            self.RetryButton:Enable()
         else
             self.ApplyButton:Disable()
-            self.RetryButton:Disable()
         end
+    end,
+
+    --- Lights or dims a nav arrow (a dim arrow reads as unavailable — at the first / last candidate).
+    ---@param self UICustomLobbyBalancePreview
+    ---@param arrow Bitmap
+    ---@param enabled boolean
+    SetNavArrow = function(self, arrow, enabled)
+        arrow:SetAlpha(enabled and 0.12 or 0.0)
+        arrow.Label:SetColor(enabled and LabelColor or '00000000')
+    end,
+
+    --- Updates the candidate browser: "i / N" + arrow availability. Hidden entirely with one candidate.
+    ---@param self UICustomLobbyBalancePreview
+    UpdateNav = function(self)
+        local count = table.getn(self.Candidates)
+        local multiple = count > 1
+        self.NavLabel:SetText(multiple and (tostring(self.CandidateIndex) .. " / " .. tostring(count)) or "")
+        self:SetNavArrow(self.NavPrev, multiple and self.CandidateIndex > 1)
+        self:SetNavArrow(self.NavNext, multiple and self.CandidateIndex < count)
     end,
 
     --- The summary: the reason it can't balance, else "Quality before -> after · Win a/b · Gap g",
@@ -772,12 +910,14 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
             return result.reason
         end
 
-        -- match quality, as "current -> proposed" when both are known
+        -- match quality, as "current -> proposed" when both are known (whole percent — the trueskill
+        -- value carries two decimals we don't need on screen)
         local quality
         if result.quality and result.currentQuality then
-            quality = "Quality " .. tostring(result.currentQuality) .. "% -> " .. tostring(result.quality) .. "%"
+            quality = "Quality " .. tostring(math.floor(result.currentQuality + 0.5))
+                .. "% -> " .. tostring(math.floor(result.quality + 0.5)) .. "%"
         elseif result.quality then
-            quality = "Quality " .. tostring(result.quality) .. "%"
+            quality = "Quality " .. tostring(math.floor(result.quality + 0.5)) .. "%"
         else
             quality = "Quality n/a"
         end
@@ -786,7 +926,6 @@ local CustomLobbyBalancePreview = ClassUI(Group) {
         if result.winChance then
             status = status .. "   ·   Win " .. tostring(result.winChance[1]) .. "% / " .. tostring(result.winChance[2]) .. "%"
         end
-        status = status .. "   ·   Gap " .. tostring(math.abs(result.totals[1] - result.totals[2]))
         if result.unassigned then
             status = status .. "   ·   " .. result.unassigned.name .. " stays put (odd count)"
         end
