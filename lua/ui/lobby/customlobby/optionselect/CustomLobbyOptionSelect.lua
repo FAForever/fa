@@ -51,7 +51,7 @@ local OptionUtil = import("/lua/ui/optionutil.lua")
 local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
 local CustomLobbyOptionColumn = import("/lua/ui/lobby/customlobby/optionselect/customlobbyoptioncolumn.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
-local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
+local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/models/customlobbylaunchmodel.lua")
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
 

@@ -21,7 +21,7 @@
 --******************************************************************************************************
 
 -- ============================================================================================
--- DERIVED MODEL — read-only. See /lua/ui/lobby/customlobby/derived/CLAUDE.md.
+-- DERIVED MODEL — read-only. See /lua/ui/lobby/customlobby/models/derived/CLAUDE.md.
 --
 -- A derived model is a pure function of the authoritative models: it resolves compact synced fields
 -- into a rich, ready-to-read bundle and exposes it reactively. Views read it; the **controller never
@@ -53,8 +53,8 @@
 
 local Create = import("/lua/lazyvar.lua").Create
 local Derive = import("/lua/lazyvar.lua").Derive
-local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
-local CustomLobbyScenarioDerivedModel = import("/lua/ui/lobby/customlobby/derived/customlobbyscenarioderivedmodel.lua")
+local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/models/customlobbylaunchmodel.lua")
+local CustomLobbyScenarioDerivedModel = import("/lua/ui/lobby/customlobby/models/derived/customlobbyscenarioderivedmodel.lua")
 local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
 local OptionUtil = import("/lua/ui/optionutil.lua")
 

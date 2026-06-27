@@ -39,7 +39,7 @@ local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Grid = import("/lua/maui/grid.lua").Grid
 
-local CustomLobbyModsDerivedModel = import("/lua/ui/lobby/customlobby/derived/customlobbymodsderivedmodel.lua")
+local CustomLobbyModsDerivedModel = import("/lua/ui/lobby/customlobby/models/derived/customlobbymodsderivedmodel.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 local Layouter = LayoutHelpers.ReusedLayoutFor

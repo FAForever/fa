@@ -34,7 +34,7 @@
 -- handlers (and any future tooling) know its exact shape.
 
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
-local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
+local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/models/customlobbylocalmodel.lua")
 
 --- Authorisation check: passes only for the host.
 ---@param lobby UICustomLobbyInstance

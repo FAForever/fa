@@ -52,8 +52,8 @@ local UnitsAnalyzer = import("/lua/ui/lobby/unitsanalyzer.lua")
 local UnitsTooltip = import("/lua/ui/lobby/unitstooltip.lua")
 local CustomLobbyUnitCatalog = import("/lua/ui/lobby/customlobby/unitselect/customlobbyunitcatalog.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
-local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
-local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
+local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/models/customlobbylaunchmodel.lua")
+local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/models/customlobbylocalmodel.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 local Layouter = LayoutHelpers.ReusedLayoutFor

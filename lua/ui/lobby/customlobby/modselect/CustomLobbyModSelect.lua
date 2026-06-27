@@ -57,8 +57,8 @@ local ModUtilities = import("/lua/ui/modutilities.lua")
 local CustomLobbyModCatalog = import("/lua/ui/lobby/customlobby/modselect/customlobbymodcatalog.lua")
 local CustomLobbyModList = import("/lua/ui/lobby/customlobby/modselect/customlobbymodlist.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
-local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
-local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
+local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/models/customlobbylaunchmodel.lua")
+local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/models/customlobbylocalmodel.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 

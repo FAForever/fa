@@ -11,7 +11,7 @@ Things deliberately deferred, with enough context to pick them up without re-der
 The launch model's `Restrictions` is a `string[]` of keys. A key is one of two kinds:
 
 - a **preset** key (e.g. `"T3"`, `"AIR"`) — fully resolved by
-  [derived/CustomLobbyRestrictionsDerivedModel.lua](derived/CustomLobbyRestrictionsDerivedModel.lua)
+  [models/derived/CustomLobbyRestrictionsDerivedModel.lua](models/derived/CustomLobbyRestrictionsDerivedModel.lua)
   against [`/lua/ui/lobby/unitsrestrictions.lua`](/lua/ui/lobby/unitsrestrictions.lua) → name / icon / tooltip.
 - a **specific unit id** (e.g. `"uel0201"`) — **not** enriched yet; it currently shows as its raw id
   (no icon, no name) via the fallback branch in `EnrichKey`.

@@ -35,9 +35,9 @@
 local MenuCommon = import("/lua/ui/menus/menucommon.lua")
 local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 
-local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
-local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/customlobbysessionmodel.lua")
-local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
+local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/models/customlobbylaunchmodel.lua")
+local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/models/customlobbysessionmodel.lua")
+local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/models/customlobbylocalmodel.lua")
 local CustomLobbyInterface = import("/lua/ui/lobby/customlobby/customlobbyinterface.lua")
 local CustomLobbySession = import("/lua/ui/lobby/customlobby/customlobbysession.lua")
 local CustomLobbyLog = import("/lua/ui/lobby/customlobby/customlobbylog.lua")

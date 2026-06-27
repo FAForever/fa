@@ -58,7 +58,7 @@ local CustomLobbyMapPreview = import("/lua/ui/lobby/customlobby/customlobbymappr
 local CustomLobbyMapCatalog = import("/lua/ui/lobby/customlobby/mapselect/customlobbymapcatalog.lua")
 local CustomLobbyMapList = import("/lua/ui/lobby/customlobby/mapselect/customlobbymaplist.lua")
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
-local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
+local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/models/customlobbylaunchmodel.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 

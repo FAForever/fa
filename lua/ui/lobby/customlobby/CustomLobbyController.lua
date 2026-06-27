@@ -37,9 +37,9 @@
 --
 -- See /lua/ui/lobby/TARGET_ARCHITECTURE.md § 5.
 
-local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
-local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/customlobbysessionmodel.lua")
-local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
+local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/models/customlobbylaunchmodel.lua")
+local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/models/customlobbysessionmodel.lua")
+local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/models/customlobbylocalmodel.lua")
 local CustomLobbySession = import("/lua/ui/lobby/customlobby/customlobbysession.lua")
 local CustomLobbyPresets = import("/lua/ui/lobby/customlobby/customlobbypresets.lua")
 

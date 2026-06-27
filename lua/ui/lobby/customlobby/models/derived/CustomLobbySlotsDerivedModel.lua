@@ -21,7 +21,7 @@
 --******************************************************************************************************
 
 -- ============================================================================================
--- DERIVED MODEL — read-only. See /lua/ui/lobby/customlobby/derived/CLAUDE.md.
+-- DERIVED MODEL — read-only. See /lua/ui/lobby/customlobby/models/derived/CLAUDE.md.
 --
 -- A derived model is a pure function of the authoritative models: it resolves compact synced fields
 -- into a rich, ready-to-read bundle and exposes it reactively. Views read it; the **controller never
@@ -66,10 +66,10 @@ local GameColors = import("/lua/gamecolors.lua").GameColors
 local Color = import("/lua/shared/color.lua")
 local Factions = import("/lua/factions.lua").Factions
 
-local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/customlobbylaunchmodel.lua")
-local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/customlobbysessionmodel.lua")
-local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/customlobbylocalmodel.lua")
-local CustomLobbyScenarioDerivedModel = import("/lua/ui/lobby/customlobby/derived/customlobbyscenarioderivedmodel.lua")
+local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/models/customlobbylaunchmodel.lua")
+local CustomLobbySessionModel = import("/lua/ui/lobby/customlobby/models/customlobbysessionmodel.lua")
+local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/models/customlobbylocalmodel.lua")
+local CustomLobbyScenarioDerivedModel = import("/lua/ui/lobby/customlobby/models/derived/customlobbyscenarioderivedmodel.lua")
 local CustomLobbyRules = import("/lua/ui/lobby/customlobby/customlobbyrules.lua")
 
 local MaxSlots = CustomLobbyLaunchModel.MaxSlots
