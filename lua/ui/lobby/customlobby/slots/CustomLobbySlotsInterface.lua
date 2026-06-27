@@ -296,7 +296,7 @@ local CustomLobbySlotsInterface = Class(Group) {
     ---@param self UICustomLobbySlotsInterface
     ---@return "one" | "two"
     KindForMode = function(self)
-        return CustomLobbyRules.AutoTeamMode() and "two" or "one"
+        return CustomLobbyRules.AutoTeamMode(CustomLobbyLaunchModel.GetSingleton().GameOptions()) and "two" or "one"
     end,
 
     --- (Re)creates the layout body for the current mode, destroying the previous one. Lays it out

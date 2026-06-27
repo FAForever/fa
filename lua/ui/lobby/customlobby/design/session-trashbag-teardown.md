@@ -102,6 +102,6 @@ implementation. `UICustomLobbyMapCatalog : Destroyable`:
 1. ✅ Map catalog (done — reference implementation).
 2. The three models (low-risk, thin `Destroy`).
 3. The mod catalog (mirror the map catalog).
-4. `CustomLobbyRules` map-dimension cache.
+4. ~~`CustomLobbyRules` map-dimension cache.~~ — N/A: `CustomLobbyRules` is now a **pure, stateless** kernel (all inputs passed in; the cached map-dimension lookup is gone), so it holds nothing to tear down.
 5. The interface + performance popover — **after** the ordering decision (#1 above).
 6. Track the lobby instance in the session bag (drop the manual `Instance:Destroy()` in lobby.lua).

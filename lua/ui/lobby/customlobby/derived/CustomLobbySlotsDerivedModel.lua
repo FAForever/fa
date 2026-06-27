@@ -344,14 +344,24 @@ local function Recompute(model)
 
     local scenario = CustomLobbyScenarioDerivedModel.GetScenario()
     local spawns = scenario and scenario.Markers and scenario.Markers.Spawns or nil
-    local cap = CustomLobbyRules.RecommendedUnitCap()
+    local maxDimension = scenario and scenario.MaxDimension or 0
+
+    -- the recommended cap scales by seated count (same for every seat), so count once up front; we feed
+    -- the inputs to the pure rule (CustomLobbyRules reads no models itself)
+    local seatedCount = 0
+    for slot = 1, MaxSlots do
+        if launch.Players[slot]() then
+            seatedCount = seatedCount + 1
+        end
+    end
+    local cap = CustomLobbyRules.RecommendedUnitCap(seatedCount, maxDimension)
 
     -- the binary auto-team split, applied once here (the rule lives in CustomLobbyRules). A seat's side
     -- is keyed on its start spot, falling back to the slot index when empty so empty cards still place;
     -- `resolved` is false for a positional mode whose map/start spots aren't loaded yet.
-    local mode = CustomLobbyRules.AutoTeamMode()
+    local mode = CustomLobbyRules.AutoTeamMode(launch.GameOptions())
     local labels = CustomLobbyRules.SideLabels(mode)
-    local resolver, resolved = CustomLobbyRules.BuildSideResolver()
+    local resolver, resolved = CustomLobbyRules.BuildSideResolver(mode, scenario)
 
     local slots = {}
     local totalA, totalB = 0, 0
