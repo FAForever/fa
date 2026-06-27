@@ -35,6 +35,7 @@
 -- § 2 — never mutate a held table in place).
 
 local Create = import("/lua/lazyvar.lua").Create
+local CustomLobbySession = import("/lua/ui/lobby/customlobby/customlobbysession.lua")
 
 --- Maximum number of player slots the engine supports.
 MaxSlots = 16
@@ -69,8 +70,20 @@ MaxSlots = 16
 -------------------------------------------------------------------------------
 --#region Reactive model
 
+-- LIFETIME. A `ClassSimple` implementing `Destroyable`, registered in the session trash bag (see
+-- CustomLobbySession) on first access, so one `CustomLobbySession.Teardown()` resets it. Per the
+-- teardown design's decision #3 the write helpers stay **free functions** (below) and `Destroy` is
+-- **thin** (nil the module singleton; the LazyVars — the 16 per-slot vars + the rest — are freed by GC
+-- once the views observing them are torn down, not proactively, since the interface that subscribes to
+-- them isn't in the bag yet). See design/session-trashbag-teardown.md.
+
+-- The singleton, forward-declared above the class so `Destroy` captures it as an upvalue. Assigned in
+-- `SetupSingleton`, cleared in `Destroy`.
+---@type UICustomLobbyLaunchModel | nil
+local Instance = nil
+
 --- Reactive launch-state singleton (shared, host-dictated, part of the launch).
----@class UICustomLobbyLaunchModel
+---@class UICustomLobbyLaunchModel : Destroyable
 ---@field Players      LazyVar<UICustomLobbyPlayer | false>[]           # one LazyVar per slot (1..MaxSlots); false = empty
 ---@field Observers    LazyVar<UICustomLobbyPlayer[]>                   # observer list
 ---@field SpawnMex     LazyVar<table<number, boolean>>                  # adaptive-map spawn-mex flags (embedded into the scenario at launch)
@@ -79,41 +92,55 @@ MaxSlots = 16
 ---@field GameMods     LazyVar<table>
 ---@field Restrictions LazyVar<string[]>                                # unit-restriction preset keys (folded into GameOptions.RestrictedCategories at launch)
 ---@field ScenarioFile LazyVar<FileName | false>
+---@field Destroyed    boolean
+local LaunchModel = ClassSimple {
 
----@type UICustomLobbyLaunchModel | nil
-local ModelInstance = nil
+    ---@param self UICustomLobbyLaunchModel
+    __init = function(self)
+        local players = {}
+        for slot = 1, MaxSlots do
+            players[slot] = Create(false)
+        end
+        self.Players      = players
+        self.Observers    = Create({})
+        self.SpawnMex     = Create({})
+        self.AutoTeams    = Create({})
+        self.GameOptions  = Create({})
+        self.GameMods     = Create({})
+        self.Restrictions = Create({})
+        self.ScenarioFile = Create(false)
+        self.Destroyed    = false
+    end,
 
---- Allocates a fresh launch-model singleton, replacing any existing instance.
+    --- `Destroyable`: thin teardown — drop the module singleton so the next session rebuilds (and
+    --- re-registers). The LazyVars GC once the views observing them are gone. Idempotent.
+    ---@param self UICustomLobbyLaunchModel
+    Destroy = function(self)
+        if self.Destroyed then
+            return
+        end
+        self.Destroyed = true
+        if Instance == self then
+            Instance = nil
+        end
+    end,
+}
+
+--- Allocates a fresh launch-model singleton and registers it in the session trash.
 ---@return UICustomLobbyLaunchModel
 function SetupSingleton()
-    local players = {}
-    for slot = 1, MaxSlots do
-        players[slot] = Create(false)
-    end
-
-    ---@type UICustomLobbyLaunchModel
-    local model = {
-        Players      = players,
-        Observers    = Create({}),
-        SpawnMex     = Create({}),
-        AutoTeams    = Create({}),
-        GameOptions  = Create({}),
-        GameMods     = Create({}),
-        Restrictions = Create({}),
-        ScenarioFile = Create(false),
-    }
-
-    ModelInstance = model
-    return model
+    Instance = LaunchModel()
+    CustomLobbySession.GetTrash():Add(Instance)
+    return Instance
 end
 
---- Returns the launch-model singleton, creating it on first access.
+--- Returns the launch-model singleton, creating (and registering) it on first access.
 ---@return UICustomLobbyLaunchModel
 function GetSingleton()
-    if not ModelInstance then
+    if not Instance then
         SetupSingleton()
     end
-    return ModelInstance --[[@as UICustomLobbyLaunchModel]]
+    return Instance --[[@as UICustomLobbyLaunchModel]]
 end
 
 --#endregion
@@ -235,18 +262,18 @@ end
 --- its value is lost on every hot-reload.
 ---@param newModule any
 function __moduleinfo.OnReload(newModule)
-    if ModelInstance then
+    if Instance then
         local handle = newModule.SetupSingleton()
         for slot = 1, MaxSlots do
-            handle.Players[slot]:Set(ModelInstance.Players[slot]())
+            handle.Players[slot]:Set(Instance.Players[slot]())
         end
-        handle.Observers:Set(ModelInstance.Observers())
-        handle.SpawnMex:Set(ModelInstance.SpawnMex())
-        handle.AutoTeams:Set(ModelInstance.AutoTeams())
-        handle.GameOptions:Set(ModelInstance.GameOptions())
-        handle.GameMods:Set(ModelInstance.GameMods())
-        handle.Restrictions:Set(ModelInstance.Restrictions())
-        handle.ScenarioFile:Set(ModelInstance.ScenarioFile())
+        handle.Observers:Set(Instance.Observers())
+        handle.SpawnMex:Set(Instance.SpawnMex())
+        handle.AutoTeams:Set(Instance.AutoTeams())
+        handle.GameOptions:Set(Instance.GameOptions())
+        handle.GameMods:Set(Instance.GameMods())
+        handle.Restrictions:Set(Instance.Restrictions())
+        handle.ScenarioFile:Set(Instance.ScenarioFile())
     end
 end
 

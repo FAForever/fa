@@ -33,41 +33,68 @@
 -- Synced host -> clients as a whole snapshot (CustomLobbyController.BroadcastSessionState).
 
 local Create = import("/lua/lazyvar.lua").Create
+local CustomLobbySession = import("/lua/ui/lobby/customlobby/customlobbysession.lua")
 
 -------------------------------------------------------------------------------
 --#region Reactive model
+--
+-- LIFETIME. A `ClassSimple` implementing `Destroyable`, registered in the session trash bag (see
+-- CustomLobbySession) on first access, so one `CustomLobbySession.Teardown()` resets it. Per the
+-- teardown design's decision #3 the write helpers stay **free functions** (below) and `Destroy` is
+-- **thin** (nil the module singleton; the LazyVars GC once the views observing them are torn down).
+
+-- The singleton, forward-declared above the class so `Destroy` captures it as an upvalue. Assigned in
+-- `SetupSingleton`, cleared in `Destroy`.
+---@type UICustomLobbySessionModel | nil
+local Instance = nil
 
 --- Reactive session-state singleton (shared, host-dictated, not launched).
----@class UICustomLobbySessionModel
+---@class UICustomLobbySessionModel : Destroyable
 ---@field SlotCount   LazyVar<number>                    # player slots the current map supports
 ---@field ClosedSlots LazyVar<table<number, boolean>>
 ---@field SlotsPinned LazyVar<boolean>                   # host locked seating: only the host may change slots
+---@field Destroyed   boolean
+local SessionModel = ClassSimple {
 
----@type UICustomLobbySessionModel | nil
-local ModelInstance = nil
+    ---@param self UICustomLobbySessionModel
+    ---@param slotCount? number
+    __init = function(self, slotCount)
+        self.SlotCount   = Create(slotCount or 8)
+        self.ClosedSlots = Create({})
+        self.SlotsPinned = Create(false)
+        self.Destroyed   = false
+    end,
 
---- Allocates a fresh session-model singleton, replacing any existing instance.
+    --- `Destroyable`: thin teardown — drop the module singleton so the next session rebuilds (and
+    --- re-registers). The LazyVars GC once the views observing them are gone. Idempotent.
+    ---@param self UICustomLobbySessionModel
+    Destroy = function(self)
+        if self.Destroyed then
+            return
+        end
+        self.Destroyed = true
+        if Instance == self then
+            Instance = nil
+        end
+    end,
+}
+
+--- Allocates a fresh session-model singleton and registers it in the session trash.
 ---@param slotCount? number
 ---@return UICustomLobbySessionModel
 function SetupSingleton(slotCount)
-    ---@type UICustomLobbySessionModel
-    local model = {
-        SlotCount   = Create(slotCount or 8),
-        ClosedSlots = Create({}),
-        SlotsPinned = Create(false),
-    }
-
-    ModelInstance = model
-    return model
+    Instance = SessionModel(slotCount)
+    CustomLobbySession.GetTrash():Add(Instance)
+    return Instance
 end
 
---- Returns the session-model singleton, creating it on first access.
+--- Returns the session-model singleton, creating (and registering) it on first access.
 ---@return UICustomLobbySessionModel
 function GetSingleton()
-    if not ModelInstance then
+    if not Instance then
         SetupSingleton()
     end
-    return ModelInstance --[[@as UICustomLobbySessionModel]]
+    return Instance --[[@as UICustomLobbySessionModel]]
 end
 
 --#endregion
@@ -109,10 +136,10 @@ end
 --- NOTE: maintained by hand — add a field to the model, add a copy line here too.
 ---@param newModule any
 function __moduleinfo.OnReload(newModule)
-    if ModelInstance then
-        local handle = newModule.SetupSingleton(ModelInstance.SlotCount())
-        handle.ClosedSlots:Set(ModelInstance.ClosedSlots())
-        handle.SlotsPinned:Set(ModelInstance.SlotsPinned())
+    if Instance then
+        local handle = newModule.SetupSingleton(Instance.SlotCount())
+        handle.ClosedSlots:Set(Instance.ClosedSlots())
+        handle.SlotsPinned:Set(Instance.SlotsPinned())
     end
 end
 

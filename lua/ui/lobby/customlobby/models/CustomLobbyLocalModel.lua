@@ -34,39 +34,70 @@
 --   * LocalModel    (this) — per-peer, never synced.
 
 local Create = import("/lua/lazyvar.lua").Create
+local CustomLobbySession = import("/lua/ui/lobby/customlobby/customlobbysession.lua")
 
 -------------------------------------------------------------------------------
 --#region Reactive model
+--
+-- LIFETIME. A `ClassSimple` implementing `Destroyable`, registered in the session trash bag (see
+-- CustomLobbySession) on first access, so one `CustomLobbySession.Teardown()` resets it. Per the
+-- teardown design's decision #3 the write helpers stay **free functions** (below) and `Destroy` is
+-- **thin** — it just nils the module singleton so the next session rebuilds; the LazyVars are freed by
+-- GC once the views observing them are torn down (we don't proactively destroy them, since the
+-- interface that subscribes to them isn't in the bag yet). See design/session-trashbag-teardown.md.
+
+-- The singleton, forward-declared above the class so `Destroy` captures it as an upvalue. Assigned in
+-- `SetupSingleton`, cleared in `Destroy`.
+---@type UICustomLobbyLocalModel | nil
+local Instance = nil
 
 --- Reactive local-state singleton (per-peer, never synced).
----@class UICustomLobbyLocalModel
+---@class UICustomLobbyLocalModel : Destroyable
 ---@field LocalPeerId   LazyVar<UILobbyPeerId>                                      # this client's peer id
 ---@field HostID        LazyVar<UILobbyPeerId>                                      # the host's peer id
 ---@field IsHost        LazyVar<boolean>                                            # whether this client is the host
 ---@field CpuBenchmarks LazyVar<table<UILobbyPeerId, UIPerformanceMetrics>>         # peer id -> in-game sim-performance history (see /lua/system/performance.lua)
-local ModelInstance = nil
+---@field Destroyed     boolean
+local LocalModel = ClassSimple {
 
---- Allocates a fresh local-model singleton, replacing any existing one.
+    ---@param self UICustomLobbyLocalModel
+    __init = function(self)
+        self.LocalPeerId   = Create("-1")
+        self.HostID        = Create("-1")
+        self.IsHost        = Create(false)
+        self.CpuBenchmarks = Create({})
+        self.Destroyed     = false
+    end,
+
+    --- `Destroyable`: thin teardown — drop the module singleton so the next session rebuilds (and
+    --- re-registers). The LazyVars GC once the views observing them are gone. Idempotent.
+    ---@param self UICustomLobbyLocalModel
+    Destroy = function(self)
+        if self.Destroyed then
+            return
+        end
+        self.Destroyed = true
+        if Instance == self then
+            Instance = nil
+        end
+    end,
+}
+
+--- Allocates a fresh local-model singleton and registers it in the session trash.
 ---@return UICustomLobbyLocalModel
 function SetupSingleton()
-    ---@type UICustomLobbyLocalModel
-    local model = {
-        LocalPeerId   = Create("-1"),
-        HostID        = Create("-1"),
-        IsHost        = Create(false),
-        CpuBenchmarks = Create({}),
-    }
-    ModelInstance = model
-    return model
+    Instance = LocalModel()
+    CustomLobbySession.GetTrash():Add(Instance)
+    return Instance
 end
 
---- Returns the local-model singleton, creating it on first access.
+--- Returns the local-model singleton, creating (and registering) it on first access.
 ---@return UICustomLobbyLocalModel
 function GetSingleton()
-    if not ModelInstance then
+    if not Instance then
         SetupSingleton()
     end
-    return ModelInstance --[[@as UICustomLobbyLocalModel]]
+    return Instance --[[@as UICustomLobbyLocalModel]]
 end
 
 --#endregion
@@ -89,15 +120,15 @@ end
 -------------------------------------------------------------------------------
 --#region Debugging
 
---- Hot-reload hook: rebuilds the singleton and copies the values across.
+--- Hot-reload hook: rebuilds the singleton (registering the new one) and copies the values across.
 ---@param newModule any
 function __moduleinfo.OnReload(newModule)
-    if ModelInstance then
+    if Instance then
         local handle = newModule.SetupSingleton()
-        handle.LocalPeerId:Set(ModelInstance.LocalPeerId())
-        handle.HostID:Set(ModelInstance.HostID())
-        handle.IsHost:Set(ModelInstance.IsHost())
-        handle.CpuBenchmarks:Set(ModelInstance.CpuBenchmarks())
+        handle.LocalPeerId:Set(Instance.LocalPeerId())
+        handle.HostID:Set(Instance.HostID())
+        handle.IsHost:Set(Instance.IsHost())
+        handle.CpuBenchmarks:Set(Instance.CpuBenchmarks())
     end
 end
 

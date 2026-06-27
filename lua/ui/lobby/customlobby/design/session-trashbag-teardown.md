@@ -82,11 +82,14 @@ implementation. `UICustomLobbyMapCatalog : Destroyable`:
    (`GetSingleton():LoadInfo()`) removes a layer but touches callers. Current lean: **keep** for
    query-style services like the catalog.
 
-3. **Models stay free-function-style.** The three models are intentionally plain data tables with
-   free-function writers (`SetPlayer(model, …)`) — the documented autolobby idiom. For them,
-   `Destroy` should be **thin**: nil `ModelInstance`, let the LazyVars GC. Do **not** convert their
-   write helpers to methods. Accept that "service" singletons (catalog: real methods) and "data"
-   singletons (models: free functions + minimal `Destroy`) legitimately differ in shape.
+3. **✅ Resolved (implemented). Models keep free-function writers; `Destroy` is thin.** The three
+   models are now `ClassSimple : Destroyable` instances, but their writers stay **free functions**
+   (`SetPlayer(model, …)` — the documented autolobby idiom; *not* converted to methods), and `Destroy`
+   is **thin**: nil the module singleton and let the LazyVars GC once the views observing them are torn
+   down (no own `Trash` proactively freeing them — see #1, the interface isn't in the bag yet).
+   "Service" singletons (catalog / derived models: real methods, own `Trash` that frees its resources)
+   and "data" singletons (these models: free-function writers + thin `Destroy`) legitimately differ in
+   shape.
 
 ### Minor wrinkles (non-blocking)
 
@@ -109,9 +112,13 @@ implementation. `UICustomLobbyMapCatalog : Destroyable`:
    `table.concatkeys`); slots `self.LoadedSignature` + `self.LoadedTeamsSignature` + `self.Observers`;
    options `self.Schema` + `self.SchemaKey` (the cached schema). The set-based dedup uses stock
    `utils.lua` (`table.concatkeys` / `table.sorted` + `table.concat`) — no bespoke helper.
-3. The three authoritative models (low-risk; per open decision #3 their write helpers stay free
-   functions — the `ClassSimple` just adds an own `Trash` + a `Destroy` that frees the LazyVars and
-   nils the singleton).
+3. ✅ The three authoritative models (Launch / Session / Local) — done. Each is a
+   `ClassSimple : Destroyable` registered in the session bag; per open decision #3 the **write helpers
+   stay free functions** and `Destroy` is **thin** — it nils the module singleton and lets the LazyVars
+   GC once the views observing them are torn down. (We deliberately do *not* give them an own `Trash`
+   that proactively destroys the LazyVars: the interface that subscribes to them isn't in the bag yet
+   (#5 below), so destroying them on `Teardown` could fire an observer into freed state. The thin
+   teardown sidesteps the ordering risk in open decision #1.)
 4. The mod catalog (mirror the map catalog).
 5. ~~`CustomLobbyRules` map-dimension cache.~~ — N/A: `CustomLobbyRules` is now a **pure, stateless** kernel (all inputs passed in; the cached map-dimension lookup is gone), so it holds nothing to tear down.
 6. The interface + performance popover — **after** the ordering decision (#1 above).
