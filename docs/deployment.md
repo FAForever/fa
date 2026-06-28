@@ -124,9 +124,9 @@ These workflows exist to apply some post processing of blueprints and various Lu
 
 A push to `deploy/faf` will also automatically trigger deployments of the unit databases to keep their info up-to-date:
 
-- [Unit DB](./workflows//unitdb-update.yaml)
-- [Spooky DB](./workflows/spookydb-update.yaml)
-- [ETFreeman DB](./workflows/etfreeman-db-update.yaml)
+- [Unit DB](https://github.com/FAForever/fa/blob/develop/.github/workflows/unitdb-update.yaml)
+- [Spooky DB](https://github.com/FAForever/fa/blob/develop/.github/workflows/spookydb-update.yaml)
+- [ETFreeman DB](https://github.com/FAForever/fa/blob/develop/.github/workflows/etfreeman-db-update.yaml)
 
 
 # FAQ
