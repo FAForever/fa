@@ -26,9 +26,9 @@
 -- **scrollable list** of rows.
 --
 -- Each row is laid out in columns, **fixed-width columns first then the flexible name** so the names
--- line up:  `time · kind · ⚠ · name`. A malformed / unauthorised message (its Validate or Accept
--- returned a reason) tints the name and fills the ⚠ slot with a warning icon whose tooltip is the
--- reason.
+-- line up:  `time · kind · peer · ⚠ · name`. A malformed / unauthorised message (its Validate or
+-- Accept returned a reason) tints the name and fills the ⚠ slot with a warning icon whose tooltip is
+-- the reason.
 --
 -- The list is a `Grid` (one column, a row Group per cell) + a vertical scrollbar — the same
 -- scrollable-rows pattern the config column's option/mod panels use; the Grid hides off-window rows
@@ -70,23 +70,28 @@ local ButtonIdle = 'ff141a20'
 local ButtonHover = 'ff1f262e'
 local ButtonIconInset = 4
 local ButtonIconColor = 'ffc8ccd0'  -- TODO: temporary 1-colour placeholder until a copy/clipboard icon exists
+local Debug = true
 
 -- font sizes per column (the message type is the one you read, so it's the largest)
 local TimeFont = 12
-local KindFont = 14
+local KindFont = 16
+local PeerFont = 14
 local NameFont = 14
 local TitleFont = 14
 
 -- fixed column widths (left → right); the name column is flexible and fills whatever is left
 local TimeWidth = 30
-local KindWidth = 16
+local KindWidth = 24
+local PeerWidth = 54
 local IconSize = 13
 local NameMax = 40
+local PeerMax = 16
 
 -- left edges of each column, accumulated so every row's name starts at the same x (aligned)
 local TimeLeft = Pad
 local KindLeft = TimeLeft + TimeWidth + ColGap
-local WarnLeft = KindLeft + KindWidth + ColGap
+local PeerLeft = KindLeft + KindWidth + ColGap
+local WarnLeft = PeerLeft + PeerWidth + ColGap
 local NameLeft = WarnLeft + IconSize + ColGap
 
 local TimeColor = 'ff6a707a'
@@ -99,9 +104,9 @@ local WarnIcon = '/MODS/mod_type_warning.dds'
 
 -- the kind glyph (its own column, so the name aligns regardless of direction)
 local KindGlyph = {
-    broadcast = "»»",
-    send = "»",
-    recv = "«",
+    broadcast = "→→",
+    send = "→",
+    recv = "←",
 }
 
 -- plain-text kind label for the clipboard copy (glyphs don't paste usefully)
@@ -126,7 +131,8 @@ end
 local function Truncate(text, maxChars)
     text = text or ""
     if string.len(text) > maxChars then
-        return string.sub(text, 1, maxChars - 1) .. "…"
+        local limit = math.max(1, math.floor(maxChars))
+        return string.sub(text, 1, limit - 1) .. "…"
     end
     return text
 end
@@ -145,7 +151,7 @@ local function EntryToText(entry)
     return line
 end
 
----@class UICustomLobbyLogsPanel : Group
+---@class UICustomLobbyLogsPanel : Bitmap
 ---@field Trash TrashBag
 ---@field Ready boolean
 ---@field CopyButton Group         # icon-button (Bg + Icon); copies the log to the clipboard
@@ -157,12 +163,14 @@ end
 ---@field Scrollbar Scrollbar | false
 ---@field Empty Text
 ---@field EntriesObserver LazyVar
-local CustomLobbyLogsPanel = ClassUI(Group) {
+local CustomLobbyLogsPanel = ClassUI(Bitmap) {
 
     ---@param self UICustomLobbyLogsPanel
     ---@param parent Control
     __init = function(self, parent)
-        Group.__init(self, parent, "CustomLobbyLogsPanel")
+        Bitmap.__init(self, parent)
+        self:SetSolidColor(Debug and '303080ff' or '00000000')
+        self:DisableHitTest()
 
         self.Trash = TrashBag()
         self.Ready = false
@@ -211,7 +219,8 @@ local CustomLobbyLogsPanel = ClassUI(Group) {
     end,
 
     ---@param self UICustomLobbyLogsPanel
-    __post_init = function(self)
+    __post_init = function(self, parent)
+        Layouter(self):Fill(parent):End()
         Layouter(self.CopyButton):AtLeftIn(self, Pad):AtTopIn(self, Pad):Width(ButtonSize):Height(ButtonSize):End()
         Layouter(self.CopyBg):Fill(self.CopyButton):End()
         Layouter(self.CopyIcon)
@@ -222,19 +231,29 @@ local CustomLobbyLogsPanel = ClassUI(Group) {
         Layouter(self.Empty):AtHorizontalCenterIn(self):AtTopIn(self, ToolbarHeight + 8):End()
     end,
 
+    --- The grid's content width (panel width minus the left pad and the scrollbar gutter), unscaled,
+    --- for row sizing. Matches the grid's `:AtLeftIn(self, Pad):AtRightIn(self, ScrollGap)` insets
+    --- so a row spans exactly the visible feed. Clamped so an early/unsettled read can't go negative.
+    ---@param self UICustomLobbyLogsPanel
+    ---@return number
+    ComputeRowWidth = function(self)
+        local scale = LayoutHelpers.GetPixelScaleFactor()
+        return math.max(1, math.floor(self.Width() / scale) - Pad - ScrollGap)
+    end,
+
     --- Builds the scrollable grid (its cell width needs the panel's concrete width) + scrollbar, and
     --- does the first render. Three-phase init (/lua/ui/CLAUDE.md § 1).
     ---@param self UICustomLobbyLogsPanel
     Initialize = function(self)
         self.Ready = true
 
-        -- Grid itemWidth is unscaled (Grid scales it); the panel width is concrete/scaled, so divide
-        -- back out the ui scale. Reserve the scrollbar gap on the right.
-        local scale = LayoutHelpers.GetPixelScaleFactor()
-        self.RowWidth = math.floor(self.Width() / scale) - ScrollGap
-        self.Grid = Grid(self, self.RowWidth, RowHeight)
+        -- The Grid hides any item outside its visible window; the visible column count is
+        -- floor(gridWidth / itemWidth), so if itemWidth exceeds the visible content width every row is
+        -- hidden. Use a dummy item width of 1 and size each row independently from the real width.
+        self.RowWidth = self:ComputeRowWidth()
+        self.Grid = Grid(self, 1, RowHeight)
         Layouter(self.Grid)
-            :AtLeftIn(self, 0):Width(self.RowWidth)
+            :AtLeftIn(self, Pad):AtRightIn(self, ScrollGap)
             :AnchorToBottom(self.CopyButton, 6):AtBottomIn(self, Pad)
             :End()
         self.Scrollbar = UIUtil.CreateVertScrollbarFor(self.Grid)
@@ -251,6 +270,9 @@ local CustomLobbyLogsPanel = ClassUI(Group) {
         if not self.Ready or not self.Grid then
             return
         end
+
+        -- Recompute after mount so rows size correctly even if Initialize ran before layout settled.
+        self.RowWidth = self:ComputeRowWidth()
 
         local entries = CustomLobbyLog.GetSingleton().Entries()
         local total = table.getn(entries)
@@ -306,9 +328,9 @@ local CustomLobbyLogsPanel = ClassUI(Group) {
         CopyToClipboard(table.concat(lines, "\n"))
     end,
 
-    --- Builds one log row: time · kind · (warn) · name. The warn icon only appears for a bad
-    --- message; its column slot is still reserved (a fixed width before the flexible name) so names
-    --- stay aligned. Private.
+    --- Builds one log row: time · kind · peer · (warn) · name. The peer is kept as separate network
+    --- metadata so the description stays to the right of all transport details. The warn icon only
+    --- appears for a bad message; its column slot is still reserved so names stay aligned. Private.
     ---@param self UICustomLobbyLogsPanel
     ---@param entry UICustomLobbyLogEntry
     ---@return Group
@@ -326,11 +348,12 @@ local CustomLobbyLogsPanel = ClassUI(Group) {
         kind:DisableHitTest()
         Layouter(kind):AtLeftIn(row, KindLeft):AtVerticalCenterIn(row):End()
 
-        local label = entry.Type
-        if entry.Peer then
-            label = label .. (entry.Kind == 'recv' and "  ← " or "  → ") .. tostring(entry.Peer)
-        end
-        local name = UIUtil.CreateText(row, Truncate(label, NameMax), NameFont, UIUtil.bodyFont)
+        local peer = UIUtil.CreateText(row, Truncate(entry.Peer and tostring(entry.Peer) or "", PeerMax), PeerFont, UIUtil.bodyFont)
+        peer:SetColor(TimeColor)
+        peer:DisableHitTest()
+        Layouter(peer):AtLeftIn(row, PeerLeft):AtVerticalCenterIn(row):Width(PeerWidth):End()
+
+        local name = UIUtil.CreateText(row, Truncate(entry.Type, NameMax), NameFont, UIUtil.bodyFont)
         name:SetColor(entry.Error and ErrorColor or NameColor)
         name:DisableHitTest()
         Layouter(name):AtLeftIn(row, NameLeft):AtRightIn(row, Pad):AtVerticalCenterIn(row):End()
