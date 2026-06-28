@@ -184,6 +184,72 @@ CustomLobbyMessages = {
         end,
     },
 
+    -- A client asks the host to set its own faction multi-select (the allowed real-faction indices;
+    -- more than one = random among them). The host applies it to the sender's slot.
+    SetFactions = {
+        ---@class UICustomLobbySetFactionsMessage : UILobbyReceivedMessage
+        ---@field Factions number[]
+
+        ---@param data UICustomLobbySetFactionsMessage
+        Validate = function(lobby, data)
+            if type(data.Factions) ~= 'table' then
+                return false, "SetFactions has no Factions list"
+            end
+            return true
+        end,
+        Accept = function(lobby, data)
+            return RequireHost(lobby)
+        end,
+        ---@param data UICustomLobbySetFactionsMessage
+        Handler = function(lobby, data)
+            CustomLobbyController.ProcessSetFactions(lobby, data)
+        end,
+    },
+
+    -- A client asks the host to set its own colour (a PlayerColor index). The host applies it to the
+    -- sender's slot, rejecting a colour already taken by another seated player.
+    SetColor = {
+        ---@class UICustomLobbySetColorMessage : UILobbyReceivedMessage
+        ---@field Color number
+
+        ---@param data UICustomLobbySetColorMessage
+        Validate = function(lobby, data)
+            if type(data.Color) ~= 'number' then
+                return false, "SetColor has no Color index"
+            end
+            return true
+        end,
+        Accept = function(lobby, data)
+            return RequireHost(lobby)
+        end,
+        ---@param data UICustomLobbySetColorMessage
+        Handler = function(lobby, data)
+            CustomLobbyController.ProcessSetColor(lobby, data)
+        end,
+    },
+
+    -- A client asks the host to set its own team (backend numbering: 1 = no team, 2..9 = teams 1..8).
+    -- The host applies it to the sender's slot.
+    SetTeam = {
+        ---@class UICustomLobbySetTeamMessage : UILobbyReceivedMessage
+        ---@field Team number
+
+        ---@param data UICustomLobbySetTeamMessage
+        Validate = function(lobby, data)
+            if type(data.Team) ~= 'number' then
+                return false, "SetTeam has no Team number"
+            end
+            return true
+        end,
+        Accept = function(lobby, data)
+            return RequireHost(lobby)
+        end,
+        ---@param data UICustomLobbySetTeamMessage
+        Handler = function(lobby, data)
+            CustomLobbyController.ProcessSetTeam(lobby, data)
+        end,
+    },
+
     -- A client asks the host to move it into an open slot (also reachable via a
     -- `/take <slot>` chat command). The host validates the seat and re-broadcasts.
     TakeSlot = {

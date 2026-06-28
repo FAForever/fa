@@ -38,23 +38,51 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 
 ---@class UICustomLobbySlotRow : UICustomLobbySlotBase
 ---@field SlotNumber Text
+---@field Avatar Bitmap
+---@field Flag Bitmap
 ---@field ColorSwatch Bitmap
 ---@field Name Text
----@field Faction Text
+---@field Rating Text
+---@field Games Text
+---@field FactionIcons Group
 ---@field Cpu Text
 ---@field CpuIndicator Bitmap
 ---@field Team Text
 ---@field Ready Text
 ---@field CpuHover Bitmap
+---@field ColorZone Bitmap
+---@field FactionZone Bitmap
+---@field TeamZone Bitmap
 local CustomLobbySlotRow = Class(CustomLobbySlotBase) {
 
     ---@param self UICustomLobbySlotRow
     CreateContents = function(self)
         self.SlotNumber = UIUtil.CreateText(self, tostring(self.SlotIndex), 14, UIUtil.bodyFont)
+
+        -- a reserved avatar placeholder (a dim box for now; a real FAF avatar lands later)
+        self.Avatar = Bitmap(self)
+        self.Avatar:SetSolidColor('33ffffff')
+        self.Avatar:SetAlpha(0.0)
+        self.Avatar:DisableHitTest()
+
+        -- the player's country flag (hidden until a country resolves)
+        self.Flag = Bitmap(self)
+        self.Flag:SetAlpha(0.0)
+        self.Flag:DisableHitTest()
+
         self.ColorSwatch = Bitmap(self)
         self.ColorSwatch:SetSolidColor('00000000')
         self.Name = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
-        self.Faction = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
+
+        -- rating (PL) + games played, dim, in the right cluster
+        self.Rating = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
+        self.Rating:SetColor('ffc8ccd0')
+        self.Games = UIUtil.CreateText(self, "", 12, UIUtil.bodyFont)
+        self.Games:SetColor('ff9aa0a8')
+
+        -- the selected factions as a small icon strip (Random icon when the full set is allowed)
+        self:CreateFactionIcons()
+
         self.Cpu = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont)
         -- a small square left of the CPU label: green when the machine sustains the
         -- recommended unit cap at full speed, fading to red the more the sim must slow
@@ -71,20 +99,43 @@ local CustomLobbySlotRow = Class(CustomLobbySlotBase) {
         self.CpuHover.HandleEvent = function(control, event)
             return self:HandleCpuHoverEvent(event)
         end
+
+        -- click zones over the editable elements (colour / faction / team); the base opens the matching
+        -- picker when the seat is editable, else falls through to the normal row press
+        self.ColorZone = self:CreateEditZone("color")
+        self.FactionZone = self:CreateEditZone("faction")
+        self.TeamZone = self:CreateEditZone("team")
+
+        -- the host-only close/open button (shown only on an empty / closed seat)
+        self:CreateSlotButton()
     end,
 
     ---@param self UICustomLobbySlotRow
     LayoutContents = function(self)
+        -- left: # · swatch · avatar · flag · name
         Layouter(self.SlotNumber):AtLeftIn(self, 6):AtVerticalCenterIn(self):End()
         Layouter(self.ColorSwatch):AnchorToRight(self.SlotNumber, 8):AtVerticalCenterIn(self):Width(14):Height(14):End()
-        Layouter(self.Name):AnchorToRight(self.ColorSwatch, 8):AtVerticalCenterIn(self):End()
+        Layouter(self.Avatar):AnchorToRight(self.ColorSwatch, 6):AtVerticalCenterIn(self):Width(16):Height(16):End()
+        Layouter(self.Flag):AnchorToRight(self.Avatar, 6):AtVerticalCenterIn(self):Width(18):Height(12):End()
+        Layouter(self.Name):AnchorToRight(self.Flag, 8):AtVerticalCenterIn(self):End()
+
+        -- right (laid out right-to-left): ready · team · cpu · faction · games · rating
         Layouter(self.Ready):AtRightIn(self, 8):AtVerticalCenterIn(self):End()
         Layouter(self.Team):AnchorToLeft(self.Ready, 12):AtVerticalCenterIn(self):End()
         Layouter(self.Cpu):AnchorToLeft(self.Team, 12):AtVerticalCenterIn(self):End()
         Layouter(self.CpuIndicator):AnchorToLeft(self.Cpu, 5):AtVerticalCenterIn(self):Width(8):Height(12):End()
-        Layouter(self.Faction):AnchorToLeft(self.CpuIndicator, 10):AtVerticalCenterIn(self):End()
+        Layouter(self.FactionIcons):AnchorToLeft(self.CpuIndicator, 10):AtVerticalCenterIn(self):End()
+        self:LayoutFactionIcons()
+        Layouter(self.Games):AnchorToLeft(self.FactionIcons, 12):AtVerticalCenterIn(self):End()
+        Layouter(self.Rating):AnchorToLeft(self.Games, 8):AtVerticalCenterIn(self):End()
 
         Layouter(self.CpuHover):Fill(self.Cpu):Over(self, 20):End()
+        Layouter(self.ColorZone):Fill(self.ColorSwatch):Over(self, 20):End()
+        Layouter(self.FactionZone):Fill(self.FactionIcons):Over(self, 20):End()
+        Layouter(self.TeamZone):Fill(self.Team):Over(self, 20):End()
+
+        Layouter(self.SlotButton):AtRightIn(self, 8):AtVerticalCenterIn(self):Width(54):Height(18):Over(self, 20):End()
+        self:LayoutSlotButton()
     end,
 }
 

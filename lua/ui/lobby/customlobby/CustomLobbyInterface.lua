@@ -216,12 +216,13 @@ local CustomLobbyInterface = Class(Group) {
         --#region bottom-left: chat / observers tabs
         -- each tab gets a config gear (left) + a count pill (right), mirroring the config column.
         -- Chat's count is a dummy until the chat slice lands; Observers shows the live observer count.
-        -- reacts to the chat feed; shows the line count (empty when none). TODO: unread-since-last-view
-        -- count once the chat slice tracks a last-seen marker.
+        -- unread chat count (lines since the Chat tab was last viewed; the panel marks the feed seen
+        -- while it's open). Empty when nothing is unread or while the Chat tab is active.
         self.ChatBadge = self.Trash:Add(LazyVarCreate())
         self.ChatBadge:Set(function()
-            local count = table.getn(CustomLobbyChatModel.GetSingleton().Entries())
-            return count > 0 and tostring(count) or ""
+            local model = CustomLobbyChatModel.GetSingleton()
+            local unread = model.TotalCount() - model.SeenTotal()
+            return unread > 0 and tostring(unread) or ""
         end)
         self.ObserversBadge = self.Trash:Add(LazyVarCreate())
         self.ObserversBadge:Set(function()

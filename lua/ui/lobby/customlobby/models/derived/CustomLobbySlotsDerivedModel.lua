@@ -93,6 +93,10 @@ local MaxSlots = CustomLobbyLaunchModel.MaxSlots
 ---@field team       string
 ---@field ready      string
 ---@field readyColor string
+---@field rating       string              # the player's displayed rating (PL), "" when unrated
+---@field games        string              # number of games played, "" when none / unknown
+---@field flag         FileName | false    # country flag texture, false when no country
+---@field factionIcons FileName[]          # the selected factions as icons (single icon = Random when the full set is allowed)
 
 --- The CPU column's resolved presentation (false when there is no player / no benchmark to show).
 ---@class UICustomLobbySlotCpuView
@@ -139,6 +143,33 @@ local function FactionLabel(faction)
         return data.DisplayName or data.Key or tostring(faction)
     end
     return "Random"
+end
+
+--- The small "any faction" icon, shown when the whole faction set is allowed (pure random).
+local RandomFactionIcon = '/faction_icon-sm/random_ico.dds'
+
+--- The selected factions as a list of small icons: the full set (or none) reads as pure random and
+--- shows a single Random icon; a subset shows that subset's icons; one shows one. So a partial random
+--- (e.g. UEF + Cybran) is legible as exactly those two icons.
+---@param player UICustomLobbyPlayer
+---@return FileName[]
+local function FactionIcons(player)
+    local factions = player.Factions
+    local count = factions and table.getn(factions) or 0
+    if count == 0 or count >= CustomLobbyLaunchModel.RealFactionCount then
+        return { RandomFactionIcon }
+    end
+    local icons = {}
+    for _, index in factions do
+        local data = Factions[index]
+        if data and data.SmallIcon then
+            table.insert(icons, data.SmallIcon)
+        end
+    end
+    if table.empty(icons) then
+        return { RandomFactionIcon }
+    end
+    return icons
 end
 
 --- The sim-rate categories tracked in PerformanceTrackingV2, ordered for the "most-played" pick.
@@ -196,6 +227,17 @@ end
 ---@param player UICustomLobbyPlayer
 ---@return UICustomLobbySlotPlayerView
 local function BuildPlayerView(player)
+    -- rating: the displayed (conservative) rating PL; blank for unrated / AI with no rating
+    local rating = ""
+    if player.PL and player.PL > 0 then
+        rating = tostring(math.floor(player.PL + 0.5))
+    end
+    -- games played; blank when none / unknown (e.g. AI)
+    local games = ""
+    if player.NG and player.NG > 0 then
+        games = tostring(player.NG)
+    end
+
     return {
         colorHex = GameColors.PlayerColors[player.PlayerColor] or 'ffffffff',
         name = player.PlayerName or "?",
@@ -204,6 +246,10 @@ local function BuildPlayerView(player)
         team = (player.Team and player.Team > 1) and ("T" .. (player.Team - 1)) or "-",
         ready = player.Ready and "ready" or "",
         readyColor = player.Ready and 'ff7ad97a' or 'ff888888',
+        rating = rating,
+        games = games,
+        flag = (player.Country and player.Country ~= "") and ('/countries/' .. player.Country .. '.dds') or false,
+        factionIcons = FactionIcons(player),
     }
 end
 
@@ -307,7 +353,7 @@ local function Signature(slots)
         parts[slot] = tostring(slot)
             .. "|" .. (entry.Closed and "C" or "_")
             .. (entry.Locked and "L" or "_")
-            .. "|" .. (pv and (pv.colorHex .. pv.name .. pv.nameColor .. pv.faction .. pv.team .. pv.ready .. pv.readyColor) or "-")
+            .. "|" .. (pv and (pv.colorHex .. pv.name .. pv.nameColor .. pv.faction .. pv.team .. pv.ready .. pv.readyColor .. pv.rating .. pv.games .. tostring(pv.flag) .. table.concat(pv.factionIcons, ",")) or "-")
             .. "|" .. (cv and (cv.text .. cv.textColor .. (cv.showIndicator and tostring(cv.indicatorColor) or "0")) or "-")
             .. "|" .. tostring(entry.StartSpot)
             .. "|" .. (pos and (tostring(pos[1]) .. ":" .. tostring(pos[2])) or "-")

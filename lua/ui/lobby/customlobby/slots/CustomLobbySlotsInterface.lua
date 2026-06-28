@@ -73,6 +73,7 @@ local PinIcon = '/game/menu-btns/pin_btn_up.dds'         -- unpinned (toggle off
 local PinnedIcon = '/game/menu-btns/pinned_btn_up.dds'   -- pinned (toggle on / the lock-notice glyph)
 local BalanceIcon = '/BUTTON/autobalance/_btn_up.dds'
 local ReopenIcon = '/game/recall-panel/icon-recall_bmp.dds'
+local CloseEmptyIcon = '/dialogs/close_btn/close.dds'   -- close all empty open slots (pairs with reopen)
 
 -- the auto-teams quick-cycle button steps through these modes in order (matches the options dropdown);
 -- its glyph is the faction-skinned per-mode art the legacy lobby used (/BUTTON/autoteam/<mode>/).
@@ -218,6 +219,7 @@ local SlotTool = Class(Group) {
 ---@field PinButton UICustomLobbySlotTool
 ---@field AutoTeamsButton UICustomLobbySlotTool
 ---@field BalanceButton UICustomLobbySlotTool
+---@field CloseEmptyButton UICustomLobbySlotTool
 ---@field ReopenButton UICustomLobbySlotTool
 ---@field Body UICustomLobbySlotsBody | false   # the active layout body
 ---@field LayoutKind "one" | "two" | false      # which layout Body currently is
@@ -286,6 +288,14 @@ local CustomLobbySlotsInterface = Class(Group) {
         Tooltip.AddControlTooltipManual(self.BalanceButton.Bg, "Auto balance",
             "Preview a balanced two-team split before applying it. Locked players stay put.")
 
+        -- closes every currently-open empty slot in one go (pairs with the reopen button)
+        self.CloseEmptyButton = SlotTool(self.Tools, CloseEmptyIcon)
+        self.CloseEmptyButton.OnPress = function()
+            CustomLobbyController.RequestCloseEmptySlots()
+        end
+        Tooltip.AddControlTooltipManual(self.CloseEmptyButton.Bg, "Close empty slots",
+            "Close every open slot that has no player, so no more players can join those seats.")
+
         self.ReopenButton = SlotTool(self.Tools, ReopenIcon)
         self.ReopenButton.OnPress = function()
             CustomLobbyController.RequestReopenClosedSlots()
@@ -352,14 +362,15 @@ local CustomLobbySlotsInterface = Class(Group) {
         Layouter(self.Tools)
             :AtRightIn(self, 4)
             :AtVerticalCenterIn(self.Header)
-            :Width(4 * ToolSize + 3 * ToolGap):Height(ToolSize)
+            :Width(5 * ToolSize + 4 * ToolGap):Height(ToolSize)
             :End()
         local function placeTool(tool)
             return Layouter(tool):AtTopIn(self.Tools):Width(ToolSize):Height(ToolSize)
         end
-        -- reading left to right: Pin · Auto teams · Balance · Reopen
+        -- reading left to right: Pin · Auto teams · Balance · Close empty · Reopen
         placeTool(self.ReopenButton):AtRightIn(self.Tools):End()
-        placeTool(self.BalanceButton):LeftOf(self.ReopenButton, ToolGap):End()
+        placeTool(self.CloseEmptyButton):LeftOf(self.ReopenButton, ToolGap):End()
+        placeTool(self.BalanceButton):LeftOf(self.CloseEmptyButton, ToolGap):End()
         placeTool(self.AutoTeamsButton):LeftOf(self.BalanceButton, ToolGap):End()
         placeTool(self.PinButton):LeftOf(self.AutoTeamsButton, ToolGap):End()
 

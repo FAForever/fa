@@ -40,6 +40,10 @@ local CustomLobbySession = import("/lua/ui/lobby/customlobby/customlobbysession.
 --- Maximum number of player slots the engine supports.
 MaxSlots = 16
 
+--- The number of real (non-random) factions — the upper bound of the faction multi-select, and the
+--- index just below the Random sentinel. Reads factions.lua so custom factions are counted too.
+RealFactionCount = table.getn(import("/lua/factions.lua").Factions)
+
 -------------------------------------------------------------------------------
 --#region Shapes
 
@@ -49,7 +53,8 @@ MaxSlots = 16
 ---@field PlayerName string
 ---@field OwnerID UILobbyPeerId
 ---@field Human boolean
----@field Faction number          # 1=UEF 2=Aeon 3=Cybran 4=Seraphim 5=Random
+---@field Faction number          # 1=UEF 2=Aeon 3=Cybran 4=Seraphim 5=Random — the representative (see Factions)
+---@field Factions number[]       # the multi-select: the real-faction indices the player allows; >1 = random among them
 ---@field PlayerColor number
 ---@field ArmyColor number
 ---@field Team number             # 1 = no team (FFA), 2..9 = teams 1..8
@@ -180,6 +185,62 @@ function SetPlayerField(model, slot, key, value)
     local player = table.copy(current)
     player[key] = value
     model.Players[slot]:Set(player)
+end
+
+--- Merges several fields onto the player in a slot in one copy-then-Set (one re-render, not N).
+--- Use when a change touches more than one field at once (e.g. the faction multi-select updates
+--- both `Factions` and the representative `Faction`).
+---@param model UICustomLobbyLaunchModel
+---@param slot number
+---@param fields table<string, any>
+function SetPlayerFields(model, slot, fields)
+    local current = model.Players[slot]()
+    if not current then
+        return
+    end
+    local player = table.copy(current)
+    for key, value in fields do
+        player[key] = value
+    end
+    model.Players[slot]:Set(player)
+end
+
+--- The single representative faction for a multi-select: the chosen one when exactly one faction is
+--- picked, else the Random sentinel (`RealFactionCount + 1`). Keeps `player.Faction` coherent for the
+--- readers that want one value (skin, the launch fallback) while `player.Factions` stays the source of
+--- truth for the choice. An empty / nil set reads as full random.
+---@param factions number[] | nil
+---@return number
+function RepresentativeFaction(factions)
+    if factions and table.getn(factions) == 1 then
+        return factions[1]
+    end
+    return RealFactionCount + 1
+end
+
+--- Normalises a faction multi-select: a sorted list of the in-range real-faction indices, de-duped.
+--- An empty / nil / all-invalid set falls back to "all factions" (full random), so a player always
+--- has at least one allowed faction.
+---@param factions number[] | nil
+---@return number[]
+function NormalizeFactions(factions)
+    local seen, out = {}, {}
+    if factions then
+        for _, index in factions do
+            if type(index) == 'number' and index >= 1 and index <= RealFactionCount and not seen[index] then
+                seen[index] = true
+                table.insert(out, index)
+            end
+        end
+    end
+    if table.empty(out) then
+        for index = 1, RealFactionCount do
+            table.insert(out, index)
+        end
+        return out
+    end
+    table.sort(out)
+    return out
 end
 
 --- Sets a single game option (copy-then-Set).

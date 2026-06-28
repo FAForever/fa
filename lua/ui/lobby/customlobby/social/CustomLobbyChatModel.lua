@@ -82,10 +82,12 @@ local Instance = nil
 --- trash so one `CustomLobbySession.Teardown()` frees it. Written by the controller (the wire half) and
 --- the chat controller (the send pipeline) through the free-function helpers below; views only read it.
 ---@class UICustomLobbyChatModel : Destroyable
----@field Trash     TrashBag                                # owns the LazyVars (freed on Destroy)
----@field Entries   LazyVar<UICustomLobbyChatEntry[]>       # the feed, capped to MaxEntries
----@field Recipient LazyVar<string>                         # current send target ('all') — reserved for whisper (slice 3)
----@field Destroyed boolean
+---@field Trash      TrashBag                               # owns the LazyVars (freed on Destroy)
+---@field Entries    LazyVar<UICustomLobbyChatEntry[]>      # the feed, capped to MaxEntries
+---@field Recipient  LazyVar<string>                        # current send target ('all') — reserved for whisper (slice 3)
+---@field TotalCount LazyVar<number>                        # monotonic count of lines ever appended (survives the ring-buffer trim) — drives the unread badge
+---@field SeenTotal  LazyVar<number>                        # `TotalCount` as of the last time the feed was viewed; unread = TotalCount - SeenTotal
+---@field Destroyed  boolean
 local ChatModel = ClassSimple {
 
     ---@param self UICustomLobbyChatModel
@@ -93,6 +95,8 @@ local ChatModel = ClassSimple {
         self.Trash = TrashBag()
         self.Entries = self.Trash:Add(Create({}))
         self.Recipient = self.Trash:Add(Create('all'))
+        self.TotalCount = self.Trash:Add(Create(0))
+        self.SeenTotal = self.Trash:Add(Create(0))
         self.Destroyed = false
     end,
 
@@ -165,7 +169,17 @@ function Append(model, entry)
     while table.getn(entries) > MaxEntries do
         table.remove(entries, 1)
     end
+    -- bump the monotonic total BEFORE publishing Entries: a panel observing Entries refreshes
+    -- synchronously and marks the feed seen, so it must read the new total (else it lags by one)
+    model.TotalCount:Set(model.TotalCount() + 1)
     model.Entries:Set(entries)
+end
+
+--- Marks the feed seen up to the current total (resets the unread count to 0). The chat panel calls
+--- this whenever it renders — it only exists while the Chat tab is open, so "rendered" means "viewed".
+---@param model UICustomLobbyChatModel
+function MarkSeen(model)
+    model.SeenTotal:Set(model.TotalCount())
 end
 
 --- Appends a system notice (a senderless `Confirmed` line — command feedback, join/leave, …). The one
@@ -234,6 +248,8 @@ function __moduleinfo.OnReload(newModule)
         local handle = newModule.SetupSingleton()
         handle.Entries:Set(Instance.Entries())
         handle.Recipient:Set(Instance.Recipient())
+        handle.TotalCount:Set(Instance.TotalCount())
+        handle.SeenTotal:Set(Instance.SeenTotal())
     end
 end
 

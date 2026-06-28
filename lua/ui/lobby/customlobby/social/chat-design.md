@@ -93,5 +93,7 @@ the same mechanism either way.
 - **Refinements.** Multi-line wrapping is **done** — `CustomLobbyChatPanel.BuildLines`/`WrapLine` wrap
   each entry's label to the message-column width (via [`/lua/maui/text.lua`](/lua/maui/text.lua)
   `WrapText`, measured by a hidden font-matched text) and emit one fixed-height grid row per wrapped line.
-  Still open: unread-since-last-view badge count (the badge shows the total line count).
+  Unread badge is **done** — the model keeps a monotonic `TotalCount` (bumped per append, survives the
+  ring-buffer trim) and a `SeenTotal` marker; the panel calls `MarkSeen` whenever it renders (it only
+  exists while the Chat tab is open), and the tab badge shows `TotalCount - SeenTotal`.
 ```

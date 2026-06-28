@@ -45,23 +45,32 @@
 -- This keeps the drag/intent logic single-sourced; the presentations are pure arrangement.
 
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local UIUtil = import("/lua/ui/uiutil.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Dragger = import("/lua/maui/dragger.lua").Dragger
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/models/customlobbylocalmodel.lua")
+local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/models/customlobbylaunchmodel.lua")
+local CustomLobbyRules = import("/lua/ui/lobby/customlobby/customlobbyrules.lua")
 local CustomLobbyPerformancePopover = import("/lua/ui/lobby/customlobby/customlobbyperformancepopover.lua")
 local CustomLobbyContextMenu = import("/lua/ui/lobby/customlobby/customlobbycontextmenu.lua")
 local CustomLobbyMenus = import("/lua/ui/lobby/customlobby/customlobbymenus.lua")
+local CustomLobbySlotPickers = import("/lua/ui/lobby/customlobby/slots/customlobbyslotpickers.lua")
 local CustomLobbySlotsDerivedModel = import("/lua/ui/lobby/customlobby/models/derived/customlobbyslotsderivedmodel.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
+local scaled = LayoutHelpers.ScaleNumber
 
 -- cursor travel (screen px) before a press becomes a drag instead of a click
 local DragThreshold = 5
+
+-- the faction display is a small left-to-right strip of the selected factions' icons
+local FactionIconSize = 14
+local FactionIconGap = 2
 
 --- The container that owns the slot rows and coordinates drag-to-swap. The row only
 --- starts the gesture; the coordinator hit-tests across all rows (it's the only thing
@@ -82,6 +91,9 @@ local DragThreshold = 5
 ---@field team string
 ---@field ready string
 ---@field readyColor string
+---@field rating string
+---@field games string
+---@field flag FileName | false
 
 --- A presentation-supplied view of the CPU column (nil = no data, clear it).
 ---@class UICustomLobbySlotCpuView
@@ -89,6 +101,11 @@ local DragThreshold = 5
 ---@field textColor string
 ---@field indicatorColor? Color
 ---@field showIndicator boolean
+
+--- The host-only per-seat close/open button (a labelled surface).
+---@class UICustomLobbySlotButton : Group
+---@field Bg Bitmap
+---@field Label Text
 
 ---@class UICustomLobbySlotBase : Group
 ---@field Trash TrashBag
@@ -104,11 +121,20 @@ local DragThreshold = 5
 -- the standard named controls a presentation must provide (the base's Render* paint these):
 ---@field ColorSwatch Bitmap
 ---@field Name Text
----@field Faction Text
 ---@field Team Text
 ---@field Ready Text
 ---@field Cpu Text
 ---@field CpuIndicator Bitmap
+-- optional controls a presentation may provide (the base paints these when present):
+---@field Faction? Text                  # legacy text faction label (presentations now use FactionIcons)
+---@field FactionIcons? Group            # the selected factions as a strip of small icons
+---@field FactionIconBitmaps? Bitmap[]   # the icon slots inside FactionIcons
+---@field Rating? Text
+---@field Games? Text
+---@field Flag? Bitmap
+---@field Avatar? Bitmap
+---@field SlotButton? UICustomLobbySlotButton    # host-only per-seat close/open button
+---@field SlotButtonMode? "close" | "open" | false
 local CustomLobbySlotBase = Class(Group) {
 
     ---@param self UICustomLobbySlotBase
@@ -203,19 +229,76 @@ local CustomLobbySlotBase = Class(Group) {
             self.ColorSwatch:SetSolidColor('00000000')
             self.Name:SetText("- open -")
             self.Name:SetColor('ff888888')
-            self.Faction:SetText("")
+            if self.Faction then self.Faction:SetText("") end
             self.Team:SetText("")
             self.Ready:SetText("")
+            self:RenderExtras(nil)
             return
         end
 
         self.ColorSwatch:SetSolidColor(view.colorHex)
         self.Name:SetText(view.name)
         self.Name:SetColor(view.nameColor)
-        self.Faction:SetText(view.faction)
+        if self.Faction then self.Faction:SetText(view.faction) end
         self.Team:SetText(view.team)
         self.Ready:SetText(view.ready)
         self.Ready:SetColor(view.readyColor)
+        self:RenderExtras(view)
+    end,
+
+    --- Paints the optional controls a presentation may provide (rating / games / country flag / avatar
+    --- placeholder) — guarded so a presentation that omits one is unaffected. `view` is nil on an empty
+    --- seat (everything clears / hides).
+    ---@param self UICustomLobbySlotBase
+    ---@param view UICustomLobbySlotPlayerView | nil
+    RenderExtras = function(self, view)
+        if self.Rating then
+            self.Rating:SetText((view and view.rating) or "")
+        end
+        if self.Games then
+            local games = (view and view.games) or ""
+            self.Games:SetText(games ~= "" and ("G:" .. games) or "")
+        end
+        if self.Flag then
+            local flag = view and view.flag
+            if flag then
+                self.Flag:SetTexture(UIUtil.UIFile(flag))
+                self.Flag:SetAlpha(1.0)
+            else
+                self.Flag:SetAlpha(0.0)
+            end
+        end
+        -- the avatar is a reserved placeholder for now: a dim box while the seat is occupied
+        if self.Avatar then
+            self.Avatar:SetAlpha(view and 1.0 or 0.0)
+        end
+        self:RenderFactionIcons(view)
+    end,
+
+    --- Paints the faction icon strip from `view.factionIcons` (one icon per allowed faction; a single
+    --- Random icon when the full set is allowed). Sizes the strip to the shown count so neighbours
+    --- reflow, and hides it entirely on an empty seat.
+    ---@param self UICustomLobbySlotBase
+    ---@param view UICustomLobbySlotPlayerView | nil
+    RenderFactionIcons = function(self, view)
+        local bitmaps = self.FactionIconBitmaps
+        if not (self.FactionIcons and bitmaps) then
+            return
+        end
+        local icons = (view and view.factionIcons) or {}
+        local count = table.getn(icons)
+        local slots = table.getn(bitmaps)
+        local shown = math.min(count, slots)
+        for k = 1, slots do
+            if k <= shown then
+                bitmaps[k]:SetTexture(UIUtil.UIFile(icons[k]))
+                bitmaps[k]:SetAlpha(1.0)
+            else
+                bitmaps[k]:SetAlpha(0.0)
+            end
+        end
+        local width = (shown > 0) and (shown * FactionIconSize + (shown - 1) * FactionIconGap) or 0
+        self.FactionIcons.Width:Set(scaled(width))
     end,
 
     --- Paints the CPU column (or clears it when `view` is nil) onto the standard named controls.
@@ -252,8 +335,15 @@ local CustomLobbySlotBase = Class(Group) {
         self.CurrentPlayer = entry.Player
         self:RenderPlayer(entry.PlayerView or nil)
         self:RenderCpu(entry.CpuView or nil)
+        -- a closed empty seat reads "- closed -" instead of "- open -"
+        if entry.Closed and not entry.Player then
+            self.Name:SetText("- closed -")
+            self.Name:SetColor('ff6a7078')
+        end
         -- a locked seat (only meaningful when occupied) shows the gold left-edge accent
         self.LockStripe:SetAlpha((entry.Locked and entry.Player) and 1.0 or 0.0)
+        -- the host-only per-seat close/open button (shown only on an empty or closed seat)
+        self:RenderSlotButton(entry)
     end,
 
     --#endregion
@@ -385,6 +475,195 @@ local CustomLobbySlotBase = Class(Group) {
         end
         if player.OwnerID == CustomLobbyLocalModel.GetSingleton().LocalPeerId() then
             CustomLobbyController.RequestSetReady(not player.Ready)
+        end
+    end,
+
+    --- Whether the local peer may edit this seat's per-player settings (faction / colour / team): your
+    --- own seat while you're not ready, or any AI seat if you're the host. (Another human's seat is not
+    --- editable.) A per-`kind` gate refines this — the team picker is hidden under a binary AutoTeams
+    --- mode (the team is decided by start position there).
+    ---@param self UICustomLobbySlotBase
+    ---@param kind "color" | "faction" | "team"
+    ---@return boolean
+    CanEdit = function(self, kind)
+        local player = self.CurrentPlayer
+        if not player then
+            return false
+        end
+        local localModel = CustomLobbyLocalModel.GetSingleton()
+        local mine = player.Human and player.OwnerID == localModel.LocalPeerId() and not player.Ready
+        local hostAi = localModel.IsHost() and not player.Human
+        if not (mine or hostAi) then
+            return false
+        end
+        if kind == "team" and CustomLobbyRules.AutoTeamMode(CustomLobbyLaunchModel.GetSingleton().GameOptions()) then
+            return false   -- binary AutoTeams decides the team from the start position
+        end
+        return true
+    end,
+
+    --- Opens the picker for an editable element, anchored at the cursor.
+    ---@param self UICustomLobbySlotBase
+    ---@param kind "color" | "faction" | "team"
+    ---@param event KeyEvent
+    OpenPicker = function(self, kind, event)
+        local player = self.CurrentPlayer
+        if not player then
+            return
+        end
+        local x, y = event.MouseX, event.MouseY
+        if kind == "color" then
+            CustomLobbySlotPickers.ShowColorPicker(self.SlotIndex, player, x, y)
+        elseif kind == "faction" then
+            CustomLobbySlotPickers.ShowFactionPicker(self.SlotIndex, player, x, y)
+        elseif kind == "team" then
+            CustomLobbySlotPickers.ShowTeamPicker(self.SlotIndex, player, x, y)
+        end
+    end,
+
+    --- Routes an edit-zone press: a left press on an editable element opens its picker; otherwise it
+    --- behaves like a normal row press (take / ready / host-drag), and a right press opens the context
+    --- menu — so the zone never swallows the row's default interactions when it isn't editable.
+    ---@param self UICustomLobbySlotBase
+    ---@param kind "color" | "faction" | "team"
+    ---@param event KeyEvent
+    ---@return boolean
+    HandleEditZoneEvent = function(self, kind, event)
+        if event.Type ~= 'ButtonPress' then
+            return false
+        end
+        if event.Modifiers.Right then
+            self:OnRowContext(event)
+        elseif self:CanEdit(kind) then
+            self:OpenPicker(kind, event)
+        else
+            self:OnRowPress(event)
+        end
+        return true
+    end,
+
+    --- Builds a transparent hit zone over an editable element (the presentation lays it out above the
+    --- ClickArea, like the CPU hover zone). Routes presses through `HandleEditZoneEvent`.
+    ---@param self UICustomLobbySlotBase
+    ---@param kind "color" | "faction" | "team"
+    ---@return Bitmap
+    CreateEditZone = function(self, kind)
+        local zone = Bitmap(self)
+        zone:SetSolidColor('00000000')
+        zone.HandleEvent = function(control, event)
+            return self:HandleEditZoneEvent(kind, event)
+        end
+        return zone
+    end,
+
+    --- Builds the faction icon strip: a Group with one icon slot per real faction (hidden until
+    --- `RenderFactionIcons` fills them). The presentation positions the outer group and calls
+    --- `LayoutFactionIcons` to lay the slots inside it; the edit zone overlays the group.
+    ---@param self UICustomLobbySlotBase
+    ---@return Group
+    CreateFactionIcons = function(self)
+        local group = Group(self)
+        local bitmaps = {}
+        for k = 1, CustomLobbyLaunchModel.RealFactionCount do
+            local icon = Bitmap(group)
+            icon:DisableHitTest()
+            icon:SetAlpha(0.0)
+            bitmaps[k] = icon
+        end
+        self.FactionIcons = group
+        self.FactionIconBitmaps = bitmaps
+        return group
+    end,
+
+    --- Lays the icon slots left-to-right inside the faction-icon group (called from the presentation's
+    --- LayoutContents after it has positioned the outer group). The slots track the group's left edge,
+    --- so the strip follows the group regardless of column orientation.
+    ---@param self UICustomLobbySlotBase
+    LayoutFactionIcons = function(self)
+        if not self.FactionIconBitmaps then
+            return
+        end
+        self.FactionIcons.Height:Set(scaled(FactionIconSize))
+        for k, icon in self.FactionIconBitmaps do
+            local offset = (k - 1) * (FactionIconSize + FactionIconGap)
+            Layouter(icon):Width(FactionIconSize):Height(FactionIconSize):AtVerticalCenterIn(self.FactionIcons)
+                :Left(function() return self.FactionIcons.Left() + scaled(offset) end):End()
+        end
+    end,
+
+    --- Builds the host-only per-seat close/open button (hidden until `RenderSlotButton` shows it on an
+    --- empty / closed seat). A small labelled surface; the presentation positions the outer group and
+    --- calls `LayoutSlotButton` to bind its internals.
+    ---@param self UICustomLobbySlotBase
+    ---@return Group
+    CreateSlotButton = function(self)
+        ---@type UICustomLobbySlotButton
+        local btn = Group(self)
+        btn.Bg = Bitmap(btn)
+        btn.Bg:SetSolidColor('ff2a333c')
+        btn.Label = UIUtil.CreateText(btn, "", 12, UIUtil.bodyFont)
+        btn.Label:SetColor('ffd0d4d8')
+        btn.Label:DisableHitTest()
+        btn.Bg.HandleEvent = function(control, event)
+            if event.Type == 'ButtonPress' then
+                self:OnSlotButtonPress()
+                return true
+            elseif event.Type == 'MouseEnter' then
+                control:SetSolidColor('ff37424d')
+                return true
+            elseif event.Type == 'MouseExit' then
+                control:SetSolidColor('ff2a333c')
+                return true
+            end
+            return false
+        end
+        btn:Hide()
+        self.SlotButton = btn
+        return btn
+    end,
+
+    --- Binds the slot button's internals (called from the presentation's LayoutContents after it has
+    --- positioned the outer group).
+    ---@param self UICustomLobbySlotBase
+    LayoutSlotButton = function(self)
+        if not self.SlotButton then
+            return
+        end
+        Layouter(self.SlotButton.Bg):Fill(self.SlotButton):End()
+        Layouter(self.SlotButton.Label):AtCenterIn(self.SlotButton):End()
+    end,
+
+    --- Updates the close/open button for the resolved entry: the host sees "Close" on an empty open
+    --- seat and "Open" on a closed seat; it is hidden otherwise (occupied seat, or a non-host peer).
+    ---@param self UICustomLobbySlotBase
+    ---@param entry UICustomLobbySlot
+    RenderSlotButton = function(self, entry)
+        local btn = self.SlotButton
+        if not btn then
+            return
+        end
+        local isHost = CustomLobbyLocalModel.GetSingleton().IsHost()
+        if isHost and not entry.Player and not entry.Closed then
+            self.SlotButtonMode = "close"
+            btn.Label:SetText("Close")
+            btn:Show()
+        elseif isHost and entry.Closed then
+            self.SlotButtonMode = "open"
+            btn.Label:SetText("Open")
+            btn:Show()
+        else
+            self.SlotButtonMode = false
+            btn:Hide()
+        end
+    end,
+
+    --- Click on the close/open button: opens or closes this seat (host-authoritative).
+    ---@param self UICustomLobbySlotBase
+    OnSlotButtonPress = function(self)
+        if self.SlotButtonMode == "close" then
+            CustomLobbyController.RequestSetSlotClosed(self.SlotIndex, true)
+        elseif self.SlotButtonMode == "open" then
+            CustomLobbyController.RequestSetSlotClosed(self.SlotIndex, false)
         end
     end,
 

@@ -296,6 +296,10 @@ local CustomLobbyChatPanel = ClassUI(Group) {
             return
         end
 
+        -- the panel only exists while the Chat tab is open, so a render means the feed is being viewed:
+        -- clear the unread count (the badge in CustomLobbyInterface reads TotalCount - SeenTotal)
+        CustomLobbyChatModel.MarkSeen(CustomLobbyChatModel.GetSingleton())
+
         -- recompute the row width from the (now-settled) panel width so rows size correctly even if the
         -- first Initialize ran before the layout settled
         self.RowWidth = self:ComputeRowWidth()

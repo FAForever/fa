@@ -269,6 +269,75 @@ local function SwapSlots(instance, slotA, slotB)
     end
 end
 
+--- Whether `color` (a PlayerColor index) is already used by a seated player other than `exceptSlot`.
+--- Colours are scarce — two players can't share one — so a colour change is rejected if taken.
+---@param color number
+---@param exceptSlot number
+---@return boolean
+local function IsColorTaken(color, exceptSlot)
+    local launch = CustomLobbyLaunchModel.GetSingleton()
+    for slot = 1, CustomLobbyLaunchModel.MaxSlots do
+        if slot ~= exceptSlot then
+            local player = launch.Players[slot]()
+            if player and player.PlayerColor == color then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+--- Host-side: applies a faction multi-select to the player in `slot` (normalised) and re-broadcasts.
+--- `Factions` is the source of truth; `Faction` is kept as its representative. A no-op on an empty slot.
+---@param instance UICustomLobbyInstance
+---@param slot number | nil
+---@param factions number[]
+local function ApplyFactions(instance, slot, factions)
+    local launch = CustomLobbyLaunchModel.GetSingleton()
+    if not (slot and launch.Players[slot]()) then
+        return
+    end
+    local normalized = CustomLobbyLaunchModel.NormalizeFactions(factions)
+    CustomLobbyLaunchModel.SetPlayerFields(launch, slot, {
+        Factions = normalized,
+        Faction = CustomLobbyLaunchModel.RepresentativeFaction(normalized),
+    })
+    BroadcastPlayers(instance)
+end
+
+--- Host-side: applies a colour to the player in `slot` (both PlayerColor + ArmyColor) and re-broadcasts.
+--- Rejected (logged) if the colour is already taken by another seated player, or the slot is empty.
+---@param instance UICustomLobbyInstance
+---@param slot number | nil
+---@param color number
+local function ApplyColor(instance, slot, color)
+    local launch = CustomLobbyLaunchModel.GetSingleton()
+    if not (slot and launch.Players[slot]() and type(color) == 'number') then
+        return
+    end
+    if IsColorTaken(color, slot) then
+        WARN("CustomLobby: colour " .. tostring(color) .. " is already taken; ignoring")
+        return
+    end
+    CustomLobbyLaunchModel.SetPlayerFields(launch, slot, { PlayerColor = color, ArmyColor = color })
+    BroadcastPlayers(instance)
+end
+
+--- Host-side: applies a team to the player in `slot` (backend numbering: 1 = no team, 2..9 = teams
+--- 1..8) and re-broadcasts. A no-op on an empty slot. (Binary AutoTeams modes still override the team
+--- from the start position at launch — see `BuildGameConfiguration`.)
+---@param instance UICustomLobbyInstance
+---@param slot number | nil
+---@param team number
+local function ApplyTeam(instance, slot, team)
+    local launch = CustomLobbyLaunchModel.GetSingleton()
+    if not (slot and launch.Players[slot]() and type(team) == 'number') then
+        return
+    end
+    CustomLobbyLaunchModel.SetPlayerField(launch, slot, 'Team', team)
+    BroadcastPlayers(instance)
+end
+
 --- Reads a numeric command-line argument (e.g. `/mean 1500`), falling back to the default
 --- when it is absent or unparseable.
 ---@param key string
@@ -326,8 +395,16 @@ function CreateLocalPlayer(instance)
     player.NG = GetCommandLineNumber("/numgames", 0)
     player.PL = math.floor(player.MEAN - 3 * player.DEV)
 
-    -- faction + team
+    -- faction + team. The faction multi-select (`Factions`) is the source of truth: seed it from the
+    -- single command-line / default faction — a concrete faction is a one-element set, the Random
+    -- sentinel becomes "all factions" — and keep `Faction` as its representative.
     player.Faction = GetCommandLineFaction(player.Faction)
+    if player.Faction and player.Faction <= CustomLobbyLaunchModel.RealFactionCount then
+        player.Factions = { player.Faction }
+    else
+        player.Factions = CustomLobbyLaunchModel.NormalizeFactions(nil)   -- all factions = random
+    end
+    player.Faction = CustomLobbyLaunchModel.RepresentativeFaction(player.Factions)
     player.Team = GetCommandLineNumber("/team", player.Team)
 
     -- identity + league standing
@@ -530,6 +607,27 @@ function ProcessSetReady(instance, data)
         CustomLobbyLaunchModel.SetPlayerField(CustomLobbyLaunchModel.GetSingleton(), slot, 'Ready', data.Ready and true or false)
         BroadcastPlayers(instance)
     end
+end
+
+--- Host applies a client's faction multi-select to that client's own slot and re-broadcasts.
+---@param instance UICustomLobbyInstance
+---@param data UICustomLobbySetFactionsMessage
+function ProcessSetFactions(instance, data)
+    ApplyFactions(instance, FindSlotForOwner(data.SenderID), data.Factions)
+end
+
+--- Host applies a client's colour choice to that client's own slot (scarcity-checked) and re-broadcasts.
+---@param instance UICustomLobbyInstance
+---@param data UICustomLobbySetColorMessage
+function ProcessSetColor(instance, data)
+    ApplyColor(instance, FindSlotForOwner(data.SenderID), data.Color)
+end
+
+--- Host applies a client's team choice to that client's own slot and re-broadcasts.
+---@param instance UICustomLobbyInstance
+---@param data UICustomLobbySetTeamMessage
+function ProcessSetTeam(instance, data)
+    ApplyTeam(instance, FindSlotForOwner(data.SenderID), data.Team)
 end
 
 --- Host moves a requesting client into the open slot it asked for. Ignored while seating
@@ -969,9 +1067,16 @@ local function BuildGameConfiguration(instance)
         local player = launch.Players[slot]()
         if player then
             local options = table.copy(player)
-            if (options.Faction or factionCount + 1) > factionCount then
+            -- resolve the faction multi-select to one concrete faction: pick uniformly from the
+            -- allowed set (`Factions`); a one-element set is that faction, a multi-element set is the
+            -- random pick. Fall back to the legacy single-Faction-or-random when no set is present.
+            local allowed = options.Factions
+            if allowed and table.getn(allowed) > 0 then
+                options.Faction = allowed[Random(1, table.getn(allowed))]
+            elseif (options.Faction or factionCount + 1) > factionCount then
                 options.Faction = Random(1, factionCount)
             end
+            options.Factions = nil   -- launch payload carries the resolved single faction only
             options.StartSpot = options.StartSpot or slot
             playerOptions[slot] = options
             if options.PL then ratings[options.PlayerName] = options.PL end
@@ -1337,6 +1442,65 @@ function RequestReopenClosedSlots()
     end))
 end
 
+--- The host opens or closes a single slot. Host-only — backs the per-slot close/open button and its
+--- context-menu entries. A closed slot has no army at launch (session state, not launched). Closing is
+--- only allowed on an empty seat (we don't evict a player by closing under them); opening always works.
+---@param slot number
+---@param closed boolean
+function RequestSetSlotClosed(slot, closed)
+    local instance = LobbyInstance
+    if not instance then
+        return
+    end
+
+    local session = CustomLobbySessionModel.GetSingleton()
+    if not CustomLobbyLocalModel.GetSingleton().IsHost() then
+        WARN("CustomLobby: only the host can open or close slots")
+        return
+    end
+    if type(slot) ~= 'number' or slot < 1 or slot > session.SlotCount() then
+        return
+    end
+    -- closing an occupied seat would silently drop its player; require it empty first
+    if closed and CustomLobbyLaunchModel.GetSingleton().Players[slot]() then
+        WARN("CustomLobby: cannot close an occupied slot " .. tostring(slot))
+        return
+    end
+
+    CustomLobbySessionModel.SetClosed(session, slot, closed and true or false)
+    BroadcastSessionState(instance)
+end
+
+--- The host closes every currently-open empty slot in one go (the header "close empty slots" button).
+--- Occupied and already-closed slots are left as-is; one broadcast for the batch.
+function RequestCloseEmptySlots()
+    local instance = LobbyInstance
+    if not instance then
+        return
+    end
+
+    local session = CustomLobbySessionModel.GetSingleton()
+    if not CustomLobbyLocalModel.GetSingleton().IsHost() then
+        WARN("CustomLobby: only the host can close slots")
+        return
+    end
+
+    local launch = CustomLobbyLaunchModel.GetSingleton()
+    local closedSlots = table.copy(session.ClosedSlots())
+    local changed = false
+    for slot = 1, session.SlotCount() do
+        if not launch.Players[slot]() and not closedSlots[slot] then
+            closedSlots[slot] = true
+            changed = true
+        end
+    end
+    if not changed then
+        return
+    end
+    session.ClosedSlots:Set(closedSlots)
+    BroadcastSessionState(instance)
+end
+
 --- Ejects the player in `slot`: a human is dropped from the network (the resulting
 --- PeerDisconnected clears the slot + re-broadcasts), an AI is just cleared. Host-only.
 --- Slot-keyed so a chat command (`/eject <slot>`) can call it too; whether the caller
@@ -1419,6 +1583,63 @@ function RequestSetReady(ready)
         end
     else
         instance:SendData(localModel.HostID(), { Type = 'SetReady', Ready = ready and true or false })
+    end
+end
+
+--- Sets the faction multi-select for a seat. The host applies directly to `slot` (it may edit any seat
+--- — its own or an AI); a client can only change its own seat, so it asks the host (which applies to the
+--- sender's slot, ignoring `slot`). `Factions` is a list of allowed real-faction indices — more than one
+--- means random among them. Mirrors RequestSetReady's host/client split.
+---@param slot number
+---@param factions number[]
+function RequestSetFactions(slot, factions)
+    local instance = LobbyInstance
+    if not instance then
+        return
+    end
+
+    local localModel = CustomLobbyLocalModel.GetSingleton()
+    if localModel.IsHost() then
+        ApplyFactions(instance, slot, factions)
+    else
+        instance:SendData(localModel.HostID(), { Type = 'SetFactions', Factions = factions })
+    end
+end
+
+--- Sets the colour for a seat (host applies to `slot`; a client asks the host for its own seat). The
+--- host rejects a colour already taken by another seated player — colours are scarce.
+---@param slot number
+---@param color number
+function RequestSetColor(slot, color)
+    local instance = LobbyInstance
+    if not instance then
+        return
+    end
+
+    local localModel = CustomLobbyLocalModel.GetSingleton()
+    if localModel.IsHost() then
+        ApplyColor(instance, slot, color)
+    else
+        instance:SendData(localModel.HostID(), { Type = 'SetColor', Color = color })
+    end
+end
+
+--- Sets the team for a seat (backend numbering: 1 = no team, 2..9 = teams 1..8). Host applies to
+--- `slot`; a client asks the host for its own seat. (Binary AutoTeams modes still decide the team from
+--- the start position at launch.)
+---@param slot number
+---@param team number
+function RequestSetTeam(slot, team)
+    local instance = LobbyInstance
+    if not instance then
+        return
+    end
+
+    local localModel = CustomLobbyLocalModel.GetSingleton()
+    if localModel.IsHost() then
+        ApplyTeam(instance, slot, team)
+    else
+        instance:SendData(localModel.HostID(), { Type = 'SetTeam', Team = team })
     end
 end
 

@@ -26,19 +26,19 @@ Roles: **Host**, **Player** (human in a slot), **Observer**, **Joining client**
 
 ## B. Slots & players
 
-- 🟡 As a **host**, I want to open or close an empty slot, so that I control how many players can join. *(Closed-slot state is modelled + synced; the open/close control isn't wired.)*
+- ✅ As a **host**, I want to open or close an empty slot, so that I control how many players can join. *(Per-seat **Close**/**Open** button on each empty/closed slot + a header **Close empty slots** button → `RequestSetSlotClosed` / `RequestCloseEmptySlots`; closing is rejected on an occupied seat.)*
 - ⬜ As a **host on an adaptive map**, I want to close a slot as "spawn-mex", so that the position yields mass instead of an ACU.
 - ✅ As a **player**, I want to occupy an empty open slot, so that I can join the game; *when* I'm not already marked ready.
 - ✅ As a **host**, I want to move a player to another slot or swap two players, so that I can arrange start positions and teams. *(Drag a row onto another → `RequestSwapSlots`.)*
 - 🟡 As a **host**, I want to kick a player with an optional message, so that I can remove someone; *and* the message is remembered for next time. *(Eject works; no message / recall.)*
-- 🟡 As a **player**, I want each slot row to show name, rating, country, faction, colour, team, ping, CPU and ready state, so that I can assess the lobby at a glance. *(Name, CPU/headroom, ready shown; rating/country/faction/colour/team/ping not yet.)*
+- 🟡 As a **player**, I want each slot row to show name, rating, country, faction, colour, team, ping, CPU and ready state, so that I can assess the lobby at a glance. *(Name, colour, faction, team, rating, games, country flag, CPU/headroom, ready shown + a reserved avatar box; ping not yet.)*
 - ✅ As a **player**, I want a slot's controls to reflect who owns it (me / another player / host / AI) via colour and an appropriate right-click menu, so that I only see actions I'm allowed to take.
 
 ## C. Per-player settings
 
-- ⬜ As a **player**, I want to choose my faction (including Random), so that I play what I want; *given* the map allows it and I'm not ready.
-- ⬜ As a **player**, I want to pick a colour, so that I'm visually distinct; *when* the colour is free — taken colours are hidden and the host reverts conflicts.
-- ⬜ As a **player**, I want to set my team, so that I'm allied correctly; *when* AutoTeams is off and I'm not ready.
+- 🟡 As a **player**, I want to choose my faction (including Random), so that I play what I want; *given* the map allows it and I'm not ready. *(Click the faction → a **multi-toggle** picker: tick a subset of factions, more than one = random among them, resolved to one at launch. Gated to your own seat while not ready, or any AI seat for the host. Per-map faction availability isn't enforced yet.)*
+- 🟡 As a **player**, I want to pick a colour, so that I'm visually distinct; *when* the colour is free — taken colours are hidden and the host reverts conflicts. *(Click the swatch → a colour grid; colours taken by another seated player are greyed, and the host rejects a taken colour if a race slips through → `RequestSetColor`.)*
+- 🟡 As a **player**, I want to set my team, so that I'm allied correctly; *when* AutoTeams is off and I'm not ready. *(Click the team tag → a team picker (No team / Team 1..8); hidden under a binary AutoTeams mode, where the start position decides the team → `RequestSetTeam`.)*
 - ✅ As a **player**, I want to toggle Ready, so that I signal I'm set; *and when* ready, my own controls lock until I unready.
 - ⬜ As a **host**, I want to force a player not-ready, so that I can change settings that affect them.
 - ⬜ As a **player**, I want to pick my start position on the map preview, so that I control where I spawn; *when* spawn is fixed (host gets swap/assign tools otherwise).
@@ -161,7 +161,7 @@ Roles: **Host**, **Player** (human in a slot), **Observer**, **Joining client**
 
 - ✅ As a **host**, I want the ability to lock players in-place when autobalance is applied so that players that want to play together stay in the same team. *(Slot context menu "Lock in slot"; a locked seat is pinned (synced session state) and the balancer rearranges only the unlocked players around it — see `CustomLobbyBalancer`.)*
 - ⬜ As a **player**, I want the observer bug that can freeze/crash the lobby fixed — or at least a warning when it's hit — so that observing doesn't break the lobby. *(Reliable repro needs a debuggable lobby setup.)*
-- ⬜ As a **player**, I want to randomise among a chosen subset of factions (multi-choice), so that I get variety without pure random.
+- ✅ As a **player**, I want to randomise among a chosen subset of factions (multi-choice), so that I get variety without pure random. *(The faction picker is a multi-toggle; the allowed set is stored as `player.Factions` and `BuildGameConfiguration` resolves it to one concrete faction at launch.)*
 - ⬜ As a **player**, I want my FAF avatar shown in the lobby, so that players are recognisable.
 - ⬜ As a **host**, I want a "players vs AI" AutoTeams option, so that all humans are teamed against the AIs automatically.
 - ⬜ As a **host**, I want closing a slot to auto-move its player to a free slot (in opti), so that rearranging doesn't drop anyone.
