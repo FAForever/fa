@@ -142,6 +142,7 @@ function Launch-LobbyInstance {
 # Host instance (top-left). Positional order for /hostgame is protocol, port, name, gameName, map.
 $hostArgs = @(
     "/log", "host_lobby_1.log",
+    "/debug",
     "/hostgame", $hostProtocol, $port, $hostPlayerName, $gameName, $map
 ) + $commonArgs + (Get-PlayerArgs)
 Launch-LobbyInstance -instanceNumber 1 -xPos 0 -yPos 0 -arguments $hostArgs

@@ -74,6 +74,7 @@ local PinnedIcon = '/game/menu-btns/pinned_btn_up.dds'   -- pinned (toggle on / 
 local BalanceIcon = '/BUTTON/autobalance/_btn_up.dds'
 local ReopenIcon = '/game/recall-panel/icon-recall_bmp.dds'
 local CloseEmptyIcon = '/dialogs/close_btn/close.dds'   -- close all empty open slots (pairs with reopen)
+local InspectIcon = '/dialogs/zoom_btn/zoom_btn_up.dds' -- /debug-only: toggle the "show control under mouse" overlay
 
 -- the auto-teams quick-cycle button steps through these modes in order (matches the options dropdown);
 -- its glyph is the faction-skinned per-mode art the legacy lobby used (/BUTTON/autoteam/<mode>/).
@@ -221,6 +222,7 @@ local SlotTool = Class(Group) {
 ---@field BalanceButton UICustomLobbySlotTool
 ---@field CloseEmptyButton UICustomLobbySlotTool
 ---@field ReopenButton UICustomLobbySlotTool
+---@field DebugButton? UICustomLobbySlotTool      # /debug-only host UI-inspection toggle
 ---@field Body UICustomLobbySlotsBody | false   # the active layout body
 ---@field LayoutKind "one" | "two" | false      # which layout Body currently is
 ---@field Mounted boolean                        # true once __post_init has laid us out
@@ -303,13 +305,38 @@ local CustomLobbySlotsInterface = Class(Group) {
         Tooltip.AddControlTooltipManual(self.ReopenButton.Bg, "Reopen closed slots",
             "Close, then re-open every closed slot to refresh the lobby for everyone.")
 
-        -- the tool strip is a host action set; hide it for clients
+        -- a UI-inspection toggle, created only when the game was launched with /debug: lights the
+        -- "show control under mouse" overlay so any control can be inspected by hovering it (the
+        -- overlay + dump-key wiring lives in the controller, see ToggleUiInspectOverlay). Unlike the
+        -- host action buttons it sits on the far left, directly right of the "Players" label (a
+        -- developer aid, not a lobby action) — so it's parented to the header band rather than the
+        -- right-aligned Tools strip, and the IsHost observer below gates its visibility separately
+        -- (creation is gated on /debug, visibility on IsHost).
+        if HasCommandLineArg('/debug') then
+            self.DebugButton = SlotTool(self, InspectIcon)
+            self.DebugButton:SetActive(CustomLobbyController.IsUiInspectOverlayEnabled())
+            self.DebugButton.OnPress = function()
+                self.DebugButton:SetActive(CustomLobbyController.ToggleUiInspectOverlay())
+            end
+            Tooltip.AddControlTooltipManual(self.DebugButton.Bg, "Inspect controls",
+                "Toggle the 'show control under mouse' overlay, then hover any UI control to inspect it. (/debug only)")
+        end
+
+        -- the tool strip (and the far-left /debug inspect button) are host-only; hide for clients
         self.IsHostObserver = self.Trash:Add(
             LazyVarDerive(CustomLobbyLocalModel.GetSingleton().IsHost, function(isHostLazy)
-                if isHostLazy() then
+                local isHost = isHostLazy()
+                if isHost then
                     self.Tools:Show()
                 else
                     self.Tools:Hide()
+                end
+                if self.DebugButton then
+                    if isHost then
+                        self.DebugButton:Show()
+                    else
+                        self.DebugButton:Hide()
+                    end
                 end
             end))
 
@@ -353,12 +380,21 @@ local CustomLobbySlotsInterface = Class(Group) {
     __post_init = function(self)
         Layouter(self.Header):AtLeftIn(self, 4):AtTopIn(self):End()
 
-        -- the lock notice, just right of the "Players" label (hidden unless seating is pinned)
-        Layouter(self.LockIcon):CenteredRightOf(self.Header, 8):Width(ToolSize):Height(ToolSize):End()
+        -- the /debug inspect toggle sits on the far left, directly right of the "Players" label
+        if self.DebugButton then
+            Layouter(self.DebugButton)
+                :CenteredRightOf(self.Header, 6):Width(ToolSize):Height(ToolSize)
+                :End()
+        end
+
+        -- the lock notice, just right of the "Players" label (right of the inspect button when it's
+        -- present), hidden unless seating is pinned
+        local lockAnchor = self.DebugButton or self.Header
+        Layouter(self.LockIcon):CenteredRightOf(lockAnchor, 8):Width(ToolSize):Height(ToolSize):End()
         Layouter(self.LockLabel):CenteredRightOf(self.LockIcon, 3):End()
 
-        -- the tool strip: a fixed-width band pinned top-right, the three square buttons inside it
-        -- laid out right-to-left (Pin · Balance · Reopen, reading left-to-right), centred on the header
+        -- the tool strip: a fixed-width band pinned top-right, the five square buttons inside it laid
+        -- out right-to-left, centred on the header
         Layouter(self.Tools)
             :AtRightIn(self, 4)
             :AtVerticalCenterIn(self.Header)
@@ -575,6 +611,11 @@ local CustomLobbySlotsInterface = Class(Group) {
 
     ---@param self UICustomLobbySlotsInterface
     OnDestroy = function(self)
+        -- if the inspect overlay was left on, turn it off so it doesn't outlive the lobby
+        -- (idempotent in the controller, so it's safe even when the button never existed)
+        if self.DebugButton then
+            CustomLobbyController.SetUiInspectOverlay(false)
+        end
         self.Trash:Destroy()
     end,
 }

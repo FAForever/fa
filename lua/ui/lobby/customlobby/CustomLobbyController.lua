@@ -1666,6 +1666,63 @@ end
 --#endregion
 
 -------------------------------------------------------------------------------
+--#region UI inspection (debug)
+--
+-- A local, per-peer developer aid — never synced, no host authority. Toggles the engine's
+-- "show control under mouse" overlay and, while it's on, binds a key to the one-shot "dump
+-- controls under cursor" debug action so hovering + that key dumps the control beneath the
+-- cursor (a button can't drive that command on its own — clicking one parks the cursor on the
+-- button). Lives here so any lobby view (or a chat command) can drive the same toggle. Bound
+-- straight into the engine key map (not the user's prefs), so it's transient and clears off.
+
+--- the key bound to the dump action while the overlay is on, and the debug key action it fires
+local InspectDumpKey = 'q'
+local InspectDumpAction = 'debug_dump_focus_ui_control'
+
+--- whether the inspect overlay is on (controller-owned so every caller reflects the same state)
+local UiInspectOverlayEnabled = false
+
+--- The transient `{ key → action }` map bound while the overlay is on, resolved from
+--- `debugKeyActions` so the console command isn't duplicated here.
+---@return table
+local function InspectDumpKeyMap()
+    local debugKeyActions = import("/lua/keymap/debugkeyactions.lua").debugKeyActions
+    return { [InspectDumpKey] = debugKeyActions[InspectDumpAction] }
+end
+
+--- Turns the "show control under mouse" overlay on or off, binding/unbinding the dump key
+--- alongside it. Idempotent — a no-op when already in the requested state.
+---@param enabled boolean
+function SetUiInspectOverlay(enabled)
+    enabled = enabled and true or false
+    if enabled == UiInspectOverlayEnabled then
+        return
+    end
+    UiInspectOverlayEnabled = enabled
+    ConExecute('UI_ShowControlUnderMouse ' .. (enabled and 'true' or 'false'))
+    if enabled then
+        IN_AddKeyMapTable(InspectDumpKeyMap())
+    else
+        IN_RemoveKeyMapTable(InspectDumpKeyMap())
+    end
+end
+
+--- Flips the inspect overlay and returns the new state (so a toggle button can reflect it).
+---@return boolean
+function ToggleUiInspectOverlay()
+    SetUiInspectOverlay(not UiInspectOverlayEnabled)
+    return UiInspectOverlayEnabled
+end
+
+--- Whether the inspect overlay is currently on (lets a view sync its toggle button on creation).
+---@return boolean
+function IsUiInspectOverlayEnabled()
+    return UiInspectOverlayEnabled
+end
+
+--#endregion
+
+-------------------------------------------------------------------------------
 --#region Debugging
 
 --- Hot-reload hook: re-imports this module so the instance's forwarders resolve to
