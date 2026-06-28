@@ -127,15 +127,16 @@ end
 ---@field Empty Text
 ---@field Measure Text             # hidden, font-matched text used only to measure widths for wrapping
 ---@field EntriesObserver LazyVar
----@field DebugPanel? Bitmap
----@field DebugEdit? Bitmap
----@field DebugGrid? Bitmap
-local CustomLobbyChatPanel = ClassUI(Group) {
+---@diagnostic disable-next-line
+local CustomLobbyChatPanel = ClassUI(Bitmap) {
 
     ---@param self UICustomLobbyChatPanel
     ---@param parent Control
     __init = function(self, parent)
-        Group.__init(self, parent, "CustomLobbyChatPanel")
+        ---@diagnostic disable-next-line: param-type-mismatch
+        Bitmap.__init(self, parent)
+        self:SetSolidColor(Debug and '303080ff' or '00000000')
+        self:DisableHitTest()
 
         self.Trash = TrashBag()
         self.Ready = false
@@ -167,7 +168,7 @@ local CustomLobbyChatPanel = ClassUI(Group) {
         -- so it doesn't trip the default circular Left/Right/Width chain (see /lua/ui/CLAUDE.md § 1).
         Layouter(self.EditBox):Left(0):Top(0):Width(200):Height(EditHeight):End()
         UIUtil.SetupEditStd(self.EditBox,
-            UIUtil.fontColor, nil, "ffffffff",
+            UIUtil.fontColor, nil, UIUtil.highlightColor,
             UIUtil.highlightColor, UIUtil.bodyFont, 14, 200)
         self.EditBox:ShowBackground(false)
         self.EditBox:SetText('')
@@ -202,7 +203,8 @@ local CustomLobbyChatPanel = ClassUI(Group) {
     end,
 
     ---@param self UICustomLobbyChatPanel
-    __post_init = function(self)
+    __post_init = function(self, parent)
+        Layouter(self):Fill(parent):End()
         -- the input field (border + inset fill) pinned to the bottom
         Layouter(self.EditFrame)
             :AtLeftIn(self, Pad):AtRightIn(self, Pad)
@@ -224,19 +226,6 @@ local CustomLobbyChatPanel = ClassUI(Group) {
 
         Layouter(self.Empty):AtHorizontalCenterIn(self):AtTopIn(self, Pad):End()
         Layouter(self.Measure):AtLeftTopIn(self, 0):End()   -- hidden; only its font metrics are used
-
-        if Debug then
-            -- whole panel (drawn under the grid tint added in Initialize) + the edit box region
-            self.DebugPanel = Bitmap(self)
-            self.DebugPanel:SetSolidColor('303080ff')   -- blue: the panel bounds
-            self.DebugPanel:DisableHitTest()
-            Layouter(self.DebugPanel):Fill(self):Over(self, 90):End()
-
-            self.DebugEdit = Bitmap(self)
-            self.DebugEdit:SetSolidColor('4080ff80')     -- green: the edit-box region
-            self.DebugEdit:DisableHitTest()
-            Layouter(self.DebugEdit):Fill(self.EditField):Over(self, 110):End()
-        end
     end,
 
     --- Builds the scrollable grid (its cell width needs the panel's concrete width) + scrollbar, and
@@ -266,14 +255,6 @@ local CustomLobbyChatPanel = ClassUI(Group) {
         self.Scrollbar:Hide()   -- shown by UpdateScrollbar only when the feed overflows
         -- let the wheel scroll the grid when the cursor is over the rows, not just over the scrollbar
         UIUtil.ForwardWheelToScroll(self.Grid, self.Grid)
-
-        if Debug then
-            -- the feed/grid region (its right edge shows where the scrollbar gutter is reserved)
-            self.DebugGrid = Bitmap(self)
-            self.DebugGrid:SetSolidColor('40ff8040')     -- orange: the grid region
-            self.DebugGrid:DisableHitTest()
-            Layouter(self.DebugGrid):Fill(self.Grid):Over(self, 100):End()
-        end
 
         self:Refresh()
     end,
@@ -313,10 +294,8 @@ local CustomLobbyChatPanel = ClassUI(Group) {
         -- grid's bottom to the edit box (done in Initialize) and float its top so the grid is only as
         -- tall as its rows — capped at the available height, beyond which it fills and scrolls.
         local rowsHeight = total * LayoutHelpers.ScaleNumber(RowHeight)
-        self.Grid.Top:Set(function()
-            local availableTop = self.Top() + LayoutHelpers.ScaleNumber(Pad)
-            return math.max(availableTop, self.Grid.Bottom() - rowsHeight)
-        end)
+        local availableHeight = self.EditFrame.Top() - self.Top() - LayoutHelpers.ScaleNumber(Pad + EditGap)
+        LayoutHelpers.SetHeight(self.Grid, math.max(0, math.min(rowsHeight, availableHeight)))
 
         -- were we at (or near) the bottom before the rebuild? if so, stick to the bottom after
         local _, rangeMax, _, visibleMax = self.Grid:GetScrollValues("Vert")
