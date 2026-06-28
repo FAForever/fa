@@ -336,7 +336,7 @@ local CustomLobbySlotBase = Class(Group) {
         self:RenderPlayer(entry.PlayerView or nil)
         self:RenderCpu(entry.CpuView or nil)
 
-        LOG(entry.IsLocalPeer)
+        -- feature: highlight the seat of the local peer
         if entry.IsLocalPeer then
             self.Background:SetSolidColor('44ffffff')
         else
@@ -348,7 +348,7 @@ local CustomLobbySlotBase = Class(Group) {
             self.Name:SetText("- closed -")
             self.Name:SetColor('ff6a7078')
         end
-        -- a locked seat (only meaningful when occupied) shows the gold left-edge accent
+        -- a locked seat (only meaningful when occupied) shows the geold left-edge accent
         self.LockStripe:SetAlpha((entry.Locked and entry.Player) and 1.0 or 0.0)
         -- the host-only per-seat close/open button (shown only on an empty or closed seat)
         self:RenderSlotButton(entry)
@@ -625,6 +625,11 @@ local CustomLobbySlotBase = Class(Group) {
             end
             return false
         end
+        local oldShow = btn.Show
+        btn.Show = function(self, ...)
+            oldShow(self, unpack(arg))
+            LOG(debug.traceback())
+        end
         btn:Hide()
         self.SlotButton = btn
         return btn
@@ -650,6 +655,8 @@ local CustomLobbySlotBase = Class(Group) {
         if not btn then
             return
         end
+
+        btn:Hide()
         local isHost = CustomLobbyLocalModel.GetSingleton().IsHost()
         if isHost and not entry.Player and not entry.Closed then
             self.SlotButtonMode = "close"
@@ -660,6 +667,7 @@ local CustomLobbySlotBase = Class(Group) {
             btn.Label:SetText("Open")
             btn:Show()
         else
+            btn.Label:SetText("HELP")
             self.SlotButtonMode = false
             btn:Hide()
         end
