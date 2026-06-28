@@ -20,8 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
--- The Observers tab of the lobby's bottom-left tabbed panel: the observer list (the shared
--- CustomLobbyObserversInterface, which self-subscribes to the model's `Observers`) plus a "Become
+-- The Observers tab of the lobby's bottom-left tabbed panel: the observer list plus a "Become
 -- observer" button. Everyone may drop to observers; the move is host-authoritative — a client's
 -- click asks the host through the `RequestMoveToObserver` intent.
 --
@@ -33,12 +32,15 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Tooltip = import("/lua/ui/game/tooltip.lua")
 
 local Group = import("/lua/maui/group.lua").Group
-local CustomLobbyObserversInterface = import("/lua/ui/lobby/customlobby/customlobbyobserversinterface.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local CustomLobbyController = import("/lua/ui/lobby/customlobby/customlobbycontroller.lua")
 local CustomLobbyLaunchModel = import("/lua/ui/lobby/customlobby/models/customlobbylaunchmodel.lua")
 local CustomLobbyLocalModel = import("/lua/ui/lobby/customlobby/models/customlobbylocalmodel.lua")
 
+local LazyVarDerive = import("/lua/lazyvar.lua").Derive
+
 local Layouter = LayoutHelpers.ReusedLayoutFor
+local Debug = true
 
 --- The local player's slot (the one this peer owns), or nil if they're an observer / unseated.
 ---@return number | nil
@@ -54,15 +56,26 @@ local function FindLocalSlot()
     return nil
 end
 
----@class UICustomLobbyObserversPanel : Group
----@field List UICustomLobbyObserversInterface
+---@class UICustomLobbyObserversPanel : Bitmap
 ---@field ObserveButton Button
-local CustomLobbyObserversPanel = ClassUI(Group) {
+---@field Header Text
+---@field Names Text
+---@field Trash TrashBag
+---@field ObserversObserver LazyVar
+local CustomLobbyObserversPanel = ClassUI(Bitmap) {
 
     ---@param self UICustomLobbyObserversPanel
     ---@param parent Control
     __init = function(self, parent)
-        Group.__init(self, parent, "CustomLobbyObserversPanel")
+        Bitmap.__init(self, parent)
+        self:SetSolidColor(Debug and '303080ff' or '00000000')
+        self:DisableHitTest()
+
+        self.Trash = TrashBag()
+
+        self.Header = UIUtil.CreateText(self, "Observers (0)", 14, UIUtil.titleFont)
+        self.Names = UIUtil.CreateText(self, "—", 12, UIUtil.bodyFont)
+        self.Names:SetColor('ff9aa0a8')
 
         self.ObserveButton = UIUtil.CreateButtonWithDropshadow(self, '/BUTTON/medium/', "Become observer")
         self.ObserveButton.OnClick = function(button, modifiers)
@@ -73,16 +86,43 @@ local CustomLobbyObserversPanel = ClassUI(Group) {
         end
         Tooltip.AddControlTooltipManual(self.ObserveButton, "Become observer", "Leave your slot and watch as an observer.")
 
-        self.List = CustomLobbyObserversInterface.Create(self)
+        local model = CustomLobbyLaunchModel.GetSingleton()
+        self.ObserversObserver = self.Trash:Add(
+            LazyVarDerive(model.Observers, function(observersLazy)
+                self:OnObserversChanged(observersLazy())
+            end))
     end,
 
     ---@param self UICustomLobbyObserversPanel
-    __post_init = function(self)
-        Layouter(self.ObserveButton):AtHorizontalCenterIn(self):AtBottomIn(self, 4):End()
-        Layouter(self.List)
-            :AtLeftIn(self):AtRightIn(self):AtTopIn(self)
-            :AnchorToTop(self.ObserveButton, 6)
-            :End()
+    __post_init = function(self, parent)
+        Layouter(self):Fill(parent):End()
+        Layouter(self.Header):AtLeftTopIn(self):End()
+        Layouter(self.Names):AtLeftIn(self):AnchorToBottom(self.Header, 4):End()
+        Layouter(self.ObserveButton):AtHorizontalCenterIn(self):AnchorToBottom(self.Names, 8):End()
+    end,
+
+    --- Renders the observer count + names.
+    ---@param self UICustomLobbyObserversPanel
+    ---@param observers UICustomLobbyPlayer[]
+    OnObserversChanged = function(self, observers)
+        local count = table.getn(observers)
+        self.Header:SetText("Observers (" .. count .. ")")
+
+        if count == 0 then
+            self.Names:SetText("—")
+            return
+        end
+
+        local names = {}
+        for i = 1, count do
+            names[i] = observers[i].PlayerName or "?"
+        end
+        self.Names:SetText(table.concat(names, ", "))
+    end,
+
+    ---@param self UICustomLobbyObserversPanel
+    OnDestroy = function(self)
+        self.Trash:Destroy()
     end,
 }
 
