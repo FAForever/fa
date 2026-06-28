@@ -148,7 +148,6 @@ local CustomLobbyTwoColumnSlots = Class(Group) {
             local prev = nil
             for _, slot in cols[column] do
                 local card = self.Rows[slot]
-                card:SetMirrored(column == 2)   -- the right column faces inward (mirrored)
                 local builder = Layouter(card):AtLeftIn(self.Columns[column]):AtRightIn(self.Columns[column]):Height(CardHeight)
                 if not prev then
                     builder:AtTopIn(self.Columns[column])
@@ -156,6 +155,7 @@ local CustomLobbyTwoColumnSlots = Class(Group) {
                     builder:AnchorToBottom(prev, CardGap)
                 end
                 builder:End()
+                card:SetMirrored(column == 2)   -- the right column faces inward (mirrored)
                 card:Show()
                 prev = card
             end

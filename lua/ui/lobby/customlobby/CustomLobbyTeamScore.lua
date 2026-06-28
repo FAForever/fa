@@ -86,18 +86,18 @@ local CustomLobbyTeamScore = ClassUI(Group) {
 
     ---@param self UICustomLobbyTeamScore
     __post_init = function(self)
-        -- centred row: LabelA  ScoreA  ·  ScoreB  LabelB
-        Layouter(self.Sep):AtHorizontalCenterIn(self):AtVerticalCenterIn(self):End()
-        Layouter(self.ScoreA):AnchorToLeft(self.Sep, 10):AtVerticalCenterIn(self):End()
-        Layouter(self.LabelA):AnchorToLeft(self.ScoreA, 8):AtVerticalCenterIn(self):End()
-        Layouter(self.ScoreB):AnchorToRight(self.Sep, 10):AtVerticalCenterIn(self):End()
-        Layouter(self.LabelB):AnchorToRight(self.ScoreB, 8):AtVerticalCenterIn(self):End()
     end,
 
     --- Builds the score after the parent has placed the widget (kept symmetric with the panels).
     ---@param self UICustomLobbyTeamScore
     Initialize = function(self)
         self.Ready = true
+        -- centred row: LabelA  ScoreA  ·  ScoreB  LabelB
+        Layouter(self.Sep):AtHorizontalCenterIn(self):AtVerticalCenterIn(self):End()
+        Layouter(self.ScoreA):AnchorToLeft(self.Sep, 10):AtVerticalCenterIn(self):End()
+        Layouter(self.LabelA):AnchorToLeft(self.ScoreA, 8):AtVerticalCenterIn(self):End()
+        Layouter(self.ScoreB):AnchorToRight(self.Sep, 10):AtVerticalCenterIn(self):End()
+        Layouter(self.LabelB):AnchorToRight(self.ScoreB, 8):AtVerticalCenterIn(self):End()
         self:Refresh()
     end,
 
