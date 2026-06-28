@@ -218,9 +218,9 @@ local CustomLobbyChatPanel = ClassUI(Group) {
         -- AtVerticalCenterIn re-sets Top (off the placeholder's 0), centring the box in the field.
         Layouter(self.EditBox)
             :AtLeftIn(self.EditField, FieldInset):AtRightIn(self.EditField, FieldInset):ResetWidth()
-            :Height(EditHeight):AtVerticalCenterIn(self.EditField)
+            :Height(EditHeight):AtTopIn(self.EditField, Pad)
             :End()
-        Layouter(self.Prompt):AtLeftIn(self.EditField, FieldInset):AtVerticalCenterIn(self.EditField):End()
+        Layouter(self.Prompt):AtLeftIn(self.EditField, FieldInset):AtTopIn(self.EditField, Pad):End()
 
         Layouter(self.Empty):AtHorizontalCenterIn(self):AtTopIn(self, Pad):End()
         Layouter(self.Measure):AtLeftTopIn(self, 0):End()   -- hidden; only its font metrics are used
@@ -235,7 +235,7 @@ local CustomLobbyChatPanel = ClassUI(Group) {
             self.DebugEdit = Bitmap(self)
             self.DebugEdit:SetSolidColor('4080ff80')     -- green: the edit-box region
             self.DebugEdit:DisableHitTest()
-            Layouter(self.DebugEdit):Fill(self.EditBox):Over(self, 110):End()
+            Layouter(self.DebugEdit):Fill(self.EditField):Over(self, 110):End()
         end
     end,
 
