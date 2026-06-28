@@ -625,11 +625,7 @@ local CustomLobbySlotBase = Class(Group) {
             end
             return false
         end
-        local oldShow = btn.Show
-        btn.Show = function(self, ...)
-            oldShow(self, unpack(arg))
-            LOG(debug.traceback())
-        end
+
         btn:Hide()
         self.SlotButton = btn
         return btn
