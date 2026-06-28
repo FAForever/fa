@@ -54,6 +54,7 @@ local ScrollGap = 32       -- standard lobby scrollbar gutter (see ModSelect)
 local GridContentWidth = 360 - 6 - ScrollGap
 local LabelMaxChars = 22
 local ValueMaxChars = 22
+local Debug = false
 
 local SpecialColor = 'ffd0a24c'      -- marker + label tint for a map/mod option
 local NormalColor = 'ffc8ccd0'
@@ -66,12 +67,13 @@ local ValueColor = 'ff9aa0a8'
 local function Truncate(text, maxChars)
     text = text or ""
     if string.len(text) > maxChars then
-        return string.sub(text, 1, maxChars - 1) .. "…"
+        local limit = math.max(1, math.floor(maxChars))
+        return string.sub(text, 1, limit - 1) .. "…"
     end
     return text
 end
 
----@class UICustomLobbyOptionsPanel : Group
+---@class UICustomLobbyOptionsPanel : Bitmap
 ---@field Trash TrashBag
 ---@field Ready boolean
 ---@field HideDefaults boolean
@@ -80,12 +82,14 @@ end
 ---@field Scrollbar Scrollbar | false
 ---@field Empty Text
 ---@field OptionsObserver LazyVar
-local CustomLobbyOptionsPanel = ClassUI(Group) {
+local CustomLobbyOptionsPanel = ClassUI(Bitmap) {
 
     ---@param self UICustomLobbyOptionsPanel
     ---@param parent Control
     __init = function(self, parent)
-        Group.__init(self, parent, "CustomLobbyOptionsPanel")
+        Bitmap.__init(self, parent)
+        self:SetSolidColor(Debug and '303080ff' or '00000000')
+        self:DisableHitTest()
 
         self.Trash = TrashBag()
         self.Ready = false
@@ -115,7 +119,8 @@ local CustomLobbyOptionsPanel = ClassUI(Group) {
     end,
 
     ---@param self UICustomLobbyOptionsPanel
-    __post_init = function(self)
+    __post_init = function(self, parent)
+        Layouter(self):Fill(parent):End()
         Layouter(self.HideDefaultsToggle):AtLeftIn(self, 6):AtTopIn(self, 4):End()
         Layouter(self.OptionsGrid)
             :AtLeftIn(self, 6):Width(GridContentWidth)
