@@ -108,6 +108,7 @@ local MaxSlots = CustomLobbyLaunchModel.MaxSlots
 --- One fully-resolved slot: the merge of player (launch) + placement (scenario) + closed (session) +
 --- CPU benchmark (local). Carries both the ready-to-paint views and the raw refs interaction needs.
 ---@class UICustomLobbySlot
+---@field IsLocalPeer boolean                        # true when the seated player is the local peer
 ---@field Slot       number                            # slot index 1..MaxSlots
 ---@field Player     UICustomLobbyPlayer | false       # the seated player (raw), false when empty — for intents/drag
 ---@field Closed     boolean                           # session: seat closed (no army at launch)
@@ -311,12 +312,13 @@ local Instance = nil
 ---@param cap number | nil         # recommended unit cap (seated-count × per-player tier)
 ---@param side 1 | 2 | false       # resolved binary auto-team side for this seat
 ---@return UICustomLobbySlot
-local function BuildSlot(slot, player, closed, locked, benchmarks, spawns, cap, side)
+local function BuildSlot(slot, player, closed, locked, benchmarks, spawns, cap, side, IsLocalPeer)
     if not player then
         return {
             Slot = slot, Player = false, Closed = closed, Locked = locked,
             StartSpot = false, Position = false, Side = side,
             PlayerView = false, CpuView = false, Benchmark = false, UnitCap = false,
+            IsLocalPeer = false,
         }
     end
 
@@ -334,6 +336,7 @@ local function BuildSlot(slot, player, closed, locked, benchmarks, spawns, cap, 
         CpuView = BuildCpuView(benchmark or nil, cap),
         Benchmark = benchmark,
         UnitCap = cap or false,
+        IsLocalPeer = IsLocalPeer
     }
 end
 
@@ -425,11 +428,14 @@ local SlotsModel = ClassSimple {
     --- scenario state and publishes each — but only when its own signature changed (the de-dup).
     ---@param self UICustomLobbySlotsDerivedModel
     Recompute = function(self)
+        LOG("Recompute")
         local launch = CustomLobbyLaunchModel.GetSingleton()
         local session = CustomLobbySessionModel.GetSingleton()
         local closedSlots = session.ClosedSlots()
         local lockedSlots = session.LockedSlots()
-        local benchmarks = CustomLobbyLocalModel.GetSingleton().CpuBenchmarks()
+        local peerModel = CustomLobbyLocalModel.GetSingleton()
+        local benchmarks = peerModel.CpuBenchmarks()
+        local peerId = peerModel.LocalPeerId()
 
         local scenario = CustomLobbyScenarioDerivedModel.GetScenario()
         local spawns = scenario and scenario.Markers and scenario.Markers.Spawns or nil
@@ -458,8 +464,9 @@ local SlotsModel = ClassSimple {
             local player = launch.Players[slot]()
             local spot = (player and player.StartSpot) or slot
             local side = (resolved and resolver and resolver(spot)) or false
+            local isLocalPeer = player and player.OwnerID == peerId or false
             slots[slot] = BuildSlot(slot, player, closedSlots[slot] and true or false,
-                lockedSlots[slot] and true or false, benchmarks, spawns, cap, side)
+                lockedSlots[slot] and true or false, benchmarks, spawns, cap, side, isLocalPeer)
             if player then
                 if side == 1 then
                     totalA = totalA + (player.PL or 0)

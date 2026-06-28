@@ -335,6 +335,14 @@ local CustomLobbySlotBase = Class(Group) {
         self.CurrentPlayer = entry.Player
         self:RenderPlayer(entry.PlayerView or nil)
         self:RenderCpu(entry.CpuView or nil)
+
+        LOG(entry.IsLocalPeer)
+        if entry.IsLocalPeer then
+            self.Background:SetSolidColor('44ffffff')
+        else
+            self.Background:SetSolidColor('22ffffff')
+        end
+
         -- a closed empty seat reads "- closed -" instead of "- open -"
         if entry.Closed and not entry.Player then
             self.Name:SetText("- closed -")
