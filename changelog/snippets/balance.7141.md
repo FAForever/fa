@@ -142,16 +142,16 @@
       - Energy cost: 47400 -> 10100
       - Build time: 4200 -> 1350
     - Nano-Repair System:
-      - Mass cost: 2300 -> 2500
-      - Energy cost: 74300 -> 75000 
-      - Build time: 5900 -> 11300
+      - Mass cost: 2300 -> 2700
+      - Energy cost: 74300 -> 100500 
+      - Build time: 5900 -> 12250
     - Tactical Missile Launcher:
       - Mass cost: 1500 -> 1800
       - Energy cost: 46000 -> 68000 
       - Build time: 4200 -> 8450
     - Overcharge:
       - Mass cost: 4500 -> 3000
-      - Energy cost: 283500 -> 173000 
+      - Energy cost: 283500 -> 155000 
       - Build time: 12600 -> 13800
     - Personal Shield Generator:
 
