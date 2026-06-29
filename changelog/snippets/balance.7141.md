@@ -150,9 +150,9 @@
       - Energy cost: 46000 -> 68000 
       - Build time: 4200 -> 8450
     - Overcharge:
-      - Mass cost: 4500 -> 1000
-      - Energy cost: 283500 -> 79500 
-      - Build time: 12600 -> 4350
+      - Mass cost: 4500 -> 3000
+      - Energy cost: 283500 -> 173000 
+      - Build time: 12600 -> 13800
     - Personal Shield Generator:
 
       The shield generator is being moved to the right arm to nerf teleport and enable a more useful Rambo preset.

@@ -399,9 +399,9 @@ UnitBlueprint{
             Slot = "Back",
         },
         Overcharge = {
-            BuildCostEnergy = 79500,
-            BuildCostMass = 1000,
-            BuildTime = 4350,
+            BuildCostEnergy = 173000,
+            BuildCostMass = 3000,
+            BuildTime = 13800,
             Icon = "oc",
             Name = "<LOC enhancements_0139>Overcharge",
             Slot = "RCH",
