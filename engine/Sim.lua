@@ -1195,8 +1195,8 @@ function SetIgnorePlayableRect(army, ignore)
 end
 
 --- Changes the distance at which the default navigator switches to a lower resolution
---- pathfinding grid, typically resulting in units moving in columns over large distances
---- instead of maintaining their formation.
+--- pathfinding grid (from "personal" per-unit waypoints to waypoints shared by many units),
+--- typically resulting in units moving in columns over large distances instead of maintaining their formation.
 ---
 --- Default engine value is 50.
 ---
