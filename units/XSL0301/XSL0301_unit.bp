@@ -51,7 +51,6 @@ UnitBlueprint{
         "SHOWATTACKRETICLE",
         "SHOWQUEUE",
         "SILO",
-        "SNIPEMODE",
         "SUBCOMMANDER",
         "TECH3",
         "USEBUILDPRESETS",
@@ -659,7 +658,6 @@ UnitBlueprint{
             RateOfFire = 10/10, --10/integer interval in ticks
             TargetPriorities = {
                 "MOBILE EXPERIMENTAL",
-                "COMMAND",
                 "MOBILE TECH3",
                 "MOBILE TECH2",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",
@@ -738,7 +736,6 @@ UnitBlueprint{
                 "MOBILE TECH3",
                 "MOBILE TECH2",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",
-                "COMMAND",
                 "ALLUNITS",
             },
             TargetRestrictDisallow = "UNTARGETABLE",
@@ -814,7 +811,6 @@ UnitBlueprint{
                 "MOBILE TECH3",
                 "MOBILE TECH2",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",
-                "COMMAND",
                 "ALLUNITS",
             },
             TargetRestrictDisallow = "UNTARGETABLE",

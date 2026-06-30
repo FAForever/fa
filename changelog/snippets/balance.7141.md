@@ -4,6 +4,8 @@
 
   Seraphim receives a RAS upgrade instead of its higher base cost and base production.
 
+  Since they're easier to rush and are more powerful, SACUs have their ACU target priority ability removed to allow overcharge to counter early SACUs again.
+
   - **Quantum Gateways (UAB0304, UEB0304, URB0304, XSB0304)**
     - Mass cost: 3000 -> 2550
     - Energy cost: 30000 -> 25500
@@ -17,6 +19,7 @@
     - Mass cost: 1950 -> 1550
     - Energy cost: 27100 -> 21500
     - Build time: 14400 -> 8250
+    - Removed ability to prioritize ACUs
     - Rapid Fabricator:
       - Mass cost: 800 -> 500
       - Energy cost: 50500 -> 10100
@@ -46,6 +49,7 @@
     - Mass: 2100 -> 1700
     - Energy: 25200 -> 20400
     - Build time: 14400 -> 9060
+    - Removed ability to prioritize ACUs
     - Shield Generator Field:
 
       The UEF bubble shield is heavily reduced in cost by removing its prerequisite, and its stats are adjusted to be closer to mobile shields.
@@ -86,6 +90,7 @@
     - Mass: 2000 -> 1600
     - Energy: 26400 -> 21100
     - Build time: 14400 -> 8530
+    - Removed ability to prioritize ACUs
     - Resource Allocation mass: 4500 -> 4600
     - Rapid Fabricator:
       - Mass cost: 800 -> 500
@@ -125,6 +130,7 @@
     - Mass: 2400 -> 1650
     - Energy: 30200 -> 20800
     - Build time: 14400 -> 8800
+    - Removed ability to prioritize ACUs
     - Mass production: 3 -> 1
     - Energy production: 300 -> 20
     - Added Resource Allocation System:

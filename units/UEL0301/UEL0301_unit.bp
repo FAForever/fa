@@ -50,7 +50,6 @@ UnitBlueprint{
         "REPAIR",
         "SELECTABLE",
         "SHOWQUEUE",
-        "SNIPEMODE",
         "SUBCOMMANDER",
         "TECH3",
         "UEF",
@@ -636,7 +635,6 @@ UnitBlueprint{
             RateOfFire = 10/10, --10/integer interval in ticks
             TargetPriorities = {
                 "MOBILE EXPERIMENTAL",
-                "COMMAND",
                 "MOBILE TECH3",
                 "MOBILE TECH2",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",
