@@ -152,7 +152,7 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 90,
             DamageFriendly = true,
-            DamageRadius = 1,
+            DamageRadius = 0.5,
             DamageType = "Normal",
             DisplayName = "Orbital Death Laser",
             FireTargetLayerCapsTable = {

@@ -1,9 +1,10 @@
-- (#7123) Reduce Novax's ability to kill many shields and T2 fabs in a single volley, and rebalance its costs to make it more vulnerable to artillery fire, especially when built in large numbers.
+- (#7123) Reduce Novax's ability to kill many shields, T2 fabs, and engineers in a single volley, and rebalance its costs to make it more vulnerable to artillery fire, especially when built in large numbers.
 
   **Novax Center: Experimental Satellite System (XEB2402, XEA0002)**
     - Defense Satellite's Orbital Death Laser:
       - Beam Lifetime: 8.1s -> 5.4s
       - Damage: 60 (4860 per volley) -> 90 (4860 per volley)
+      - Damage Radius: 1 -> 0.5
       - Aim Speed: 360 deg/s -> 8 deg/s
       - Charge cost: 0 E -> 72000 E (3750 E/s average)
       - Charge drain rate: 0 E -> 5000 E/s
