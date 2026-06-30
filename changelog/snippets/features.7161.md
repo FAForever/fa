@@ -1,4 +1,4 @@
-- (#XXXX) Add an "ACU Transfer" lobby option
+- (#7161) Add an "ACU Transfer" lobby option
 
 Adds a new global lobby option that controls whether players can transfer their ACU to an ally:
 
