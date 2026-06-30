@@ -41,32 +41,44 @@ if SetProcessPriority and GetProcessAffinityMask and SetProcessAffinityMask then
 
     -- priority values can be found at:
     -- - https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setpriorityclass
-    local success = SetProcessPriority(0x00000080)
+    local success = SetProcessPriority(0x00008000)
     if success then
-        LOG("Process - priority set to: 'high'")
+        LOG("Process - priority set to: 'above normal'")
     else
         LOG("Process - Failed to adjust process priority, this may impact your framerate")
     end
 
-    -- affinity values acts like a bit mask, we retrieve the mask and shift it if we think there are sufficient computing units
-    local success, processAffinityMask, systemAffinityMask = GetProcessAffinityMask();
-    if success then
-
-        -- system has 6 (logical) threads or more, skip first two computing units
-        if systemAffinityMask >= 63 then
-            processAffinityMask = systemAffinityMask & (systemAffinityMask << 2)
-        end
-
-        if processAffinityMask != systemAffinityMask then
-            local success = SetProcessAffinityMask(processAffinityMask);
-            if success then
-                LOG("Process - affinity set to: " .. tostring(processAffinityMask))
-            else
-                LOG("Process - Failed to adjust the process affinity, this may impact your framerate")
+    local forceAffinity = ForceAffinity == "true"
+    if forceAffinity then
+        -- affinity values acts like a bit mask, we retrieve the mask and shift it if we think there are sufficient computing units
+        local success, processAffinityMask, systemAffinityMask = GetProcessAffinityMask();
+        if success then
+            -- system has 24 (logical) computing units or more, skip the first two computing units and all cores beyond the first 24. We need 
+            -- to do this because of floating point imprecision - we simply can't deduct a few digits to prevent using the first two cores
+            if systemAffinityMask >= 16777215 then
+                processAffinityMask = 16777212 -- 2 ^ 24 - 3 - 1
+    
+            -- system has 6 (logical) computing units or more, skip first two computing units
+            elseif (systemAffinityMask >= 63) then
+                processAffinityMask = systemAffinityMask - 3 -- (2 ^ 6 - 1) - 3
             end
+    
+            -- update the afinity mask
+            if processAffinityMask != systemAffinityMask then
+                local success = SetProcessAffinityMask(processAffinityMask);
+                if success then
+                    LOG("Process - affinity set to: " .. tostring(processAffinityMask))
+                else
+                    LOG("Process - Failed to adjust the process affinity, this may impact your framerate")
+                end
+            else
+                LOG("Process - Failed to update the process affinity, this may impact your framerate")
+            end
+        else
+            LOG("Process - Failed to retrieve the process affinity, this may impact your framerate")
         end
     else
-        LOG("Process - Failed to retrieve the process affinity, this may impact your framerate")
+        LOG("Process - Process affinity adjustment is disabled in client settings, this may impact your framerate")
     end
 else
     LOG("Process - Failed to find process priority and affinity related functions, this may impact your framerate")
@@ -125,7 +137,6 @@ integratedMods["nvidia fix"] = true
 
 integratedMods = LowerHashTable(integratedMods)
 
-
 -- take care that the folder name is properly spelled and Capitalized
 -- deprecatedMods["Mod Folder Name"] = deprecation status
 --   true: deprecated regardless of mod version
@@ -135,11 +146,12 @@ local deprecatedMods = {}
 -- mods that are deprecated, based on mod folder name
 deprecatedMods["simspeed++"] = true
 deprecatedMods["#quality of performance 2022"] = true
+deprecatedMods["em"] = "11"
 
 -- as per #4119 the control groups (called selection sets in code) are completely overhauled and extended feature-wise,
 -- because of that these mods are no longer viable / broken / integrated
-deprecatedMods["group_split"] = true
-deprecatedMods["Control Group Zoom Mod"] = true
+deprecatedMods["group_split"] = "0.1"
+deprecatedMods["Control Group Zoom Mod"] = "2"
 deprecatedMods["additionalControlGroupStuff"] = true
 
 -- as per #4124 the cursor and command interactions are complete overhauled and extended feature-wise,
@@ -148,16 +160,17 @@ deprecatedMods["additionalCameraStuff"] = "3"
 deprecatedMods["RUI"] = "1.0"
 
 -- as per #4232 the reclaim view is completely overhauled
-deprecatedMods["Advanced Reclaim&Selection Info"] = true
-deprecatedMods["AdvancedReclaimInfo"] = true
-deprecatedMods["BetterReclaimView"] = true
-deprecatedMods["disableReclaimUI"] = true
-deprecatedMods["DynamicReclaimGrouping"] = true
-deprecatedMods["EzR"] = true
-deprecatedMods["OnScreenReclaimCounter"] = true
-deprecatedMods["ORV"] = true
-deprecatedMods["SmartReclaimSupport"] = true
+deprecatedMods["Advanced Reclaim&Selection Info"] = "1"
+deprecatedMods["AdvancedReclaimInfo"] = "1"
+deprecatedMods["BetterReclaimView"] = "2"
+deprecatedMods["disableReclaimUI"] = "2"
+deprecatedMods["DynamicReclaimGrouping"] = "1"
+deprecatedMods["EzReclaim"] = "1.0"
+deprecatedMods["OnScreenReclaimCounter"] = "8"
+deprecatedMods["ORV"] = "1"
+deprecatedMods["SmartReclaimSupport"] = "3"
 deprecatedMods["DrimsUIPack"] = "3"
+deprecatedMods["Rheclaim"] = "2"
 
 -- convert all mod folder name keys to lower case to prevent typos
 deprecatedMods = LowerHashTable(deprecatedMods)
@@ -182,19 +195,15 @@ allowedAssetsScd["loc_fr.scd"] = true
 allowedAssetsScd["loc_it.scd"] = true
 allowedAssetsScd["loc_de.scd"] = true
 allowedAssetsScd["loc_ru.scd"] = true
+allowedAssetsScd["loc_cz.scd"] = true
+allowedAssetsScd["loc_cn.scd"] = true
+allowedAssetsScd["loc_pl.scd"] = true
 allowedAssetsScd["env.scd"] = true
 allowedAssetsScd["effects.scd"] = true
 allowedAssetsScd["editor.scd"] = false      -- Unused
 allowedAssetsScd["ambience.scd"] = false    -- Empty 
 allowedAssetsScd["sc_music.scd"] = true
 allowedAssetsScd = LowerHashTable(allowedAssetsScd)
-
--- typical backwards compatible packages
-local allowedAssetsNxt = { }
-allowedAssetsNxt["kyros.nxt"] = true
-allowedAssetsNxt["advanced strategic icons.nxt"] = true
-allowedAssetsNxt["advanced_strategic_icons.nxt"] = true
-allowedAssetsNxt = LowerHashTable(allowedAssetsNxt)
 
 -- default wave banks to prevent collisions
 local soundsBlocked = { }
@@ -235,7 +244,7 @@ local function MountAllowedContent(dir, pattern, allowedAssets)
     for _,entry in IoDir(dir .. pattern) do
         if entry != '.' and entry != '..' then
             local mp = StringLower(entry)
-            if allowedAssets[mp] then 
+            if (not allowedAssets) or allowedAssets[mp] then
                 LOG("mounting content: " .. entry)
                 MountDirectory(dir .. "/" .. entry, '/')
             end
@@ -427,7 +436,7 @@ end
 ---@param modinfo FileName
 ---@return string|nil | false
 local function GetModVersion(modinfo)
-    local handle = io.open(modinfo, 'r')
+    local handle = io.open(modinfo, 'rb')
     if not handle then
         return false -- can't read file
     end

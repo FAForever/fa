@@ -36,39 +36,44 @@ if SetProcessPriority and GetProcessAffinityMask and SetProcessAffinityMask then
 
     -- priority values can be found at:
     -- - https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setpriorityclass
-    local success = SetProcessPriority(0x00000080)
+    local success = SetProcessPriority(0x00008000)
     if success then
-        LOG("Process - priority set to: 'high'")
+        LOG("Process - priority set to: 'above normal'")
     else
         LOG("Process - Failed to adjust process priority, this may impact your framerate")
     end
 
-    -- affinity values acts like a bit mask, we retrieve the mask and shift it if we think there are sufficient computing units
-    local success, processAffinityMask, systemAffinityMask = GetProcessAffinityMask();
-    if success then
-        -- system has 24 (logical) computing units or more, skip the first two computing units and all cores beyond the first 24. We need 
-        -- to do this because of floating point imprecision - we simply can't deduct a few digits to prevent using the first two cores
-        if systemAffinityMask >= 16777215 then
-            processAffinityMask = 16777212 -- 2 ^ 24 - 3 - 1
-
-        -- system has 6 (logical) computing units or more, skip first two computing units
-        elseif (systemAffinityMask >= 63) then
-            processAffinityMask = systemAffinityMask - 3 -- (2 ^ 6 - 1) - 3
-        end
-
-        -- update the afinity mask
-        if processAffinityMask != systemAffinityMask then
-            local success = SetProcessAffinityMask(processAffinityMask);
-            if success then
-                LOG("Process - affinity set to: " .. tostring(processAffinityMask))
+    local forceAffinity = ForceAffinity == "true"
+    if forceAffinity then
+        -- affinity values acts like a bit mask, we retrieve the mask and shift it if we think there are sufficient computing units
+        local success, processAffinityMask, systemAffinityMask = GetProcessAffinityMask();
+        if success then
+            -- system has 24 (logical) computing units or more, skip the first two computing units and all cores beyond the first 24. We need 
+            -- to do this because of floating point imprecision - we simply can't deduct a few digits to prevent using the first two cores
+            if systemAffinityMask >= 16777215 then
+                processAffinityMask = 16777212 -- 2 ^ 24 - 3 - 1
+    
+            -- system has 6 (logical) computing units or more, skip first two computing units
+            elseif (systemAffinityMask >= 63) then
+                processAffinityMask = systemAffinityMask - 3 -- (2 ^ 6 - 1) - 3
+            end
+    
+            -- update the afinity mask
+            if processAffinityMask != systemAffinityMask then
+                local success = SetProcessAffinityMask(processAffinityMask);
+                if success then
+                    LOG("Process - affinity set to: " .. tostring(processAffinityMask))
+                else
+                    LOG("Process - Failed to adjust the process affinity, this may impact your framerate")
+                end
             else
-                LOG("Process - Failed to adjust the process affinity, this may impact your framerate")
+                LOG("Process - Failed to update the process affinity, this may impact your framerate")
             end
         else
-            LOG("Process - Failed to update the process affinity, this may impact your framerate")
+            LOG("Process - Failed to retrieve the process affinity, this may impact your framerate")
         end
     else
-        LOG("Process - Failed to retrieve the process affinity, this may impact your framerate")
+        LOG("Process - Process affinity adjustment is disabled in client settings, this may impact your framerate")
     end
 else
     LOG("Process - Failed to find process priority and affinity related functions, this may impact your framerate")
@@ -77,6 +82,10 @@ end
 --#endregion
 
 -- upvalued performance
+local dofile = dofile
+
+local StringFind = string.find 
+local StringGsub = string.gsub
 local StringSub = string.sub
 local StringLower = string.lower
 
@@ -115,21 +124,6 @@ local function LowerHashTable(t)
         o[StringLower(k)] = v 
     end
     return o
-end
-
-local function FindFilesWithExtension(dir, extension, prepend, files)
-    files = files or { }
-
-    for k, file in IoDir(dir .. "/*") do
-        if not (file == '.' or file == '..') then
-            if StringSub(file, -3) == extension then
-                TableInsert(files, prepend .. "/" .. file)
-            end
-            FindFilesWithExtension(dir .. "/" .. file, extension, prepend .. "/" .. file, files)
-        end
-    end
-
-    return files
 end
 
 -- mods that have been integrated, based on folder name 
@@ -208,8 +202,8 @@ allowedAssetsScd = LowerHashTable(allowedAssetsScd)
 
 -- default wave banks to prevent collisions
 local soundsBlocked = { }
-local sounds = FindFilesWithExtension(fa_path .. '/sounds', "xwb", "/sounds")
-for k, v in sounds do 
+local faSounds = IoDir(fa_path .. '/sounds/*')
+for k, v in faSounds do 
     if v == '.' or v == '..' then 
         continue 
     end
@@ -364,16 +358,16 @@ local function MountMapContent(dir)
                     MountDirectory(dir .. "/" .. map .. '/movies', '/movies')
                 end
             elseif folder == 'sounds' then
-                local banks = FindFilesWithExtension(dir .. '/' .. map .. "/sounds", "xwb", "/sounds")
-
                 -- find conflicting files
                 local conflictingFiles = { }
-                for _, bank in banks do
-                    local identifier = StringLower(bank) 
-                    if soundsBlocked[identifier] then 
-                        TableInsert(conflictingFiles, { file = bank, conflict = soundsBlocked[identifier] })
-                    else 
-                        soundsBlocked[identifier] = StringLower(map)
+                for _, file in IoDir(dir .. '/' .. map .. '/sounds/*') do
+                    if not (file == '.' or file == '..') then 
+                        local identifier = StringLower(file) 
+                        if soundsBlocked[identifier] then 
+                            TableInsert(conflictingFiles, { file = file, conflict = soundsBlocked[identifier] })
+                        else 
+                            soundsBlocked[identifier] = StringLower(map)
+                        end
                     end
                 end
                 
@@ -541,23 +535,23 @@ local function MountModContent(dir)
 
             -- if we found a directory named 'sounds' then we mount its content
             if folder == 'sounds' then
-                local banks = FindFilesWithExtension(dir .. '/' ..  mod .. "/sounds", "xwb", "/sounds")
-
                 -- find conflicting files
                 local conflictingFiles = { }
-                for _, bank in banks do
-                    local identifier = StringLower(bank) 
-                    if soundsBlocked[identifier] then 
-                        TableInsert(conflictingFiles, { file = bank, conflict = soundsBlocked[identifier] })
-                    else
-                        soundsBlocked[identifier] = StringLower(mod)
+                for _, file in IoDir(dir .. '/' .. mod .. '/sounds/*') do
+                    if not (file == '.' or file == '..') then 
+                        local identifier = StringLower(file) 
+                        if soundsBlocked[identifier] then 
+                            TableInsert(conflictingFiles, { file = file, conflict = soundsBlocked[identifier] })
+                        else 
+                            soundsBlocked[identifier] = StringLower(mod)
+                        end
                     end
                 end
 
                 -- report them if they exist and do not mount
                 if TableGetn(conflictingFiles) > 0 then 
                     LOG("Found conflicting sound banks for mod: '" .. mod .. "', cannot mount the sound bank(s):")
-                    for _, v in conflictingFiles do 
+                    for k, v in conflictingFiles do 
                         LOG(" - Conflicting sound bank: '" .. v.file .. "' of mod '" .. mod .. "' is conflicting with a sound bank from: '" .. v.conflict .. "'" )
                     end
                 -- else, mount folder
