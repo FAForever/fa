@@ -13,7 +13,7 @@
     - Health: 10000 -> 7500
     - Adjacency:
       - Energy discount from T1 and T3 pgens: 0.25% and 5% -> 1.563% and 15.62%
-      - Mass discount from T2 and T3 mass fabs: 0.75% and 3.75% -> 1.25% and 15%
+      - Mass discount from T2 and T3 mass fabs: 0.75% and 3.75% -> 1.25% and 20%
 
   - **Aeon Support Armored Command Unit (UAL0301)**
     - Mass cost: 1950 -> 1550
