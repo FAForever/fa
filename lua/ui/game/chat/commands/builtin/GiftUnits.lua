@@ -34,7 +34,8 @@ Command = {
         if not selection or table.getn(selection) == 0 then
             return false, "/gift-units: no units selected."
         end
-        if table.getn(selection) == 1 and EntityCategoryContains(categories.COMMAND, selection[1]) then
+        local acuTransfer = SessionGetScenarioInfo().Options.ACUTransfer
+        if acuTransfer ~= 'free' and table.getn(selection) == 1 and EntityCategoryContains(categories.COMMAND, selection[1]) then
             return false, "/gift-units: can't gift your ACU."
         end
 
@@ -43,10 +44,12 @@ Command = {
     Execute = function(args)
         -- `true` second arg passes the current selection to the sim
         -- handler as `units`.
-        SimCallback({
-            Func = "GiveUnitsToPlayer",
-            Args = { From = GetFocusArmy(), To = args.target },
-        }, true)
+        import("/lua/ui/game/acutransferconfirm.lua").MaybeConfirmACUTransfer(function()
+            SimCallback({
+                Func = "GiveUnitsToPlayer",
+                Args = { From = GetFocusArmy(), To = args.target },
+            }, true)
+        end)
     end,
 }
 

@@ -752,7 +752,11 @@ function GiveUnitsToPlayer(data, units)
             end
         end
 
-        local transferredUnits = TransferUnitsOwnership(units, toArmy)
+        -- When the host enabled free ACU transfer we bypass the commander
+        -- restriction so the ACU is not filtered out by ChangeUnitArmy. The
+        -- target is always a live ally here, so relaxing the restriction is safe.
+        local allowCommanders = ScenarioInfo.Options.ACUTransfer == 'free'
+        local transferredUnits = TransferUnitsOwnership(units, toArmy, false, allowCommanders)
 
         -- Whisper from giver → receiver, with an `Area` location so the
         -- receiver can click the cam-icon to jump to where the units are.

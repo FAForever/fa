@@ -359,10 +359,14 @@ function SetupPlayerLines()
                 if (event.Type ~= 'ButtonPress') or (not event.Modifiers.Left) or (IsObserver()) or (GetFocusArmy() == group.armyID) then return end
                 if event.Modifiers.Shift then
                     local SelUnits = GetSelectedUnits()
-                    if (not SelUnits) or ((table.getn(SelUnits) == 1) and EntityCategoryContains(categories.COMMAND, SelUnits[1])) then return end
-                    SimCallback( { Func = "GiveUnitsToPlayer", Args = { From = GetFocusArmy(), To = group.armyID }, }, true)
-                    SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name,
-                        to = 'allies', Chat = true, text = 'Sent units to '..ScoresCache[group.armyID].name })
+                    if not SelUnits then return end
+                    local acuTransfer = SessionGetScenarioInfo().Options.ACUTransfer
+                    if acuTransfer ~= 'free' and (table.getn(SelUnits) == 1) and EntityCategoryContains(categories.COMMAND, SelUnits[1]) then return end
+                    import("/lua/ui/game/acutransferconfirm.lua").MaybeConfirmACUTransfer(function()
+                        SimCallback( { Func = "GiveUnitsToPlayer", Args = { From = GetFocusArmy(), To = group.armyID }, }, true)
+                        SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name,
+                            to = 'allies', Chat = true, text = 'Sent units to '..ScoresCache[group.armyID].name })
+                    end)
                 elseif event.Modifiers.Ctrl then
                     SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name,
                         to = 'allies', Chat = true, text = ScoresCache[group.armyID].name..' give me Engineer' })

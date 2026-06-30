@@ -538,7 +538,16 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         self:SetDefeatStatus("Defeat")
 
         local opt = ScenarioInfo.Options
-        ForkThread(KillAbandonedArmy, self, opt.DisconnectShare, opt.DisconnectShareCommanders, opt.Victory)
+
+        -- The ACU Transfer option overrides the disconnect ACU behaviour: both
+        -- 'disconnect' and 'free' permanently hand the disconnecting player's
+        -- whole army (ACU included) to their highest rated ally.
+        local shareAcuOption = opt.DisconnectShareCommanders
+        if opt.ACUTransfer == 'disconnect' or opt.ACUTransfer == 'free' then
+            shareAcuOption = 'Permanent'
+        end
+
+        ForkThread(KillAbandonedArmy, self, opt.DisconnectShare, shareAcuOption, opt.Victory)
 
         if self.Trash then
             self.Trash:Destroy()

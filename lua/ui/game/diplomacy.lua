@@ -189,8 +189,12 @@ local function LayoutMajorAlliedEntry(entry, manualShare)
         giveUnitBtn:Disable()
     else
         giveUnitBtn.OnClick = function(self, modifiers)
+            local dialogText = LOC("<LOC unitxfer_0000>Give Selected Units to %s?"):format(entry.Data.nickname)
+            if import("/lua/ui/game/acutransferconfirm.lua").ShouldWarnACU() then
+                dialogText = LOC("<LOC acu_transfer_warn_02>You are about to give away your ACU to %s. If you have no ACU left you will be defeated. Continue?"):format(entry.Data.nickname)
+            end
             UIUtil.QuickDialog(GetFrame(0),
-                LOC("<LOC unitxfer_0000>Give Selected Units to %s?"):format(entry.Data.nickname),
+                dialogText,
                 '<LOC _Yes>',
                 function()
                     local to = entry.Data.armyIndex

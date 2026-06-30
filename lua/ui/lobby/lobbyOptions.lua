@@ -13,6 +13,7 @@
 ---@alias ShareOption "CivilianDeserter" | "Defectors" | "FullShare" | "PartialShare" | "ShareUntilDeath" | "TransferToKiller"
 ---@alias DisconnectShareOption ShareOption | "SameAsShare"
 ---@alias DisconnectShareCommandersOption "Explode" | "Permanent" | "Recall" | "RecallDelayed"
+---@alias ACUTransferOption "none" | "disconnect" | "free"
 ---@alias CommonArmyOption "Off" | "UnionWhenDisconnected" | "Union" | "Common"
 
 --- Additionally, extra options can be specified by the map in `mapname .. 'options.lua'`
@@ -38,6 +39,7 @@
 ---@field Share ShareOption
 ---@field DisconnectShare DisconnectShareOption
 ---@field DisconnectShareCommanders DisconnectShareCommandersOption
+---@field ACUTransfer ACUTransferOption
 ---@field ShareUnitCap 'none' | 'allies' | 'all'
 ---@field Timeouts '0' | '3'| '-1' | -1
 ---@field UnitCap '125' | '250' | '375' | '500' | '625' | '750' | '875' | '1000' | '1250' | '1500'
@@ -338,6 +340,29 @@ globalOpts = {
             --     help = "<LOC lobui_dc_share_14>Disconnected ACUs are permanently shared to allies.",
             --     key = 'Permanent',
             -- },
+        },
+    },
+    {
+        default = 1,
+        label = "<LOC lobui_acu_transfer_01>ACU Transfer",
+        help = "<LOC lobui_acu_transfer_02>Controls whether players can transfer their ACU to an ally.",
+        key = 'ACUTransfer',
+        values = {
+            {
+                text = "<LOC lobui_acu_transfer_03>No ACU Transfer",
+                help = "<LOC lobui_acu_transfer_04>ACUs can never be transferred to an ally. This is the default behaviour.",
+                key = 'none',
+            },
+            {
+                text = "<LOC lobui_acu_transfer_05>Transfer on Disconnect",
+                help = "<LOC lobui_acu_transfer_06>When a player disconnects their whole army, including the ACU, is permanently transferred to their highest rated ally. The ACU cannot be transferred manually.",
+                key = 'disconnect',
+            },
+            {
+                text = "<LOC lobui_acu_transfer_07>Free ACU Transfer",
+                help = "<LOC lobui_acu_transfer_08>The ACU can be manually transferred to an ally at any time, and is also transferred on disconnect. Requires manual unit sharing to be enabled. In Assassination a confirmation is shown because giving away your ACU defeats you.",
+                key = 'free',
+            },
         },
     },
     {
