@@ -60,7 +60,7 @@
       - Energy maintenance cost: 1000 -> 700
       - Shield stats:
         - Health: 52000 -> 22000
-        - Recharge Time: 215 -> 110 seconds
+        - Recharge Time: 215 -> 100 seconds
         - Regen Rate: 150 -> 160 hp/s
         - Regen Delay: 1 -> 3 seconds
         - Spillover mult: 0.2 -> 0.3
