@@ -542,4 +542,12 @@ end
 function CAiBrain:TakeResource(type, amount)
 end
 
+--- Called by the engine when a unit fails unit transfer due to issues other than unit cap.
+---@type fun(self: moho.aibrain_methods)
+CAiBrain.OnFailedUnitTransfer = nil
+
+--- Called by the engine when a unit fails to create due to unit cap.
+---@type fun(self: Unit)
+CAiBrain.OnUnitCapLimitReached = nil
+
 return CAiBrain
