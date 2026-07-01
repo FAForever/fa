@@ -38,12 +38,48 @@ function TransferWouldCauseDefeat()
     return false
 end
 
+--- Returns true if this is a campaign or co-op mission, where ACU transfer is disabled because
+--- missions have scripted commanders and army logic that a transfer could break.
+---@return boolean
+function InCampaign()
+    return import("/lua/ui/campaign/campaignmanager.lua").campaignMode == true
+end
+
+--- Returns true if free ACU transfer is actually usable this game. It requires the option to
+--- be set to 'free', a share condition that keeps a transferred ACU with the recipient, and a
+--- non-campaign game. Under the other share conditions a manually shared ACU is destroyed or
+--- reclaimed when the giver dies, which would undo the transfer, so the option is ignored there.
+---@return boolean
+function FreeTransferEnabled()
+    local scenarioInfo = SessionGetScenarioInfo()
+    local options = scenarioInfo and scenarioInfo.Options
+    if not options or options.ACUTransfer ~= 'free' then
+        return false
+    end
+    if InCampaign() then
+        return false
+    end
+    local share = options.Share
+    return share == 'FullShare' or share == 'PartialShare'
+end
+
+--- If free ACU transfer is selected but this is a campaign mission and the player is trying to
+--- give their own ACU, shows an on-screen message and returns true so the caller aborts the give.
+---@return boolean
+function BlockACUTransferInCampaign()
+    local scenarioInfo = SessionGetScenarioInfo()
+    local options = scenarioInfo and scenarioInfo.Options
+    if options and options.ACUTransfer == 'free' and InCampaign() and SelectionContainsOwnACU() then
+        print(LOC("<LOC acu_transfer_campaign_01>ACU transfer is not possible in campaign missions."))
+        return true
+    end
+    return false
+end
+
 --- Returns true if the give about to happen should warn the player about losing their ACU.
 ---@return boolean
 function ShouldWarnACU()
-    local scenarioInfo = SessionGetScenarioInfo()
-    local acuTransfer = scenarioInfo and scenarioInfo.Options and scenarioInfo.Options.ACUTransfer
-    return acuTransfer == 'free' and SelectionContainsOwnACU() and TransferWouldCauseDefeat()
+    return FreeTransferEnabled() and SelectionContainsOwnACU() and TransferWouldCauseDefeat()
 end
 
 --- Runs `onConfirm` directly, unless an ACU-loss warning is warranted, in which case a

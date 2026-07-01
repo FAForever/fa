@@ -345,7 +345,7 @@ globalOpts = {
     {
         default = 1,
         label = "<LOC lobui_acu_transfer_01>ACU Transfer",
-        help = "<LOC lobui_acu_transfer_02>Controls whether players can transfer their ACU to an ally.",
+        help = "<LOC lobui_acu_transfer_02>Controls whether players can transfer their ACU to an ally. Only works with the Full Share or Partial Share settings.",
         key = 'ACUTransfer',
         values = {
             {

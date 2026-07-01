@@ -753,9 +753,14 @@ function GiveUnitsToPlayer(data, units)
         end
 
         -- When the host enabled free ACU transfer we bypass the commander
-        -- restriction so the ACU is not filtered out by ChangeUnitArmy. The
-        -- target is always a live ally here, so relaxing the restriction is safe.
-        local allowCommanders = ScenarioInfo.Options.ACUTransfer == 'free'
+        -- restriction so the ACU is not filtered out by ChangeUnitArmy. Only the
+        -- Full Share / Partial Share conditions keep a transferred ACU with the
+        -- recipient; the others destroy or reclaim shared units on death, which
+        -- would undo the transfer, so the ACU stays blocked under them. It is
+        -- also blocked in campaign/co-op missions, which have scripted ACUs.
+        local share = ScenarioInfo.Options.Share
+        local shareKeepsAcu = share == 'FullShare' or share == 'PartialShare'
+        local allowCommanders = ScenarioInfo.Options.ACUTransfer == 'free' and shareKeepsAcu and not ScenarioInfo.CampaignMode
         local transferredUnits = TransferUnitsOwnership(units, toArmy, false, allowCommanders)
 
         -- Whisper from giver → receiver, with an `Area` location so the

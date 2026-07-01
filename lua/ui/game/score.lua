@@ -360,8 +360,8 @@ function SetupPlayerLines()
                 if event.Modifiers.Shift then
                     local SelUnits = GetSelectedUnits()
                     if not SelUnits then return end
-                    local acuTransfer = SessionGetScenarioInfo().Options.ACUTransfer
-                    if acuTransfer ~= 'free' and (table.getn(SelUnits) == 1) and EntityCategoryContains(categories.COMMAND, SelUnits[1]) then return end
+                    if import("/lua/ui/game/acutransferconfirm.lua").BlockACUTransferInCampaign() then return end
+                    if not import("/lua/ui/game/acutransferconfirm.lua").FreeTransferEnabled() and (table.getn(SelUnits) == 1) and EntityCategoryContains(categories.COMMAND, SelUnits[1]) then return end
                     import("/lua/ui/game/acutransferconfirm.lua").MaybeConfirmACUTransfer(function()
                         SimCallback( { Func = "GiveUnitsToPlayer", Args = { From = GetFocusArmy(), To = group.armyID }, }, true)
                         SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name,

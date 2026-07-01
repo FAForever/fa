@@ -541,9 +541,12 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
         -- The ACU Transfer option overrides the disconnect ACU behaviour: both
         -- 'disconnect' and 'free' permanently hand the disconnecting player's
-        -- whole army (ACU included) to their highest rated ally.
+        -- whole army (ACU included) to their highest rated ally. This only
+        -- applies under Full Share / Partial Share and outside campaign/co-op
+        -- missions; otherwise the normal ACU handling is left untouched.
         local shareAcuOption = opt.DisconnectShareCommanders
-        if opt.ACUTransfer == 'disconnect' or opt.ACUTransfer == 'free' then
+        local shareKeepsAcu = opt.Share == 'FullShare' or opt.Share == 'PartialShare'
+        if (opt.ACUTransfer == 'disconnect' or opt.ACUTransfer == 'free') and shareKeepsAcu and not ScenarioInfo.CampaignMode then
             shareAcuOption = 'Permanent'
         end
 

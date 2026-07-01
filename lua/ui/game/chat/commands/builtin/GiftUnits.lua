@@ -34,8 +34,12 @@ Command = {
         if not selection or table.getn(selection) == 0 then
             return false, "/gift-units: no units selected."
         end
-        local acuTransfer = SessionGetScenarioInfo().Options.ACUTransfer
-        if acuTransfer ~= 'free' and table.getn(selection) == 1 and EntityCategoryContains(categories.COMMAND, selection[1]) then
+        local acuTransferConfirm = import("/lua/ui/game/acutransferconfirm.lua")
+        local hasOwnACU = table.getn(selection) >= 1 and acuTransferConfirm.SelectionContainsOwnACU()
+        if SessionGetScenarioInfo().Options.ACUTransfer == 'free' and acuTransferConfirm.InCampaign() and hasOwnACU then
+            return false, "/gift-units: ACU transfer is not possible in campaign missions."
+        end
+        if not acuTransferConfirm.FreeTransferEnabled() and table.getn(selection) == 1 and EntityCategoryContains(categories.COMMAND, selection[1]) then
             return false, "/gift-units: can't gift your ACU."
         end
 
