@@ -3324,6 +3324,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
 
         self:RequestRefreshUI()
+        return true
     end,
 
     ---@param self Unit
