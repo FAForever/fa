@@ -175,6 +175,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field ImmuneToStun? boolean
 ---@field Anims? Animator[] # Animators that get stopped when a unit is stunned. Not used in FAF.
 ---@field IsBeingTransferred? boolean
+---@field OnStopBeingBuiltEnhancementsThread thread?
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent, FastDecayComponent) {
 
     IsUnit = true,
@@ -2490,7 +2491,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
 
         if bp.EnhancementPresetAssigned then
-            self:ForkThread(self.CreatePresetEnhancementsThread)
+            self.OnStopBeingBuiltEnhancementsThread = self:ForkThread(self.CreatePresetEnhancementsThread)
         end
 
         -- Don't try sending a Notify message from here if we're an ACU
@@ -2630,6 +2631,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         if self and not self.Dead then
             self:CreatePresetEnhancements()
         end
+        self.OnStopBeingBuiltEnhancementsThread = nil
     end,
 
     ---@param self Unit

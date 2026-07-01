@@ -6,6 +6,7 @@
 local ArmyBrains = ArmyBrains
 local GetCurrentCommandSource = GetCurrentCommandSource
 local TableEmpty = table.empty
+local KillThread = KillThread
 
 ------------------------------------------------------------------------------------------------------------------------
 --#region General Unit Transfer Scripts
@@ -418,9 +419,15 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         end
 
         if activeEnhancements then
-            for _, enh in activeEnhancements do
-                newUnit:CreateEnhancement(enh)
-            end
+            local thread = newUnit.OnStopBeingBuiltEnhancementsThread
+            if thread then KillThread(thread) end
+            newUnit.OnStopBeingBuiltEnhancementsThread = newUnit:ForkThread(function()
+                WaitTicks(1)
+                for _, enh in activeEnhancements do
+                    newUnit:CreateEnhancement(enh)
+                end
+                newUnit.OnStopBeingBuiltEnhancementsThread = nil
+            end)
         end
 
         local maxHealth = newUnit:GetMaxHealth()
