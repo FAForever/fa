@@ -5,6 +5,7 @@
 -- upvalues for performance
 local ArmyBrains = ArmyBrains
 local GetCurrentCommandSource = GetCurrentCommandSource
+local TableEmpty = table.empty
 
 ------------------------------------------------------------------------------------------------------------------------
 --#region General Unit Transfer Scripts
@@ -324,13 +325,10 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         local enhancements = bp.Enhancements
         if enhancements then
             local unitEnh = SimUnitEnhancements[unit.EntityId]
-            if unitEnh then
+            if not TableEmpty(unitEnh) then
                 activeEnhancements = {}
-                for i, enh in unitEnh do
-                    activeEnhancements[i] = enh
-                end
-                if not activeEnhancements[1] then
-                    activeEnhancements = nil
+                for slot, enh in unitEnh do
+                    activeEnhancements[slot] = enh
                 end
             end
         end
