@@ -738,6 +738,7 @@ function GiveUnitsToPlayer(data, units)
     if manualShare == 'none' or table.empty(units) then
         return
     end
+    ---@cast units -nil
     local toArmy = data.To
     local owner = units[1].Army
     if OkayToMessWithArmy(owner) and IsAlly(owner, toArmy) then
