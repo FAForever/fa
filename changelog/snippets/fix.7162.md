@@ -1,0 +1,1 @@
+- (#7162) Fix transfer of units with manually built enhancements.
