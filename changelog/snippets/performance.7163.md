@@ -1,0 +1,1 @@
+- (#7163) Memoize `NavUtils.GetLabel` to avoid repeated navmesh quad-tree descents. Measured at ~1.5% of the sim tick at CPU-bound endgame (~2.5k units, 4v4), with a 98.6% cache hit rate.
