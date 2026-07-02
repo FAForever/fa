@@ -966,7 +966,7 @@ end
 ---@see GetTerrainLabel
 ---@param layer NavLayers
 ---@param position Vector
----@return number? 
+---@return number?
 ---@return ('NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'SystemError' | 'Unpathable')?
 function GetLabel(layer, position)
     -- check if generated
@@ -995,6 +995,73 @@ function GetLabel(layer, position)
     end
 
     return leaf.Label, nil
+end
+
+-- Memoized wrapper over GetLabel.
+--
+-- The FAF navmesh is generated once from static terrain (surface height + water depth;
+-- no units or buildings). So (layer, position) -> label is constant for the whole
+-- session. GetLabel re-descends the quad-tree on every call: M28AI alone issues
+-- ~558 calls/tick at ~1k units, growing with unit count, costing ~1.5% of the
+-- sim tick at CPU-bound endgame (~2.5k units, 4v4). Caching the result per
+-- integer ogrid cell eliminates the repeated descents.
+--
+-- Key: floor(x), floor(z). The quad-tree bottoms out at an integer-aligned
+-- compressionThreshold grid, so a floored cell falls inside exactly one leaf and
+-- has exactly one permanent label. Only PERMANENT labels are cached — 'NotGenerated'
+-- and 'SystemError' are transient and must not stick.
+--
+-- Memory: bounded by queried map area × number of layers; ~10^5 entries (~few MB)
+-- for a full 4v4 Seton's game. Deterministic: terrain labels are static, so the cache
+-- cannot cause desync.
+do
+    local _GetLabel = GetLabel
+    local _floor = math.floor
+    -- [layer][kx][kz] = label (number) | false (permanent nil: Unpathable/OutsideMap)
+    local _cache = {}
+
+    GetLabel = function(layer, position)
+        local px, pz = position[1], position[3]
+        -- Guard malformed positions that the base function short-circuits before touching.
+        if px == nil or pz == nil then
+            return _GetLabel(layer, position)
+        end
+
+        local lc = _cache[layer]
+        if not lc then
+            lc = {}
+            _cache[layer] = lc
+        end
+
+        local kx = _floor(px)
+        local row = lc[kx]
+        if not row then
+            row = {}
+            lc[kx] = row
+        end
+
+        local kz = _floor(pz)
+        local entry = row[kz]
+        if entry ~= nil then
+            -- cache hit: false encodes a permanent nil result
+            if entry == false then
+                return nil, 'CachedNil'
+            end
+            return entry
+        end
+
+        -- cache miss: call base and populate
+        local label, msg = _GetLabel(layer, position)
+        if label ~= nil then
+            row[kz] = label
+        elseif msg == 'OutsideMap' or msg == 'Unpathable' or msg == 'InvalidLayer' then
+            -- permanent: safe to cache as false
+            row[kz] = false
+        end
+        -- 'NotGenerated' / 'SystemError': transient, do not cache
+
+        return label, msg
+    end
 end
 
 --- Returns a table with all labels in the current iMAP cell. The keys represent the labels. The values represent the ratio of area it occupies in the cell
