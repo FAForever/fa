@@ -547,7 +547,7 @@ end
 CAiBrain.OnFailedUnitTransfer = nil
 
 --- Called by the engine when a unit fails to create due to unit cap.
----@type fun(self: Unit)
+---@type fun(self: moho.aibrain_methods)
 CAiBrain.OnUnitCapLimitReached = nil
 
 return CAiBrain
