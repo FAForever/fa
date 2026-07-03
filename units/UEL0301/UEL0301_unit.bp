@@ -255,7 +255,7 @@ UnitBlueprint{
     },
     Enhancements = {
         AdvancedCoolingUpgrade = {
-            BuildCostEnergy = 40000,
+            BuildCostEnergy = 43900,
             BuildCostMass = 1000,
             BuildTime = 5060,
             Icon = "acu",
@@ -281,7 +281,7 @@ UnitBlueprint{
             Slot = "LCH",
         },
         HighExplosiveOrdnance = {
-            BuildCostEnergy = 25500,
+            BuildCostEnergy = 28600,
             BuildCostMass = 800,
             BuildTime = 3370,
             Icon = "heo",
@@ -417,7 +417,7 @@ UnitBlueprint{
             Slot = "LCH",
         },
         Shield = {
-            BuildCostEnergy = 90200,
+            BuildCostEnergy = 99600,
             BuildCostMass = 2000,
             BuildTime = 8390,
             Icon = "psg",

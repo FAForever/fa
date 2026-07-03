@@ -72,14 +72,14 @@
       - Energy cost: 8700 -> 7700
       - Build time: 2500 -> 1000
     - Personal Shield Generator:
-      - Energy cost: 100200 -> 90200
+      - Energy cost: 100200 -> 99600
       - Build time: 7200 -> 8390
       - Energy maintenance cost: 500 -> 350
     - Energy Accelerator (Fire Rate upgrade):
-      - Energy cost: 44700 -> 40000
+      - Energy cost: 44700 -> 43900
       - Build time: 5040 -> 5060
     - Heavy Plasma Refractor (Range and AoE upgrade):
-      - Energy cost: 30000 -> 25500
+      - Energy cost: 30000 -> 28600
       - Build time: 3360 -> 3370
     - Radar Jammer:
       - Build time: 2500 -> 1000
