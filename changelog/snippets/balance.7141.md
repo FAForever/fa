@@ -105,7 +105,7 @@
       Due to the SACU cost reduction making SACUs upgraded with only this gun upgrade overpowered, mass costs from EMP, Nano, and Cloaking are moved to this upgrade.
 
       - Mass cost: 800 -> 1400
-      - Energy cost: 24000 -> 45000
+      - Energy cost: 24000 -> 50100
       - Build time: 3000 -> 6950
     - Personal Cloaking Generator:
       - Mass cost: 5000 -> 4700
@@ -113,13 +113,13 @@
       - Build time: 13800 -> 21350
     - EMP Burst:
       - Mass cost: 1000 -> 700
-      - Energy cost: 60000 -> 26500 
+      - Energy cost: 60000 -> 32500 
       - Build time: 3600 -> 3000
     - Nanite Missile System:
       - Build time: 3000 -> 2750
     - Nano-Repair System:
       - Mass cost: 2200 -> 1900
-      - Energy cost: 103500 -> 86700 
+      - Energy cost: 103500 -> 92300 
       - Build time: 6000 -> 7850
     - Personal Stealth Generator:
       - Energy cost: 7400 -> 13000

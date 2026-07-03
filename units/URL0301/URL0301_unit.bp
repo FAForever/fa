@@ -291,7 +291,7 @@ UnitBlueprint{
             Slot = "Back",
         },
         EMPCharge = {
-            BuildCostEnergy = 26500,
+            BuildCostEnergy = 32500,
             BuildCostMass = 700,
             BuildTime = 3000,
             Icon = "emp",
@@ -313,7 +313,7 @@ UnitBlueprint{
             Slot = "LCH",
         },
         FocusConvertor = {
-            BuildCostEnergy = 45000,
+            BuildCostEnergy = 50100,
             BuildCostMass = 1400,
             BuildTime = 6950,
             Icon = "fc",
@@ -385,7 +385,7 @@ UnitBlueprint{
             Slot = "RCH",
         },
         SelfRepairSystem = {
-            BuildCostEnergy = 86700,
+            BuildCostEnergy = 92300,
             BuildCostMass = 1900,
             BuildTime = 7850,
             Icon = "srs",
