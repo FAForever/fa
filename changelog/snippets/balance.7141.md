@@ -6,6 +6,8 @@
 
   Since they're easier to rush and are more powerful, SACUs have their ACU target priority ability removed to allow overcharge to counter early SACUs again.
 
+  Due to costing less, the buildpower of non-UEF SACUs is reduced (engi presets keep their buildpower). UEF keeps their buildpower because they have a weaker engineer preset, the most expensive base SACU, a T4 that struggles with pushing, and unique ravagers.
+
   - **Quantum Gateways (UAB0304, UEB0304, URB0304, XSB0304)**
     - Mass cost: 3000 -> 2550
     - Energy cost: 30000 -> 25500
@@ -19,11 +21,13 @@
     - Mass cost: 1950 -> 1550
     - Energy cost: 27100 -> 21500
     - Build time: 14400 -> 8250
+    - Buildpower: 56 -> 42
     - Removed ability to prioritize ACUs
     - Rapid Fabricator:
       - Mass cost: 800 -> 500
       - Energy cost: 50500 -> 10100
       - Build time: 4200 -> 1350
+      - Added buildpower: +42 -> +56
     - Resource Allocation System:
       
       Cost increased to keep requirements for sacrifice the same and to slightly counteract the base cost and quantum gateway buildpower/adjacency buffs.
@@ -90,11 +94,13 @@
     - Mass: 2000 -> 1600
     - Energy: 26400 -> 21100
     - Build time: 14400 -> 8530
+    - Buildpower: 56 -> 42
     - Removed ability to prioritize ACUs
     - Rapid Fabricator:
       - Mass cost: 800 -> 500
       - Energy cost: 51100 -> 10100
       - Build time: 4200 -> 1350
+      - Added buildpower: +42 -> +56
     - Resource Allocation System:
       - Mass cost: 4500 -> 4600
       - Energy cost: 90000 -> 94400 
@@ -129,6 +135,7 @@
     - Mass: 2400 -> 1650
     - Energy: 30200 -> 20800
     - Build time: 14400 -> 8800
+    - Buildpower: 56 -> 42
     - Removed ability to prioritize ACUs
     - Mass production: 3 -> 1
     - Energy production: 300 -> 20
@@ -146,6 +153,7 @@
       - Mass cost: 450 -> 500
       - Energy cost: 47400 -> 10100
       - Build time: 4200 -> 1350
+      - Added buildpower: +42 -> +56
     - Nano-Repair System:
       - Mass cost: 2300 -> 2700
       - Energy cost: 74300 -> 100500 

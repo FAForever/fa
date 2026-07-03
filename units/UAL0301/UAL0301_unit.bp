@@ -185,7 +185,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 21500,
         BuildCostMass = 1550,
-        BuildRate = 56,
+        BuildRate = 42,
         BuildTime = 8250,
         BuildableCategory = { "BUILTBYTIER3ENGINEER AEON" },
         MaxBuildDistance = 10,
