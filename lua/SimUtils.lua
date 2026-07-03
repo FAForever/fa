@@ -326,7 +326,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         local enhancements = bp.Enhancements
         if enhancements then
             local unitEnh = SimUnitEnhancements[unit.EntityId]
-            if not TableEmpty(unitEnh) then
+            if unitEnh then
                 activeEnhancements = {}
                 for slot, enh in unitEnh do
                     activeEnhancements[slot] = enh
@@ -421,13 +421,17 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         if activeEnhancements then
             local thread = newUnit.OnStopBeingBuiltEnhancementsThread
             if thread then KillThread(thread) end
-            newUnit.OnStopBeingBuiltEnhancementsThread = newUnit:ForkThread(function()
-                WaitTicks(1)
-                for _, enh in activeEnhancements do
-                    newUnit:CreateEnhancement(enh)
-                end
+            if TableEmpty(activeEnhancements) then
                 newUnit.OnStopBeingBuiltEnhancementsThread = nil
-            end)
+            else
+                newUnit.OnStopBeingBuiltEnhancementsThread = newUnit:ForkThread(function()
+                    WaitTicks(1)
+                    for _, enh in activeEnhancements do
+                        newUnit:CreateEnhancement(enh)
+                    end
+                    newUnit.OnStopBeingBuiltEnhancementsThread = nil
+                end)
+            end
         end
 
         local maxHealth = newUnit:GetMaxHealth()
