@@ -64,13 +64,13 @@
         - Regen Rate: 150 -> 160 hp/s
         - Regen Delay: 1 -> 3 seconds
         - Spillover mult: 0.2 -> 0.3
+    - C-D3 Engineering Drone:
+      - Energy cost: 8700 -> 7700
+      - Build time: 2500 -> 1000
     - Resource Allocation System:
       - Mass cost: 4500 -> 4600
       - Energy cost: 90000 -> 94400 
       - Build time: 8400 -> 20550
-    - C-D3 Engineering Drone:
-      - Energy cost: 8700 -> 7700
-      - Build time: 2500 -> 1000
     - Personal Shield Generator:
       - Energy cost: 100200 -> 99600
       - Build time: 7200 -> 8390
