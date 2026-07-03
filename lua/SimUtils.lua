@@ -426,8 +426,10 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
             else
                 newUnit.OnStopBeingBuiltEnhancementsThread = newUnit:ForkThread(function()
                     WaitTicks(1)
-                    for _, enh in activeEnhancements do
-                        newUnit:CreateEnhancement(enh)
+                    if newUnit and not newUnit.Dead and not IsDestroyed(newUnit) then
+                        for _, enh in activeEnhancements do
+                            newUnit:CreateEnhancement(enh)
+                        end
                     end
                     newUnit.OnStopBeingBuiltEnhancementsThread = nil
                 end)
