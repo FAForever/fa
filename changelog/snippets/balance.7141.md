@@ -91,7 +91,6 @@
     - Energy: 26400 -> 21100
     - Build time: 14400 -> 8530
     - Removed ability to prioritize ACUs
-    - Resource Allocation mass: 4500 -> 4600
     - Rapid Fabricator:
       - Mass cost: 800 -> 500
       - Energy cost: 51100 -> 10100
