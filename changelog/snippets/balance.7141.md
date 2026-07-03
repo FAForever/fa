@@ -32,7 +32,7 @@
       - Energy cost: 90000 -> 94400 
       - Build time: 8400 -> 20550
     - Personal Shield Generator:
-      - Energy cost: 64950 -> 44900
+      - Energy cost: 64950 -> 49000
       - Build time: 5040 -> 4950
       - Energy maintenance cost: 300 -> 210
     - Heavy Personal Shield Generator:
@@ -43,7 +43,7 @@
       - Energy cost: 46200 -> 45600
       - Build time: 6048 -> 6200
     - Nano-Repair System:
-      - Energy cost: 74000 -> 42500
+      - Energy cost: 74000 -> 57500
 
   - **UEF Support Armored Command Unit (UEL0301)**
     - Mass: 2100 -> 1700
