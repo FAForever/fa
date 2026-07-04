@@ -1,0 +1,1 @@
+- (#7166) Rename `CLAUDE.md` to `AGENTS.md` for cross-agent compatibility.
