@@ -2,7 +2,7 @@
 
 This directory contains the refactored in-game chat. The goal is to replace the monolithic legacy `/lua/ui/game/chat.lua` with a clean MVC structure where the **model** is reactive (LazyVar-based), the **view** is dumb (reads from the model, never writes), and the **controller** is the only place that sends or receives messages.
 
-> **Read first:** [`/lua/ui/AGENTS.MD`](/lua/ui/AGENTS.MD) covers project-wide UI patterns — `__init` vs `__post_init`, LazyVars and `Derive`, `TrashBag`, layout, skinning, debug overlays, hot-reload. This doc is chat-specific and assumes those rules. Class field annotation conventions live in [`annotation.md`](annotation.md).
+> **Read first:** [`/lua/ui/AGENTS.md`](/lua/ui/AGENTS.md) covers project-wide UI patterns — `__init` vs `__post_init`, LazyVars and `Derive`, `TrashBag`, layout, skinning, debug overlays, hot-reload. This doc is chat-specific and assumes those rules. Class field annotation conventions live in [`annotation.md`](annotation.md).
 
 ---
 
@@ -178,7 +178,7 @@ Every public function on `ChatController` either reads input, writes the model, 
 
 ## Views
 
-Every `*Interface` file follows the rules in [`/lua/ui/AGENTS.MD`](../../AGENTS.MD) — `__init` for state and children, `__post_init` for layout, observers via `Derive`, cleanup via `TrashBag`. The chat-specific bits are which model fields each interface observes and which controller calls it makes.
+Every `*Interface` file follows the rules in [`/lua/ui/AGENTS.md`](../../AGENTS.md) — `__init` for state and children, `__post_init` for layout, observers via `Derive`, cleanup via `TrashBag`. The chat-specific bits are which model fields each interface observes and which controller calls it makes.
 
 | Interface | Observes | Calls into controller |
 |-----------|----------|-----------------------|
@@ -228,9 +228,9 @@ Every complete UI component in this system (chat window, options dialog, edit ar
 1. **Debugging** — any component can be opened in isolation without launching the full game flow.
 2. **Separation of concerns** — if a component requires another component to exist before it can be opened, that is a design smell indicating hidden coupling.
 
-Each top-level view module exports module-level `Toggle()` / `Open()` / `Close()` and an `Instance` local. Bind `chat_toggle` and `chat_config` actions in `keyactions.lua` to `UI_Lua import("/lua/ui/game/chat/ChatInterface.lua").Toggle()` and the corresponding config call. The same `Toggle()` is also what the hot-reload `__moduleinfo.OnReload` block reopens after a save — see [`/lua/ui/AGENTS.MD § 7.2`](../../AGENTS.MD).
+Each top-level view module exports module-level `Toggle()` / `Open()` / `Close()` and an `Instance` local. Bind `chat_toggle` and `chat_config` actions in `keyactions.lua` to `UI_Lua import("/lua/ui/game/chat/ChatInterface.lua").Toggle()` and the corresponding config call. The same `Toggle()` is also what the hot-reload `__moduleinfo.OnReload` block reopens after a save — see [`/lua/ui/AGENTS.md § 7.2`](../../AGENTS.md).
 
-> This convention is currently chat-specific but is a candidate to lift into [`/lua/ui/AGENTS.MD`](../../AGENTS.MD). Until it does, treat this as the reference for any other top-level UI module.
+> This convention is currently chat-specific but is a candidate to lift into [`/lua/ui/AGENTS.md`](../../AGENTS.md). Until it does, treat this as the reference for any other top-level UI module.
 
 ---
 
@@ -239,6 +239,6 @@ Each top-level view module exports module-level `Toggle()` / `Open()` / `Close()
 - **Don't store UI references in the model.** The model must be constructable with no UI present (and is — see the model singleton's hot-reload hook, which rebuilds without touching the view tree).
 - **Don't write to the model from a view.** Views call into the controller; the controller writes.
 - **Don't call `SessionSendChatMessage` or `gamemain.RegisterChatFunc` from anywhere but `ChatController`.** Network and sim-side traffic is funnelled through that file precisely so legacy/notify/script paths don't fork.
-- **Don't mutate `model.History` (or any LazyVar's table) in place.** Build a new table and `Set` it; otherwise dependents never go dirty. See [`/lua/ui/AGENTS.MD § 2 Reactivity rules`](../../AGENTS.MD).
+- **Don't mutate `model.History` (or any LazyVar's table) in place.** Build a new table and `Set` it; otherwise dependents never go dirty. See [`/lua/ui/AGENTS.md § 2 Reactivity rules`](../../AGENTS.md).
 - **Don't replicate the autolobby's drilling pattern.** State is on the model; views import and subscribe — no parent needs to push updates into children.
 - **Don't add a slash command by editing the registry directly.** Drop a file in [`commands/builtin/`](commands/builtin/) and add one `Registry.RegisterFromPath` line in `ChatController.RegisterBuiltinCommands` — see the [`add-chat-command`](../../../../.claude/skills/add-chat-command/SKILL.md) skill.

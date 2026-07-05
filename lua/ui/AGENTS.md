@@ -1,6 +1,6 @@
 # UI — General Patterns
 
-This doc covers conventions that apply to **any** UI work in `/lua/ui` — control authoring, layout, reactivity, and lifecycle. Folder-specific docs (e.g. [`game/chat/AGENTS.MD`](game/chat/AGENTS.MD)) extend or specialize these rules; if you're working on chat, options dialogs, lobby UI, etc., read the local AGENTS.MD too.
+This doc covers conventions that apply to **any** UI work in `/lua/ui` — control authoring, layout, reactivity, and lifecycle. Folder-specific docs (e.g. [`game/chat/AGENTS.md`](game/chat/AGENTS.md)) extend or specialize these rules; if you're working on chat, options dialogs, lobby UI, etc., read the local AGENTS.md too.
 
 The patterns described here came out of refactoring the in-game chat in 2026. Some older modules (legacy lobby, notify, etc.) predate them and won't match — when extending those modules, follow the rules here for **new** code rather than mirroring the existing style.
 
@@ -130,7 +130,7 @@ Reading the value into a local at the top of the handler is the convention even 
 
 ### The `Derive` rule
 
-**Never assign `OnDirty` directly on a LazyVar you don't own.** Direct assignment overwrites whatever handler was there before, silently breaking unrelated code. Always `Derive`. The Derive function bundles the safe three-step dance (create new LazyVar, hang OnDirty on it, Set a reader) into one call. See the rationale and the `Trash:Add` integration in [game/chat/AGENTS.MD § Reactive State](game/chat/AGENTS.MD).
+**Never assign `OnDirty` directly on a LazyVar you don't own.** Direct assignment overwrites whatever handler was there before, silently breaking unrelated code. Always `Derive`. The Derive function bundles the safe three-step dance (create new LazyVar, hang OnDirty on it, Set a reader) into one call. See the rationale and the `Trash:Add` integration in [game/chat/AGENTS.md § Reactive State](game/chat/AGENTS.md).
 
 ### Don't use `OnFrame` for reactivity, unless strictly necessary
 
@@ -158,7 +158,7 @@ When you do need `OnFrame`, remember it is gated by `SetNeedsFrameUpdate(true)` 
 
 ### Models and controllers
 
-Models and controllers are module singletons. Import them at the top of any file that needs them — never thread them through constructors or callback tables. Direct imports keep dependencies visible at the top of the file and avoid the autolobby's "prop drilling" pattern. See [game/chat/AGENTS.MD § Imports vs callbacks](game/chat/AGENTS.MD) for the chat refactor's specific framing.
+Models and controllers are module singletons. Import them at the top of any file that needs them — never thread them through constructors or callback tables. Direct imports keep dependencies visible at the top of the file and avoid the autolobby's "prop drilling" pattern. See [game/chat/AGENTS.md § Imports vs callbacks](game/chat/AGENTS.md) for the chat refactor's specific framing.
 
 ---
 
@@ -384,7 +384,7 @@ This only works if your module follows the standalone-invocation convention (a m
 
 The seven sections above are the load-bearing patterns. Candidates for follow-up additions, in rough order of value:
 
-1. **Standalone invocation convention** — every top-level UI module should export a module-level `Toggle()` / `Open()` / `Close()` that's safe to call from the keybind table or console. Currently documented only in [game/chat/AGENTS.MD § Standalone Invocation](game/chat/AGENTS.MD). Lifting this here would let every new feature inherit the convention without re-explaining it (and the hot-reload block in § 7.2 already assumes it).
+1. **Standalone invocation convention** — every top-level UI module should export a module-level `Toggle()` / `Open()` / `Close()` that's safe to call from the keybind table or console. Currently documented only in [game/chat/AGENTS.md § Standalone Invocation](game/chat/AGENTS.md). Lifting this here would let every new feature inherit the convention without re-explaining it (and the hot-reload block in § 7.2 already assumes it).
 2. **Tooltips** — `Tooltip.AddButtonTooltip` / `AddCheckboxTooltip` / `AddControlTooltip` and how their string keys resolve through the localization tables.
 3. **Localization** — `<LOC key>fallback` strings and `LOC` / `LOCF` helpers; when text is user-visible, it must go through the LOC system.
 4. **Hit testing** — `DisableHitTest()` on visual-only overlays is easy to forget and produces baffling click-through bugs. One paragraph would save a future debugging session.
