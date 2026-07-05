@@ -1,1 +1,1 @@
-- (#7106) Generate BaseTemplate tables at import time instead of parsing them from lua source files.
+- Generate BaseTemplate tables at import time instead of parsing them from lua source files (#7106).
