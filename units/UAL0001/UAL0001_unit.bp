@@ -1040,7 +1040,7 @@ UnitBlueprint{
             WeaponCategory = "Death",
         },
         {
-            Damage = 100,
+            Damage = 101,
             DamageFriendly = true,
             DamageRadius = 4,
             DamageType = "Normal",
