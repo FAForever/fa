@@ -112,6 +112,7 @@ keyDescriptions = {
     ['select_naval'] = '<LOC key_desc_0048>Select all Naval units',
     ['cap_frames'] = '<LOC key_desc_0050>Capture Frames',
     ['pause_unit'] = '<LOC key_desc_0056>Pause',
+    ['shift_pause_unit'] = '<LOC key_desc_0056>Pause',
     ['pause_unit_all'] = '<LOC key_pause_unit_all>Pause all units in the selection',
     ['unpause_unit_all'] = '<LOC key_unpause_unit_all>Unpause all units in the selection',
     ['suicide'] = '<LOC key_desc_0057>Self-Destruct',
@@ -292,6 +293,7 @@ keyDescriptions = {
 
     -- GAZUI
     ['toggle_repeat_build'] = '<LOC key_desc_0185>Toggle factory repeat build',
+    ['shift_toggle_repeat_build'] = '<LOC key_desc_0185>Toggle factory repeat build',
     ['show_enemy_life'] = '<LOC key_desc_0186>Show enemy life bars',
     ['show_network_stats'] = '<LOC key_desc_0187>Show network stats window',
     ['toggle_shield'] = '<LOC key_desc_0189>Toggle unit shield',
