@@ -20,11 +20,9 @@ We use snippets to reduce the burden on maintainers to write an accurate changel
 
 ### Format of a snippet
 
-All current snippets can be found in the [snippets folder](../changelog/snippets/).
-
 The structure of the file name is `XXX.ABCD.md`, where `XXX` is one of the snippet types and `ABCD` is the pull request number. The available snippet types are `fix`, `features`, `balance`, `graphics`, `ai`, `performance` or `other`.
 
-The content of a snippet is similar to a commit message. The first line is a title that starts with the relevant pull requests and a concise description of the changes, as an example: ` - (#PR1, #PR2, ...) <concise description of changes>`. Use a dot at the end of the first line. The remainder of the file can be used to provide additional and more detailed information about the changes. Remember to indent these additional lines, so they follow the indentation that gets created because of the list item of the first line. Add an empty line at the end of the file to make sure that the next snippet is separated by an empty line. You can make use of a Markdown formatter to ensure consistency, one example is the use of [prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode).
+The format of a snippet depends on whether it is a [balance snippet](../development/changelog/balance-snippet) or [any other category](../development/changelog/other-snippet).
 
 ### Choosing a category
 
@@ -37,10 +35,6 @@ The content of a snippet is similar to a commit message. The first line is a tit
 `other` Refactors, changes for developers and modders, code annotations and the like fall into this category.
 
 If multiple categories are fitting, use the one that appears first in this list.
-
-### Example snippet
-
-
 
 ## Sources and inspiration
 

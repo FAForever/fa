@@ -55,9 +55,9 @@ jobs:
     needs: [test, changelog-lua]
     runs-on: ubuntu-latest
     steps:
-      # https://github.com/actions/checkout/tree/v4/
+      # https://github.com/actions/checkout/tree/v6/
       - name: Checkout FA repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
           ref: staging/fafdevelop
@@ -96,7 +96,7 @@ jobs:
         run: rm -f lua/ui/lobby/changelog/generated/*
 
       - name: Retrieve generated lua changelog
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: lua_changelog
           path: lua/ui/lobby/changelog/generated
