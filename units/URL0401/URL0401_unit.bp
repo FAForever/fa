@@ -41,8 +41,8 @@ UnitBlueprint{
     Defense = {
         ArmorType = "Experimental",
         EconomyThreatLevel = 1600,
-        Health = 18000,
-        MaxHealth = 18000,
+        Health = 17000,
+        MaxHealth = 17000,
         RegenRate = 134,
     },
     Display = {
