@@ -1,4 +1,8 @@
 ---@declare-global
+
+-- nilable alias used for fields that are defined in the engine during runtime (purely to prevent undefined field errors in the lua language server)
+---@alias EngineDefinedField<T> T | nil
+
 --- Class structure
 
 -- Simple class
@@ -167,7 +171,7 @@ end
 
 --- Prepares the construction of a class, referring to the paragraphs of text at the top of this file.
 ---@generic T: fa-class
----@generic T_Base: fa-class
+---@generic T_Base
 ---@param ... T_Base
 ---@return fun(specs: T): T|T_Base
 function Class(...)
@@ -198,7 +202,7 @@ function Class(...)
 end
 
 ---@generic T: fa-class
----@generic T_Base: fa-class
+---@generic T_Base
 ---@param ... T_Base
 ---@return fun(specs: T): T|T_Base
 function ClassUI(...)
@@ -217,7 +221,7 @@ function ClassUI(...)
 end
 
 ---@generic T: fa-class
----@generic T_Base: fa-class
+---@generic T_Base
 ---@param ... T_Base
 ---@return fun(specs: T): T|T_Base
 function ClassShield(...)
@@ -236,7 +240,7 @@ function ClassShield(...)
 end
 
 ---@generic T: fa-class
----@generic T_Base: fa-class
+---@generic T_Base
 ---@param ... T_Base
 ---@return fun(specs: T): T|T_Base
 function ClassProjectile(...)
@@ -255,7 +259,7 @@ function ClassProjectile(...)
 end
 
 ---@generic T: fa-class
----@generic T_Base: fa-class
+---@generic T_Base
 ---@param ... T_Base
 ---@return fun(specs: T): T|T_Base
 function ClassDummyProjectile(...)
@@ -274,7 +278,7 @@ function ClassDummyProjectile(...)
 end
 
 ---@generic T: fa-class
----@generic T_Base: fa-class
+---@generic T_Base
 ---@param ... T_Base
 ---@return fun(specs: T): T|T_Base
 function ClassUnit(...)
@@ -293,7 +297,7 @@ function ClassUnit(...)
 end
 
 ---@generic T: fa-class
----@generic T_Base: fa-class
+---@generic T_Base
 ---@param ... T_Base
 ---@return fun(specs: T): T|T_Base
 function ClassDummyUnit(...)
@@ -312,7 +316,7 @@ function ClassDummyUnit(...)
 end
 
 ---@generic T: fa-class
----@generic T_Base: fa-class
+---@generic T_Base
 ---@param ... T_Base
 ---@return fun(specs: T): T|T_Base
 function ClassWeapon(...)

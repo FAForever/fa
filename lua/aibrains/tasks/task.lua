@@ -45,7 +45,7 @@ local TableGetn = table.getn
 ---@class AITaskTemplate
 ---@field Identifier string             # Unique identifier for a task.
 ---
----@field BuildCategory EntityCategory         # Used when searching for a task and when executing a task. Defines the categories of the unit that we're trying to build
+---@field BuildCategory EngineDefinedField <EntityCategory>         # Used when searching for a task and when executing a task. Defines the categories of the unit that we're trying to build
 ---@field DefaultDistance? number       # Used when searching for a task. If set, any unit that is within this distance to the base can accept this task.
 ---@field DefaultPriority number        # Used when creating or evaluating the task.
 ---@field PreferredChunk? string        # Used when executing a task. Specifically used by engineers that are looking for a place to build

@@ -1,8 +1,8 @@
 ---@declare-global
 
 ---@class AIBaseTemplateManager
----@field BuilderGroupTemplates AIBuilderGroupTemplate[]                # List of names of builder groups
----@field BuilderGroupTemplatesNonCheating AIBuilderGroupTemplate[]     # List of names of builder groups when AI does not have `SallyShears` enabled
+---@field BuilderGroupTemplates EngineDefinedField <AIBuilderGroupTemplate[]>                # List of names of builder groups
+---@field BuilderGroupTemplatesNonCheating EngineDefinedField <AIBuilderGroupTemplate[]>     # List of names of builder groups when AI does not have `SallyShears` enabled
 
 ---@class AIBaseTemplate
 ---@field BaseTemplateName string   # Unique identifier to reference the base template

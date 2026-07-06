@@ -33,15 +33,15 @@
 --- `moho.manipulator_methods:SetPrecedence(precedence)`. Treated as `10` when absent.
 ---@field AimControlPrecedence? number
 --- this weapon will aim straight ahead when disabled
----@field AimsStraightOnDisable boolean
+---@field AimsStraightOnDisable EngineDefinedField <boolean>
 --- always recheck for better target regardless of whether you already have one or not
----@field AlwaysRecheckTarget boolean
+---@field AlwaysRecheckTarget EngineDefinedField <boolean>
 --- animation played by the weapon's Rack Salvo Reload Sequence
 ---@field AnimationReload? FileName
 --- if an anti-artillery shield will block this projectile
 ---@field ArtilleryShieldBlocks? boolean
 --- information about the audio files used by the weapon
----@field Audio WeaponBlueprintAudio
+---@field Audio EngineDefinedField <WeaponBlueprintAudio>
 --- How many times the engine calls OnFire for the weapon when attacking ground before moving on to the next ground attack order. Defaults to 3
 ---@field AttackGroundTries? number
 --- if the unit has no issued commands and has a weapon that has `AutoInitiateAttackCommand` set,
@@ -50,15 +50,15 @@
 --- Ballistic arcs that should be used on the projectile
 ---@field BallisticArc? WeaponBallisticArc
 --- Interval in seconds between beam collision checks (which take 1 tick) - using `0` will cause beams to damage every tick
----@field BeamCollisionDelay number
+---@field BeamCollisionDelay EngineDefinedField <number>
 --- the amount of time the beam exists
----@field BeamLifetime number
+---@field BeamLifetime EngineDefinedField <number>
 --- if the weapon will only fire when underwater
 ---@field BelowWaterFireOnly? boolean
 --- Distance from bomb firing solution's position to the target's position within which the weapon will fire 
 ---@field BombDropThreshold? number
 --- information about the bonuses added to the weapon when it reaches a specific veterancy level
----@field Buffs BlueprintBuff[]
+---@field Buffs EngineDefinedField <BlueprintBuff[]>
 --- used by UEL0103 (Lobo) script to pass the lifetime of the vision marker created upon landing
 ---@field CameraLifetime? number
 --- time to maintain the camera shake
@@ -70,13 +70,13 @@
 --- used by UEL0103 (Lobo) script to pass the radius of the vision marker created upon landing
 ---@field CameraVisionRadius? number
 --- how far from the unit should the camera shake
----@field CameraShakeRadius number
+---@field CameraShakeRadius EngineDefinedField <number>
 --- if the weapon cannot attack ground positions
 ---@field CannotAttackGround? boolean
 --- should the unit collide against friendly meshes
----@field CollideFriendly boolean
+---@field CollideFriendly EngineDefinedField <boolean>
 --- beams fire without stopping - overrides `RateOfFire`
----@field ContinuousBeam boolean
+---@field ContinuousBeam EngineDefinedField <boolean>
 --- This projectile needs to be built and stored before the weapon can fire.
 --- Makes the engine check if the weapon has silo ammo before being allowed to fire.
 ---@field CountedProjectile? boolean
@@ -97,14 +97,14 @@
 --- See `moho.projectile_methods:ChangeDetonateAboveHeight(height)`
 ---@field DetonatesAtTargetHeight? boolean
 --- Disables the weapon while it is reloading
----@field DisableWhileReloading boolean
+---@field DisableWhileReloading EngineDefinedField <boolean>
 --- Name of the weapon. Used for lobby restrictions and for debugging:
 --- `dbg weapons` in the console shows the weapon names.
 ---@field DisplayName string
 --- number of times the Damage over Time damage will be dealt
----@field DoTPulses number
+---@field DoTPulses EngineDefinedField <number>
 --- duration that the Damage over Time will last in seconds
----@field DoTTime number
+---@field DoTTime EngineDefinedField <number>
 --- If `FixBombTrajectory` is set, then bombs dropped with this weapon will be aimed at the position
 --- this fraction of the distance between the target and where it dropped. This may only be useful
 --- for torpedo bombers.
@@ -113,7 +113,7 @@
 --- script object. This is for purely script driven weapons (like death weapons).
 ---@field DummyWeapon boolean
 --- the effective range that this weapon really has
----@field EffectiveRadius number
+---@field EffectiveRadius EngineDefinedField <number>
 --- if defined, will make this weapon not contribute to the automatically generated threat levels
 ---@field EnabledByEnhancement? Enhancement
 --- if `false`, the first shot out of this weapon will not create an economy drain event
@@ -142,14 +142,14 @@
 --- this value
 ---@field FixedSpreadRadius? number
 --- flares that this weapons launches
----@field Flare WeaponBlueprintFlare
+---@field Flare EngineDefinedField <WeaponBlueprintFlare>
 --- used to force packing up a weapon before being able to fire again
 ---@field ForceSingleFire? boolean
 --- controls what the weapon is allowed to target in reference to the heading of the unit. Defaults to 0
----@field HeadingArcCenter number
+---@field HeadingArcCenter EngineDefinedField <number>
 --- controls what the weapon is allowed to target in reference to the arc center,
 --- this is degrees on either side. Defaults to 180
----@field HeadingArcRange number
+---@field HeadingArcRange EngineDefinedField <number>
 --- does not consider the weapon when attacking targets if it is disabled
 ---@field IgnoreIfDisabled? boolean
 --- the intial damage done on impact for a Damage over Time weapon
@@ -175,38 +175,38 @@
 --- Defaults to nil, which gives infinite vertical range.
 ---@field MaxHeightDiff? number
 --- this weapon can only hold this many counted projectiles
----@field MaxProjectileStorage number
+---@field MaxProjectileStorage EngineDefinedField <number>
 --- how far the target needs to be before we start firing
----@field MaxRadius number
+---@field MaxRadius EngineDefinedField <number>
 --- the beam will cut off at this distance from the weapon
 ---@field MaximumBeamLength? number
 ---@field MetaImpactAmount any unused
 ---@field MetaImpactRadius any unused
 --- the minimum range we must be to fire at our target
----@field MinRadius number
+---@field MinRadius EngineDefinedField <number>
 --- The time that the muzzle will wait between playing the FxMuzzleFlash table and the creation of
 --- the projectile. Note: This will delay the firing of the projectile. So if you set the rate of
 --- fire to fire quickly, this will throttle it.
----@field MuzzleChargeDelay number
+---@field MuzzleChargeDelay EngineDefinedField <number>
 --- Time in between muzzles firing. Setting to 0 means all muzzles fire together. This time,
 --- multiplied by the number of muzzles minus 1, must not exceed the inverse of the rate of fire.
----@field MuzzleSalvoDelay number
+---@field MuzzleSalvoDelay EngineDefinedField <number>
 --- Number of times the muzzle will fire during a rack firing
----@field MuzzleSalvoSize number
+---@field MuzzleSalvoSize EngineDefinedField <number>
 --- Speed at which the projectile comes out of the muzzle. This speed is used in the ballistics
 --- calculations. If you weapon doesn't fire at its max radius, this may be too low.
 ---@field MuzzleChargeStart? number
 --- Determines which bone units are tractored to. Used by `ADFTractorClaw` (UAL0401 Galactic Colossus's tractor beam)
 ---@field MuzzleSpecial? number
 --- the exit velocity of the projectile once created at the muzzle of the barrel 
----@field MuzzleVelocity number
+---@field MuzzleVelocity EngineDefinedField <number>
 --- random variation in the weapon's muzzle velocity (gaussian)
----@field MuzzleVelocityRandom number
+---@field MuzzleVelocityRandom EngineDefinedField <number>
 --- Target distance at which the weapon will start reducing muzzle velocity to maintain a higher
 --- firing arc. This was put there so weapons that have a high muzzle velocity (because they have
 --- a huge range, like an artillery piece), wouldn't point right at something that's close,
 --- it'll slow down its shot to still have a nice arc to it.
----@field MuzzleVelocityReduceDistance number
+---@field MuzzleVelocityReduceDistance EngineDefinedField <number>
 --- if `NeedProp` is true then whenever the unit aquires a new target and is ready to attack it, it
 --- will first run the `OnGotTarget` script on the weapon
 ---@field NeedPrep? boolean
@@ -247,17 +247,17 @@
 --- targeting
 ---@field PrefersPrimaryWeaponTarget? boolean
 --- blueprint of the projectile to fire
----@field ProjectileId FileName
+---@field ProjectileId EngineDefinedField <FileName>
 --- Lifetime for projectile in seconds.
 --- If 0, the projectile will use the lifetime from its own blueprint.
----@field ProjectileLifetime number
+---@field ProjectileLifetime EngineDefinedField <number>
 --- Sets the lifetime for the projectile to use the lifetime equation of
 --- `ProjectileLifetimeUsesMultiplier * MaxRadius / MuzzleVelocity`
 ---@field ProjectileLifetimeUsesMultiplier? number
 --- list of weapon racks this weapon uses
----@field RackBones WeaponRacksBlueprint
+---@field RackBones EngineDefinedField <WeaponRacksBlueprint>
 --- if all racks fire simultaneously
----@field RackFireTogether boolean
+---@field RackFireTogether EngineDefinedField <boolean>
 --- Distance racks will recoil along the weapon's z-axis (local coords).
 --- `MuzzleSalvoDelay` cannot be 0, so that there's time to return the racks.
 ---@field RackRecoilDistance? number
@@ -269,15 +269,15 @@
 --- time before the racks start firing
 ---@field RackSalvoChargeTime? number
 --- if the racks immediately fire when done charging or if they wait until next `OnFire` event
----@field RackSalvoFiresAfterCharge boolean
+---@field RackSalvoFiresAfterCharge EngineDefinedField <boolean>
 --- time the racks will reload before starting its next charge/salve cycle
----@field RackSalvoReloadTime number
+---@field RackSalvoReloadTime EngineDefinedField <number>
 --- if all rack bones are "slaved" to the turret pitch bone
----@field RackSlavedToTurret boolean
+---@field RackSlavedToTurret EngineDefinedField <boolean>
 --- the range category this weapon satisfies
 ---@field RangeCategory? WeaponRangeCategory
 --- Rack firings per second. You can use decimals for fire rates that are longer than a second.
----@field RateOfFire number
+---@field RateOfFire EngineDefinedField <number>
 --- if this weapon will find new target on miss events
 ---@field ReTargetOnMiss? boolean
 --- if `true`, will set the orange work progress bar to display the reload progress of this weapon
@@ -300,17 +300,17 @@
 --- flag to specify to not make the weapon active if the primary weapon has a current target
 ---@field StopOnPrimaryWeaponBusy? boolean
 --- interval of time between looking for a target
----@field TargetCheckInterval number
+---@field TargetCheckInterval EngineDefinedField <number>
 --- issues a `ResetTarget` half way the firing sequence
----@field TargetResetWhenReady boolean
+---@field TargetResetWhenReady EngineDefinedField <boolean>
 --- table of category strings that define the targetting order of this weapon
----@field TargetPriorities UnparsedCategory[]
+---@field TargetPriorities EngineDefinedField <UnparsedCategory[]>
 --- comma separated list of category names that are always invalid targets
----@field TargetRestrictDisallow UnparsedCategory
+---@field TargetRestrictDisallow EngineDefinedField <UnparsedCategory>
 --- comma separated list of category names that are the only valid targets
----@field TargetRestrictOnlyAllow UnparsedCategory
+---@field TargetRestrictOnlyAllow EngineDefinedField <UnparsedCategory>
 --- the type of entity this unit can target
----@field TargetType WeaponTargetType
+---@field TargetType EngineDefinedField <WeaponTargetType>
 --- Lets the AI know that this weapon is one of two weapon definitions on a weapon bone that gets
 --- used when toggling between ground and anti-air. Which weapon is which is determined by which
 --- weapon has a `FireTargetLayerCapsTable` layer containing `"Air"`. The string should be the label
@@ -336,25 +336,25 @@
 --- If two manipulators are needed for this weapon. Used for bots with arms.
 ---@field TurretDualManipulators? boolean
 --- if this weapon has a turret. Defaults to false
----@field Turreted boolean
+---@field Turreted EngineDefinedField <boolean>
 --- the center angle for determining pitch, based off the rest pose of the model
----@field TurretPitch number
+---@field TurretPitch EngineDefinedField <number>
 --- the angle +/- off the pitch that is a valid angle to turn to
----@field TurretPitchRange number
+---@field TurretPitchRange EngineDefinedField <number>
 --- the speed at which the turret can pitch
----@field TurretPitchSpeed number
+---@field TurretPitchSpeed EngineDefinedField <number>
 --- the center angle for determining yaw, based off the rest pose of the model
----@field TurretYaw number
+---@field TurretYaw EngineDefinedField <number>
 --- the angle +/- off the yaw that is a valid angle to turn to
----@field TurretYawRange number
+---@field TurretYawRange EngineDefinedField <number>
 --- the speed at which the turret can turn in its yaw direction
----@field TurretYawSpeed number
+---@field TurretYawSpeed EngineDefinedField <number>
 --- the center angle for determining secondary yaw, based off the rest pose of the model
----@field TurretDualYaw number
+---@field TurretDualYaw EngineDefinedField <number>
 --- the angle +/- off the secondary yaw that is a valid angle to turn to
----@field TurretDualYawRange number
+---@field TurretDualYawRange EngineDefinedField <number>
 --- the speed at which the secondary turret can turn in its yaw direction
----@field TurretDualYawSpeed number
+---@field TurretDualYawSpeed EngineDefinedField <number>
 --- if this weapon uses the recent firing solution to create projectile instead of the
 --- aim bone transform when it fires.
 ---@field UseFiringSolutionInsteadOfAimBone? boolean
@@ -381,11 +381,11 @@
 ---@field YawOnlyOnTarget? boolean
 ---
 --- auto-generated by `unit.BlueprintId .. "-" .. <weapon index> .. "-" .. weapon.Label`
----@field BlueprintId BlueprintId
+---@field BlueprintId EngineDefinedField <BlueprintId>
 --- auto-generated from `MuzzleSalvoSize` to keep backwards compatibility
----@field ProjectilesPerOnFire number
+---@field ProjectilesPerOnFire EngineDefinedField <number>
 --- auto-generated to `1` to keep backwards compatibility
----@field RackSalvoSize number
+---@field RackSalvoSize EngineDefinedField <number>
 
 ---@class WeaponBlueprintFlare
 --- the category of projectiles this flare will attract

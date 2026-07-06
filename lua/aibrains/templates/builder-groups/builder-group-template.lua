@@ -4,7 +4,7 @@
 
 ---@class AIBuilderGroupTemplate
 ---@field BuilderGroupName string
----@field BuilderGroupType string
+---@field BuilderGroupType EngineDefinedField <string>
 ---@field BuilderTemplates AIBuilderTemplate[]
 
 --- Register a builder group, or override an existing builder group

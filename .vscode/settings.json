@@ -6,12 +6,16 @@
     "doscript": "require",
     "lazyimport": "require"
   },
-  "Lua.runtime.version": "Lua 5.1",
-  "Lua.telemetry.enable": false,
+  "Lua.runtime.version": "LuaFA",
   "Lua.workspace.checkThirdParty": false,
   "Lua.runtime.path": ["/?"],
   "Lua.runtime.plugin": ".vscode/fa-plugin.lua",
-  "Lua.workspace.ignoreDir": [".vscode", "loc", "*.bp", "lua/ui/lobby/changelog/generated/*"],
+  "Lua.workspace.ignoreDir": [
+    ".vscode",
+    "loc",
+    "*.bp",
+    "lua/ui/lobby/changelog/generated/*"
+  ],
   "[lua]": {
     "editor.wordBasedSuggestions": "off"
   },
@@ -25,10 +29,10 @@
   "Lua.completion.autoRequire": false,
   "Lua.diagnostics.globals": ["ScenarioInfo", "__moduleinfo"],
   "Lua.format.defaultConfig": {
-    "max_line_length": "unset",
+    "max_line_length": "unset"
   },
   "[markdown]": {
-    "editor.tabSize": 2,
+    "editor.tabSize": 2
   },
 
   // used for grammar checks of changelog

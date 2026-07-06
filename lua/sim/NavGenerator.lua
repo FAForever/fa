@@ -406,7 +406,7 @@ end
 ---@field pz number                 # z-coordinate of center in world space
 
 ---@class NavSection : NavPathingData
----@field Area number
+---@field Area EngineDefinedField <number>
 ---@field Center Vector
 ---@field Identifier NavSectionIdentifier
 ---@field Label NavLabelIdentifier

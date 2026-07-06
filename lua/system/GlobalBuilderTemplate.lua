@@ -26,11 +26,11 @@
 ---@class BuilderSpec
 ---@field BuilderName BuilderNames
 ---@field BuilderType BuilderType
----@field BuilderData table
+---@field BuilderData EngineDefinedField <table>
 ---@field PlatoonTemplate string
 ---@field Priority number
----@field InstanceCount number
----@field BuilderConditions BuilderCondition[]
+---@field InstanceCount EngineDefinedField <number>
+---@field BuilderConditions EngineDefinedField <BuilderCondition[]>
 
 -- Global list of all builders found in the game
 ---@type table<string, BuilderSpec>

@@ -26,24 +26,24 @@ local TableDeepCopy = table.deepcopy
 ---@alias MarkerType 'Mass' | 'Hydrocarbon' | 'Spawn' | 'Start Location' | 'Air Path Node' | 'Land Path Node' | 'Water Path Node' | 'Ampibious Path Node' | 'Transport Marker' | 'Naval Area' | 'Naval Link' | 'Rally Point' | 'Large Expansion Area' | 'Expansion Area' | 'Protected Experimental Construction'
 
 ---@class MarkerDataLegacy
----@field size number           # Legacy name used by the GPG editor, same as `Size`
----@field resource boolean      # Legacy name used by the GPG editor, same as `Resource`
----@field type string           # Legacy name used by the GPG editor, same as `Type`
----@field orientation Vector    # Legacy name used by the GPG editor, same as `Orientation`
----@field position Vector       # Legacy name used by the GPG editor, same as `Position`
+---@field size EngineDefinedField <number>           # Legacy name used by the GPG editor, same as `Size`
+---@field resource EngineDefinedField <boolean>      # Legacy name used by the GPG editor, same as `Resource`
+---@field type EngineDefinedField <string>           # Legacy name used by the GPG editor, same as `Type`
+---@field orientation EngineDefinedField <Vector>    # Legacy name used by the GPG editor, same as `Orientation`
+---@field position EngineDefinedField <Vector>       # Legacy name used by the GPG editor, same as `Position`
 ---@field color? Color          # Legacy name used by the GPG editor, same as `Color`
 ---@field adjacentTo? string    # Legacy name used by the Ozonex editor
 
 ---@class MarkerDataModSupport
----@field Size number           # Field exists for mod support, same as `size`
----@field Resource boolean      # Field exists for mod support, same as `resource`
----@field Type string           # Field exists for mod support, same as `type`
----@field Orientation Vector    # Field exists for mod support, same as `orientation`
----@field Position Vector       # Field exists for mod support, same as `position`
+---@field Size EngineDefinedField <number>           # Field exists for mod support, same as `size`
+---@field Resource EngineDefinedField <boolean>      # Field exists for mod support, same as `resource`
+---@field Type EngineDefinedField <string>           # Field exists for mod support, same as `type`
+---@field Orientation EngineDefinedField <Vector>    # Field exists for mod support, same as `orientation`
+---@field Position EngineDefinedField <Vector>       # Field exists for mod support, same as `position`
 ---@field Color? Color          # Field exists for mod support, same as `color`
 
 ---@class MarkerData : MarkerDataLegacy, MarkerDataModSupport
----@field Name string               # Unique name for marker
+---@field Name EngineDefinedField <string>               # Unique name for marker
 ---@field NavLayer? NavLayers       # Navigational layer that this marker is on, only defined for resources
 ---@field NavLabel? number | nil    # Navigational label of the graph this marker is on, only defined for resources and when AIs are in-game
 
@@ -53,7 +53,7 @@ local TableDeepCopy = table.deepcopy
 -- ---@field Island MarkerIsland
 
 ---@class MarkerExpansion : MarkerData
----@field NavLabel number
+---@field NavLabel EngineDefinedField <number>
 -- ---@field Island MarkerIsland
 ---@field Extractors MarkerResource[]
 -- ---@field Hydrocarbons MarkerResource[]

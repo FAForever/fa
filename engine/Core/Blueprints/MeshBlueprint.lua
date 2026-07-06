@@ -7,25 +7,25 @@
 --- zoomed out you must be for the icon to appear.
 ---@field IconFadeInZoom number
 --- sort order of mesh we render smallest to largest
----@field SortOrder number
+---@field SortOrder EngineDefinedField <number>
 --- uniform scale factor
----@field UniformScale number
+---@field UniformScale EngineDefinedField<number>
 --- render both above and below the water
----@field StraddleWater boolean
+---@field StraddleWater EngineDefinedField <boolean>
 
 ---@class MeshBlueprintLod
 --- name of mesh to use for this LOD
----@field MeshName FileName
+---@field MeshName EngineDefinedField <FileName>
 --- name of the albedo to use for this LOD
----@field AlbedoName FileName
+---@field AlbedoName EngineDefinedField <FileName>
 --- name of the normal map to use for this LOD
----@field NormalsName FileName
+---@field NormalsName EngineDefinedField <FileName>
 --- name of the specular map to use for this LOD
----@field SpecularName FileName
+---@field SpecularName EngineDefinedField <FileName>
 --- name of the lookup map to use for this LOD
 ---@field LookupName FileName
 --- name of the secondary map to use for this LOD
----@field SecondaryName FileName
+---@field SecondaryName EngineDefinedField <FileName>
 --- the shader name from `Mesh.fx` to use for this LOD
 ---@field ShaderName? string
 --- name of the texture map to use for this LOD

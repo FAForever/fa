@@ -15,30 +15,30 @@ LayerColors = {
 }
 
 ---@class NavDebugGetLabelState
----@field Position Vector 
----@field Layer NavLayers
+---@field Position EngineDefinedField <Vector> 
+---@field Layer EngineDefinedField <NavLayers>
 
 ---@class NavDebugGetLabelMetadataState
 ---@field Id number
 
 ---@class NavDebugPathToState
----@field Origin Vector 
----@field Destination Vector 
----@field Layer NavLayers
+---@field Origin EngineDefinedField <Vector> 
+---@field Destination EngineDefinedField <Vector> 
+---@field Layer EngineDefinedField <NavLayers>
 
 ---@class NavDebugPathToStateWithThreatThreshold
----@field Origin Vector 
----@field Destination Vector 
----@field Layer NavLayers
----@field Radius number
----@field Threshold number
----@field ThreatFunctionName AIThreatFunctionNames
----@field Army Army
+---@field Origin EngineDefinedField <Vector> 
+---@field Destination EngineDefinedField <Vector> 
+---@field Layer EngineDefinedField <NavLayers>
+---@field Radius EngineDefinedField <number>
+---@field Threshold EngineDefinedField <number>
+---@field ThreatFunctionName EngineDefinedField <AIThreatFunctionNames>
+---@field Army EngineDefinedField <Army>
 
 ---@class NavDebugCanPathToState
----@field Origin Vector 
----@field Destination Vector 
----@field Layer NavLayers
+---@field Origin EngineDefinedField <Vector> 
+---@field Destination EngineDefinedField <Vector> 
+---@field Layer EngineDefinedField <NavLayers>
 
 ---@class NavLayerDataInstance
 ---@field Subdivisions number

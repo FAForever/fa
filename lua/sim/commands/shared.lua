@@ -64,9 +64,9 @@
 ---@class DistributeOrderInfo
 ---@field Callback? fun(units: Unit[], target: Vector | Entity, arg3?: any, arg4?: any): boolean
 ---@field Type DistributeOrderInfoCommandName   # Describes the intended order, useful for debugging
----@field BatchOrders boolean                   # When set, assigns orders to groups of units
----@field FullRedundancy boolean                # When set, attempts to add full redundancy when reasonable by assigning multiple orders to each group
----@field Redundancy number                     # When set, assigns orders to individual units. Number of orders assigned is equal to the redundancy factor
+---@field BatchOrders EngineDefinedField <boolean>                   # When set, assigns orders to groups of units
+---@field FullRedundancy EngineDefinedField <boolean>                # When set, attempts to add full redundancy when reasonable by assigning multiple orders to each group
+---@field Redundancy EngineDefinedField <number>                     # When set, assigns orders to individual units. Number of orders assigned is equal to the redundancy factor
 
 -- upvalue scope for performance
 local IssueNuke = IssueNuke

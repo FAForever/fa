@@ -9,7 +9,7 @@
 ---@class CScriptObject : userdata
 
 ---@class InternalObject : Destroyable
----@field _c_object CScriptObject
+---@field _c_object EngineDefinedField <CScriptObject>
 
 ---@class Destroyable
 local Destroyable = {}

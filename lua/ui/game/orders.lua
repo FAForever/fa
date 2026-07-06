@@ -1085,10 +1085,10 @@ end
 ---@alias ToggleCap EngineToggleCap
 
 ---@class OrderInfo
----@field helpText string
----@field bitmapId string
----@field preferredSlot integer
----@field behavior function
+---@field helpText EngineDefinedField <string>
+---@field bitmapId EngineDefinedField <string>
+---@field preferredSlot EngineDefinedField <integer>
+---@field behavior EngineDefinedField <function>
 ---@field initialStateFunc? fun(control: Control, unitList: table<Unit>): any
 ---@field onframe? fun(control: Control, delta: number)
 ---@field ButtonTextFunc? fun(button: Button): string

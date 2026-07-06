@@ -38,13 +38,13 @@
 ---@field [2] FunctionName
 
 ---@class PlatoonData
----@field TransportReturn Marker                # Location for transports to return to
----@field PatrolChains MarkerChain[]            # Selection of patrol chains to guide the constructed units
----@field PatrolChain MarkerChain               # Patrol chain to guide the construced units
----@field AttackChain MarkerChain               # Attack chain to guide the constructed units
----@field LandingChain MarkerChain              # Landing chain to guide the transports carrying the constructed units
----@field Area Area                             # An area, use depends on master platoon function
----@field Location Marker                       # A location, use depends on master platoon function
+---@field TransportReturn EngineDefinedField <Marker>                # Location for transports to return to
+---@field PatrolChains EngineDefinedField <MarkerChain[]>            # Selection of patrol chains to guide the constructed units
+---@field PatrolChain EngineDefinedField <MarkerChain>               # Patrol chain to guide the construced units
+---@field AttackChain EngineDefinedField <MarkerChain>               # Attack chain to guide the constructed units
+---@field LandingChain EngineDefinedField <MarkerChain>              # Landing chain to guide the transports carrying the constructed units
+---@field Area EngineDefinedField <Area>                             # An area, use depends on master platoon function
+---@field Location EngineDefinedField <Marker>                       # A location, use depends on master platoon function
 
 ---@class AddOpAIData
 ---@field MasterPlatoonFunction FileFunctionRef     # Behavior of instances upon completion

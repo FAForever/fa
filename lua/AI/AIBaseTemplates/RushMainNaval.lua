@@ -139,6 +139,7 @@ BaseBuilderTemplate {
     ExpansionFunction = function(aiBrain, location, markerType)
         return 0
     end,
+    
     FirstBaseFunction = function(aiBrain)
         local mapSizeX, mapSizeZ = GetMapSize()
         local startX, startZ = aiBrain:GetArmyStartPos()

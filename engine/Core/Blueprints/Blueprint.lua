@@ -1,5 +1,8 @@
 ---@meta
 
+-- nilable alias used for fields that are defined in the engine (purely to prevent undefined field errors in the lua language server)
+---@alias EngineDefinedField<T> T | nil
+
 ---@alias BlueprintId string
 
 ---@class Blueprint
@@ -10,12 +13,12 @@
 ---     Merge = true,
 --- would let you change the blueprint of the Snoop UEF Land Scout without needing to add everything
 --- in the original definition (which could change or be modified by other mods).
----@field BlueprintId BlueprintId
+---@field BlueprintId EngineDefinedField <BlueprintId>
 --- Setting `Merge = true` will make the blueprint definition merge with an already existing one
 --- given by `BlueprintId` (which must also be set to an existing blueprint id).
 ---@field Merge? boolean
 --- the file the blueprint was originally defined in
----@field Source string
+---@field Source EngineDefinedField <string>
 
 ---@alias SoundLodCutoff
 ---| "DefaultLodCutoff"
@@ -29,4 +32,4 @@
 --- the sound cue inside of the sound bank to use
 ---@field Cue string
 --- unknown usage
----@field LodCutoff SoundLodCutoff
+---@field LodCutoff EngineDefinedField <SoundLodCutoff>

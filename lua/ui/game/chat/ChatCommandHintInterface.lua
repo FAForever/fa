@@ -50,12 +50,12 @@ end
 
 --- One pooled hint row; ordinal 0 means hidden, otherwise it's the row's position from the bottom.
 ---@class UIChatHintRow
----@field Text    Text
----@field BG      Bitmap
+---@field Text    EngineDefinedField <Text>
+---@field BG      EngineDefinedField <Bitmap>
 ---@field Ordinal LazyVar<number>            # 0 = hidden, 1 = bottom row, growing upward
 ---@field Target  UIChatCommand | nil
----@field Hovered boolean
----@field Paint   fun()                       # re-applies BG solid-colour from Hovered + owner.Selected
+---@field Hovered EngineDefinedField <boolean>
+---@field Paint   EngineDefinedField <fun()>                       # re-applies BG solid-colour from Hovered + owner.Selected
 
 --- Slash-command auto-suggest popup anchored above the edit box; reuses a row pool across refreshes.
 ---@class UIChatCommandHintInterface : Group

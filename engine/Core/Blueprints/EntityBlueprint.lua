@@ -14,50 +14,50 @@
 --- list of categories to remove during blueprint loading (for merge blueprints)
 ---@field DelCategories? CategoryName[]
 --- shape to use for collisions with the entity
----@field CollisionShape CollisionShape
+---@field CollisionShape EngineDefinedField <CollisionShape>
 --- the desired maximum number of shooters taking shots at the entity
----@field DesiredShooterCap number
+---@field DesiredShooterCap EngineDefinedField <number>
 --- Unit footprint. If absent, uses the `SizeX` and `SizeZ` fields.
 ---@field Footprint? FootprintBlueprint
 --- component X,X of inertia tensor
----@field InertiaTensorX number
+---@field InertiaTensorX EngineDefinedField <number>
 --- component Y,Y of inertia tensor
----@field InertiaTensorY number
+---@field InertiaTensorY EngineDefinedField <number>
 --- component Z,Z of inertia tensor
----@field InertiaTensorZ number
+---@field InertiaTensorZ EngineDefinedField <number>
 --- height of lifebar in OGrids
 ---@field LifeBarHeight number
 --- vertical offset of the lifebar from the entity
 ---@field LifeBarOffset number
 --- if the life bar is rendered or not
----@field LifeBarRender boolean
+---@field LifeBarRender EngineDefinedField <boolean>
 --- size of lifebar in OGrids
 ---@field LifeBarSize number
 --- module defining entity's class
----@field ScriptModule FileName
+---@field ScriptModule EngineDefinedField <FileName>
 --- name of entity's class
----@field ScriptClass string
+---@field ScriptClass EngineDefinedField <string>
 --- x offset from center of the entity's selection box
----@field SelectionCenterOffsetX number
+---@field SelectionCenterOffsetX EngineDefinedField <number>
 --- y offset from center of the entity's selection box
----@field SelectionCenterOffsetY number
+---@field SelectionCenterOffsetY EngineDefinedField <number>
 --- y offset from center of the entity's selection box
----@field SelectionCenterOffsetZ number
+---@field SelectionCenterOffsetZ EngineDefinedField <number>
 --- how far to reduce the top of the collision box for selection (defaults to 0.5)
 ---@field SelectionYOffset? number
 --- Scale the mesh on the X axis by this much when we perform our mouse over entity test
----@field SelectionMeshScaleX number
+---@field SelectionMeshScaleX EngineDefinedField <number>
 --- Scale the mesh on the Y axis by this much when we perform our mouse over entity test
----@field SelectionMeshScaleY number
+---@field SelectionMeshScaleY EngineDefinedField <number>
 --- Scale the mesh on the Z axis by this much when we perform our mouse over entity test
----@field SelectionMeshScaleZ number
+---@field SelectionMeshScaleZ EngineDefinedField <number>
 --- Use this much of the top portion of our mesh for intersection test. Useful for naval stuctures
 --- that go deep into water
----@field SelectionMeshUseTopAmount number
+---@field SelectionMeshUseTopAmount EngineDefinedField <number>
 --- x size of the entity's selection box
 ---@field SelectionSizeX number
 --- y size of the entity's selection box
----@field SelectionSizeY number
+---@field SelectionSizeY EngineDefinedField <number>
 --- z size of the entity's selection box
 ---@field SelectionSizeZ number
 --- Use this to modify the thickness of the rendered selection indicator for the unit
@@ -71,12 +71,12 @@
 --- icons were created in and the sort priority of the surrounding icons) 
 ---@field StrategicIconSortPriority integer
 --- Use OOB hit test for this unit when camera is below this zoom level
----@field UseOOBTestZoom number
+---@field UseOOBTestZoom EngineDefinedField <number>
 
 ---@class HitBox
----@field CollisionOffsetX number
----@field CollisionOffsetY number
----@field CollisionOffsetZ number
+---@field CollisionOffsetX EngineDefinedField <number>
+---@field CollisionOffsetY EngineDefinedField <number>
+---@field CollisionOffsetZ EngineDefinedField <number>
 ---@field SizeX number
 ---@field SizeY number
 ---@field SizeZ number

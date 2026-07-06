@@ -7,10 +7,10 @@ local IsDestroyed = IsDestroyed
 local TableGetn = table.getn
 
 ---@class AIPlatoonDebugInfo
----@field EntityId EntityId
----@field BlueprintId BlueprintId
----@field Position Vector
----@field PlatoonInfo { DebugMessages: string[], PlatoonName: string, StateName: string } 
+---@field EntityId EngineDefinedField <EntityId>
+---@field BlueprintId EngineDefinedField <BlueprintId>
+---@field Position EngineDefinedField <Vector>
+---@field PlatoonInfo EngineDefinedField <{ DebugMessages: string[], PlatoonName: string, StateName: string }>
 
 ---@class AIPlatoonState : State
 ---@field StateName string

@@ -77,14 +77,14 @@ local AutolobbyEngineStrings = {
 ---| "" # when Division is grandmaster or unlisted
 
 ---@class UIAutolobbyPlayer: UILobbyLaunchPlayerConfiguration
----@field StartSpot number
----@field DEV number    # Related to rating/divisions
----@field MEAN number   # Related to rating/divisions
----@field NG number     # Related to rating/divisions
----@field DIV Division    # Related to rating/divisions
----@field SUBDIV Subdivision # Related to rating/divisions
----@field PL number     # Related to rating/divisions
----@field PlayerClan string
+---@field StartSpot EngineDefinedField <number>
+---@field DEV EngineDefinedField <number>    # Related to rating/divisions
+---@field MEAN EngineDefinedField <number>   # Related to rating/divisions
+---@field NG EngineDefinedField <number>     # Related to rating/divisions
+---@field DIV EngineDefinedField <Division>    # Related to rating/divisions
+---@field SUBDIV EngineDefinedField <Subdivision> # Related to rating/divisions
+---@field PL EngineDefinedField <number>     # Related to rating/divisions
+---@field PlayerClan EngineDefinedField <string>
 
 ---@alias UIAutolobbyConnections boolean[][]
 ---@alias UIAutolobbyStatus UIPeerLaunchStatus[]
