@@ -117,9 +117,10 @@
       - Energy cost: 24000 -> 50100
       - Build time: 3000 -> 6950
     - Personal Cloaking Generator:
-      - Mass cost: 5000 -> 4700
-      - Energy cost: 382200 -> 234000 
-      - Build time: 13800 -> 21350
+      - Mass cost: 5000 -> 2000
+      - Energy cost: 382200 -> 312700 
+      - Build time: 13800 -> 8300
+      - Health bonus: 15000 -> 17000
       - Energy maintenance cost: 3500 -> 2500
     - EMP Burst:
       - Mass cost: 1000 -> 700

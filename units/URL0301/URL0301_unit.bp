@@ -265,13 +265,13 @@ UnitBlueprint{
     },
     Enhancements = {
         CloakingGenerator = {
-            BuildCostEnergy = 234000,
-            BuildCostMass = 4700,
-            BuildTime = 21350,
+            BuildCostEnergy = 312700,
+            BuildCostMass = 2000,
+            BuildTime = 8300,
             Icon = "cfs",
             MaintenanceConsumptionPerSecondEnergy = 2500,
             Name = "<LOC enhancements_0089>Personal Cloaking Generator",
-            NewHealth = 15000,
+            NewHealth = 17000,
             Prerequisite = "StealthGenerator",
             Slot = "Back",
             UpgradeUnitAmbientBones = { "URL0301" },

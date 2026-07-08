@@ -1603,7 +1603,7 @@ Unit_Description_0465_faf="Massively increases the rate at which the ACU repairs
 
 -- CYBRAN -- Support Commander Units/Upgrades
 Unit_Description_0115="A highly versatile combat and engineering unit useful on late-stage battlefields."
-Unit_Description_0116="Personal Cloaking further hiding the SACU from optical sensors and massively boosting HP. Countered by omni sensors. Costs a large amount of energy to run.\n\n+15000 Health"
+Unit_Description_0116="Personal Cloaking further hiding the SACU from optical sensors and massively boosting HP. Countered by omni sensors. Costs a large amount of energy to run.\n\n+17000 Health"
 Unit_Description_0117="Grants the main cannon EMP capability, utterly disabling enemy units.\n\n+3 Main cannon EMP Radius - Stun Duration = 3 seconds (T3) 0.3 seconds (SACU)"
 Unit_Description_0118="Increases main cannon damage and range.\n\n+200 Main cannon damage\n+10 Main cannon range"
 Unit_Description_0119="Adds an anti-air SAM weapon system.\n\nNanite Missile System - DPS: 360, Range: 60"
