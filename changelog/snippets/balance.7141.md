@@ -120,6 +120,7 @@
       - Mass cost: 5000 -> 4700
       - Energy cost: 382200 -> 234000 
       - Build time: 13800 -> 21350
+      - Energy maintenance cost: 3500 -> 2500
     - EMP Burst:
       - Mass cost: 1000 -> 700
       - Energy cost: 60000 -> 32500 
