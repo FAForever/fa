@@ -59,8 +59,9 @@
       The UEF bubble shield is heavily reduced in cost by removing its prerequisite, and its stats are adjusted to be closer to mobile shields.
 
       - Prerequisite: Personal Shield Generator -> None
-      - Energy cost: 360800 -> 187700
-      - Build time: 10800 -> 15400
+      - Mass cost: 3500 -> 3300
+      - Energy cost: 360800 -> 244700
+      - Build time: 10800 -> 14500
       - Energy maintenance cost: 1000 -> 700
       - Shield stats:
         - Health: 52000 -> 22000
@@ -76,8 +77,9 @@
       - Energy cost: 90000 -> 94400 
       - Build time: 8400 -> 20550
     - Personal Shield Generator:
-      - Energy cost: 100200 -> 99600
-      - Build time: 7200 -> 8390
+      - Mass cost: 2000 -> 1700
+      - Energy cost: 100200 -> 289000
+      - Build time: 7200 -> 6950
       - Energy maintenance cost: 500 -> 350
     - Energy Accelerator (Fire Rate upgrade):
       - Energy cost: 44700 -> 43900
