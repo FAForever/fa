@@ -1,1 +1,1 @@
-- (#7129) Fix typo in unlocalised version of the descriptive name of the UEF T3 Support Land Factory.
+- Fix typo in unlocalised version of the descriptive name of the UEF T3 Support Land Factory (#7129).

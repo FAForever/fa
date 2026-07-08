@@ -1,4 +1,4 @@
-- (#7098, #7148) Rework the chat window
+- (#7098, #7148, #7157) Rework the chat window
 
 The chat window is re-implemented from scratch. It is rebuilt using the MVC-principle, creating a clear separation between state, viewing the state and interacting with the state. This rework fixes a few bugs:
 
