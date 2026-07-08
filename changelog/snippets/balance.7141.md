@@ -42,8 +42,9 @@
       - Build time: 5040 -> 4950
       - Energy maintenance cost: 300 -> 210
     - Heavy Personal Shield Generator:
-      - Energy cost: 100000 -> 73600
-      - Build time: 7000 -> 7900
+      - Mass cost: 1800 -> 900
+      - Energy cost: 100000 -> 200975
+      - Build time: 7000 -> 3660
       - Energy maintenance cost: 600 -> 420
     - Reacton Refractor (Range and AoE upgrade):
       - Energy cost: 46200 -> 45600

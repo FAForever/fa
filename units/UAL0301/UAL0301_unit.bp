@@ -359,9 +359,9 @@ UnitBlueprint{
             UpgradeUnitAmbientBones = { "UAL0301" },
         },
         ShieldHeavy = {
-            BuildCostEnergy = 73600,
-            BuildCostMass = 1800,
-            BuildTime = 7900,
+            BuildCostEnergy = 200975,
+            BuildCostMass = 900,
+            BuildTime = 3660,
             Icon = "phtsg",
             ImpactEffects = "AeonShieldHit01",
             MaintenanceConsumptionPerSecondEnergy = 420,
