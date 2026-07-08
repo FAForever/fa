@@ -161,9 +161,9 @@
       - Build time: 4200 -> 1350
       - Added buildpower: +42 -> +56
     - Nano-Repair System:
-      - Mass cost: 2300 -> 2700
-      - Energy cost: 74300 -> 100500 
-      - Build time: 5900 -> 12250
+      - Mass cost: 2300 -> 2500
+      - Energy cost: 74300 -> 141200 
+      - Build time: 5900 -> 11650
     - Tactical Missile Launcher:
       - Mass cost: 1500 -> 1800
       - Energy cost: 46000 -> 68000 
@@ -182,7 +182,7 @@
 
 
       - Slot: Back (TML and sensors/gun range) -> Right arm (teleport and overcharge)
-      - Mass cost: 1050 -> 1200
-      - Energy cost: 107500 -> 43500
-      - Build time: 6720 -> 5400
+      - Mass cost: 1050 -> 1000
+      - Energy cost: 107500 -> 190000
+      - Build time: 6720 -> 4000
       - Energy maintenance cost: 300 -> 210

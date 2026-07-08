@@ -288,9 +288,9 @@ UnitBlueprint{
     },
     Enhancements = {
         DamageStabilization = {
-            BuildCostEnergy = 100500,
-            BuildCostMass = 2700,
-            BuildTime = 12250,
+            BuildCostEnergy = 141200,
+            BuildCostMass = 2500,
+            BuildTime = 11650,
             Icon = "dss",
             Name = "<LOC enhancements_0131>Nano-Repair System",
             NewHealth = 14000,
@@ -452,9 +452,9 @@ UnitBlueprint{
             Slot = "RCH",
         },
         Shield = {
-            BuildCostEnergy = 43500,
-            BuildCostMass = 1200,
-            BuildTime = 5400,
+            BuildCostEnergy = 190000,
+            BuildCostMass = 1000,
+            BuildTime = 4000,
             Icon = "sp",
             ImpactEffects = "SeraphimShieldHit01",
             MaintenanceConsumptionPerSecondEnergy = 210,
