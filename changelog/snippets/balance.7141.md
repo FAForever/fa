@@ -8,6 +8,8 @@
 
   Due to costing less, the buildpower of non-UEF SACUs is reduced (engi presets keep their buildpower). UEF keeps their buildpower because they have a weaker engineer preset, the most expensive base SACU, a T4 that struggles with pushing, and unique ravagers.
 
+  Combatant and Rambo presets are separated by a high energy cost difference and Rambos get a mass cost reduction. This allows combatants to help with a faction's early issues, while Rambos play a role in the late game by being efficient but high infrastructure cost combat units, and highly versatile engineering units that can mitigate the dominance of air and the risk of reclaim donations.
+
   - **Quantum Gateways (UAB0304, UEB0304, URB0304, XSB0304)**
     - Mass cost: 3000 -> 2550
     - Energy cost: 30000 -> 25500
