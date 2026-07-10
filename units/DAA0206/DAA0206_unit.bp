@@ -53,8 +53,8 @@ UnitBlueprint{
     Defense = {
         ArmorType = "Light",
         EconomyThreatLevel = 80000,
-        Health = 90,
-        MaxHealth = 90,
+        Health = 10,
+        MaxHealth = 10,
     },
     Display = {
         Abilities = { "<LOC ability_suicideweapon>Suicide Weapon" },
