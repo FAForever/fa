@@ -48,7 +48,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     -- Called when the weapon is created, almost always when the owning unit is created
     ---@param self DefaultProjectileWeapon
-    ---@return boolean
     OnCreate = function(self)
         Weapon.OnCreate(self)
 
@@ -100,7 +99,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local strg = '*ERROR: You can not have a RackRecoilDistance with a MuzzleSalvoDelay not equal to 0, aborting weapon setup.  Weapon: '
                 .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
-            return false
+            return
         end
 
         -- Ensure firing cycle is compatible internally
@@ -117,7 +116,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local strg = '*ERROR: The total time to fire muzzles is longer than the RateOfFire allows, aborting weapon setup.  Weapon: '
                 .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
-            return false
+            return
         end
 
         if bp.EnergyChargeForFirstShot == false then
@@ -730,6 +729,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
+        ---@param self DefaultProjectileWeapon
         Main = function(self)
             local unit = self.unit
             if unit.Dead then return end
@@ -753,8 +753,16 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 self:PlayFxRackSalvoReloadSequence()
                 self.CurrentRackSalvoNumber = 1
             end
+            -- unpacking, manual fire, salvo-reloading weapons can get stuck unpacked here because
+            -- the engine doesn't clear orders for manually fired weapons after the order is finished
+            if bp.ManualFire and self.WeaponPackState == 'Unpacked' then
+                -- Let the weapon call `OnFire` the next tick if it has targets before state change interrupts it
+                WaitTicks(3)
+                ChangeState(self, self.WeaponPackingState)
+            end
         end,
 
+        ---@param self DefaultProjectileWeapon
         OnGotTarget = function(self)
             Weapon.OnGotTarget(self)
 
@@ -784,6 +792,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon
         OnFire = function(self)
 
             local bp = self.Blueprint
@@ -811,6 +820,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
+        ---@param self DefaultProjectileWeapon
         Main = function(self)
             local unit = self.unit
             local bp = self.Blueprint
@@ -834,6 +844,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon
         OnFire = function(self)
         end,
     },
@@ -846,6 +857,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
+        ---@param self DefaultProjectileWeapon
         Main = function(self)
 
             -- We change the state on counted projectiles because we won't get another OnFire call.
@@ -913,6 +925,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon
         OnFire = function(self)
             if self.WeaponCanFire then
                 ChangeState(self, self.RackSalvoFiringState)
@@ -970,6 +983,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon
         Main = function(self)
             local unit = self.unit
             unit:SetBusy(true)
@@ -1137,8 +1151,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     ChangeState(self, self.RackSalvoReloadState)
                 elseif bp.RackSalvoChargeTime > 0 then
                     ChangeState(self, self.IdleState)
-                elseif countedProjectile then
-                    if bp.WeaponUnpacks then
+                elseif bp.CountedProjectile then
+                    if bp.WeaponUnpacks and bp.ForceSingleFire then
                         ChangeState(self, self.WeaponPackingState)
                     else
                         ChangeState(self, self.IdleState)
@@ -1157,6 +1171,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon
         OnLostTarget = function(self)
             -- Override the default OnLostTarget but not inherited ones
             -- the inherited ones are needed for beam weapons to stop firing: https://github.com/FAForever/fa/pull/4863
@@ -1194,6 +1209,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         -- Set a bool so we won't fire if the target reticle is moved
+        ---@param self DefaultProjectileWeapon
         OnHaltFire = function(self)
             self.HaltFireOrdered = true
         end,
@@ -1207,6 +1223,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
+        ---@param self DefaultProjectileWeapon
         Main = function(self)
             local unit = self.unit
             unit:SetBusy(true)
@@ -1240,9 +1257,11 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon
         OnFire = function(self)
         end,
 
+        ---@param self DefaultProjectileWeapon
         OnLostTarget = function(self)
             -- Override default OnLostTarget to prevent bypassing reload time by switching to idle state immediately
             local unit = self.unit
@@ -1262,6 +1281,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponWantEnabled = false,
         WeaponAimWantEnabled = false,
 
+        ---@param self DefaultProjectileWeapon
         Main = function(self)
             local unit = self.unit
             unit:SetBusy(true)
@@ -1280,6 +1300,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon
         OnFire = function(self)
         end,
     },
@@ -1295,13 +1316,13 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         ---@param self DefaultProjectileWeapon
         Main = function(self)
             local unit = self.unit
+            local bp = self.Blueprint
+
+            WaitSeconds(bp.WeaponRepackTimeout)
 
             if not IsDestroyed(unit) then
                 unit:SetBusy(true)
             end
-
-            local bp = self.Blueprint
-            WaitSeconds(bp.WeaponRepackTimeout)
 
             self:AimManipulatorSetEnabled(false)
             self:PlayFxWeaponPackSequence()
@@ -1345,9 +1366,11 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         StateName = 'DeadState',
 
+        ---@param self DefaultProjectileWeapon
         OnEnterState = function(self)
         end,
 
+        ---@param self DefaultProjectileWeapon
         Main = function(self)
         end,
     },
