@@ -1372,6 +1372,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param vector Vector
     ---@param damageType DamageType
     OnDamage = function(self, instigator, amount, vector, damageType)
+        self:DebugLog('OnDamage', instigator.Blueprint.BlueprintId, amount, damageType)
 
         -- only applies to trees
         if damageType == "TreeForce" or damageType == "TreeFire" then 
