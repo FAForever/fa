@@ -23,12 +23,12 @@
 local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
 
 ---@class PodDataEntry
----@field PodHandle XEA3204
----@field PodUnitID "XEA3204" # Determined in pod tower's blueprint's `Economy.EngineeringPods`
----@field PodName string # Determined in pod tower's blueprint's `Economy.EngineeringPods`
----@field Active boolean
----@field PodAttachpoint Bone # Determined in pod tower's blueprint's `Economy.EngineeringPods`
----@field CreateWithUnit boolean # Determined in pod tower's blueprint's `Economy.EngineeringPods`
+---@field PodHandle EngineDefinedField <XEA3204>
+---@field PodUnitID EngineDefinedField <"XEA3204"> # Determined in pod tower's blueprint's `Economy.EngineeringPods`
+---@field PodName EngineDefinedField <string> # Determined in pod tower's blueprint's `Economy.EngineeringPods`
+---@field Active EngineDefinedField <boolean>
+---@field PodAttachpoint EngineDefinedField <Bone> # Determined in pod tower's blueprint's `Economy.EngineeringPods`
+---@field CreateWithUnit EngineDefinedField <boolean> # Determined in pod tower's blueprint's `Economy.EngineeringPods`
 
 ---@class TPodTowerUnit : TStructureUnit
 ---@field PodData table<string, PodDataEntry>

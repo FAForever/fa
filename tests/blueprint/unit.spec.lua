@@ -52,7 +52,7 @@ end
 function MeshBlueprint(bp)
     return bp
 end
-
+--#endregion
 -------------------------------------------------------------------------------
 
 
@@ -218,7 +218,7 @@ luft.describe(
                             end
                         )
                     end
-
+                    --#endregion
                     -----------------------------------------------------------
                     --#region Unique radia
 

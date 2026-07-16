@@ -5,13 +5,13 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 ---@alias PingTypeLowercase 'alert' | 'move' | 'attack' | 'marker'
 
 ---@class SyncPingData
----@field Owner integer # Army index of who sent the ping
----@field Location Vector # position
----@field Type PingType
----@field Lifetime number
----@field Ring FileName
----@field ArrowColor 'yellow' | 'blue' | 'red'
----@field Sound string # 'UI_Main_IG_Click'
+---@field Owner EngineDefinedField <integer> # Army index of who sent the ping
+---@field Location EngineDefinedField <Vector> # position
+---@field Type EngineDefinedField <PingType>
+---@field Lifetime EngineDefinedField <number>
+---@field Ring EngineDefinedField <FileName>
+---@field ArrowColor EngineDefinedField <'yellow' | 'blue' | 'red'>
+---@field Sound EngineDefinedField <string> # 'UI_Main_IG_Click'
 ---@field Marker? true
 ---@field Name? string # Text under the marker ping
 ---@field Color? string # Color of marker ping, matching army color.

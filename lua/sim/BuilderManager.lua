@@ -24,8 +24,8 @@ local function BuilderSortLambda(a, b)
 end
 
 ---@class AIBuilderData
----@field Builders Builder[]
----@field NeedSort boolean
+---@field Builders EngineDefinedField <Builder[]>
+---@field NeedSort EngineDefinedField <boolean>
 
 --- An abstract class of the various managers. Introduces the logic to maintain
 --- and find builders as the base is trying to figure out what to do

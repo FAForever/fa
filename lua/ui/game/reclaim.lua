@@ -22,7 +22,7 @@ local TableGetn = table.getn
 ---@field mass number
 ---@field position Vector
 ---@field count number
----@field max number
+---@field max EngineDefinedField <number>
 
 ---@type number
 local HeightRatio = 0.020

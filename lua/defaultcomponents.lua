@@ -597,9 +597,9 @@ local VeterancyRegenBuffs = {
 }
 
 ---@class VeterancyComponent
----@field VetDamage table<EntityId, number>
----@field VetDamageTaken number
----@field VetInstigators table<EntityId, Unit>
+---@field VetDamage EngineDefinedField <table<EntityId, number>>
+---@field VetDamageTaken EngineDefinedField <number>
+---@field VetInstigators EngineDefinedField <table<EntityId, Unit>>
 ---@field VetExperience? number
 ---@field VetLevel? number 
 ---@field VetMassKillCredit? number -- bookkeeping number available to the player via stat

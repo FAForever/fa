@@ -23,8 +23,8 @@
 ---@class ContextBasedTemplate
 ---@field Name string                           # Printed on screen when cycling the templates
 ---@field TemplateData UIBuildTemplate          # A regular build template, except that it is written in Pascal Case and usually the first unit is removed
----@field TemplateSortingOrder number           # Lower numbers end up first in the queue
----@field TemplateBlueprintId BlueprintId       
+---@field TemplateSortingOrder EngineDefinedField <number>           # Lower numbers end up first in the queue
+---@field TemplateBlueprintId EngineDefinedField <BlueprintId>       
 ---
 --- By mouse context
 ---@field TriggersOnUnit? EntityCategory        # When defined, includes this template when the player is hovering over a unit, a build order for a given unit or a unit in build preview that matches the categories

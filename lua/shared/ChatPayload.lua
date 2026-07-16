@@ -25,7 +25,7 @@
 ---@field location?   table                # lightweight location hint — see `UIChatEntryLocation` for the inner shape
 ---@field Args?       any[]                # `LOCF`-style format args spread alongside `text` on render
 ---@field Id?         string               # sender-stamped near-unique id; dedupes the two delivery paths
----@field From        number               # sim-stamped trusted sender army index — written by the relay before broadcast
+---@field From        EngineDefinedField <number>               # sim-stamped trusted sender army index — written by the relay before broadcast
 
 --- Maximum UTF-8 character length for a chat message body. The UI edit box
 --- enforces this on input; the sim relay and the receive path gate on the

@@ -6,10 +6,10 @@
 ---@alias ProfilerSource "C" | "Lua" | "main" | "unknown"
 
 ---@class ProfilerData
----@field C ProfilerSourceData
----@field Lua ProfilerSourceData
----@field main ProfilerSourceData
----@field unknown ProfilerSourceData
+---@field C EngineDefinedField <ProfilerSourceData>
+---@field Lua EngineDefinedField <ProfilerSourceData>
+---@field main EngineDefinedField <ProfilerSourceData>
+---@field unknown EngineDefinedField <ProfilerSourceData>
 
 ---@alias ProfilerScope "field" | "global" | "local" | "method" | "other" | "upvalue"
 

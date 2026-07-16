@@ -1,3 +1,8 @@
+--Many fields are handled by the engine, but not nullable, so UnitBlueprints.lua will flag errors without this.
+
+
+
+----@diagnostic disable: missing-fields
 UnitBlueprint{
     Description = "<LOC xsb1104_desc>Mass Fabricator",
     Adjacency = "T1MassFabricatorAdjacencyBuffs",

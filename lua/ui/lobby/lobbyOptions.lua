@@ -17,40 +17,40 @@
 
 --- Additionally, extra options can be specified by the map in `mapname .. 'options.lua'`
 ---@class GameOptions
----@field AutoTeams 'none' | 'manual' | 'tvsb' | 'lvsr' | 'pvsi'
----@field TeamLock 'locked' | 'unlocked'
----@field TeamSpawn 'fixed' | 'random' | 'balanced' | 'balanced_flex' | 'random_reveal' | 'balanced_reveal' | 'balanced_reveal_mirrored' | 'balanced_flex_reveal'
+---@field AutoTeams EngineDefinedField <'none' | 'manual' | 'tvsb' | 'lvsr' | 'pvsi'>
+---@field TeamLock EngineDefinedField <'locked' | 'unlocked'>
+---@field TeamSpawn EngineDefinedField <'fixed' | 'random' | 'balanced' | 'balanced_flex' | 'random_reveal' | 'balanced_reveal' | 'balanced_reveal_mirrored' | 'balanced_flex_reveal'>
 ---@field TeamShareOverflow "enabled" | "disabled"
 ---
----@field AllowObservers boolean
+---@field AllowObservers EngineDefinedField <boolean>
 ---@field CheatsEnabled 'false' | 'true'
 ---@field CivilianAlliance 'enemy' | 'neutral' | 'removed'
----@field DisconnectionDelay02 '10' | '30' | '90'
+---@field DisconnectionDelay02 EngineDefinedField <'10' | '30' | '90'>
 ---@field FogOfWar 'none' | 'explored'
 ---@field GameSpeed 'normal' | 'fast' | 'adjustable'
----@field ManualUnitShare 'none' | 'no_builders' | 'all'
+---@field ManualUnitShare EngineDefinedField <'none' | 'no_builders' | 'all'>
 ---@field NoRushOption '1' | '2' | '3' | '4' | '5' | '10' | '15' | '20' | '25' | '30' | '35' | '40' | '45' | '50' | '55' | '60' | 'Off'
 ---@field PrebuiltUnits 'Off' | 'On'
----@field Ranked boolean
----@field RevealCivilians 'No' | 'Yes'
----@field RandomMap 'Off' | 'Official' | 'All'
----@field Score 'no' | 'yes'
+---@field Ranked EngineDefinedField <boolean>
+---@field RevealCivilians EngineDefinedField <'No' | 'Yes'>
+---@field RandomMap EngineDefinedField <'Off' | 'Official' | 'All'>
+---@field Score EngineDefinedField <'no' | 'yes'>
 ---@field Share ShareOption
----@field DisconnectShare DisconnectShareOption
----@field DisconnectShareCommanders DisconnectShareCommandersOption
----@field ShareUnitCap 'none' | 'allies' | 'all'
+---@field DisconnectShare EngineDefinedField <DisconnectShareOption>
+---@field DisconnectShareCommanders EngineDefinedField <DisconnectShareCommandersOption>
+---@field ShareUnitCap EngineDefinedField <'none' | 'allies' | 'all'>
 ---@field Timeouts '0' | '3'| '-1' | -1
 ---@field UnitCap '125' | '250' | '375' | '500' | '625' | '750' | '875' | '1000' | '1250' | '1500'
----@field Unranked 'No' | 'Yes'
+---@field Unranked EngineDefinedField <'No' | 'Yes'>
 ---@field Victory VictoryCondition
----@field CommonArmy CommonArmyOption
+---@field CommonArmy EngineDefinedField <CommonArmyOption>
 ---
----@field BuildMult AIMultiplierOptionValue
----@field CheatMult AIMultiplierOptionValue
----@field LandExpansionsAllowed AIExpansionOptionValue
----@field NavalExpansionsAllowed AIExpansionOptionValue
----@field OmniCheat 'off' | 'on'
----@field TMLRandom '0' | '2.5' | '5' | '7.5' | '10' | '12.5' | '15' | '17.5' | '20'
+---@field BuildMult EngineDefinedField <AIMultiplierOptionValue>
+---@field CheatMult EngineDefinedField <AIMultiplierOptionValue>
+---@field LandExpansionsAllowed EngineDefinedField <AIExpansionOptionValue>
+---@field NavalExpansionsAllowed EngineDefinedField <AIExpansionOptionValue>
+---@field OmniCheat EngineDefinedField <'off' | 'on'>
+---@field TMLRandom EngineDefinedField <'0' | '2.5' | '5' | '7.5' | '10' | '12.5' | '15' | '17.5' | '20'>
 
 ---@class ScenarioOption
 ---@field default number

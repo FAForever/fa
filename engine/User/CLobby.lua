@@ -43,8 +43,8 @@ local CLobby = {}
 ---@field Timeouts any          # Read by the engine to determine the behavior of time outs.
 ---@field CivilianAlliance any  # Read by the engine to determine the alliance towards civilians.
 ---@field GameSpeed any         # Read by the engine to determine the behavior of game speed (adjustments).
----@field Ratings table<string, number>
----@field Divisions table<string, string>
+---@field Ratings EngineDefinedField <table<string, number>>
+---@field Divisions EngineDefinedField <table<string, string>>
 
 ---@class UILobbyLaunchGameModsConfiguration
 ---@field name string           # Read by the engine, TODO
@@ -55,17 +55,17 @@ local CLobby = {}
 ---@field PlayerName string         # Read by the engine, TODO
 
 ---@class UILobbyLaunchPlayerConfiguration
----@field StartSpot number          # Read by Lua code to determine start locations
----@field Team number               # Read by Lua code to determine teams
----@field ArmyName string           # Read by the engine, TODO
----@field PlayerName string         # Read by the engine, TODO
----@field Civilian boolean          # Read by the engine, TODO
----@field Human boolean             # Read by the engine, TODO
----@field AIPersonality string      # Read by the engine iff Human is false
----@field ArmyColor number          # Read by the engine, is mapped to a color by reading the values of `lua\GameColors.lua`.
----@field PlayerColor number        # Read by the engine, is mapped to a color by reading the values of `lua\GameColors.lua`
----@field Faction number            # Read by the engine to determine the faction of the player.
----@field OwnerID UILobbyPeerId   # Read by the engine, TODO
+---@field StartSpot EngineDefinedField <number>          # Read by Lua code to determine start locations
+---@field Team EngineDefinedField <number>               # Read by Lua code to determine teams
+---@field ArmyName EngineDefinedField <string>           # Read by the engine, TODO
+---@field PlayerName EngineDefinedField <string>         # Read by the engine, TODO
+---@field Civilian EngineDefinedField <boolean>          # Read by the engine, TODO
+---@field Human EngineDefinedField <boolean>             # Read by the engine, TODO
+---@field AIPersonality EngineDefinedField <string>      # Read by the engine iff Human is false
+---@field ArmyColor EngineDefinedField <number>          # Read by the engine, is mapped to a color by reading the values of `lua\GameColors.lua`.
+---@field PlayerColor EngineDefinedField <number>        # Read by the engine, is mapped to a color by reading the values of `lua\GameColors.lua`
+---@field Faction EngineDefinedField <number>            # Read by the engine to determine the faction of the player.
+---@field OwnerID EngineDefinedField <UILobbyPeerId>   # Read by the engine, TODO
 
 --- All the following fields are read by the engine upon launching the lobby.
 ---@class UILobbyLaunchConfiguration

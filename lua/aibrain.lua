@@ -1219,7 +1219,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     -------------------------------------------------------------------------------
 }
 
----#region backwards compatibility
+--#region backwards compatibility
 
 local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
 local TransferUnitsOwnership = SimUtils.TransferUnitsOwnership

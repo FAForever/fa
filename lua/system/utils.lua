@@ -352,7 +352,7 @@ end
 ---   for k,v in sortedpairs(t) do
 ---       print(k,v)
 ---   end
---- @param comp is an optional comparison function, defaulting to less-than.
+--- @param comp any -- is an optional comparison function, defaulting to less-than.
 function sortedpairs(t, comp)
     local keys = table.keys(t, comp)
     local i=1
@@ -555,8 +555,8 @@ function table.print(tbl, tblPrefix, printer)
 end
 
 --- Return filtered table containing every mapping from table for which fn function returns true when passed the value.
---- @param t  - is a table to filter
---- @param fn - is decision function to use to filter the table, defaults checking if a value is true or exists in table
+--- @param t table - is a table to filter
+--- @param fn function - is decision function to use to filter the table, defaults checking if a value is true or exists in table
 function table.filter(t, fn)
     local r = {}
     if not fn then fn = function(v) return v end end
@@ -569,7 +569,7 @@ function table.filter(t, fn)
 end
 
 --- Returns total count of values that match fn function or if values exist in table
---- @param fn is optional filtering function that is applied to each value of the table
+--- @param fn function -- is optional filtering function that is applied to each value of the table
 function table.count(t, fn)
     if not t then return 0 end -- prevents looping over nil table
     if not fn then fn = function(v) return v end end
@@ -632,7 +632,7 @@ end
 
 --- "explode" a string into a series of tokens, using a separator character `sep`
 ---@param str string
----@param sep string
+---@param sep? string
 ---@return string[]
 function StringSplit(str, sep)
     local sep, fields = sep or ":", {}

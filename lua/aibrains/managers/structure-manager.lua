@@ -25,9 +25,9 @@ local TableGetSize = table.getsize
 local WeakValueTable = { __mode = 'v' }
 
 ---@class AIStructureManagerDebugInfo
----@field Structures { TECH1: EntityId[], TECH2: EntityId[], TECH3: EntityId[], EXPERIMENTAL: EntityId[] }
----@field StructuresBeingBuilt { TECH1: EntityId[], TECH2: EntityId[], TECH3: EntityId[], EXPERIMENTAL: EntityId[] }
----@field GeneratedThreat { Surface: number, Air: number, Economy: number, Sub: number }
+---@field Structures EngineDefinedField <{ TECH1: EntityId[], TECH2: EntityId[], TECH3: EntityId[], EXPERIMENTAL: EntityId[] }>
+---@field StructuresBeingBuilt EngineDefinedField <{ TECH1: EntityId[], TECH2: EntityId[], TECH3: EntityId[], EXPERIMENTAL: EntityId[] }>
+---@field GeneratedThreat EngineDefinedField <{ Surface: number, Air: number, Economy: number, Sub: number }>
 
 ---@class AIStructureManagerReferences
 ---@field TECH1 table<EntityId, Unit>

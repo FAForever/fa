@@ -5,13 +5,13 @@ local Dragger = import("/lua/maui/dragger.lua").Dragger
 ---@alias MauiCheckboxState "normal" | "over" | "disabled"
 
 ---@class MauiCheckboxTexture
----@field checked FileName
----@field unchecked FileName
+---@field checked EngineDefinedField <FileName>
+---@field unchecked EngineDefinedField <FileName>
 
 ---@class MauiCheckboxStateTextures
----@field normal MauiCheckboxTexture
----@field over MauiCheckboxTexture
----@field disabled MauiCheckboxTexture
+---@field normal EngineDefinedField <MauiCheckboxTexture>
+---@field over EngineDefinedField <MauiCheckboxTexture>
+---@field disabled EngineDefinedField <MauiCheckboxTexture>
 
 ---@alias CheckState "checked" | "unchecked"
 

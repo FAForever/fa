@@ -1017,8 +1017,8 @@ end
 
 ---@class ModalityInfo
 ---@field escapeButton number `1-3` the button function to mimic when the escape button is pressed
----@field enterButton number `1-3` the button function to mimic when the enter button is pressed
----@field OnlyWorldCover boolean if only the world is covered (i.e. it's non-modal)
+---@field enterButton EngineDefinedField <number> `1-3` the button function to mimic when the enter button is pressed
+---@field OnlyWorldCover EngineDefinedField <boolean> if only the world is covered (i.e. it's non-modal)
 
 --- Creates and manages an info dialog. Setting a callback for a button will prevent it from closing
 --- the dialog unless `destroyOnCallback` is true (which is the default only when all three callbacks

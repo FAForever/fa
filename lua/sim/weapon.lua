@@ -20,20 +20,20 @@ local DebugWeaponComponent = import("/lua/sim/weapons/components/debugweaponcomp
 --- Table of damage information passed from the weapon to the projectile
 --- Can be assigned as a meta table to the projectile's damage table to reduce memory usage for unchanged values
 ---@class WeaponDamageTable
----@field DamageToShields number        # weaponBlueprint.DamageToShields
----@field InitialDamageAmount number    # weaponBlueprint.InitialDamage or 0
----@field DamageRadius number           # weaponBlueprint.DamageRadius + Weapon.DamageRadiusMod
----@field DamageAmount number           # weaponBlueprint.Damage + Weapon.DamageMod
----@field DamageType DamageType         # weaponBlueprint.DamageType
----@field DamageFriendly boolean        # weaponBlueprint.DamageFriendly or true
----@field CollideFriendly boolean       # weaponBlueprint.CollideFriendly or false
----@field DoTTime number                # weaponBlueprint.DoTTime
----@field DoTPulses number              # weaponBlueprint.DoTPulses
+---@field DamageToShields EngineDefinedField <number>        # weaponBlueprint.DamageToShields
+---@field InitialDamageAmount EngineDefinedField <number>    # weaponBlueprint.InitialDamage or 0
+---@field DamageRadius EngineDefinedField <number>           # weaponBlueprint.DamageRadius + Weapon.DamageRadiusMod
+---@field DamageAmount EngineDefinedField <number>           # weaponBlueprint.Damage + Weapon.DamageMod
+---@field DamageType EngineDefinedField <DamageType>         # weaponBlueprint.DamageType
+---@field DamageFriendly EngineDefinedField <boolean>        # weaponBlueprint.DamageFriendly or true
+---@field CollideFriendly EngineDefinedField <boolean>       # weaponBlueprint.CollideFriendly or false
+---@field DoTTime EngineDefinedField <number>                # weaponBlueprint.DoTTime
+---@field DoTPulses EngineDefinedField <number>              # weaponBlueprint.DoTPulses
 ---@field MetaImpactAmount any          # weaponBlueprint.MetaImpactAmount
 ---@field MetaImpactRadius any          # weaponBlueprint.MetaImpactRadius
----@field ArtilleryShieldBlocks boolean # weaponBlueprint.ArtilleryShieldBlocks
----@field Buffs BlueprintBuff[]         # Active buffs for the weapon
----@field __index WeaponDamageTable
+---@field ArtilleryShieldBlocks EngineDefinedField <boolean> # weaponBlueprint.ArtilleryShieldBlocks
+---@field Buffs EngineDefinedField <BlueprintBuff[]>         # Active buffs for the weapon
+---@field __index EngineDefinedField <WeaponDamageTable>
 
 ---@return EntityCategory[]
 local function ParsePriorities()

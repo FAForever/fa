@@ -99,8 +99,8 @@ SyncMeta = {
 ---@field AdjRoFMod? number
 
 ---@class AIUnitProperties
----@field AIPlatoonReference AIPlatoon
----@field AIBaseManager LocationType
+---@field AIPlatoonReference EngineDefinedField <AIPlatoon>
+---@field AIBaseManager EngineDefinedField <LocationType>
 ---@field ForkedEngineerTask? thread    # used by the engineer manager
 ---@field DesiresAssist? boolean         # used by the engineer manager
 ---@field NumAssistees? number           # used by the engineer manager
@@ -112,8 +112,8 @@ SyncMeta = {
 ---@field Combat? boolean
 
 ---@class CampaignAIUnitProperties
----@field BaseName string Name of the BaseManager the unit belongs to
----@field UnitName string Name of the unit from the map editor (_save.lua)
+---@field BaseName EngineDefinedField <string> Name of the BaseManager the unit belongs to
+---@field UnitName EngineDefinedField <string> Name of the unit from the map editor (_save.lua)
 ---@field SetToUpgrade boolean|nil Unit marked by the BaseManager for upgrade
 ---@field CDRData table|nil Copy of the platoon data when the BaseManager upgrades the commander
 
@@ -127,43 +127,43 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties, CampaignAIUnitProperties, UnitBuffFields, DebugUnitComponent, FastDecayComponent
 ---@field CDRHome? LocationType
 ---@field AIManagerIdentifier? string
----@field Repairers table<EntityId, Unit>
----@field Brain AIBrain
+---@field Repairers EngineDefinedField <table<EntityId, Unit>>
+---@field Brain EngineDefinedField <AIBrain>
 ---@field buildBots? Unit[]
----@field Blueprint UnitBlueprint
----@field BuildEffectsBag TrashBag
+---@field Blueprint EngineDefinedField <UnitBlueprint>
+---@field BuildEffectsBag EngineDefinedField <TrashBag>
 ---@field BuildArmManipulator? moho.BuilderArmManipulator
----@field Trash TrashBag
----@field Layer Layer
----@field Army Army
+---@field Trash EngineDefinedField <TrashBag>
+---@field Layer EngineDefinedField <Layer>
+---@field Army EngineDefinedField <Army>
 ---@field Dead? boolean
----@field UnitId UnitId
----@field EntityId EntityId
----@field EventCallbacks table<string, function[]>
----@field Buffs UnitBuffsTable
+---@field UnitId EngineDefinedField <UnitId>
+---@field EntityId EngineDefinedField <EntityId>
+---@field EventCallbacks EngineDefinedField <table<string, function[]>>
+---@field Buffs EngineDefinedField <UnitBuffsTable>
 ---@field EngineFlags? table<string, any>
----@field TerrainType TerrainType
+---@field TerrainType EngineDefinedField <TerrainType>
 ---@field EngineCommandCap? table<string, boolean>
 ---@field UnitBeingBuilt Unit?
----@field UnitBuildOrder string
+---@field UnitBuildOrder EngineDefinedField <string>
 ---@field MyShield Shield?
 ---@field EntityBeingReclaimed Unit | Prop | nil
 ---@field SoundEntity? Unit | Entity
 ---@field AutoModeEnabled? boolean
----@field OnBeingBuiltEffectsBag TrashBag
----@field IdleEffectsBag TrashBag
+---@field OnBeingBuiltEffectsBag EngineDefinedField <TrashBag>
+---@field IdleEffectsBag EngineDefinedField <TrashBag>
 ---@field SiloWeapon? Weapon
 ---@field SiloProjectile? ProjectileBlueprint
 ---@field ReclaimTimeMultiplier? number
 ---@field CaptureTimeMultiplier? number
 ---@field PlatoonHandle? Platoon
 ---@field tickIssuedShieldRepair number? # Used by shields to keep track of when this unit's guards were ordered to start shield repair instantly
----@field Sync { id: string, army: Army } # Sync table replicated to the global sync table as to be copied to the user layer at sync time.
+---@field Sync EngineDefinedField <{ id: string, army: Army }> # Sync table replicated to the global sync table as to be copied to the user layer at sync time.
 ---@field ignoreDetectionFrom table<Army, true>? # Armies being given free vision to reveal beams hitting targets
 ---@field reallyDetectedBy table<Army, true>?    # Armies that detected the unit without free vision and don't need intel flushed when beam weapons stop hitting
----@field Weapons table<string, Weapon> # string is weapon Label
----@field WeaponInstances Weapon[]
----@field WeaponCount number
+---@field Weapons EngineDefinedField <table<string, Weapon>> # string is weapon Label
+---@field WeaponInstances EngineDefinedField <Weapon[]>
+---@field WeaponCount EngineDefinedField <number>
 ---@field CaptureProgress? number # Keeps track of capture progress to prevent sharing units being captured and to sync capture work progress bars
 ---@field oldowner? Army # After a unit is transferred, keeps track of the original Army to kill shared units when needed.
 ---@field TransferUpgradeProgress? boolean # Keeps track of upgrades for unit transfer

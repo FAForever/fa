@@ -38,7 +38,7 @@
 ---@class UnitBlueprint: EntityBlueprint
 --- Table keyed with a `ScriptTask`'s `TaskName` that determines the properties of the order button for that ability.
 --- The `OrderInfo.behavior` is overwritten in `orders.lua`.
----@field Abilities table<string, OrderInfo>
+---@field Abilities EngineDefinedField <table<string, OrderInfo>>
 --- the number of build bots a Cybran builder has
 ---@field BuildBotTotal? number
 --- set to an integer that describes the unit's position in the list of build icons
@@ -67,9 +67,9 @@
 --- `CollisionSphereOffset` species of collision offsets
 ---@field SizeSphere? number
 --- Whether this unit uses the mass-based veterancy system
----@field VetEnabled boolean
+---@field VetEnabled EngineDefinedField <boolean>
 --- Defines threshold when 
----@field VetThresholds table<number, number>
+---@field VetThresholds EngineDefinedField <table<number, number>>
 --- overrides the veterancy instant heal multiplier per level (which is 0.1)
 ---@field VeteranHealingMult? number[]
 --- Additional mass needed to get to the veterancy level of the index in the table, relative to the
@@ -83,11 +83,11 @@
 --- destroyed. Defaults to bone `0`
 ---@field WatchBone? Bone
 ---
----@field AI UnitBlueprintAI
----@field Air UnitBlueprintAir
+---@field AI EngineDefinedField <UnitBlueprintAI>
+---@field Air EngineDefinedField <UnitBlueprintAir>
 ---@field Adjacency UnitBlueprintAdjacency|string
 ---@field Audio? UnitBlueprintAudio
----@field Buffs BlueprintBuff[]
+---@field Buffs EngineDefinedField <BlueprintBuff[]>
 ---@field Defense UnitBlueprintDefense
 ---@field Display UnitBlueprintDisplay
 ---@field Economy UnitBlueprintEconomy
@@ -95,8 +95,8 @@
 ---@field Enhancements?  table<Enhancement, UnitBlueprintEnhancement>
 ---@field EnhancementPresets? table<string, UnitBlueprintEnhancementPreset>
 ---@field General UnitBlueprintGeneral
----@field Intel UnitBlueprintIntel
----@field Interface UnitBlueprintInterface
+---@field Intel EngineDefinedField <UnitBlueprintIntel>
+---@field Interface EngineDefinedField <UnitBlueprintInterface>
 ---@field Physics UnitBlueprintPhysics
 ---@field Transport? UnitBlueprintTransport
 ---@field Veteran? UnitBlueprintVeterancy
@@ -106,23 +106,23 @@
 ---
 --- Auto-generated unit id from the folder name. When modifying a blueprint, this must be defined to
 --- the blueprint id it is modifying instead.
----@field BlueprintId UnitId
+---@field BlueprintId EngineDefinedField <UnitId>
 --- auto-generated categories table based on `Categories` with each key a value in that array
----@field CategoriesHash table<CategoryName, true>
+---@field CategoriesHash EngineDefinedField <table<CategoryName, true>>
 --- auto-generated for unit blueprints generated from a unit with a preset in `EnhancementPresets`
 ---@field EnhancementPresetAssigned? UnitBlueprintAssignedEnhancementPreset
 --- auto-generated faction category from `Categories`
----@field FactionCategory FactionCategory
+---@field FactionCategory EngineDefinedField <FactionCategory>
 --- auto-generated later category from `Categories`
----@field LayerCategory LayerCategory
+---@field LayerCategory EngineDefinedField <LayerCategory>
 --- auto-generated volume based on `SizeX`, `SizeY`, and `SizeZ`
----@field SizeVolume number
+---@field SizeVolume EngineDefinedField <number>
 --- auto-generated damage effects size based on `SizeVolume`
----@field SizeDamageEffects number
+---@field SizeDamageEffects EngineDefinedField <number>
 --- auto-generated damage effects size scale based on `SizeVolume`
----@field SizeDamageEffectsScale number
+---@field SizeDamageEffectsScale EngineDefinedField <number>
 --- auto-generated tech category from `Categories`
----@field TechCategory TechCategory
+---@field TechCategory EngineDefinedField <TechCategory>
 ---
 --- adds categories to `Categories` and then is deleted. Takes precedence over `DelCategories`
 ---@field AddCategories? CategoryName[]
@@ -134,17 +134,17 @@
 --- At what angle (to either side) the unit attacks its target after getting an attack order. 
 --- If one of the unit's weapons has a target and has `SlavedToBody = true`, it will rotate when idle and attacking.
 --- Overrides Weapon `SlavedToBody` and `SlavedToBodyArcRange` behavior.
----@field AttackAngle number
+---@field AttackAngle EngineDefinedField <number>
 --- automatically surface to attack ground targets
----@field AutoSurfaceToAttack boolean
+---@field AutoSurfaceToAttack EngineDefinedField <boolean>
 --- this is the beacon that this unit will create under some circumstances
----@field BeaconName string
+---@field BeaconName EngineDefinedField <string>
 --- the formation name used for guarding this unit
----@field GuardFormationName string
+---@field GuardFormationName EngineDefinedField <string>
 --- how far a unit on patrol will look off it's patrol path to go attack
----@field GuardRadius number
+---@field GuardRadius EngineDefinedField <number>
 --- maximum range from the guarded unit before initiating return
----@field GuardReturnRadius number
+---@field GuardReturnRadius EngineDefinedField <number>
 --- Guard scan range for the unit. The guard scan radius is used by attack move and patrol orders. Through this scanning mechanic the patrolling (or attack moving) unit can find a target to chase. The scanning behavior includes neutral units.
 ---
 --- Through a binary patch the guard scan radius is reset to 0 when the unit is not patrolling and/or attack moving:
@@ -156,17 +156,17 @@
 --- - https://github.com/FAForever/fa/pull/3892
 ---
 --- The value is automatically populated during blueprint loading to a sensible default if it is not set in the blueprint.
----@field GuardScanRadius number
+---@field GuardScanRadius EngineDefinedField <number>
 --- initial toggle of automatic behaviors (silo building and auto-assist)
 ---@see SetAutoMode
----@field InitialAutoMode boolean
+---@field InitialAutoMode EngineDefinedField <boolean>
 --- unit should unpack before firing weapon
 --- Engine sets tracking radius to 1x, calls OnLostTarget when given a move order, and OnGotTarget only when not moving
----@field NeedUnpack boolean
+---@field NeedUnpack EngineDefinedField <boolean>
 --- this muliplier is applied to an air unit's refuel rate when the staging platform is refueling it
----@field RefuelingMultiplier number
+---@field RefuelingMultiplier EngineDefinedField <number>
 --- this amount of repair per **second** is offered to refueling air units
----@field RefuelingRepairAmount number
+---@field RefuelingRepairAmount EngineDefinedField <number>
 --- this amount of energy per **tick** is required to repair the air unit
 ---@field RepairConsumeEnergy? number
 --- this amount of mass per **tick** is required to repair the air unit
@@ -177,7 +177,7 @@
 ---@field StagingPlatformScanRadius? number
 --- Names of bones for other units to try to aim at instead of the default center pos.
 --- The center pos is calculated using Size values but doesn't use CollisionOffset values.
----@field TargetBones string[]
+---@field TargetBones EngineDefinedField <string[]>
 
 
 ---@class UnitBlueprintAir
@@ -371,7 +371,7 @@
 ---@field MaxHealth number
 --- Default amount of health to regenerate per second for the unit.
 --- (It could be changed by a veterancy buff or enhancement)
----@field RegenRate number
+---@field RegenRate EngineDefinedField <number>
 --- if the unit has a shield, the settings are held in a table here
 ---@field Shield? UnitBlueprintDefenseShield
 --- if the various threat levels are not to be auto-generated at all for this unit
@@ -384,7 +384,7 @@
 --- how much anti-air it has.
 --- Different AI's can interpret this value differently (for example, the `SurfaceThreatLevel` may
 --- be added in its calculations).
----@field AirThreatLevel number
+---@field AirThreatLevel EngineDefinedField <number>
 --- An auto-generated value representing the threat this unit poses to the enemy due to an
 --- "economy score" calculated when the blueprint is loaded.
 --- Different AI's can interpret the result differently.
@@ -392,11 +392,11 @@
 --- An auto-generated value representing the threat this unit poses to the enemy units in the
 --- submarine layer based on how much anti-navy it has.
 --- Different AI's can interpret this value differently.
----@field SubThreatLevel number
+---@field SubThreatLevel EngineDefinedField <number>
 --- An auto-generated value representing the threat this unit poses to enemy surface units based on
 --- how much direct fire, indirect fire, and bombing capability it has.
 --- Different AI's can interpret this value differently.
----@field SurfaceThreatLevel number
+---@field SurfaceThreatLevel EngineDefinedField <number>
 
 ---@class UnitBlueprintDefenseShield
 --- If this shield only blocks weapons marked with `ArtilleryShieldBlocks`.
@@ -483,16 +483,16 @@
 --- Backup abilities shown by the unit view, if the detected ones don't cover them.
 ---@field Abilities UnlocalizedString[]
 --- names that the AI can use to name the unit, provided the AI is programmed to do this
----@field AINames UnlocalizedString[]
+---@field AINames EngineDefinedField <UnlocalizedString[]>
 --- The animation that is played when the unit is completed
 --- (seen in experimentals, e.g. Megalith - XRL0403)
----@field AnimationActivate FileName
+---@field AnimationActivate EngineDefinedField <FileName>
 --- Animation that is played when the unit is building
 ---@field AnimationBuild? FileName
 --- How fast the build animation plays. Treated as `1` if absent.
 ---@field AnimationBuildRate? number
 --- The table of animations shown at death. One will be randomly pulled.
----@field AnimationDeath UnitBlueprintAnimationDeath[]
+---@field AnimationDeath EngineDefinedField <UnitBlueprintAnimationDeath[]>
 --- used by the XRB2309 (submerged HARMS) script
 ---@field AnimationDeploy? FileName
 --- factories will play this animation on land units they build
@@ -514,18 +514,18 @@
 --- used by the URS0201 (Salem class destroyer) script
 ---@field AnimationTransform? FileName
 --- the animation that is played when the unit is upgrading
----@field AnimationUpgrade FileName
+---@field AnimationUpgrade EngineDefinedField <FileName>
 --- A table of animations to use while upgrading, depending on the unit it is upgrading to.
 ---@field AnimationUpgradeTable? table<UnitId, FileName>
 --- Full path to file. Base game path is typically `'/units/UnitID/UnitID_awalk.sca'` but mods should use their mod path `'/mods/ModName/...'`.
 ---@field AnimationWalk? FileName
 --- controls the speed of the animation. Adjusting this number can cause or prevent "skating"
----@field AnimationWalkRate number
+---@field AnimationWalkRate EngineDefinedField <number>
 --- used by UEF and Cybran construction units to animate their hover transition
 ---@field AnimationWater? FileName
 ---@field AttackReticleSize? number unused
----@field BlinkingLights UnitBlueprintBlinkingLightsData[]
----@field BlinkingLightsFx UnitBlueprintBlinkingLightsFx
+---@field BlinkingLights EngineDefinedField <UnitBlueprintBlinkingLightsData[]>
+---@field BlinkingLightsFx EngineDefinedField <UnitBlueprintBlinkingLightsFx>
 --- the bone on factories where units are built
 ---@field BuildAttachBone? Bone
 --- used while cloaked
@@ -539,7 +539,7 @@
 ---@field HideLifebars? boolean
 --- Effects displayed when the unit is idle (e.g. glow beneath hovering units), multiple layers can
 --- be used. The key should be the name of the layer where effects should be displayed
----@field IdleEffects table<Layer, UnitBlueprintEffects>
+---@field IdleEffects EngineDefinedField <table<Layer, UnitBlueprintEffects>>
 --- used by the URS0201 (Salem class destroyer) script 
 ---@field LandAnimationDeath? {Animation: FileName, Weight: number}
 --- effects displayed when the unit changes layers (e.g. when an aircraft lands or takes off)
@@ -547,23 +547,23 @@
 --- first one is the old layer and the second is the new one. E.g. effects are needed for an
 --- aircraft landing, so the old layer is Air and the new one is Land, then the 'string' will be
 --- airLand (LandAir would be the opposite - take off). Note: there is NO space between layer names
----@field LayerChangeEffects table<LayerChangeType, UnitBlueprintEffects>
+---@field LayerChangeEffects EngineDefinedField <table<LayerChangeType, UnitBlueprintEffects>>
 --- used by the XSB1102 (Seraphim hydrocarbon powerplant) script
 ---@field LoopingAnimation? FileName
 ---@field MaxRockSpeed? number
 ---@field Mesh MeshBlueprint
----@field MeshBlueprint FileName
+---@field MeshBlueprint EngineDefinedField <FileName>
 --- used for the wreackge if `Wreckage.UseCustomMesh` is set
 ---@field MeshBlueprintWrecked? FileName
 --- used by the XSB2401 (Yolona Oss) script
 ---@field MissileBone? Bone
----@field MotionChangeEffects table<MotionChangeType, UnitBlueprintEffects>
+---@field MotionChangeEffects EngineDefinedField <table<MotionChangeType, UnitBlueprintEffects>>
 --- Effects displayed during movement of the unit. Key should be Name of the layer for which the
 --- effects are displayed.
----@field MovementEffects table<Layer, UnitBlueprintEffects>
----@field PlaceholderMeshName string
+---@field MovementEffects EngineDefinedField <table<Layer, UnitBlueprintEffects>>
+---@field PlaceholderMeshName EngineDefinedField <string>
 ---@field ShowBuildEffectsDuringUpgrade? boolean
----@field SpawnRandomRotation boolean
+---@field SpawnRandomRotation EngineDefinedField <boolean>
 ---@field Tarmacs UnitBlueprintTarmac[]
 ---@field TerrainMeshes? table<TerrainStyle, FileName>
 ---@field TransportAnimation? FileName
@@ -578,7 +578,7 @@
 ---@field WaterAnimationDeath? {}                   
 ---
 --- auto-generated field that points to the mesh to use while building
----@field BuildMeshBlueprint BlueprintId
+---@field BuildMeshBlueprint EngineDefinedField <BlueprintId>
 
 ---@class UnitBlueprintAnimationDeath
 --- Full path of the animation file. Typically `'/units/UnitID/UnitID_ADeath.sca'` but mods should use their mod path `'/mods/ModName/...'`.
@@ -691,12 +691,12 @@
 
 ---@class UnitBlueprintTarmac
 ---@field Albedo FileName
----@field Albedo2 FileName
+---@field Albedo2 EngineDefinedField <FileName>
 ---@field DeathLifetime number
 ---@field FadeOut number
 ---@field Length number
 ---@field Normal FileName
----@field Glow FileName
+---@field Glow EngineDefinedField <FileName>
 ---@field Orientations number[]
 ---@field RemoveWhenDead boolean
 ---@field Width number
@@ -707,18 +707,18 @@
 ---@field AdjacentMassProductionMod? number
 ---@field AdjacentStructureEnergyMod? number
 --- Defines what units can be built. Used by the engine.
----@field BuildableCategory UnparsedCategory[]
+---@field BuildableCategory EngineDefinedField <UnparsedCategory[]>
 --- Defines what buildable units can only be produced through upgrading. Used in Lua.
----@field UpgradeOnlyCategory UnparsedCategory[]
+---@field UpgradeOnlyCategory EngineDefinedField <UnparsedCategory[]>
 --- energy cost to build this unit
----@field BuildCostEnergy number
+---@field BuildCostEnergy EngineDefinedField <number>
 --- mass cost to build this unit
----@field BuildCostMass number
+---@field BuildCostMass EngineDefinedField <number>
 --- how fast this unit build other units
----@field BuildRate number
+---@field BuildRate EngineDefinedField <number>
 --- the needed time when producing this unit; this is only a factor of time,
 --- not the real time to produce the unit
----@field BuildTime number
+---@field BuildTime EngineDefinedField <number>
 --- present in UEF engineering drones
 ---@field BuildRadius? number
 --- What unit spawns out of the egg. Used by `CConstructionEggUnit` (Megalith's crab eggs)
@@ -731,9 +731,9 @@
 ---@field DifferentialUpgradeCostCalculation? boolean
 ---@field EngineeringPods? {CreateWithUnit: boolean, PodAttachpoint: Bone, PodName: string, PodUnitID: UnitId}
 --- default rally point X for the factory
----@field InitialRallyX number
+---@field InitialRallyX EngineDefinedField <number>
 --- default rally point Z for the factory
----@field InitialRallyZ number
+---@field InitialRallyZ EngineDefinedField <number>
 --- Total energy drain when changing scrying locations. Used by XAB3301 (Eye of Rhianne)
 ---@field InitialRemoteViewingEnergyDrain? number
 --- amount that define which amount of energy the unit is consuming per second; Used for Shields
@@ -741,22 +741,22 @@
 ---@field MaintenanceConsumptionPerSecondMass? number
 --- Maximum build range of the unit. The target must be within this range before the
 --- builder can perform operation.
----@field MaxBuildDistance number
+---@field MaxBuildDistance EngineDefinedField <number>
 --- used by XAB1401 (Paragon) script
 ---@field MaxEnergy? number
 --- used by XAB1401 (Paragon) script
 ---@field MaxMass? number
----@field MinBuildTime number
+---@field MinBuildTime EngineDefinedField <number>
 ---@field MinConsumptionPerSecondEnergy? number
 ---@field MinConsumptionPerSecondMass? number
 --- produces resource naturally and does not consume anything
----@field NaturalProducer boolean
+---@field NaturalProducer EngineDefinedField <boolean>
 --- builder needs to face target before it can build/repair
----@field NeedToFaceTargetToBuild boolean
+---@field NeedToFaceTargetToBuild EngineDefinedField <boolean>
 --- amount of energy produced per second
----@field ProductionPerSecondEnergy number
+---@field ProductionPerSecondEnergy EngineDefinedField <number>
 --- amount of mass produced per second
----@field ProductionPerSecondMass number
+---@field ProductionPerSecondMass EngineDefinedField <number>
 --- You will get a bonus if you rebuild this unit over the wreckage of these wreckages.
 --- Multible BonusID's can be added.
 ---@field RebuildBonusIds? string[]
@@ -960,34 +960,34 @@
 
 ---@class UnitBlueprintGeneral
 ---@field BuildBones? BuildBones
----@field BuildBonesAlt1 BuildBones
+---@field BuildBonesAlt1 EngineDefinedField <BuildBones>
 --- Cost of the unit towards unit cap (default is 1.0)
----@field CapCost number
----@field Category string
----@field Classification UnitClassification
+---@field CapCost EngineDefinedField <number>
+---@field Category EngineDefinedField <string>
+---@field Classification EngineDefinedField <UnitClassification>
 --- command capability flags for this unit
----@field CommandCaps table<CommandCap, boolean>
+---@field CommandCaps EngineDefinedField <table<CommandCap, boolean>>
 ---@field ExcludeFromVeterancy? boolean
 --- Faction the unit belongs to.
----@field FactionName FactionName
+---@field FactionName EngineDefinedField <FactionName>
 ---@field FractionThreshold? number
 --- indicates the background for the build icon
----@field Icon IconBackgroundType
+---@field Icon EngineDefinedField <IconBackgroundType>
 --- if the unit always self-destructs immediately, skipping any countdown sequence
 ---@field InstantDeathOnSelfDestruct? boolean
----@field OrderOverrides table<CommandCap, OrderInfo>
+---@field OrderOverrides EngineDefinedField <table<CommandCap, OrderInfo>>
 --- indicates unit has it's own avatar button in the quick select interface,
 --- and it's sorting priority
----@field QuickSelectPriority integer
+---@field QuickSelectPriority EngineDefinedField <integer>
 --- how long to wait before rolling the unit off the factory
 ---@field RolloffDelay? number
 --- Determines if a unit will be selected in a drag selection, only the highest priority units will
 --- get selected (1 is highest).
----@field SelectionPriority integer
+---@field SelectionPriority EngineDefinedField <integer>
 ---@field TarmacDecal? any unused
 ---@field TarmacGlowDecal? any unused
 --- defines the tech level used for display purposes
----@field TechLevel UnitTechLevel
+---@field TechLevel EngineDefinedField <UnitTechLevel>
 --- Extra time taken to teleport before other teleport time calculations. Defaults to 0 seconds.
 --- If `UseVariableTeleportCosts` is false, then this also delays teleport FX appearing at the destination.
 --- If `UseVariableTeleportCosts` is true, then destination FX appear after 0.4x the total teleport time.
@@ -1000,12 +1000,12 @@
 --- Only applies when `UseVariableTeleportCosts` is true. Defaults to 50 seconds.
 ---@field TeleportMaximumDuration? number
 --- table of toggle capabilities available for this unit
----@field ToggleCaps table<ToggleCap, boolean>
+---@field ToggleCaps EngineDefinedField <table<ToggleCap, boolean>>
 --- table of boolean toggles set/got with SetStatByCallback/GetStat
----@field StatToggles table<string, table>
+---@field StatToggles EngineDefinedField <table<string, table>>
 --- name of the unit
----@field UnitName UnlocalizedString
----@field UnitWeight number unused
+---@field UnitName EngineDefinedField <UnlocalizedString>
+---@field UnitWeight EngineDefinedField <number> unused
 --- what unit, if any, this unit can be upgraded from
 ---@field UpgradesFrom? UnitId
 --- what unit, if any, this unit can be upgraded to
@@ -1014,7 +1014,7 @@
 ---@field UpgradesFromBase? UnitId
 ---
 --- auto-generated field from `CommandCaps`
----@field CommandCapsHash table<CommandCap, true>
+---@field CommandCapsHash EngineDefinedField <table<CommandCap, true>>
 
 ---@class BuildBones
 --- the bone that gets aimed that what the unit is building
@@ -1028,10 +1028,10 @@
 
 ---@class UnitIntelStatus
 ---@field RechargeThread thread?
----@field AllIntel table<IntelType, boolean>
----@field AllIntelRecharging table<IntelType, boolean>
----@field AllIntelMaintenanceFree table<IntelType, boolean>
----@field AllIntelDisabledByEvent table<IntelType, table<string, boolean>>
+---@field AllIntel EngineDefinedField <table<IntelType, boolean>>
+---@field AllIntelRecharging EngineDefinedField <table<IntelType, boolean>>
+---@field AllIntelMaintenanceFree EngineDefinedField <table<IntelType, boolean>>
+---@field AllIntelDisabledByEvent EngineDefinedField <table<IntelType, table<string, boolean>>>
 
 ---@class UnitBlueprintIntel
 --- intel status that is deep-copied for each unit instance
@@ -1095,81 +1095,81 @@
 
 ---@class UnitBlueprintPhysics
 --- Forces terrain alignment for structures
----@field AltitudeToTerrain boolean
+---@field AltitudeToTerrain EngineDefinedField <boolean>
 --- forces terrain alignment for structures
----@field AlwaysAlignToTerrain boolean
+---@field AlwaysAlignToTerrain EngineDefinedField <boolean>
 --- alternate method of locomotion
 ---@field AltMotionType? UnitMotionType
 --- preferred attack height when attacking ground targets (used by dive bombers)
----@field AttackElevation number
+---@field AttackElevation EngineDefinedField <number>
 --- distance that the unit will just back up if it is easier to do so
----@field BackUpDistance number
+---@field BackUpDistance EngineDefinedField <number>
 --- how much the unit banks in corners (negative to lean outwards)
----@field BankingSlope number
+---@field BankingSlope EngineDefinedField <number>
 --- unit may be built on these layers (only applies to structures)
----@field BuildOnLayerCaps table<LayerEnum, boolean>
+---@field BuildOnLayerCaps EngineDefinedField <table<LayerEnum, boolean>>
 --- special build restrictions (mass deposit, thermal vent, etc)
----@field BuildRestriction UnitBuildRestriction
+---@field BuildRestriction EngineDefinedField <UnitBuildRestriction>
 --- acceleration to allow unit to catch up to the target when it starts to drift
----@field CatchUpAcc number
+---@field CatchUpAcc EngineDefinedField <number>
 --- unknown if significant in `Physics`
 ---@field CollisionOffsetX? number
 --- if a naval factory uses the special rolloff point computation
 ---@field ComputeRollOffPoint? boolean
 ---@field DragCoefficient number unused
 --- preferred height above (negative for below) land or water surface
----@field Elevation number
+---@field Elevation EngineDefinedField <number>
 --- if true, terrain under building's skirt will be flattened
 ---@field FlattenSkirt boolean
----@field Footprint FootprintBlueprint
+---@field Footprint EngineDefinedField <FootprintBlueprint>
 --- unit fuels up at this rate per second. Required for air staging to undock automatically.
----@field FuelRechargeRate number
+---@field FuelRechargeRate EngineDefinedField <number>
 --- unit has fuel for this number of seconds. Required for air staging to undock automatically.
----@field FuelUseTime number
+---@field FuelUseTime EngineDefinedField <number>
 --- How much the collision model is offset from the ground. Used to make aircraft land properly.
 ---@field GroundCollisionOffset? number
 --- Used in combination with `FlattenSkirt` to guarantee the result is completely horizontal
----@field HorizontalSkirt boolean
+---@field HorizontalSkirt EngineDefinedField <boolean>
 --- used by XSL0305 (Seraphim sniper bot) script as the speed multiplier during the reload of the alternate sniper mode
 --- also used by URS0201 (Salem class destroyer) script as the speed multiplier when walking on land
 ---@field LandSpeedMultiplier? number
 --- an offset to the layer change height used during the transition between seabed/water and land
----@field LayerChangeOffsetHeight number
+---@field LayerChangeOffsetHeight EngineDefinedField <number>
 --- transition time in seconds when going from water/land and land/water
----@field LayerTransitionDuration number
+---@field LayerTransitionDuration EngineDefinedField <number>
 --- maximum acceleration for the unit
----@field MaxAcceleration number
+---@field MaxAcceleration EngineDefinedField <number>
 --- maximum braking acceleration for the unit
----@field MaxBrake number
+---@field MaxBrake EngineDefinedField <number>
 --- maximum elevation difference across skirt for build site
----@field MaxGroundVariation number
+---@field MaxGroundVariation EngineDefinedField <number>
 --- maximum speed for the unit
----@field MaxSpeed number
+---@field MaxSpeed EngineDefinedField <number>
 --- maximum speed for the unit in reverse. Defaults to the same value as MaxSpeed
----@field MaxSpeedReverse number
+---@field MaxSpeedReverse EngineDefinedField <number>
 --- maximum steer force magnitude that can be applied to acceleration
----@field MaxSteerForce number
+---@field MaxSteerForce EngineDefinedField <number>
 --- Used by some build animations to scale their effects
 ---@field MeshExtentsX number
 --- Used by some build animations to scale their effects
 ---@field MeshExtentsY number
 --- Used by some build animations to scale their effects
 ---@field MeshExtentsZ number
----@field MinSpeedPercent number
+---@field MinSpeedPercent EngineDefinedField <number>
 --- method of locomotion
 ---@field MotionType UnitMotionType
 --- The occupy rectangles of the unit that will override the footprint. Every 4 numbers in the
 --- array define a occupation rectangle for the override (offsetX, offsetZ, sizeX, sizeZ).
----@field OccupyRects number[]
+---@field OccupyRects EngineDefinedField <number[]>
 --- Raised platform definition for ground units to move on. Every 3 numbers define a point relative
 --- to the center (x, z, height), and every 4 points (or 12 numbers) defines a platform.
----@field RaisedPlatforms number[]
+---@field RaisedPlatforms EngineDefinedField <number[]>
 --- how much damping there is against rolling motion (1 = no motion at all)
----@field RollDamping number
+---@field RollDamping EngineDefinedField <number>
 --- how stable the unit is against rolling (0 to 1)
----@field RollStability number
+---@field RollStability EngineDefinedField <number>
 --- The set of rolloff points available for a factory unit.
----@field RollOffPoints UnitRollOffPoint[]
+---@field RollOffPoints EngineDefinedField <UnitRollOffPoint[]>
 --- ability to rotate body to aim weapon "slaved" to body while in still in motion
 ---@field RotateBodyWhileMoving? boolean
 --- if this unit can try to rotate on the spot
@@ -1189,25 +1189,25 @@
 --- unit construction pad Size Z for building
 ---@field SkirtSizeZ number
 --- Stands upright regardless of terrain
----@field StandUpright boolean
+---@field StandUpright EngineDefinedField <boolean>
 --- used by XSB3202 (T2 sonar) and XSS0201 (Destroyer) when the vertical layer changes from top to sub
 ---@field SubSpeedMultiplier? number
 --- How much this unit slows down transports it is loaded in.  
 --- Defaults to 0.15 (Tech 1), 0.3 (Tech 2), 0.6 (Tech 3), and 1 (ACU/SACU/Experimentals).
----@field TransportSpeedReduction number
+---@field TransportSpeedReduction EngineDefinedField <number>
 --- turn facing damping for the unit, usually used for hover units only
----@field TurnFacingRate number
+---@field TurnFacingRate EngineDefinedField <number>
 --- turn radius for the unit, in world units. Used when the nav waypoint is further than `TurnRadius` distance,
 --- and if it results in a faster turn rate than `TurnRate`. Disabled at 0
----@field TurnRadius number
+---@field TurnRadius EngineDefinedField <number>
 --- turn rate for the unit, in degrees per second. Turning acts improperly when at 0
----@field TurnRate number
+---@field TurnRate EngineDefinedField <number>
 --- when present, the speed multiplier is set to this number when entering the water layer
 ---@field WaterSpeedMultiplier? number
 --- how much wobbling for the unit while hovering
----@field WobbleFactor number
+---@field WobbleFactor EngineDefinedField <number>
 --- how fast is the wobble, the faster the less stable looking
----@field WobbleSpeed number
+---@field WobbleSpeed EngineDefinedField <number>
 ---
 --- auto-generated flag for naval factories
 ---@field CorrectNavalRollOffPoints? true

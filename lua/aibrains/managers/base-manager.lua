@@ -43,9 +43,9 @@ local TableSort = table.sort
 --- | string
 
 ---@class AIBaseDebugInfo
----@field Position Vector
----@field Layer NavLayers
----@field Managers { EngineerManagerDebugInfo: AIEngineerManagerDebugInfo, StructureManagerDebugInfo: AIStructureManagerDebugInfo, FactoryManagerDebugInfo: AIFactoryManagerDebugInfo }
+---@field Position EngineDefinedField <Vector>
+---@field Layer EngineDefinedField <NavLayers>
+---@field Managers EngineDefinedField <{ EngineerManagerDebugInfo: AIEngineerManagerDebugInfo, StructureManagerDebugInfo: AIStructureManagerDebugInfo, FactoryManagerDebugInfo: AIFactoryManagerDebugInfo }>
 
 ---@class AIBase
 ---@field Brain AIBrain

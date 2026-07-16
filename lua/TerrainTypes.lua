@@ -131,16 +131,16 @@
 ---@field TypeCode integer
 ---@field Color Color
 ---@field Description string
----@field Style TerrainStyle
----@field Slippery number
----@field Bumpiness number
----@field Blocking boolean
----@field FXIdle table<Layer, table<IdleEffectType, FileName[]>>
----@field FXImpact table<ImpactType, table<ImpactEffectType, FileName[]>>
----@field FXLayerChange table<LayerChangeType, table<LayerChangeEffectType, FileName[]>>
----@field FXMotionChange table<MotionChangeType, table<MotionChangeEffectType, FileName[]>>
----@field FXMovement table<Layer, table<MovementEffectType, FileName[]>>
----@field FXOther table<Layer, table<OtherEffectType, FileName[]>>
+---@field Style EngineDefinedField <TerrainStyle>
+---@field Slippery EngineDefinedField <number>
+---@field Bumpiness EngineDefinedField <number>
+---@field Blocking EngineDefinedField <boolean>
+---@field FXIdle EngineDefinedField <table<Layer, table<IdleEffectType, FileName[]>>>
+---@field FXImpact EngineDefinedField <table<ImpactType, table<ImpactEffectType, FileName[]>>>
+---@field FXLayerChange EngineDefinedField <table<LayerChangeType, table<LayerChangeEffectType, FileName[]>>>
+---@field FXMotionChange EngineDefinedField <table<MotionChangeType, table<MotionChangeEffectType, FileName[]>>>
+---@field FXMovement EngineDefinedField <table<Layer, table<MovementEffectType, FileName[]>>>
+---@field FXOther EngineDefinedField <table<Layer, table<OtherEffectType, FileName[]>>>
 ---@field Treads? TerrainTreadType
 
 local EmitterBasePath = '/effects/emitters/'
