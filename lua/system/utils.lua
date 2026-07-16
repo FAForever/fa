@@ -558,9 +558,10 @@ function table.print(tbl, tblPrefix, printer)
     printer(tblPrefix.." }")
 end
 
---- Return filtered table containing every mapping from table for which fn function returns true when passed the value.
---- @param t  - is a table to filter
---- @param fn - is decision function to use to filter the table, defaults checking if a value is true or exists in table
+--- Return shallow-copied, filtered table containing every mapping from table for which function `fn` returns true when passed the value.
+---@generic K, V
+---@param t table<K, V> # table to filter
+---@param fn? fun(value: V): boolean # Value filter function. Defaults to checking if a value is truthy
 function table.filter(t, fn)
     local r = {}
     if not fn then fn = function(v) return v end end
