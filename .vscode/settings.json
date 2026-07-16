@@ -12,9 +12,6 @@
   "Lua.runtime.path": ["/?"],
   "Lua.runtime.plugin": ".vscode/fa-plugin.lua",
   "Lua.workspace.ignoreDir": [".vscode", "loc", "*.bp", "lua/ui/lobby/changelog/generated/*"],
-  "Lua.misc.parameters": [
-    "--develop=true"
-  ],
   "[lua]": {
     "editor.wordBasedSuggestions": "off"
   },
