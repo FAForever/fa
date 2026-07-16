@@ -360,8 +360,6 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
             end
         end
 
-        self:DebugLog('Instigator', instigator, instigator.Blueprint.BlueprintId, 'destroyed?', IsDestroyed(instigator))
-
         -- localize information for performance
         local vcx, vcy, vcz = EntityGetPositionXYZ(self)
 
@@ -655,7 +653,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                         damageSelf
                     )
                 end
-                self:DebugLog('DamageArea instigator param', instigator, instigator.Blueprint.BlueprintId, 'destroyed?', IsDestroyed(instigator))
+
                 DamageArea(
                     instigator,
                     cachedPosition,
