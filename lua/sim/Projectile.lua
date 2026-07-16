@@ -357,7 +357,12 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
 
         -- Try to use the launcher as instigator first. If its been deleted, use ourselves (this
         -- projectile is still associated with an army)
-        local instigator = launcher or self
+        ---@type Unit | Projectile | nil
+        local instigator = launcher
+        if not launcher or launcher.Dead then
+            instigator = self
+        end
+        ---@cast instigator -nil
 
         self:DebugLog('Instigator', instigator, instigator.Blueprint.BlueprintId, 'destroyed?', IsDestroyed(instigator))
 
@@ -621,7 +626,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
 
     --- Called by Lua to process the damage logic of a projectile
     ---@param self Projectile
-    ---@param instigator Unit # The launcher, and if it doesn't exist, the projectile itself
+    ---@param instigator Unit | Projectile # The launcher, and if it doesn't exist, the projectile itself
     ---@param DamageData WeaponDamageTable # passed by the weapon
     ---@param targetEntity Unit | Prop | nil # nil if hitting terrain
     ---@param cachedPosition Vector # A cached position that is passed to prevent table allocations, can not be used in fork threads and / or after a yield statement
