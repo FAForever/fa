@@ -27,3 +27,5 @@ end
 doscript '/lua/footprints.lua'
 doscript '/lua/system/Blueprints.lua'
 LoadBlueprints()
+
+error
