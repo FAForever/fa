@@ -5336,8 +5336,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param location number
     OnSpecialAction = function(self, location) end,
 
+    --- Called by the engine when the unit is damaged by an army.
     ---@param self Unit
-    ---@param index integer
+    ---@param index Army
     OnDamageBy = function(self, index) end,
 
     --- Deprecated functionality
