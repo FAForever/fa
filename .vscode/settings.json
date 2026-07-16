@@ -23,7 +23,22 @@
   "Lua.runtime.pathStrict": false,
   "Lua.runtime.exportEnvDefault": true,
   "Lua.completion.autoRequire": false,
-  "Lua.diagnostics.globals": ["ScenarioInfo", "__moduleinfo"],
+  "Lua.diagnostics.globals": [
+    "ScenarioInfo",
+    "__moduleinfo",
+    "sortedpairs",
+    "sort_by",
+    "sort_down_by",
+    "safecall",
+    "printField",
+    "__diskwatch",
+    "repr",
+    "repru",
+    "reprs",
+    "reprsl",
+    "__language",
+    "__installedlanguages"
+  ],
   "Lua.format.defaultConfig": {
     "max_line_length": "unset",
   },
