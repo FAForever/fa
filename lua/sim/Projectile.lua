@@ -338,31 +338,26 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         local blueprintDisplay = blueprint.Display
         local blueprintCategoriesHash = blueprint.CategoriesHash
 
-        -- callbacks for launcher to have an idea what is going on for AIs
-        if blueprintCategoriesHash['TACTICAL'] or blueprintCategoriesHash['STRATEGIC'] then
+        --- Usually the launcher will be the instigator but if it has been deleted
+        --- use ourselves since this projectile is still associated with an army.
+        ---@type Unit | Projectile
+        local instigator = self
+        if not IsDestroyed(launcher) then
+            ---@cast launcher -nil
+            instigator = launcher
 
-            -- we have a target, but got caught by terrain
-            if targetType == 'Terrain' then
-                if not IsDestroyed(launcher) then
+            -- callbacks for launcher to have an idea what is going on for AIs
+            if blueprintCategoriesHash['TACTICAL'] or blueprintCategoriesHash['STRATEGIC'] then
+                -- we have a target, but got caught by terrain
+                if targetType == 'Terrain' then
                     launcher:OnMissileImpactTerrain(self:GetCurrentTargetPosition(), position)
-                end
 
                 -- we have a target, but got caught by an (unexpected) shield
-            elseif targetType == 'Shield' then
-                if not IsDestroyed(launcher) then
+                elseif targetType == 'Shield' then
                     launcher:OnMissileImpactShield(self:GetCurrentTargetPosition(), targetEntity.Owner, position)
                 end
             end
         end
-
-        -- Try to use the launcher as instigator first. If its been deleted, use ourselves (this
-        -- projectile is still associated with an army)
-        ---@type Unit | Projectile | nil
-        local instigator = launcher
-        if not launcher or launcher.Dead then
-            instigator = self
-        end
-        ---@cast instigator -nil
 
         self:DebugLog('Instigator', instigator, instigator.Blueprint.BlueprintId, 'destroyed?', IsDestroyed(instigator))
 
