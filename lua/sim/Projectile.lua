@@ -92,7 +92,7 @@ local VectorCached = Vector(0, 0, 0)
 ---@field Blueprint ProjectileBlueprint
 ---@field Army Army
 ---@field Trash TrashBag
----@field Launcher Unit
+---@field Launcher Unit? # May be dead or destroyed when the projectile impacts
 ---@field OriginalTarget? Unit | Blip
 ---@field DamageData WeaponDamageTable
 ---@field MyDepthCharge? DepthCharge    # If weapon blueprint has a (valid) `DepthCharge` field
