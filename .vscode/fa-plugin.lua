@@ -4,6 +4,8 @@ local StringMatch = string.match
 
 local IoOpen = io.open
 
+print('[FA Plugin] FA plugin starting...')
+
 -- repository to use for hook file intellisense. Same as the one in the dev init file.
 local initPath = 'C:/ProgramData/FAForever/bin/init_local_development.lua'
 
@@ -72,10 +74,15 @@ function OnSetText(uri, text)
         if hookDir then
             local repoFile = IoOpen(locationOfRepository .. hookDir)
             if repoFile then
+                local repoContent = repoFile:read("*a")
+                -- all diagnostics registered in /server/script/proto/diagnostic.lua
+                local diagnostics = 'exp-in-action,unused-local,unused-function,unused-label,unused-vararg,trailing-space,redundant-return,empty-block,code-after-break,unreachable-code,redundant-value,unbalanced-assignments,redundant-parameter,missing-parameter,missing-return-value,redundant-return-value,missing-return,need-check-nil,undefined-field,cast-local-type,assign-type-mismatch,param-type-mismatch,cast-type-mismatch,return-type-mismatch,duplicate-doc-alias,undefined-doc-class,undefined-doc-name,circle-doc-class,undefined-doc-param,duplicate-doc-param,doc-field-no-class,duplicate-doc-field,unknown-diag-code,unknown-cast-variable,unknown-operator,codestyle-check,spell-check,newline-call,newfield-call,ambiguity-1,count-down-loop,different-requires,await-in-sync,not-yieldable,no-unknown,redefined-local,undefined-global,global-in-nil-env,lowercase-global,undefined-env-child,duplicate-index,duplicate-set-field,close-non-object,deprecated,discard-returns'
+                local diagnosticDisable = '---@diagnostic disable:' .. diagnostics .. '\n'
+                local diagnosticEnable = '---@diagnostic enable:' .. diagnostics .. '\n'
                 diffs[#diffs + 1] = {
                     start = 1,
                     finish = 1,
-                    text = repoFile:read("*a")
+                    text = diagnosticDisable .. repoContent .. diagnosticEnable .. text:sub(1, 1)
                 }
             end
         end
@@ -83,3 +90,5 @@ function OnSetText(uri, text)
 
     return diffs
 end
+
+print('[FA Plugin] FA plugin started')
