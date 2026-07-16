@@ -573,8 +573,10 @@ function table.filter(t, fn)
     return r
 end
 
---- Returns total count of values that match fn function or if values exist in table
---- @param fn is optional filtering function that is applied to each value of the table
+--- Returns total count of values that match function `fn`
+---@generic K, V
+---@param t table<K, V>
+---@param fn? fun(value: V): boolean # Defaults to checking if value is truthy
 function table.count(t, fn)
     if not t then return 0 end -- prevents looping over nil table
     if not fn then fn = function(v) return v end end
