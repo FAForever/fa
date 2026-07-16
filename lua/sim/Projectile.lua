@@ -354,6 +354,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
 
                 -- we have a target, but got caught by an (unexpected) shield
                 elseif targetType == 'Shield' then
+                    ---@cast targetEntity Shield
                     launcher:OnMissileImpactShield(self:GetCurrentTargetPosition(), targetEntity.Owner, position)
                 end
             end
