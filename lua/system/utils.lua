@@ -397,7 +397,7 @@ function table.reverse(t)
 end
 
 --- Combines a series of tables into one table. Returns a new table. The parameters are merged into the new table in order
----@see `table.assimilate`
+---@see table.assimilate
 ---@param ... table[]
 ---@return table
 function table.combine(...)
