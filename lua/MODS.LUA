@@ -466,8 +466,8 @@ function SetSelectedMods(selectedMods)
         LOG("Mod list set to:")
         for uid in selectedMods do
             local info = _mod_cache[uid]
-            LOG(string.format('\t"[%3s] %-30s v%02s (%-37s by %s'
-                , info.ui_only and 'UI' or 'SIM'
+            LOG(string.format('\t%-5s "%-30s v%02s (%-37s by %s'
+                , info.ui_only and '[UI]' or '[SIM]'
                 , tostring(info.name) .. '"'
                 , tostring(info.version)
                 , tostring(info.uid) .. ')'
