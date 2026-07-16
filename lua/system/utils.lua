@@ -352,7 +352,12 @@ end
 ---   for k,v in sortedpairs(t) do
 ---       print(k,v)
 ---   end
---- @param comp is an optional comparison function, defaulting to less-than.
+--- comp is an optional comparison function, defaulting to less-than.
+---@generic T
+---@generic k, v
+---@param t table<k, v>
+---@param comp? fun(a: T, b: T):boolean
+---@return fun(): k, v
 function sortedpairs(t, comp)
     local keys = table.keys(t, comp)
     local i=1
