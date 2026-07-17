@@ -733,7 +733,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         if self.InnerRing and self.OuterRing then
             local damageType = DamageData.DamageType or 'Nuke'
             self.InnerRing:DoNukeDamage(
-                self.Launcher,
+                instigator,
                 self:GetPosition(), -- can't use cachedPosition here: breaks invariant
                 self.Brain,
                 self.Army,
@@ -741,7 +741,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
             )
 
             self.OuterRing:DoNukeDamage(
-                self.Launcher,
+                instigator,
                 self:GetPosition(), -- can't use cachedPosition here: breaks invariant
                 self.Brain,
                 self.Army,
