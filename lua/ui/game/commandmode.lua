@@ -760,7 +760,7 @@ end
 --- If the callback returns true, it skips feedback blip and enhancement queue check logic.
 ---@param type UserCommandType
 ---@param callback nil | fun(command: UserCommand): skipFeedback: boolean
----@param id any
+---@param id string
 function SetOnCommandIssuedCallback(type, id, callback)
     local callbacks = HashedOnCommandIssuedCallbacks[type]
     if not callbacks and callback then
