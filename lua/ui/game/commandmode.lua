@@ -681,6 +681,9 @@ local OnCommandIssuedCallback = {
     Repair = OnRepairIssued,
 }
 
+---@type table<UserCommandType, table<string, fun(command: UserCommand): skipFeedback: boolean> | nil>
+local HashedOnCommandIssuedCallbacks = {}
+
 --- Called by the engine when a new command has been issued by the player.
 ---@param command UserCommand
 function OnCommandIssued(command)
@@ -692,10 +695,18 @@ function OnCommandIssued(command)
         issuedOneCommand = true
     end
 
-    -- If our callback returns true or we don't have a command type, we skip the rest of our logic
+    -- If one of our callbacks returns true or we don't have a command type, we skip the rest of our logic
     local commandType = command.CommandType
-    local cb = OnCommandIssuedCallback[commandType]
-    if (cb and cb(command))
+    local defaultCallback = OnCommandIssuedCallback[commandType]
+    local cbRet = defaultCallback and defaultCallback(command)
+    local callbacks = HashedOnCommandIssuedCallbacks[commandType]
+    if callbacks then
+        for _, callback in callbacks do
+            cbRet = callback(command) or cbRet
+        end
+    end
+
+    if cbRet
         or commandType == 'None'
     then
         -- we do still need to end the commandmode for things like HotBuild.
