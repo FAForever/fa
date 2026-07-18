@@ -216,6 +216,10 @@ local orderToCursorCallback = {
     RULEUCC_RetaliateToggle = nil,
 }
 
+--- Used by worldview for persistent command mode.
+---@see WorldView.HandleEvent
+local catchButtonRelease = false
+
 ---@class PingGroup : Group
 ---@field coords Vector2 # On-screen coordinates
 ---@field data SyncPingData
@@ -985,6 +989,22 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldVie
                 end
                 SetActiveBuildTemplate(template)
             end
+        end
+
+        if event.Type == 'ButtonPress' and event.Modifiers.Right then
+            local CM = import('/lua/ui/game/commandmode.lua')
+            local modeData = CM.GetCommandMode()[2]
+            if modeData.persistent then
+                CM.SetPersistentMode(false)
+                CM.EndCommandMode(true)
+                catchButtonRelease = true
+                return true
+            end
+
+        -- release of right mouse button causes the last given right click order to be re-issued, so we need to catch the release too
+        elseif event.Type == "ButtonRelease" and catchButtonRelease then
+            catchButtonRelease = false
+            return true
         end
 
         return false

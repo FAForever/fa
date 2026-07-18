@@ -102,10 +102,10 @@ local MathAtan = math.atan
 ---@class CommandModeDataBase
 ---@field cursor? CommandCap        # Similar to the field 'name'
 ---@field altCursor? string          # Allows for an alternative cursor
+---@field persistent? boolean
 
 ---@class CommandModeDataOrder : CommandModeDataBase
 ---@field name CommandCap
----@field consistent boolean    # Allows command mode to remain after you issue a command, without queueing the commands
 
 ---@class CommandModeDataBuild : CommandModeDataBase
 ---@field name string # blueprint id of the unit being built
@@ -195,6 +195,11 @@ end
 --- Called when the command mode ends and deconstructs all the data.
 ---@param isCancel boolean # set when we're at the end of (a sequence of) order(s), is usually always true. False when the mode is ended with right click, except for "ping" mode.
 function EndCommandMode(isCancel)
+    if modeData.persistent then
+        issuedOneCommand = false
+        return false
+    end
+
     if ignoreSelection then
         return
     end
@@ -728,6 +733,15 @@ function OnCommandModeBeat()
 end
 
 GameMain.AddBeatFunction(OnCommandModeBeat)
+
+---@param enable boolean
+function SetPersistentMode(enable)
+    if modeData then
+        modeData.persistent = enable or nil
+    else
+        WARN('SetPersistentMode run without mode data enabled! Check your command logic.', debug.traceback())
+    end
+end
 
 -- kept for mod backwards compatibility
 local Dragger = import("/lua/maui/dragger.lua").Dragger
