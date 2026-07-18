@@ -714,3 +714,21 @@ PersistentCommandModeAction = function(action, ...)
     end
     CM.SetPersistentMode(true)
 end
+
+StartFormationlessMoveNoClearCmds = function()
+    local CM = import('/lua/ui/game/commandmode.lua')
+    CM.StartCommandMode('order', { name = "RULEUCC_Move" })
+    CM.SetOnCommandIssuedCallback('Move', "FormationlessMove", function(command)
+        local cqueue = command.Units[1]:GetCommandQueue()
+        import("/lua/ui/game/hotkeys/distribute-queue.lua").DistributeOrders(false)
+        DeleteCommand(cqueue[1].ID)
+        return false
+    end)
+    CM.AddEndBehavior(function (mode, data)
+        CM.SetOnCommandIssuedCallback('Move', 'FormationlessMove', nil)
+    end)
+end
+
+StartPersistentFormationlessMoveNoClearCmds = function ()
+    PersistentCommandModeAction(StartFormationlessMoveNoClearCmds)
+end

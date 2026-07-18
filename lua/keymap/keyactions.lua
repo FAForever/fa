@@ -1657,7 +1657,11 @@ local keyActionsOrdersAdvanced = {
     ['shift_discharge'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DischargeShields()',
         category = 'ordersAdvanced',
-    }
+    },
+    ['move_persistent_distributing_no_clear'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").StartPersistentFormationlessMoveNoClearCmds()',
+        category = 'ordersAdvanced',
+    },
 }
 
 local keyActionsOrdersQueueBased = {
