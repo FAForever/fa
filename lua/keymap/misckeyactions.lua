@@ -693,3 +693,24 @@ SelectCommander = function(zoomTo)
         UIZoomTo(selectedUnits, 0)
     end
 end
+
+--- After running the given action, make the current command mode persistent,
+--- which means it doesn't end when shift is not pressed, and instead ends with right click.
+--- 
+--- If there is no current command mode, the action should start a command mode.
+--- 
+--- The action can be a function to call with given args or a string for a console command.
+---@generic T
+---@param action fun(...: T) | string
+---@param ... T # arguments for the action
+PersistentCommandModeAction = function(action, ...)
+    local CM = import('/lua/ui/game/commandmode.lua')
+    if iscallable(action) then
+        ---@cast action function
+        action(unpack(arg))
+    else
+        ---@cast action string
+        ConExecute(action)
+    end
+    CM.SetPersistentMode(true)
+end
