@@ -645,6 +645,7 @@ local function OnStopIssued(command)
 end
 
 -- Callbacks for different command types, nil values for reference to functions that don't exist yet
+---@type table<UserCommandType, (fun(command: UserCommand): skipFeedback: boolean) | nil>
 local OnCommandIssuedCallback = {
     None = nil,
     Stop = OnStopIssued,
@@ -681,21 +682,24 @@ local OnCommandIssuedCallback = {
 }
 
 --- Called by the engine when a new command has been issued by the player.
--- @param command Information surrounding the command that has been issued, such as its CommandType or its Target.
 ---@param command UserCommand
 function OnCommandIssued(command)
-    -- not command.Clear = when we hold shift, to queue up multiple commands.
-    if not command.Clear then
+    -- `command.Clear = false` when we hold shift, to queue up multiple commands.
+    local commandClear = command.Clear
+    if not commandClear then
         -- signal for OnCommandModeBeat to end commandMode at the next beat
         -- potentially removable? dont see the effect
         issuedOneCommand = true
     end
 
     -- If our callback returns true or we don't have a command type, we skip the rest of our logic
-    if (OnCommandIssuedCallback[command.CommandType] and OnCommandIssuedCallback[command.CommandType](command))
-    or command.CommandType == 'None' then
+    local commandType = command.CommandType
+    local cb = OnCommandIssuedCallback[commandType]
+    if (cb and cb(command))
+        or commandType == 'None'
+    then
         -- we do still need to end the commandmode for things like HotBuild.
-        if command.Clear and not modeData.persistent then
+        if commandClear and not modeData.persistent then
             -- but only when not using the cheat menu, which should stay open.
             if modeData and not modeData.cheat or not modeData then
                 EndCommandMode(true)
@@ -704,10 +708,10 @@ function OnCommandIssued(command)
         return
     end
 
-    if command.Clear and not modeData.persistent then
+    if commandClear and not modeData.persistent then
         EndCommandMode(true)
 
-        if command.CommandType ~= 'Stop'
+        if commandType ~= 'Stop'
             and TableGetN(command.Units) == 1
             and checkBadClean(command.Units[1])
         then
@@ -737,6 +741,21 @@ function SetPersistentMode(enable)
         modeData.persistent = enable or nil
     else
         WARN('SetPersistentMode run without mode data enabled! Check your command logic.', debug.traceback())
+    end
+end
+
+--- Set a callback by string identifier for when a command of a certain type is issued.
+--- 
+--- If the callback returns true, it skips feedback blip and enhancement queue check logic.
+---@param type UserCommandType
+---@param callback nil | fun(command: UserCommand): skipFeedback: boolean
+---@param id any
+function SetOnCommandIssuedCallback(type, id, callback)
+    local callbacks = HashedOnCommandIssuedCallbacks[type]
+    if not callbacks and callback then
+        HashedOnCommandIssuedCallbacks[type] = { [id] = callback }
+    elseif callbacks then
+        callbacks[id] = callback
     end
 end
 
