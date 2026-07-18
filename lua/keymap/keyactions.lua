@@ -1439,6 +1439,10 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").ToggleHardMove()',
         category = 'orders',
     },
+    ['move_persistent'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").PersistentCommandModeAction("StartCommandMode order RULEUCC_Move")',
+        category = 'orders',
+    },
     ['nuke'] = {
         action = 'StartCommandMode order RULEUCC_Nuke',
         category = 'orders',

@@ -139,6 +139,7 @@ keyDescriptions = {
     ['overcharge'] = '<LOC key_desc_0055>Overcharge',
     ['move'] = '<LOC key_desc_0065>Move',
     ['move_hard'] = '<LOC KEY_MOVE_HARD>Move order that you can consistently issue without queueing',
+    ['move_persistent'] = '<LOC key_move_persistent>Move order command that can be re-issued without holding shift (right click to exit mode).',
     ['nuke'] = '<LOC key_desc_0063>Nuke',
     ['mode'] = '<LOC key_desc_0101>Cycle through all of the available fire states.',
     ['dock'] = '<LOC key_desc_0405>Dock',
