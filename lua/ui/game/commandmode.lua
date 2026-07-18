@@ -195,11 +195,6 @@ end
 --- Called when the command mode ends and deconstructs all the data.
 ---@param isCancel boolean # set when we're at the end of (a sequence of) order(s), is usually always true. False when the mode is ended with right click, except for "ping" mode.
 function EndCommandMode(isCancel)
-    if modeData.persistent then
-        issuedOneCommand = false
-        return false
-    end
-
     if ignoreSelection then
         return
     end
@@ -700,7 +695,7 @@ function OnCommandIssued(command)
     if (OnCommandIssuedCallback[command.CommandType] and OnCommandIssuedCallback[command.CommandType](command))
     or command.CommandType == 'None' then
         -- we do still need to end the commandmode for things like HotBuild.
-        if command.Clear then
+        if command.Clear and not modeData.persistent then
             -- but only when not using the cheat menu, which should stay open.
             if modeData and not modeData.cheat or not modeData then
                 EndCommandMode(true)
@@ -709,7 +704,7 @@ function OnCommandIssued(command)
         return
     end
 
-    if command.Clear then
+    if command.Clear and not modeData.persistent then
         EndCommandMode(true)
 
         if command.CommandType ~= 'Stop'
@@ -726,7 +721,9 @@ end
 --- ???
 --- Ensures the command mode ends when one one command should be passed through?
 function OnCommandModeBeat()
-    if issuedOneCommand and not IsKeyDown('Shift')
+    if issuedOneCommand
+        and not IsKeyDown('Shift')
+        and modeData and not modeData.persistent
     then
         EndCommandMode(true)
     end
