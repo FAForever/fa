@@ -1,0 +1,1 @@
+- Add a persistent formationless move order that can be re-issued without holding shift and distributes orders after every command issued to break formations. (#7181)
