@@ -703,12 +703,14 @@ function OnCommandIssued(command)
         end
         return
     end
-    
+
     if command.Clear then
         EndCommandMode(true)
+
         if command.CommandType ~= 'Stop'
-        and TableGetN(command.Units) == 1
-        and checkBadClean(command.Units[1]) then
+            and TableGetN(command.Units) == 1
+            and checkBadClean(command.Units[1])
+        then
             watchForQueueChange(command.Units[1])
         end
     end
