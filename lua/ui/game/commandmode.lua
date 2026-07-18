@@ -83,7 +83,7 @@ local MathAtan = math.atan
 
 ---@class MeshInfo
 ---@field Position Vector
----@field Blueprint string
+---@field BlueprintID string
 ---@field TextureName string
 ---@field ShaderName string
 ---@field UniformScale number
