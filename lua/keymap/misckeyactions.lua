@@ -721,7 +721,7 @@ StartFormationlessMoveNoClearCmds = function()
     CM.SetOnCommandIssuedCallback('Move', "FormationlessMove", function(command)
         local cqueue = command.Units[1]:GetCommandQueue()
         import("/lua/ui/game/hotkeys/distribute-queue.lua").DistributeOrders(false)
-        DeleteCommand(cqueue[1].ID)
+        DeleteCommand(cqueue[table.getn(cqueue)].ID)
         return false
     end)
     CM.AddEndBehavior(function (mode, data)
