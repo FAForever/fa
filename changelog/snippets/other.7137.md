@@ -1,0 +1,1 @@
+- Add missing annotation for `CommonArmy` game option (#7137).

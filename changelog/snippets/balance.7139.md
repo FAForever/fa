@@ -1,0 +1,1 @@
+- Give an on-impact water vision radius of 4 to Aeon depth charges and the Solace's cluster torpedoes to be consistent with their normal on-impact vision (#7139).

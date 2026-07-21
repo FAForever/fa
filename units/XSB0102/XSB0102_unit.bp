@@ -47,15 +47,19 @@ UnitBlueprint{
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
         AnimationDeath = {
             {
-                Animation = "/units/xsb0102/xsb0102_ADeath.sca",
+                Animation = "/units/xsb0102/xsb0102_adeath.sca",
                 AnimationRateMax = 1,
                 AnimationRateMin = 1,
                 Weight = 100,
             },
         },
         AnimationUpgrade = "/units/xsb0102/xsb0102_aupgrade.sca",
+        AnimationUpgradeTable = {
+            xsb0202 = "/units/xsb0102/xsb0102_aupgrade.sca",
+            zsb9502 = "/units/xsb0102/xsb0102_aupgrade_sup.sca",
+        },
         BlinkingLights = {
-            { BLBone = 0,     BLOffsetX = 0,     BLOffsetY = 1.9,   BLOffsetZ = -1.45, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 0,    BLOffsetY = 3.8,   BLOffsetZ = -2.3, BLScale = 1 },
         },
         BlinkingLightsFx = {
             Green = "/effects/emitters/light_green_03_emit.bp",
@@ -166,9 +170,9 @@ UnitBlueprint{
     SelectionSizeX = 2.75,
     SelectionSizeZ = 2.75,
     SelectionThickness = 0.36,
-    SizeX = 2.5,
-    SizeY = 2.8,
-    SizeZ = 2.5,
+    SizeX = 3.5,
+    SizeY = 2.7,
+    SizeZ = 3.5,
     StrategicIconName = "icon_factory1_air",
     StrategicIconSortPriority = 220,
     Wreckage = {

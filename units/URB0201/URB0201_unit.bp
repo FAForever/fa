@@ -1,6 +1,17 @@
 UnitBlueprint{
     Description = "<LOC urb0201_desc>Land Factory HQ",
-    AI = {},
+    AI = {
+        TargetBones = {
+            "Attachpoint",
+            "B11",
+            "B15",
+            "B15",
+            "B12",
+            "B13",
+            "B01_1",
+            "B02_1",
+        },
+    },
     Audio = {
         Construct      = Sound { Bank = 'URB',        Cue = 'URB0201_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
         ConstructLoop  = Sound { Bank = 'URB',        Cue = 'URB0201_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
@@ -43,8 +54,8 @@ UnitBlueprint{
         AnimationBuild = "/units/urb0201/urb0201_abuild.sca",
         AnimationUpgrade = "/units/urb0201/urb0201_aopen.sca",
         BlinkingLights = {
-            { BLBone = 0,     BLOffsetX = 2.05,  BLOffsetY = 1.8,   BLOffsetZ = -0.35, BLScale = 1 },
-            { BLBone = 0,     BLOffsetX = -2.05, BLOffsetY = 1.8,   BLOffsetZ = -0.35, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 0.74,  BLOffsetY = 2.16,   BLOffsetZ = -1.15, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = -0.74, BLOffsetY = 2.16,   BLOffsetZ = -1.15, BLScale = 1 },
         },
         BlinkingLightsFx = {
             Green = "/effects/emitters/light_green_03_emit.bp",
@@ -169,9 +180,9 @@ UnitBlueprint{
     SelectionSizeX = 3.25,
     SelectionSizeZ = 3,
     SelectionThickness = 0.3,
-    SizeX = 2.9,
+    SizeX = 4.3,
     SizeY = 1,
-    SizeZ = 4.2,
+    SizeZ = 4.3,
     StrategicIconName = "icon_factoryhq2_land",
     StrategicIconSortPriority = 215,
     Wreckage = {

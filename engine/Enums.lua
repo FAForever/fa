@@ -132,8 +132,8 @@
 ---| "Invalid"
 ---| "Terrain"
 ---| "Water"
----| "Air"
----| "Underwater"
+---| "Air" # Caused by end of lifetime
+---| "Underwater" # Caused by end of lifetime
 ---| "Projectile"
 ---| "ProjectileUnderwater"
 ---| "Prop"

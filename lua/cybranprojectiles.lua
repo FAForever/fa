@@ -478,36 +478,42 @@ CNeutronClusterBombChildProjectile = ClassProjectile(SinglePolyTrailProjectile) 
 CNeutronClusterBombProjectile = ClassProjectile(SinglePolyTrailProjectile) {
     PolyTrail = '/effects/emitters/default_polytrail_03_emit.bp',
     ChildProjectile = '/projectiles/CIFNeutronClusterBomb02/CIFNeutronClusterBomb02_proj.bp',
+    Impacted = false,
 
     ---@param self CNeutronClusterBombProjectile
     OnCreate = function(self)
         SinglePolyTrailProjectile.OnCreate(self)
-        self.Impacted = false
     end,
 
     --- Note: Damage is done once in AOE by main projectile. Secondary projectiles
     --- are just visual.
     ---@param self CNeutronClusterBombProjectile
-    ---@param targetType string
+    ---@param targetType ImpactType
     ---@param targetEntity Unit
     OnImpact = function(self, targetType, targetEntity)
-        if self.Impacted == false and targetType ~= 'Air' then
+        if not self.Impacted and not targetEntity.DisallowCollisions then
             self.Impacted = true
-            local Random = Random 
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(0,Random(1,3),Random(1.5,3))
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(Random(1,2),Random(1,3),Random(1,2))
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(0,Random(1,3),-Random(1.5,3))
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(Random(1.5,3),Random(1,3),0)
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(-Random(1,2),Random(1,3),-Random(1,2))
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(-Random(1.5,2.5),Random(1,3),0)
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(-Random(1,2),Random(1,3),Random(2,4))
+
+            if targetType ~= 'Air' then
+                local Random = Random
+                local child = self.ChildProjectile
+
+                self:CreateChildProjectile(child):SetVelocity(0, Random(1,3), Random(1.5,3))
+                self:CreateChildProjectile(child):SetVelocity(Random(1,2), Random(1,3), Random(1,2))
+                self:CreateChildProjectile(child):SetVelocity(0, Random(1,3), -Random(1.5,3))
+                self:CreateChildProjectile(child):SetVelocity(Random(1.5,3), Random(1,3), 0)
+                self:CreateChildProjectile(child):SetVelocity(-Random(1,2), Random(1,3), -Random(1,2))
+                self:CreateChildProjectile(child):SetVelocity(-Random(1.5,2.5), Random(1,3), 0)
+                self:CreateChildProjectile(child):SetVelocity(-Random(1,2), Random(1,3), Random(2,4))
+            end
+
             SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
         end
     end,
 
     --- Overiding Destruction
     ---@param self CNeutronClusterBombProjectile
-    ---@param targetType string
+    ---@param targetType ImpactType
     ---@param targetEntity Unit
     OnImpactDestroy = function(self, targetType, targetEntity)
         self.Trash:Add(ForkThread(self.DelayedDestroyThread, self))

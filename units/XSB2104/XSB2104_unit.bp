@@ -1,5 +1,5 @@
 UnitBlueprint{
-    Description = "<LOC xsb2104_desc>Anti-Air Defense",
+    Description = "<LOC xsb2104_desc>Anti-Air Turret",
     Audio = {
         Destroyed      = Sound { Bank = 'XSL_Destroy',    Cue = 'XSB_Destroy_Huge',           LodCutoff = 'UnitMove_LodCutoff' },
         DoneBeingBuilt = Sound { Bank = 'XSB',            Cue = 'XSB2104_Activate',           LodCutoff = 'UnitMove_LodCutoff' },

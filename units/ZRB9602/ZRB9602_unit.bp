@@ -2,8 +2,11 @@ UnitBlueprint{
     Description = "<LOC zrb9602_desc>Air Factory",
     AI = {
         TargetBones = {
-            "ZRB9602",
-            "B08",
+            "B01",
+            "Arm04",
+            "B15",
+            "B05",
+            "B07",
         },
     },
     Audio = {
@@ -48,8 +51,8 @@ UnitBlueprint{
         AnimationBuild = "/units/zrb9602/zrb9602_abuild.sca",
         AnimationFinishBuildLand = "/units/zrb9602/zrb9602_aplatform.sca",
         BlinkingLights = {
-            { BLBone = 0,     BLOffsetX = 1.1,   BLOffsetY = 1.4,   BLOffsetZ = -1.9,  BLScale = 1 },
-            { BLBone = 0,     BLOffsetX = -1.1,  BLOffsetY = 1.4,   BLOffsetZ = -1.9,  BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 1.1,   BLOffsetY = 1.42,   BLOffsetZ = -1.9,  BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = -1.1,  BLOffsetY = 1.42,   BLOffsetZ = -1.9,  BLScale = 1 },
         },
         BlinkingLightsFx = {
             Green = "/effects/emitters/light_green_03_emit.bp",
@@ -177,7 +180,7 @@ UnitBlueprint{
     SelectionSizeZ = 3,
     SelectionThickness = 0.33,
     SizeX = 3.5,
-    SizeY = 0.75,
+    SizeY = 1,
     SizeZ = 3.5,
     StrategicIconName = "icon_factory3_air",
     StrategicIconSortPriority = 210,

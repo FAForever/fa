@@ -34,47 +34,35 @@ The workflow requires an approval of another maintainer. Once approved, wait for
 You can continue the deployment steps, but you can not finalize it until the server administrator got back to you that it is set. This may take an arbitrary amount of time so make sure this is done at least a week in advance.
 
 ### Preparation of Lua changes
+Most of the preparation steps are automated to reduce the likelihood of errors.
 
-- (0) Checkout on the [develop](https://github.com/FAForever/fa/tree/develop) branch and pull in the latest version. Make sure that there are no other open changes.
-- (1) Create a new branch that originates from [develop](https://github.com/FAForever/fa/tree/develop). We'll refer to this branch as the `changelog branch`.
-- (2) Generate the changelog using the [Changelog generation workflow](https://github.com/FAForever/fa/actions/workflows/docs-changelog.yaml) with the develop branch as target.
-- (3) Once the workflow is completed, navigate to the summary section and download the artifact that is created by the workflow.
-- (4) Save the generated changelog to a new file in the format `yyyy-mm-dd-game-version.md` in `docs/_posts`. As an example for a file name: `2024-08-03-3811.md`.
-- (5) Verify and update the content of the changelog is complete.
-- - (5.1) Add the front matter (what is in between `---`) at the top, for example:
+- (1) Push everything that you want to release from [develop](https://github.com/FAForever/fa/tree/develop) to the [staging/faf](https://github.com/FAForever/fa/tree/staging/faf) branch.
+- (2) Generate the necessary file changes and a changelog file using the [Prepare release workflow](https://github.com/FAForever/fa/actions/workflows/prepare-release.yaml). Add the correct date of the release.
+- (3) Once the workflow is completed, navigate to the pull request that has been created.
+- (4) Review the changelog and update the following:
 
-```markdown
----
-layout: post
-title: Game version 3811
-permalink: changelog/3811
----
-```
+- - (4.1) Add an introduction at the top of the changelog.
+- - (4.2) Add the contributors at the bottom.
+- - (4.3) If it is not one of the quarterly patches, change the title from `Game patch` to `Hotfix`
 
-- - (5.2) Add an introduction at the top of the changelog.
-- - (5.3) Add the contributors at the bottom.
+- (5) Commit these changes to the changelog branch.
+- (6) Allow some time for the other maintainers to review the changelog.
 
-- (6) commit this file to the changelog branch.
-- (7) Delete the current snippets.
-- (8) Update the game version in [mod_info.lua](https://github.com/FAForever/fa/blob/develop/mod_info.lua) and [version.lua](https://github.com/FAForever/fa/blob/develop/lua/version.lua).
-- (9) Update the latest version in [changelogData.lua](https://github.com/FAForever/fa/blob/develop/lua/ui/lobby/changelogData.lua) (at the top of the file) and add a short version of the patchnotes there. Add an explanation that players can use the in-game button to github to read the detailed changes.
-- (10) Push the changes to GitHub. Create a pull request on GitHub to allow other maintainers to review the changelog. Make sure the pull request points to [develop](https://github.com/FAForever/fa/tree/develop).
+At this point you need to wait until the changelog branch is merged.
 
-At this point you need to wait until the `changelog branch` is merged.
+- (7) Create a [release on GitHub](https://github.com/FAForever/fa/releases) that targets the [develop](https://github.com/FAForever/fa/tree/develop) branch.
+- - (7.1) Set the tag with the game version.
+- - (7.2) Match the format of the title with that of previous releases.
+- - (7.3) Paste a link to our changelog website.
+- - (7.4) Create the release.
 
-- (11) Create a [release on GitHub](https://github.com/FAForever/fa/releases) that targets the [develop](https://github.com/FAForever/fa/tree/develop) branch.
-- - (11.1) Set the tag with the game version.
-- - (11.2) Match the format of the title with that of previous releases.
-- - (11.3) Copy and paste the changelog into the description. Make sure to remove the title as a release has its own title.
-- - (11.4) Create the release.
-
-The github release will be where most players will read about the changes, so while not technically necessary for the deployment, it should be prepared before the actual deployment happens.
+This step is not technically necessary for the deployment, but it keeps the information on github in sync with our website.
 
 ### Deployment - final steps
 
-- (1) Push everything that you want to release from [develop](https://github.com/FAForever/fa/tree/develop) to the [staging/faf](https://github.com/FAForever/fa/tree/staging/faf) branch.
+Update the [staging/faf](https://github.com/FAForever/fa/tree/staging/faf) branch once more to include the committed changelog branch.
 
-- (2) Use the [Deploy to FAF Workflow](https://github.com/FAForever/fa/actions/workflows/deploy-faf.yaml) to perform the deployment.
+Use the [Deploy to FAF Workflow](https://github.com/FAForever/fa/actions/workflows/deploy-faf.yaml) to perform the deployment.
 
 The workflow requires an approval of another maintainer. Once approved, wait for the workflow to finish.
 You can then review the status of the deployment by the server in the [production environment](https://github.com/FAForever/fa/deployments/production). Once that returns green the deployment succeeded and you can inform the community of the deployment. Congratulations!
