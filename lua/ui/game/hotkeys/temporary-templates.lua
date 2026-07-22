@@ -49,7 +49,10 @@ local function TryBuildTemporaryTemplateForUnits(units)
         return true
     end
     ---@cast units -nil
-    TemplateUtils.CanUnitsBuildTemplate(units, template)
+    if not TemplateUtils.CanUnitsBuildTemplate(units, template) then
+        print('Selection cannot build Temporary Template')
+        return false
+    end
     CM.StartCommandMode('build', { name = firstBpId })
     SetActiveBuildTemplate(template)
     print('Activated Temporary Template')
