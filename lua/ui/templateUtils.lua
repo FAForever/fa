@@ -86,8 +86,8 @@ function GetTemplateOffsetToCenterBp(buildModeBp)
     return centerOffX, centerOffZ
 end
 
---- Gets an offset to add to template positions to center templates with units
---- that have odd-numbered footprint sizes, such as walls and SMD.
+--- Gets an offset to align templates with the world grid when using build command
+--- mode with a blueprint that has even-numbered footprint sizes, like SMD.
 ---@param unitbp UnitBlueprint
 ---@param axis 'SizeX' | 'SizeZ'
 ---@nodiscard
