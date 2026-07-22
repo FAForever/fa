@@ -62,9 +62,6 @@ function GetTemplateBpSkirtRectCoords(bp)
         local skirtDiff = bpPhysics.SkirtSizeX - footSizeX
         x0 = 0.5 - footSizeX + offX
         x1 = 0.5 + skirtDiff + offX
-        -- LOG(bp.BlueprintId)
-        -- LOG('coords x0', x0, 'x1', x1)
-        -- LOG('footSizeX', footSizeX, 'offX', offX, 'halfSkirtDiff', skirtDiff)
     end
     local footSizeZ = bpFoot.SizeZ
     if bpPhysics.SkirtSizeZ <= footSizeZ then
@@ -130,7 +127,6 @@ function CenterTemplateForBuildModeBp(template, buildModeBp)
     buildModeBp = buildModeBp or __blueprints[template[3][1]] --[[@as UnitBlueprint]]
 
     local mouseCenterOffX, mouseCenterOffZ = GetTemplateOffsetToCenterBp(buildModeBp)
-    LOG('mouseCenterOffX, mouseCenterOffZ', mouseCenterOffX, mouseCenterOffZ)
 
     local x0Min, z0Min, x1Max, z1Max = 10000, 10000, -10000, -10000
     for i = 3, table.getn(template) do
@@ -138,7 +134,6 @@ function CenterTemplateForBuildModeBp(template, buildModeBp)
         local bpId = nextBuilding[1]
         local bp = __blueprints[bpId] --[[@as UnitBlueprint]]
         local x0, z0, x1, z1 = GetTemplateBpSkirtRectCoords(bp)
-        LOG(string.format('skirt coords for %s: (%.1f, %.1f) (%.1f, %.1f) (before offsets)', bpId, x0, z0, x1, z1))
         local offX = nextBuilding[3] + mouseCenterOffX
         local offZ = nextBuilding[4] + mouseCenterOffZ
         nextBuilding[3] = offX
@@ -147,25 +142,15 @@ function CenterTemplateForBuildModeBp(template, buildModeBp)
         z0 = z0 + offZ
         x1 = x1 + offX
         z1 = z1 + offZ
-        LOG(string.format('skirt coords for %s: (%.1f, %.1f) (%.1f, %.1f) (after offsets)', bpId, x0, z0, x1, z1))
         x0Min = math.min(x0, x0Min)
         z0Min = math.min(z0, z0Min)
         x1Max = math.max(x1, x1Max)
         z1Max = math.max(z1, z1Max)
     end
-    -- x0Min = math.floor(x0Min)
-    -- z0Min = math.floor(z0Min)
-    -- x1Max = math.floor(x1Max)
-    -- z1Max = math.floor(z1Max)
-    LOG('x0Min, z0Min, x1Max, z1Max', x0Min, z0Min, x1Max, z1Max)
-    local sizeX = x1Max - x0Min
-    local sizeZ = z1Max - z0Min
-    LOG('sizeX, sizeZ', sizeX, sizeZ)
     -- Floor so that we don't break smooth movement of the template with
     -- an unnecessary 0.5 offset.
     local centerX = math.floor((x0Min + x1Max) / 2)
     local centerZ = math.floor((z0Min + z1Max) / 2)
-    LOG('centerX, centerZ', centerX, centerZ)
 
     for i = 3, table.getn(template) do
         local nextBuilding = template[i]
@@ -191,7 +176,6 @@ end
 ---@param template UIBuildTemplate
 ---@return boolean success
 function SaveTemporaryTemplate(template)
-    -- OffsetTemplateForBuildModeBp(template)
     CenterTemplateForBuildModeBp(template)
     local ok = VerifyTemplate(template)
     if not ok then
@@ -245,25 +229,6 @@ local function TryBuildTemporaryTemplateForUnits(units)
             print('No selection for building Temporary Template')
             return false
         end
-        -- xsb5101
-        -- local bpId = 'urb1301'
-        -- local bpId = 'uab4302'
-        -- local bpId = 'xsb1301'
-        -- local bpId = firstBpId
-        -- local bpPhysics = bp.Physics
-        -- LOG('GetBlueprintSkirtRect', repr(GetBlueprintSkirtRectCoords(bp)))
-        -- local offX, offZ = GetTemplateOffsetToCenterBp(bp)
-        -- ---@type UIBuildTemplate
-        -- template = {
-        --     bpPhysics.SkirtSizeX,
-        --     bpPhysics.SkirtSizeZ,
-        --     { bpId, 943
-        --         , offX
-        --         , offZ
-        --     },
-        -- }
-        LOG("Template placed:")
-        _ALERT(repr(template))
         CM.StartCommandMode('build', { name = firstBpId, cheat = true, army = GetFocusArmy(), yaw = 0 })
         SetActiveBuildTemplate(template)
         print('Activated Temporary Template (Cheat spawn mode)')
