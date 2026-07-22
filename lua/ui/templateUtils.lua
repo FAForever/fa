@@ -210,8 +210,7 @@ function CanUnitsBuildTemplate(units, template)
     buildables = EntityCategoryGetUnitList(buildables)
     local buildablesHashed = tableHash(buildables)
 
-    local n = tableGetN(template)
-    for i = 3, n do
+    for i = 3, tableGetN(template) do
         local bpId = template[i][1]
         if not buildablesHashed[bpId] then
             return false
