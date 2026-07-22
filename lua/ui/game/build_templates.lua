@@ -138,5 +138,5 @@ end
 
 
 --#region Backwards compatibility
-local TemplateAxisOffset = TemplateUtils.TemplateAxisOffset
+local TemplateAxisOffset = TemplateUtils.GetTemplateAlignmentAxisOffsetForBp
 --#endregion

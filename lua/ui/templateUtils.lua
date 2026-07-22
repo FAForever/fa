@@ -88,15 +88,15 @@ end
 
 --- Gets an offset to align templates with the world grid when using build command
 --- mode with a blueprint that has even-numbered footprint sizes, like SMD.
----@param unitbp UnitBlueprint
+---@param buildModeBp UnitBlueprint
 ---@param axis 'SizeX' | 'SizeZ'
 ---@nodiscard
 ---@return number # 0 or 0.5
-function TemplateAxisOffset(unitbp, axis)
+function GetTemplateAlignmentAxisOffsetForBp(buildModeBp, axis)
     return mathMod(
             mathCeil(
-                unitbp.Footprint and unitbp.Footprint[axis]
-                or unitbp[axis]
+                buildModeBp.Footprint and buildModeBp.Footprint[axis]
+                or buildModeBp[axis]
                 or 1
             )
             , 2
@@ -104,6 +104,15 @@ function TemplateAxisOffset(unitbp, axis)
         or 0.5
 end
 
+--- Gets the offsets to align templates with the world grid when using build command
+--- mode with a blueprint that has even-numbered footprint sizes, like SMD.
+---@param buildModeBp UnitBlueprint
+---@return number offX
+---@return number offZ
+function GetTemplateAlignmentOffsetsForBp(buildModeBp)
+    return GetTemplateAlignmentAxisOffsetForBp(buildModeBp, 'SizeX')
+        , GetTemplateAlignmentAxisOffsetForBp(buildModeBp, 'SizeZ')
+end
 
 --#endregion
 
@@ -134,8 +143,7 @@ end
 ---@return UIBuildTemplate offsetTemplate
 function OffsetTemplateForBuildModeBp(template, buildModeBlueprint)
     buildModeBlueprint = buildModeBlueprint or __blueprints[template[3][1]] --[[@as UnitBlueprint]]
-    local offX = TemplateAxisOffset(buildModeBlueprint, 'SizeX')
-    local offZ = TemplateAxisOffset(buildModeBlueprint, 'SizeZ')
+    local offX, offZ = GetTemplateAlignmentOffsetsForBp(buildModeBlueprint)
     if offX ~= 0 or offZ ~= 0 then
         OffsetTemplate(template, offX, offZ)
     end
