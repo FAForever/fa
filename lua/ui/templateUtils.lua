@@ -161,18 +161,21 @@ end
 function CenterTemplateForBuildModeBp(template, buildModeBp)
     buildModeBp = buildModeBp or __blueprints[template[3][1]] --[[@as UnitBlueprint]]
 
-    local mouseCenterOffX, mouseCenterOffZ = GetTemplateOffsetToCenterBp(buildModeBp)
+    local alignOffX, alignOffZ = GetTemplateAlignmentOffsetsForBp(buildModeBp)
 
     local x0Min, z0Min, x1Max, z1Max = 10000, 10000, -10000, -10000
     for i = 3, tableGetN(template) do
+        -- Offset template to align it with world grid
         local nextBuilding = template[i]
+        local offX = nextBuilding[3] + alignOffX
+        local offZ = nextBuilding[4] + alignOffZ
+        nextBuilding[3] = offX
+        nextBuilding[4] = offZ
+
+        -- While we're offsetting the template, collect skirt rect data.
         local bpId = nextBuilding[1]
         local bp = __blueprints[bpId] --[[@as UnitBlueprint]]
         local x0, z0, x1, z1 = GetTemplateBpSkirtRectCoords(bp)
-        local offX = nextBuilding[3] + mouseCenterOffX
-        local offZ = nextBuilding[4] + mouseCenterOffZ
-        nextBuilding[3] = offX
-        nextBuilding[4] = offZ
         x0 = x0 + offX
         z0 = z0 + offZ
         x1 = x1 + offX
