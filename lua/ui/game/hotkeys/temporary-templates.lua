@@ -22,8 +22,14 @@ function SaveTemporaryTemplate(template)
 end
 
 local function GenerateTemporaryTemplateFromSelection()
+    local oldTemplate = GetActiveBuildTemplate()
     GenerateBuildTemplateFromSelection()
     SaveTemporaryTemplate(GetActiveBuildTemplate())
+    if table.empty(oldTemplate) then
+        ClearBuildTemplates()
+    else
+        SetActiveBuildTemplate(oldTemplate)
+    end
 end
 
 --- Tries to start command mode with the Temporary Template, respecting build restrictions for the given units.
