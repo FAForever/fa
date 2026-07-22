@@ -11,45 +11,7 @@ local EntityCategoryGetUnitList = EntityCategoryGetUnitList
 
 -- Utilities that help work with UI build template data
 
---#region Template movement functions
-
---- Gets an offset to add to template positions to center templates with units
---- that have odd-numbered footprint sizes, such as walls and SMD.
----@param unitbp UnitBlueprint
----@param axis 'SizeX' | 'SizeZ'
----@return number # 0 or 0.5
-function TemplateAxisOffset(unitbp, axis)
-    return mathMod(
-            mathCeil(
-                unitbp.Footprint and unitbp.Footprint[axis]
-                or unitbp[axis]
-                or 1
-            )
-            , 2
-        ) == 1 and 0
-        or 0.5
-end
-
---- Offsets the given template in-place so that it moves smoothly with the mouse
---- when used in build command mode with the given blueprint.
---- 
---- Blueprint defaults to the bp for the first bp id in the template.
----@param template UIBuildTemplate
----@param buildModeBlueprint UnitBlueprint? # Defaults to the bp for the first bp id in the template.
----@return UIBuildTemplate offsetTemplate
-function OffsetTemplateForBuildModeBp(template, buildModeBlueprint)
-    buildModeBlueprint = buildModeBlueprint or __blueprints[template[3][1]] --[[@as UnitBlueprint]]
-    local offX = TemplateAxisOffset(buildModeBlueprint, 'SizeX')
-    local offZ = TemplateAxisOffset(buildModeBlueprint, 'SizeZ')
-    if offX ~= 0 or offZ ~= 0 then
-        for i = 3, tableGetN(template) do
-            local nextbp = template[i]
-            nextbp[3] = nextbp[3] + offX
-            nextbp[4] = nextbp[4] + offZ
-        end
-    end
-    return template
-end
+--#region Data calculation functions
 
 ---@param bp UnitBlueprint
 ---@nodiscard
@@ -121,6 +83,49 @@ function GetTemplateOffsetToCenterBp(buildModeBp)
         - bpPhysics.SkirtSizeZ / 2
         - bpPhysics.SkirtOffsetZ
     return centerOffX, centerOffZ
+end
+
+--- Gets an offset to add to template positions to center templates with units
+--- that have odd-numbered footprint sizes, such as walls and SMD.
+---@param unitbp UnitBlueprint
+---@param axis 'SizeX' | 'SizeZ'
+---@return number # 0 or 0.5
+function TemplateAxisOffset(unitbp, axis)
+    return mathMod(
+            mathCeil(
+                unitbp.Footprint and unitbp.Footprint[axis]
+                or unitbp[axis]
+                or 1
+            )
+            , 2
+        ) == 1 and 0
+        or 0.5
+end
+
+
+--#endregion
+
+--#region Template movement functions
+
+--- Offsets the given template in-place so that it moves smoothly with the mouse
+--- when used in build command mode with the given blueprint.
+--- 
+--- Blueprint defaults to the bp for the first bp id in the template.
+---@param template UIBuildTemplate
+---@param buildModeBlueprint UnitBlueprint? # Defaults to the bp for the first bp id in the template.
+---@return UIBuildTemplate offsetTemplate
+function OffsetTemplateForBuildModeBp(template, buildModeBlueprint)
+    buildModeBlueprint = buildModeBlueprint or __blueprints[template[3][1]] --[[@as UnitBlueprint]]
+    local offX = TemplateAxisOffset(buildModeBlueprint, 'SizeX')
+    local offZ = TemplateAxisOffset(buildModeBlueprint, 'SizeZ')
+    if offX ~= 0 or offZ ~= 0 then
+        for i = 3, tableGetN(template) do
+            local nextbp = template[i]
+            nextbp[3] = nextbp[3] + offX
+            nextbp[4] = nextbp[4] + offZ
+        end
+    end
+    return template
 end
 
 --- Centers the given template in-place so that it is centered on the build mode cursor. 
