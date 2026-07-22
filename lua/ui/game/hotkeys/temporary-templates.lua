@@ -37,25 +37,25 @@ local function TryBuildTemporaryTemplateForUnits(units)
         return false
     end
 
-    local firstBpId = template[3][1]
     if table.empty(units) then
         if cheatsEnabled ~= 'true' then
             print('No selection for building Temporary Template')
             return false
         end
-        CM.StartCommandMode('build', { name = firstBpId, cheat = true, army = GetFocusArmy(), yaw = 0 })
+        CM.StartCommandMode('build', { name = template[3][1], cheat = true, army = GetFocusArmy(), yaw = 0 })
         SetActiveBuildTemplate(template)
         print('Activated Temporary Template (Cheat spawn mode)')
-        return true
+    else
+        ---@cast units -nil
+        if not TemplateUtils.CanUnitsBuildTemplate(units, template) then
+            print('Selection cannot build Temporary Template')
+            return false
+        end
+        CM.StartCommandMode('build', { name = template[3][1] })
+        SetActiveBuildTemplate(template)
+        print('Activated Temporary Template')
     end
-    ---@cast units -nil
-    if not TemplateUtils.CanUnitsBuildTemplate(units, template) then
-        print('Selection cannot build Temporary Template')
-        return false
-    end
-    CM.StartCommandMode('build', { name = firstBpId })
-    SetActiveBuildTemplate(template)
-    print('Activated Temporary Template')
+
     return true
 end
 
