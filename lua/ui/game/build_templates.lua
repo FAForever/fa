@@ -43,16 +43,7 @@ function CreateBuildTemplate()
     local template = GetActiveBuildTemplate()
     ClearBuildTemplates()
     if next(template) then
-        local bp1 = __blueprints[ template[3][1] ] --[[@as UnitBlueprint]]
-        local bp1Xoffset = TemplateUtils.TemplateAxisOffset(bp1, 'SizeX')
-        local bp1Yoffset = TemplateUtils.TemplateAxisOffset(bp1, 'SizeZ')
-        if bp1Xoffset ~= 0 or bp1Yoffset ~= 0 then
-            for i = 3, table.getn(template) do
-                local nextbp = template[i]
-                nextbp[3] = nextbp[3] + bp1Xoffset
-                nextbp[4] = nextbp[4] + bp1Yoffset
-            end
-        end
+        TemplateUtils.OffsetTemplateForBuildModeBp(template)
         AddTemplate(template)
     end
 end
