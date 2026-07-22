@@ -7,6 +7,7 @@
 
 local Prefs = import("/lua/user/prefs.lua")
 local UIUtil = import("/lua/ui/uiutil.lua")
+local TemplateUtils = import('/lua/ui/templateUtils.lua')
 
 ---@type UIBuildTemplateData
 local templates = Prefs.GetFromCurrentProfile('build_templates') or {}
@@ -37,53 +38,14 @@ function AddTemplate(newTemplate)
     Prefs.SetToCurrentProfile('build_templates', templates)
 end
 
---- Gets an offset to add to template positions to center templates with units
---- that have odd-numbered footprint sizes, such as walls and SMD.
----@param unitbp UnitBlueprint
----@param axis 'SizeX' | 'SizeZ'
----@return number # 0 or 0.5
-local function TemplateAxisOffset(unitbp, axis)
-    return (math.mod(
-        math.ceil(
-            unitbp.Footprint and unitbp.Footprint[axis]
-            or unitbp[axis]
-            or 1
-        )
-        , 2
-        ) == 1 and 0
-        or 0.5
-    )
-end
-
---- Offsets the given template so that it moves smoothly with the mouse
---- when used in build command mode with the given blueprint.
---- 
---- Blueprint defaults to the bp for the first bp id in the template.
----@param template UIBuildTemplate
----@param buildModeBlueprint UnitBlueprint? # Defaults to the bp for the first bp id in the template.
----@return UIBuildTemplate centeredTemplate
-function OffsetTemplateForBuildModeBp(template, buildModeBlueprint)
-    buildModeBlueprint = buildModeBlueprint or __blueprints[template[3][1]] --[[@as UnitBlueprint]]
-    local bp1Xoffset = TemplateAxisOffset(buildModeBlueprint, 'SizeX')
-    local bp1Yoffset = TemplateAxisOffset(buildModeBlueprint, 'SizeZ')
-    if bp1Xoffset ~= 0 or bp1Yoffset ~= 0 then
-        for i = 3, table.getn(template) do
-            local nextbp = template[i]
-            nextbp[3] = nextbp[3] + bp1Xoffset
-            nextbp[4] = nextbp[4] + bp1Xoffset
-        end
-    end
-    return template
-end
-
 function CreateBuildTemplate()
     GenerateBuildTemplateFromSelection()
     local template = GetActiveBuildTemplate()
     ClearBuildTemplates()
     if next(template) then
         local bp1 = __blueprints[ template[3][1] ] --[[@as UnitBlueprint]]
-        local bp1Xoffset = TemplateAxisOffset(bp1, 'SizeX')
-        local bp1Yoffset = TemplateAxisOffset(bp1, 'SizeZ')
+        local bp1Xoffset = TemplateUtils.TemplateAxisOffset(bp1, 'SizeX')
+        local bp1Yoffset = TemplateUtils.TemplateAxisOffset(bp1, 'SizeZ')
         if bp1Xoffset ~= 0 or bp1Yoffset ~= 0 then
             for i = 3, table.getn(template) do
                 local nextbp = template[i]
