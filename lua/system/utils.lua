@@ -430,6 +430,9 @@ end
 --- it is useful for quickly looking up values in tables instead of looping over them
 --- table.hash { [1] = 'A',  [2] = 'B',  [3] = 'C',  [4] = 'C' } =>
 ---            { [A] = true, [B] = true, [C] = true }
+---@generic K, V
+---@param t table<K, V>
+---@return table<V, true>
 function table.hash(t)
     if not t then return {} end -- prevents looping over nil table
     local r = {}
