@@ -34,7 +34,7 @@ function OffsetTemplateForBuildModeBp(template, buildModeBlueprint)
         for i = 3, table.getn(template) do
             local nextbp = template[i]
             nextbp[3] = nextbp[3] + bp1Xoffset
-            nextbp[4] = nextbp[4] + bp1Xoffset
+            nextbp[4] = nextbp[4] + bp1Yoffset
         end
     end
     return template
