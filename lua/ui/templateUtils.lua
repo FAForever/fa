@@ -107,6 +107,22 @@ end
 
 --#region Template movement functions
 
+--- Offests the template in-place
+--- 
+--- You should only use offsets that are multiples of 0.5
+---@param template UIBuildTemplate
+---@param offX number
+---@param offZ number
+---@return UIBuildTemplate
+function OffsetTemplate(template, offX, offZ)
+    for i = 3, tableGetN(template) do
+        local buildData = template[i]
+        buildData[3] = buildData[3] + offX
+        buildData[4] = buildData[4] + offZ
+    end
+    return template
+end
+
 --- Offsets the given template in-place so that it moves smoothly with the mouse
 --- when used in build command mode with the given blueprint.
 --- 
@@ -119,11 +135,7 @@ function OffsetTemplateForBuildModeBp(template, buildModeBlueprint)
     local offX = TemplateAxisOffset(buildModeBlueprint, 'SizeX')
     local offZ = TemplateAxisOffset(buildModeBlueprint, 'SizeZ')
     if offX ~= 0 or offZ ~= 0 then
-        for i = 3, tableGetN(template) do
-            local nextbp = template[i]
-            nextbp[3] = nextbp[3] + offX
-            nextbp[4] = nextbp[4] + offZ
-        end
+        OffsetTemplate(template, offX, offZ)
     end
     return template
 end
@@ -165,12 +177,7 @@ function CenterTemplateForBuildModeBp(template, buildModeBp)
     local centerX = mathFloor((x0Min + x1Max) / 2)
     local centerZ = mathFloor((z0Min + z1Max) / 2)
 
-    for i = 3, tableGetN(template) do
-        local nextBuilding = template[i]
-        local offX, offZ = nextBuilding[3], nextBuilding[4]
-        nextBuilding[3] = offX - centerX
-        nextBuilding[4] = offZ - centerZ
-    end
+    OffsetTemplate(template, -centerX, -centerZ)
 
     return template
 end
