@@ -9,7 +9,7 @@ local Prefs = import("/lua/user/prefs.lua")
 local UIUtil = import("/lua/ui/uiutil.lua")
 local TemplateUtils = import('/lua/ui/templateUtils.lua')
 
----@type UIBuildTemplateData
+---@type UIBuildTemplateData[]
 local templates = Prefs.GetFromCurrentProfile('build_templates') or {}
 
 ---@param template UIBuildTemplate
@@ -38,6 +38,11 @@ function AddTemplate(newTemplate)
     Prefs.SetToCurrentProfile('build_templates', templates)
 end
 
+--#region Template Module functions
+-- These functions must have the same name as the ones in build_templates.lua
+-- due to the implementation of construction.lua.
+
+--- Creates a new build template and saves it.
 function CreateBuildTemplate()
     GenerateBuildTemplateFromSelection()
     local template = GetActiveBuildTemplate()
@@ -48,38 +53,38 @@ function CreateBuildTemplate()
     end
 end
 
-function Init()
-    import("/lua/ui/game/gamemain.lua").RegisterChatFunc(ReceiveTemplate, 'Template')
-end
-
-function ReceiveTemplate(sender, msg)
-    if Prefs.GetOption('accept_build_templates') ~= 'yes' then return end
-    local tab = import("/lua/ui/game/construction.lua").GetTabByID('templates')
-    if tab then
-        import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC('<LOC template_0000>Build Template Received'), tab, LOCF('<LOC template_0001>From %s', sender))
-    end
-    AddTemplate(msg.data)
-end
-
+--- Returns build templates from prefs.
+---@return UIBuildTemplateData[]
 function GetTemplates()
     return Prefs.GetFromCurrentProfile('build_templates')
 end
 
+--- Removes the build template with the given ID (an array index).
+---@param templateID integer
 function RemoveTemplate(templateID)
     table.remove(templates, templateID)
     Prefs.SetToCurrentProfile('build_templates', templates)
 end
 
+--- Renames the build template with the given ID (an array index).
+---@param templateID integer
+---@param name string
 function RenameTemplate(templateID, name)
     templates[templateID].name = name
     Prefs.SetToCurrentProfile('build_templates', templates)
 end
 
+--- Removes the build template with the given ID (an array index).
+---@param templateID integer
+---@param iconPath FileName
 function SetTemplateIcon(templateID, iconPath)
     templates[templateID].icon = iconPath
     Prefs.SetToCurrentProfile('build_templates', templates)
 end
 
+--- Shares to another army the build template with the given ID (an array index).
+---@param templateID integer
+---@param armyIndex integer
 function SendTemplate(templateID, armyIndex)
     armyIndex = armyIndex
     if table.getn(templates[templateID].templateData) > 22 then
@@ -90,6 +95,11 @@ function SendTemplate(templateID, armyIndex)
     SessionSendChatMessage(armyIndex, {Template = true, data = templates[templateID].templateData})
 end
 
+--- Sets a hotkey for the build template with the given ID (an array index).
+--- 
+--- Returns false if the hotkey is already in use by another build template.
+---@param templateID integer
+---@param key Keycode
 function SetTemplateKey(templateID, key)
     for i, template in templates do
         if i ~= templateID and template.key == key then
@@ -101,10 +111,31 @@ function SetTemplateKey(templateID, key)
     return true
 end
 
+--- Removes the hotkey for the build template with the given ID (an array index).
+---@param templateID integer
 function ClearTemplateKey(templateID)
     templates[templateID].key = nil
     Prefs.SetToCurrentProfile('build_templates', templates)
 end
+--#endregion
+
+--- Registered chat function for receiving templates from SendTemplate
+---@param sender string
+---@param msg table
+function ReceiveTemplate(sender, msg)
+    if Prefs.GetOption('accept_build_templates') ~= 'yes' then return end
+    local tab = import("/lua/ui/game/construction.lua").GetTabByID('templates')
+    if tab then
+        import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC('<LOC template_0000>Build Template Received'), tab, LOCF('<LOC template_0001>From %s', sender))
+    end
+    AddTemplate(msg.data)
+end
+
+--- Called in `gamemain.lua` `CreateUI`
+function Init()
+    import("/lua/ui/game/gamemain.lua").RegisterChatFunc(ReceiveTemplate, 'Template')
+end
+
 
 --#region Backwards compatibility
 local TemplateAxisOffset = TemplateUtils.TemplateAxisOffset
