@@ -1,4 +1,15 @@
--- Utilities that help modify UI template data
+local mathMod = math.mod
+local mathCeil = math.ceil
+local mathFloor = math.floor
+local mathMin = math.min
+local mathMax = math.max
+local tableGetN = table.getn
+local tableHash = table.hash
+
+local GetUnitCommandData = GetUnitCommandData
+local EntityCategoryGetUnitList = EntityCategoryGetUnitList
+
+-- Utilities that help work with UI build template data
 
 --#region Template movement functions
 
@@ -8,8 +19,8 @@
 ---@param axis 'SizeX' | 'SizeZ'
 ---@return number # 0 or 0.5
 function TemplateAxisOffset(unitbp, axis)
-    return math.mod(
-            math.ceil(
+    return mathMod(
+            mathCeil(
                 unitbp.Footprint and unitbp.Footprint[axis]
                 or unitbp[axis]
                 or 1
@@ -19,22 +30,22 @@ function TemplateAxisOffset(unitbp, axis)
         or 0.5
 end
 
---- Offsets the given template so that it moves smoothly with the mouse
+--- Offsets the given template in-place so that it moves smoothly with the mouse
 --- when used in build command mode with the given blueprint.
 --- 
 --- Blueprint defaults to the bp for the first bp id in the template.
 ---@param template UIBuildTemplate
 ---@param buildModeBlueprint UnitBlueprint? # Defaults to the bp for the first bp id in the template.
----@return UIBuildTemplate centeredTemplate
+---@return UIBuildTemplate offsetTemplate
 function OffsetTemplateForBuildModeBp(template, buildModeBlueprint)
     buildModeBlueprint = buildModeBlueprint or __blueprints[template[3][1]] --[[@as UnitBlueprint]]
-    local bp1Xoffset = TemplateAxisOffset(buildModeBlueprint, 'SizeX')
-    local bp1Yoffset = TemplateAxisOffset(buildModeBlueprint, 'SizeZ')
-    if bp1Xoffset ~= 0 or bp1Yoffset ~= 0 then
-        for i = 3, table.getn(template) do
+    local offX = TemplateAxisOffset(buildModeBlueprint, 'SizeX')
+    local offZ = TemplateAxisOffset(buildModeBlueprint, 'SizeZ')
+    if offX ~= 0 or offZ ~= 0 then
+        for i = 3, tableGetN(template) do
             local nextbp = template[i]
-            nextbp[3] = nextbp[3] + bp1Xoffset
-            nextbp[4] = nextbp[4] + bp1Yoffset
+            nextbp[3] = nextbp[3] + offX
+            nextbp[4] = nextbp[4] + offZ
         end
     end
     return template
@@ -112,7 +123,7 @@ function GetTemplateOffsetToCenterBp(buildModeBp)
     return centerOffX, centerOffZ
 end
 
---- Centers the given template onto the build mode cursor. 
+--- Centers the given template in-place so that it is centered on the build mode cursor. 
 --- Ensures smooth movement of the template in build mode.
 --- 
 --- Since the blueprint id passed to the build command is relevant to the template offsets relative to the mouse,
@@ -126,7 +137,7 @@ function CenterTemplateForBuildModeBp(template, buildModeBp)
     local mouseCenterOffX, mouseCenterOffZ = GetTemplateOffsetToCenterBp(buildModeBp)
 
     local x0Min, z0Min, x1Max, z1Max = 10000, 10000, -10000, -10000
-    for i = 3, table.getn(template) do
+    for i = 3, tableGetN(template) do
         local nextBuilding = template[i]
         local bpId = nextBuilding[1]
         local bp = __blueprints[bpId] --[[@as UnitBlueprint]]
@@ -139,20 +150,18 @@ function CenterTemplateForBuildModeBp(template, buildModeBp)
         z0 = z0 + offZ
         x1 = x1 + offX
         z1 = z1 + offZ
-        x0Min = math.min(x0, x0Min)
-        z0Min = math.min(z0, z0Min)
-        x1Max = math.max(x1, x1Max)
-        z1Max = math.max(z1, z1Max)
+        x0Min = mathMin(x0, x0Min)
+        z0Min = mathMin(z0, z0Min)
+        x1Max = mathMax(x1, x1Max)
+        z1Max = mathMax(z1, z1Max)
     end
     -- Floor so that we don't break smooth movement of the template with
     -- an unnecessary 0.5 offset.
-    local centerX = math.floor((x0Min + x1Max) / 2)
-    local centerZ = math.floor((z0Min + z1Max) / 2)
+    local centerX = mathFloor((x0Min + x1Max) / 2)
+    local centerZ = mathFloor((z0Min + z1Max) / 2)
 
-    for i = 3, table.getn(template) do
+    for i = 3, tableGetN(template) do
         local nextBuilding = template[i]
-        local bpId = nextBuilding[1]
-        local bp = __blueprints[bpId] --[[@as UnitBlueprint]]
         local offX, offZ = nextBuilding[3], nextBuilding[4]
         nextBuilding[3] = offX - centerX
         nextBuilding[4] = offZ - centerZ
@@ -164,6 +173,9 @@ end
 --#endregion
 --#region Template validation functions
 
+--- Returns true if the template has anything in the first building's blueprint id index.
+---@param template UIBuildTemplate
+---@return boolean
 function VerifyTemplate(template)
     local firstBpId = template[3][1]
     if not firstBpId then
@@ -180,9 +192,9 @@ end
 function CanUnitsBuildTemplate(units, template)
     local _, _, buildables = GetUnitCommandData(units --[[@as UserUnit[] ]])
     buildables = EntityCategoryGetUnitList(buildables)
-    local buildablesHashed = table.hash(buildables)
+    local buildablesHashed = tableHash(buildables)
 
-    local n = table.getn(template)
+    local n = tableGetN(template)
     for i = 3, n do
         local bpId = template[i][1]
         if not buildablesHashed[bpId] then
