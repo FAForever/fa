@@ -122,6 +122,7 @@ function SetupCampaignSession(scenario, difficulty, inFaction, campaignFlowInfo,
     Prefs.SetToCurrentProfile('LoadingFaction', faction)
 
     sessionInfo.scenarioMods = import("/lua/mods.lua").GetCampaignMods(sessionInfo.scenarioInfo)
+    sessionInfo.scenarioMods += import("/lua/mods.lua").GetUiMods(sessionInfo.scenarioInfo)
     LOG('sessioninfo: ', repr(sessionInfo.teamInfo))
     return sessionInfo
 end
@@ -375,7 +376,7 @@ function StartCommandLineSession(mapName, isPerfTest)
     end
 
     local sessionInfo
-    if scenario.type == 'campaign' then
+    if scenario.type == 'campaign' or scenario.type == 'campaign_coop' then
         local difficulty = 2
         if HasCommandLineArg("/diff") then
             difficulty = tonumber(GetCommandLineArg("/diff", 1)[1])--[[@as integer]]
