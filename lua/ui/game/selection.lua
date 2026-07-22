@@ -1,5 +1,5 @@
 local Prefs = import("/lua/user/prefs.lua")
-local gamemainSetIgnoreSelection = import("/lua/ui/game/gamemain.lua").SetIgnoreSelection
+local gameMainSetIgnoreSelection = import("/lua/ui/game/gamemain.lua").SetIgnoreSelection
 
 ---@alias SelectionSetDoubleTapBehavior
 --- | 'none'                        # When you double tap it will have no effect
@@ -46,17 +46,17 @@ function IsHidden()
 end
 
 function Hidden(callback)
-    local CM = import("/lua/ui/game/commandmode.lua")
-    local current_command = CM.GetCommandMode()
-    local old_selection = GetSelectedUnits() or {}
+    local commandMode = import("/lua/ui/game/commandmode.lua")
 
+    commandMode.CacheAndClearCommandMode()
     hidden_select = true
-    gamemainSetIgnoreSelection(true)
+    gameMainSetIgnoreSelection(true)
+    local oldSelection = GetSelectedUnits()
     callback()
-    SelectUnits(old_selection)
-    CM.StartCommandMode(current_command[1], current_command[2])
+    SelectUnits(oldSelection)
     hidden_select = false
-    gamemainSetIgnoreSelection(false)
+    gameMainSetIgnoreSelection(false)
+    commandMode.RestoreCommandMode(true)
 end
 
 --- Registers a callback that is called when a selection is set (flag set to false) and when it is used (flag set to true)
