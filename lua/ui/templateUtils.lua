@@ -58,6 +58,7 @@ end
 ---
 --- Ensures smooth movement for the given bp if it is used in a template.
 ---@param buildModeBp UnitBlueprint
+---@nodiscard
 ---@return number centerOffX
 ---@return number centerOffZ
 function GetTemplateOffsetToCenterBp(buildModeBp)
@@ -89,6 +90,7 @@ end
 --- that have odd-numbered footprint sizes, such as walls and SMD.
 ---@param unitbp UnitBlueprint
 ---@param axis 'SizeX' | 'SizeZ'
+---@nodiscard
 ---@return number # 0 or 0.5
 function TemplateAxisOffset(unitbp, axis)
     return mathMod(
@@ -187,6 +189,7 @@ end
 
 --- Returns true if the template has anything in the first building's blueprint id index.
 ---@param template UIBuildTemplate
+---@nodiscard
 ---@return boolean
 function VerifyTemplate(template)
     local firstBpId = template[3][1]
@@ -200,6 +203,7 @@ end
 --- Checks if command data of units allows building the template
 ---@param units UserUnit[]
 ---@param template UIBuildTemplate
+---@nodiscard
 ---@return boolean
 function CanUnitsBuildTemplate(units, template)
     local _, _, buildables = GetUnitCommandData(units --[[@as UserUnit[] ]])
