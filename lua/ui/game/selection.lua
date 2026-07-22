@@ -50,10 +50,12 @@ function Hidden(callback)
     local old_selection = GetSelectedUnits() or {}
 
     hidden_select = true
+    CM.SetIgnoreSelection(true)
     callback()
     SelectUnits(old_selection)
     CM.StartCommandMode(current_command[1], current_command[2])
     hidden_select = false
+    CM.SetIgnoreSelection(false)
 end
 
 --- Registers a callback that is called when a selection is set (flag set to false) and when it is used (flag set to true)
