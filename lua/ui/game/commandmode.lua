@@ -198,6 +198,7 @@ function EndCommandMode(isCancel)
     if ignoreSelection then
         return
     end
+    LOG('EndCommandMode with not ignored selection')
 
     -- in case we want to end the command mode, without knowing it has already ended or not
     if modeData then
