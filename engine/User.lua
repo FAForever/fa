@@ -124,6 +124,18 @@
 --- | 'NUMPAD_DECIMAL'
 --- | 'NUMPAD_DIVIDE'
 
+---@class UIBuildTemplateBuilding
+---@field [1] UnitId
+---@field [2] integer # build order
+---@field [3] integer # position x
+---@field [4] integer # position z
+
+---@class UIBuildTemplate
+---@field [1] integer        # width that is used when drag building the template
+---@field [2] integer        # height that is used when drag building the template
+---@field [3] UIBuildTemplateBuilding
+--@field [...] UIBuildTemplateBuilding
+
 --- Repeatedly the selection box of the unit to the hovered-over state to create a blinking effect
 ---@param entityId EntityId
 ---@param onTime number
