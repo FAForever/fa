@@ -78,7 +78,7 @@ function UseOrCreateTemporaryTemplate()
     end
 end
 
-function CreateTemporaryTemplate()
+function CreateTemporaryTemplateFromSelection()
     local selection = GetSelectedUnits()
     if not selection then
         print('No units selected for creating Temporary Template')
