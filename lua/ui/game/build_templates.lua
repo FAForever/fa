@@ -55,22 +55,25 @@ local function TemplateAxisOffset(unitbp, axis)
     )
 end
 
---- Centers the given template
+--- Offsets the given template so that it moves smoothly with the mouse
+--- when used in build command mode with the given blueprint.
+--- 
+--- Blueprint defaults to the bp for the first bp id in the template.
 ---@param template UIBuildTemplate
+---@param buildModeBlueprint UnitBlueprint? # Defaults to the bp for the first bp id in the template.
 ---@return UIBuildTemplate centeredTemplate
-function CenterTemplate(template)
-    local centeredTemplate = { template[1], template[2] }
-    local bp1 = __blueprints[ template[3][1] ] --[[@as UnitBlueprint]]
-    local bp1Xoffset = TemplateAxisOffset(bp1, 'SizeX')
-    local bp1Yoffset = TemplateAxisOffset(bp1, 'SizeZ')
+function OffsetTemplateForBuildModeBp(template, buildModeBlueprint)
+    buildModeBlueprint = buildModeBlueprint or __blueprints[template[3][1]] --[[@as UnitBlueprint]]
+    local bp1Xoffset = TemplateAxisOffset(buildModeBlueprint, 'SizeX')
+    local bp1Yoffset = TemplateAxisOffset(buildModeBlueprint, 'SizeZ')
     if bp1Xoffset ~= 0 or bp1Yoffset ~= 0 then
         for i = 3, table.getn(template) do
             local nextbp = template[i]
             nextbp[3] = nextbp[3] + bp1Xoffset
-            nextbp[4] = nextbp[4] + bp1Yoffset
+            nextbp[4] = nextbp[4] + bp1Xoffset
         end
     end
-    return centeredTemplate
+    return template
 end
 
 function CreateBuildTemplate()
