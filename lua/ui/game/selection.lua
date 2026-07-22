@@ -52,11 +52,14 @@ function Hidden(callback)
     hidden_select = true
     gameMainSetIgnoreSelection(true)
     local oldSelection = GetSelectedUnits()
-    callback()
+    local ok, msg = pcall(callback)
     SelectUnits(oldSelection)
     hidden_select = false
     gameMainSetIgnoreSelection(false)
     commandMode.RestoreCommandMode(true)
+    if not ok then
+        error(msg)
+    end
 end
 
 --- Registers a callback that is called when a selection is set (flag set to false) and when it is used (flag set to true)
