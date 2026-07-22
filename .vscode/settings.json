@@ -37,7 +37,8 @@
     "reprs",
     "reprsl",
     "__language",
-    "__installedlanguages"
+    "__installedlanguages",
+    "__blueprints"
   ],
   "Lua.format.defaultConfig": {
     "max_line_length": "unset",
