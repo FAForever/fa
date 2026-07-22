@@ -105,3 +105,7 @@ function ClearTemplateKey(templateID)
     templates[templateID].key = nil
     Prefs.SetToCurrentProfile('build_templates', templates)
 end
+
+--#region Backwards compatibility
+local TemplateAxisOffset = TemplateUtils.TemplateAxisOffset
+--#endregion
