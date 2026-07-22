@@ -1,15 +1,17 @@
+local Prefs = import("/lua/user/prefs.lua")
+local UIUtil = import("/lua/ui/uiutil.lua")
+
+-- This file is an implementation of factory queue templates, not a factory for templates.
+
 ---@class UIBuildTemplateData
 ---@field templateData UIBuildTemplate
 ---@field name string
 ---@field icon UnitId
 
-local Prefs = import("/lua/user/prefs.lua")
-
 ---@type UIBuildTemplateData[]
 local templates = Prefs.GetFromCurrentProfile('build_templates_factory') or {}
-local UIUtil = import("/lua/ui/uiutil.lua")
 
--- Utils
+--#region Utils
 function GetInitialName()
     local nextNum = 0
     for _, template in templates do
@@ -35,7 +37,13 @@ function GetInitialIcon(buildQueue)
     return 'default' -- If we don't find a valid IconName; return string 'default'
 end
 
--- Main functions
+--#endregion
+
+--#region Template Module functions
+-- These functions must have the same name as the ones in build_templates.lua
+-- due to the implementation of construction.lua.
+
+--#region Main functions
 function CreateBuildTemplate(buildQueue)
     if buildQueue and not table.empty(buildQueue) then
         PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Tab_Click_02'}))
@@ -50,8 +58,8 @@ end
 function GetTemplates()
     return Prefs.GetFromCurrentProfile('build_templates_factory')
 end
-
--- Options menu
+--#endregion
+--#region Template options context menu
 function RemoveTemplate(templateID)
     table.remove(templates, templateID)
     Prefs.SetToCurrentProfile('build_templates_factory', templates)
@@ -93,3 +101,5 @@ function ClearTemplateKey(templateID)
     templates[templateID].key = nil
     Prefs.SetToCurrentProfile('build_templates_factory', templates)
 end
+--#endregion
+--#endregion
