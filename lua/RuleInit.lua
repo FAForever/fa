@@ -10,7 +10,6 @@
 `BlueprintId` for units  
 `FileName` for projectiles and meshes (meshes have the file extension stripped)]]
 ---@type table<number | BlueprintId | FileName, UnitBlueprint | ProjectileBlueprint | MeshBlueprint>
----@diagnostic disable-next-line: lowercase-global
 __blueprints = {}
 
 doscript '/lua/system/config.lua'

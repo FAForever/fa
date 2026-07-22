@@ -43,7 +43,9 @@ ArmyBrains = {}
 function AddBuildRestriction(army, category)
 end
 
---- it is unknown what this function does or where it gets its value from
+--- it is unknown what this function fully does or where it gets its value from
+--- 
+--- Reduces damage dealt by this army after armor by dividing by `1 + handicap`.
 ---@param army Army
 ---@deprecated
 function ArmyGetHandicap(army)
