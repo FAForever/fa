@@ -51,7 +51,7 @@ VizMarker = Class(Entity) {
         if self.Radar != false then
             self:InitIntel(self.Army, 'Radar', self.Radius)
             self:EnableIntel('Radar')
-        end        
+        end
         if self.Vision != false then
             self:InitIntel(self.Army, 'Vision', self.Radius)
             self:EnableIntel('Vision')
@@ -81,7 +81,7 @@ VizMarker = Class(Entity) {
 }
 local PositionCache = { 0, 0, 0 }
 
---- Performance-wise a better alternative to the regular vision marker. 
+--- Performance-wise a better alternative to the regular vision marker.
 ---@class VisionMarkerOpti : Entity
 ---@overload fun(spec: EntitySpec): VisionMarkerOpti
 VisionMarkerOpti = Class(Entity) {
@@ -109,28 +109,28 @@ VisionMarkerOpti = Class(Entity) {
         if waterVision then
             self:InitIntel(army, 'WaterVision', radius)
             self:EnableIntel('WaterVision')
-        elseif waterVision == false then 
+        elseif waterVision == false then
             self:DisableIntel('WaterVision')
         end
 
         if radar then
             self:InitIntel(army, 'Radar', radius)
             self:EnableIntel('Radar')
-        elseif radar == false then 
+        elseif radar == false then
             self:DisableIntel('Radar')
         end
 
         if sonar then
             self:InitIntel(army, 'Sonar', radius)
             self:EnableIntel('Sonar')
-        elseif sonar == false then 
+        elseif sonar == false then
             self:DisableIntel('Sonar')
         end
 
         if omni then
             self:InitIntel(army, 'Omni', radius)
             self:EnableIntel('Omni')
-        elseif omni == false then 
+        elseif omni == false then
             self:DisableIntel('Omni')
         end
 
