@@ -287,7 +287,9 @@
 ---@field RateOfFire number
 --- if this weapon will find new target on miss events
 ---@field ReTargetOnMiss? boolean
---- if `true`, will set the orange work progress bar to display the reload progress of this weapon
+--- if `true`, will set the orange work progress bar to display the reload progress of this weapon.
+--- Should not be used for units with silo weapons, as the work progress of the reload will transfer
+--- as silo build progress after unit transfer.
 ---@field RenderFireClock? boolean
 --- used by the XSL0402 (Othuy "lighting storm") to define the time to re-aquire a new target before going
 --- through the next lighting strike process
