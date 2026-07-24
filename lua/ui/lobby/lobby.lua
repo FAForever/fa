@@ -2344,7 +2344,6 @@ local function TryLaunch(skipNoObserversCheck)
 
         --#region Filter GameOptions to remove options from disabled mods
 
-        local simMods = Mods.GetGameMods(gameInfo.GameMods)
         local enabledModUIDs = Mods.GetSelectedMods()
 
         -- Remove options from disabled mods
@@ -2389,7 +2388,7 @@ local function TryLaunch(skipNoObserversCheck)
         -- set the mods
         -- We don't broadcast them because its a huge table of type ModInfo[]
         -- Clients will set their mods independently in the `Launch` message handler
-        gameInfo.GameMods = simMods
+        gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
 
         SetWindowedLobby(false)
 
