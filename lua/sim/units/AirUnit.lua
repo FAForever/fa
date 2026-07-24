@@ -8,8 +8,6 @@ local EffectUtil = import("/lua/effectutilities.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local DefaultExplosions = import("/lua/defaultexplosions.lua")
 
-local VisionMarkerOpti = import('/lua/sim/VizMarker.lua').VisionMarkerOpti
-
 ---@class AirUnit : MobileUnit
 AirUnit = ClassUnit(MobileUnit) {
     -- Contrails
@@ -222,14 +220,13 @@ AirUnit = ClassUnit(MobileUnit) {
                 proj:Start(self, 0)
                 self.Trash:Add(proj)
 
-                -- Create a vision entity so vision shading is visible since dying
-                -- does not disable intel for air units while they fall through the air. 
+                -- Create an intel dummy so range rings and vision shading are visible since
+                -- dying does not disable intel for air units while they fall through the air. 
                 local x, y, z = self:GetPositionXYZ(0)
-                ---@type VisionMarkerOpti
-                local vizEnt = self.Trash:Add(VisionMarkerOpti({ Army = army }))
-                vizEnt:UpdateIntel(army, self:GetIntelRadius("Vision"), "Vision", true)
-                vizEnt:UpdatePosition(x, z)
-                vizEnt:AttachTo(self, 0)
+                local vizUnit = self.Trash:Add(CreateUnit('zxa0004', army, x, y, z, 0, 0, 0, 1) --[[@as ZXA0004]])
+                vizUnit:SetPositionXZ(x, z)
+                vizUnit:AttachTo(self, 0)
+                vizUnit:CopyAllIntelFrom(self)
             end
 
             self:VeterancyDispersal()

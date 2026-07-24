@@ -1,0 +1,26 @@
+UnitBlueprint {
+    Description = 'Range overlay dummy unit',
+    AI = {
+        GuardReturnRadius = 0,
+        StagingPlatformScanRadius = 0,
+    },
+    Categories = {
+        "DUMMYUNIT",
+        "INSIGNIFICANTUNIT",
+        "OVERLAYCOUNTERINTEL",
+        "OVERLAYOMNI",
+        "OVERLAYRADAR",
+        "OVERLAYSONAR",
+        "UNSPAWNABLE",
+        "UNTARGETABLE",
+    },
+    General = {
+        CapCost = 0,
+    },
+    Intel = {
+        VisionRadius = 0,
+        WaterVisionRadius = 0,
+    },
+    CollisionShape = "None",
+    LifeBarRender = false,
+}
