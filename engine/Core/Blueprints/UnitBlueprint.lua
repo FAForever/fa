@@ -1081,11 +1081,11 @@
 ---@field SpoofRadius { Max: number, Min: number }
 --- used by XSL0101 (Selen) to define how it needs to sit still while its cloak is enabled for it to work
 ---@field StealthWaitTime? number
---- how far the unit can see above water and land
+--- how far the unit can see above water and land. Defaults to 10
 ---@field VisionRadius number
 --- used by XSA0101 (Seraphim T1 air scout) to set its vision radius when it crashes
 ---@field VisionRadiusOnDeath? number
---- how far the unit can see underwater
+--- how far the unit can see underwater. Defaults to 10
 ---@field WaterVisionRadius number
 
 ---@class UnitBlueprintInterface
@@ -1156,7 +1156,9 @@
 --- Used by some build animations to scale their effects
 ---@field MeshExtentsZ number
 ---@field MinSpeedPercent number
---- method of locomotion
+--- method of locomotion.
+---
+--- Set by engine to `RULEUMT_None` if MaxSpeed = 0.
 ---@field MotionType UnitMotionType
 --- The occupy rectangles of the unit that will override the footprint. Every 4 numbers in the
 --- array define a occupation rectangle for the override (offsetX, offsetZ, sizeX, sizeZ).
