@@ -213,7 +213,7 @@
 --- sets `AlwaysRecheckTarget = false` and prevents automatic target resetting
 --- so that bombers don't retarget halfway through a bombing run
 ---@field NeedToComputeBombDrop? boolean
---- If the unit is set as "busy" while the weapon charges/reloads/fires. Set to `true` to allow
+--- Controls whether the unit is set as "busy" while the weapon charges/reloads/fires. Set to `true` to allow
 --- other weapons to fire/unit actions to occur while this weapon is working.
 ---@field NotExclusive? boolean
 ---@field NoPause any unused
