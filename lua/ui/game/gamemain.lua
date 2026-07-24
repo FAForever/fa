@@ -1140,7 +1140,7 @@ function QuickLoad(filename)
         local path = GetSpecialFilePath(Prefs.GetCurrentProfile().Name, filename, saveType)
         --#endregion
 
-        local statusStr = "Loading Quick Save..."
+        local statusStr = "<LOC saveload_QuickLoad>Loading Quick Save..."
         local status = UIUtil.ShowInfoDialog(GetFrame(0), statusStr)
 
         --#region Duplicate of `/lua/ui/dialogs/saveload.lua` `CreateLoadDialog` `DoLoad`
