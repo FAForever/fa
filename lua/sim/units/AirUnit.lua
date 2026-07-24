@@ -9,6 +9,7 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local DefaultExplosions = import("/lua/defaultexplosions.lua")
 
 ---@class AirUnit : MobileUnit
+---@field vizUnit ZXA0004? # intel dummy so range rings and vision shading are visible while dead and falling to the surface
 AirUnit = ClassUnit(MobileUnit) {
     -- Contrails
     ContrailEffects = { '/effects/emitters/contrail_polytrail_01_emit.bp', },
@@ -129,6 +130,9 @@ AirUnit = ClassUnit(MobileUnit) {
 
         self:DisableUnitIntel('Killed')
         self:DisableIntel('Vision') -- Disable vision seperately, it's not handled in DisableUnitIntel
+        if not IsDestroyed(self.vizUnit) then
+            self.vizUnit:Destroy()
+        end
         self:ForkThread(self.DeathThread, self.OverKillRatio)
     end,
 
@@ -221,9 +225,11 @@ AirUnit = ClassUnit(MobileUnit) {
                 self.Trash:Add(proj)
 
                 -- Create an intel dummy so range rings and vision shading are visible since
-                -- dying does not disable intel for air units while they fall through the air. 
+                -- dying does not disable intel for air units while they fall through the air.
+
                 local x, y, z = self:GetPositionXYZ(0)
                 local vizUnit = self.Trash:Add(CreateUnit('zxa0004', army, x, y, z, 0, 0, 0, 1) --[[@as ZXA0004]])
+                self.vizUnit = vizUnit
                 vizUnit:SetPositionXZ(x, z)
                 vizUnit:AttachTo(self, 0)
                 vizUnit:CopyAllIntelFrom(self)
