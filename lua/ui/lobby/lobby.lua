@@ -99,8 +99,9 @@ local AIOpts = lobbyOptions.AIOpts
 local gameColors = import("/lua/gamecolors.lua").GameColors
 
 -- Table mapping option keys to mods that use them
--- Format: { [optionKey] = { modName1 = true, modName2 = true, ... } }
----@type table<string, table<string, true>>
+--
+-- Format: `{ [optionKey] = { modUID = modName, modUID = modName, ... } }`
+---@type table<string, table<string, string>>
 local ModOptionMapping = {}
 
 -- Set of option keys from the original/default lobbyOptions.lua
@@ -125,13 +126,13 @@ function ImportModAIOptions()
     local simMods = import("/lua/mods.lua").AllMods()
     local OptionData
     local alreadyStored
-    for Index, ModData in simMods do
+    for _, ModData in simMods do
         if exists(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua') then
             OptionData = import(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua').AIOpts
-            for s, t in OptionData do
+            for _, t in OptionData do
                 -- check, if we have this option already stored
                 alreadyStored = false
-                for k, v in AIOpts do
+                for _, v in AIOpts do
                     if v.key == t.key then
                         if DebugComponent.EnabledLogging then
                             LOG(string.format(
@@ -151,7 +152,7 @@ function ImportModAIOptions()
                 -- Initialize the option's mod set
                 ModOptionMapping[t.key] = ModOptionMapping[t.key] or {}
                 -- Track that this option is used by this mod
-                ModOptionMapping[t.key][ModData.name] = true
+                ModOptionMapping[t.key][ModData.uid] = ModData.name
             end
         end
     end
@@ -170,13 +171,13 @@ end
 
 --- Helper function: Returns true if the given option is used by any of the given mods
 ---@param optionKey string
----@param enabledModNames table<string, true>
+---@param enabledModUIDs table<string, nonnil> # `table<modUID, unused>`
 ---@return boolean
-local function IsOptionUsedByGivenMods(optionKey, enabledModNames)
-    local modNamesUsingOpt = ModOptionMapping[optionKey]
-    if not modNamesUsingOpt then return false end
-    for modName, _ in modNamesUsingOpt do
-        if enabledModNames[modName] then
+local function IsOptionUsedByGivenMods(optionKey, enabledModUIDs)
+    local modUIDsUsingOpt = ModOptionMapping[optionKey]
+    if not modUIDsUsingOpt then return false end
+    for modUID, _ in modUIDsUsingOpt do
+        if enabledModUIDs[modUID] then
             return true
         end
     end
@@ -2344,11 +2345,7 @@ local function TryLaunch(skipNoObserversCheck)
         --#region Filter GameOptions to remove options from disabled mods
 
         local simMods = Mods.GetGameMods(gameInfo.GameMods)
-        -- Build set of enabled mod names for quick lookup
-        local enabledModNames = {}
-        for _, modInfo in simMods do
-            enabledModNames[modInfo.name] = true
-        end
+        local enabledModUIDs = Mods.GetSelectedMods()
 
         -- Remove options from disabled mods
         -- Only remove options that are not in the default lobbyOptions.lua
@@ -2357,7 +2354,7 @@ local function TryLaunch(skipNoObserversCheck)
             -- Skip if this is a default option (always keep default options)
             if not IsDefaultOption(optionKey) and ModOptionMapping[optionKey] then
                 -- Check if this option is used by an enabled mod
-                local isUsed = IsOptionUsedByGivenMods(optionKey, enabledModNames)
+                local isUsed = IsOptionUsedByGivenMods(optionKey, enabledModUIDs)
 
                 -- If NOT used, mark for removal
                 if not isUsed then
@@ -2365,7 +2362,7 @@ local function TryLaunch(skipNoObserversCheck)
                     if DebugComponent.EnabledSpewing then
                         SPEW(string.format('Option "%s" marked for removal because none of these mods are enabled: "%s"'
                             , optionKey
-                            , table.concatkeys(ModOptionMapping[optionKey], '", "')
+                            , table.concat(table.values(ModOptionMapping[optionKey]))
                         ))
                     end
                 end
