@@ -8,6 +8,8 @@ local EffectUtil = import("/lua/effectutilities.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local DefaultExplosions = import("/lua/defaultexplosions.lua")
 
+local VisionMarkerOpti = import('/lua/sim/VizMarker.lua').VisionMarkerOpti
+
 ---@class AirUnit : MobileUnit
 AirUnit = ClassUnit(MobileUnit) {
     -- Contrails
@@ -181,6 +183,8 @@ AirUnit = ClassUnit(MobileUnit) {
         if self:GetFractionComplete() == 1 and
             (self.Layer == 'Air' or EntityCategoryContains(categories.TRANSPORTATION, self))
         then
+            local army = self.Army
+
             self.Dead = true
             -- We want to skip all the visual/audio/shield bounce/death weapon stuff if we're in internal storage
             if type ~= "TransportDamage" then
@@ -217,11 +221,19 @@ AirUnit = ClassUnit(MobileUnit) {
                 self.colliderProj = proj
                 proj:Start(self, 0)
                 self.Trash:Add(proj)
+
+                -- Create a vision entity so vision shading is visible since dying
+                -- does not disable intel for air units while they fall through the air. 
+                local x, y, z = self:GetPositionXYZ(0)
+                ---@type VisionMarkerOpti
+                local vizEnt = self.Trash:Add(VisionMarkerOpti({ Army = army }))
+                vizEnt:UpdateIntel(army, self:GetIntelRadius("Vision"), "Vision", true)
+                vizEnt:UpdatePosition(x, z)
+                vizEnt:AttachTo(self, 0)
             end
 
             self:VeterancyDispersal()
 
-            local army = self.Army
             -- awareness for traitor game mode and game statistics
             ArmyBrains[army].LastUnitKilledBy = (instigator or self).Army
             ArmyBrains[army]:AddUnitStat(self.UnitId, "lost", 1)
