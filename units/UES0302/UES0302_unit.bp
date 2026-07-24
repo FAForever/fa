@@ -208,7 +208,7 @@ UnitBlueprint{
             BallisticArc = "RULEUBA_LowArc",
             CollideFriendly = false,
             Damage = 1000,
-            DamageRadius = 2,
+            DamageRadius = 3,
             DamageType = "Normal",
             DisplayName = "Gauss Cannon",
             FireTargetLayerCapsTable = { Water = "Land|Water|Seabed" },
