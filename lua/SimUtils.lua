@@ -1021,7 +1021,7 @@ local function KillUnits(toKill)
     end
 end
 
---- Kills all given units after a delay, if not already dead.
+--- Asynchronously kills all given units after a delay, if not already dead.
 ---@param toKill Entity[]
 ---@param delaySec number
 local function DelayedKillUnits(toKill, delaySec)
