@@ -83,13 +83,14 @@ local PositionCache = { 0, 0, 0 }
 
 --- Performance-wise a better alternative to the regular vision marker. 
 ---@class VisionMarkerOpti : Entity
+---@overload fun(spec: EntitySpec): VisionMarkerOpti
 VisionMarkerOpti = Class(Entity) {
 
     --- Update all intel types
-    ---@see `UpdateIntel` if you intend to apply only one intel type
-    ---@see `UpdatePosition`and `UpdateDuration` for additional functionality
+    ---@see VisionMarkerOpti.UpdateIntel if you intend to apply only one intel type
+    ---@see VisionMarkerOpti.UpdatePosition and `UpdateDuration` for additional functionality
     ---@param self VisionMarkerOpti
-    ---@param lifetime number       # Duration of the intel, if set to -1 it lasts indefinitely
+    ---@param lifetime number?      # Duration of the intel, if set to -1 it lasts indefinitely
     ---@param army number           # Army that we're creating intel for
     ---@param radius number         # Radius of the intel type(s)
     ---@param vision? boolean       # Intel type is enabled when true, disabled when false and left alone when nil
