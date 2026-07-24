@@ -9,8 +9,7 @@ local PositionCache = { 0, 0, 0 }
 ---@see VisionMarkerOpti # for just intel capabilities
 ---@class ZXA0004 : DummyUnit
 ZXA0004 = ClassUnit(DummyUnit) {
-
-    ---@param self ZXA0003
+    ---@param self ZXA0004
     OnCreate = function(self)
         DummyUnit.OnCreate(self)
     end,

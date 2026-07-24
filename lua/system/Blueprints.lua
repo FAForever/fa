@@ -420,7 +420,7 @@ local function StoreBlueprint(group, bp)
     local source
     local loadOrderTable = loadersPerBpId[id]
     local n
-    local orderNumber
+    local curSourceLoadOrderIndex
     if trackDependencies then
         source = GetSource()
         if not loadOrderTable then
@@ -436,9 +436,9 @@ local function StoreBlueprint(group, bp)
         -- prevent recursion
         reloadingBlueprint = false
         -- when we're reloading a single bp file, reload the precursor bps
-        orderNumber = loadOrderTable[source]
-        if orderNumber then
-            for i = 1, orderNumber - 1 do
+        curSourceLoadOrderIndex = loadOrderTable[source]
+        if curSourceLoadOrderIndex then
+            for i = 1, curSourceLoadOrderIndex - 1 do
                 local file = loadOrderTable[i]
                 LOG('Blueprints Reloading: reloading ' .. tostring(id) .. ' dependency from ' .. file)
                 safecall('Blueprints Reloading: reloading ' .. tostring(id) .. ' dependency from ' .. file, doscript, file)
@@ -460,11 +460,13 @@ local function StoreBlueprint(group, bp)
         -- prevent recursion
         reloadingBlueprint = false
         -- when we're reloading a single bp file, reload the dependent bps
-        n = TableGetn(loadOrderTable)
-        for i = loadOrderTable[source] + 1, n do
-            local file = loadOrderTable[i]
-            LOG('Blueprints Reloading: reloading ' .. tostring(id) .. ' dependent from ' .. file)
-            safecall('Blueprints Reloading: reloading ' .. tostring(id) .. ' dependent from ' .. file, doscript, file)
+        if curSourceLoadOrderIndex then
+            n = TableGetn(loadOrderTable)
+            for i = curSourceLoadOrderIndex + 1, n do
+                local file = loadOrderTable[i]
+                LOG('Blueprints Reloading: reloading ' .. tostring(id) .. ' dependent from ' .. file)
+                safecall('Blueprints Reloading: reloading ' .. tostring(id) .. ' dependent from ' .. file, doscript, file)
+            end
         end
         reloadingBlueprint = true
     end
