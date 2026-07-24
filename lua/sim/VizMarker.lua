@@ -133,6 +133,11 @@ VisionMarkerOpti = Class(Entity) {
         elseif omni == false then 
             self:DisableIntel('Omni')
         end
+
+        if lifetime >= 0 then
+            ---@cast lifetime -nil
+            self:UpdateDuration(lifetime)
+        end
     end,
 
     --- Updates the position of where the intel is shown
