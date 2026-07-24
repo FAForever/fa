@@ -5,6 +5,8 @@
 -- upvalues for performance
 local ArmyBrains = ArmyBrains
 local GetCurrentCommandSource = GetCurrentCommandSource
+local TableEmpty = table.empty
+local KillThread = KillThread
 
 ------------------------------------------------------------------------------------------------------------------------
 --#region General Unit Transfer Scripts
@@ -326,11 +328,8 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
             local unitEnh = SimUnitEnhancements[unit.EntityId]
             if unitEnh then
                 activeEnhancements = {}
-                for i, enh in unitEnh do
-                    activeEnhancements[i] = enh
-                end
-                if not activeEnhancements[1] then
-                    activeEnhancements = nil
+                for slot, enh in unitEnh do
+                    activeEnhancements[slot] = enh
                 end
             end
         end
@@ -420,8 +419,20 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         end
 
         if activeEnhancements then
-            for _, enh in activeEnhancements do
-                newUnit:CreateEnhancement(enh)
+            local thread = newUnit.OnStopBeingBuiltEnhancementsThread
+            if thread then KillThread(thread) end
+            if TableEmpty(activeEnhancements) then
+                newUnit.OnStopBeingBuiltEnhancementsThread = nil
+            else
+                newUnit.OnStopBeingBuiltEnhancementsThread = newUnit:ForkThread(function()
+                    WaitTicks(1)
+                    if newUnit and not newUnit.Dead and not IsDestroyed(newUnit) then
+                        for _, enh in activeEnhancements do
+                            newUnit:CreateEnhancement(enh)
+                        end
+                    end
+                    newUnit.OnStopBeingBuiltEnhancementsThread = nil
+                end)
             end
         end
 
@@ -738,6 +749,7 @@ function GiveUnitsToPlayer(data, units)
     if manualShare == 'none' or table.empty(units) then
         return
     end
+    ---@cast units -nil
     local toArmy = data.To
     local owner = units[1].Army
     if OkayToMessWithArmy(owner) and IsAlly(owner, toArmy) then
