@@ -1003,8 +1003,12 @@ function MergeWeaponByLabel(baseBp, label, insertPos, newBp)
     end
 
     for i, w in weaponTable do
+        local merged = false
         if w.Label == label then
             weaponTable[i] = BlueprintMerged(w, newBp)
+            merged = true
+        end
+        if merged then
             return
         end
     end

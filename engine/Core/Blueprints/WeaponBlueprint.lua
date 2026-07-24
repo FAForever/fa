@@ -21,6 +21,7 @@
 
 ---@class WeaponBlueprint: Blueprint
 --- During blueprint loading, which Label to look for when merging into a weapon blueprint.
+--- If the original weapon has multiple weapons with that label, they are all merged into.
 ---@field MergeLabel? string
 --- During blueprint loading, if `MergeLabel` is not found, which index the weapon should be added at.  
 --- For example, index 1 controls the unit's weapon AI. Defaults to adding to the end of the `Weapon` table.
