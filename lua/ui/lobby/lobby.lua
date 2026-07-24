@@ -189,6 +189,7 @@ local formattedOptions = {}
 local nonDefaultFormattedOptions = {}
 local LrgMap = false
 
+---@type UILobbyHostUtils
 local HostUtils
 local mapPreviewSlotSwapFrom = 0
 local mapPreviewSlotSwap = false
@@ -284,7 +285,7 @@ local commands = {
 
 local Strings = LobbyComm.Strings
 
----@type LobbyComm
+---@type UILobbyCommunication
 local lobbyComm = false
 local localPlayerName = ""
 local gameName = ""
@@ -2348,6 +2349,8 @@ local function TryLaunch(skipNoObserversCheck)
         lobbyComm:BroadcastData({ Type = 'Launch', GameInfo = gameInfo })
 
         -- set the mods
+        -- We don't broadcast them because its a huge table of type ModInfo[]
+        -- Clients will set their mods independently in the `Launch` message handler
         gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
 
         --#region Filter GameOptions to remove options from disabled mods
@@ -5191,7 +5194,7 @@ local FromSubjectOrHost = function(data)
     return false
 end
 
---
+---@class UIlobbyMessageHandlers
 local MessageHandlers = {
     -- Update player options. Either the host reconfiguring, or users tweaking their own settings.
     PlayerOptions = {
@@ -6928,6 +6931,7 @@ function InitHostUtils()
         return
     end
 
+    ---@class UILobbyHostUtils
     HostUtils = {
         --- Cause a player's ready box to become unchecked.
         --
