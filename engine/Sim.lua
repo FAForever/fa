@@ -1196,6 +1196,19 @@ end
 function SetIgnorePlayableRect(army, ignore)
 end
 
+--- Changes the distance at which the default navigator switches to a lower resolution
+--- pathfinding grid (from "personal" per-unit waypoints to waypoints shared by many units),
+--- typically resulting in units moving in columns over large distances instead of maintaining their formation.
+---
+--- Default engine value is 50.
+---
+--- Useful console commands for debugging: "dbg navwaypoints", "dbg navpath", "dbg navsteering"
+---
+--- Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/132
+---@param distance number
+function SetNavigatorPersonalPosMaxDistance(distance)
+end
+
 --- sets the playable area of a map
 ---@param minX number
 ---@param minZ number
