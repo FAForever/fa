@@ -26,6 +26,12 @@ AirUnit = ClassUnit(MobileUnit) {
         MobileUnitOnCreate(self)
         self.HasFuel = true
         self:AddPingPong()
+
+        local x, y, z = self:GetPositionXYZ(0)
+        local vizUnit = self.Trash:Add(CreateUnit('zxa0004', self.Army, x, y, z, 0, 0, 0, 1) --[[@as ZXA0004]])
+        self.vizUnit = vizUnit
+        vizUnit:SetPositionXZ(x, z)
+        vizUnit:AttachTo(self, 0)
     end,
 
     ---@param self AirUnit
@@ -226,13 +232,7 @@ AirUnit = ClassUnit(MobileUnit) {
 
                 -- Create an intel dummy so range rings and vision shading are visible since
                 -- dying does not disable intel for air units while they fall through the air.
-
-                local x, y, z = self:GetPositionXYZ(0)
-                local vizUnit = self.Trash:Add(CreateUnit('zxa0004', army, x, y, z, 0, 0, 0, 1) --[[@as ZXA0004]])
-                self.vizUnit = vizUnit
-                vizUnit:SetPositionXZ(x, z)
-                vizUnit:AttachTo(self, 0)
-                vizUnit:CopyAllIntelFrom(self)
+                self.vizUnit:CopyAllIntelFrom(self)
             end
 
             self:VeterancyDispersal()
