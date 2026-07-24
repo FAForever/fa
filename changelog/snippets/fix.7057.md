@@ -1,0 +1,1 @@
+- (#7057) Remove game options of unused mods from game launch info to try to get live replays to work.
