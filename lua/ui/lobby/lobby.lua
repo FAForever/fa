@@ -2341,22 +2341,12 @@ local function TryLaunch(skipNoObserversCheck)
 
         HostUtils.SendArmySettingsToServer()
 
-        -- Tell everyone else to launch and then launch ourselves.
-        -- TODO: Sending gamedata here isn't necessary unless lobbyComm is fucking stupid and allows
-        -- out-of-order message delivery.
-        -- Downlord: I use this in clients now to store the rehost preset. So if you're going to remove this, please
-        -- check if rehosting still works for non-host players.
-        lobbyComm:BroadcastData({ Type = 'Launch', GameInfo = gameInfo })
-
-        -- set the mods
-        -- We don't broadcast them because its a huge table of type ModInfo[]
-        -- Clients will set their mods independently in the `Launch` message handler
-        gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
-
         --#region Filter GameOptions to remove options from disabled mods
+
+        local simMods = Mods.GetGameMods(gameInfo.GameMods)
         -- Build set of enabled mod names for quick lookup
         local enabledModNames = {}
-        for _, modInfo in gameInfo.GameMods do
+        for _, modInfo in simMods do
             enabledModNames[modInfo.name] = true
         end
 
@@ -2391,14 +2381,25 @@ local function TryLaunch(skipNoObserversCheck)
         end
         --#endregion
 
+        -- Tell everyone else to launch and then launch ourselves.
+        -- TODO: Sending gamedata here isn't necessary unless lobbyComm is fucking stupid and allows
+        -- out-of-order message delivery.
+        -- Downlord: I use this in clients now to store the rehost preset. So if you're going to remove this, please
+        -- check if rehosting still works for non-host players.
+        ---@see UIlobbyMessageHandlers.Launch
+        lobbyComm:BroadcastData({ Type = 'Launch', GameInfo = gameInfo })
+
+        -- set the mods
+        -- We don't broadcast them because its a huge table of type ModInfo[]
+        -- Clients will set their mods independently in the `Launch` message handler
+        gameInfo.GameMods = simMods
+
         SetWindowedLobby(false)
 
         Presets.SaveLastGamePreset()
 
         -- launch the game
         lobbyComm:LaunchGame(gameInfo)
-
-        
     end
 
     LaunchGame()
