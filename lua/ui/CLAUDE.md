@@ -184,6 +184,32 @@ end,
 
 `TrashBag` is a weak table for values, so an item already destroyed elsewhere drops out automatically — `Destroy()` should always be idempotent. See [trashbag.lua:30-50](../system/trashbag.lua#L1-L50) for the contract.
 
+### ⚠️ A `Trash:Add(Derive(...))` with no strong reference gets garbage-collected
+
+This is the load-bearing reason the canonical pattern assigns to `self.Observer` **and** passes through `Trash:Add` — the two references do different jobs:
+
+- `self.Observer = …` is the **strong** reference that keeps the derived LazyVar alive.
+- `self.Trash:Add(…)` registers it for **teardown**, nothing more.
+
+`Trash:Add` does **not** keep its contents alive: `TrashBag` is `__mode = 'v'` (weak *values*, [trashbag.lua:40](../system/trashbag.lua#L40)), and a LazyVar's `used_by` (the subscriber list a source walks on `:Set`) is `__mode = 'k'` (weak *keys*, [lazyvar.lua:306](../lazyvar.lua#L306)). So a derived observer reachable **only** through those two tables has no strong referrer and is eligible for collection.
+
+```lua
+-- ❌ BUG: nothing holds the derived LazyVar strongly. It fires once on creation,
+--    then a GC pass collects it and it silently stops reacting to source changes.
+self.Trash:Add(LazyVarDerive(model.IsHost, function(isHostLazy)
+    self:OnHostChanged(isHostLazy())
+end))
+
+-- ✅ CORRECT: the self field is the strong ref; Trash:Add still handles teardown.
+self.IsHostObserver = self.Trash:Add(LazyVarDerive(model.IsHost, function(isHostLazy)
+    self:OnHostChanged(isHostLazy())
+end))
+```
+
+The failure mode is nasty because it's **timing-dependent and silent**: the observer's first synchronous fire works (before any GC), so initial render looks correct; only a *later* `source:Set` — after a GC cycle — fails to propagate, with no error. (Real example: a tab's host-only gear that stayed hidden because its visibility observer was collected before `IsHost` flipped to `true` at hosting time. The source's own `OnDirty` still fired — the source was strongly held by its model singleton — but the orphaned derived observer was already gone.)
+
+If you build observers in a loop (per row / per tab) and have no natural `self.X` name for each, keep them in a strong list field — `self.Observers = self.Observers or {}; table.insert(self.Observers, self.Trash:Add(Derive(...)))` — so the list holds them and the `Trash` still tears them down.
+
 ---
 
 ## 4. Layout — Fluent Layouter
@@ -223,6 +249,46 @@ self.SomeLine.Top:Set(scaled(20))
 ```
 
 If you find yourself reaching for `ScaleNumber` a lot, that's usually a sign you should be using `Layouter` instead.
+
+### Standard asset sizes — look them up, don't guess
+
+A `Button` (and most textured controls) sizes to its art by default, so the texture's width *is* the
+control width unless you override it. Don't eyeball these. Most textures' native (unscaled) sizes are
+dumped in [`/textures/texture-dimensions.csv`](/textures/texture-dimensions.csv)
+(`RelativePath, Width, Height, Format`) — grep it for the resolved path. **The `/BUTTON/` tree is not
+in that CSV**; read those from the DDS header instead (`od -An -t u4 -j 12 -N 8 <file>` → `height width`).
+`SkinnableFile` resolves `/BUTTON/`, `/scx_menu/`, `/dialogs/` to the active **faction** skin (`common`
+is only the fallback, and loads differently); `CreateButtonStd`/`CreateButtonWithDropshadow` append
+`_btn_{up,…}.dds`. Verified standard buttons (unscaled W × H): `/BUTTON/large/` **296 × 80**,
+`/BUTTON/medium/` **132 × 44** (these two are the lobby's Launch/Leave buttons — **there is no
+`/BUTTON/small/`**, referencing it makes the button invisible), `/scx_menu/small-btn/small` **200 × 72**
+(the map/mod dialogs' button), `/dialogs/close_btn/close` and gear menu-btns **24 × 24**. Don't confuse
+`/BUTTON/<size>/` with the separate `widgets/<size>_btn` family in the CSV (392/276/152 wide). Pre-scale —
+multiply by the UI scale.
+
+### Scrollbars — reserve the gutter on the content, not the bar
+
+`UIUtil.CreateVertScrollbarFor(content, offset_right)` sets `bar.Left = content.Right + offset_right` (`AnchorToRight`). The convention here: **inset the content's right edge by the gutter and attach the bar at offset 0** — the bar then sits in that reserved strip.
+
+```lua
+Layouter(self.Content):AtLeftIn(self, 6):AtRightIn(self, 32):End()  -- 32px gutter on the right
+self.Scrollbar = UIUtil.CreateVertScrollbarFor(self.Content)        -- offset 0 → bar sits in it
+```
+
+The standard gutter is **32px** (`/lua/ui/lobby/customlobby` is aligned to this). For a fixed-width grid the same reservation goes into the width math (`width = panelW - leftInset - 32`); right-aligned cell content (a value dropdown) then clears the bar automatically.
+
+- **Don't double-reserve.** Use *either* a content inset *or* a negative `offset_right` (e.g. `-32` on a full-width control), never both — combined they push the bar over the content.
+- **Pooled/virtualised lists** that attach the bar to themselves (`CreateVertScrollbarFor(self)`, rows full-width) put the bar just *outside* the list's right edge instead — a deliberate different idiom; a negative `offset_right` is the only way to inset those.
+- **TextArea**: bind `Width` in `Initialize` (post-mount), not `__post_init` — see the TextArea gotcha in the lobby CLAUDE.md.
+
+**The wheel only scrolls over the bar by default.** The engine routes `WheelRotation` to the scrollbar itself, so spinning the wheel over the *content* does nothing unless the content forwards it. Use `UIUtil.ForwardWheelToScroll(content, scrollable)` (chains any existing `HandleEvent`) right after creating the bar:
+
+```lua
+self.Scrollbar = UIUtil.CreateVertScrollbarFor(self.Grid)
+UIUtil.ForwardWheelToScroll(self.Grid, self.Grid)   -- wheel over the rows now scrolls too
+```
+
+It forwards with the explicit `"Vert"` axis: a native `Grid` indexes its scroll state by axis (a `nil` axis errors in [grid.lua](../maui/grid.lua) `ScrollLines`); single-axis scrollables (`ItemList`/`TextArea`, custom lists) ignore the argument. Wheel events bubble from rows/cells to the parent `Grid`/`ItemList`, so attaching to the scrollable itself is enough — and a child that consumes the wheel (e.g. a `Combo` adjusting its value) still wins, which is what you want.
 
 ### Reusing layout files
 

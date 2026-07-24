@@ -26,18 +26,31 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Group = import("/lua/maui/group.lua").Group
 
 local AutolobbyConnectionMatrixDot = import("/lua/ui/lobby/autolobby/autolobbyconnectionmatrixdot.lua")
+local AutolobbyModel = import("/lua/ui/lobby/autolobby/autolobbymodel.lua")
+
+local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
 ---@class UIAutolobbyConnectionMatrix : Group
+---@field Trash TrashBag
 ---@field PlayerCount number
+---@field Border any
+---@field Background Bitmap
 ---@field Elements UIAutolobbyConnectionMatrixDot[][]
+---@field ConnectionsObserver LazyVar
+---@field StatusesObserver LazyVar
+---@field OwnershipObserver LazyVar
+---@field IsAliveObserver LazyVar
 local AutolobbyConnectionMatrix = Class(Group) {
 
     ---@param self UIAutolobbyConnectionMatrix
     ---@param parent Control
-    __init = function(self, parent, playerCount)
+    __init = function(self, parent)
         Group.__init(self, parent, "AutolobbyConnectionMatrix")
 
-        self.PlayerCount = playerCount
+        self.Trash = TrashBag()
+
+        local model = AutolobbyModel.GetSingleton()
+        self.PlayerCount = model.PlayerCount()
 
         self.Border = UIUtil.SurroundWithBorder(self, '/scx_menu/lan-game-lobby/frame/')
         self.Background = UIUtil.CreateBitmapColor(self, '99000000')
@@ -50,6 +63,34 @@ local AutolobbyConnectionMatrix = Class(Group) {
                 self.Elements[y][x] = AutolobbyConnectionMatrixDot.Create(self)
             end
         end
+
+        -- hidden until we know of a peer; the observers below reveal it once
+        -- there is something to show
+        self:Hide()
+
+        -- subscribe to the model directly: each handler reads its LazyVar
+        -- (establishing the dependency edge) and feeds the dot grid
+        self.ConnectionsObserver = self.Trash:Add(
+            LazyVarDerive(model.Connections, function(connectionsLazy)
+                self:OnConnectionsChanged(connectionsLazy())
+            end))
+        self.StatusesObserver = self.Trash:Add(
+            LazyVarDerive(model.Statuses, function(statusesLazy)
+                self:OnStatusesChanged(statusesLazy())
+            end))
+        self.OwnershipObserver = self.Trash:Add(
+            LazyVarDerive(model.Ownership, function(ownershipLazy)
+                self:OnOwnershipChanged(ownershipLazy())
+            end))
+        self.IsAliveObserver = self.Trash:Add(
+            LazyVarDerive(model.IsAliveStamp, function(stampLazy)
+                self:OnIsAliveChanged(stampLazy())
+            end))
+    end,
+
+    ---@param self UIAutolobbyConnectionMatrix
+    OnDestroy = function(self)
+        self.Trash:Destroy()
     end,
 
     ---@param self UIAutolobbyConnectionMatrix
@@ -118,17 +159,74 @@ local AutolobbyConnectionMatrix = Class(Group) {
     ---@param self UIAutolobbyConnectionMatrix
     ---@param id number
     UpdateIsAliveTimestamp = function(self, id)
+        -- a StartSpot can fall outside the grid; guard the row lookup
+        if not self.Elements[id] then
+            return
+        end
         ---@type UIAutolobbyConnectionMatrixDot
         local dot = self.Elements[id][id]
         if dot then
             dot:SetIsAliveTimestamp(GetSystemTimeSeconds())
         end
     end,
+
+    ---------------------------------------------------------------------------
+    --#region Model observers
+
+    ---@param self UIAutolobbyConnectionMatrix
+    ---@param connections UIAutolobbyConnections
+    OnConnectionsChanged = function(self, connections)
+        if not connections then
+            return
+        end
+
+        -- reveal the matrix only once we actually know of a peer; the initial
+        -- (empty) derivation should not flash an empty grid on screen
+        if next(AutolobbyModel.GetSingleton().ConnectionMatrix()) then
+            self:Show()
+        end
+        self:UpdateConnections(connections)
+    end,
+
+    ---@param self UIAutolobbyConnectionMatrix
+    ---@param statuses UIAutolobbyStatus
+    OnStatusesChanged = function(self, statuses)
+        if not statuses then
+            return
+        end
+
+        if next(statuses) then
+            self:Show()
+        end
+        self:UpdateStatuses(statuses)
+    end,
+
+    ---@param self UIAutolobbyConnectionMatrix
+    ---@param ownership boolean[][] | false
+    OnOwnershipChanged = function(self, ownership)
+        if not ownership then
+            return
+        end
+
+        self:Show()
+        self:UpdateOwnership(ownership)
+    end,
+
+    ---@param self UIAutolobbyConnectionMatrix
+    ---@param stamp UIAutolobbyAliveStamp | false
+    OnIsAliveChanged = function(self, stamp)
+        if not stamp then
+            return
+        end
+
+        self:UpdateIsAliveTimestamp(stamp.Index)
+    end,
+
+    --#endregion
 }
 
 ---@param parent Control
----@param count number
 ---@return UIAutolobbyConnectionMatrix
-Create = function(parent, count)
-    return AutolobbyConnectionMatrix(parent, count)
+Create = function(parent)
+    return AutolobbyConnectionMatrix(parent)
 end

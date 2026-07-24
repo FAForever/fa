@@ -34,17 +34,9 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Group = import("/lua/maui/group.lua").Group
 local AutolobbyMapPreview = import("/lua/ui/lobby/autolobby/autolobbymappreview.lua")
 local AutolobbyConnectionMatrix = import("/lua/ui/lobby/autolobby/autolobbyconnectionmatrix.lua")
-
----@class UIAutolobbyInterfaceState
----@field PlayerCount number
----@field PlayerOptions? table<UILobbyPeerId, UIAutolobbyPlayer>
----@field PathToScenarioFile? FileName
----@field GameOptions? UILobbyLaunchGameOptionsConfiguration
----@field Connections? UIAutolobbyConnections
----@field Statuses? UIAutolobbyStatus
+local AutolobbyModel = import("/lua/ui/lobby/autolobby/autolobbymodel.lua")
 
 ---@class UIAutolobbyInterface : Group
----@field State UIAutolobbyInterfaceState
 ---@field BackgroundTextures string[]
 ---@field Background Bitmap
 ---@field Preview UIAutolobbyMapPreview
@@ -59,20 +51,18 @@ local AutolobbyInterface = Class(Group) {
         "/menus02/background-paint05_bmp.dds",
     },
 
+    -- Pure composition root: it builds and lays out the background, the map
+    -- preview and the connection matrix. It holds no model subscriptions —
+    -- each child subscribes to the model itself and owns its own visibility.
     ---@param self UIAutolobbyInterface
     ---@param parent Control
-    __init = function(self, parent, playerCount)
+    __init = function(self, parent)
         Group.__init(self, parent, "AutolobbyInterface")
-
-        -- initial, empty state
-        self.State = {
-            PlayerCount = playerCount
-        }
 
         local backgroundTexture = self.BackgroundTextures[math.random(1, 5)] --[[@as FileName]]
         self.Background = UIUtil.CreateBitmap(self, backgroundTexture)
         self.Preview = AutolobbyMapPreview.GetInstance(self)
-        self.ConnectionMatrix = AutolobbyConnectionMatrix.Create(self, playerCount)
+        self.ConnectionMatrix = AutolobbyConnectionMatrix.Create(self)
     end,
 
     ---@param self UIAutolobbyInterface
@@ -86,96 +76,18 @@ local AutolobbyInterface = Class(Group) {
             :Fill(self)
             :End()
 
+        -- position / size only; the preview and matrix manage their own
+        -- visibility from the model
         LayoutHelpers.ReusedLayoutFor(self.Preview)
             :AtCenterIn(self, -100, 0)
             :Width(400)
             :Height(400)
-            :Hide()
             :End()
 
         LayoutHelpers.ReusedLayoutFor(self.ConnectionMatrix)
             :CenteredBelow(self.Preview, 20)
-            :Hide()
             :End()
     end,
-
-    ---@param self UIAutolobbyInterface
-    ---@param ownership boolean[][]
-    UpdateOwnership = function(self, ownership)
-        self.State.OwnerShip = ownership
-
-        self.ConnectionMatrix:Show()
-        self.ConnectionMatrix:UpdateOwnership(ownership)
-    end,
-
-    ---@param self UIAutolobbyInterface
-    ---@param connections UIAutolobbyConnections
-    UpdateConnections = function(self, connections)
-        self.State.Connections = connections
-
-        self.ConnectionMatrix:Show()
-        self.ConnectionMatrix:UpdateConnections(connections)
-    end,
-
-    ---@param self UIAutolobbyInterface
-    ---@param statuses UIAutolobbyStatus
-    UpdateLaunchStatuses = function(self, statuses)
-        self.State.Statuses = statuses
-
-        self.ConnectionMatrix:Show()
-        self.ConnectionMatrix:UpdateStatuses(statuses)
-    end,
-
-    ---@param self UIAutolobbyInterface
-    ---@param pathToScenarioInfo FileName
-    ---@param playerOptions UIAutolobbyPlayer[]
-    UpdateScenario = function(self, pathToScenarioInfo, playerOptions)
-        self.State.PathToScenarioFile = pathToScenarioInfo
-        self.State.PlayerOptions = playerOptions
-
-        if pathToScenarioInfo and playerOptions then
-            -- hide it for now until we have a better way to decipher its possible (negative) impact
-            self.Preview:Show()
-            self.Preview:UpdateScenario(pathToScenarioInfo, playerOptions)
-        end
-    end,
-
-    ---@param self UIAutolobbyInterface
-    ---@param id number
-    UpdateIsAliveStamp = function(self, id)
-        self.ConnectionMatrix:UpdateIsAliveTimestamp(id)
-    end,
-
-    --#region Debugging
-
-    ---@param self UIAutolobbyInterface
-    ---@param state UIAutolobbyInterfaceState
-    RestoreState = function(self, state)
-        self.State = state
-
-        if state.PathToScenarioFile and state.PlayerOptions then
-            local ok, msg = pcall(self.UpdateScenario, self, state.PathToScenarioFile, state.PlayerOptions)
-            if not ok then
-                WARN(msg)
-            end
-        end
-
-        if state.Connections then
-            local ok, msg = pcall(self.UpdateConnections, self, state.Connections)
-            if not ok then
-                WARN(msg)
-            end
-        end
-
-        if state.Statuses then
-            local ok, msg = pcall(self.UpdateLaunchStatuses, self, state.Statuses)
-            if not ok then
-                WARN(msg)
-            end
-        end
-    end,
-
-    --#endregion
 }
 
 --- A trashbag that should be destroyed upon reload.
@@ -221,8 +133,10 @@ end
 ---@param newModule any
 function __moduleinfo.OnReload(newModule)
     if AutolobbyInterfaceInstance then
-        local handle = newModule.SetupSingleton(AutolobbyInterfaceInstance.State.PlayerCount)
-        handle:RestoreState(AutolobbyInterfaceInstance.State)
+        -- the model survives the reload (it is its own singleton), so a fresh
+        -- interface restores itself: its observers read the current model
+        -- values on their first fire. No manual state replay is needed.
+        newModule.SetupSingleton(AutolobbyModel.GetSingleton().PlayerCount())
     end
 end
 

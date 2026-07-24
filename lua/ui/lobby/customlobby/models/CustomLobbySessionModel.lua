@@ -1,0 +1,170 @@
+--******************************************************************************************************
+--** Copyright (c) 2026 FAForever
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
+
+-- The **session** state: host-dictated lobby-room management that is shared with everyone
+-- but is NOT part of the launched game. A closed slot just means "no army there" at launch
+-- and the slot count is map-derived presentation — neither reaches the scenario, so they
+-- live here rather than in the launch payload.
+--
+-- One of three lobby models — see /lua/ui/lobby/customlobby/CLAUDE.md:
+--   * LaunchModel   — shared, launched.
+--   * SessionModel  (this) — shared, lobby-room only.
+--   * LocalModel    — per-peer, never synced.
+--
+-- Synced host -> clients as a whole snapshot (CustomLobbyController.BroadcastSessionState).
+
+local Create = import("/lua/lazyvar.lua").Create
+local CustomLobbySession = import("/lua/ui/lobby/customlobby/customlobbysession.lua")
+
+-------------------------------------------------------------------------------
+--#region Reactive model
+--
+-- LIFETIME. A `ClassSimple` implementing `Destroyable`, registered in the session trash bag (see
+-- CustomLobbySession) on first access, so one `CustomLobbySession.Teardown()` resets it. Per the
+-- teardown design's decision #3 the write helpers stay **free functions** (below) and `Destroy` is
+-- **thin** (nil the module singleton; the LazyVars GC once the views observing them are torn down).
+
+-- The singleton, forward-declared above the class so `Destroy` captures it as an upvalue. Assigned in
+-- `SetupSingleton`, cleared in `Destroy`.
+---@type UICustomLobbySessionModel | nil
+local Instance = nil
+
+--- Reactive session-state singleton (shared, host-dictated, not launched).
+---@class UICustomLobbySessionModel : Destroyable
+---@field SlotCount   LazyVar<number>                    # player slots the current map supports
+---@field ClosedSlots LazyVar<table<number, boolean>>
+---@field LockedSlots LazyVar<table<number, boolean>>    # host pinned a seat: its player is held in place by auto-balance
+---@field SlotsPinned LazyVar<boolean>                   # host locked seating: only the host may change slots
+---@field Destroyed   boolean
+local SessionModel = ClassSimple {
+
+    ---@param self UICustomLobbySessionModel
+    ---@param slotCount? number
+    __init = function(self, slotCount)
+        self.SlotCount   = Create(slotCount or 8)
+        self.ClosedSlots = Create({})
+        self.LockedSlots = Create({})
+        self.SlotsPinned = Create(false)
+        self.Destroyed   = false
+    end,
+
+    --- `Destroyable`: thin teardown — drop the module singleton so the next session rebuilds (and
+    --- re-registers). The LazyVars GC once the views observing them are gone. Idempotent.
+    ---@param self UICustomLobbySessionModel
+    Destroy = function(self)
+        if self.Destroyed then
+            return
+        end
+        self.Destroyed = true
+        if Instance == self then
+            Instance = nil
+        end
+    end,
+}
+
+--- Allocates a fresh session-model singleton and registers it in the session trash.
+---@param slotCount? number
+---@return UICustomLobbySessionModel
+function SetupSingleton(slotCount)
+    Instance = SessionModel(slotCount)
+    CustomLobbySession.GetTrash():Add(Instance)
+    return Instance
+end
+
+--- Returns the session-model singleton, creating (and registering) it on first access.
+---@return UICustomLobbySessionModel
+function GetSingleton()
+    if not Instance then
+        SetupSingleton()
+    end
+    return Instance --[[@as UICustomLobbySessionModel]]
+end
+
+--#endregion
+
+-------------------------------------------------------------------------------
+--#region Write helpers
+
+--- Sets the number of active slots.
+---@param model UICustomLobbySessionModel
+---@param slotCount number
+function SetSlotCount(model, slotCount)
+    model.SlotCount:Set(slotCount)
+end
+
+--- Sets the closed flag for a slot (copy-then-Set).
+---@param model UICustomLobbySessionModel
+---@param slot number
+---@param closed boolean
+function SetClosed(model, slot, closed)
+    local closedSlots = table.copy(model.ClosedSlots())
+    closedSlots[slot] = closed
+    model.ClosedSlots:Set(closedSlots)
+end
+
+--- Sets the locked flag for a slot (copy-then-Set). A locked seat's player is held in place by
+--- auto-balance — see CustomLobbyBalancer.
+---@param model UICustomLobbySessionModel
+---@param slot number
+---@param locked boolean
+function SetLocked(model, slot, locked)
+    local lockedSlots = table.copy(model.LockedSlots())
+    lockedSlots[slot] = locked or nil
+    model.LockedSlots:Set(lockedSlots)
+end
+
+--- Sets whether seating is pinned (only the host may change slots while on).
+---@param model UICustomLobbySessionModel
+---@param pinned boolean
+function SetSlotsPinned(model, pinned)
+    model.SlotsPinned:Set(pinned and true or false)
+end
+
+--#endregion
+
+-------------------------------------------------------------------------------
+--#region Debugging
+
+--- Hot-reload hook: rebuilds the singleton and copies the current values across.
+---
+--- NOTE: maintained by hand — add a field to the model, add a copy line here too.
+---@param newModule any
+function __moduleinfo.OnReload(newModule)
+    if Instance then
+        local handle = newModule.SetupSingleton(Instance.SlotCount())
+        handle.ClosedSlots:Set(Instance.ClosedSlots())
+        handle.LockedSlots:Set(Instance.LockedSlots())
+        handle.SlotsPinned:Set(Instance.SlotsPinned())
+    end
+end
+
+--- Hot-reload hook: re-imports this module after a couple of frames.
+function __moduleinfo.OnDirty()
+    ForkThread(
+        function()
+            WaitFrames(2)
+            import(__moduleinfo.name)
+        end
+    )
+end
+
+--#endregion

@@ -76,7 +76,7 @@ function StartHostLobbyUI(protocol, port, playerName, gameName, mapFile, natTrav
     LOG("Hosting lobby from the command line")
     local lobby
     -- auto lobby only works with 2+ players
-    local autoStart = GetCommandLineArg("/players", 1)[1] >= 2
+    local autoStart = (GetCommandLineArg("/players", 1)[1] or 0) >= 2
     if autoStart then   
         lobby = import("/lua/ui/lobby/autolobby.lua")
     else
@@ -97,7 +97,7 @@ function StartJoinLobbyUI(protocol, address, playerName, natTraversalProvider)
     LOG("Joining lobby from the command line") -- can also be from lobby.lua ReturnToMenu(true), but that never gets called
     local lobby
     -- auto lobby only works with 2+ players
-    local autoStart = GetCommandLineArg("/players", 1)[1] >= 2
+    local autoStart = (GetCommandLineArg("/players", 1)[1] or 0) >= 2
     if autoStart then
         lobby = import("/lua/ui/lobby/autolobby.lua")
     else

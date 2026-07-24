@@ -57,7 +57,7 @@ AutolobbyArgumentsComponent = ClassSimple {
     },
 
     --- Verifies that it is an expected command line argument
-    ---@param self UIAutolobbyArgumentsComponent | UIAutolobbyCommunications
+    ---@param self UIAutolobbyArgumentsComponent | UIAutolobbyInstance
     ---@param option string
     ---@return boolean
     ValidCommandLineKey = function(self, option)
@@ -70,7 +70,7 @@ AutolobbyArgumentsComponent = ClassSimple {
     end,
 
     --- Attempts to retrieve a string-like command line argument
-    ---@param self UIAutolobbyArgumentsComponent | UIAutolobbyCommunications
+    ---@param self UIAutolobbyArgumentsComponent | UIAutolobbyInstance
     ---@param option string
     ---@param default string
     ---@return string
@@ -89,7 +89,7 @@ AutolobbyArgumentsComponent = ClassSimple {
     end,
 
     --- Attempts to retrieve a number-like command line argument
-    ---@param self UIAutolobbyArgumentsComponent | UIAutolobbyCommunications
+    ---@param self UIAutolobbyArgumentsComponent | UIAutolobbyInstance
     ---@param option string
     ---@param default number
     ---@return number
@@ -114,7 +114,7 @@ AutolobbyArgumentsComponent = ClassSimple {
     end,
 
     --- Attempts to retrieve a table-like command line argument
-    ---@param self UIAutolobbyArgumentsComponent | UIAutolobbyCommunications
+    ---@param self UIAutolobbyArgumentsComponent | UIAutolobbyInstance
     ---@param option string
     ---@return table<string, string>
     GetCommandLineArgumentArray = function(self, option)
