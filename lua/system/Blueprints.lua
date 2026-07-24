@@ -437,10 +437,12 @@ local function StoreBlueprint(group, bp)
         reloadingBlueprint = false
         -- when we're reloading a single bp file, reload the precursor bps
         orderNumber = loadOrderTable[source]
-        for i = 1, orderNumber - 1 do
-            local file = loadOrderTable[i]
-            LOG('Blueprints Reloading: reloading ' .. tostring(id) .. ' dependency from ' .. file)
-            safecall('Blueprints Reloading: reloading ' .. tostring(id) .. ' dependency from ' .. file, doscript, file)
+        if orderNumber then
+            for i = 1, orderNumber - 1 do
+                local file = loadOrderTable[i]
+                LOG('Blueprints Reloading: reloading ' .. tostring(id) .. ' dependency from ' .. file)
+                safecall('Blueprints Reloading: reloading ' .. tostring(id) .. ' dependency from ' .. file, doscript, file)
+            end
         end
         reloadingBlueprint = true
         LOG('Blueprints Reloading: storing ' .. tostring(id) .. ' changes from ' .. source)
