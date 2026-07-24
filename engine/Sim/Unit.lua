@@ -284,7 +284,7 @@ function Unit:GetTacticalSiloAmmoCount()
 end
 
 --- Returns our target unit if we have one
----@return Entity | Unit | nil
+---@return Entity | Unit | Prop | nil
 function Unit:GetTargetEntity()
 end
 
@@ -733,5 +733,9 @@ end
 ---@return boolean
 function Unit:TransportHasSpaceFor(target)
 end
+
+--- Called by the engine when the unit takes >= 2 times as much damage due to armor multi or handicap divisor.
+---@type fun(self: Unit, type: DamageType)
+Unit.OnExtraDamageDealt = nil
 
 return Unit

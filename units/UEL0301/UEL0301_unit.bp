@@ -50,7 +50,6 @@ UnitBlueprint{
         "REPAIR",
         "SELECTABLE",
         "SHOWQUEUE",
-        "SNIPEMODE",
         "SUBCOMMANDER",
         "TECH3",
         "UEF",
@@ -256,7 +255,7 @@ UnitBlueprint{
     },
     Enhancements = {
         AdvancedCoolingUpgrade = {
-            BuildCostEnergy = 40000,
+            BuildCostEnergy = 43900,
             BuildCostMass = 1000,
             BuildTime = 5060,
             Icon = "acu",
@@ -282,7 +281,7 @@ UnitBlueprint{
             Slot = "LCH",
         },
         HighExplosiveOrdnance = {
-            BuildCostEnergy = 25500,
+            BuildCostEnergy = 28600,
             BuildCostMass = 800,
             BuildTime = 3370,
             Icon = "heo",
@@ -418,9 +417,9 @@ UnitBlueprint{
             Slot = "LCH",
         },
         Shield = {
-            BuildCostEnergy = 90200,
-            BuildCostMass = 2000,
-            BuildTime = 8390,
+            BuildCostEnergy = 289000,
+            BuildCostMass = 1700,
+            BuildTime = 6950,
             Icon = "psg",
             ImpactEffects = "UEFShieldHit01",
             MaintenanceConsumptionPerSecondEnergy = 350,
@@ -445,9 +444,9 @@ UnitBlueprint{
             UpgradeUnitAmbientBones = { "UEL0301" },
         },
         ShieldGeneratorField = {
-            BuildCostEnergy = 187700,
-            BuildCostMass = 3500,
-            BuildTime = 15400,
+            BuildCostEnergy = 244700,
+            BuildCostMass = 3300,
+            BuildTime = 14500,
             Icon = "sgf",
             ImpactEffects = "UEFShieldHit01",
             ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01_mesh",
@@ -457,7 +456,7 @@ UnitBlueprint{
             Name = "<LOC enhancements_0074>Shield Generator Field",
             ShieldEnergyDrainRechargeTime = 5,
             ShieldMaxHealth = 22000,
-            ShieldRechargeTime = 110,
+            ShieldRechargeTime = 100,
             ShieldRegenRate = 160,
             ShieldRegenStartTime = 3,
             ShieldSize = 20,
@@ -636,7 +635,6 @@ UnitBlueprint{
             RateOfFire = 10/10, --10/integer interval in ticks
             TargetPriorities = {
                 "MOBILE EXPERIMENTAL",
-                "COMMAND",
                 "MOBILE TECH3",
                 "MOBILE TECH2",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",

@@ -55,7 +55,7 @@ local function ParsePriorities()
             end
             for _, priority in priorities do
                 if not finalPriorities[priority] then
-                    if StringFind(priority, '%(', 1, true) then
+                    if StringFind(priority, '(', 1, true) then
                         finalPriorities[priority] = ParseEntityCategoryProperly(priority)
                     else
                         finalPriorities[priority] = ParseEntityCategory(priority)

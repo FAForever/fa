@@ -149,6 +149,7 @@ categories = {
     OVERLAYOMNI = categoryValue,
     OVERLAYRADAR = categoryValue,
     OVERLAYSONAR = categoryValue,
+    -- Allows unit to reclaim and repair on patrol/aggressive move tasks.
     PATROLHELPER = categoryValue,
     PERSONALSHIELD = categoryValue,
     POD = categoryValue,

@@ -1,0 +1,1 @@
+- (#7138) Fix default target priorities that use parentheses to enable richer category parsing using normal category parsing instead.

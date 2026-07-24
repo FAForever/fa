@@ -1,0 +1,1 @@
+- (#7012) Annotate states and fix annotation warnings in `DefaultProjectileWeapon.lua`.

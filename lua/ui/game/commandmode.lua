@@ -258,6 +258,9 @@ end
 local commandModeTable = {}
 
 --- Retrieves the current command mode information.
+--- 
+--- Called by the engine for worldview right click action, left click action, and
+--- engine worldview HandleEvent.
 ---@return CommandModeTable
 function GetCommandMode()
     commandModeTable[1] = commandMode
