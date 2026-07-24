@@ -5,7 +5,7 @@ local Warp = Warp
 local PositionCache = { 0, 0, 0 }
 
 --- Dummy unit to provide intel capabilities and range rings for an army
---- 
+---
 ---@see VisionMarkerOpti # for just intel capabilities
 ---@class ZXA0004 : DummyUnit
 ZXA0004 = ClassUnit(DummyUnit) {
