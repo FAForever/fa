@@ -284,7 +284,7 @@ function Unit:GetTacticalSiloAmmoCount()
 end
 
 --- Returns our target unit if we have one
----@return Entity | Unit | nil
+---@return Entity | Unit | Prop | nil
 function Unit:GetTargetEntity()
 end
 

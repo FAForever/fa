@@ -36,8 +36,14 @@
 ---@field AimsStraightOnDisable boolean
 --- always recheck for better target regardless of whether you already have one or not
 ---@field AlwaysRecheckTarget boolean
+--- animation played by the weapon's Rack Salvo Charge Sequence
+---@field AnimationCharge? FileName
+--- How fast the charge animation runs
+---@field AnimationChargeRate? number
 --- animation played by the weapon's Rack Salvo Reload Sequence
 ---@field AnimationReload? FileName
+--- How fast the reload animation runs
+---@field AnimationReloadRate? number
 --- if an anti-artillery shield will block this projectile
 ---@field ArtilleryShieldBlocks? boolean
 --- information about the audio files used by the weapon
@@ -373,6 +379,8 @@
 --- as a moble artillery unit or when a unit is required to be stationary during an unpack / repack
 --- sequence.
 ---@field WeaponUnpackLocksMotion? boolean
+--- Deprecated. Use `WeaponUnpackLocksMotion` instead.
+---@field WeaponUnpackLockMotion? boolean
 --- time the unit will take to unpack the weapon
 ---@field WeaponUnpackTimeout? number
 --- if the weapon must unpack before it's ready to fire
