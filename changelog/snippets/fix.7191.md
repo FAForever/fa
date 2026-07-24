@@ -1,0 +1,1 @@
+- When using `MergeLabel` to merge weapon blueprints, merge into all weapon blueprints that have that label instead of merging into only one blueprint under the assumption that labels must be unique (#7191).
