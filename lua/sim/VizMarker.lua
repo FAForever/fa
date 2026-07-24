@@ -146,8 +146,8 @@ VisionMarkerOpti = Class(Entity) {
     ---@param z number
     UpdatePosition = function(self, x, z)
         PositionCache[1] = x
+        -- cache[2] doesn't need update since intel is independent of height
         PositionCache[3] = z
-        PositionCache[2] = GetTerrainHeight(x, z)
         Warp(self, PositionCache)
     end,
 
