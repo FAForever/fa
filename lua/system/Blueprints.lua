@@ -934,6 +934,7 @@ function PreModBlueprints(all_bps)
                 local insertPos = bpWeapon.AddIndex
                 MergeWeaponByLabel(bp, mergeLabel, insertPos, bpWeapon)
             end
+            bp.ModWeapon = nil
         end
 
         BlueprintLoaderUpdateProgress()
