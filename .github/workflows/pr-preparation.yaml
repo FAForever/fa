@@ -40,14 +40,13 @@ jobs:
         working-directory: changelog/snippets
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          IS_BALANCE: ${{ contains(github.event.pull_request.labels.*.name, 'area: balance') || contains(github.event.pull_request.labels.*.name, 'area: balance idea') }}
         run: |
           # Configure git
           git config user.email "github@faforever.com"
           git config user.name "FAForever Machine User"
 
-          LABELS="$(echo '${{ toJson(github.event.pull_request.labels) }}' | jq -r '.[].name')"
-
-          if echo "$LABELS" | grep -Eq '^(area: balance|area: balance idea)$'; then
+          if [ "$IS_BALANCE" = "true" ]; then
             FILE="balance.${PR_NUMBER}.md"
             cp sections/template-snippet-balance.md "$FILE"
             sed -i "s/PR_NUMBER/${PR_NUMBER}/g" "$FILE"
