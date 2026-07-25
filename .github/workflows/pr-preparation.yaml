@@ -40,21 +40,42 @@ jobs:
         working-directory: changelog/snippets
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          IS_BALANCE: "${{ contains(github.event.pull_request.labels.*.name, 'area: balance') || contains(github.event.pull_request.labels.*.name, 'area: balance idea') }}"
+          # Priority order as documented in /docs/development-changelog.md
+          IS_GRAPHICS: "${{ contains(github.event.pull_request.labels.*.name, 'area: graphics') }}"
+          IS_AI: "${{ contains(github.event.pull_request.labels.*.name, 'area: AI') }}"
+          # Performance snippet category - no associated label
+          IS_BALANCE: |
+            "${{ contains(github.event.pull_request.labels.*.name, 'area: balance') 
+              || contains(github.event.pull_request.labels.*.name, 'area: balance idea') 
+            }}"
+          # Features snippet category - no associated label
+          IS_FIX: "${{ contains(github.event.pull_request.labels.*.name, 'type: bug') }}"
+          IS_OTHER: | 
+            "${{ contains(github.event.pull_request.labels.*.name, 'area: documentation') 
+                || contains(github.event.pull_request.labels.*.name, 'area: tooling') 
+              }}"
         run: |
           # Configure git
           git config user.email "github@faforever.com"
           git config user.name "FAForever Machine User"
 
-          if [ "$IS_BALANCE" = "true" ]; then
-            FILE="balance.${PR_NUMBER}.md"
-            cp sections/template-snippet-balance.md "$FILE"
-            sed -i "s/PR_NUMBER/${PR_NUMBER}/g" "$FILE"
-          else
-            FILE="category.${PR_NUMBER}.md"
-            cp sections/template-snippet.md "$FILE"
-            sed -i "s/XYZW/${PR_NUMBER}/g" "$FILE"
+          category="category"
+          template="sections/template-snippet.md"
+          if [ "$IS_GRAPHICS" = "true" ]; then
+            category="graphics"
+          elif [ "$IS_AI" = "true" ]; then
+            category="ai"
+          elif [ "$IS_BALANCE" = "true" ]; then
+            category="balance"
+            template="sections/template-snippet-balance.md"
+          elif [ "$IS_FIX" = "true" ]; then
+            category="fix"
+          elif [ "$IS_OTHER" = "true" ]; then
+            category="other"
           fi
+          file="${category}.${PR_NUMBER}.md"
+          cp "$template" "$file"
+          sed -i "s/PR_NUMBER/${PR_NUMBER}/g" "$file"
 
           git add .
           git commit -m "Add snippet template"
