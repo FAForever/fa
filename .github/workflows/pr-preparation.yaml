@@ -40,7 +40,7 @@ jobs:
         working-directory: changelog/snippets
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          IS_BALANCE: ${{ contains(github.event.pull_request.labels.*.name, 'area: balance') || contains(github.event.pull_request.labels.*.name, 'area: balance idea') }}
+          IS_BALANCE: "${{ contains(github.event.pull_request.labels.*.name, 'area: balance') || contains(github.event.pull_request.labels.*.name, 'area: balance idea') }}"
         run: |
           # Configure git
           git config user.email "github@faforever.com"
