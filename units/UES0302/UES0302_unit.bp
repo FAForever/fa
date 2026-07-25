@@ -215,7 +215,7 @@ UnitBlueprint{
             FiringRandomness = 0.3,
             FiringTolerance = 2,
             Label = "FrontTurret01",
-            MaxRadius = 150,
+            MaxRadius = 148,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 30,
