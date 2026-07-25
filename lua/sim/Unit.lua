@@ -5,6 +5,9 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+local lastTick = 0
+local instigatorHits = setmetatable({}, {__mode='k'})
+
 -- Imports. Localise commonly used subfunctions for speed
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local EffectUtilities = import("/lua/effectutilities.lua")
@@ -1381,6 +1384,19 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         if self.CanTakeDamage then
 
+            local tick = GetGameTick()
+            local hits = instigatorHits[instigator]
+            if tick ~= lastTick then
+                if hits then
+                    instigator:DebugLog('num entities hit last time:', hits)
+                end
+                instigatorHits[instigator] = 1
+                lastTick = tick
+            else
+                if hits then
+                    instigatorHits[instigator] = hits + 1
+                end
+            end
             -- Pass damage to an active personal shield, as personal shields no longer have collisions
             local myShield = self.MyShield
             if myShield.ShieldType == "Personal" and myShield:IsUp() then
