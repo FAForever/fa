@@ -24,7 +24,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'UES',        Cue = 'UES0302_Move_Stop',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Naval',   LodCutoff = 'UnitMove_LodCutoff' },
     },
-    AverageDensity = 51000,
+    AverageDensity = 49500,
     BuildIconSortPriority = 20,
     Categories = {
         "ANTIMISSILE",
@@ -52,8 +52,8 @@ UnitBlueprint{
         AirThreatLevel = 6,
         ArmorType = "Normal",
         EconomyThreatLevel = 300,
-        Health = 51000,
-        MaxHealth = 51000,
+        Health = 49500,
+        MaxHealth = 49500,
         SurfaceThreatLevel = 15,
     },
     Display = {
