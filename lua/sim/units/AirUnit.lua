@@ -221,7 +221,7 @@ AirUnit = ClassUnit(MobileUnit) {
 
                 self:DisableUnitIntel('Killed')
 
-                if not self.Blueprint.CategoriesHash["SCOUT"] then
+                if not self.Blueprint.Air.EnableVisionWhileFalling then
                     self:DisableIntel('Vision') -- Disable vision seperately, it's not handled in DisableUnitIntel
                 else
                     -- Create a vision entity so vision shading is visible

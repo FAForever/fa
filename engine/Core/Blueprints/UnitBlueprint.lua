@@ -262,6 +262,9 @@
 ---@field TurnSpeed? number
 --- if the unit uses wings for forward flight
 ---@field Winged? boolean
+--- if the unit gives vision after it dies and before it impacts the ground or water
+--- Defaults to true for `SCOUT` category air units
+---@field EnableVisionWhileFalling? boolean
 
 
 ---@class UnitBlueprintAdjacency
