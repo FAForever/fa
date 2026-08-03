@@ -624,11 +624,19 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         -- put the player where it belongs
         self.PlayerOptions[playerOptions.StartSpot] = playerOptions
 
-        -- send all player options to the server, this is necessary to do immediately (for the host) so that the server knows who is (not) connected. 
-        for slot, otherPlayerOptions in self.PlayerOptions do
+        -- Army numbers need to be calculated: they are numbered incrementally in slot order.
+        local slots = {}
+        for slotIndex, _ in pairs(self.PlayerOptions) do
+            table.insert(slots, slotIndex)
+        end
+        table.sort(slots)
+
+        -- send player options to the server
+        for armyIndex, slotIndex in ipairs(slots) do
+            local otherPlayerOptions = self.PlayerOptions[slotIndex]
             local ownerId = otherPlayerOptions.OwnerID
             self:SendPlayerOptionToServer(ownerId, 'Team', otherPlayerOptions.Team)
-            self:SendPlayerOptionToServer(ownerId, 'Army', otherPlayerOptions.StartSpot)
+            self:SendPlayerOptionToServer(ownerId, 'Army', armyIndex)
             self:SendPlayerOptionToServer(ownerId, 'StartSpot', otherPlayerOptions.StartSpot)
             self:SendPlayerOptionToServer(ownerId, 'Faction', otherPlayerOptions.Faction)
         end
