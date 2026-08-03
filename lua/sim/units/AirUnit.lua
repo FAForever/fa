@@ -220,17 +220,19 @@ AirUnit = ClassUnit(MobileUnit) {
                 self.Trash:Add(proj)
 
                 self:DisableUnitIntel('Killed')
-                self:DisableIntel('Vision') -- Disable vision seperately, it's not handled in DisableUnitIntel
 
-                -- Create a vision entity so vision shading is visible since dying
-                -- does not disable intel for air units while they fall through the air. 
+                if not self.Blueprint.CategoriesHash["SCOUT"] then
+                    self:DisableIntel('Vision') -- Disable vision seperately, it's not handled in DisableUnitIntel
+                else
+                    -- Create a vision entity so vision shading is visible
 
-                local x, y, z = self:GetPositionXYZ(0)
-                ---@type VisionMarkerOpti
-                local vizEnt = self.Trash:Add(VisionMarkerOpti({ Army = army }))
-                vizEnt:UpdateIntel(army, self:GetIntelRadius("Vision"), "Vision", true)
-                vizEnt:UpdatePosition(x, z)
-                vizEnt:AttachTo(self, 0)
+                    local x, y, z = self:GetPositionXYZ(0)
+                    ---@type VisionMarkerOpti
+                    local vizEnt = self.Trash:Add(VisionMarkerOpti({ Army = army }))
+                    vizEnt:UpdateIntel(army, self:GetIntelRadius("Vision"), "Vision", true)
+                    vizEnt:UpdatePosition(x, z)
+                    vizEnt:AttachTo(self, 0)
+                end
             end
 
             self:VeterancyDispersal()
