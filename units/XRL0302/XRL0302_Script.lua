@@ -84,34 +84,10 @@ local DeathWeaponEMP = ClassWeapon(Weapon) {
 }
 
 ---@class XRL0302 : CWalkingLandUnit
----@field EffectsBagXRL TrashBag
----@field AmbientExhaustEffectsBagXRL TrashBag
----@field PeriodicFXThread thread
 XRL0302 = ClassUnit(CWalkingLandUnit) {
-
-    IntelEffects = {
-        Cloak = {
-            {
-                Bones = {
-                    'XRL0302',
-                },
-                Scale = 3.0,
-                Type = 'Cloak01',
-            },
-        },
-    },
-
     Weapons = {
         Suicide = ClassWeapon(DeathWeaponKamikaze) {},
         DeathWeapon = ClassWeapon(DeathWeaponEMP) {},
-    },
-
-    AmbientExhaustBones = {
-        'XRL0302',
-    },
-
-    AmbientLandExhaustEffects = {
-        '/effects/emitters/cannon_muzzle_smoke_12_emit.bp',
     },
 
     ---@param self XRL0302
@@ -119,9 +95,6 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
         CWalkingLandUnit.OnCreate(self)
         self.EffectsBagXRL = TrashBag()
         self.AmbientExhaustEffectsBagXRL = TrashBag()
-        self:CreateTerrainTypeEffects(self.IntelEffects.Cloak, 'FXIdle', self.Layer, nil, self.EffectsBag)
-        self.PeriodicFXThread = ForkThread(self.EmitPeriodicEffects, self)
-        self.Trash:Add(self.PeriodicFXThread)
 
         self.Trash:Add(
             ForkThread(
@@ -171,16 +144,6 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
     ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
-        self.Trash:Add(ForkThread(self.HideUnit, self))
-        self:SetMaintenanceConsumptionActive()
-    end,
-
-    --- Sets cloak mesh on a delay because `Unit.StopBeingBuiltEffects` sets the normal mesh regardless of cloak
-    ---@param self XRL0302
-    HideUnit = function(self)
-        -- Wait until `StopBeingBuiltEffects` is done
-        WaitTicks(1)
-        self:SetMesh(self.Blueprint.Display.CloakMeshBlueprint, true)
     end,
 
     ---@param self XRL0302
@@ -189,29 +152,9 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
     end,
 
     ---@param self XRL0302
-    EmitPeriodicEffects = function(self)
-        local army = self.Army
-        local ambientLandExhaustEffects = self.AmbientLandExhaustEffects
-        local ambientExhaustBones = self.AmbientExhaustBones
-
-        while not self.Dead do
-            for kE, vE in ambientLandExhaustEffects do
-                for kB, vB in ambientExhaustBones do
-                    CreateAttachedEmitter(self, vB, army, vE)
-                end
-            end
-            WaitTicks(31)
-        end
-    end,
-
-    ---@param self XRL0302
     DoDeathWeapon = function(self)
         if self:IsBeingBuilt() then return end
         CWalkingLandUnit.DoDeathWeapon(self)
-        self.EffectsBagXRL:Destroy()
-        self.AmbientExhaustEffectsBagXRL:Destroy()
-        self.PeriodicFXThread:Destroy()
-        self.PeriodicFXThread = nil
         local bp
         for k, v in self.Blueprint.Buffs do
             if v.Add.OnDeath then

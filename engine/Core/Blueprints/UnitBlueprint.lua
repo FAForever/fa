@@ -100,7 +100,8 @@
 ---@field Physics UnitBlueprintPhysics
 ---@field Transport? UnitBlueprintTransport
 ---@field Veteran? UnitBlueprintVeterancy
----@field Weapon? WeaponBlueprint[]
+--- The weapon in the first index controls unit AI. Weapons with `DummyWeapon = true` must be at the end of the table.
+---@field Weapon? WeaponBlueprint[] 
 ---@field ModWeapon? WeaponBlueprint[] # Used during blueprint loading to mod `Weapon` table
 ---@field Wreckage? UnitBlueprintWreckage
 ---
@@ -951,7 +952,9 @@
 ---@field RegenPerSecond number
 --- Which unit categories are buffed by the aura
 ---@field UnitCategory UnparsedCategory
-
+---
+--- Used by RAS SACU to add damage to their death weapon
+---@field DeathWeaponDamageAdd number
 
 
 

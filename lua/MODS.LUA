@@ -463,9 +463,16 @@ local _mod_cache = nil
 ---@param selectedMods? uidSet set of mod UID's
 function SetSelectedMods(selectedMods)
     if selectedMods then
-        LOG("MOD LIST SET TO:")
+        LOG("Mod list set to:")
         for uid in selectedMods do
-            LOG("\t" .. tostring(_mod_cache[uid].name) .. "\t(" .. uid .. ")")
+            local info = _mod_cache[uid]
+            LOG(string.format('\t%-5s "%-30s v%02s (%-37s by %s'
+                , info.ui_only and '[UI]' or '[SIM]'
+                , tostring(info.name) .. '"'
+                , tostring(info.version)
+                , tostring(info.uid) .. ')'
+                , tostring(info.author)
+            ))
         end
 
         SetPreference('active_mods', selectedMods)

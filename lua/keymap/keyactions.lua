@@ -1834,6 +1834,10 @@ local keyActionsGame = {
         action = 'UI_Lua import("/lua/ui/game/gamemain.lua").QuickSave(LOC("<LOC QuickSave>QuickSave"))',
         category = 'ui',
     },
+    ['quick_load'] = {
+        action = 'UI_Lua import("/lua/ui/game/gamemain.lua").QuickLoad(LOC("<LOC QuickSave>QuickSave"))',
+        category = 'ui',
+    },
     ['toggle_key_bindings'] = {
         action = 'UI_Lua import("/lua/ui/dialogs/keybindings.lua").CreateUI()',
         category = 'ui',
@@ -1863,19 +1867,19 @@ local keyActionsGame = {
 ---@type table<string, UIKeyAction>
 local keyActionsChat = {
     ['chat_page_up'] = {
-        action = 'UI_Lua import("/lua/ui/game/chat.lua").ChatPageUp(10)',
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatInterface.lua").OpenAndScrollLines(-10)',
         category = 'chat',
     },
     ['chat_page_down'] = {
-        action = 'UI_Lua import("/lua/ui/game/chat.lua").ChatPageDown(10)',
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatInterface.lua").OpenAndScrollLines(10)',
         category = 'chat',
     },
     ['chat_line_up'] = {
-        action = 'UI_Lua import("/lua/ui/game/chat.lua").ChatPageUp(1)',
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatInterface.lua").OpenAndScrollLines(-1)',
         category = 'chat',
     },
     ['chat_line_down'] = {
-        action = 'UI_Lua import("/lua/ui/game/chat.lua").ChatPageDown(1)',
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatInterface.lua").OpenAndScrollLines(1)',
         category = 'chat',
     },
 }

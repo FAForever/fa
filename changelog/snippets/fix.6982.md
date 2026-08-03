@@ -1,1 +1,0 @@
-- (#6982) Change 3 prop normal textures from size 518x518 to 512x512 to make them compatible with BC3 texture compression and allow the FAF map editor to load everything from the ancient-earth props section.
