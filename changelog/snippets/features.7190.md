@@ -1,1 +1,1 @@
-- Show intel overlays for the vision and intel that aircraft provide after they die while falling to the ground (#7190).
+- Show the vision that scouts provide after they die while they fall to the ground (#7190).
