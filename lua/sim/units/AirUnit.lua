@@ -203,7 +203,7 @@ AirUnit = ClassUnit(MobileUnit) {
 
                 -- Store our death weapon's damage on the unit so it can be edited remotely by the shield bouncer projectile
                 local bp = self.Blueprint
-                for i, numweapons in bp.Weapon do
+                for i, _ in bp.Weapon do
                     if bp.Weapon[i].Label == 'DeathImpact' then
                         self.deathWep = bp.Weapon[i]
                         break
