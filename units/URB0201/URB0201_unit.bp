@@ -121,8 +121,8 @@ UnitBlueprint{
             BuildEffectBones = {
                 "Arm01_Muzzle",
                 "Arm02_Muzzle",
-                "Arm03_Muzzle",
-                "Arm03_Muzzle",
+                "Arm05_Muzzle",
+                "Arm06_Muzzle",
             },
         },
         CommandCaps = {
