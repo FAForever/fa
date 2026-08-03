@@ -129,8 +129,6 @@ AirUnit = ClassUnit(MobileUnit) {
             self.colliderProj = nil
         end
 
-        self:DisableUnitIntel('Killed')
-        self:DisableIntel('Vision') -- Disable vision seperately, it's not handled in DisableUnitIntel
         self:ForkThread(self.DeathThread, self.OverKillRatio)
     end,
 
@@ -220,6 +218,9 @@ AirUnit = ClassUnit(MobileUnit) {
                 self.colliderProj = proj
                 proj:Start(self, 0)
                 self.Trash:Add(proj)
+
+                self:DisableUnitIntel('Killed')
+                self:DisableIntel('Vision') -- Disable vision seperately, it's not handled in DisableUnitIntel
 
                 -- Create a vision entity so vision shading is visible since dying
                 -- does not disable intel for air units while they fall through the air. 
