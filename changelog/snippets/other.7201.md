@@ -1,0 +1,1 @@
+- Add localization support for scenario names and descriptions in map selection (#7201).
