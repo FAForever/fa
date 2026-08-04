@@ -80,7 +80,7 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
     ---@param target Unit|Prop
     OnStopReclaim = function(self, target)
         TConstructionUnit.OnStopReclaim(self, target)
-        -- Check if we finished our reclaim task and clear our cached commaand if so
+        -- Check if we finished our reclaim task and clear our cached command if so
         if self.guardCache and table.empty(target) then
             self.guardCache = nil
         end
