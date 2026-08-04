@@ -5,7 +5,7 @@ UnitBlueprint {
         'FACTORY',
         'CONSTRUCTION',
         'SELECTABLE',
-        'UNTARGETTABLE',
+        'UNTARGETABLE',
         'RALLYPOINT',
         'SORTCONSTRUCTION',
         'DRAGBUILD',
