@@ -1,45 +1,60 @@
 
-## When making a PR:
+## When making a Pull Request (PR):
 
-If you plan a bigger change, make an issue first to discuss the feature. This way you can avoid spending time on something that would ultimately be denied integration.
+If you plan a bigger change, make sure to discuss the feature first. This way you can avoid spending time on something that would ultimately be denied integration. You can open an issue to lay out the problem that you want to fix, but this is not strictly required.
+We discuss changes on our discord, so start a discussion there and link the discussion in the PR description once a conclusion has been reached.
+
+## Technical info
 
 - Target the `develop` branch.
-- Start your PR as draft.
 - Don't forget to add appropriate tags.
 
+Useful tooling:
+-  [ScreenToGif](https://www.screentogif.com/): Free, open source screen recorder that can export to MP4. If the changes are visual, these can help you tell us exactly what the changes imply!
+
 Each PR needs a [snippet](https://faforever.github.io/fa/development/changelog) for the changelog file of the release.
-When you have made all the changes you intended to do and have added the snippet, you can mark the PR as ready for review by removing the draft status from the PR.
-Now the PR should be milestoned to the next release.
+We have an automatic workflow that adds a snippet template and tries to guess the category based on the PR tags. It also converts the PR to a draft.
+When you have made all the changes you intended to do and have updated the snippet text, you can mark the PR as ready for review by removing the draft status from the PR.
 You can request reviews from people that a knowledgable in the domains of the code you changed (See below).
+
+## About reviews
+
+To make reviews easier, reviewers are only tasked with making sure that a PR is technically correct, not if we want that feature at all. So at the stage of requesting reviewers it is important that it's clear that the intention behind the change is greenlighted. We already have a good game and adding new features does not necessarily make the holistic experience of the game better. 
+
+There are various ways to consider a change to be greenlighted:
+- It is a bugfix
+- The game team lead has made a decision
+- The discussion on discord has concluded positively.
+
+If a feature changes the balance of the gameplay, then the balance team has to also be in favor. If there was a discussion on discord, a link to it should be inserted into the PR description, so people can later find it.
+
+Sometimes it's necessary to test changes in a real game to be able to decide if integrating them is a good idea. To do this we can deploy changes to the fafbeta game mode to test them.
+
+Once there is approval from a conceptual point of view, tick the box in the PR description. This way possible reviewers know that a technical review is the only step left to do when they have a look at the overview list of PRs.
+Reviewers don't like to spend time on PRs that might never make it into the game, so they will probably ignore PRs that don't have this box set.
+
+Try to keep PRs small to make reviews easier and consider splitting big features into multiple PRs.
 
 
 ## How to do a review:
 
-1. Do we want this feature?  
-   If it's just a bugfix this can generally be answered as yes.  
-   If it's a new feature or changes gameplay in a more meaningful way there is ideally a linked issue where the discussion already happened and it was concluded that we want this feature.  
-   Sanity check: Should this rather be a sim/ui mod?
-
-2. Functionality  
+1. Functionality  
    Start the game with these changes and see if the described changes work as intended.  
-   Test if related functionality still works and didn't inadvertantly break.
+   Test if related functionality still works and didn't inadvertently break.
    There is no hard rule how much testing is needed, especially as we can't automate this. You don't have to go overboard with testing as we still have the duration between the merge and the next release to notice bugs during actual gameplay.
+   If the PR author has already done extensive testing you can keep this short.
 
-3. Technical code review  
+2. Technical code review  
    Is the code style correct? Please follow the [Lua Style Guide](http://lua-users.org/wiki/LuaStyleGuide).  
    Is the code readable and doing things the way things should be done?  
    This step should be done by people that have knowledge of the affected domains of the code base (See below).
 
-4. Balance implications (only for PRs labeled as balance)  
-   Changes touching balance need a green light from the balance team.
-
-It's totally possible to review not all steps if you don't have the knowledge or motivation to do them all. Someone else can pick up the other steps.  
-If you don't review all steps, don't formally approve the PR, but state your approval of the steps you did in a review comment. Only PRs that passed all review steps should be formally approved.
+It's totally possible to just do some testing if you don't have the knowledge to do a code review. Someone else can pick that up. In that case, don't formally approve the PR, but state what you tested in a comment. Knowing that the change has been tested well already helps for the code review.
 
 
 ## When to merge:
 
-After all the necessary reviews have passed and the PR has been approved it can be merged. We suggest to wait 24 hours after approval, so the owner of the PR can interject if there was some sort of miscommunication and the owner still intends to do some changes. The PR owner can also merge the PR if they want.
+After the PR has been tested and approved it can be merged. We suggest to wait 24 hours after approval, so the owner of the PR can interject if there was some sort of miscommunication and the owner still intends to do some changes. The PR owner can also merge the PR if they want.
 
 Merge by using the squash option.  
 Use the normal git conventions for the commit message, with the following rules:
@@ -47,7 +62,6 @@ Use the normal git conventions for the commit message, with the following rules:
 - Subject line shorter than 80 characters
 - Pull request number at the end
 - No trailing period
-- For non-trivial commits, always include a commit message body, describing the change in detail
 
 If the branch was in the FAForever repository, delete it after the merge, so it doesn't clutter the repo.
 
