@@ -807,6 +807,7 @@
 ---@field SelectionMeshScaleY? number
 ---@field SelectionMeshScaleZ? number
 ---@field UniformScale? number
+---@field UISelection? SoundHandle
 
 ---@class UnitBlueprintEnhancements : table<Enhancement, UnitBlueprintEnhancement>
 ---@field Slots table<EnhancementSlot, {name: UnlocalizedString, x: number, y: number}>
