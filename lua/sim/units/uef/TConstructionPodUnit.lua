@@ -5,7 +5,6 @@ local oldGetGuards = TConstructionUnit.GetGuards
 ---@field Pod string
 ---@field Parent? UEL0301 | UEL0001 # Only these two units set the parent properly
 ---@field guardCache table
----@field guardDummy Unit # Dummy unit to allow assist orders targeting the drone to persist after the drone docks and undocks
 ---@field rebuildDrone boolean # If true, the parent should rebuild the pod. Caches script bit 1.
 TConstructionPodUnit = ClassUnit(TConstructionUnit) {
     Parent = nil,
@@ -13,9 +12,6 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
     ---@param self TConstructionPodUnit
     OnCreate = function(self)
         TConstructionUnit.OnCreate(self)
-        self.guardDummy = CreateUnitHPR('ZXA0003', self:GetArmy(), 0,0,0,0,0,0)
-        self.guardDummy:AttachTo(self, -1)
-        self.Trash:Add(self.guardDummy)
     end,
 
     ---@param self TConstructionPodUnit
@@ -43,16 +39,6 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
         -- Removing the state allows guards to keep assisting the drone
         self:SetUnitState("Attached", false)
         TConstructionUnit.OnAttachedToTransport(self, transport, bone)
-    end,
-
-    ---@param self TConstructionPodUnit
-    ---@param transport Unit
-    ---@param bone number
-    OnDetachedFromTransport = function(self, transport, bone)
-        TConstructionUnit.OnDetachedFromTransport(self, transport, bone)
-        local guards = self.guardDummy:GetGuards()
-        IssueClearCommands(guards)
-        IssueGuard(guards, self)
     end,
 
     ---@param self TConstructionPodUnit
