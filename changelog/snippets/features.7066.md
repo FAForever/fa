@@ -1,1 +1,1 @@
-- (#7066) Add a quick load hotkey that loads the game from the special quick save file.
+- Add a quick load hotkey that loads the game from the special quick save file (#7066).
