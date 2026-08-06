@@ -1,4 +1,4 @@
-- (#7141, #7164) Make SACUs easier to access with reduced infrastructure costs and make them more powerful with a general cost reduction for SACUs and targeted adjustments for weaker upgrades (engineering upgrades, UEF bubble shield, Seraphim Overcharge).
+- Make SACUs easier to access with reduced infrastructure costs and make them more powerful with a general cost reduction for SACUs and targeted adjustments for weaker upgrades (engineering upgrades, UEF bubble shield, Seraphim Overcharge) (#7141, #7164).
 
   Seraphim Shield is moved to the right arm to nerf Seraphim teleport SACUs and enable a more useful Rambo preset. 
 

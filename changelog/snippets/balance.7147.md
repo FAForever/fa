@@ -1,4 +1,4 @@
-- (#7147) Increase Scathis accuracy and survivability so it can better compete against other enders.
+- Increase Scathis accuracy and survivability so it can better compete against other enders (#7147).
 
 {% unit URL0401 %}
 Scathis: Experimental Mobile Rapid-Fire Artillery

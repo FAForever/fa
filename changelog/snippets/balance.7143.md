@@ -1,4 +1,4 @@
-- (#7143) Rebalance Fire Beetle with removed cloak to make it interactable outside of later T3 stage or in ACU fights.
+- Rebalance Fire Beetle with removed cloak to make it interactable outside of later T3 stage or in ACU fights (#7143).
 
 {% unit XRL0302 %}
 Fire Beetle: T2 Mobile Bomb
