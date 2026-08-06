@@ -44,10 +44,7 @@ jobs:
           IS_GRAPHICS: "${{ contains(github.event.pull_request.labels.*.name, 'area: graphics') }}"
           IS_AI: "${{ contains(github.event.pull_request.labels.*.name, 'area: AI') }}"
           # Performance snippet category - no associated label
-          IS_BALANCE: >
-            "${{ contains(github.event.pull_request.labels.*.name, 'area: balance') 
-              || contains(github.event.pull_request.labels.*.name, 'area: balance idea') 
-            }}"
+          IS_BALANCE: "${{ contains(github.event.pull_request.labels.*.name, 'area: balance idea') }}"
           # Features snippet category - no associated label
           IS_OTHER: > 
             "${{ contains(github.event.pull_request.labels.*.name, 'area: documentation') 
