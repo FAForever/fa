@@ -26,7 +26,7 @@ The snippet file should be named `balance.<PR Number>.md`.
 - Parameter Name: The name for the value that was changed. It doesn't need to be the exact blueprint field name; it should be a name that players can understand.
 - Value before/after: The value before/after the change. If relevant, derived values like DPS can be put in parentheses after the value as such: `<damage> (<dps>) -> <damage> (<dps>)`.
 
-This formatting allows automatic styling of the changes on the website, but it actually consists of independent parts. You can insert additional description text after the parameter change lines, just make sure to leave a blank line. When a balance change affects multiple units in different ways, you can also put the description text first and then insert the affected units with their changed stats.
+This formatting allows automatic styling of the changes on the website, but it actually consists of independent parts. You can insert additional description text after the parameter change lines, just make sure to leave a blank line so that the text starts on a new line. When a balance change affects multiple units in different ways, you can also put the description text first and then insert the affected units with their changed stats.
 
 ### Example snippets
 
