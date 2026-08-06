@@ -1,6 +1,8 @@
 - (#7147) Increase Scathis accuracy and survivability so it can better compete against other enders.
 
-  **Scathis: Experimental Mobile Rapid-Fire Artillery (URL0401)**
+{% unit URL0401 %}
+Scathis: Experimental Mobile Rapid-Fire Artillery
+{% endunit %}
   - Health: 9000 -> 17000
   - Regen: 0 -> 134
   - Add stealth field with 24 radius and 400 e/s maintenance.
