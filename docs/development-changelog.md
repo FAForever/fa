@@ -29,10 +29,10 @@ The format of a snippet depends on whether it is a [balance snippet](../developm
 1. `graphics` is everything graphics-related.
 2. `ai` is everything AI-related, for example new features that AI modders can use, or new capabilities of the AI.
 3. `performance` is for changes that were made to increase the performance of the game.
-4. `balance` are changes that are made to improve the balance of the game.
+4. `balance` is for changes that are made to improve the balance of the game.
 5. `features` is for new features that are available for the players in the game.
-6. `fix` is for fixes of bugs in the game. Bugs regarding intellisense or other areas outside of the game should go into `other`.
-7. `other` is for Refactors, changes for developers and modders, code annotations and the like fall into this category.
+6. `fix` is for fixes of bugs in the game. Bugs regarding IntelliSense or other areas outside the game should go into `other`.
+7. `other` is for refactors, changes for developers and modders, and code annotations.
 
 If multiple categories are fitting, use the one that appears first in this list.
 
