@@ -1,1 +1,1 @@
-- (#7162) Fix transfer of units with manually built enhancements.
+- Fix transfer of units with manually built enhancements (#7162).

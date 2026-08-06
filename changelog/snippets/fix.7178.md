@@ -1,1 +1,1 @@
-- (#7178) Fix projectiles passing destroyed units as damage instigators instead of themselves.
+- Fix projectiles passing destroyed units as damage instigators instead of themselves (#7178).

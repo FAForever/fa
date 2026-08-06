@@ -1,1 +1,1 @@
-- (#7159) Fix mods that allow building units on water causing those units to not be buildable on land due to how the expected default of a missing `BuildOnLayerCaps` table interacts with blueprint merge.
+- Fix mods that allow building units on water causing those units to not be buildable on land due to how the expected default of a missing `BuildOnLayerCaps` table interacts with blueprint merge (#7159).
