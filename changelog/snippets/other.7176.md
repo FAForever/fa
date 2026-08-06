@@ -1,1 +1,1 @@
-- (#7176) Update the FA Lua plugin used alongside our vscode intellisense extension to exclude diagnostics coming from the base file when writing a mod's hook file.
+- Update the FA Lua plugin used alongside our vscode intellisense extension to exclude diagnostics coming from the base file when writing a mod's hook file (#7176).

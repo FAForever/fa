@@ -1,1 +1,1 @@
-- (#7155) Annotate `SetNavigatorPersonalPosMaxDistance` and check it exists before calling it.
+- Annotate `SetNavigatorPersonalPosMaxDistance` and check it exists before calling it (#7155).

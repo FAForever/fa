@@ -1,1 +1,1 @@
-- (#7045) Document engine-side details of `UnitWeapon:CanFire()`.
+- Document engine-side details of `UnitWeapon:CanFire()` (#7045).
