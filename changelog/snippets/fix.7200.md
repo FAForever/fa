@@ -1,0 +1,1 @@
+- Fix salem wiggling and locking up when issued lots of move orders. This is done by changing the 5x5 floating/hover footprint spec to 4x4, which only affects Salem in FAF but may affect large floating/hover units in mods by making them occupy slightly less space. (#7200)
