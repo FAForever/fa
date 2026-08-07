@@ -49,6 +49,7 @@ UnitBlueprint{
         "REPAIR",
         "SELECTABLE",
         "SHOWQUEUE",
+        "SNIPEMODE",
         "SUBCOMMANDER",
         "TECH3",
         "USEBUILDPRESETS",
@@ -175,7 +176,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 21100,
         BuildCostMass = 1600,
-        BuildRate = 42,
+        BuildRate = 56,
         BuildTime = 8530,
         BuildableCategory = { "BUILTBYTIER3ENGINEER CYBRAN" },
         MaintenanceConsumptionPerSecondEnergy = 0,
@@ -265,13 +266,13 @@ UnitBlueprint{
     },
     Enhancements = {
         CloakingGenerator = {
-            BuildCostEnergy = 312700,
-            BuildCostMass = 2000,
-            BuildTime = 8300,
+            BuildCostEnergy = 234000,
+            BuildCostMass = 4700,
+            BuildTime = 21350,
             Icon = "cfs",
             MaintenanceConsumptionPerSecondEnergy = 2500,
             Name = "<LOC enhancements_0089>Personal Cloaking Generator",
-            NewHealth = 17000,
+            NewHealth = 15000,
             Prerequisite = "StealthGenerator",
             Slot = "Back",
             UpgradeUnitAmbientBones = { "URL0301" },
@@ -291,7 +292,7 @@ UnitBlueprint{
             Slot = "Back",
         },
         EMPCharge = {
-            BuildCostEnergy = 32500,
+            BuildCostEnergy = 26500,
             BuildCostMass = 700,
             BuildTime = 3000,
             Icon = "emp",
@@ -313,7 +314,7 @@ UnitBlueprint{
             Slot = "LCH",
         },
         FocusConvertor = {
-            BuildCostEnergy = 50100,
+            BuildCostEnergy = 45000,
             BuildCostMass = 1400,
             BuildTime = 6950,
             Icon = "fc",
@@ -385,7 +386,7 @@ UnitBlueprint{
             Slot = "RCH",
         },
         SelfRepairSystem = {
-            BuildCostEnergy = 92300,
+            BuildCostEnergy = 86700,
             BuildCostMass = 1900,
             BuildTime = 7850,
             Icon = "srs",
@@ -631,6 +632,7 @@ UnitBlueprint{
             RateOfFire = 10/10, --10/integer interval in ticks
             TargetPriorities = {
                 "MOBILE EXPERIMENTAL",
+                "COMMAND",
                 "MOBILE TECH3",
                 "MOBILE TECH2",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",

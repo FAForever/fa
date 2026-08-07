@@ -1603,12 +1603,12 @@ Unit_Description_0465_faf="Massively increases the rate at which the ACU repairs
 
 -- CYBRAN -- Support Commander Units/Upgrades
 Unit_Description_0115="A highly versatile combat and engineering unit useful on late-stage battlefields."
-Unit_Description_0116="Personal Cloaking further hiding the SACU from optical sensors and massively boosting HP. Countered by omni sensors. Costs a large amount of energy to run.\n\n+17000 Health"
+Unit_Description_0116="Personal Cloaking further hiding the SACU from optical sensors and massively boosting HP. Countered by omni sensors. Costs a large amount of energy to run.\n\n+15000 Health"
 Unit_Description_0117="Grants the main cannon EMP capability, utterly disabling enemy units.\n\n+3 Main cannon EMP Radius - Stun Duration = 3 seconds (T3) 0.3 seconds (SACU)"
 Unit_Description_0118="Increases main cannon damage and range.\n\n+200 Main cannon damage\n+10 Main cannon range"
 Unit_Description_0119="Adds an anti-air SAM weapon system.\n\nNanite Missile System - DPS: 360, Range: 60"
 Unit_Description_0120="Increases SACU's resource generation and volatility.\n\n+10 mass production per second\n+1000 energy production per second\n+1000 Death Nuke damage"
-Unit_Description_0121="Massively increases SACU build speed.\n\n+56 Buildpower"
+Unit_Description_0121="Massively increases SACU build speed.\n\n+42 Buildpower"
 Unit_Description_0122="Massively increases the rate at which the SACU repairs its armour.\n\n+375 Regen"
 Unit_Description_0123="Personal Stealth hiding the SACU from radar. Countered by omni sensors. Costs energy to run."
 
@@ -1767,7 +1767,7 @@ Unit_Description_0466_faf="Further increases the range of the ACU's main cannon 
 
 -- AEON -- Support Commander Units/Upgrades
 Unit_Description_0167="A highly versatile combat and engineering unit useful on late-stage battlefields."
-Unit_Description_0168="Massively increases SACU build speed.\n\n+56 Buildpower"
+Unit_Description_0168="Massively increases SACU build speed.\n\n+42 Buildpower"
 Unit_Description_0169="Increases SACU's resource generation and volatility.\n\n+10 mass production per second\n+1000 energy production per second\n+1000 Death Nuke damage"
 Unit_Description_0170="Grants the Sacrifice ability, allowing the SACU to sacrifice itself to add its mass and energy to another construction project instantly at 90% efficiency."
 Unit_Description_0171="Creates a protective Personal Shield around the SACU. Requires energy to run.\n\nShield Regen Rate = 40 HP/s\nShield Recharge Time = 190 seconds"
@@ -1926,7 +1926,7 @@ Unit_Description_0433="A highly versatile combat and engineering unit useful on 
 Unit_Description_0434="Mounts a Tactical Cruise Missile Launcher onto the back of the SACU."
 Unit_Description_0435="Massively increases the rate at which the SACU repairs its armour as well as providing a large HP boost.\n\n+14000 Health\n+250 Regen"
 Unit_Description_0436="Greatly increases the range of the SACU's main cannon, overcharge if present, and sensors.\n\n+10 Main cannon range\n+44 Omni Radius\n+6 Vision Radius"
-Unit_Description_0437="Massively increases SACU build speed.\n\n+56 Buildpower"
+Unit_Description_0437="Massively increases SACU build speed.\n\n+42 Buildpower"
 Unit_Description_0438="Creates a protective Personal Shield around the SACU. Requires energy to run.\n\nShield Regen Rate = 22 HP/s\nShield Recharge Time = 160 seconds"
 Unit_Description_0439="Adds Teleportation capability. Requires considerable energy to activate."
 Unit_Description_0440="Expands the SACU's weaponry with an Overcharge function identical to that of the standard ACU. Requires 100000 energy storage for maximum damage."

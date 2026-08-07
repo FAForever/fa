@@ -45,6 +45,7 @@ UnitBlueprint{
         "REPAIR",
         "SELECTABLE",
         "SHOWQUEUE",
+        "SNIPEMODE",
         "SUBCOMMANDER",
         "TECH3",
         "USEBUILDPRESETS",
@@ -185,7 +186,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 21500,
         BuildCostMass = 1550,
-        BuildRate = 42,
+        BuildRate = 56,
         BuildTime = 8250,
         BuildableCategory = { "BUILTBYTIER3ENGINEER AEON" },
         MaxBuildDistance = 10,
@@ -338,7 +339,7 @@ UnitBlueprint{
             Slot = "LCH",
         },
         Shield = {
-            BuildCostEnergy = 49000,
+            BuildCostEnergy = 44900,
             BuildCostMass = 1200,
             BuildTime = 4950,
             Icon = "tsg",
@@ -359,9 +360,9 @@ UnitBlueprint{
             UpgradeUnitAmbientBones = { "UAL0301" },
         },
         ShieldHeavy = {
-            BuildCostEnergy = 200975,
-            BuildCostMass = 900,
-            BuildTime = 3660,
+            BuildCostEnergy = 73600,
+            BuildCostMass = 1800,
+            BuildTime = 7900,
             Icon = "phtsg",
             ImpactEffects = "AeonShieldHit01",
             MaintenanceConsumptionPerSecondEnergy = 420,
@@ -450,7 +451,7 @@ UnitBlueprint{
             Slot = "RCH",
         },
         SystemIntegrityCompensator = {
-            BuildCostEnergy = 57500,
+            BuildCostEnergy = 42500,
             BuildCostMass = 1500,
             BuildTime = 6720,
             Icon = "sic",
@@ -626,6 +627,7 @@ UnitBlueprint{
             RateOfFire = 10/10, --10/integer interval in ticks
             TargetPriorities = {
                 "MOBILE EXPERIMENTAL",
+                "COMMAND",
                 "MOBILE TECH3",
                 "MOBILE TECH2",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",
