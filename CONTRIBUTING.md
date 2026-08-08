@@ -1,10 +1,22 @@
+Hello dear contributor,
+
+it's good to have you here. Things here run a bit differently than you might expect. That's why we set up this document for your information. Please take the time to read it. We promise that it won't waste your time and provides actually useful and relevant information.
+If after reading you feel this isn't true, please let us know, so we can improve the document.
+
 
 ## When making a Pull Request (PR):
+
+We don't have the capacity to closely watch the development of each pull request and to actively approach you to coach you through the process. That's why this document exists.
+
+When you open a pull request *you* are in charge. That means you are expected to get in touch with the relevant people and to request reviewers.
+Feel free to ask for a follow-up after 2-4 weeks if you haven't heard back from someone. Things can easily slip through the cracks. If someone is very busy, maybe you can find someone else to help you. In general, it's better to ask questions directed at specific people than to ask into the void where nobody is compelled to answer.
+
+Being in charge also means you carry responsibility for the change you are introducing. When later it turns out there are some issues with it, you are expected to contribute to fixing the bugs.
 
 If you plan a bigger change, make sure to discuss the feature first. This way you can avoid spending time on something that would ultimately be denied integration. You can open an issue to lay out the problem that you want to fix, but this is not strictly required.
 We discuss changes on our discord, so start a discussion there and link the discussion in the PR description once a conclusion has been reached.
 
-## Technical info
+### Technical info
 
 - Target the `develop` branch.
 - Don't forget to add appropriate tags.
