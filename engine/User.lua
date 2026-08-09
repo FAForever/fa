@@ -551,8 +551,8 @@ end
 function GetSimRate()
 end
 
----
----@return number
+--- Returns a hardcoded constant of how many sim ticks are supposed to occur per second.
+---@return 10
 function GetSimTicksPerSecond()
 end
 
