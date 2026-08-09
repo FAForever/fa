@@ -74,7 +74,7 @@ A fully-specified ask ("add `/ping` that prints 'pong' locally") needs no Q&A �
 | ✅ | Route side effects through `ctx.Controller` to preserve MVC discipline (calls below). |
 | ✅ | Call LazyVars at the moment of use: `ctx.Model.Recipient()`. |
 | 🚫 | Write to `ChatModel` from a command — read the model, mutate via the controller. |
-| 🚫 | Cache a LazyVar in a local (see `AGENTS.md` § Reactive State). |
+| 🚫 | Cache a LazyVar in a local (see `CLAUDE.md` § Reactive State). |
 
 | Goal | Call |
 |------|------|
