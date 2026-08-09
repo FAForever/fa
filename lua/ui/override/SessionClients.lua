@@ -29,6 +29,7 @@
 ---@field ping number
 ---@field quiet number
 ---@field uid string
+---@field maxSP integer # max sim speed
 
 local Prefs = import("/lua/user/prefs.lua")
 
