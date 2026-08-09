@@ -70,7 +70,7 @@ function OnSetText(uri, text)
 
     if locationOfRepository then
         -- prepend the content of hooked files just like the game would
-        local first, last, hookDir = StringFind(uri, '/hook(/[%w/]+.lua)')
+        local first, last, hookDir = StringFind(uri, '/hook(/.*%.lua)')
         if hookDir then
             local repoFile = IoOpen(locationOfRepository .. hookDir)
             if repoFile then
