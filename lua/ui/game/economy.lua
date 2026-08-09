@@ -55,9 +55,9 @@ end
 
 function SetLayout(layout)
     import(UIUtil.GetLayoutFilename('economy')).SetLayout()
-    GameMain.RemoveBeatFunction(_BeatFunction)
+    GameMain.RemoveBeatFunction(_BeatFunction, 'economy.BeatFunction')
     ConfigureBeatFunction()
-    GameMain.AddBeatFunction(_BeatFunction, true)
+    GameMain.AddBeatFunction(_BeatFunction, true, 'economy.BeatFunction')
 
     return CommonLogic()
 end
@@ -481,4 +481,17 @@ end
 
 function InitialAnimation()
     import(UIUtil.GetLayoutFilename('economy')).InitAnimation()
+end
+
+__moduleinfo.OnDirty = function ()
+    ForkThread(import, __moduleinfo.name) 
+end
+
+__moduleinfo.OnReload = function (newModule)
+    for k, v in GUI do
+        if k == 'savedParent' then continue end
+        v:Destroy()
+    end
+    GameMain.RemoveBeatFunction(_BeatFunction, 'economy.BeatFunction')
+    newModule.CreateEconomyBar(savedParent)
 end
