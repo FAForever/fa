@@ -7,6 +7,7 @@
 ---@field Ping SyncPingData[]
 ---@field Score GameScoreData # Filtered based on game state.
 ---@field FocusArmyChanged? { new: integer, old: integer }
+---@field Cheaters? { [integer]: integer, CheatsEnabled: boolean } # Created by the engine. Array part is cheating command source indices.
 Sync = { }
 
 local SyncDefaults = {
