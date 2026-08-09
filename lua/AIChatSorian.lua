@@ -66,11 +66,11 @@ function AISendChatMessage(towho, msg)
         if towho then
             for k,v in towho do
                 if v == focus then
-                    import("/lua/ui/game/chat/ChatController.lua").OnReceive(msg.aisender, msg)
+                    import("/lua/ui/game/chat.lua").ReceiveChat(msg.aisender, msg)
                 end
             end
         else
-            import("/lua/ui/game/chat/ChatController.lua").OnReceive(msg.aisender, msg)
+            import("/lua/ui/game/chat.lua").ReceiveChat(msg.aisender, msg)
         end
     elseif msg.Taunt then
         import("/lua/ui/game/taunt.lua").RecieveAITaunt(msg.aisender, msg)
@@ -93,3 +93,5 @@ function GetArmyData(army)
     return result
 end
 
+--- Kept for backwards compatibility
+local Chat = import("/lua/ui/game/chat.lua")

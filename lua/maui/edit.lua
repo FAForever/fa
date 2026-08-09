@@ -140,17 +140,8 @@ Edit = ClassUI(moho.edit_methods, Control) {
     OnEnterPressed = function(self, text)
     end,
 
-    --- Called when a non-text key (one that doesn't affect text editing —
-    --- so things like Home / End / Insert / Delete / arrow keys are
-    --- consumed by the engine for caret navigation and do **not** reach
-    --- this handler) is pressed. `keycode` is the OS-level VK_* code (use
-    --- `UIUtil.VK_*` to compare); `event` is the full event payload, with
-    --- modifier state under `event.Modifiers`.
-    ---@param self Edit
-    ---@param keycode number
-    ---@param event KeyEvent
-    ---@diagnostic disable-next-line: unused-local
-    OnNonTextKeyPressed = function(self, keycode, event)
+    -- called when non text keys (that don't affect text editing) are pressed, passes in the windows VK key code
+    OnNonTextKeyPressed = function(self, keycode, modifiers)
         AddUnicodeCharToEditText(self, keycode)
     end,
 

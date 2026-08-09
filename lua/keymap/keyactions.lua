@@ -1867,19 +1867,19 @@ local keyActionsGame = {
 ---@type table<string, UIKeyAction>
 local keyActionsChat = {
     ['chat_page_up'] = {
-        action = 'UI_Lua import("/lua/ui/game/chat/ChatInterface.lua").OpenAndScrollLines(-10)',
+        action = 'UI_Lua import("/lua/ui/game/chat.lua").ChatPageUp(10)',
         category = 'chat',
     },
     ['chat_page_down'] = {
-        action = 'UI_Lua import("/lua/ui/game/chat/ChatInterface.lua").OpenAndScrollLines(10)',
+        action = 'UI_Lua import("/lua/ui/game/chat.lua").ChatPageDown(10)',
         category = 'chat',
     },
     ['chat_line_up'] = {
-        action = 'UI_Lua import("/lua/ui/game/chat/ChatInterface.lua").OpenAndScrollLines(-1)',
+        action = 'UI_Lua import("/lua/ui/game/chat.lua").ChatPageUp(1)',
         category = 'chat',
     },
     ['chat_line_down'] = {
-        action = 'UI_Lua import("/lua/ui/game/chat/ChatInterface.lua").OpenAndScrollLines(1)',
+        action = 'UI_Lua import("/lua/ui/game/chat.lua").ChatPageDown(1)',
         category = 'chat',
     },
 }

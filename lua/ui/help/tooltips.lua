@@ -401,6 +401,10 @@ Tooltips = {
         title = 'Chat Feed Background',
         description = "Adds a black bar behind chat lines when the chat window is closed",
     },
+    chat_feed_persist = {
+        title = "Persist Chat Feed Timeout",
+        description = "Allows chat to timeout normally in the chat feed after closing the chat window",
+    },
     chat_send_type = {
         title = "<LOC chat_send_type_title>Default recipient: allies",
         description = "<LOC chat_send_type_description>When enabled, enter sends messages to allies and holding shift + enter sends to all. When not enabled, the behavior is reversed.",

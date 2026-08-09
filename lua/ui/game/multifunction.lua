@@ -371,7 +371,7 @@ function OnDropoutChecked(self, checked)
 end
 
 function CreateMapDropout(parent)
-    import("/lua/ui/game/chat/config/ChatConfigInterface.lua").Close()
+    import("/lua/ui/game/chat.lua").CloseChatConfig()
     local bg = CreateDropoutBG(false)
 
     local function CreateMapOptions(inMapControl)

@@ -217,13 +217,11 @@ Window = ClassUI(Group) {
         self.window_m.Bottom:Set(self.window_bm.Top)
 
         self.TitleGroup = Group(self, 'window title group')
-        LayoutHelpers.LayoutFor(self.TitleGroup)
-            :Top(self.tm.Top)
-            :Left(self.tl.Left)
-            :Right(self.tr.Right)
-            :Height(30)
-            :Over(self._windowGroup, 2)
-            :End()
+        self.TitleGroup.Top:Set(self.tm.Top)
+        self.TitleGroup.Left:Set(self.tl.Left)
+        self.TitleGroup.Right:Set(self.tr.Right)
+        self.TitleGroup.Height:Set(30)
+        self.TitleGroup.Depth:Set(function() return self._windowGroup.Depth() + 2 end)
 
         if icon then
             self._titleIcon = Bitmap(self.TitleGroup, icon)
@@ -287,10 +285,11 @@ Window = ClassUI(Group) {
         LayoutHelpers.Layouter(self.ClientGroup)
             :Top(self.TitleGroup.Bottom)
             :Left(self.ml.Right)
+            :Height(function() return self.bm.Top() - self.TitleGroup.Bottom() end)
+            :Width(function() return self.mr.Left() - self.ml.Right() end)
             :Right(self.mr.Left)
             :Bottom(self.bm.Top)
             :Over(self.window_m)
-            :End()
 
         self.StartSizing = function(event, xControl, yControl)
             local drag = Dragger()
@@ -477,25 +476,18 @@ Window = ClassUI(Group) {
                     self.Left:Set(math.max(math.min(location.right, parent.Right()) - oldWidth), parent.Left())
                 end
             -- new version in preference file that does support UI scaling
-            else
-                local top = location.top
-                local left = location.left
-                -- width/height are stored inverse-scaled so the saved size
-                -- survives a ui_scale change; rescale them now.
-                local width = LayoutHelpers.ScaleNumber(location.width)
-                local height = LayoutHelpers.ScaleNumber(location.height)
-
-                -- Clamp into the parent rect so a saved position can't put
-                -- the window off-screen after a resolution change shrinks
-                -- the parent. Mirrors the old-prefs branch above and the
-                -- title-bar drag clamp in `TitleGroup.HandleEvent`.
-                left = math.max(parent.Left(), math.min(left, parent.Right() - width))
-                top = math.max(parent.Top(), math.min(top, parent.Bottom() - height))
+            else 
+                local top = location.top 
+                local left = location.left 
+                local width = location.width 
+                local height = location.height 
 
                 self.Left:Set(left)
                 self.Top:Set(top)
-                self.Right:Set(left + width)
-                self.Bottom:Set(top + height)
+
+                -- we can scale these accordingly as we applied the inverse on saving
+                self.Right:Set(LayoutHelpers.ScaleNumber(width) + left)
+                self.Bottom:Set(LayoutHelpers.ScaleNumber(height) + top)
             end
         elseif defaultPosition then
             -- Scale only if it's a number, else it's already scaled lazyvar

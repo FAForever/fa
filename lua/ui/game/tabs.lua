@@ -585,7 +585,7 @@ function BuildContent(contentID)
         return
     end
     import("/lua/ui/game/multifunction.lua").CloseMapDialog()
-    import("/lua/ui/game/chat/config/ChatConfigInterface.lua").Close()
+    import("/lua/ui/game/chat.lua").CloseChatConfig()
     activeTab = contentID
     for _, tab in controls.tabs do
         if tab.Data.content == contentID then

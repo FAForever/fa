@@ -1,5 +1,0 @@
-settings.local.json
-.credentials.json
-*.local.*
-scratch/
-*.draft.md

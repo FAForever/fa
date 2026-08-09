@@ -13,7 +13,6 @@
 ---@field Args table
 
 local SimUtils = import("/lua/simutils.lua")
-local ChatUtils = import("/lua/chatutils.lua")
 local SimPing = import("/lua/simping.lua")
 local SimTriggers = import("/lua/scenariotriggers.lua")
 local SUtils = import("/lua/ai/sorianutilities.lua")
@@ -162,8 +161,6 @@ Callbacks.BreakAlliance = SimUtils.BreakAlliance
 Callbacks.GiveUnitsToPlayer = SimUtils.GiveUnitsToPlayer
 
 Callbacks.GiveResourcesToPlayer = SimUtils.GiveResourcesToPlayer
-
-Callbacks.SendChatMessage = ChatUtils.SendChatMessage
 
 Callbacks.SetResourceSharing = SimUtils.SetResourceSharing
 
