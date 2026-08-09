@@ -339,11 +339,11 @@ function ConfigureBeatFunction()
             if warnOnResourceFull then
                 ShowUIWarnings = function(effVal, storedVal, maxStorageVal)
                     if storedVal / maxStorageVal > 0.8 then
-                        if effVal > 2.0 then
+                        if effVal > 200 then
                             warningBG:SetToState('red')
-                        elseif effVal > 1.0 then
+                        elseif effVal > 100 then
                             warningBG:SetToState('yellow')
-                        elseif effVal < 1.0 then
+                        elseif effVal < 100 then
                             warningBG:SetToState('hide')
                         end
                     else
@@ -353,11 +353,11 @@ function ConfigureBeatFunction()
             else
                 ShowUIWarnings = function(effVal, storedVal, maxStorageVal)
                     if storedVal / maxStorageVal < 0.2 then
-                        if effVal < 0.25 then
+                        if effVal < 25 then
                             warningBG:SetToState('red')
-                        elseif effVal < 0.75 then
+                        elseif effVal < 75 then
                             warningBG:SetToState('yellow')
-                        elseif effVal > 1.0 then
+                        elseif effVal > 100 then
                             warningBG:SetToState('hide')
                         end
                     else
