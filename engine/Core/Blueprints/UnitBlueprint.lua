@@ -1122,6 +1122,9 @@
 ---@field Elevation number
 --- if true, terrain under building's skirt will be flattened
 ---@field FlattenSkirt boolean
+--- Determines what cells this unit occupies for pathfinding.
+--- Mobile units are forced to use the closest footprint spec that is defined in `footprints.lua`.
+--- Structures can define their own footprints.
 ---@field Footprint FootprintBlueprint
 --- unit fuels up at this rate per second. Required for air staging to undock automatically.
 ---@field FuelRechargeRate number
