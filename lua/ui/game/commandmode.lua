@@ -414,7 +414,7 @@ local function OnGuardUpgrade(guardees, unit)
 
     if upgradeRadarTech2 and
         EntityCategoryContains(categories.STRUCTURE * categories.RADAR * categories.TECH2, unit) and
-        unitBlueprint.Economy.ConsumptionPerSecondEnergy > unit:GetEconData().energyConsumed -- check for any adjacency
+        unitBlueprint.Economy.MaintenanceConsumptionPerSecondEnergy > unit:GetEconData().energyConsumed -- check for any adjacency
     then
         ForkThread(UpgradeUnit, unit)
         return
