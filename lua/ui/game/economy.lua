@@ -332,11 +332,15 @@ function ConfigureBeatFunction()
         local warnOnResourceFull = resourceType == "MASS" and econ_warnings
         local getRateColour = getGetRateColour(warnOnResourceFull, econ_warnings)
 
+        ---@type fun(effVal: number, storedVal: number, maxStorageVal: number)
         local ShowUIWarnings
         if not econ_warnings then
             ShowUIWarnings = function() end
         else
             if warnOnResourceFull then
+                ---@param effVal number Resource produced divided by requested, in percent (multiplied by 100).
+                ---@param storedVal number
+                ---@param maxStorageVal number
                 ShowUIWarnings = function(effVal, storedVal, maxStorageVal)
                     if storedVal / maxStorageVal > 0.8 then
                         if effVal > 200 then
@@ -351,6 +355,9 @@ function ConfigureBeatFunction()
                     end
                 end
             else
+                ---@param effVal number Resource produced divided by requested, in percent (multiplied by 100).
+                ---@param storedVal number
+                ---@param maxStorageVal number
                 ShowUIWarnings = function(effVal, storedVal, maxStorageVal)
                     if storedVal / maxStorageVal < 0.2 then
                         if effVal < 25 then
