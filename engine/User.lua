@@ -556,10 +556,12 @@ end
 function GetSimTicksPerSecond()
 end
 
+---@alias SpecialFileType 'SaveGame' | 'Replay' | 'CampaignSave'
+
 --- Gets information on a profile based file, `nil` if unable to find
 ---@param profileName string
 ---@param basename string
----@param type string
+---@param type SpecialFileType
 ---@return table
 function GetSpecialFileInfo(profileName, basename, type)
 end
@@ -567,19 +569,19 @@ end
 --- Given the base name of a special file, returns the complete path
 ---@param profilename string
 ---@param filename string
----@param type string
+---@param type SpecialFileType
 ---@return string
 function GetSpecialFilePath(profilename,  filename,  type)
 end
 
 --- Returns a table of strings which are the names of files in special locations (currently SaveFile, Replay)
----@param type string
+---@param type SpecialFileType
 ---@return { extension: string, directory: string, files: table<string, string[]> }
 function GetSpecialFiles(type)
 end
 
 ---
----@param type string
+---@param type SpecialFileType
 ---@return string
 function GetSpecialFolder(type)
 end

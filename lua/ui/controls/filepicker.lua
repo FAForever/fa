@@ -145,7 +145,7 @@ end
 FilePicker = ClassUI(Group) {
     ---@param self FilePicker
     ---@param parent Control
-    ---@param fileType filetype
+    ---@param fileType SpecialFileType
     ---@param onlyShowMine any
     ---@param selectAction any
     ---@param debugName any
