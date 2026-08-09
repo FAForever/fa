@@ -592,14 +592,16 @@ function DeselectSelens(selection)
 end
 
 --- A cache used with ObserveSelection to prevent continuous table allocations
+---@class SelectionChangedData
 local cachedSelection = {
-    oldSelection = { },
-    newSelection = { },
-    added = { },
-    removed = { },
+    oldSelection = {}, ---@type UserUnit[]
+    newSelection = {}, ---@type UserUnit[]
+    added = {},        ---@type UserUnit[]
+    removed = {},      ---@type UserUnit[]
 }
 
 --- Observable to allow mods to do something with a new selection
+---@type Observer<SelectionChangedData>
 ObserveSelection = import("/lua/shared/observable.lua").Create()
 
 local hotkeyLabelsOnSelectionChanged = false
