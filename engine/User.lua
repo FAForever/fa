@@ -138,8 +138,13 @@ end
 function AddCommandFeedbackBlip(meshInfo, duration)
 end
 
+---@class ConsoluteOutputReceiverHandle : userdata
+
+--- Creates a console output receiver that calls the given function on console output.
 ---
----@param func fun(text: string): any
+---@see RemoveConsoleOutputReciever Destroy the receiver and stop calling the function.
+---@param func fun(text: string)
+---@return ConsoluteOutputReceiverHandle
 function AddConsoleOutputReciever(func)
 end
 
@@ -974,9 +979,10 @@ end
 function PrefetchSession(mapname, mods, hipri)
 end
 
----
----@param handler function
-function RemoveConsoleOutputReciever(handler)
+--- Destroys a console output receiver.
+---@see AddConsoleOutputReciever To create receivers.
+---@param handle ConsoluteOutputReceiverHandle
+function RemoveConsoleOutputReciever(handle)
 end
 
 --- Remove unit from the session extra select list
