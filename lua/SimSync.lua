@@ -6,6 +6,7 @@
 ---@field EnhanceRestrict table<Enhancement, true>
 ---@field Ping SyncPingData[]
 ---@field Score GameScoreData # Filtered based on game state.
+---@field FocusArmyChanged? { new: integer, old: integer }
 Sync = { }
 
 local SyncDefaults = {
@@ -146,6 +147,9 @@ function OnPostLoad()
     Sync.IsSavedGame = true
 end
 
+--- Called by the engine when the focus army changes
+---@param new integer
+---@param old integer
 function NoteFocusArmyChanged(new, old)
     import("/lua/simping.lua").OnArmyChange()
     import("/lua/sim/recall.lua").OnArmyChange()
