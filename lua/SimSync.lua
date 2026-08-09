@@ -36,6 +36,7 @@ UnitData = {}
 ---@type EnhancementSyncTable
 SimUnitEnhancements = {}
 
+--- Called by the engine every sim beat
 function ResetSyncTable()
     local sync = Sync
     for k, v in sync do
