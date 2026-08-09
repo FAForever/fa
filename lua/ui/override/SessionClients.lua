@@ -63,7 +63,7 @@ local GlobalGetSessionClients = _G.GetSessionClients
 --- Allows UI elements to be updated when the cache is updated by adding a callback via Observable:AddObserver()
 ---@type Client[]
 local Cached = PostprocessClients(GlobalGetSessionClients())
-
+---@type Observer<Client[]>
 Observable = import("/lua/shared/observable.lua").Create()
 Observable:Set(Cached)
 
