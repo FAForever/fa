@@ -1359,7 +1359,7 @@ end
 function ValidateIPAddress(ipaddr)
 end
 
---- Validate a list of units
+--- Returns a copy of the units excluding those which are dead or destroyed.
 ---@param units UserUnit[]
 ---@return UserUnit[]
 function ValidateUnitsList(units)
