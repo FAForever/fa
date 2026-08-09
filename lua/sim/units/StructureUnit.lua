@@ -775,7 +775,6 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
 
         -- make sure we're both finished building
         if self:IsBeingBuilt() or adjacentUnit:IsBeingBuilt() then
-            LOG('OnAdjacentTo return')
             return
         end
 
@@ -818,7 +817,6 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
 
         -- make sure we're both finished building
         if self:IsBeingBuilt() or adjacentUnit:IsBeingBuilt() then
-            LOG('OnNotAdjacentTo return')
             return
         end
 
