@@ -506,7 +506,7 @@ end
 
 --- Function to handle AI map pings.
 ---@param position Vector
----@param pingType string
+---@param pingType PingTypeLowercase
 ---@param army Army
 function AISendPing(position, pingType, army)
     local PingTypes = {
@@ -639,7 +639,7 @@ end
 
 --- Handles the AIs reaction to a human ally's ping.
 ---@param aiBrain AIBrain
----@param pingData table
+---@param pingData SyncPingData
 function AIHandlePing(aiBrain, pingData)
     if pingData.Type == 'move' then
         local nextping = (table.getn(aiBrain.TacticalBases) + 1)
