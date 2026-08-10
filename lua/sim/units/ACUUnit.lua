@@ -14,6 +14,7 @@ ACUUnit = ClassUnit(CommandUnit) {
         -- Mutate the OnDamage function for this one very special shield.
         local oldApplyDamage = self.MyShield.ApplyDamage
         self.MyShield.ApplyDamage = function(...)
+            ---@diagnostic disable-next-line: param-type-mismatch
             oldApplyDamage(unpack(arg))
             aiBrain:OnPlayCommanderUnderAttackVO()
         end
@@ -33,7 +34,7 @@ ACUUnit = ClassUnit(CommandUnit) {
     ---@return boolean
     OnWorkBegin = function(self, work)
         local legalWork = CommandUnit.OnWorkBegin(self, work)
-        if not legalWork then return end
+        if not legalWork then return false end
 
         self:SendNotifyMessage('started', work)
 
@@ -153,7 +154,7 @@ ACUUnit = ClassUnit(CommandUnit) {
         self:SetWeaponEnabledByLabel('AutoOverCharge', false)
 
         -- Ugly hack to re-initialise auto-OC once a task finishes
-        local wep = self:GetWeaponByLabel('AutoOverCharge')
+        local wep = self:GetWeaponByLabel('AutoOverCharge') --[[@as OverchargeWeapon]]
         wep:SetAutoOvercharge(wep.AutoMode)
     end,
 
