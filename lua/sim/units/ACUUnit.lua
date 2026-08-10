@@ -5,7 +5,7 @@ local CommandUnit = import("/lua/sim/units/commandunit.lua").CommandUnit
 ACUUnit = ClassUnit(CommandUnit) {
     -- The "commander under attack" warnings.
     ---@param self ACUUnit
-    ---@param bpShield any
+    ---@param bpShield UnitBlueprintDefenseShield
     CreateShield = function(self, bpShield)
         CommandUnit.CreateShield(self, bpShield)
 
@@ -20,7 +20,7 @@ ACUUnit = ClassUnit(CommandUnit) {
     end,
 
     ---@param self ACUUnit
-    ---@param enh string
+    ---@param enh Enhancement
     CreateEnhancement = function(self, enh)
         CommandUnit.CreateEnhancement(self, enh)
 
@@ -29,7 +29,7 @@ ACUUnit = ClassUnit(CommandUnit) {
     end,
 
     ---@param self ACUUnit
-    ---@param work string
+    ---@param work Enhancement
     ---@return boolean
     OnWorkBegin = function(self, work)
         local legalWork = CommandUnit.OnWorkBegin(self, work)
@@ -43,7 +43,7 @@ ACUUnit = ClassUnit(CommandUnit) {
     end,
 
     ---@param self ACUUnit
-    ---@param work string
+    ---@param work Enhancement
     OnWorkFail = function(self, work)
         self:SendNotifyMessage('cancelled', work)
         self:SetImmobile(false)
