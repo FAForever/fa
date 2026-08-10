@@ -139,7 +139,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field Dead? boolean
 ---@field UnitId UnitId
 ---@field EntityId EntityId
----@field EventCallbacks table<string, function[]>
+---@field EventCallbacks table<string, fun(self: Unit, param: any)[]>
 ---@field Buffs UnitBuffsTable
 ---@field EngineFlags? table<string, any>
 ---@field TerrainType TerrainType
@@ -4166,7 +4166,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     -- UNIT CALLBACKS
     -------------------------------------------------------------------------------------------
     ---@param self Unit
-    ---@param fn function
+    ---@param fn fun(self: Unit, param: any)
     ---@param type string
     AddUnitCallback = function(self, fn, type)
         self.EventCallbacks[type] = self.EventCallbacks[type] or { }
@@ -4177,9 +4177,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param type string
     ---@param param any
     DoUnitCallbacks = function(self, type, param)
-        if self.EventCallbacks[type] then
-            for num, cb in self.EventCallbacks[type] do
-                cb(self, param)
+        local callbacks = self.EventCallbacks[type]
+        if callbacks then
+            for num, cb in callbacks do
+                local ok, msg = pcall(cb, self, param)
+                if not ok then
+                    callbacks[num] = nil
+                    WARN(string.format('Error running unit "%s" callback: %s', type, msg))
+                end
             end
         end
     end,
