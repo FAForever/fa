@@ -139,7 +139,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field Dead? boolean
 ---@field UnitId UnitId
 ---@field EntityId EntityId
----@field EventCallbacks table<string, fun(self: Unit, param: any)[]>
+---@field EventCallbacks table<string, (fun(self: Unit, param: any) | { category: EntityCategory, cb: fun(self: Unit, built: Unit )})[]>
 ---@field Buffs UnitBuffsTable
 ---@field EngineFlags? table<string, any>
 ---@field TerrainType TerrainType
@@ -4332,27 +4332,33 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end,
 
     ---@param self Unit
-    ---@param fn function
+    ---@param fn fun(self: Unit, built: Unit)
     ---@param category EntityCategory
     AddOnUnitBuiltCallback = function(self, fn, category)
+        if type(fn) ~= 'function' then error("function expected but got " .. (fn.__name or type(fn)), 2) end
+        if category.__name ~= 'EntityCategory' then error("EntityCategory expected but got " .. (category.__name or type(category)), 2) end
         self.EventCallbacks.OnUnitBuilt = self.EventCallbacks.OnUnitBuilt or { }
         table.insert(self.EventCallbacks['OnUnitBuilt'], {category=category, cb=fn})
     end,
 
     ---@param self Unit
-    ---@param unit Unit
-    DoOnUnitBuiltCallbacks = function(self, unit)
-        if self.EventCallbacks.OnUnitBuilt then 
-            for _, v in self.EventCallbacks.OnUnitBuilt do
-                if unit and not unit.Dead and EntityCategoryContains(v.category, unit) then
-                    v.cb(self, unit)
+    ---@param built Unit
+    DoOnUnitBuiltCallbacks = function(self, built)
+        if self.EventCallbacks.OnUnitBuilt and built and not built.Dead then
+            for i, v in self.EventCallbacks.OnUnitBuilt do
+                if EntityCategoryContains(v.category, built) then
+                    local ok, msg = pcall(v.cb, self, built)
+                    if not ok then
+                        self.EventCallbacks.OnUnitBuilt[i] = nil
+                        WARN(string.format('Error running OnUnitBuilt callback: %s', msg))
+                    end
                 end
             end
         end
     end,
 
     ---@param self Unit
-    ---@param fn function
+    ---@param fn fun(self: Unit, built: Unit)
     RemoveCallback = function(self, fn)
         for k, v in self.EventCallbacks do
             if type(v) == "table" then
