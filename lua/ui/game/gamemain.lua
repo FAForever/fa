@@ -30,7 +30,9 @@ local mapGroup = controls.map
 local mfdControl = controls.mfd
 local ordersControl = false
 
-local OnDestroyFuncs = {}
+--- Callbacks to run in WldUiProvider.DestroyGameInterface
+---@see WldUIProvider.DestroyGameInterface
+local OnDestroyFuncs = {} ---@type fun()[]
 
  --- game's "Non-Interactive Sequence" state as synced from Sim
  ---@type 'on' | 'off' | false
@@ -570,6 +572,9 @@ function CreateWldUIProvider()
 
 end
 
+--- Add callback to run when the the world UI provider is destroyed.
+---@see WldUIProvider.DestroyGameInterface
+---@param func fun()
 function AddOnUIDestroyedFunction(func)
     table.insert(OnDestroyFuncs, func)
 end
