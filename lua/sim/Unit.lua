@@ -3093,7 +3093,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     ---@param self Unit
     ---@param built Unit
-    ---@param order string
+    ---@param order BuildOrderType
     StartBuildingEffects = function(self, built, order)
         local buildEffectsBag = self.BuildEffectsBag
         if buildEffectsBag then
@@ -3105,7 +3105,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     ---@param self Unit
     ---@param built Unit
-    ---@param order string
+    ---@param order BuildOrderType
     CreateBuildEffects = function(self, built, order)
     end,
 
