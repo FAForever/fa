@@ -122,20 +122,26 @@ ACUUnit = ClassUnit(CommandUnit) {
                 Sync.Teamkill = { killTime = GetGameTimeSeconds(), instigator = instigator.Army, victim = self.Army }
             end
 
-            -- prepare sync
-            local sync = Sync
-            local events = sync.Events or {}
-            sync.Events = events
-            local acuDestroyed = events.ACUDestroyed or {}
-            events.ACUDestroyed = acuDestroyed
-
-            -- sync the event
-            table.insert(acuDestroyed, {
+            -- Provides ACU kill info to UI mods (ex: Supreme Score Board)
+            ---@class Sync.Event.ACUDestroyed
+            local acuDestroyedEvent = {
                 Timestamp = GetGameTimeSeconds(),
                 InstigatorArmy = instigator.Army,
                 KilledArmy = self.Army
-            })
+            }
 
+            local sync = Sync
+            local events = sync.Events
+            if not events then
+                sync.Events = { acuDestroyed = { acuDestroyedEvent } }
+            else
+                local acuDestroyed = events.acuDestroyed
+                if not acuDestroyed then
+                    events.acuDestroyed = { acuDestroyedEvent }
+                else
+                    table.insert(acuDestroyed, acuDestroyedEvent)
+                end
+            end
         end
         self.Brain.CommanderKilledBy = (instigator or self).Army
         self.Brain.CommanderKilledTick = GetGameTick()

@@ -5,6 +5,7 @@
 ---@class SyncTable: table
 ---@field EnhanceRestrict table<Enhancement, true>
 ---@field Ping SyncPingData[]
+---@field Events { ACUDestroyed: Sync.Event.ACUDestroyed } # used by UI mods such as supreme score board
 Sync = { }
 
 local SyncDefaults = {
