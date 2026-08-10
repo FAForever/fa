@@ -807,23 +807,23 @@ function OnUserPause(pause)
     end
 end
 
+---@type { fn: fun(), throttle: boolean, key: any }[]
 local _beatFunctions = {}
 
--- Adds a function callback that will be called on sim beats
--- @param fn       - specifies function callback
--- @param throttle - specifies whether never to run a function more than 10 times per second
---                   to reduce UI load when speeding up sim / replay
--- @param key      - specifies optional key used later for removing callbacks by a key
-function AddBeatFunction(fn, throttle, key)
-    table.insert(_beatFunctions, {fn = fn, throttle = throttle == true, key = key})
+--- Adds a function callback that will be called on sim beats.
+---@param cb fun()
+---@param throttle boolean # Limits callback to 10 times per second to reduce UI load when speeding up sim/replay
+---@param key any # Optional key for removing callbacks by a key
+function AddBeatFunction(cb, throttle, key)
+    table.insert(_beatFunctions, { fn = cb, throttle = throttle == true, key = key })
 end
 
--- Removes a function callback from calling on sim beats
--- @param fn  - specifies function callback
--- @param key - specifies optional key associated with function callback
-function RemoveBeatFunction(fn, key)
-    for i,v in _beatFunctions do
-        if v.fn == fn then
+--- Removes the first found function callback from calling on sim beats
+---@param cb fun() # function to compare to for removal. Has priority over `key`
+---@param key any # key to compare to for removal
+function RemoveBeatFunction(cb, key)
+    for i, v in _beatFunctions do
+        if v.fn == cb then
             table.remove(_beatFunctions, i)
             break
         end
@@ -834,8 +834,8 @@ function RemoveBeatFunction(fn, key)
     end
 end
 
--- Calls function callbacks that were added previously, whenever the sim beat occurs
 local last = 0
+--- Called by the engine whenever the sim beat occurs.
 function OnBeat()
     local rate = GetSimRate()
     local throttle = false
