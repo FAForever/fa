@@ -147,7 +147,7 @@ function OnSync()
         -- if it fails, kick it out
         if not ok then
             SyncCallbacks[k] = nil
-            WARN(msg)
+            WARN(string.format('Error running Sync callback (id "%s"): %s', k, msg))
         end
     end
 
@@ -159,7 +159,7 @@ function OnSync()
                 local ok, msg = pcall(callback, data)
                 if not ok then
                     callbacks[l] = nil
-                    WARN(string.format('Error running Sync.%s callback "%s": %s', k, l, msg))
+                    WARN(string.format('Error running Sync.%s callback (id "%s"): %s', k, l, msg))
                 end
             end
         end
