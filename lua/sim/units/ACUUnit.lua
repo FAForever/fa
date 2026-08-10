@@ -171,8 +171,8 @@ ACUUnit = ClassUnit(CommandUnit) {
         WaitTicks(1)
         local bp = self.Blueprint
         local aiBrain = self:GetAIBrain()
-        aiBrain:GiveResource('Energy', bp.Economy.StorageEnergy)
-        aiBrain:GiveResource('Mass', bp.Economy.StorageMass)
+        aiBrain:GiveResource('ENERGY', bp.Economy.StorageEnergy)
+        aiBrain:GiveResource('MASS', bp.Economy.StorageMass)
     end,
 
     ---@param self ACUUnit
