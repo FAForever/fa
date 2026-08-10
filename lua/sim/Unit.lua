@@ -4374,8 +4374,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param self Unit
     ---@param fn function
     ---@param amount? number Fraction of HP lost. Defaults to `-1` - any amount of damage
-    ---@param repeatNum? integer Defaults to `1` - Triggered only once
+    ---@param repeatNum? integer How many times the callback can trigger. Defaults to `1` - Triggered only once
     AddOnDamagedCallback = function(self, fn, amount, repeatNum)
+        if type(fn) ~= 'function' then error("function expected but got " .. (fn.__name or type(fn)), 2) end
         local num = amount or -1
         repeatNum = repeatNum or 1
         self.EventCallbacks.OnDamaged = self.EventCallbacks.OnDamaged or { }
@@ -4386,10 +4387,19 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param instigator Unit
     DoOnDamagedCallbacks = function(self, instigator)
         if self.EventCallbacks.OnDamaged then
-            for num, callback in self.EventCallbacks.OnDamaged do
-                if (callback.Called < callback.Repeat or callback.Repeat == -1) and (callback.Amount == -1 or (1 - self:GetHealthPercent() > callback.Amount)) then
-                    callback.Called = callback.Called + 1
-                    callback.Func(self, instigator)
+            for i, callback in self.EventCallbacks.OnDamaged do
+                local called = callback.Called
+                local callLimit = callback.Repeat
+                local amount = callback.Amount
+                if (callLimit == -1 or called < callLimit)
+                    and (amount == -1 or (1 - self:GetHealthPercent() > amount))
+                then
+                    callback.Called = called + 1
+                    local ok, msg = pcall(callback.Func, self, instigator)
+                    if not ok then
+                        self.EventCallbacks.OnDamaged[i] = nil
+                        WARN('Error running Unit OnDamaged callback: ', msg)
+                    end
                 end
             end
         end
