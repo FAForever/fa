@@ -133,11 +133,11 @@ ACUUnit = ClassUnit(CommandUnit) {
             local sync = Sync
             local events = sync.Events
             if not events then
-                sync.Events = { acuDestroyed = { acuDestroyedEvent } }
+                sync.Events = { ACUDestroyed = { acuDestroyedEvent } }
             else
-                local acuDestroyed = events.acuDestroyed
+                local acuDestroyed = events.ACUDestroyed
                 if not acuDestroyed then
-                    events.acuDestroyed = { acuDestroyedEvent }
+                    events.ACUDestroyed = { acuDestroyedEvent }
                 else
                     table.insert(acuDestroyed, acuDestroyedEvent)
                 end
