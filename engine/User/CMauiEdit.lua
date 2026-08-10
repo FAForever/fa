@@ -212,4 +212,8 @@ CMauiEdit.OnCharPressed = nil
 ---@type fun(self: Edit, text: string): boolean
 CMauiEdit.OnEscPressed = nil
 
+--- Engine does not call HandleEvent for Edit controls.
+---@type nil
+CMauiEdit.HandleEvent = nil
+
 return CMauiEdit
