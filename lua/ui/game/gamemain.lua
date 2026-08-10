@@ -866,8 +866,9 @@ function OnBeat()
         if fn then
             local ok, msg = pcall(fn)
             if not ok then
-                WARN('Error running OnBeat function:' .. msg)
                 _beatFunctions[i] = nil
+                local keyStr = v.key and string.format(' (key "%s")', tostring(v.key)) or ''
+                WARN(string.format('Error running OnBeat callback%s: %s', keyStr, msg))
             end
         end
     end
