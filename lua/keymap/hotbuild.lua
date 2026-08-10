@@ -288,7 +288,7 @@ end
 factoryHotkeyLastClickWasLeft = false
 
 function factoryHotkey(units, count, selection, exFacUnits)
-    CommandMode.StartCommandMode("build", {name = ''})
+    CommandMode.StartCommandMode("build", { name = '' })
 
     -- Another 'hack' that is, uuhh - a hack. Override the event handle of the world view. If it doesn't
     -- return false then the event is captured and the engine ignores it (no orders are issued when clicking, etc)
@@ -666,8 +666,7 @@ function buildActionUpgrade()
     return result
 end
 
--- Smart Factory
--- Merged mod: Alternative Preset Fix + Factory Smart Templates 1
+-- Better Alt Hotbuilding
 
 local function GetUnitTech(unitId)
     local bp = __blueprints[unitId]
