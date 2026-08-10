@@ -2,6 +2,7 @@ local CommandUnit = import("/lua/sim/units/commandunit.lua").CommandUnit
 
 ---@class ACUUnit : CommandUnit
 ---@field LastTickDamaged? number
+---@field WeaponEnabled table<string, boolean> # Tracks enabled state of weapons so that it is restored correctly after stopping engineering actions
 ACUUnit = ClassUnit(CommandUnit) {
     -- The "commander under attack" warnings.
     ---@param self ACUUnit
@@ -192,7 +193,7 @@ ACUUnit = ClassUnit(CommandUnit) {
     ---@param self ACUUnit
     ---@param label string
     ---@param enable boolean
-    ---@param lockOut boolean
+    ---@param lockOut boolean? # If enabled, weapon's state won't be remembered for later restoration in `self.WeaponEnabled`
     SetWeaponEnabledByLabel = function(self, label, enable, lockOut)
         CommandUnit.SetWeaponEnabledByLabel(self, label, enable)
 
