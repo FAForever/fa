@@ -17,6 +17,10 @@ local Movie = import("/lua/maui/movie.lua").Movie
 local Prefs = import("/lua/user/prefs.lua")
 local options = Prefs.GetFromCurrentProfile('options')
 
+local GetSimRate = GetSimRate
+local GetSystemTimeSeconds = GetSystemTimeSeconds
+local pcall = pcall
+
 local controls = import("/lua/ui/controls.lua").Get()
 
 local gameParent = controls.gameParent
@@ -837,10 +841,9 @@ end
 local last = 0
 --- Called by the engine whenever the sim beat occurs.
 function OnBeat()
-    local rate = GetSimRate()
     local throttle = false
 
-    if rate > 0 then
+    if GetSimRate() > 0 then
         if GetSystemTimeSeconds() - last < 0.1 then
             throttle = true
         else
