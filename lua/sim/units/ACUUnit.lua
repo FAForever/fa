@@ -105,8 +105,6 @@ ACUUnit = ClassUnit(CommandUnit) {
 
         -- If there is a killer, and it's not me
         if instigator and instigator.Army ~= self.Army then
-            local instigatorBrain = ArmyBrains[instigator.Army]
-
             Sync.EnforceRating = true
             WARN("ACU kill detected. Time requirement for rating games will now be removed.")
 
