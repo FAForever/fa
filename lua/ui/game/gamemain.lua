@@ -850,7 +850,14 @@ function OnBeat()
 
     for i,v in _beatFunctions do
         if v.throttle and throttle then continue end
-        if v.fn then v.fn() end
+        local fn = v.fn
+        if fn then
+            local ok, msg = pcall(fn)
+            if not ok then
+                WARN('Error running OnBeat function:' .. msg)
+                _beatFunctions[i] = nil
+            end
+        end
     end
 end
 
