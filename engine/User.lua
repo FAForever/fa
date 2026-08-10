@@ -528,10 +528,10 @@ function GetRolloverInfo()
 end
 
 --- Gets the state for the script bit
----@param unit UserUnit
+---@param units UserUnit[] # Returns false instead of erroring if wrong table format
 ---@param bit number
 ---@return boolean
-function GetScriptBit(unit, bit)
+function GetScriptBit(units, bit)
 end
 
 --- Returns a table of the currently selected units
