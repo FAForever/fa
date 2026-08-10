@@ -852,7 +852,7 @@ function OnBeat()
         end
     end
 
-    for i,v in _beatFunctions do
+    for i, v in _beatFunctions do
         if v.throttle and throttle then continue end
         local fn = v.fn
         if fn then
