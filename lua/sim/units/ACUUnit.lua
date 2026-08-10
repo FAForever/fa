@@ -117,7 +117,7 @@ ACUUnit = ClassUnit(CommandUnit) {
             --     'Deathnuke' - when ACU is killed
             if IsAlly(self.Army, instigator.Army) and
                 not
-                ((type == 'DeathExplosion' or type == 'Nuke' or type == 'Deathnuke') and not instigator.SelfDestructed) then
+                ((type == 'DeathExplosion' or type == 'Nuke' or type == 'Deathnuke')) then
                 WARN('Teamkill detected')
                 Sync.Teamkill = { killTime = GetGameTimeSeconds(), instigator = instigator.Army, victim = self.Army }
             end
