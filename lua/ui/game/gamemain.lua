@@ -838,17 +838,17 @@ function RemoveBeatFunction(cb, key)
     end
 end
 
-local last = 0
+local next = 0
 --- Called by the engine whenever the sim beat occurs.
 function OnBeat()
     local throttle = false
 
     if GetSimRate() > 0 then
         local sysTime = GetSystemTimeSeconds()
-        if sysTime - last < 0.1 then
+        if sysTime > next then
             throttle = true
         else
-            last = sysTime
+            next = sysTime + 0.1
         end
     end
 
