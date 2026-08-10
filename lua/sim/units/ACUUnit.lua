@@ -97,8 +97,8 @@ ACUUnit = ClassUnit(CommandUnit) {
     end,
 
     ---@param self ACUUnit
-    ---@param instigator Unit
-    ---@param type string
+    ---@param instigator Unit | Projectile
+    ---@param type DamageType
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
         CommandUnit.OnKilled(self, instigator, type, overkillRatio)
