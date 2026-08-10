@@ -58,7 +58,7 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field Civilian boolean
 ---@field Trash TrashBag
 ---@field UnitBuiltTriggerList table
----@field PingCallbackList { CallbackFunction: fun(pingData: any), PingType: string }[]
+---@field PingCallbackList { CallbackFunction: fun(self: AIBrain, pingData: SyncPingData), PingType: PingTypeLowercase }[]
 ---@field BrainType 'Human' | 'AI'
 ---@field CustomUnits { [string]: EntityId[] }
 ---@field CommanderKilledBy Army        # Which army last killed one of our commanders. Used for transfering to killer in `demoralization` (Assassination) and `decapitation` victory.
@@ -583,8 +583,8 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     --#region ping functionality
 
     ---@param self AIBrain
-    ---@param callback function
-    ---@param pingType string
+    ---@param callback fun(self: AIBrain, pingData: SyncPingData)
+    ---@param pingType PingTypeLowercase
     AddPingCallback = function(self, callback, pingType)
         if callback and pingType then
             table.insert(self.PingCallbackList, { CallbackFunction = callback, PingType = pingType })
@@ -592,15 +592,19 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     end,
 
     ---@param self AIBrain
-    ---@param pingData table
+    ---@param pingData SyncPingData
     DoPingCallbacks = function(self, pingData)
-        for _, v in self.PingCallbackList do
-            v.CallbackFunction(self, pingData)
+        for i, v in self.PingCallbackList do
+            local ok, msg = pcall(v.CallbackFunction, self, pingData)
+            if not ok then
+                self.PingCallbackList[i] = nil
+                WARN('Error running AI brain ping callback:', msg)
+            end
         end
     end,
 
     ---@param self AIBrain
-    ---@param pingData table
+    ---@param pingData SyncPingData
     DoAIPing = function(self, pingData)
         if self.Sorian then
             if pingData.Type then
