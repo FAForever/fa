@@ -15,7 +15,8 @@
     ".vscode/",
     "loc/",
     "*.bp",
-    "lua/ui/lobby/changelog/generated/"
+    "lua/ui/lobby/changelog/generated/",
+    "*_save.lua"
   ],
   "[lua]": {
     "editor.wordBasedSuggestions": "off"
