@@ -556,7 +556,10 @@ function CreateWldUIProvider()
     provider.DestroyGameInterface = function(self)
         if gameParent then gameParent:Destroy() end
         for _, func in OnDestroyFuncs do
-            func()
+            local ok, msg = pcall(func)
+            if not ok then
+                WARN('Error running OnUIDestroyed function:', msg)
+            end
         end
         import("/lua/ui/game/rallypoint.lua").ClearAllRallyPoints()
     end
