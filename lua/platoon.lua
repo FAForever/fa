@@ -63,7 +63,7 @@ local SUtils = import("/lua/ai/sorianutilities.lua")
 ---@class Platoon : moho.platoon_methods
 ---@field PlatoonData table
 ---@field Trash TrashBag
----@field EventCallbacks table
+---@field EventCallbacks Platoon.EventCallbacks
 ---@field MovementLayer string
 ---@field AIThread? thread
 ---@field PlanName string
@@ -86,8 +86,9 @@ Platoon = Class(moho.platoon_methods) {
             self.AIThread = self:ForkThread(self[plan])
         end
         self.PlatoonData = {}
+        ---@class Platoon.EventCallbacks
         self.EventCallbacks = {
-            OnDestroyed = {},
+            OnDestroyed = {}, ---@type fun(brain: AIBrain, platoon: Platoon)[]
         }
         self.PartOfAttackForce = false
         self.CreationTime = GetGameTimeSeconds()
@@ -185,18 +186,23 @@ Platoon = Class(moho.platoon_methods) {
 
     ---@param self Platoon
     DoDestroyCallbacks = function(self)
-        if self.EventCallbacks.OnDestroyed then
+        local OnDestroyedCallbacks = self.EventCallbacks.OnDestroyed
+        if OnDestroyedCallbacks then
             local brain = self:GetBrain()
-            for k, cb in self.EventCallbacks.OnDestroyed do
-                cb(brain, self)
+            for k, cb in OnDestroyedCallbacks do
+                local ok, msg = pcall(cb, brain, self)
+                if not ok then
+                    OnDestroyedCallbacks[k] = nil
+                    WARN('Error running Platoon OnDestroy callback:', msg)
+                end
             end
         end
     end,
 
     ---@param self Platoon
-    ---@param fn function
+    ---@param fn fun(brain: AIBrain, platoon: Platoon)
     RemoveDestroyCallback = function(self, fn)
-        for k,v in self.EventCallbacks.OnDestroyed do
+        for k, v in self.EventCallbacks.OnDestroyed do
             if v == fn then
                 self.EventCallbacks.OnDestroyed[k] = nil
             end
