@@ -24,6 +24,18 @@ local StructureUnit = import("/lua/sim/units/structureunit.lua").StructureUnit
 
 ---@class AirStagingPlatformUnit : StructureUnit
 AirStagingPlatformUnit = ClassUnit(StructureUnit) {
+    ---@param self AirStagingPlatformUnit
+    ---@param attachBone Bone
+    ---@param attachedUnit Unit
+    OnTransportAttach = function(self, attachBone, attachedUnit)
+        StructureUnit.OnTransportAttach(self, attachBone, attachedUnit)
+
+        local maxHealth = attachedUnit:GetMaxHealth()
+        if attachedUnit:GetHealth() > maxHealth then
+            attachedUnit:SetHealth(attachedUnit, maxHealth)
+        end
+    end,
+
     --- Detach units from air staging on death to allow working around an engine bug
     --- where units get stuck in the air staging.
     ---@param self AirStagingPlatformUnit
