@@ -1,0 +1,1 @@
+- Fix aircraft stuck on air staging facility after passing through Restoration Field. (#7219)
