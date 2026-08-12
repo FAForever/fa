@@ -4,6 +4,7 @@
 ---@type EntityCategory
 local categoryValue
 
+---@type table<CategoryName | UnitId, EntityCategory>
 categories = {
     ABILITYBUTTON = categoryValue,
     ADVANCEDCOMBATPRESET = categoryValue,
@@ -148,6 +149,7 @@ categories = {
     OVERLAYOMNI = categoryValue,
     OVERLAYRADAR = categoryValue,
     OVERLAYSONAR = categoryValue,
+    -- Allows unit to reclaim and repair on patrol/aggressive move tasks.
     PATROLHELPER = categoryValue,
     PERSONALSHIELD = categoryValue,
     POD = categoryValue,
@@ -208,6 +210,7 @@ categories = {
     TACTICAL = categoryValue,
     TACTICALMISSILEPLATFORM = categoryValue,
     TANK = categoryValue,
+    -- Unit does not mantain any formation when on attack task
     TARGETCHASER = categoryValue,
     TECH1 = categoryValue,
     TECH2 = categoryValue,

@@ -1380,7 +1380,7 @@ function PlayTeleportInEffects(unit, effectsBag)
 
             local fn = function(unit)
                 CreateLightParticle(unit, -1, unitArmy, 4, 10, 'glow_03', 'ramp_yellow_01')
-                DamageArea(unit, unit:GetPosition(), 9, 1, 'Force', true)
+                DamageArea(unit, unit:GetPosition(), 9, 1, 'TreeForce', true)
 
                 unit.TeleportFx_IsInvisible = true
                 unit:HideBone(0, true)
@@ -1407,7 +1407,7 @@ function PlayTeleportInEffects(unit, effectsBag)
             end
 
             CreateLightParticle(unit.TeleportCybranSphere, -1, unitArmy, 4, 10, 'glow_02', 'ramp_white_01')
-            DamageArea(unit, unit:GetPosition(), 9, 1, 'Force', true)
+            DamageArea(unit, unit:GetPosition(), 9, 1, 'TreeForce', true)
 
             CreateDecal(unit:GetPosition(), decalOrient, 'Scorch_generic_002_albedo', '', 'Albedo', 7, 7, 200, 300, unitArmy)
 
@@ -1444,7 +1444,7 @@ function PlayTeleportInEffects(unit, effectsBag)
                 end
 
                 CreateLightParticle(unit, -1, unitArmy, 4, 15, 'glow_05', 'ramp_jammer_01')
-                DamageArea(unit, unit:GetPosition(), 9, 1, 'Force', true)
+                DamageArea(unit, unit:GetPosition(), 9, 1, 'TreeForce', true)
 
                 local decalOrient = UtilGetRandomFloat(0, mathTau)
                 CreateDecal(unit:GetPosition(), decalOrient, 'crater01_albedo', '', 'Albedo', 4, 4, 200, 300, unitArmy)
@@ -1472,7 +1472,7 @@ function PlayTeleportInEffects(unit, effectsBag)
                 IEffectOffsetEmitter(CreateEmitterAtEntity(unit, unitArmy, effect), 0, offsetY, 0)
             end
 
-            DamageArea(unit, unit:GetPosition(), 9, 1, 'Force', true)
+            DamageArea(unit, unit:GetPosition(), 9, 1, 'TreeForce', true)
             CreateDecal(unit:GetPosition(), decalOrient, 'Scorch_generic_002_albedo', '', 'Albedo', 7, 7, 200, 300, unitArmy)
             CreateTeleSteamFX(unit)
         end

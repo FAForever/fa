@@ -1,0 +1,1 @@
+- Fix unit icons not loading on the changelog website (#7202).

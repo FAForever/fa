@@ -28,11 +28,13 @@ local ordersControl = false
 
 local OnDestroyFuncs = {}
 
+ --- game's "Non-Interactive Sequence" state as synced from Sim
+ ---@type 'on' | 'off' | false
 local NISActive = false
 local isReplay = false
 local waitingDialog = false
 
-local sendChat = import("/lua/ui/game/chat.lua").ReceiveChatFromSim
+local sendChat = import("/lua/ui/game/chat/ChatController.lua").OnReceive
 local oldData = {}
 local lastObserving
 
@@ -87,7 +89,6 @@ function SetLayout(layout)
     import("/lua/ui/game/score.lua").SetLayout()
     import("/lua/ui/game/tabs.lua").SetLayout()
     import("/lua/ui/game/controlgroups.lua").SetLayout()
-    import("/lua/ui/game/chat.lua").SetLayout()
     import("/lua/ui/game/minimap.lua").SetLayout()
     import("/lua/ui/game/massfabs.lua").SetLayout()
     import("/lua/ui/game/recall.lua").SetLayout()
@@ -298,8 +299,8 @@ function CreateUI(isReplay)
     import("/lua/ui/game/consoleecho.lua").CreateConsoleEcho(mapGroup)
     import("/lua/ui/game/build_templates.lua").Init()
     import("/lua/ui/game/taunt.lua").Init()
+    import("/lua/ui/game/chat/ChatController.lua").Init()
 
-    import("/lua/ui/game/chat.lua").SetupChatLayout(windowGroup)
     import("/lua/ui/game/minimap.lua").CreateMinimap(windowGroup)
 
     if import("/lua/ui/campaign/campaignmanager.lua").campaignMode then
@@ -735,6 +736,7 @@ function OnQueueChanged(newQueue)
     end
 end
 
+
 --- Called by the engine after the sim confirmed that the game is indeed paused. This is run on all instances that are connected to the lobby.
 ---@param pausedBy integer   # The index of the client in the clients list (that you get via `GetSessionClients`)
 ---@param timeoutsRemaining number
@@ -932,6 +934,9 @@ local rangePrefs = {
 }
 
 local preNISSettings = {}
+
+--- Called by user sync to set the NIS mode state and do callbacks for the states
+---@param state 'on' | 'off'
 function NISMode(state)
     NISActive = state
     local worldView = import("/lua/ui/game/worldview.lua")
@@ -941,7 +946,7 @@ function NISMode(state)
         import("/lua/ui/game/consoleecho.lua").ToggleOutput(false)
         import("/lua/ui/game/multifunction.lua").PreNIS()
         import("/lua/ui/game/tooltip.lua").DestroyMouseoverDisplay()
-        import("/lua/ui/game/chat.lua").OnNISBegin()
+        import("/lua/ui/game/chat/ChatInterface.lua").Close()
         import("/lua/ui/game/unitviewdetail.lua").OnNIS()
         HideGameUI(state)
         ShowNISBars()
@@ -1032,6 +1037,8 @@ function ShowNISBars()
     end
 end
 
+--- Returns true if the game is in a "Non-Interactive Sequence"
+---@return boolean
 function IsNISMode()
     if NISActive == 'on' then
         return true
@@ -1071,6 +1078,12 @@ end
 ---@param sender string     # username
 ---@param data table        
 function ReceiveChat(sender, data)
+    -- console output ends up as a chat message, hence we early exit here
+    if data.ConsoleOutput then
+        print(LOCF("%s %s", sender, data.ConsoleOutput))
+        return
+    end
+
     if data.Identifier then
 
         -- we highly encourage to use the 'Identifier' field to quickly identify the correct function
@@ -1114,6 +1127,55 @@ function QuickSave(filename)
                              UIUtil.ShowInfoDialog(GetFrame(0), infoStr, "<LOC _Ok>")
                          end
                      end)
+    end
+end
+
+--- Called by key action to load a special quick save file.
+---@param filename string
+function QuickLoad(filename)
+    if not SessionIsActive()
+        or not SessionIsMultiplayer()
+    then
+        --#region Duplicate code from QuickSave
+        local saveType
+        if import("/lua/ui/campaign/campaignmanager.lua").campaignMode then
+            saveType = "CampaignSave"
+        else
+            saveType = "SaveGame"
+        end
+        local path = GetSpecialFilePath(Prefs.GetCurrentProfile().Name, filename, saveType)
+        --#endregion
+
+        local statusStr = "<LOC saveload_QuickLoad>Loading Quick Save..."
+        local status = UIUtil.ShowInfoDialog(GetFrame(0), statusStr)
+
+        --#region Duplicate of `/lua/ui/dialogs/saveload.lua` `CreateLoadDialog` `DoLoad`
+        SetFrontEndData('NextOpBriefing', nil)
+        local SaveErrors = {
+            WrongVersion = '<LOC uisaveload_0005>Wrong version for savegame "%s"',
+            CantOpen = '<LOC uisaveload_0004>Couldn\'t open savegame "%s"',
+            InvalidFormat = '<LOC uisaveload_0006>"%s" is not a valid savegame',
+            InternalError = '<LOC uisaveload_0007>Internal error loading savegame "%s": %s',
+        }
+        local InternalErrors = {
+            ['eof'] = "<LOC Engine0027>EOF reached during serialization.",
+            ['noread'] = "<LOC Engine0028>Error reading file stream during serialization.",
+            ['nowrite'] = "<LOC Engine0026>Error writing data during serialization. Possibly out of disk space.",
+        }
+
+        local worked, error, detail = LoadSavedGame(path)
+        if not worked then
+            UIUtil.ShowInfoDialog(GetFrame(0),
+                -- note - the 'Unknown error...' string below is intentionally not localized because
+                -- it should never show up.  If it does, add the error string to SaveErrors.
+                LOCF(SaveErrors[error] or ('Unknown error ' .. repr(error) .. 'loading savegame %s: %s'),
+                    Basename(path, true),
+                    InternalErrors[detail] or detail),
+                "<LOC _Ok>")
+        end
+        --#endregion
+
+        status:Destroy()
     end
 end
 
@@ -1167,7 +1229,15 @@ SendChat = function()
                     if newChat then
                         chat.oldTime = GetGameTimeSeconds()
                         table.insert(oldData, chat)
-                        sendChat(chat.sender, chat.msg)
+                        -- Sim-side `ConsoleOutput` messages are log-only —
+                        -- they never open a chat line. The new receive path
+                        -- drops non-`Chat` messages, so handle the print
+                        -- here instead of in the controller.
+                        if chat.msg.ConsoleOutput then
+                            print(LOCF("%s %s", chat.sender or "nil sender", chat.msg.ConsoleOutput))
+                        else
+                            sendChat(chat.sender, chat.msg)
+                        end
                     end
                 end
                 UnitData.Chat = {}

@@ -1,1 +1,0 @@
-- (#7039) Salem Class (URS0201): Fix Nanite Torpedoes preventing the other weapons from firing during their salvo.

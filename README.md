@@ -12,13 +12,17 @@ Forged Alliance Forever is a vibrant, community-driven [project](https://github.
 - Log in using the account you registered and host a game with AIs and/or players, queue up for matchmaker or upload your own content to our vaults for other players to enjoy.
 - Engage with the community through the [forums](https://forum.faforever.com/) using the account you registered or join us on the official [Discord server](https://discord.gg/mXahVSKGVb).
 
+## Changelog
+
+Over the years we continued to update the game to improve the balancing and refine mechanics. You can find the complete changelog [here](https://faforever.github.io/fa/changelog).
+
 ## Information for contributors
 
 All contributions are expected to apply the [code of conduct](https://www.faforever.com/rules) to create a healthy and sustainable contributor environment.
 
-- [Changelog](./.github/CHANGELOG.md): documentation about how we manage changelogs and release notes.
-- [Development](./.github/DEVELOPMENT.md): documentation about development including how to setup a development environment and various best practices.
-- [Deployment](./.github/DEVELOPMENT.md): documentation about deployment to the FAF, FAF Beta Balance and FAF Develop game types.
+- [Changelog](https://faforever.github.io/fa/development/changelog): documentation about how we manage changelogs and release notes.
+- [Development](https://faforever.github.io/fa/development): documentation about development including how to setup a development environment and various best practices.
+- [Deployment](https://faforever.github.io/fa/deploy): documentation about deployment to the FAF, FAF Beta and FAF Develop game types.
 
 In addition, there is an [extensive guide](./setup/setup-english.md) to help you setup your development environment. This guide is due to be replaced by the development file.
 

@@ -12,13 +12,13 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 90,
+                    LODCutoff = 440,
                     ShaderName = "VertexNormal",
                     AlbedoName = "jbuild01_Albedo.dds",
                     NormalsName = "jbuild01_NormalsTS.dds",
                 },
                 {
-                    LODCutoff = 350,
+                    LODCutoff = 870,
                     ShaderName = "VertexNormal",
                     AlbedoName = "jbuild01_Albedo.dds",
                     NormalsName = "jbuild01_NormalsTS.dds",

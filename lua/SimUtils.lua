@@ -5,6 +5,8 @@
 -- upvalues for performance
 local ArmyBrains = ArmyBrains
 local GetCurrentCommandSource = GetCurrentCommandSource
+local TableEmpty = table.empty
+local KillThread = KillThread
 
 ------------------------------------------------------------------------------------------------------------------------
 --#region General Unit Transfer Scripts
@@ -289,7 +291,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
 
         -- B E F O R E
         local orientation = unit:GetOrientation()
-        local workprogress = unit:GetWorkProgress()
+        local siloWorkProgress = unit:IsUnitState("SiloBuildingAmmo") and unit:GetWorkProgress() or 0
         local numNukes = unit:GetNukeSiloAmmoCount() -- nuclear missiles; SML or SMD
         local numTacMsl = unit:GetTacticalSiloAmmoCount()
         local massKilled = unit.VetExperience
@@ -326,11 +328,8 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
             local unitEnh = SimUnitEnhancements[unit.EntityId]
             if unitEnh then
                 activeEnhancements = {}
-                for i, enh in unitEnh do
-                    activeEnhancements[i] = enh
-                end
-                if not activeEnhancements[1] then
-                    activeEnhancements = nil
+                for slot, enh in unitEnh do
+                    activeEnhancements[slot] = enh
                 end
             end
         end
@@ -420,8 +419,20 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         end
 
         if activeEnhancements then
-            for _, enh in activeEnhancements do
-                newUnit:CreateEnhancement(enh)
+            local thread = newUnit.OnStopBeingBuiltEnhancementsThread
+            if thread then KillThread(thread) end
+            if TableEmpty(activeEnhancements) then
+                newUnit.OnStopBeingBuiltEnhancementsThread = nil
+            else
+                newUnit.OnStopBeingBuiltEnhancementsThread = newUnit:ForkThread(function()
+                    WaitTicks(1)
+                    if newUnit and not newUnit.Dead and not IsDestroyed(newUnit) then
+                        for _, enh in activeEnhancements do
+                            newUnit:CreateEnhancement(enh)
+                        end
+                    end
+                    newUnit.OnStopBeingBuiltEnhancementsThread = nil
+                end)
             end
         end
 
@@ -448,7 +459,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         end
 
         if newUnit.Blueprint.CategoriesHash["SILO"] then
-            newUnit:GiveNukeSiloBlocks(workprogress)
+            newUnit:GiveNukeSiloBlocks(siloWorkProgress)
         end
 
         local newShield = newUnit.MyShield
@@ -675,8 +686,8 @@ function FinalizeRebuiltUnits(trackers, blockingEntities)
             -- Don't refund energy because it would be counterintuitive for wreckage
             local energy = 0
             -- global 2x time multiplier for unit wrecks, see `Unit:CreateWreckageProp`
-            local time = (bp.Wreckage.ReclaimTimeMultiplier or 1) * 2
-            CreateWreckage(bp, pos, orientation, mass, energy, time)
+            local timeMult = (bp.Wreckage.ReclaimTimeMultiplier or 1) * 2
+            CreateWreckage(bp, pos, orientation, mass, energy, timeMult)
         end
     end
 
@@ -738,6 +749,7 @@ function GiveUnitsToPlayer(data, units)
     if manualShare == 'none' or table.empty(units) then
         return
     end
+    ---@cast units -nil
     local toArmy = data.To
     local owner = units[1].Army
     if OkayToMessWithArmy(owner) and IsAlly(owner, toArmy) then
@@ -752,7 +764,63 @@ function GiveUnitsToPlayer(data, units)
             end
         end
 
-        TransferUnitsOwnership(units, toArmy)
+        local transferredUnits = TransferUnitsOwnership(units, toArmy)
+
+        -- Whisper from giver → receiver, with an `Area` location so the
+        -- receiver can click the cam-icon to jump to where the units are.
+        -- The bounding box is computed from the units' positions before
+        -- they scatter; padded slightly so a single-unit gift gives the
+        -- camera region a non-degenerate framing rectangle.
+        local count = transferredUnits and table.getn(transferredUnits) or 0
+        if transferredUnits and count > 0 then
+            local init = transferredUnits[1]:GetPosition()
+            local x0, x1, z0, z1 = init[1], init[1], init[3], init[3]
+            for _, unit in transferredUnits do
+                local pos = unit:GetPosition()
+                if pos[1] < x0 then x0 = pos[1] end
+                if pos[1] > x1 then x1 = pos[1] end
+                if pos[3] < z0 then z0 = pos[3] end
+                if pos[3] > z1 then z1 = pos[3] end
+            end
+            local pad = 30
+            local area = { x0 = x0 - pad, x1 = x1 + pad, y0 = z0 - pad, y1 = z1 + pad }
+            local fromBrain = ArmyBrains[owner]
+            local fromName = fromBrain.Nickname or tostring(owner)
+
+            -- Specialize the wording when every shared unit is an engineer
+            -- — "shared 5 engineers" reads more naturally than "shared 5
+            -- units" when the transfer is e.g. a builder pool. Mixed
+            -- transfers fall through to the generic noun.
+            local allEngineers = true
+            for _, unit in transferredUnits do
+                if not EntityCategoryContains(categories.ENGINEER, unit) then
+                    allEngineers = false
+                    break
+                end
+            end
+
+            local locKey, fallback
+            if allEngineers then
+                if count == 1 then
+                    locKey, fallback = 'chat_engineers_received_one', '%s shared an engineer with you.'
+                else
+                    locKey, fallback = 'chat_engineers_received_many', '%s shared %d engineers with you.'
+                end
+            else
+                if count == 1 then
+                    locKey, fallback = 'chat_units_received_one', '%s shared a unit with you.'
+                else
+                    locKey, fallback = 'chat_units_received_many', '%s shared %d units with you.'
+                end
+            end
+
+            local args = count == 1 and { fromName } or { fromName, count }
+            fromBrain:SendChatToPlayer(toArmy,
+                '<LOC ' .. locKey .. '>' .. fallback,
+                args,
+                { Area = area }
+            )
+        end
     end
 end
 
@@ -936,7 +1004,22 @@ end
 -- shortly thereafter due to the army being defeated (as is common), we then
 -- have an opportunity to see the final game state as observers before everything
 -- would have blown up.
+--
+-- This should be longer than `AbandonedArmyGracePeriod`
 EndGameGracePeriod = 10
+
+-- Seconds to wait after an army has been abandoned (the player disconnected)
+-- before processing its units. This gives a small opportunity to avoid the ACU
+-- explosion, and prevents disconnecting players from providing the server with
+-- a cut-off replay due to the sim on their client instantly killing all other ACUs
+-- and reporting a game over state.
+--
+-- This should be shorter than `EndGameGracePeriod`
+AbandonedArmyGracePeriod = 3
+
+-- Set to true in `AbstractVictoryCondition.EndGame` to prevent killing units after a
+-- team is victorious but before the sim is stopped.
+GameIsEnding = false
 
 --- Kills all given units, if not already dead
 ---@param toKill Entity[]
@@ -948,6 +1031,16 @@ local function KillUnits(toKill)
             end
         end
     end
+end
+
+--- Asynchronously kills all given units after a delay, if not already dead.
+---@param toKill Entity[]
+---@param delaySec number
+local function DelayedKillUnits(toKill, delaySec)
+    ForkThread(function ()
+        WaitSeconds(delaySec)
+        KillUnits(toKill)
+    end)
 end
 
 ---@param self AIBrain
@@ -1072,6 +1165,8 @@ function KillArmy(self, shareOption)
 
     WaitSeconds(EndGameGracePeriod)
 
+    if GameIsEnding then return end
+
     local selfIndex = self.Army
     local brainCategories = GetAllegianceCategories(selfIndex)
 
@@ -1112,6 +1207,8 @@ end
 function KillRecalledArmy(self, shareOption)
 
     WaitSeconds(EndGameGracePeriod)
+
+    if GameIsEnding then return end
 
     local brainCategories = GetAllegianceCategories(self.Army)
 
@@ -1187,13 +1284,17 @@ MinimumShareTime = 5 * 60 * 10 -- 5 minutes
 function KillUnsafeCommanders(commanders, tick)
     tick = tick or GetGameTick()
     local safeCommanders = {}
+    local unsafeCommanders = {}
     for _, com in commanders do
         if com.LastTickDamaged and com.LastTickDamaged + CommanderSafeTime > tick then
-            com:Kill()
+            table.insert(unsafeCommanders, com)
         else
             table.insert(safeCommanders, com)
         end
     end
+
+    DelayedKillUnits(unsafeCommanders, AbandonedArmyGracePeriod)
+
     return safeCommanders
 end
 
@@ -1241,8 +1342,7 @@ function KillArmyOnDelayedRecall(self, shareOption, shareTime)
             local safeCommanders = KillUnsafeCommanders(sharedCommanders)
 
             if not table.empty(safeCommanders) then
-                -- note: this adds 3 seconds to the grace period
-                FakeTeleportUnits(safeCommanders, true)
+                ForkThread(FakeTeleportUnits, safeCommanders, true)
             end
         end
     end
@@ -1281,8 +1381,6 @@ function KillAbandonedArmy(self, shareOption, shareAcuOption, victoryOption)
         shareOption = ScenarioInfo.Options.Share
     end
 
-    -- Don't apply instant-effect disconnect rules for players/ACUs that might be defeated soon,
-    -- and might have intentionally disconnected.
     if shareAcuOption == 'Explode' or shareAcuOption == 'Recall' then
         local safeCommanders
         local commanders = self:GetListOfUnits(categories.COMMAND, false)
@@ -1290,7 +1388,7 @@ function KillAbandonedArmy(self, shareOption, shareAcuOption, victoryOption)
             safeCommanders = KillUnsafeCommanders(commanders)
         else
             -- explode all the ACUs so they don't get shared
-            KillUnits(commanders)
+            DelayedKillUnits(commanders, AbandonedArmyGracePeriod)
         end
 
         -- Only handle Assassination victory, as in other settings the player is unlikely to be defeated soon
@@ -1300,8 +1398,7 @@ function KillAbandonedArmy(self, shareOption, shareAcuOption, victoryOption)
 
         -- non-assassination modes can have armies abandon without commanders
         if shareAcuOption == 'Recall' and not table.empty(safeCommanders) then
-            -- note: this adds 3 seconds to the grace period
-            FakeTeleportUnits(safeCommanders, true)
+            ForkThread(FakeTeleportUnits, safeCommanders, true)
         end
 
         KillArmy(self, shareOption)
@@ -1441,19 +1538,17 @@ function SetOfferDraw(data)
     brain.OfferingDraw = data.Value
 end
 
----@param data {Sender: integer, Msg: string}
-function SendChatToReplay(data)
-    if data.Sender and data.Msg then
-        if not Sync.UnitData.Chat then
-            Sync.UnitData.Chat = {}
-        end
-        table.insert(Sync.UnitData.Chat, { sender = data.Sender, msg = data.Msg })
-    end
-end
+-- Chat-relay helpers moved to `/lua/ChatUtils.lua`:
+--   * `SendChatMessage`  — trusted sim relay that feeds `Sync.ChatMessages`.
 
----@param data {From: Army, To: Army, Mass: number, Energy: number}
+---@param data {From: Army, To: Army, Mass: number, Energy: number, Sender?: string, Msg?: table}
 function GiveResourcesToPlayer(data)
-    SendChatToReplay(data)
+    -- The refactored chat path (see `ChatUtils.SendChatMessage`) still fires
+    -- this callback once per outgoing chat message with `Sender`/`Msg` set,
+    -- because external replay parsers scrape those fields out of the recorded
+    -- args. The legacy per-receive `SendChatToReplay` write into
+    -- `Sync.UnitData.Chat` is gone — chat now syncs through
+    -- `Sync.ChatMessages`.
 
     -- Ignore observers and players trying to send resources to themselves or to enemies
     if data.From == -1 or data.From == data.To or not IsAlly(data.From, data.To) then
@@ -1472,8 +1567,42 @@ function GiveResourcesToPlayer(data)
     local massTaken = fromBrain:TakeResource('MASS', data.Mass * fromBrain:GetEconomyStored('MASS'))
     local energyTaken = fromBrain:TakeResource('ENERGY', data.Energy * fromBrain:GetEconomyStored('ENERGY'))
 
-    toBrain:GiveResource('MASS', massTaken)
-    toBrain:GiveResource('ENERGY', energyTaken)
+    -- `GiveResource` silently caps at the receiver's max storage, and
+    -- storage stats only update next tick, so derive what actually lands
+    -- up front from `MaxStorage - Stored`.
+    local massCapacity = toBrain:GetArmyStat('Economy_MaxStorage_Mass', 0).Value
+        - toBrain:GetEconomyStored('MASS')
+    local energyCapacity = toBrain:GetArmyStat('Economy_MaxStorage_Energy', 0).Value
+        - toBrain:GetEconomyStored('ENERGY')
+    local massGiven = math.min(massTaken, massCapacity)
+    local energyGiven = math.min(energyTaken, energyCapacity)
+
+    toBrain:GiveResource('MASS', massGiven)
+    toBrain:GiveResource('ENERGY', energyGiven)
+
+    -- Whisper from giver → receiver so the line reads with the giver's
+    -- attribution. Three LOC keys rather than one templated string so each
+    -- locale gets a clean sentence per case.
+    local mass = math.floor(massGiven)
+    local energy = math.floor(energyGiven)
+    local toArmy = data.To --[[@as integer]]
+    local fromName = fromBrain.Nickname or tostring(data.From)
+    if mass > 0 and energy > 0 then
+        fromBrain:SendChatToPlayer(toArmy,
+            "<LOC chat_resources_received_both>%s sent you %d mass and %d energy.",
+            { fromName, mass, energy }
+        )
+    elseif mass > 0 then
+        fromBrain:SendChatToPlayer(toArmy,
+            "<LOC chat_resources_received_mass>%s sent you %d mass.",
+            { fromName, mass }
+        )
+    elseif energy > 0 then
+        fromBrain:SendChatToPlayer(toArmy,
+            "<LOC chat_resources_received_energy>%s sent you %d energy.",
+            { fromName, energy }
+        )
+    end
 end
 
 ---@param data {From: Army, To: Army}

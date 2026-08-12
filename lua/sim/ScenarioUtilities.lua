@@ -442,63 +442,29 @@ end
 ---CreateResources
 function CreateResources()
     local markers = GetMarkers()
-    for i, tblData in pairs(markers) do
-        if tblData.resource then
-            CreateResourceDeposit(
-                tblData.type,
-                tblData.position[1], tblData.position[2], tblData.position[3],
-                tblData.size
-            )
+    for _, tblData in pairs(markers) do
+        if not tblData.resource then continue end
 
-            -- fixme: texture names should come from editor
-            local albedo, sx, sz, lod
-            if tblData.type == "Mass" then
-                albedo = "/env/common/splats/mass_marker.dds"
-                sx = 2
-                sz = 2
-                lod = 100
-                CreatePropHPR(
-                    '/env/common/props/massDeposit01_prop.bp',
-                    tblData.position[1], tblData.position[2], tblData.position[3],
-                    Random(0, 360), 0, 0
-                )
-            else
-                albedo = "/env/common/splats/hydrocarbon_marker.dds"
-                sx = 6
-                sz = 6
-                lod = 200
-                CreatePropHPR(
-                    '/env/common/props/hydrocarbonDeposit01_prop.bp',
-                    tblData.position[1], tblData.position[2], tblData.position[3],
-                    Random(0, 360), 0, 0
-                )
-            end
-            -- Decal - (position, heading, textureName1, textureName2, type, sizeX, sizeZ, lodParam, duration, army)
-            -- Splat - (position, heading, textureName1, textureName2, type, sizeX, sizeZ, lodParam, duration, army)
-            --            if not ScenarioInfo.MapData.Decals then
-            --                ScenarioInfo.MapData.Decals = {}
-            --            end
-            --            table.insert(ScenarioInfo.MapData.Decals, CreateDecal(
-            --                tblData.position, -- position
-            --                0, -- heading
-            --                albedo, "", -- TEX1, TEX2
-            --                "Albedo", -- TYPE
-            --                sx, sz, -- SIZE
-            --                lod, -- LOD
-            --                0, -- DURACTION
-            --                -1 -- ARMY
-            --            ))
-            CreateSplat(
-                tblData.position, -- Position
-                0, -- Heading (rotation)
-                albedo, -- Texture name for albedo
-                sx, sz, -- SizeX/Z
-                lod, -- LOD
-                0, -- Duration (0 == does not expire)
-                -1, -- army (-1 == not owned by any single army)
-                0
-            )
+        local pos = tblData.position
+        local x, y, z = unpack(pos)
+        CreateResourceDeposit(tblData.type, x, y, z, tblData.size)
+
+        local albedo, sx, sz, lod
+        if tblData.type == "Mass" then
+            albedo = "/env/common/splats/mass_marker.dds"
+            sx = 2
+            sz = 2
+            lod = 100
+            CreatePropHPR('/env/common/props/massDeposit01_prop.bp', x, y, z, Random(0, 360), 0, 0)
+        else
+            albedo = "/env/common/splats/hydrocarbon_marker.dds"
+            sx = 6
+            sz = 6
+            lod = 200
+            CreatePropHPR('/env/common/props/hydrocarbonDeposit01_prop.bp', x, y, z, Random(0, 360), 0, 0)
         end
+
+        CreateSplat(pos, 0, albedo, sx, sz, lod, 0, -1, 0)
     end
 end
 

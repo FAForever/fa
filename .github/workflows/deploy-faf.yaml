@@ -32,16 +32,16 @@ on:
 
 jobs:
   test:
-    uses: ./.github/workflows/test.yaml
+    uses: ./.github/workflows/tests.yaml
   update:
     name: Update FAF
     needs: [test]
     runs-on: ubuntu-latest
     environment: deploy/faf
     steps:
-      # https://github.com/actions/checkout/tree/v4/
+      # https://github.com/actions/checkout/tree/v6/
       - name: Checkout FA repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
           repository: FAForever/fa

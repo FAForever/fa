@@ -1001,24 +1001,37 @@ function MergeWeaponByLabel(baseBp, label, insertPos, newBp)
         return
     end
 
+    local firstDummyIndex
     for i, w in weaponTable do
         if w.Label == label then
             weaponTable[i] = BlueprintMerged(w, newBp)
             return
         end
+        if w.DummyWeapon then
+            firstDummyIndex = i
+        end
     end
 
+    local finalInsertIndex = firstDummyIndex or TableGetn(weaponTable) + 1
     if insertPos then
-        local size = table.getn(weaponTable)
-        if insertPos > size + 1 then
-            WARN("Tried to insert a weapon bp in a position beyond the end of the Weapon array! Inserting at the end instead.")
-            TableInsert(weaponTable, newBp)
+        if firstDummyIndex and insertPos > firstDummyIndex then
+            WARN(string.format("Tried to insert weapon with label `%s` for unit %s at a position %d beyond the first dummy weapon of the Weapon array! Inserting before the dummy weapon at: %d"
+                , tostring(newBp.Label)
+                , baseBp.BlueprintId
+                , insertPos
+                , firstDummyIndex
+            ))
+        elseif insertPos > finalInsertIndex then
+            WARN(string.format("Tried to insert weapon with label `%s` for unit %s at a position %d beyond the end of the Weapon array! Inserting at the end instead."
+                , tostring(newBp.Label)
+                , baseBp.BlueprintId
+                , insertPos
+            ))
         else
-            TableInsert(weaponTable, insertPos, newBp)
+            finalInsertIndex = insertPos
         end
-    else
-        TableInsert(weaponTable, newBp)
     end
+    TableInsert(weaponTable, finalInsertIndex, newBp)
 end
 
 --#endregion

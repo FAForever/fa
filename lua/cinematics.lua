@@ -121,6 +121,14 @@ function CameraMoveToRectangle(rectangle, seconds)
     end
 end
 
+--- This will move the camera to an area
+---@param area string
+---@param seconds? number
+function CameraMoveToArea(area, seconds)
+    local rectangle = ScenarioUtils.AreaToRect(area)
+    CameraMoveToRectangle(rectangle, seconds)
+end
+
 --- See track entities
 ---@param entity Unit
 ---@param zoom number

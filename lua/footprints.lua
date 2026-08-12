@@ -35,7 +35,7 @@ SpecFootprints {
     { Name = 'WaterLand1x1',   SizeX=1,  SizeZ=1,  Caps=LAND|WATER, MaxWaterDepth=1, MinWaterDepth=0.1, MaxSlope=0.75, Flags=0 },
     { Name = 'WaterLand2x2',   SizeX=2,  SizeZ=2,  Caps=LAND|WATER, MaxWaterDepth=1, MinWaterDepth=0.1, MaxSlope=0.75, Flags=0 },
     { Name = 'WaterLand3x3',   SizeX=3,  SizeZ=3,  Caps=LAND|WATER, MaxWaterDepth=5, MinWaterDepth=0, MaxSlope=0.75, Flags=0 },
-    { Name = 'WaterLand5x5',   SizeX=5,  SizeZ=5,  Caps=LAND|WATER, MaxWaterDepth=5, MinWaterDepth=0, MaxSlope=0.75, Flags=0 },
+    { Name = 'WaterLand4x4',   SizeX=4,  SizeZ=4,  Caps=LAND|WATER, MaxWaterDepth=5, MinWaterDepth=0, MaxSlope=0.75, Flags=0 },
 
     { Name = 'SurfacingSub2x2',   SizeX=2,  SizeZ=2,  Caps=SUB|WATER, MinWaterDepth=1.5, Flags=0 },
     { Name = 'SurfacingSub3x3',   SizeX=3,  SizeZ=3,  Caps=SUB|WATER, MinWaterDepth=1.5, Flags=0 },

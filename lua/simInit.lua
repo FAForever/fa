@@ -221,6 +221,8 @@ function SetupSession()
     doscript(ScenarioInfo.script, ScenarioInfo.Env)
 
     ResetSyncTable()
+    
+    SetupPathfinding()
 end
 
 -- OnCreateArmyBrain() is called by then engine as the brains are created, and we
@@ -572,6 +574,20 @@ function OnPostLoad()
     import("/lua/simsync.lua").OnPostLoad()
     if GetFocusArmy() ~= -1 then
         Sync.SetAlliedVictory = ArmyBrains[GetFocusArmy()].RequestingAlliedVictory or false
+    end
+    
+    SetupPathfinding()
+end
+
+-- This changes default navigator's behaviour to make pathfinding more predictable and less frustrating. 
+-- Default value in the engine is 50. When distance between current units positions and 
+-- their final destination point >50, they use some weird pathfinding logic based on hidden waypoints and 
+-- start moving in columns. We disable such behaviour by setting this value to 9999, so navigator
+-- will be using personal positioning instead of waypoints for any move order (doesn't affect "formation move").
+-- useful console commands for debugging: "dbg navwaypoints", "dbg navpath", "dbg navsteering"
+function SetupPathfinding()
+    if rawget(_G, "SetNavigatorPersonalPosMaxDistance") then
+        SetNavigatorPersonalPosMaxDistance(9999)
     end
 end
 
