@@ -406,12 +406,25 @@ function buildAction(name)
         modifier = "Alt"
     end
 
-    local engineers = EntityCategoryFilterDown(categories.ENGINEER - categories.STRUCTURE, selection)
-    local factories = EntityCategoryFilterDown(categories.FACTORY * categories.STRUCTURE, selection)
+    -- The Megalith builds its units as construction eggs. It has CONSTRUCTION
+    -- and a BuildableCategory, but deliberately has no ENGINEER category.
+    -- Exclude factories here because their construction orders use the
+    -- factory one-click path below.
+    local builders = EntityCategoryFilterDown(
+        (categories.ENGINEER + categories.CONSTRUCTION)
+        - categories.STRUCTURE
+        - categories.FACTORY
+        - categories.EXTERNALFACTORY,
+        selection
+    )
+    local factories = EntityCategoryFilterDown(categories.FACTORY + categories.EXTERNALFACTORY, selection)
+    local selectionCount = table.getsize(selection)
 
-    if table.getsize(engineers) > 0 then
+    -- Only enter a build mode when every selected unit belongs to the same
+    -- builder type. Mixed selections retain the hotbuild filtering behavior.
+    if selectionCount > 0 and table.getsize(builders) == selectionCount then
         buildActionBuilding(name, modifier)
-    elseif table.getsize(factories) > 0 then
+    elseif selectionCount > 0 and table.getsize(factories) == selectionCount then
         buildActionUnit(name, modifier)
     else
         selectUnitsWith(name)
@@ -687,7 +700,12 @@ function buildActionUnit(name, modifier)
         return
     end
 
-    local sharedTech = GetFactoryTech(selection)
+    -- External-factory parents (Fatboy, carriers, Tempest, and similar units)
+    -- are selected instead of their attached factory entity. Use the attached
+    -- factory for tech detection so they follow the same one-click path as
+    -- ordinary factories.
+    local factorySelection = TranslateExFacUnits(selection) or selection
+    local sharedTech = GetFactoryTech(factorySelection)
     if sharedTech and maxPos > 1 then
         local targetTech = Construction.GetCurrentTechTab() or sharedTech
         local targetPos = nil
