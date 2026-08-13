@@ -8,7 +8,8 @@ Changelog = {
     Description = {
         "# Game version 3837 (August 14, 2026)",
         "",
-        "Your introduction here",
+        "This patch is mostly a small balance patch. But we also completely reworked the chat window under the hood. Please let us know if you",
+        "encounter any issues. Other than that we have included a bunch of bugfixes again.",
         "",
         "With gratitude to all those who contributed to this patch and/or took the time to report issues,",
         "",
@@ -262,6 +263,20 @@ Changelog = {
         "",
         "## Contributors",
         "",
-        "With thanks to the following contributors:"
+        "With thanks to the following contributors:",
+        "",
+        "- PreciseBump38",
+        "- niuniu319",
+        "- Jip",
+        "- Nomander",
+        "- Nory",
+        "- ostrovaya",
+        "- AzarAI",
+        "- BlackYps",
+        "- Lightningbulb2",
+        "- vjt4",
+        "- speed2",
+        "- Saver27",
+        "- 4z0t"
     }
 }
