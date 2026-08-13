@@ -1,1 +1,0 @@
-- Annotate some engine behavior and miscellaneous lua functions (#7179).
