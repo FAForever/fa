@@ -251,13 +251,13 @@ ChatFeedInterface = ClassUI(Group) {
     UpdateVisibility = function(self)
         -- `SetNeedsFrameUpdate` toggles in lockstep so we don't tick idle.
         local windowVisible = ChatModel.GetSingleton().WindowVisible()
-        if not windowVisible and table.getn(self.Rows) > 0 then
+        local hasRows = table.getn(self.Rows) > 0
+        if not windowVisible and hasRows then
             self:Show()
-            self:SetNeedsFrameUpdate(true)
         else
             self:Hide()
-            self:SetNeedsFrameUpdate(false)
         end
+        self:SetNeedsFrameUpdate(hasRows)
     end,
 
     --- Per-frame: ages each row, fades the line text and BG strip,
