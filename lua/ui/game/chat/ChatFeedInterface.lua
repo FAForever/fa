@@ -75,7 +75,7 @@ ChatFeedInterface = ClassUI(Group) {
         self.WindowVisibleObserver = self.Trash:Add(
             LazyVarDerive(model.WindowVisible, function(lv)
                 if lv() then
-                    self:ClearAll()
+                    self:Hide()
                 end
                 self:UpdateVisibility()
             end)
@@ -133,10 +133,8 @@ ChatFeedInterface = ClassUI(Group) {
     ---@param history UIChatEntry[]
     OnHistoryChanged = function(self, history)
         local newCount = table.getn(history)
-        if not ChatModel.GetSingleton().WindowVisible() then
-            for i = self.LastHistoryLength + 1, newCount do
-                self:AppendRow(history[i])
-            end
+        for i = self.LastHistoryLength + 1, newCount do
+            self:AppendRow(history[i])
         end
         self.LastHistoryLength = newCount
     end,
