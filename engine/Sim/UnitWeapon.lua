@@ -228,4 +228,8 @@ end
 function UnitWeapon:WeaponHasTarget()
 end
 
+--- Called by the engine to check if the weapon is allowed to fire.
+---@type fun(self: Weapon): boolean
+UnitWeapon.CanWeaponFire = nil
+
 return UnitWeapon
