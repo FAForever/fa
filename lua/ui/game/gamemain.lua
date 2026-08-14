@@ -853,7 +853,7 @@ function OnBeat()
 
     if GetSimRate() > 0 then
         local sysTime = GetSystemTimeSeconds()
-        if sysTime > next then
+        if sysTime < next then
             throttle = true
         else
             next = sysTime + 0.1
