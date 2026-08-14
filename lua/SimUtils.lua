@@ -16,6 +16,7 @@ local CreateWreckage = import("/lua/wreckage.lua").CreateWreckage
 local transferUnbuiltCategory = categories.ALLUNITS
 local transferUnitsCategory = categories.ALLUNITS - categories.INSIGNIFICANTUNIT
 local buildersCategory = categories.ALLUNITS - categories.CONSTRUCTION - categories.ENGINEER
+local engineersCategory = categories.ENGINEER - categories.SUBCOMMANDER - categories.COMMAND
 
 ---@class FactoryRebuildData
 ---@field FacRebuild_Progress number # progress -- save current progress for some later checks
@@ -793,7 +794,7 @@ function GiveUnitsToPlayer(data, units)
             -- transfers fall through to the generic noun.
             local allEngineers = true
             for _, unit in transferredUnits do
-                if not EntityCategoryContains(categories.ENGINEER, unit) then
+                if not EntityCategoryContains(engineersCategory, unit) then
                     allEngineers = false
                     break
                 end
