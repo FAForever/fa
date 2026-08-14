@@ -68,10 +68,9 @@ ChatFeedInterface = ClassUI(Group) {
         -- existing entry as a fresh feed line.
         self.LastHistoryLength = table.getn(model.History())
 
-        -- Opening the window discards active feed rows: anything worth
-        -- reading is now in the main view, and a stale fade countdown
-        -- across an open/close cycle would clutter content the user
-        -- already saw.
+        -- Opening the window hides the feed interface: anything worth
+        -- reading is now in the main view, and a visible feed interface
+        -- would overlap the text the user is already seeing.
         self.WindowVisibleObserver = self.Trash:Add(
             LazyVarDerive(model.WindowVisible, function(lv)
                 if lv() then
@@ -128,7 +127,7 @@ ChatFeedInterface = ClassUI(Group) {
     -- History handling
     ---------------------------------------------------------------------------
 
-    --- Reacts to history mutations: feeds in new entries while the chat window is hidden.
+    --- Reacts to history mutations: feeds in new entries
     ---@param self UIChatFeedInterface
     ---@param history UIChatEntry[]
     OnHistoryChanged = function(self, history)
