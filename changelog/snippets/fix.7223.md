@@ -1,0 +1,1 @@
+- Show the chat history after the chat window is closed (#7223).
