@@ -744,4 +744,16 @@ Unit.OnExtraDamageDealt = nil
 ---@type fun(self: Unit, new: MotionState, old: MotionState)
 Unit.OnMotionStateChange = nil
 
+--- Called by the engine when the unit starts refueling at an air staging platform.
+---@type fun(self: Unit)
+Unit.OnStartRefueling = nil
+
+--- Called by the engine when the unit runs out of fuel.
+---@type fun(self: Unit)
+Unit.OnRunOutOfFuel = nil
+
+--- Called by the engine when the unit was out of fuel and recharges fuel (either by air staging or by landing).
+---@type fun(self: Unit)
+Unit.OnGotFuel = nil
+
 return Unit
