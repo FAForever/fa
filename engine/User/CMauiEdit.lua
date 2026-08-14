@@ -12,6 +12,34 @@
 ---@field Right?  boolean   # right mouse button held (mouse events)
 ---@field Middle? boolean   # middle mouse button held (mouse events)
 
+---@alias KeyEventType 
+---| KeyEventType.Mouse
+---| KeyEventType.Keyboard
+
+--- Key events from the mouse
+---@alias KeyEventType.Mouse
+---| "ButtonPress"
+---| "ButtonRelease"
+---| "ButtonDClick"
+---| "MouseEnter"
+---| "MouseMotion"
+---| "MouseExit"
+---| "WheelRotation"
+
+--- Key events from the keyboard when a Control has "keyboard focus" or is an "input capture"
+---@see Control.AcquireKeyboardFocus # Keyboard focus
+---@see Control.AbandonKeyboardFocus # Keyboard focus
+---@see Control.OnKeyboardFocusChange # Keyboard focus
+---@see Control.OnLoseKeyboardFocus # Keyboard focus
+---@see AddInputCapture # Input Capture
+---@see AnyInputCapture # Input Capture
+---@see GetInputCapture # Input Capture
+---@see RemoveInputCapture # Input Capture
+---@alias KeyEventType.Keyboard
+---| "KeyDown"
+---| "Char"
+---| "KeyUp"
+
 --- Generic input-event payload delivered to MAUI control hooks. Each
 --- control hook (`HandleEvent`, the keyboard / mouse callbacks on `Edit`,
 --- `Button`, `Checkbox`, etc.) receives a single `KeyEvent` table; not
@@ -22,7 +50,7 @@
 --- — `keycode` is the raw VK_* code (compare against `UIUtil.VK_*`) and
 --- `event.Modifiers` is the modifier state at the time of the press.
 ---@class KeyEvent
----@field Type           string         # "Char" / "KeyDown" / "ButtonPress" / "MouseEnter" / "MouseExit" / "WheelRotation" / ...
+---@field Type           KeyEventType   # "Char" / "KeyDown" / "ButtonPress" / "MouseEnter" / "MouseExit" / "WheelRotation" / ...
 ---@field Control        Control        # the control receiving the event
 ---@field KeyCode        number         # engine-translated keycode (post-IME, etc.)
 ---@field RawKeyCode     number         # OS-level VK_* keycode (compare against `UIUtil.VK_*`)
