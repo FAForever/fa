@@ -274,7 +274,7 @@ Changelog = {
         "- AzarAI",
         "- BlackYps",
         "- Lightningbulb2",
-        "- vjt4",
+        "- HotCheese",
         "- speed2",
         "- Saver27",
         "- 4z0t"
