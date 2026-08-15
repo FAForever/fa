@@ -180,13 +180,9 @@ ChatFeedInterface = ClassUI(Group) {
             end
             line:SetAlpha(1.0, true)
 
-            if entry.Camera then
-                line.OnCameraClicked = self.OnCameraClicked
-                line.OnBodyClicked = self.OnCameraClicked
-                line.OnNameClicked = self.OnCameraClicked
-            else
-                line:DisableHitTest(true)
-            end
+            line.OnCameraClicked = self.OnCameraClicked
+            line.OnBodyClicked = self.OnCameraClicked
+            line.OnNameClicked = self.OnNameClicked
 
             -- Readability strip behind the row. Lives on the feed group
             -- (not the line) so we can drive its alpha independently of
@@ -219,6 +215,16 @@ ChatFeedInterface = ClassUI(Group) {
             end
         elseif entry.Camera then
             cam:RestoreSettings(entry.Camera)
+        end
+    end,
+
+    ---@param _ UIChatLineInterface
+    ---@param entry UIChatEntry
+    ---@param event KeyEvent
+    OnNameClicked = function(_, entry, event)
+        if entry.ArmyID and entry.ArmyID ~= GetFocusArmy() then
+            ChatController.ActivateChat()
+            ChatController.SetRecipient(entry.ArmyID)
         end
     end,
 
