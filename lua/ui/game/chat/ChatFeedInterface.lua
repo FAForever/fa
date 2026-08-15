@@ -82,8 +82,8 @@ ChatFeedInterface = ClassUI(Group) {
             end)
         )
 
-        -- Push to feed only while the window is hidden; bump
-        -- `LastHistoryLength` either way so we don't replay later.
+        -- Append new history entries in both visibility states and bump
+        -- `LastHistoryLength` after processing to avoid replaying entries.
         self.HistoryObserver = self.Trash:Add(
             LazyVarDerive(model.History, function(lv)
                 self:OnHistoryChanged(lv())
