@@ -197,7 +197,7 @@ end
 --- Looks up army data by army index (number) or nickname (string). For
 --- nickname lookups the returned table has `ArmyID` set to the matching index.
 ---@param army number | string
----@return table | nil
+---@return ArmyInfo | nil
 local function GetArmyData(army)
     local armies = GetArmiesTable()
     if type(army) == 'number' then
