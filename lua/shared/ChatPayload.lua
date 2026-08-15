@@ -31,6 +31,7 @@
 ---@field Id?         string               # sender-stamped near-unique id; dedupes the two delivery paths
 ---@field From        number               # sim-stamped trusted sender army index — written by the relay before broadcast
 ---@field Type?       ChatMessageType      #
+---@field notifyFrom?       integer              # Source army index. Used by notify.
 
 --- Maximum UTF-8 character length for a chat message body. The UI edit box
 --- enforces this on input; the sim relay and the receive path gate on the

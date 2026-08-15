@@ -337,12 +337,6 @@ function OnReceive(sender, msg)
         msg.text = LOCF(msg.text, unpack(msg.Args))
     end
 
-    -- Notify owns the display decision for `to='notify'`. Only fall
-    -- through to rendering a chat line if it returns false.
-    if msg.to == ChatModel.RecipientNotify and not import("/lua/ui/notify/notify.lua").processIncomingMessage(sender, msg) then
-        return
-    end
-
     local armyData = GetArmyData(sender)
     if not armyData and GetFocusArmy() ~= -1 and not SessionIsReplay() then
         return
@@ -353,6 +347,19 @@ function OnReceive(sender, msg)
     -- Drop the message entirely rather than stripping the flag, which
     -- would let manipulated traffic render under a different label.
     if msg.Observer and armyData then return end
+
+    if msg.to == ChatModel.RecipientNotify then
+        -- ignore unwanted messages
+        if not import("/lua/ui/notify/notify.lua").processIncomingMessage(sender, msg) then
+            return
+        -- if we are an observer, display the message as sent from the player making the upgrade
+        elseif GetFocusArmy() == -1 then
+            local armyInfo = GetArmyData(msg.notifyFrom)
+            if armyInfo then
+                sender = armyInfo.nickname or armyInfo.name
+            end
+        end
+    end
 
     local to = msg.to
     local descriptor = ToStrings[to] or ToStrings.private
