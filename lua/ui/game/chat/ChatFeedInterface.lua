@@ -178,11 +178,15 @@ ChatFeedInterface = ClassUI(Group) {
             else
                 line:SetContinuation(entry, chunk)
             end
-            -- `SetHeader` calls `EnableHitTest` on the cam icon when the
-            -- entry has a camera/location; disable hit-test last so
-            -- nothing on the row swallows clicks meant for worldview.
-            line:DisableHitTest(true)
             line:SetAlpha(1.0, true)
+
+            if entry.Camera then
+                line.OnCameraClicked = self.OnCameraClicked
+                line.OnBodyClicked = self.OnCameraClicked
+                line.OnNameClicked = self.OnCameraClicked
+            else
+                line:DisableHitTest(true)
+            end
 
             -- Readability strip behind the row. Lives on the feed group
             -- (not the line) so we can drive its alpha independently of
@@ -198,6 +202,24 @@ ChatFeedInterface = ClassUI(Group) {
 
         self:LayoutRows()
         self:UpdateVisibility()
+    end,
+
+    ---@param _ UIChatLineInterface
+    ---@param entry UIChatEntry
+    ---@param event KeyEvent
+    OnCameraClicked = function(_, entry, event)
+        local cam = GetCamera('WorldCamera')
+        if entry.Location then
+            if entry.Location.Area then
+                cam:MoveToRegion(entry.Location.Area, 0.5)
+            elseif entry.Location.Position then
+                local settings = cam:SaveSettings()
+                settings.Focus = entry.Location.Position
+                cam:RestoreSettings(settings)
+            end
+        elseif entry.Camera then
+            cam:RestoreSettings(entry.Camera)
+        end
     end,
 
     --- Lays out feed rows pinned from the bottom up.
