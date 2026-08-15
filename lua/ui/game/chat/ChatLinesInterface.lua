@@ -267,34 +267,6 @@ ChatLinesInterface = ClassUI(Group) {
     end,
 
     ---------------------------------------------------------------------------
-    -- Filtering
-    ---------------------------------------------------------------------------
-
-    --- Whether an entry counts toward the virtual scroll size.
-    ---@param self UIChatLinesInterface
-    ---@param entry UIChatEntry
-    ---@return boolean
-    IsValidEntry = function(self, entry)
-        -- Gates on the per-army mute map and the `links` option. Camera
-        -- or Location both qualify as "link" messages: either surfaces
-        -- the camera-link affordance on the row.
-        if entry == nil then return false end
-        local options = ChatConfigModel.GetOptions()
-        if options.muted and entry.ArmyID and options.muted[entry.ArmyID] then
-            return false
-        end
-        if (entry.Camera or entry.Location) and options.links == false then
-            return false
-        end
-        if entry.Type == 'ReceiveResources' and options.muteSharedResources
-            or entry.Type == 'ReceiveUnits' and options.muteSharedUnits
-        then
-            return false
-        end
-        return true
-    end,
-
-    ---------------------------------------------------------------------------
     -- Scroll container
     ---------------------------------------------------------------------------
 
@@ -305,7 +277,7 @@ ChatLinesInterface = ClassUI(Group) {
         history = history or ChatModel.GetSingleton().History()
         local size = 0
         for _, entry in ipairs(history) do
-            if self:IsValidEntry(entry) then
+            if ChatController.IsValidEntry(entry) then
                 size = size + ((entry.WrappedText and table.getn(entry.WrappedText)) or 1)
             end
         end
@@ -421,7 +393,7 @@ ChatLinesInterface = ClassUI(Group) {
         local wrappedIdx = 1
         local virtualPos = 0
 
-        while entryIdx <= historyCount and not self:IsValidEntry(history[entryIdx]) do
+        while entryIdx <= historyCount and not ChatController.IsValidEntry(history[entryIdx]) do
             entryIdx = entryIdx + 1
         end
 
@@ -435,7 +407,7 @@ ChatLinesInterface = ClassUI(Group) {
             end
             virtualPos = virtualPos + wrapCount
             entryIdx = entryIdx + 1
-            while entryIdx <= historyCount and not self:IsValidEntry(history[entryIdx]) do
+            while entryIdx <= historyCount and not ChatController.IsValidEntry(history[entryIdx]) do
                 entryIdx = entryIdx + 1
             end
         end
@@ -469,7 +441,7 @@ ChatLinesInterface = ClassUI(Group) {
                     wrappedIdx = wrappedIdx - 1
                 else
                     entryIdx = entryIdx - 1
-                    while entryIdx >= 1 and not self:IsValidEntry(history[entryIdx]) do
+                    while entryIdx >= 1 and not ChatController.IsValidEntry(history[entryIdx]) do
                         entryIdx = entryIdx - 1
                     end
                     if entryIdx >= 1 then

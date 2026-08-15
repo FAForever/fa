@@ -9,6 +9,7 @@ local ChatLineInterface = import("/lua/ui/game/chat/ChatLineInterface.lua").Chat
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
 local ChatConfigModel = import("/lua/ui/game/chat/config/ChatConfigModel.lua")
 local ChatUtils = import("/lua/ui/game/chat/ChatUtils.lua")
+local ChatController = import("/lua/ui/game/chat/chatcontroller.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
@@ -151,6 +152,8 @@ ChatFeedInterface = ClassUI(Group) {
         -- cache is empty. We borrow the chat panel's measure-line because
         -- it shares our row width by LazyVar bind.
         if not entry then return end
+
+        if not ChatController.IsValidEntry(entry) then return end
 
         if not entry.WrappedText and self.Window then
             ChatUtils.WrapEntry(entry, self.Window.ChatLinesInterface.ChatLineInterfaces[1])

@@ -78,6 +78,34 @@ function AppendLocalSystemMessage(text)
     }
 end
 
+---------------------------------------------------------------------------
+-- Filtering
+
+--- Whether an entry should be shown by chat interfaces according to options
+---@param entry UIChatEntry
+---@return boolean
+IsValidEntry = function(entry)
+    -- Gates on the per-army mute map and the `links` option. Camera
+    -- or Location both qualify as "link" messages: either surfaces
+    -- the camera-link affordance on the row.
+    if entry == nil then return false end
+    local options = ChatConfigModel.GetOptions()
+    if options.muted and entry.ArmyID and options.muted[entry.ArmyID] then
+        return false
+    end
+    if (entry.Camera or entry.Location) and options.links == false then
+        return false
+    end
+    if entry.Type == 'ReceiveResources' and options.muteSharedResources then
+        return false
+    end
+    if entry.Type == 'ReceiveUnits' and options.muteSharedUnits then
+        return false
+    end
+    return true
+end
+
+
 -------------------------------------------------------------------------------
 -- Slash commands
 
