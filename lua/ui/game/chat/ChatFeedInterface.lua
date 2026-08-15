@@ -233,7 +233,7 @@ ChatFeedInterface = ClassUI(Group) {
         local cam = GetCamera('WorldCamera')
         if entry.Location then
             if entry.Location.Area then
-                cam:MoveToRegion(entry.Location.Area, 0.5)
+                cam:MoveToRegion(entry.Location.Area, 0.001)
             elseif entry.Location.Position then
                 local settings = cam:SaveSettings()
                 settings.Focus = entry.Location.Position
