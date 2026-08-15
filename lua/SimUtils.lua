@@ -1593,28 +1593,18 @@ function GiveResourcesToPlayer(data)
     local toArmy = data.To --[[@as integer]]
     local fromName = fromBrain.Nickname or tostring(data.From)
     local toName = toBrain.Nickname or tostring(toArmy)
+    local msg, args
     if mass > 0 and energy > 0 then
-        fromBrain:SendChatToPlayer(toArmy,
-            "<LOC chat_resources_received_both>%s sent %s %d mass and %d energy.",
-            { fromName, toName, mass, energy },
-            nil,
-            'ReceiveResources'
-        )
+        msg = "<LOC chat_resources_received_both>%s sent %s %d mass and %d energy."
+        args = { fromName, toName, mass, energy }
     elseif mass > 0 then
-        fromBrain:SendChatToPlayer(toArmy,
-            "<LOC chat_resources_received_mass>%s sent %s %d mass.",
-            { fromName, toName, mass },
-            nil,
-            'ReceiveResources'
-        )
+        msg = "<LOC chat_resources_received_mass>%s sent %s %d mass."
+        args = { fromName, toName, mass }
     elseif energy > 0 then
-        fromBrain:SendChatToPlayer(toArmy,
-        "<LOC chat_resources_received_energy>%s sent %s %d energy.",
-        { fromName, toName, energy },
-            nil,
-            'ReceiveResources'
-        )
+        msg = "<LOC chat_resources_received_energy>%s sent %s %d energy."
+        args = { fromName, toName, energy }
     end
+    fromBrain:SendChatToPlayer(toArmy, msg, args, nil, 'ReceiveResources')
 end
 
 ---@param data {From: Army, To: Army}
