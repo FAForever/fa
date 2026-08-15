@@ -125,10 +125,7 @@ ChatFeedInterface = ClassUI(Group) {
             -- resize tracks for free through the dependency graph.
             ---@diagnostic disable-next-line: param-type-mismatch
             Layouter(self)
-                :Left(self.Window.ChatLinesInterface.Left)
-                :Right(self.Window.ChatLinesInterface.Right)
-                :Top(self.Window.ChatLinesInterface.Top)
-                :Bottom(self.Window.ChatLinesInterface.Bottom)
+                :Fill(self.Window.ChatLinesInterface.Pool)
                 :End()
         else
             -- Standalone debug fallback for dev-hotkey `Toggle()`.
