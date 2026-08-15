@@ -366,9 +366,8 @@ function OnReceive(sender, msg)
     local towho = msg.Observer and LOC("<LOC lobui_0692>to observers:") or LOC(descriptor.text)
 
     local name
-    if type(to) == 'number' and SessionIsReplay() then
-        -- In a replay, private messages need the full routing so
-        -- spectators can attribute the conversation.
+    if type(to) == 'number' and (SessionIsReplay() or IsObserver() or GetFocusArmy() == -1) then
+        -- Full routing so that observers can see who private messages are sent to
         name = string.format("%s %s %s:", sender, LOC(ToStrings.to.text),
             (GetArmyData(to) or {}).nickname or tostring(to))
     else
