@@ -557,7 +557,7 @@ function Init()
     -- `RegisterChatFunc` overwrites, so re-running `Init` just rebinds
     -- the handlers.
     import("/lua/ui/game/gamemain.lua").RegisterChatFunc(OnReceive, 'Chat')
-    AddOnSyncHashedCallback(OnSyncChatMessages, 'ChatMessages', 'Chat')
+    import("/lua/usersync.lua").AddOnSyncHashedCallback(OnSyncChatMessages, 'ChatMessages', 'Chat')
     RegisterBuiltinCommands()
 
     -- Build the chat tree eagerly so the sibling feed is mounted in
