@@ -49,6 +49,7 @@ local FeedBackgroundAlpha = 0.5
 ---@field WindowVisibleObserver LazyVar<boolean>                    # derived from ChatModel.WindowVisible
 ---@field HistoryObserver       LazyVar<UIChatEntry[]>              # derived from ChatModel.History
 ---@field DebugBG?              Bitmap                              # semi-transparent overlay shown when `Debug` is true
+---@overload fun(parent: Control, window?: UIChatInterface): UIChatFeedInterface
 ChatFeedInterface = ClassUI(Group) {
 
     ---@param self UIChatFeedInterface

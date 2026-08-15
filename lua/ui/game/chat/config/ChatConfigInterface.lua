@@ -89,6 +89,7 @@ local CheckboxDefs = {
 ---@field DragBR         Bitmap                  # decorative bottom-right corner grip
 ---@field PendingObserver LazyVar<UIChatOptions>  # derived from ChatConfigModel.Pending
 ---@field DebugBG?       Bitmap                  # semi-transparent overlay shown when `Debug` is true
+---@overload fun(parent: Control): UIChatConfigInterface
 local ChatConfigInterface = ClassUI(Window) {
 
     ---@param self UIChatConfigInterface

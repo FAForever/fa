@@ -40,6 +40,7 @@ local Debug = false
 ---@field TBG     Bitmap
 ---@field BBG     Bitmap
 ---@field DebugBG? Bitmap                # semi-transparent overlay shown when `Debug` is true
+---@overload fun(parent: Control): UIChatListInterface
 ChatListInterface = ClassUI(Group) {
 
     ---@param self UIChatListInterface

@@ -55,6 +55,7 @@ end
 ---@field Text        Text
 ---@field Entry       UIChatEntry | nil
 ---@field DebugBG?    Bitmap                # semi-transparent overlay shown when `Debug` is true
+---@overload fun(parent: Control): UIChatLineInterface
 ChatLineInterface = ClassUI(Group) {
 
     ---@param self UIChatLineInterface

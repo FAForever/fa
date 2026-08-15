@@ -76,6 +76,7 @@ local DefaultRect = { Left = 8, Top = 460, Right = 430, Bottom = 720 }
 ---@field OptionsObserver       LazyVar<UIChatOptions>        # derived from ChatConfigModel.Committed (window-level options only)
 ---@field ChatFeedInterface     UIChatFeedInterface           # sibling feed view; visible while the window is hidden
 ---@field DebugBG?              Bitmap                        # semi-transparent overlay shown when `Debug` is true
+---@overload fun(parent: Control): UIChatInterface
 local ChatInterface = ClassUI(Window) {
 
     ---@param self UIChatInterface
