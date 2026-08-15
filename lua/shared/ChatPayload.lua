@@ -22,7 +22,7 @@
 ---@field Identifier? string               # usually `'Chat'`; legacy / synthetic paths may set other values
 ---@field Observer?   boolean              # sender was in observer mode (`GetFocusArmy() == -1`)
 ---@field camera?     table                # `WorldCamera:SaveSettings()` snapshot for click-to-jump links
----@field location?   table                # lightweight location hint — see `UIChatEntryLocation` for the inner shape
+---@field location?   UIChatEntryLocation  # lightweight location hint
 ---@field Args?       any[]                # `LOCF`-style format args spread alongside `text` on render
 ---@field Id?         string               # sender-stamped near-unique id; dedupes the two delivery paths
 ---@field From        number               # sim-stamped trusted sender army index — written by the relay before broadcast
