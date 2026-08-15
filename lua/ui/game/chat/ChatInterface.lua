@@ -76,6 +76,7 @@ local DefaultRect = { Left = 8, Top = 460, Right = 430, Bottom = 720 }
 ---@field OptionsObserver       LazyVar<UIChatOptions>        # derived from ChatConfigModel.Committed (window-level options only)
 ---@field ChatFeedInterface     UIChatFeedInterface           # sibling feed view; visible while the window is hidden
 ---@field DebugBG?              Bitmap                        # semi-transparent overlay shown when `Debug` is true
+---@field MouseIsInWindow    boolean                       # Keeps track of MouseEnter and MouseExit events for the entire window
 local ChatInterface = ClassUI(Window) {
 
     ---@param self UIChatInterface
@@ -143,6 +144,19 @@ local ChatInterface = ClassUI(Window) {
             )
         )
         ---@diagnostic enable: undefined-field
+
+        local oldHandleEvent = Window.HandleEvent
+        ---@param self UIChatInterface
+        ---@param event KeyEvent
+        self.HandleEvent = function(self, event)
+            local type = event.Type
+            if type == 'MouseEnter' then
+                self.MouseIsInWindow = true
+            elseif type == 'MouseExit' then
+                self.MouseIsInWindow = false
+            end
+            return oldHandleEvent(self, event)
+        end
     end,
 
     --- Creates the four corner resize grips and wires `RolloverHandler` to
@@ -313,9 +327,13 @@ local ChatInterface = ClassUI(Window) {
         local model = ChatModel.GetSingleton()
         if model.Pinned() then return end
         local fadeTime = ChatConfigModel.GetOptions().fade_time or 15
-        local elapsed = GetSystemTimeSeconds() - model.LastActivity()
-        if elapsed >= fadeTime then
-            ChatController.CloseWindow()
+        if self.MouseIsInWindow or self.ChatEditInterface.HasKeyboardFocus then
+            ChatController.NotifyActivity()
+        else
+            local elapsed = GetSystemTimeSeconds() - model.LastActivity()
+            if elapsed >= fadeTime then
+                ChatController.CloseWindow()
+            end
         end
     end,
 
