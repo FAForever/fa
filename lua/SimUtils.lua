@@ -819,7 +819,7 @@ function GiveUnitsToPlayer(data, units)
                 args = { fromName, toName, count }
             end
 
-            fromBrain:SendChatToPlayer(toArmy,
+            fromBrain:SendChatToAllies(
                 '<LOC ' .. locKey .. '>' .. fallback,
                 args,
                 { Area = area },
@@ -1604,7 +1604,7 @@ function GiveResourcesToPlayer(data)
         msg = "<LOC chat_resources_received_energy>%s sent %s %d energy."
         args = { fromName, toName, energy }
     end
-    fromBrain:SendChatToPlayer(toArmy, msg, args, nil, 'ReceiveResources')
+    fromBrain:SendChatToAllies(msg, args, nil, 'ReceiveResources')
 end
 
 ---@param data {From: Army, To: Army}
