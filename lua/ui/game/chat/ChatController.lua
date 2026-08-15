@@ -481,7 +481,8 @@ end
 
 --- Opens the chat window with the recipient forced to `allies` or `all`
 --- based on `send_type` and the Shift modifier. A specific-army recipient
---- (mid-private) is left alone.---@param modifiers? table  # engine-supplied modifier state ({Shift, Ctrl, ...})
+--- (mid-private) is left alone.
+---@param modifiers? KeyModifiers  # engine-supplied modifier state
 function ActivateChat(modifiers)
     -- The engine calls this via a top-level `ActivateChat` shim in
     -- `gamemain.lua` when the user presses Enter outside the edit box.
