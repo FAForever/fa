@@ -801,30 +801,24 @@ function GiveUnitsToPlayer(data, units)
                 end
             end
 
-            local locKey, fallback
-            local args
+            local msg, args
             if count == 1 then
                 if allEngineers then
-                    locKey, fallback = 'chat_engineers_received_one', '%s sent %s an engineer'
+                    msg = '<LOC chat_engineers_received_one>%s sent %s an engineer'
                 else
-                    locKey, fallback = 'chat_units_received_one', '%s sent %s a unit'
+                    msg = "<LOC chat_units_received_one>%s sent %s a unit"
                 end
                 args = { fromName, toName }
             else
                 if allEngineers then
-                    locKey, fallback = 'chat_engineers_received_many', '%s sent %s %d engineers'
+                    msg = "<LOC chat_engineers_received_many>%s sent %s %d engineers"
                 else
-                    locKey, fallback = 'chat_units_received_many', '%s sent %s %d units'
+                    msg = "<LOC chat_units_received_many>%s sent %s %d units"
                 end
                 args = { fromName, toName, count }
             end
 
-            fromBrain:SendChatToAllies(
-                '<LOC ' .. locKey .. '>' .. fallback,
-                args,
-                { Area = area },
-                'ReceiveUnits'
-            )
+            fromBrain:SendChatToAllies(msg, args, { Area = area }, 'ReceiveUnits')
         end
     end
 end
