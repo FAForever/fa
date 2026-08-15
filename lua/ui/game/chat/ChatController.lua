@@ -176,26 +176,29 @@ end
 ---@return number[]
 local function FindClientsAsPlayer(armiesTable, focus, armyID)
     local result = {}
-    local srcs = {}
+    local sendSrc = {}
+    local nHumanArmies = 0
     for army, info in armiesTable do
         if armyID then
             if army == armyID then
                 for _, cmdsrc in info.authorizedCommandSources do
-                    srcs[cmdsrc] = true
+                    sendSrc[cmdsrc] = true
                 end
                 break
             end
-        else
-            if IsAlly(focus, army) then
-                for _, cmdsrc in info.authorizedCommandSources do
-                    srcs[cmdsrc] = true
-                end
+        elseif IsAlly(focus, army) then
+            for _, cmdsrc in info.authorizedCommandSources do
+                sendSrc[cmdsrc] = true
             end
         end
+        if info.human then nHumanArmies = nHumanArmies + 1 end
     end
     for index, client in GetSessionClients() do
         for _, cmdsrc in client.authorizedCommandSources do
-            if srcs[cmdsrc] then
+            if sendSrc[cmdsrc]
+                -- observers have a source greater than the number of player armies
+                or cmdsrc > nHumanArmies
+            then
                 table.insert(result, index)
                 break
             end
