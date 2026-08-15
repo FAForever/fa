@@ -217,11 +217,22 @@ local ToStrings = ChatUtils.ToStrings
 -------------------------------------------------------------------------------
 -- Chat line construction
 
+---@class ChatLineArgs
+---@field Name string
+---@field Text? string
+---@field ArmyData? table
+---@field IsObserver? boolean
+---@field Recipient UIChatRecipient
+---@field Camera? table
+---@field Location? UIChatEntryLocation
+---@field Id? string
+---@field Type? ChatMessageType
+
 --- Builds a `UIChatEntry` from a sender's army data + message metadata and
 --- appends it to the model history. Fields with natural defaults (colour,
 --- army ID, faction icon) fall back when the army data is missing or the
 --- sender is an observer.
----@param args { Name: string, Text?: string, ArmyData?: table, IsObserver?: boolean, Recipient: UIChatRecipient, Camera?: table, Location?: UIChatEntryLocation, Id?: string }
+---@param args ChatLineArgs
 local function AppendChatLine(args)
     local armyData = args.ArmyData or {}
     -- Observers have no `faction`, fall through to the tail icon in
@@ -254,6 +265,7 @@ local function AppendChatLine(args)
         Camera    = args.Camera,
         Location  = args.Location,
         Id        = args.Id,
+        Type      = args.Type,
     }
 end
 
@@ -305,13 +317,6 @@ function OnReceive(sender, msg)
         return
     end
 
-    if msg.Type == 'ReceiveUnits' and ChatConfigModel.GetOptions().muteSharedUnits then
-        return
-    end
-    if msg.Type == 'ReceiveResources' and ChatConfigModel.GetOptions().muteSharedResources then
-        return
-    end
-
     -- `msg.Observer` is only set when the sender has no army entry. A
     -- peer claiming Observer while resolving to a real army is malformed.
     -- Drop the message entirely rather than stripping the flag, which
@@ -341,6 +346,7 @@ function OnReceive(sender, msg)
         Camera     = msg.camera,
         Location   = msg.location,
         Id         = msg.Id,
+        Type       = msg.Type
     }
 end
 
@@ -380,6 +386,7 @@ local function OnEcho(senderData, recipientData, msg)
         Camera    = msg.camera,
         Location  = msg.location,
         Id        = msg.Id,
+        Type      = msg.Id,
     }
 end
 

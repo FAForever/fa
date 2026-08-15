@@ -286,6 +286,11 @@ ChatLinesInterface = ClassUI(Group) {
         if (entry.Camera or entry.Location) and options.links == false then
             return false
         end
+        if entry.Type == 'ReceiveResources' and options.muteSharedResources
+            or entry.Type == 'ReceiveUnits' and options.muteSharedUnits
+        then
+            return false
+        end
         return true
     end,
 
