@@ -419,7 +419,7 @@ local function OnEcho(senderData, recipientData, msg)
         Camera    = msg.camera,
         Location  = msg.location,
         Id        = msg.Id,
-        Type      = msg.Id,
+        Type      = msg.Type,
     }
 end
 
