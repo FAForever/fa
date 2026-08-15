@@ -37,7 +37,7 @@ AIChatBrainComponent = ClassSimple {
     ---@param location? AIChatLocation
     ---@param msgType? ChatMessageType
     SendChatToAll = function(self, text, args, location, msgType)
-        self:SendChatTo('all', text, args, location)
+        self:SendChatTo('all', text, args, location, msgType)
     end,
 
     --- Broadcasts a message to the AI's allies. `Sync.ChatMessages` reaches
@@ -48,7 +48,7 @@ AIChatBrainComponent = ClassSimple {
     ---@param location? AIChatLocation
     ---@param msgType? ChatMessageType
     SendChatToAllies = function(self, text, args, location, msgType)
-        self:SendChatTo('allies', text, args, location)
+        self:SendChatTo('allies', text, args, location, msgType)
     end,
 
     --- Whispers a message to a specific army. No ally constraint — the AI is
@@ -75,7 +75,7 @@ AIChatBrainComponent = ClassSimple {
     ---@param location? AIChatLocation
     ---@param msgType? ChatMessageType
     SendChatToSelf = function(self, text, args, location, msgType)
-        self:SendChatTo(self:GetArmyIndex(), text, args, location)
+        self:SendChatTo(self:GetArmyIndex(), text, args, location, msgType)
     end,
 
     --- Shared implementation: builds the message, stamps it with the
