@@ -35,7 +35,8 @@ AIChatBrainComponent = ClassSimple {
     ---@param text string
     ---@param args? any[]                   # optional `string.format` arguments; UI applies `LOCF(text, unpack(args))` on receive
     ---@param location? AIChatLocation
-    SendChatToAll = function(self, text, args, location)
+    ---@param msgType? ChatMessageType
+    SendChatToAll = function(self, text, args, location, msgType)
         self:SendChatTo('all', text, args, location)
     end,
 
@@ -45,7 +46,8 @@ AIChatBrainComponent = ClassSimple {
     ---@param text string
     ---@param args? any[]
     ---@param location? AIChatLocation
-    SendChatToAllies = function(self, text, args, location)
+    ---@param msgType? ChatMessageType
+    SendChatToAllies = function(self, text, args, location, msgType)
         self:SendChatTo('allies', text, args, location)
     end,
 
@@ -71,7 +73,8 @@ AIChatBrainComponent = ClassSimple {
     ---@param text string
     ---@param args? any[]
     ---@param location? AIChatLocation
-    SendChatToSelf = function(self, text, args, location)
+    ---@param msgType? ChatMessageType
+    SendChatToSelf = function(self, text, args, location, msgType)
         self:SendChatTo(self:GetArmyIndex(), text, args, location)
     end,
 
