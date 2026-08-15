@@ -179,19 +179,14 @@ local function FindClientsAsPlayer(armiesTable, focus, armyID)
     local sendSrc = {}
     local nHumanArmies = 0
     for army, info in armiesTable do
-        if armyID then
-            if army == armyID then
-                for _, cmdsrc in info.authorizedCommandSources do
-                    sendSrc[cmdsrc] = true
-                end
-                break
-            end
-        elseif IsAlly(focus, army) then
+        if info.human then nHumanArmies = nHumanArmies + 1 end
+        if (armyID and armyID == army)
+            or (not armyID and IsAlly(focus, army))
+        then
             for _, cmdsrc in info.authorizedCommandSources do
                 sendSrc[cmdsrc] = true
             end
         end
-        if info.human then nHumanArmies = nHumanArmies + 1 end
     end
     for index, client in GetSessionClients() do
         for _, cmdsrc in client.authorizedCommandSources do
