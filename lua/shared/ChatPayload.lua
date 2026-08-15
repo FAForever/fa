@@ -11,6 +11,10 @@
 ---|  'notify'   # UI subsystem channel — internal traffic, not player chat
 ---|  number     # army ID for a private whisper
 
+---@alias ChatMessageType
+---| 'ReceiveResources'
+---| 'ReceiveUnits'
+
 --- Wire-format chat payload — what travels through `SessionSendChatMessage`
 --- and the sim-routed `Sync.ChatMessages`. `From` is filled by the sim relay
 --- (originating clients leave it blank), so every consumer past
@@ -26,6 +30,7 @@
 ---@field Args?       any[]                # `LOCF`-style format args spread alongside `text` on render
 ---@field Id?         string               # sender-stamped near-unique id; dedupes the two delivery paths
 ---@field From        number               # sim-stamped trusted sender army index — written by the relay before broadcast
+---@field Type?       ChatMessageType      #
 
 --- Maximum UTF-8 character length for a chat message body. The UI edit box
 --- enforces this on input; the sim relay and the receive path gate on the

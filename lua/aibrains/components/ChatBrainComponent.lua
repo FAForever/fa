@@ -57,8 +57,9 @@ AIChatBrainComponent = ClassSimple {
     ---@param text string
     ---@param args? any[]
     ---@param location? AIChatLocation
-    SendChatToPlayer = function(self, army, text, args, location)
-        self:SendChatTo(army, text, args, location)
+    ---@param msgType? ChatMessageType
+    SendChatToPlayer = function(self, army, text, args, location, msgType)
+        self:SendChatTo(army, text, args, location, msgType)
     end,
 
     --- Addresses a message back at this brain's own army. Useful for
@@ -98,7 +99,8 @@ AIChatBrainComponent = ClassSimple {
     ---@param text string
     ---@param args? any[]
     ---@param location? AIChatLocation
-    SendChatTo = function(self, to, text, args, location)
+    ---@param msgType? ChatMessageType
+    SendChatTo = function(self, to, text, args, location, msgType)
         if type(text) ~= 'string' or text == '' then return end
 
         local msg = {
@@ -108,6 +110,7 @@ AIChatBrainComponent = ClassSimple {
             Args     = args,
             From     = self:GetArmyIndex(),
             location = location,
+            Type     = msgType,
         }
         msg.Id = tostring(msg)
 

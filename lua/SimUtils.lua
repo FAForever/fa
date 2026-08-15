@@ -819,7 +819,8 @@ function GiveUnitsToPlayer(data, units)
             fromBrain:SendChatToPlayer(toArmy,
                 '<LOC ' .. locKey .. '>' .. fallback,
                 args,
-                { Area = area }
+                { Area = area },
+                'ReceiveUnits'
             )
         end
     end
@@ -1591,17 +1592,23 @@ function GiveResourcesToPlayer(data)
     if mass > 0 and energy > 0 then
         fromBrain:SendChatToPlayer(toArmy,
             "<LOC chat_resources_received_both>%s sent you %d mass and %d energy.",
-            { fromName, mass, energy }
+            { fromName, mass, energy },
+            nil,
+            'ReceiveResources'
         )
     elseif mass > 0 then
         fromBrain:SendChatToPlayer(toArmy,
             "<LOC chat_resources_received_mass>%s sent you %d mass.",
-            { fromName, mass }
+            { fromName, mass },
+            nil,
+            'ReceiveResources'
         )
     elseif energy > 0 then
         fromBrain:SendChatToPlayer(toArmy,
             "<LOC chat_resources_received_energy>%s sent you %d energy.",
-            { fromName, energy }
+        { fromName, energy },
+            nil,
+            'ReceiveResources'
         )
     end
 end

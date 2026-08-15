@@ -279,13 +279,14 @@ end
 --- message, dedupes against history, delegates Notify-subsystem messages,
 --- resolves the sender's army data, and appends a chat line.
 ---@param sender string
----@param msg ChatPayload
+---@param msg any
 function OnReceive(sender, msg)
     if type(sender) ~= 'string' or sender == '' then
         sender = 'nil sender'
     end
 
     if not ChatPayload.IsValidPayload(msg) then return end
+    ---@cast msg ChatPayload
     if IsDuplicateMessage(msg) then return end
 
     -- only apply LOCf when Args are present, otherwise players can randomly send localized messages by including format specifiers in their text.
@@ -301,6 +302,13 @@ function OnReceive(sender, msg)
 
     local armyData = GetArmyData(sender)
     if not armyData and GetFocusArmy() ~= -1 and not SessionIsReplay() then
+        return
+    end
+
+    if msg.Type == 'ReceiveUnits' and ChatConfigModel.GetOptions().muteSharedUnits then
+        return
+    end
+    if msg.Type == 'ReceiveResources' and ChatConfigModel.GetOptions().muteSharedResources then
         return
     end
 
