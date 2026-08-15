@@ -3,6 +3,7 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local FloatText = import("/lua/ui/controls/floattext.lua").FloatText
 
 local ChatLineInterface = import("/lua/ui/game/chat/ChatLineInterface.lua").ChatLineInterface
 
@@ -88,6 +89,31 @@ ChatFeedInterface = ClassUI(Group) {
                 self:OnHistoryChanged(lv())
             end)
         )
+
+        ---@param _ UIChatLineInterface
+        ---@param entry UIChatEntry
+        ---@param event KeyEvent
+        self.OnBodyClicked = function(_, entry, event)
+            if event.Modifiers and event.Modifiers.Ctrl then
+                if CopyToClipboard(entry.Text or '') then
+                    -- Parent to the engine frame so the `event.MouseX/Y`
+                    -- screen coords map straight to Left/Top without going
+                    -- through the Layouter's `pixelScaleFactor` scaling.
+                    -- `event.MouseX/Y` carry the actual click position.
+                    -- `GetMouseScreenPos()` would freeze at the last
+                    -- pre-UI-occlusion position.
+                    local mouseX, mouseY = event.MouseX, event.MouseY
+                    local toast = FloatText(GetFrame(0), "Copied to clipboard!")
+                    -- Center horizontally on the cursor; the Width LazyVar
+                    -- settles after the inner Text is measured.
+                    toast.Left:SetFunction(function() return mouseX - toast.Width() / 2 end)
+                    toast.Top:Set(mouseY - LayoutHelpers.ScaleNumber(30))
+                    toast:Float()
+                end
+            else
+                self.OnCameraClicked(_, entry, event)
+            end
+        end
     end,
 
     ---@param self UIChatFeedInterface
@@ -225,29 +251,6 @@ ChatFeedInterface = ClassUI(Group) {
         if entry.ArmyID and entry.ArmyID ~= GetFocusArmy() then
             ChatController.ActivateChat()
             ChatController.SetRecipient(entry.ArmyID)
-        end
-    end,
-
-    ---@param _ UIChatLineInterface
-    ---@param entry UIChatEntry
-    ---@param event KeyEvent
-    OnBodyClicked = function(_, entry, event)
-        if event.Modifiers and event.Modifiers.Ctrl then
-            if CopyToClipboard(entry.Text or '') then
-                -- Parent to the engine frame so the `event.MouseX/Y`
-                -- screen coords map straight to Left/Top without going
-                -- through the Layouter's `pixelScaleFactor` scaling.
-                -- `event.MouseX/Y` carry the actual click position.
-                -- `GetMouseScreenPos()` would freeze at the last
-                -- pre-UI-occlusion position.
-                local mouseX, mouseY = event.MouseX, event.MouseY
-                local toast = FloatText(GetFrame(0), "Copied to clipboard!")
-                -- Center horizontally on the cursor; the Width LazyVar
-                -- settles after the inner Text is measured.
-                toast.Left:SetFunction(function() return mouseX - toast.Width() / 2 end)
-                toast.Top:Set(mouseY - LayoutHelpers.ScaleNumber(30))
-                toast:Float()
-            end
         end
     end,
 

@@ -89,6 +89,8 @@ ChatLinesInterface = ClassUI(Group) {
                     toast.Top:Set(mouseY - LayoutHelpers.ScaleNumber(30))
                     toast:Float()
                 end
+            else
+                self.OnCameraClicked(entry, event)
             end
         end
         self.OnCameraClicked = function(entry, event)
