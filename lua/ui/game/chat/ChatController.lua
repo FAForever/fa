@@ -357,6 +357,7 @@ function OnReceive(sender, msg)
             local armyInfo = GetArmyData(msg.notifyFrom)
             if armyInfo then
                 sender = armyInfo.nickname or armyInfo.name
+                armyData = armyInfo
             end
         end
     end
