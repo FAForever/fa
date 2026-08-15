@@ -34,6 +34,7 @@ UnitBlueprint{
         MaxHealth = 1600,
     },
     Display = {
+        Abilities = { "<LOC ability_amphibious>Amphibious" },
         AnimationPermOpen = "/Units/UAB1102/UAB1102_Aopen.sca",
         Mesh = {
             IconFadeInZoom = 130,
