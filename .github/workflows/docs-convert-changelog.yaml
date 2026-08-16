@@ -53,6 +53,8 @@ jobs:
 
       - name: Download develop changelog
         if: inputs.additional-changelog == 'fafdevelop'
+        # No artifact exists when there are no snippets to process
+        continue-on-error: true
         uses: actions/download-artifact@v7
         with:
           name: changelog-fafdevelop
@@ -61,8 +63,9 @@ jobs:
         if: inputs.additional-changelog == 'fafdevelop'
         run: |
           FILE="${{ github.workspace }}/docs/_posts/fafdevelop.md"
-          cat changelog/snippets/sections/template-header-fafdevelop.md >> $FILE
-          cat changelog-fafdevelop.md >> $FILE
+          cat changelog/snippets/sections/template-header-fafdevelop.md >> "$FILE"
+          # the changelog file might not exist
+          [ -f changelog-fafdevelop.md ] && cat changelog-fafdevelop.md >> "$FILE"
 
       - name: Download beta changelog
         if: inputs.additional-changelog == 'fafbeta'
