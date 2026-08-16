@@ -8,3 +8,4 @@
   - Fixed live observers being unable to see ally-only and private messages.
   - Fix not being able to click the camera link unless you opened the chat window.
   - Chat window no longer automatically closes while the text input is being used or if moused over.
+  - Prevent loading versions < 5 of the "Emojis" mod by 4z0t since it no longer works with the chat rework.
