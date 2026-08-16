@@ -65,7 +65,7 @@ jobs:
           FILE="${{ github.workspace }}/docs/_posts/fafdevelop.md"
           cat changelog/snippets/sections/template-header-fafdevelop.md >> "$FILE"
           # the changelog file might not exist
-          [ -f changelog-fafdevelop.md ] && cat changelog-fafdevelop.md >> "$FILE"
+          if [ -f changelog-fafdevelop.md ]; then cat changelog-fafdevelop.md >> "$FILE"; fi
 
       - name: Download beta changelog
         if: inputs.additional-changelog == 'fafbeta'
@@ -79,8 +79,8 @@ jobs:
         if: inputs.additional-changelog == 'fafbeta'
         run: |
           FILE="${{ github.workspace }}/docs/_posts/fafbeta.md"
-          cat changelog/snippets/sections/template-header-fafbeta.md >> $FILE
-          [ -f changelog-fafbeta.md ] && cat changelog-fafbeta.md >> $FILE
+          cat changelog/snippets/sections/template-header-fafbeta.md >> "$FILE"
+          if [ -f changelog-fafdevelop.md ]; then cat changelog-fafbeta.md >> "$FILE"; fi
 
       - name: Setup python
         uses: actions/setup-python@v6
