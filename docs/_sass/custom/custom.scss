@@ -32,3 +32,13 @@
 .new {
   color: #2da44e;
 }
+
+[data-color-scheme="dark"] {
+  .old {
+    color: #ff7b72;
+  }
+
+  .new {
+    color: #3fb950;
+  }
+}

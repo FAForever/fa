@@ -1,0 +1,21 @@
+<button id="color-scheme-toggle" class="btn" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
+<script>
+  (function () {
+    var btn = document.getElementById('color-scheme-toggle');
+    var darkLink = document.getElementById('dark-scheme-stylesheet');
+
+    function isDark() {
+      return !darkLink.disabled;
+    }
+
+    function apply(dark) {
+      darkLink.disabled = !dark;
+      document.documentElement.setAttribute('data-color-scheme', dark ? 'dark' : 'light');
+      localStorage.setItem('faf-color-scheme', dark ? 'dark' : 'light');
+    }
+
+    btn.addEventListener('click', function () {
+      apply(!isDark());
+    });
+  })();
+</script>
