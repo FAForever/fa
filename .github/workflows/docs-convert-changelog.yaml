@@ -69,6 +69,8 @@ jobs:
 
       - name: Download beta changelog
         if: inputs.additional-changelog == 'fafbeta'
+        # No artifact exists when there are no snippets to process
+        continue-on-error: true
         uses: actions/download-artifact@v7
         with:
           name: changelog-fafbeta
@@ -78,7 +80,7 @@ jobs:
         run: |
           FILE="${{ github.workspace }}/docs/_posts/fafbeta.md"
           cat changelog/snippets/sections/template-header-fafbeta.md >> $FILE
-          cat changelog-fafbeta.md >> $FILE
+          [ -f changelog-fafbeta.md ] && cat changelog-fafbeta.md >> $FILE
 
       - name: Setup python
         uses: actions/setup-python@v6
