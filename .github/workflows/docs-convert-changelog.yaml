@@ -80,7 +80,7 @@ jobs:
         run: |
           FILE="${{ github.workspace }}/docs/_posts/fafbeta.md"
           cat changelog/snippets/sections/template-header-fafbeta.md >> "$FILE"
-          if [ -f changelog-fafdevelop.md ]; then cat changelog-fafbeta.md >> "$FILE"; fi
+          if [ -f changelog-fafbeta.md ]; then cat changelog-fafbeta.md >> "$FILE"; fi
 
       - name: Setup python
         uses: actions/setup-python@v6
