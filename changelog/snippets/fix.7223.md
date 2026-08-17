@@ -1,4 +1,4 @@
-- Plethora of fixes for the reworked chat window (#7223):
+- Plethora of fixes and improvements for the reworked chat window (#7223):
   - Let messages fade away instead of instantly closing when closing the window.
   - Add options to mute the new unit and resource share chat messages.
   - Unit and resource share messages now send to all allies instead of privately to the receiver.
