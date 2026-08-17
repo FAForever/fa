@@ -144,19 +144,16 @@ local ChatInterface = ClassUI(Window) {
             )
         )
         ---@diagnostic enable: undefined-field
+    end,
 
-        local oldHandleEvent = Window.HandleEvent
-        ---@param self UIChatInterface
-        ---@param event KeyEvent
-        self.HandleEvent = function(self, event)
-            local type = event.Type
-            if type == 'MouseEnter' then
-                self.MouseIsInWindow = true
-            elseif type == 'MouseExit' then
-                self.MouseIsInWindow = false
-            end
-            return oldHandleEvent(self, event)
+    HandleEvent = function(self, event)
+        local type = event.Type
+        if type == 'MouseEnter' then
+            self.MouseIsInWindow = true
+        elseif type == 'MouseExit' then
+            self.MouseIsInWindow = false
         end
+        return Window.HandleEvent(self, event)
     end,
 
     --- Creates the four corner resize grips and wires `RolloverHandler` to
