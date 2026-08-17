@@ -2,6 +2,7 @@
   - Let messages fade away instead of instantly closing when closing the window.
   - Add options to mute the new unit and resource share chat messages.
   - Unit and resource share messages now send to all allies instead of privately to the receiver.
+  - Fix not being able to see messages when observing after the game ends.
   - Notify messages for observers show who sent them.
   - Make the shared units camera link move the camera instantly.
   - Allow clicking the text of a message to use its camera link (instead of only the small camera icon). Originally you could only ctrl+click the text to copy it to clipboard.

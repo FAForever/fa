@@ -341,7 +341,7 @@ function OnReceive(sender, msg)
     -- peer claiming Observer while resolving to a real army is malformed.
     -- Drop the message entirely rather than stripping the flag, which
     -- would let manipulated traffic render under a different label.
-    if msg.Observer and armyData then return end
+    if not SessionIsGameOver() and msg.Observer and armyData then return end
 
     if msg.to == ChatModel.RecipientNotify then
         -- ignore unwanted messages
