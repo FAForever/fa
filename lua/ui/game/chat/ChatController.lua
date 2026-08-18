@@ -148,18 +148,16 @@ local function FindClientsAsObserver(armiesTable)
     local result = {}
     for index, client in GetSessionClients() do
         if not client.connected then continue end
-        local playerIsObserver = true
+        local clientIsObserver = true
         for _, player in armiesTable do
-            if player.outOfGame and player.human and player.nickname == client.name then
-                table.insert(result, index)
-                playerIsObserver = false
-                break
-            elseif player.nickname == client.name then
-                playerIsObserver = false
+            if player.nickname == client.name then
+                if not (player.human and player.outOfGame) then
+                    clientIsObserver = false
+                end
                 break
             end
         end
-        if playerIsObserver then
+        if clientIsObserver then
             table.insert(result, index)
         end
     end
