@@ -464,7 +464,10 @@ function Send(text, attachCamera)
     -- Observers can't target a private recipient. Bail before stamping
     -- an id or firing sim callbacks for a message the engine would
     -- refuse anyway.
-    if focusArmy == -1 and type(recipient) == 'number' then return end
+    if focusArmy == -1 and type(recipient) == 'number' then
+        AppendLocalSystemMessage(LOC("<LOC chat_private_message_as_observer>Cannot privately message as observer."))
+        return
+    end
 
     -- Flag observer broadcasts so receivers render "to observers:".
     -- Both delivery paths need to see this, so set it before either
