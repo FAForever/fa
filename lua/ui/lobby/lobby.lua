@@ -2236,27 +2236,22 @@ local function TryLaunch(skipNoObserversCheck)
             return
         end
 
-        if launchInProgress then
-            return
-        end
-        launchInProgress = true
-        if GUI and GUI.launchGameButton and not IsDestroyed(GUI.launchGameButton) then
-            GUI.launchGameButton:Disable()
-        end
-
         HostUtils.KickObservers("GameLaunched")
     end
 
-    if not launchInProgress then
-        launchInProgress = true
-        if GUI and GUI.launchGameButton and not IsDestroyed(GUI.launchGameButton) then
-            GUI.launchGameButton:Disable()
-        end
+    if launchInProgress then
+        return
+    end
+    launchInProgress = true
+    if GUI and GUI.launchGameButton and not IsDestroyed(GUI.launchGameButton) then
+        GUI.launchGameButton:Disable()
     end
 
     if not EveryoneHasEstablishedConnections(gameInfo.GameOptions.AllowObservers) then
         launchInProgress = false
-        if GUI and GUI.launchGameButton and not IsDestroyed(GUI.launchGameButton) then
+        if HostUtils and HostUtils.RefreshButtonEnabledness then
+            HostUtils.RefreshButtonEnabledness()
+        elseif GUI and GUI.launchGameButton and not IsDestroyed(GUI.launchGameButton) then
             GUI.launchGameButton:Enable()
         end
         return

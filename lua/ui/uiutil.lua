@@ -1092,6 +1092,9 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
 
                 if destroyOnCallback and not IsDestroyed(popup) then
                     popup:Close()
+                elseif not IsDestroyed(self) then
+                    self._clicked = false
+                    self:Enable()
                 end
             end
         else
@@ -1102,6 +1105,9 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
 
                 if not IsDestroyed(popup) then
                     popup:Close()
+                elseif not IsDestroyed(self) then
+                    self._clicked = false
+                    self:Enable()
                 end
             end
         end
