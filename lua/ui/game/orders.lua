@@ -36,8 +36,8 @@ local numSlots = 14
 local firstAltSlot = 8
 local vertRows = 3
 local horzRows = 4
-local vertCols = numSlots/vertRows
-local horzCols = numSlots/horzRows
+local vertCols = numSlots / vertRows
+local horzCols = numSlots / horzRows
 local lastOCTime = {}
 
 local function CreateOrderGlow(parent)
@@ -116,17 +116,17 @@ local currentSelection = nil
 local function GetOrderBitmapNames(bitmapId)
     if bitmapId == nil then
         LOG("Error - nil bitmap passed to GetOrderBitmapNames")
-        bitmapId = "basic-empty"    -- TODO do I really want to default it?
+        bitmapId = "basic-empty" -- TODO do I really want to default it?
     end
 
     local button_prefix = "/game/orders/" .. bitmapId .. "_btn_"
     return UIUtil.SkinnableFile(button_prefix .. "up.dds", true)
-        ,  UIUtil.SkinnableFile(button_prefix .. "up_sel.dds", true)
-        ,  UIUtil.SkinnableFile(button_prefix .. "over.dds", true)
-        ,  UIUtil.SkinnableFile(button_prefix .. "over_sel.dds", true)
-        ,  UIUtil.SkinnableFile(button_prefix .. "dis.dds", true)
-        ,  UIUtil.SkinnableFile(button_prefix .. "dis_sel.dds", true)
-        , "UI_Action_MouseDown", "UI_Action_Rollover"   -- Sets click and rollover cues
+        , UIUtil.SkinnableFile(button_prefix .. "up_sel.dds", true)
+        , UIUtil.SkinnableFile(button_prefix .. "over.dds", true)
+        , UIUtil.SkinnableFile(button_prefix .. "over_sel.dds", true)
+        , UIUtil.SkinnableFile(button_prefix .. "dis.dds", true)
+        , UIUtil.SkinnableFile(button_prefix .. "dis_sel.dds", true)
+        , "UI_Action_MouseDown", "UI_Action_Rollover" -- Sets click and rollover cues
 end
 
 -- Used by most orders, which start and stop a command mode, so they toggle on when pressed
@@ -136,7 +136,7 @@ local function StandardOrderBehavior(self, modifiers)
     if self:IsChecked() then
         CommandMode.EndCommandMode(true)
     else
-        CommandMode.StartCommandMode("order", {name=self._order})
+        CommandMode.StartCommandMode("order", { name = self._order })
     end
 end
 
@@ -168,7 +168,8 @@ local OrderTogglesTable = {
     Attack = {
         ToggleFromOn = function() SetWeaponPriorities(0, 'Default') end,
         ToggleFromOff = function() SetWeaponPriorities("{categories.COMMAND, categories.STRATEGIC, categories.ANTIMISSILE * categories.TECH3, categories.MASSEXTRACTION * categories.STRUCTURE * categories.TECH3, categories.MASSEXTRACTION * categories.STRUCTURE * categories.TECH2, categories.ENERGYPRODUCTION * categories.STRUCTURE * categories.TECH3, categories.ENERGYPRODUCTION * categories.STRUCTURE * categories.TECH2, categories.MASSFABRICATION * categories.STRUCTURE, categories.SHIELD,}",
-                                    'Snipe', false) end,
+                'Snipe', false)
+        end,
     },
 }
 -- we can add duplicate fields in like this:
@@ -247,14 +248,13 @@ local function AttackOrderInit(control, unitList)
     UpdateToggleIcon(control)
 end
 
-
 -- Allow the right button on the attack order to change target priorities, while the left button stays as before.
 -- would be cool to implement overloading like this onto other orders too for epic things.
 local function AttackOrderBehavior(self, modifiers)
     if modifiers.Left then
         StandardOrderBehavior(self, modifiers)
     elseif modifiers.Right then
-        ToggleOrder(self,'Attack')
+        ToggleOrder(self, 'Attack')
         UpdateToggleIcon(self)
     end
 end
@@ -293,7 +293,7 @@ local function MomentaryOrderBehavior(self, modifiers)
 end
 
 function ClearCommands(units)
-    local cb = {Func = 'ClearCommands'}
+    local cb = { Func = 'ClearCommands' }
 
     if units then
         EnhancementQueue.clearEnhancements(units)
@@ -306,7 +306,7 @@ function ClearCommands(units)
         for _, u in units do
             table.insert(ids, u:GetEntityId())
         end
-        cb.Args = {ids=ids}
+        cb.Args = { ids = ids }
     end
 
     SimCallback(cb, true)
@@ -388,7 +388,7 @@ local function DiveOrderBehavior(self, modifiers)
         -- Searching the unitlist for SUB's and memorizing submerged and surfaced state
         for i, v in unitList do
             if EntityCategoryContains(categories.SUBMERSIBLE, v) then
-                local submergedSUBState = GetIsSubmerged({v})
+                local submergedSUBState = GetIsSubmerged({ v })
                 if submergedSUBState == 1 then
                     surfacedSUB = true
                 elseif submergedSUBState == -1 then
@@ -405,7 +405,7 @@ local function DiveOrderBehavior(self, modifiers)
         if submergedSUB and surfacedSUB then
             local SurfacedSubs = {}
             for i, v in unitList do
-                if GetIsSubmerged({v}) == 1 then
+                if GetIsSubmerged({ v }) == 1 then
                     table.insert(SurfacedSubs, v)
                 end
             end
@@ -485,7 +485,7 @@ end
 function ToggleDiveOrder()
     local diveCB = orderCheckboxMap["RULEUCC_Dive"]
     if diveCB then
-        DiveOrderBehavior(diveCB, {Left = true})
+        DiveOrderBehavior(diveCB, { Left = true })
     end
 end
 
@@ -519,9 +519,9 @@ local function AttackMoveBehavior(self, modifiers)
         CommandMode.EndCommandMode(true)
     else
         local modeData = {
-            name="RULEUCC_Script",
-            AbilityName='AttackMove',
-            TaskName='AttackMove',
+            name = "RULEUCC_Script",
+            AbilityName = 'AttackMove',
+            TaskName = 'AttackMove',
             Cursor = 'ATTACK_MOVE',
         }
         CommandMode.StartCommandMode("order", modeData)
@@ -533,9 +533,9 @@ local function AbilityButtonBehavior(self, modifiers)
         CommandMode.EndCommandMode(true)
     else
         local modeData = {
-            name="RULEUCC_Script",
-            AbilityName=self._script,
-            TaskName=self._script,
+            name = "RULEUCC_Script",
+            AbilityName = self._script,
+            TaskName = self._script,
             Cursor = self._cursor,
         }
         CommandMode.StartCommandMode("order", modeData)
@@ -574,7 +574,7 @@ local function ScriptButtonInitFunction(control, unitList, subCheck)
     local result = nil
     local mixed = false
     for i, v in unitList do
-        local thisUnitStatus = GetScriptBit({v}, control._data.extraInfo)
+        local thisUnitStatus = GetScriptBit({ v }, control._data.extraInfo)
         if result == nil then
             result = thisUnitStatus
         else
@@ -612,9 +612,9 @@ local function StatToggleOrderBehavior(self, modifiers, subState)
 
     -- Mixed shields get special behaviour: turn everything on, not off.
     if mixed then
-        SimCallback( { Func="SetStatByCallback", Args= {[self._data.statToggle] = true}}, true )
+        SimCallback({ Func = "SetStatByCallback", Args = { [self._data.statToggle] = true } }, true)
     else
-        SimCallback( { Func="SetStatByCallback", Args= {[self._data.statToggle] = not state}}, true)
+        SimCallback({ Func = "SetStatByCallback", Args = { [self._data.statToggle] = not state } }, true)
     end
 
     Tooltip.SetTooltipText(self._curHelpText)
@@ -708,10 +708,10 @@ end
 
 -- Retaliate button specific behvior
 local retaliateStateInfo = {
-    [-1] = {bitmap = 'stand-ground',    helpText = "mode_mixed"},
-    [0] = {bitmap = 'return-fire',     helpText = "mode_return_fire", id = 'ReturnFire'},
-    [1] = {bitmap = 'hold-fire',       helpText = "mode_hold_fire", id = 'HoldFire'},
-    [2] = {bitmap = 'stand-ground',    helpText = "mode_hold_ground", id = 'HoldGround'},
+    [-1] = { bitmap = 'stand-ground', helpText = "mode_mixed" },
+    [0] = { bitmap = 'return-fire', helpText = "mode_return_fire", id = 'ReturnFire' },
+    [1] = { bitmap = 'hold-fire', helpText = "mode_hold_fire", id = 'HoldFire' },
+    [2] = { bitmap = 'stand-ground', helpText = "mode_hold_ground", id = 'HoldGround' },
 }
 
 local function CreateBorder(parent)
@@ -790,7 +790,7 @@ local function CreateFirestatePopup(parent, selected)
                 LayoutHelpers.AtBottomIn(bg.buttons[i], bg)
                 LayoutHelpers.AtLeftIn(bg.buttons[i], bg)
             else
-                LayoutHelpers.Above(bg.buttons[i], bg.buttons[i-1])
+                LayoutHelpers.Above(bg.buttons[i], bg.buttons[i - 1])
             end
             i = i + 1
         end
@@ -931,9 +931,10 @@ function FindOCWeapon(bp)
 
     return
 end
+
 ---@param units UserUnit[]
 local function IsAutoOCMode(units)
-    return units[1]:GetStat("AutoOC",0).Value == 1
+    return units[1]:GetStat("AutoOC", 0).Value == 1
 end
 
 local function OverchargeInit(control, unitList)
@@ -993,7 +994,7 @@ function OverchargeBehavior(self, modifiers)
 
         Tooltip.SetTooltipText(self._curHelpText)
 
-        SimCallback({Func = 'AutoOvercharge', Args = {auto = self._isAutoMode == true} }, true)
+        SimCallback({ Func = 'AutoOvercharge', Args = { auto = self._isAutoMode == true } }, true)
     end
 end
 
@@ -1025,7 +1026,7 @@ local function OverchargeFrame(self, deltaTime)
             self:Enable()
             local armyTable = GetArmiesTable()
             local facStr = import("/lua/factions.lua").Factions[armyTable.armiesTable[armyTable.focusArmy].faction + 1].SoundPrefix
-            local sound = Sound({Bank = 'XGG', Cue = 'Computer_Computer_Basic_Orders_01173'})
+            local sound = Sound({ Bank = 'XGG', Cue = 'Computer_Computer_Basic_Orders_01173' })
             if not lastOCTime[unit:GetArmy()] then
                 lastOCTime[unit:GetArmy()] = GetGameTimeSeconds() - 2
             end
@@ -1103,52 +1104,52 @@ end
 
 local defaultOrdersTable = {
     -- Common rules
-    AttackMove = {                  helpText = "attack_move",       bitmapId = 'attack_move',           preferredSlot = 1,  behavior = AttackMoveBehavior},
-    RULEUCC_Move = {                helpText = "move",              bitmapId = 'move',                  preferredSlot = 2,  behavior = StandardOrderBehavior},
-    RULEUCC_Attack = {              helpText = "attack",            bitmapId = 'attack',                preferredSlot = 3,  behavior = AttackOrderBehavior, initialStateFunc = AttackOrderInit},
-    RULEUCC_Patrol = {              helpText = "patrol",            bitmapId = 'patrol',                preferredSlot = 4,  behavior = StandardOrderBehavior},
-    RULEUCC_Stop = {                helpText = "stop",              bitmapId = 'stop',                  preferredSlot = 5,  behavior = StopOrderBehavior},
-    RULEUCC_Guard = {               helpText = "assist",            bitmapId = 'guard',                 preferredSlot = 6,  behavior = StandardOrderBehavior},
-    RULEUCC_RetaliateToggle = {     helpText = "mode",              bitmapId = 'stand-ground',          preferredSlot = 7,  behavior = RetaliateOrderBehavior,      initialStateFunc = RetaliateInitFunction},
+    AttackMove = { helpText = "attack_move", bitmapId = 'attack_move', preferredSlot = 1, behavior = AttackMoveBehavior },
+    RULEUCC_Move = { helpText = "move", bitmapId = 'move', preferredSlot = 2, behavior = StandardOrderBehavior },
+    RULEUCC_Attack = { helpText = "attack", bitmapId = 'attack', preferredSlot = 3, behavior = AttackOrderBehavior, initialStateFunc = AttackOrderInit },
+    RULEUCC_Patrol = { helpText = "patrol", bitmapId = 'patrol', preferredSlot = 4, behavior = StandardOrderBehavior },
+    RULEUCC_Stop = { helpText = "stop", bitmapId = 'stop', preferredSlot = 5, behavior = StopOrderBehavior },
+    RULEUCC_Guard = { helpText = "assist", bitmapId = 'guard', preferredSlot = 6, behavior = StandardOrderBehavior },
+    RULEUCC_RetaliateToggle = { helpText = "mode", bitmapId = 'stand-ground', preferredSlot = 7, behavior = RetaliateOrderBehavior, initialStateFunc = RetaliateInitFunction },
     -- Unit specific rules
-    RULEUCC_Overcharge = {          helpText = "overcharge",        bitmapId = 'overcharge',            preferredSlot = 8,  behavior = OverchargeBehavior,          initialStateFunc = OverchargeInit, onframe = OverchargeFrame},
-    RULEUCC_SiloBuildTactical = {   helpText = "build_tactical",    bitmapId = 'silo-build-tactical',   preferredSlot = 9,  behavior = BuildOrderBehavior,          initialStateFunc = BuildInitFunction},
-    RULEUCC_SiloBuildNuke = {       helpText = "build_nuke",        bitmapId = 'silo-build-nuke',       preferredSlot = 9,  behavior = BuildOrderBehavior,          initialStateFunc = BuildInitFunction},
-    RULEUCC_Script = {              helpText = "special_action",    bitmapId = 'overcharge',            preferredSlot = 8,  behavior = StandardOrderBehavior},
-    RULEUCC_Transport = {           helpText = "transport",         bitmapId = 'unload',                preferredSlot = 9,  behavior = TransportOrderBehavior},
-    RULEUCC_Nuke = {                helpText = "fire_nuke",         bitmapId = 'launch-nuke',           preferredSlot = 10, behavior = StandardOrderBehavior, ButtonTextFunc = NukeBtnText},
-    RULEUCC_Tactical = {            helpText = "fire_tactical",     bitmapId = 'launch-tactical',       preferredSlot = 10, behavior = StandardOrderBehavior, ButtonTextFunc = TacticalBtnText},
-    RULEUCC_Teleport = {            helpText = "teleport",          bitmapId = 'teleport',              preferredSlot = 10, behavior = StandardOrderBehavior},
-    RULEUCC_Ferry = {               helpText = "ferry",             bitmapId = 'ferry',                 preferredSlot = 10, behavior = StandardOrderBehavior},
-    RULEUCC_Sacrifice = {           helpText = "sacrifice",         bitmapId = 'sacrifice',             preferredSlot = 10, behavior = StandardOrderBehavior},
-    RULEUCC_Dive = {                helpText = "dive",              bitmapId = 'dive',                  preferredSlot = 11, behavior = DiveOrderBehavior,           initialStateFunc = DiveInitFunction},
-    RULEUCC_Reclaim = {             helpText = "reclaim",           bitmapId = 'reclaim',               preferredSlot = 12, behavior = StandardOrderBehavior},
-    RULEUCC_Capture = {             helpText = "capture",           bitmapId = 'convert',               preferredSlot = 13, behavior = StandardOrderBehavior},
-    RULEUCC_Repair = {              helpText = "repair",            bitmapId = 'repair',                preferredSlot = 14, behavior = StandardOrderBehavior},
-    RULEUCC_Dock = {                helpText = "dock",              bitmapId = 'dock',                  preferredSlot = 14, behavior = DockOrderBehavior},
+    RULEUCC_Overcharge = { helpText = "overcharge", bitmapId = 'overcharge', preferredSlot = 8, behavior = OverchargeBehavior, initialStateFunc = OverchargeInit, onframe = OverchargeFrame },
+    RULEUCC_SiloBuildTactical = { helpText = "build_tactical", bitmapId = 'silo-build-tactical', preferredSlot = 9, behavior = BuildOrderBehavior, initialStateFunc = BuildInitFunction },
+    RULEUCC_SiloBuildNuke = { helpText = "build_nuke", bitmapId = 'silo-build-nuke', preferredSlot = 9, behavior = BuildOrderBehavior, initialStateFunc = BuildInitFunction },
+    RULEUCC_Script = { helpText = "special_action", bitmapId = 'overcharge', preferredSlot = 8, behavior = StandardOrderBehavior },
+    RULEUCC_Transport = { helpText = "transport", bitmapId = 'unload', preferredSlot = 9, behavior = TransportOrderBehavior },
+    RULEUCC_Nuke = { helpText = "fire_nuke", bitmapId = 'launch-nuke', preferredSlot = 10, behavior = StandardOrderBehavior, ButtonTextFunc = NukeBtnText },
+    RULEUCC_Tactical = { helpText = "fire_tactical", bitmapId = 'launch-tactical', preferredSlot = 10, behavior = StandardOrderBehavior, ButtonTextFunc = TacticalBtnText },
+    RULEUCC_Teleport = { helpText = "teleport", bitmapId = 'teleport', preferredSlot = 10, behavior = StandardOrderBehavior },
+    RULEUCC_Ferry = { helpText = "ferry", bitmapId = 'ferry', preferredSlot = 10, behavior = StandardOrderBehavior },
+    RULEUCC_Sacrifice = { helpText = "sacrifice", bitmapId = 'sacrifice', preferredSlot = 10, behavior = StandardOrderBehavior },
+    RULEUCC_Dive = { helpText = "dive", bitmapId = 'dive', preferredSlot = 11, behavior = DiveOrderBehavior, initialStateFunc = DiveInitFunction },
+    RULEUCC_Reclaim = { helpText = "reclaim", bitmapId = 'reclaim', preferredSlot = 12, behavior = StandardOrderBehavior },
+    RULEUCC_Capture = { helpText = "capture", bitmapId = 'convert', preferredSlot = 13, behavior = StandardOrderBehavior },
+    RULEUCC_Repair = { helpText = "repair", bitmapId = 'repair', preferredSlot = 14, behavior = StandardOrderBehavior },
+    RULEUCC_Dock = { helpText = "dock", bitmapId = 'dock', preferredSlot = 14, behavior = DockOrderBehavior },
 
-    DroneL = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 10, behavior = DroneBehavior,               initialStateFunc = DroneInit},
-    DroneR = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 11, behavior = DroneBehavior,               initialStateFunc = DroneInit},
+    DroneL = { helpText = "drone", bitmapId = 'unload02', preferredSlot = 10, behavior = DroneBehavior, initialStateFunc = DroneInit },
+    DroneR = { helpText = "drone", bitmapId = 'unload02', preferredSlot = 11, behavior = DroneBehavior, initialStateFunc = DroneInit },
 
-    ExFac = {                       helpText = "external_factory",  bitmapId = 'exfac',                 preferredSlot = 10,  behavior = ExternalFactoryBehavior},
+    ExFac = { helpText = "external_factory", bitmapId = 'exfac', preferredSlot = 10, behavior = ExternalFactoryBehavior },
 
     -- Unit toggle rules
-    RULEUTC_ShieldToggle = {        helpText = "toggle_shield",     bitmapId = 'shield',                preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 0},
-    RULEUTC_WeaponToggle = {        helpText = "toggle_weapon",     bitmapId = 'toggle-weapon',         preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 1},
-    RULEUTC_JammingToggle = {       helpText = "toggle_jamming",    bitmapId = 'jamming',               preferredSlot = 9,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 2},
-    RULEUTC_IntelToggle = {         helpText = "toggle_intel",      bitmapId = 'intel',                 preferredSlot = 9,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 3},
-    RULEUTC_ProductionToggle = {    helpText = "toggle_production", bitmapId = 'production',            preferredSlot = 10, behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 4},
-    RULEUTC_StealthToggle = {       helpText = "toggle_stealth",    bitmapId = 'stealth',               preferredSlot = 10, behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 5},
-    RULEUTC_GenericToggle = {       helpText = "toggle_generic",    bitmapId = 'production',            preferredSlot = 11, behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 6},
-    RULEUTC_SpecialToggle = {       helpText = "toggle_special",    bitmapId = 'activate-weapon',       preferredSlot = 12, behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 7},
-    RULEUTC_CloakToggle = {         helpText = "toggle_cloak",      bitmapId = 'intel-counter',         preferredSlot = 12, behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 8},
+    RULEUTC_ShieldToggle = { helpText = "toggle_shield", bitmapId = 'shield', preferredSlot = 8, behavior = ScriptButtonOrderBehavior, initialStateFunc = ScriptButtonInitFunction, extraInfo = 0 },
+    RULEUTC_WeaponToggle = { helpText = "toggle_weapon", bitmapId = 'toggle-weapon', preferredSlot = 8, behavior = ScriptButtonOrderBehavior, initialStateFunc = ScriptButtonInitFunction, extraInfo = 1 },
+    RULEUTC_JammingToggle = { helpText = "toggle_jamming", bitmapId = 'jamming', preferredSlot = 9, behavior = ScriptButtonOrderBehavior, initialStateFunc = ScriptButtonInitFunction, extraInfo = 2 },
+    RULEUTC_IntelToggle = { helpText = "toggle_intel", bitmapId = 'intel', preferredSlot = 9, behavior = ScriptButtonOrderBehavior, initialStateFunc = ScriptButtonInitFunction, extraInfo = 3 },
+    RULEUTC_ProductionToggle = { helpText = "toggle_production", bitmapId = 'production', preferredSlot = 10, behavior = ScriptButtonOrderBehavior, initialStateFunc = ScriptButtonInitFunction, extraInfo = 4 },
+    RULEUTC_StealthToggle = { helpText = "toggle_stealth", bitmapId = 'stealth', preferredSlot = 10, behavior = ScriptButtonOrderBehavior, initialStateFunc = ScriptButtonInitFunction, extraInfo = 5 },
+    RULEUTC_GenericToggle = { helpText = "toggle_generic", bitmapId = 'production', preferredSlot = 11, behavior = ScriptButtonOrderBehavior, initialStateFunc = ScriptButtonInitFunction, extraInfo = 6 },
+    RULEUTC_SpecialToggle = { helpText = "toggle_special", bitmapId = 'activate-weapon', preferredSlot = 12, behavior = ScriptButtonOrderBehavior, initialStateFunc = ScriptButtonInitFunction, extraInfo = 7 },
+    RULEUTC_CloakToggle = { helpText = "toggle_cloak", bitmapId = 'intel-counter', preferredSlot = 12, behavior = ScriptButtonOrderBehavior, initialStateFunc = ScriptButtonInitFunction, extraInfo = 8 },
 }
 
 
 local standardOrdersTable = nil
 
 local specialOrdersTable = {
-    RULEUCC_Pause = {behavior = pauseFunc, notAvailableBehavior = disPauseFunc},
+    RULEUCC_Pause = { behavior = pauseFunc, notAvailableBehavior = disPauseFunc },
 }
 
 -- This is a used as a set
@@ -1333,7 +1334,7 @@ local function CreateCommonOrders(availableOrders, init)
     if units and not table.empty(units) and EntityCategoryFilterDown(categories.MOBILE - categories.STRUCTURE, units) then
         for _, availOrder in availableOrders do
             if (availOrder == 'RULEUCC_RetaliateToggle' and not table.empty(EntityCategoryFilterDown(categories.MOBILE, units)))
-                    or not table.empty(EntityCategoryFilterDown(categories.ENGINEER - categories.POD, units)) then
+                or not table.empty(EntityCategoryFilterDown(categories.ENGINEER - categories.POD, units)) then
                 orderCheckboxMap['AttackMove']:Enable()
                 break
             end
@@ -1384,16 +1385,16 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
             podUnits['DroneL'] = assistingUnits
         end
 
-        
+
         if not table.empty(assistingUnits) then
             if table.getn(podStagingPlatforms) == 1 and table.empty(pods) then
                 table.insert(availableOrders, 'DroneL')
-                assistingUnitList['DroneL'] = {assistingUnits[1]}
+                assistingUnitList['DroneL'] = { assistingUnits[1] }
                 if table.getn(assistingUnits) > 1 then
                     table.insert(availableOrders, 'DroneR')
-                    assistingUnitList['DroneR'] = {assistingUnits[2]}
-                    podUnits['DroneL'] = {assistingUnits[1]}
-                    podUnits['DroneR'] = {assistingUnits[2]}
+                    assistingUnitList['DroneR'] = { assistingUnits[2] }
+                    podUnits['DroneL'] = { assistingUnits[1] }
+                    podUnits['DroneR'] = { assistingUnits[2] }
                 end
             else
                 table.insert(availableOrders, 'DroneL')
@@ -1407,7 +1408,7 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
     if not table.empty(exFacs) and table.getn(exFacs) == table.getn(units) then
         -- make sure we've selected all external factories, or all external factory units
         if table.getn(EntityCategoryFilterDown(categories.EXTERNALFACTORY, exFacs)) == table.getn(units) or
-           table.getn(EntityCategoryFilterDown(categories.EXTERNALFACTORYUNIT, exFacs)) == table.getn(units) then
+            table.getn(EntityCategoryFilterDown(categories.EXTERNALFACTORYUNIT, exFacs)) == table.getn(units) then
             assistingUnitList['ExFac'] = {}
             -- finally, make sure our units are all of the same type
             local bp = exFacs[1]:GetUnitId()
@@ -1604,7 +1605,7 @@ function ApplyOverrides(standardOrdersTable, newSelection)
                 for key, value in override do
                     -- if we have a function override, we'll need to get it from the table
                     -- overrideFunctionTable takes a string and gives a function of the same name
-                    -- the value of the behavior field in the override in the blueprint should be 
+                    -- the value of the behavior field in the override in the blueprint should be
                     -- equal to the key in the overrideFunctionTable
                     if key == 'behavior' or key == 'initialStateFunc' then
                         if not overrideFunctionTable[value] then
@@ -1710,6 +1711,33 @@ function SetLayout(layout)
     CreateCommonOrders({}, true)
 end
 
+function RightClickDischarge()
+    local grid = controls.orderButtonGrid
+    local columns, rows = grid:GetDimensions()
+    for row = 1, rows do
+        for column = 1, columns do
+            local button = grid:GetItem(column, row)
+            if button and button._order == "RULEUTC_ShieldToggle" and not button._shieldRechargeRightClick then
+                local oldOnClick = button.OnClick
+
+                button.OnClick = function(self, modifiers)
+                    if modifiers and modifiers.Right then
+                        SimCallback({ Func = "DischargeShields", Args = {} }, true)
+                        return
+                    end
+
+                    if oldOnClick then
+                        return oldOnClick(self, modifiers)
+                    end
+                end
+
+                button._shieldRechargeRightClick = true
+                return
+            end
+        end
+    end
+end
+
 -- Called from gamemain to create control
 function SetupOrdersControl(parent, mfd)
     controls.controlClusterGroup = parent
@@ -1728,7 +1756,7 @@ function SetupOrdersControl(parent, mfd)
                 orderCheckbox:SetCheck(true)
             end
         end
-)
+    )
     CommandMode.AddEndBehavior(
         function(commandMode, data)
             local orderCheckbox = orderCheckboxMap[data]
@@ -1736,7 +1764,7 @@ function SetupOrdersControl(parent, mfd)
                 orderCheckbox:SetCheck(false)
             end
         end
-)
+    )
 
     return controls.bg
 end
@@ -1757,6 +1785,7 @@ end
 function CreateMouseoverDisplay(parent, ID)
     Tooltip.CreateMouseoverDisplay(parent, ID, nil, true)
 end
+
 local _mouseoverDisplay = setmetatable({}, { __index = { Destroy = Tooltip.DestroyMouseoverDisplay, text = { SetText = Tooltip.SetTooltipText } }, __newindex = function() end })
 setmetatable(controls, {
     __index = function(t, k)
