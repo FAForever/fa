@@ -570,6 +570,15 @@ local function ScriptButtonOrderBehavior(self, modifiers, subState)
     end
 end
 
+local function ShieldToggleOrderBehavior(self, modifiers, subState)
+    if modifiers and modifiers.Right then
+        SimCallback({ Func = "DischargeShields", Args = {} }, true)
+        return
+    end
+
+    ScriptButtonOrderBehavior(self, modifiers, subState)
+end
+
 local function ScriptButtonInitFunction(control, unitList, subCheck)
     local result = nil
     local mixed = false
@@ -1134,7 +1143,7 @@ local defaultOrdersTable = {
     ExFac = { helpText = "external_factory", bitmapId = 'exfac', preferredSlot = 10, behavior = ExternalFactoryBehavior },
 
     -- Unit toggle rules
-    RULEUTC_ShieldToggle = { helpText = "toggle_shield", bitmapId = 'shield', preferredSlot = 8, behavior = ScriptButtonOrderBehavior, initialStateFunc = ScriptButtonInitFunction, extraInfo = 0 },
+    RULEUTC_ShieldToggle = { helpText = "toggle_shield", bitmapId = 'shield', preferredSlot = 8, behavior = ShieldToggleOrderBehavior, initialStateFunc = ScriptButtonInitFunction, extraInfo = 0 },
     RULEUTC_WeaponToggle = { helpText = "toggle_weapon", bitmapId = 'toggle-weapon', preferredSlot = 8, behavior = ScriptButtonOrderBehavior, initialStateFunc = ScriptButtonInitFunction, extraInfo = 1 },
     RULEUTC_JammingToggle = { helpText = "toggle_jamming", bitmapId = 'jamming', preferredSlot = 9, behavior = ScriptButtonOrderBehavior, initialStateFunc = ScriptButtonInitFunction, extraInfo = 2 },
     RULEUTC_IntelToggle = { helpText = "toggle_intel", bitmapId = 'intel', preferredSlot = 9, behavior = ScriptButtonOrderBehavior, initialStateFunc = ScriptButtonInitFunction, extraInfo = 3 },
@@ -1709,33 +1718,6 @@ function SetLayout(layout)
 
     -- Created greyed out orders on setup
     CreateCommonOrders({}, true)
-end
-
-function RightClickDischarge()
-    local grid = controls.orderButtonGrid
-    local columns, rows = grid:GetDimensions()
-    for row = 1, rows do
-        for column = 1, columns do
-            local button = grid:GetItem(column, row)
-            if button and button._order == "RULEUTC_ShieldToggle" and not button._shieldRechargeRightClick then
-                local oldOnClick = button.OnClick
-
-                button.OnClick = function(self, modifiers)
-                    if modifiers and modifiers.Right then
-                        SimCallback({ Func = "DischargeShields", Args = {} }, true)
-                        return
-                    end
-
-                    if oldOnClick then
-                        return oldOnClick(self, modifiers)
-                    end
-                end
-
-                button._shieldRechargeRightClick = true
-                return
-            end
-        end
-    end
 end
 
 -- Called from gamemain to create control
