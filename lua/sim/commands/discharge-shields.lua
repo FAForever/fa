@@ -43,7 +43,7 @@ function DischargeShields(units, doPrint)
         local unit = units[k]
         if not IsDestroyed(unit) then
             local shield = unit.MyShield
-            if shield and shield:IsOn() then
+            if shield then
                 local shieldHealth = shield:GetHealth()
                 shield:ApplyDamage(nil, shieldHealth, unit:GetPosition(), 'Discharge', false)
 
