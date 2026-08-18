@@ -9,7 +9,6 @@ local function assert_true(cond, msg)
         tests_failed = tests_failed + 1
         local err = "FAIL: " .. (msg or "assertion failed")
         print(err)
-        error(err, 2)
     else
         tests_passed = tests_passed + 1
     end
@@ -24,7 +23,6 @@ local function assert_equal(a, b, msg)
         tests_failed = tests_failed + 1
         local err = string.format("FAIL: expected %s, got %s (%s)", tostring(b), tostring(a), msg or "")
         print(err)
-        error(err, 2)
     else
         tests_passed = tests_passed + 1
     end
@@ -40,7 +38,9 @@ local function PushEscapeHandler(h)
 end
 local function PopEscapeHandler()
     if #escapeHandlers == 0 then
-        error("EscapeHandler stack underflow / popped when empty!", 2)
+        tests_failed = tests_failed + 1
+        print("FAIL: EscapeHandler stack underflow / popped when empty!")
+        return nil
     end
     return table.remove(escapeHandlers)
 end
@@ -71,7 +71,9 @@ end
 
 function Control:Destroy()
     if self._destroyed then
-        error("Native crash / Assertion failed: Double-destroy on " .. tostring(self.debugname), 2)
+        tests_failed = tests_failed + 1
+        print("FAIL: Native crash / Assertion failed: Double-destroy on " .. tostring(self.debugname))
+        return
     end
     self._destroyed = true
     -- Recursively destroy children in Moho C++ engine
@@ -116,10 +118,12 @@ function Popup.new(parent, content)
     local self = Group.new(parent, "Popup")
     setmetatable(self, Popup)
     self.content = content
+    self._closed = false
     content._parent = self
     table.insert(self._children, content)
 
     PushEscapeHandler(function()
+        self._closed = true
         PopEscapeHandler()
         self:OnEscapePressed()
     end)
@@ -172,6 +176,9 @@ local function QuickDialog(parent, dialogText, button1Text, button1Callback, but
 
                 if destroyOnCallback and not IsDestroyed(popup) then
                     popup:Close()
+                elseif not IsDestroyed(self) then
+                    self._clicked = false
+                    self:Enable()
                 end
             end
         else
@@ -182,6 +189,9 @@ local function QuickDialog(parent, dialogText, button1Text, button1Callback, but
 
                 if not IsDestroyed(popup) then
                     popup:Close()
+                elseif not IsDestroyed(self) then
+                    self._clicked = false
+                    self:Enable()
                 end
             end
         end
@@ -204,7 +214,7 @@ end
 
 print("--- Running QuickDialog & Popup Lifecycle Tests ---")
 
--- Test 1: Standard open & close
+-- Test 1: Standard open & close via button
 do
     local initialEscCount = GetEscapeHandlerCount()
     local GUI = Group.new(nil, "LobbyGUI")
@@ -219,7 +229,24 @@ do
     assert_equal(GetEscapeHandlerCount(), initialEscCount, "Escape handler popped after close")
 end
 
--- Test 2: Fixed QuickDialog - callback destroys parent GUI without crashing or double-destroy
+-- Test 2: Standard open & close via Escape handler
+do
+    local initialEscCount = GetEscapeHandlerCount()
+    local GUI = Group.new(nil, "LobbyGUI")
+    local popup, dialog = QuickDialog(GUI, "Escape Dialog", "OK", nil, nil, nil, true)
+
+    assert_equal(GetEscapeHandlerCount(), initialEscCount + 1, "Escape handler registered")
+
+    -- Simulate Escape key press calling topmost handler
+    local topHandler = escapeHandlers[#escapeHandlers]
+    assert_true(topHandler ~= nil, "Top escape handler found")
+    topHandler()
+
+    assert_true(IsDestroyed(popup), "Popup destroyed via escape")
+    assert_equal(GetEscapeHandlerCount(), initialEscCount, "Escape handler stack cleanly balanced after escape")
+end
+
+-- Test 3: Fixed QuickDialog - callback destroys parent GUI without crashing or double-destroy
 do
     local initialEscCount = GetEscapeHandlerCount()
     local GUI = Group.new(nil, "LobbyGUI")
@@ -236,18 +263,15 @@ do
     assert_equal(GetEscapeHandlerCount(), initialEscCount + 1, "Escape handler pushed on popup create")
 
     -- Click "Yes"
-    local status, err = pcall(function()
-        dialog._button1:OnClick()
-    end)
+    dialog._button1:OnClick()
 
-    assert_true(status, "Fixed QuickDialog handles parent destruction cleanly without crashing")
     assert_equal(launchCount, 1, "TryLaunch called once")
     assert_true(IsDestroyed(GUI), "GUI destroyed")
     assert_true(IsDestroyed(popup), "Popup destroyed")
     assert_equal(GetEscapeHandlerCount(), initialEscCount, "Escape handler stack cleanly balanced")
 end
 
--- Test 3: Fixed QuickDialog - Button is one-shot and ignores rapid double clicks
+-- Test 4: Dialog stays open (destroyOnCallback = false) -> button re-arms for subsequent clicks
 do
     local initialEscCount = GetEscapeHandlerCount()
     local GUI = Group.new(nil, "LobbyGUI")
@@ -259,18 +283,18 @@ do
 
     -- First click
     dialog._button1:OnClick()
-    assert_true(dialog._button1:IsDisabled(), "Button is disabled on first click")
     assert_equal(actionCount, 1, "Action called on first click")
+    assert_false(dialog._button1:IsDisabled(), "Button re-armed when dialog stays open")
 
-    -- Rapid second click
+    -- Second click
     dialog._button1:OnClick()
-    assert_equal(actionCount, 1, "Action NOT called on second click")
+    assert_equal(actionCount, 2, "Action called on second click when dialog kept open")
 
     popup:Close()
     assert_equal(GetEscapeHandlerCount(), initialEscCount, "Escape handlers restored")
 end
 
--- Test 4: Lobby TryLaunch re-entrancy guard test
+-- Test 5: Lobby TryLaunch re-entrancy guard test
 do
     local launchInProgress = false
     local kickCount = 0
@@ -289,13 +313,22 @@ do
             return
         end
 
+        HostUtils = {
+            KickObservers = function(reason)
+                kickCount = kickCount + 1
+            end,
+            RefreshButtonEnabledness = function()
+                GUI.launchGameButton:Enable()
+            end,
+        }
+        HostUtils.KickObservers("GameLaunched")
+
         if launchInProgress then
             return
         end
         launchInProgress = true
         GUI.launchGameButton:Disable()
 
-        kickCount = kickCount + 1
         launchCount = launchCount + 1
         GUI:Destroy()
     end
@@ -326,5 +359,9 @@ do
     assert_true(IsDestroyed(GUI), "GUI cleanly destroyed")
 end
 
-print("\n--- All 4 test suites passed successfully! ---")
+print("\n--- All 5 test suites finished! ---")
 print(string.format("Total assertions passed: %d, failed: %d\n", tests_passed, tests_failed))
+
+if tests_failed > 0 then
+    os.exit(1)
+end

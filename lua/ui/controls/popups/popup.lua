@@ -8,6 +8,7 @@ local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 -- and draws a standard background behind its content. You'll probably want to extend it to do
 -- something more involved, or use it as-is if you want to manually assemble your popup UI Group.
 ---@class Popup : Group
+---@field _closed boolean
 Popup = ClassUI(Group) {
 
     --- Create a new popup
@@ -17,6 +18,7 @@ Popup = ClassUI(Group) {
     __init = function(self, GUI, content)
         Group.__init(self, GUI)
         self.content = content
+        self._closed = false
         content:SetParent(self)
         LayoutHelpers.AtLeftTopIn(content, self)
 
@@ -49,6 +51,7 @@ Popup = ClassUI(Group) {
 
         ---- Close when the escape key is pressed.
         EscapeHandler.PushEscapeHandler(function()
+            self._closed = true
             EscapeHandler.PopEscapeHandler()
             self:OnEscapePressed()
         end)
