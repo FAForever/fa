@@ -1084,14 +1084,25 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
         local button = CreateButtonWithDropshadow(dialog, '/BUTTON/medium/', text)
         if callback then
             button.OnClick = function(self)
+                if self._clicked then return end
+                self._clicked = true
+                self:Disable()
+
                 callback()
-                if destroyOnCallback then
+
+                if destroyOnCallback and not IsDestroyed(popup) then
                     popup:Close()
                 end
             end
         else
             button.OnClick = function(self)
-                popup:Close()
+                if self._clicked then return end
+                self._clicked = true
+                self:Disable()
+
+                if not IsDestroyed(popup) then
+                    popup:Close()
+                end
             end
         end
         LayoutHelpers.AtBottomIn(button, dialog, 10)
