@@ -57,8 +57,10 @@ Popup = ClassUI(Group) {
     --- Close the dialog.
     ---@param self Popup
     Close = function(self)
-        self:OnClosed()
-        self:Destroy()
+        if not IsDestroyed(self) then
+            self:OnClosed()
+            self:Destroy()
+        end
     end,
 
     --- Called when escape is pressed if the dialog is open. Defaults to closing the dialog.
@@ -76,6 +78,16 @@ Popup = ClassUI(Group) {
     --- Called when the dialog is closed via any method.
     ---@param self Popup
     OnClosed = function(self)
-        EscapeHandler.PopEscapeHandler()
+        if not self._closed then
+            self._closed = true
+            EscapeHandler.PopEscapeHandler()
+        end
+    end,
+
+    --- Called when the control is destroyed
+    ---@param self Popup
+    OnDestroy = function(self)
+        self:OnClosed()
+        Group.OnDestroy(self)
     end,
 }

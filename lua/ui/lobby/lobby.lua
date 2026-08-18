@@ -284,6 +284,7 @@ local localPlayerName = ""
 local gameName = ""
 local hostID = false
 local singlePlayer = false
+local launchInProgress = false
 ---@type Group
 local GUI = false
 local localPlayerID = false
@@ -2142,6 +2143,10 @@ function UpdateAvailableSlots(numAvailStartSpots, scenario)
 end
 
 local function TryLaunch(skipNoObserversCheck)
+    if launchInProgress then
+        return
+    end
+
     if not singlePlayer then
         local notReady = GetPlayersNotReady()
         if notReady then
@@ -2231,10 +2236,29 @@ local function TryLaunch(skipNoObserversCheck)
             return
         end
 
+        if launchInProgress then
+            return
+        end
+        launchInProgress = true
+        if GUI and GUI.launchGameButton and not IsDestroyed(GUI.launchGameButton) then
+            GUI.launchGameButton:Disable()
+        end
+
         HostUtils.KickObservers("GameLaunched")
     end
 
+    if not launchInProgress then
+        launchInProgress = true
+        if GUI and GUI.launchGameButton and not IsDestroyed(GUI.launchGameButton) then
+            GUI.launchGameButton:Disable()
+        end
+    end
+
     if not EveryoneHasEstablishedConnections(gameInfo.GameOptions.AllowObservers) then
+        launchInProgress = false
+        if GUI and GUI.launchGameButton and not IsDestroyed(GUI.launchGameButton) then
+            GUI.launchGameButton:Enable()
+        end
         return
     end
 
@@ -3137,6 +3161,7 @@ end
 
 -- create UI won't typically be called directly by another module
 function CreateUI(maxPlayers)
+    launchInProgress = false
     local ResourceMapPreview = import("/lua/ui/controls/resmappreview.lua").ResourceMapPreview
     local ItemList = import("/lua/maui/itemlist.lua").ItemList
     local Prefs = import("/lua/user/prefs.lua")
