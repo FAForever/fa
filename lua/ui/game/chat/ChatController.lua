@@ -121,6 +121,7 @@ local function FindClientsAsObserver(armiesTable)
     for index, client in GetSessionClients() do
         if not client.connected then continue end
         local playerIsObserver = true
+        ---@param player ArmyInfo
         for _, player in armiesTable do
             if player.outOfGame and player.human and player.nickname == client.name then
                 table.insert(result, index)
@@ -286,6 +287,7 @@ function OnReceive(sender, msg)
     end
 
     if not ChatPayload.IsValidPayload(msg) then return end
+    ---@cast msg ChatPayload
     if IsDuplicateMessage(msg) then return end
 
     -- only apply LOCf when Args are present, otherwise players can randomly send localized messages by including format specifiers in their text.
