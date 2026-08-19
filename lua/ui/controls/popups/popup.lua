@@ -5,18 +5,18 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 
 --- Base class for popups. A popup appears on top of other UI content, darkens the content behind it,
--- and draws a standard background behind its content. You'll probably want to extend it to do
--- something more involved, or use it as-is if you want to manually assemble your popup UI Group.
+--- and draws a standard background behind its content
 ---@class Popup : Group
----@field _closed boolean
----@field _escapeHandler function
 ---@field Trash TrashBag
+---@field content Control
+---@field _closed boolean
+---@field _escapeHandler? function
 Popup = ClassUI(Group) {
 
-    --- Create a new popup
+    --- Creates a new popup
     ---@param self Popup
-    ---@param GUI Control       -- A reference to the lobby's GUI object (dialogs should all be parented off there)
-    ---@param content Control   -- A Group containing the UI to show inside the popup.
+    ---@param GUI Control A reference to the lobby GUI object
+    ---@param content Control A Group containing the UI to show inside the popup
     __init = function(self, GUI, content)
         Group.__init(self, GUI)
         self.Trash = TrashBag()
@@ -69,7 +69,7 @@ Popup = ClassUI(Group) {
         })
     end,
 
-    --- Close the dialog.
+    --- Closes the dialog
     ---@param self Popup
     Close = function(self)
         if not IsDestroyed(self) then
@@ -78,19 +78,19 @@ Popup = ClassUI(Group) {
         end
     end,
 
-    --- Called when escape is pressed if the dialog is open. Defaults to closing the dialog.
+    --- Called when escape is pressed if the dialog is open. Defaults to closing the dialog
     ---@param self Popup
     OnEscapePressed = function(self)
         self:Close()
     end,
 
-    --- Called when the shadow is clicked. Defaults to closing the dialog.
+    --- Called when the shadow is clicked. Defaults to closing the dialog
     ---@param self Popup
     OnShadowClicked = function(self)
         self:Close()
     end,
 
-    --- Called when the dialog is closed via any method.
+    --- Called when the dialog is closed via any method
     ---@param self Popup
     OnClosed = function(self)
         if not self._closed then
