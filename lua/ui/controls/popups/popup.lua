@@ -9,6 +9,8 @@ local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 -- something more involved, or use it as-is if you want to manually assemble your popup UI Group.
 ---@class Popup : Group
 ---@field _closed boolean
+---@field _escapeHandler function
+---@field Trash TrashBag
 Popup = ClassUI(Group) {
 
     --- Create a new popup
@@ -17,6 +19,7 @@ Popup = ClassUI(Group) {
     ---@param content Control   -- A Group containing the UI to show inside the popup.
     __init = function(self, GUI, content)
         Group.__init(self, GUI)
+        self.Trash = TrashBag()
         self.content = content
         self._closed = false
         content:SetParent(self)
@@ -50,11 +53,20 @@ Popup = ClassUI(Group) {
         end
 
         ---- Close when the escape key is pressed.
-        EscapeHandler.PushEscapeHandler(function()
-            self._closed = true
-            EscapeHandler.PopEscapeHandler()
+        local escapeHandler = function()
             self:OnEscapePressed()
-        end)
+        end
+        self._escapeHandler = escapeHandler
+        EscapeHandler.PushEscapeHandler(escapeHandler)
+
+        self.Trash:Add({
+            Destroy = function()
+                if self._escapeHandler then
+                    EscapeHandler.PopEscapeHandler(self._escapeHandler)
+                    self._escapeHandler = nil
+                end
+            end,
+        })
     end,
 
     --- Close the dialog.
@@ -83,13 +95,19 @@ Popup = ClassUI(Group) {
     OnClosed = function(self)
         if not self._closed then
             self._closed = true
-            EscapeHandler.PopEscapeHandler()
+            if self._escapeHandler then
+                EscapeHandler.PopEscapeHandler(self._escapeHandler)
+                self._escapeHandler = nil
+            end
         end
     end,
 
     --- Called when the control is destroyed
     ---@param self Popup
     OnDestroy = function(self)
+        if self.Trash then
+            self.Trash:Destroy()
+        end
         self:OnClosed()
         Group.OnDestroy(self)
     end,

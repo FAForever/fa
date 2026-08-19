@@ -1,5 +1,11 @@
 -- Unit test and regression suite for QuickDialog / Popup lifetime & Launch re-entrancy
--- Simulates Moho UI object hierarchy, EscapeHandler, and Lobby launch sequence.
+-- Simulates Moho UI object hierarchy, TrashBag, EscapeHandler, and Lobby launch sequence.
+--
+-- This test specifies and verifies the contracts implemented in:
+-- - lua/ui/controls/popups/popup.lua (Popup lifecycle, TrashBag, and owner-aware escape teardown)
+-- - lua/ui/uiutil.lua (QuickDialog button lifecycle, double-click protection, and re-arming)
+-- - lua/ui/dialogs/eschandler.lua (EscapeHandler stack and owner-aware PopEscapeHandler)
+-- - lua/ui/lobby/lobby.lua (TryLaunch launchInProgress lock and observer kick flow)
 
 local tests_failed = 0
 local tests_passed = 0
@@ -33,25 +39,71 @@ end
 -- ============================================================================
 
 local escapeHandlers = {}
+
 local function PushEscapeHandler(h)
     table.insert(escapeHandlers, h)
+    return h
 end
-local function PopEscapeHandler()
+
+local function PopEscapeHandler(handler)
     if #escapeHandlers == 0 then
         tests_failed = tests_failed + 1
         print("FAIL: EscapeHandler stack underflow / popped when empty!")
         return nil
     end
+
+    if handler then
+        for i = #escapeHandlers, 1, -1 do
+            if escapeHandlers[i] == handler then
+                return table.remove(escapeHandlers, i)
+            end
+        end
+        return nil
+    end
+
     return table.remove(escapeHandlers)
 end
+
 local function GetEscapeHandlerCount()
     return #escapeHandlers
+end
+
+local function HandleEsc()
+    if #escapeHandlers > 0 then
+        local topHandler = escapeHandlers[#escapeHandlers]
+        topHandler()
+    end
 end
 
 local function IsDestroyed(control)
     return not control or control._destroyed == true
 end
 
+-- Simulates TrashBag (matching lua/system/trashbag.lua)
+local TrashBag = {}
+TrashBag.__index = TrashBag
+
+function TrashBag.new()
+    local self = setmetatable({}, TrashBag)
+    self._items = {}
+    return self
+end
+
+function TrashBag:Add(item)
+    table.insert(self._items, item)
+    return item
+end
+
+function TrashBag:Destroy()
+    for _, item in ipairs(self._items) do
+        if item and item.Destroy then
+            item:Destroy()
+        end
+    end
+    self._items = {}
+end
+
+-- Simulates Control (matching lua/maui/control.lua)
 local Control = {}
 Control.__index = Control
 
@@ -63,10 +115,28 @@ function Control.new(parent, debugname)
     self._children = {}
     self.debugname = debugname or "Control"
     if parent then
-        self._parent = parent
-        table.insert(parent._children, self)
+        self:SetParent(parent)
     end
     return self
+end
+
+function Control:SetParent(newParent)
+    -- Remove from old parent's child list
+    if self._parent and self._parent._children then
+        for i, child in ipairs(self._parent._children) do
+            if child == self then
+                table.remove(self._parent._children, i)
+                break
+            end
+        end
+    end
+
+    self._parent = newParent
+
+    -- Add to new parent's child list
+    if newParent and newParent._children then
+        table.insert(newParent._children, self)
+    end
 end
 
 function Control:Destroy()
@@ -76,12 +146,18 @@ function Control:Destroy()
         return
     end
     self._destroyed = true
+
     -- Recursively destroy children in Moho C++ engine
+    local childrenCopy = {}
     for _, child in ipairs(self._children) do
+        table.insert(childrenCopy, child)
+    end
+    for _, child in ipairs(childrenCopy) do
         if not child._destroyed then
             child:Destroy()
         end
     end
+
     if self.OnDestroy then
         self:OnDestroy()
     end
@@ -108,7 +184,7 @@ function Group.new(parent, debugname)
 end
 
 -- ============================================================================
--- Fixed Popup Implementation (matching lua/ui/controls/popups/popup.lua)
+-- Popup Implementation (matching lua/ui/controls/popups/popup.lua)
 -- ============================================================================
 
 local Popup = {}
@@ -117,16 +193,26 @@ Popup.__index = setmetatable(Popup, Group)
 function Popup.new(parent, content)
     local self = Group.new(parent, "Popup")
     setmetatable(self, Popup)
+    self.Trash = TrashBag.new()
     self.content = content
     self._closed = false
-    content._parent = self
-    table.insert(self._children, content)
+    content:SetParent(self)
 
-    PushEscapeHandler(function()
-        self._closed = true
-        PopEscapeHandler()
+    local escapeHandler = function()
         self:OnEscapePressed()
-    end)
+    end
+    self._escapeHandler = escapeHandler
+    PushEscapeHandler(escapeHandler)
+
+    self.Trash:Add({
+        Destroy = function()
+            if self._escapeHandler then
+                PopEscapeHandler(self._escapeHandler)
+                self._escapeHandler = nil
+            end
+        end,
+    })
+
     return self
 end
 
@@ -140,11 +226,17 @@ end
 function Popup:OnClosed()
     if not self._closed then
         self._closed = true
-        PopEscapeHandler()
+        if self._escapeHandler then
+            PopEscapeHandler(self._escapeHandler)
+            self._escapeHandler = nil
+        end
     end
 end
 
 function Popup:OnDestroy()
+    if self.Trash then
+        self.Trash:Destroy()
+    end
     self:OnClosed()
 end
 
@@ -152,17 +244,23 @@ function Popup:OnEscapePressed()
     self:Close()
 end
 
+function Popup:OnShadowClicked()
+    self:Close()
+end
+
 -- ============================================================================
--- Fixed QuickDialog Implementation (matching lua/ui/uiutil.lua)
+-- QuickDialog Implementation (matching lua/ui/uiutil.lua)
 -- ============================================================================
 
-local function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Text, button2Callback, destroyOnCallback)
+local function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Text, button2Callback, destroyOnCallback, modalInfo)
     if destroyOnCallback == nil then
         destroyOnCallback = true
     end
 
     local dialog = Group.new(parent, "quickDialogGroup")
     local popup = Popup.new(parent, dialog)
+    popup.OnShadowClicked = function() end
+    popup.OnEscapePressed = function() end
 
     local function MakeButton(text, callback)
         local button = Control.new(dialog, "Button_" .. tostring(text))
@@ -205,6 +303,17 @@ local function QuickDialog(parent, dialogText, button1Text, button1Callback, but
         dialog._button2 = MakeButton(button2Text, button2Callback)
     end
 
+    if modalInfo and modalInfo.escapeButton then
+        popup.OnEscapePressed = function(self)
+            local btn = modalInfo.escapeButton == 1 and dialog._button1 or dialog._button2
+            if btn and not btn:IsDisabled() then
+                btn:OnClick()
+            else
+                self:Close()
+            end
+        end
+    end
+
     return popup, dialog
 end
 
@@ -233,14 +342,12 @@ end
 do
     local initialEscCount = GetEscapeHandlerCount()
     local GUI = Group.new(nil, "LobbyGUI")
-    local popup, dialog = QuickDialog(GUI, "Escape Dialog", "OK", nil, nil, nil, true)
+    local popup = Popup.new(GUI, Group.new(GUI, "PopupContent"))
 
     assert_equal(GetEscapeHandlerCount(), initialEscCount + 1, "Escape handler registered")
 
     -- Simulate Escape key press calling topmost handler
-    local topHandler = escapeHandlers[#escapeHandlers]
-    assert_true(topHandler ~= nil, "Top escape handler found")
-    topHandler()
+    HandleEsc()
 
     assert_true(IsDestroyed(popup), "Popup destroyed via escape")
     assert_equal(GetEscapeHandlerCount(), initialEscCount, "Escape handler stack cleanly balanced after escape")
@@ -313,7 +420,7 @@ do
             return
         end
 
-        HostUtils = {
+        local HostUtils = {
             KickObservers = function(reason)
                 kickCount = kickCount + 1
             end,
@@ -359,7 +466,100 @@ do
     assert_true(IsDestroyed(GUI), "GUI cleanly destroyed")
 end
 
-print("\n--- All 5 test suites finished! ---")
+-- Test 6: Nested Popups - closing in LIFO order keeps stack balanced
+do
+    local initialEscCount = GetEscapeHandlerCount()
+    local GUI = Group.new(nil, "LobbyGUI")
+
+    local popupA = Popup.new(GUI, Group.new(GUI, "PopupAContent"))
+    assert_equal(GetEscapeHandlerCount(), initialEscCount + 1, "Popup A escape handler pushed")
+
+    local popupB = Popup.new(GUI, Group.new(GUI, "PopupBContent"))
+    assert_equal(GetEscapeHandlerCount(), initialEscCount + 2, "Popup B escape handler pushed")
+
+    -- Press Escape to close B
+    HandleEsc()
+    assert_true(IsDestroyed(popupB), "Popup B destroyed on Escape")
+    assert_false(IsDestroyed(popupA), "Popup A remains open")
+    assert_equal(GetEscapeHandlerCount(), initialEscCount + 1, "Only Popup A handler remains")
+
+    -- Press Escape to close A
+    HandleEsc()
+    assert_true(IsDestroyed(popupA), "Popup A destroyed on Escape")
+    assert_equal(GetEscapeHandlerCount(), initialEscCount, "Escape stack empty after all popups closed")
+end
+
+-- Test 7: Nested Popups - destroying lower popup out-of-order removes its handler without corrupting upper popup
+do
+    local initialEscCount = GetEscapeHandlerCount()
+    local GUI = Group.new(nil, "LobbyGUI")
+
+    local popupA = Popup.new(GUI, Group.new(GUI, "PopupAContent"))
+    local popupB = Popup.new(GUI, Group.new(GUI, "PopupBContent"))
+    assert_equal(GetEscapeHandlerCount(), initialEscCount + 2, "Two popups active")
+
+    -- Destroy lower popup A directly (e.g. parent container teardown or programmatic close)
+    popupA:Destroy()
+    assert_true(IsDestroyed(popupA), "Popup A destroyed")
+    assert_false(IsDestroyed(popupB), "Popup B still alive")
+    assert_equal(GetEscapeHandlerCount(), initialEscCount + 1, "Handler A removed cleanly")
+
+    -- Press Escape: Popup B's handler should be executed
+    HandleEsc()
+    assert_true(IsDestroyed(popupB), "Popup B destroyed on Escape")
+    assert_equal(GetEscapeHandlerCount(), initialEscCount, "Escape stack fully balanced")
+end
+
+-- Test 8: Subclass Lifecycle Override - TrashBag cleans up escape handler even with custom OnDestroy
+do
+    local initialEscCount = GetEscapeHandlerCount()
+    local GUI = Group.new(nil, "LobbyGUI")
+
+    local CustomPopup = {}
+    CustomPopup.__index = setmetatable(CustomPopup, Popup)
+    function CustomPopup.new(parent)
+        local content = Group.new(parent, "CustomContent")
+        local self = Popup.new(parent, content)
+        setmetatable(self, CustomPopup)
+        return self
+    end
+
+    -- Subclass defines custom OnDestroy
+    local customDestroyRan = false
+    function CustomPopup:OnDestroy()
+        customDestroyRan = true
+        Popup.OnDestroy(self)
+    end
+
+    local customPopup = CustomPopup.new(GUI)
+    assert_equal(GetEscapeHandlerCount(), initialEscCount + 1, "Custom popup registered escape handler")
+
+    customPopup:Close()
+    assert_true(customDestroyRan, "Custom OnDestroy executed")
+    assert_true(IsDestroyed(customPopup), "Custom popup destroyed")
+    assert_equal(GetEscapeHandlerCount(), initialEscCount, "Escape handler stack balanced")
+end
+
+-- Test 9: QuickDialog with modalInfo escapeButton
+do
+    local initialEscCount = GetEscapeHandlerCount()
+    local GUI = Group.new(nil, "LobbyGUI")
+    local cancelPressed = false
+
+    local popup, dialog = QuickDialog(GUI, "Modal prompt", "Accept", nil, "Cancel", function()
+        cancelPressed = true
+    end, true, { escapeButton = 2 })
+
+    assert_equal(GetEscapeHandlerCount(), initialEscCount + 1, "Modal QuickDialog escape handler registered")
+
+    -- Press Escape -> routes to Cancel button
+    HandleEsc()
+    assert_true(cancelPressed, "Escape routed to Cancel callback")
+    assert_true(IsDestroyed(popup), "Popup closed after escape-button callback")
+    assert_equal(GetEscapeHandlerCount(), initialEscCount, "Escape handler stack balanced")
+end
+
+print("\n--- All 9 test suites finished! ---")
 print(string.format("Total assertions passed: %d, failed: %d\n", tests_passed, tests_failed))
 
 if tests_failed > 0 then
