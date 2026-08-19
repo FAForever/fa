@@ -123,6 +123,7 @@ end
 ---@operator call(...): table
 ---@field __init? fun(self, ...)
 ---@field __post_init? fun(self, ...)
+---@field __name MohoExportedClassName
 
 ---@class State
 ---@field __base table
@@ -910,6 +911,8 @@ Factory = {
 
 --- Converts a C class into a simplified Lua class with no bases. This must adjust the cclass in place as the reference
 -- to the table appears to be hardcoded in the engine.
+---@param cclass table<string, function>
+---@param name MohoExportedClassName
 function ConvertCClassToLuaSimplifiedClass(cclass, name)
     local seen = {}
     local flatten = {}
