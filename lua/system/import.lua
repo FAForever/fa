@@ -180,6 +180,8 @@ end
 
 -- Clear out a module from the table of loaded modules, so that on the next import attempt it will
 -- get reloaded from scratch
+---@param name FileName
+---@param why FileAction
 function dirty_module(name, why)
     local modules = __modules
     local module = modules[name]

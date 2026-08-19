@@ -8,7 +8,8 @@
 -- does something useful.
 -- debug.trackallocations(true)
 
--- Set up global diskwatch table (you can add callbacks to it to be notified of disk changes)
+--- Global table for disk change callbacks
+---@type fun(name: FileName, why: FileAction)[]
 __diskwatch = {}
 
 -- Set up custom Lua weirdness
