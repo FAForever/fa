@@ -50,8 +50,7 @@ local CheckboxDefs = {
     { Key = ChatConfigModel.KeyLinks,          Text = "Show camera links",         Tooltip = 'chat_filter' },
 }
 
--------------------------------------------------------------------------------
---  Window class
+--#region  Window class
 
 --- One label-plus-bitmap-combo row in the colour section; `Key` is the option this row writes.
 ---@class UIChatConfigColorRow
@@ -430,8 +429,8 @@ local ChatConfigInterface = ClassUI(Window) {
     end,
 }
 
--------------------------------------------------------------------------------
---  Module-level singleton and standalone entry points
+--#endregion
+--#region  Module-level singleton and standalone entry points
 
 --- Singleton handle; nil until `Open` builds the dialog for the first time.
 ---@type UIChatConfigInterface | nil
@@ -474,7 +473,7 @@ function Toggle()
     end
 end
 
--------------------------------------------------------------------------------
+--#endregion
 --#region Debugging
 
 --- Hot-reload hook: reopens the dialog on the freshly loaded module if it was open.

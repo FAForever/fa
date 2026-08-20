@@ -22,8 +22,7 @@ local Debug = false
 -- Reserve space on the right of the wrapper for the scrollbar widget.
 local ScrollbarReserve = 32
 
--------------------------------------------------------------------------------
--- A self-contained chat-lines panel: outer wrapper, inner pool of line rows,
+--#region A self-contained chat-lines panel: outer wrapper, inner pool of line rows,
 -- and the vertical scrollbar.
 --
 -- Click hooks (`OnNameClicked`, `OnBodyClicked`, `OnCameraClicked`) are
@@ -532,7 +531,7 @@ ChatLinesInterface = ClassUI(Group) {
     end,
 }
 
--------------------------------------------------------------------------------
+--#endregion
 --#region Debugging
 
 --- Hot-reload hook: re-imports this module on save.

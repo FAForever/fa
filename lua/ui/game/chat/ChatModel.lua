@@ -1,8 +1,7 @@
 
 local Create = import("/lua/lazyvar.lua").Create
 
--------------------------------------------------------------------------------
--- Recipient constants, exported so the rest of the system never hardcodes them.
+--#region Recipient constants, exported so the rest of the system never hardcodes them.
 
 RecipientAll = 'all'
 
@@ -15,8 +14,8 @@ RecipientNotify = 'notify'
 --- Send target: a known channel constant, or an army ID for a private whisper.
 ---@alias UIChatRecipient 'all' | 'allies' | number  # number = army ID for a private message
 
--------------------------------------------------------------------------------
--- History entry.
+--#endregion
+--#region History entry.
 
 --- Location hint carried by a sim-originated message (AI brains, system
 --- messages). The UI translates this to a camera move on click without
@@ -75,7 +74,7 @@ function GetSingleton()
     return ModelInstance --[[@as UIChatModel]]
 end
 
--------------------------------------------------------------------------------
+--#endregion
 --#region Debugging
 
 --- Hot-reload hook: rebuilds the singleton on the new module and copies

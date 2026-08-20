@@ -23,8 +23,7 @@ local Debug = false
 ---@field Badge? ChatFactionBadge      # only present on player entries
 ---@field Target UIChatRecipient
 
--------------------------------------------------------------------------------
--- Popup recipient picker. Lists "All", "Allies", and one entry per
+--#region Popup recipient picker. Lists "All", "Allies", and one entry per
 -- connected non-local human player (`GetSessionClients` excludes bots and
 -- disconnected players). Each open rebuilds from fresh session state.
 
@@ -257,3 +256,4 @@ ChatListInterface = ClassUI(Group) {
         self._OnClosed = callback
     end,
 }
+--#endregion

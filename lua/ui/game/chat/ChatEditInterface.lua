@@ -25,8 +25,7 @@ local Debug = false
 
 local MaxCommandHistorySize = 32
 
--------------------------------------------------------------------------------
--- The chat input area: a chat-bubble button, a recipient label, and an edit
+--#region The chat input area: a chat-bubble button, a recipient label, and an edit
 -- box. Pressing Enter dispatches the text to the controller. Clicking the
 -- chat-bubble button or the label opens the recipient picker (ChatListInterface).
 
@@ -461,3 +460,4 @@ ChatEditInterface = ClassUI(Group) {
         self.Trash:Destroy()
     end,
 }
+--#endregion
