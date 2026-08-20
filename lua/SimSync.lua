@@ -5,6 +5,7 @@
 ---@class SyncTable: table
 ---@field EnhanceRestrict table<Enhancement, true>
 ---@field Ping SyncPingData[]
+---@field EnhanceMessage? NotifyMessageSyncData[]
 Sync = { }
 
 local SyncDefaults = {
