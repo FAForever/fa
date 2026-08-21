@@ -7,7 +7,6 @@ local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 --- Base class for popups. A popup appears on top of other UI content, darkens the content behind it,
 --- and draws a standard background behind its content
 ---@class Popup : Group
----@field Trash TrashBag
 ---@field content Control
 ---@field _closed boolean
 ---@field _escapeHandler? function
@@ -19,7 +18,6 @@ Popup = ClassUI(Group) {
     ---@param content Control A Group containing the UI to show inside the popup
     __init = function(self, GUI, content)
         Group.__init(self, GUI)
-        self.Trash = TrashBag()
         self.content = content
         self._closed = false
         content:SetParent(self)
@@ -58,15 +56,6 @@ Popup = ClassUI(Group) {
         end
         self._escapeHandler = escapeHandler
         EscapeHandler.PushEscapeHandler(escapeHandler)
-
-        self.Trash:Add({
-            Destroy = function()
-                if self._escapeHandler then
-                    EscapeHandler.PopEscapeHandler(self._escapeHandler)
-                    self._escapeHandler = nil
-                end
-            end,
-        })
     end,
 
     --- Closes the dialog
@@ -105,9 +94,6 @@ Popup = ClassUI(Group) {
     --- Called when the control is destroyed
     ---@param self Popup
     OnDestroy = function(self)
-        if self.Trash then
-            self.Trash:Destroy()
-        end
         self:OnClosed()
         Group.OnDestroy(self)
     end,

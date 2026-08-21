@@ -1,11 +1,11 @@
 -- Unit test and regression suite for QuickDialog / Popup lifetime & Launch re-entrancy
--- Simulates Moho UI object hierarchy, TrashBag, EscapeHandler, and Lobby launch sequence.
+-- Simulates Moho UI object hierarchy, EscapeHandler, and Lobby launch sequence.
 --
--- This test specifies and verifies the contracts implemented in:
--- - lua/ui/controls/popups/popup.lua (Popup lifecycle, TrashBag, and owner-aware escape teardown)
+-- This suite specifies and verifies behavioral contracts modeled after:
+-- - lua/ui/controls/popups/popup.lua (Popup lifecycle and owner-aware escape teardown)
 -- - lua/ui/uiutil.lua (QuickDialog button lifecycle, double-click protection, and re-arming)
 -- - lua/ui/dialogs/eschandler.lua (EscapeHandler stack and owner-aware PopEscapeHandler)
--- - lua/ui/lobby/lobby.lua (TryLaunch launchInProgress lock and observer kick flow)
+-- - lua/ui/lobby/lobby.lua (TryLaunch button disabling, observer kick flow, and LaunchFailed recovery)
 
 local tests_failed = 0
 local tests_passed = 0
@@ -193,7 +193,6 @@ Popup.__index = setmetatable(Popup, Group)
 function Popup.new(parent, content)
     local self = Group.new(parent, "Popup")
     setmetatable(self, Popup)
-    self.Trash = TrashBag.new()
     self.content = content
     self._closed = false
     content:SetParent(self)
@@ -203,15 +202,6 @@ function Popup.new(parent, content)
     end
     self._escapeHandler = escapeHandler
     PushEscapeHandler(escapeHandler)
-
-    self.Trash:Add({
-        Destroy = function()
-            if self._escapeHandler then
-                PopEscapeHandler(self._escapeHandler)
-                self._escapeHandler = nil
-            end
-        end,
-    })
 
     return self
 end
@@ -234,9 +224,6 @@ function Popup:OnClosed()
 end
 
 function Popup:OnDestroy()
-    if self.Trash then
-        self.Trash:Destroy()
-    end
     self:OnClosed()
 end
 
@@ -401,13 +388,22 @@ do
     assert_equal(GetEscapeHandlerCount(), initialEscCount, "Escape handlers restored")
 end
 
--- Test 5: Lobby TryLaunch re-entrancy guard test
+-- Test 5: Lobby TryLaunch re-entrancy guard and observer confirmation dialog test
 do
     local launchInProgress = false
     local kickCount = 0
     local launchCount = 0
     local GUI = Group.new(nil, "LobbyGUI")
     GUI.launchGameButton = Control.new(GUI, "LaunchButton")
+
+    local HostUtils = {
+        KickObservers = function(reason)
+            kickCount = kickCount + 1
+        end,
+        RefreshButtonEnabledness = function()
+            GUI.launchGameButton:Enable()
+        end,
+    }
 
     local function TryLaunch(skipNoObserversCheck)
         if launchInProgress then
@@ -416,35 +412,40 @@ do
 
         local anyOtherObservers = true
         if anyOtherObservers and not skipNoObserversCheck then
-            QuickDialog(GUI, "Kick observers?", "Yes", function() TryLaunch(true) end, "No", nil, true)
+            if GUI and not IsDestroyed(GUI.launchGameButton) then
+                GUI.launchGameButton:Disable()
+            end
+            local function OnCancel()
+                if HostUtils and HostUtils.RefreshButtonEnabledness then
+                    HostUtils.RefreshButtonEnabledness()
+                elseif GUI and not IsDestroyed(GUI.launchGameButton) then
+                    GUI.launchGameButton:Enable()
+                end
+            end
+            QuickDialog(GUI, "Kick observers?", "Yes", function() TryLaunch(true) end, "No", OnCancel, true)
             return
         end
 
-        local HostUtils = {
-            KickObservers = function(reason)
-                kickCount = kickCount + 1
-            end,
-            RefreshButtonEnabledness = function()
-                GUI.launchGameButton:Enable()
-            end,
-        }
         HostUtils.KickObservers("GameLaunched")
 
         if launchInProgress then
             return
         end
         launchInProgress = true
-        GUI.launchGameButton:Disable()
+        if GUI and not IsDestroyed(GUI.launchGameButton) then
+            GUI.launchGameButton:Disable()
+        end
 
         launchCount = launchCount + 1
         GUI:Destroy()
     end
 
-    -- Initial launch click prompts dialog
+    -- Initial launch click prompts dialog and disables launch button
     TryLaunch(false)
     assert_equal(kickCount, 0, "No kick before confirmation")
     assert_equal(launchCount, 0, "No launch before confirmation")
     assert_false(launchInProgress, "launchInProgress is false while dialog open")
+    assert_true(GUI.launchGameButton:IsDisabled(), "Launch button disabled while confirmation dialog is open")
 
     -- Find the open dialog inside GUI
     local dialog
@@ -464,6 +465,62 @@ do
     assert_equal(launchCount, 1, "Launched game exactly once")
     assert_true(launchInProgress, "Launch marked in progress")
     assert_true(IsDestroyed(GUI), "GUI cleanly destroyed")
+end
+
+-- Test 5b: Lobby TryLaunch observer dialog cancel restores launch button
+do
+    local launchInProgress = false
+    local kickCount = 0
+    local launchCount = 0
+    local GUI = Group.new(nil, "LobbyGUI")
+    GUI.launchGameButton = Control.new(GUI, "LaunchButton")
+
+    local HostUtils = {
+        KickObservers = function(reason)
+            kickCount = kickCount + 1
+        end,
+        RefreshButtonEnabledness = function()
+            GUI.launchGameButton:Enable()
+        end,
+    }
+
+    local function TryLaunch(skipNoObserversCheck)
+        if launchInProgress then
+            return
+        end
+
+        local anyOtherObservers = true
+        if anyOtherObservers and not skipNoObserversCheck then
+            if GUI and not IsDestroyed(GUI.launchGameButton) then
+                GUI.launchGameButton:Disable()
+            end
+            local function OnCancel()
+                if HostUtils and HostUtils.RefreshButtonEnabledness then
+                    HostUtils.RefreshButtonEnabledness()
+                elseif GUI and not IsDestroyed(GUI.launchGameButton) then
+                    GUI.launchGameButton:Enable()
+                end
+            end
+            QuickDialog(GUI, "Kick observers?", "Yes", function() TryLaunch(true) end, "No", OnCancel, true, { escapeButton = 2 })
+            return
+        end
+
+        HostUtils.KickObservers("GameLaunched")
+        launchInProgress = true
+        launchCount = launchCount + 1
+    end
+
+    TryLaunch(false)
+    assert_true(GUI.launchGameButton:IsDisabled(), "Launch button disabled while dialog open")
+
+    -- User cancels via Escape
+    HandleEsc()
+    assert_false(launchInProgress, "launchInProgress remains false after cancel")
+    assert_false(GUI.launchGameButton:IsDisabled(), "Launch button re-enabled after cancel")
+    assert_equal(kickCount, 0, "No observers kicked")
+    assert_equal(launchCount, 0, "No launch executed")
+
+    GUI:Destroy()
 end
 
 -- Test 6: Nested Popups - closing in LIFO order keeps stack balanced
@@ -510,7 +567,7 @@ do
     assert_equal(GetEscapeHandlerCount(), initialEscCount, "Escape stack fully balanced")
 end
 
--- Test 8: Subclass Lifecycle Override - TrashBag cleans up escape handler even with custom OnDestroy
+-- Test 8: Subclass Lifecycle Override - Popup.OnDestroy cleans up escape handler even with custom OnDestroy
 do
     local initialEscCount = GetEscapeHandlerCount()
     local GUI = Group.new(nil, "LobbyGUI")
@@ -559,7 +616,90 @@ do
     assert_equal(GetEscapeHandlerCount(), initialEscCount, "Escape handler stack balanced")
 end
 
-print("\n--- All 9 test suites finished! ---")
+-- Test 10: Lobby LaunchFailed resets launchInProgress and re-enables launchGameButton allowing retry
+do
+    local launchInProgress = false
+    local launchAttempts = 0
+    local launchSuccessCount = 0
+    local chatMessages = {}
+
+    local GUI = Group.new(nil, "LobbyGUI")
+    GUI.launchGameButton = Control.new(GUI, "LaunchButton")
+
+    local function AddChatText(msg)
+        table.insert(chatMessages, msg)
+    end
+
+    local HostUtils = {
+        RefreshButtonEnabledness = function()
+            GUI.launchGameButton:Enable()
+        end,
+    }
+
+    local lobbyComm = {
+        LaunchFailed = function(self, reasonKey)
+            AddChatText("Launch failed: " .. tostring(reasonKey))
+            launchInProgress = false
+            if HostUtils and HostUtils.RefreshButtonEnabledness then
+                HostUtils.RefreshButtonEnabledness()
+            elseif GUI and not IsDestroyed(GUI.launchGameButton) then
+                GUI.launchGameButton:Enable()
+            end
+        end,
+        LaunchGame = function(self, info)
+            launchAttempts = launchAttempts + 1
+            if launchAttempts == 1 then
+                -- Simulate failure on first attempt
+                self:LaunchFailed("FailedToLaunch")
+                return false
+            else
+                -- Simulate success on subsequent attempt
+                launchSuccessCount = launchSuccessCount + 1
+                return true
+            end
+        end,
+    }
+
+    local function TryLaunch()
+        if launchInProgress then
+            return
+        end
+        launchInProgress = true
+        if not IsDestroyed(GUI.launchGameButton) then
+            GUI.launchGameButton:Disable()
+        end
+
+        local function LaunchGame()
+            lobbyComm:LaunchGame({})
+        end
+
+        LaunchGame()
+    end
+
+    -- First launch attempt: fails
+    assert_false(launchInProgress, "Initial launchInProgress is false")
+    assert_false(GUI.launchGameButton:IsDisabled(), "Launch button starts enabled")
+
+    TryLaunch()
+
+    assert_equal(launchAttempts, 1, "First launch was attempted")
+    assert_equal(launchSuccessCount, 0, "First launch failed")
+    assert_equal(#chatMessages, 1, "Error message logged to chat")
+    assert_false(launchInProgress, "launchInProgress reset to false after LaunchFailed")
+    assert_false(GUI.launchGameButton:IsDisabled(), "Launch button re-enabled after LaunchFailed")
+
+    -- Second launch attempt: retrying succeeds
+    TryLaunch()
+
+    assert_equal(launchAttempts, 2, "Second launch was attempted")
+    assert_equal(launchSuccessCount, 1, "Second launch succeeded")
+    assert_true(launchInProgress, "launchInProgress is true after successful launch start")
+    assert_true(GUI.launchGameButton:IsDisabled(), "Launch button disabled during launch")
+
+    GUI:Destroy()
+end
+
+print("\n--- All 10 test suites finished! ---")
 print(string.format("Total assertions passed: %d, failed: %d\n", tests_passed, tests_failed))
 
 if tests_failed > 0 then
