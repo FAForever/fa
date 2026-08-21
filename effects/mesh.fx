@@ -3796,44 +3796,44 @@ float4 ShieldPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
     float terrainBand = colorMask.b * 0.95;
     float4 albedo = tex2D( albedoSampler, vertex.texcoord0.zw);
     float3 secondary = tex2D( secondarySampler, vertex.texcoord1.xy ).gaa * 2 - 1;
-    secondary.z = sqrt( 1 - secondary.x*secondary.x - secondary.y*secondary.y );
+    secondary.z = sqrt(1 - secondary.x * secondary.x - secondary.y * secondary.y);
     float3 specular = tex2D( specularSampler, vertex.texcoord1.zw );
 
     // Combine albedo and secondary sampler for a final color
-    float4 color = float4( mul( albedo.rgr, secondary.rgb ) + float3( 0, 0, 0.25), 1.0);
+    float3 color = mul(albedo.rgr, secondary.rgb) + float3( 0, 0, 0.25);
 
     // Using the specular sampler, with 3 layers of noise in color chanels modulate the
     // alpha channel for the current pixel
-    if( specular.g <= albedo.r )
-    {
+    float alpha;
+    if( specular.g <= albedo.r ) {
         if( specular.b >= albedo.g )
-            color.a = ( color.b >= secondary.b ) ? 0.12 : lerp( 0.05, 0, sin(frac( 0.01 * time) * 3.14) );
+            alpha = ( color.b >= secondary.b ) ? 0.12 : lerp( 0.05, 0, sin(frac( 0.01 * time) * 3.14) );
         else
-            color.a = ( secondary.b >= albedo.r ) ? 0.2 : lerp( 0.01, 0.1, sin(frac( 0.01 * time) * 3.14) );
-    }
-    else
-    {
+            alpha = ( secondary.b >= albedo.r ) ? 0.2 : lerp( 0.01, 0.1, sin(frac( 0.01 * time) * 3.14) );
+    } else {
         if( specular.r >= albedo.r )
-            color.a = ( specular.b >= albedo.r ) ? 0.025 : 0.1;
+            alpha = ( specular.b >= albedo.r ) ? 0.025 : 0.1;
         else
-            color.a = ( specular.g >= albedo.g ) ? 0.02 : lerp( 0.37, 0.46, sin(frac( 0.01 * time) * 3.14) );
+            alpha = ( specular.g >= albedo.g ) ? 0.02 : lerp( 0.37, 0.46, sin(frac( 0.01 * time) * 3.14) );
     }
 
-    color.rgb += float3( 0, 0, 0.15 );
+    color += float3(0, 0, 0.15);
+
+    float4 output = float4(color, alpha);
 
     // Adjust color of shield based on its health percentage
-    float4 colorMod1 = lerp(float4( 0.5, 0.0, 0.0, 0.05 ), color, 0.5);
-    colorMod1 = lerp( color, colorMod1 + color, sin(frac( 0.06 * time) * 3.14) );
-    color = lerp( colorMod1, color, vertex.material.y );
+    float4 colorMod = float4(0.25, 0.0, 0.0, 0.025) + output * 1.5;
+    colorMod = lerp(output, colorMod, sin(frac( 0.06 * time) * 3.14));
+    output = lerp(colorMod, output, vertex.material.y);
 
-    color += terrainBand;
+    output += terrainBand;
 
     // Mask UV pinching at the top of the sphere
-    color.a *= colorMask.a;
+    output.a *= colorMask.a;
 
-    color.a *= shieldWaterAbsorption(vertex.depth.x);
+    output.a *= shieldWaterAbsorption(vertex.depth.x);
 
-    return color;
+    return output;
 }
 
 float4 ShieldLoFiPS( LOFIEFFECT_VERTEX vertex ) : COLOR
@@ -4025,19 +4025,18 @@ float4 ShieldAeonPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
     float factor1 = specular.r * lerp( 0.6, 1.3, sin(frac( 0.015 * time) * 3.14));
     float factor2 = specular2.r * lerp( 2.0, 2.2, sin(frac( 0.0045 * time) * 3.14));
 
-    float3 color = color1 * factor1 * factor2;
-    float3 color2 = (color * normal.rgb) * 0.65 + color;
-    color = color2 * environment * albedo.a;
+    float3 color = color1 * factor1 * factor2 * (normal.rgb * 0.65 + 1) * environment * albedo.a;
 
     // Adjust color of shield based on its health percentage
     float3 colorMod1 = lerp(float3( 0.7, 0.3, 0.3 ), color, 0.9 );
     float3 colorMod2 = lerp( color, colorMod1, sin(frac( 0.05 * vertex.material.x) * 3.14) );
     color = lerp( colorMod1, color, vertex.material.y);
+    color = lerp( colorMod1, color, vertex.material.y);
 
     float alpha = 0.707 * ((environment.r + environment.g + environment.b) * 0.25) + terrainBand.r;
     alpha *= shieldWaterAbsorption(vertex.depth.x);
 
-    return float4( lerp( colorMod1, color, vertex.material.y), alpha);
+    return float4(color, alpha);
 }
 
 float4 ShieldAeonLoFiPS( LOFIEFFECT_VERTEX vertex, uniform float alpha ) : COLOR
@@ -4112,29 +4111,27 @@ float4 ShieldSeraphimPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
     float2 texcoord = vertex.texcoord0.xy + (uvaddress.rb * 0.1);
     float4 specular = tex2D( specularSampler, texcoord );
 
-    const float max_brightness = 0.453;
-    float dp = abs( cos(dot( float4(0,1,0,0), normal )) );
-    float channel_color = max_brightness - clamp((1.0 - dp), 0, max_brightness );
     float relative_height = abs(dot(float4(0,1,0,0), normalize(vertex.normal)));
     float height_cutoff = 0.753;
-    float ndotv = abs(dot(vertex.viewDirection,normal));
-
-    float m;
+    float opacity;
     if( relative_height < height_cutoff ){
-        m = 1.0;
+        opacity = 1.0;
     } else {
         // Decrease the factor linearly to 0.3 at the top
-        m = 1.0 - 0.7 * (relative_height - height_cutoff) / (1.0 - height_cutoff);
+        opacity = 1.0 - 0.7 * (relative_height - height_cutoff) / (1.0 - height_cutoff);
     }
 
-    ///Compute the final translucency value.
-    float alpha = m *( ndotv * 0.3 + channel_color )*1.75;
+    const float max_brightness = 0.453;
+    float dp = abs(cos(dot(float4(0,1,0,0), normal)));
+    float clamped_dp = max_brightness - clamp((1.0 - dp), 0, max_brightness);
+    float ndotv = abs(dot(vertex.viewDirection,normal));
+
+    float alpha = opacity * 1.75 * (ndotv * 0.3 + clamped_dp);
     alpha *= shieldWaterAbsorption(vertex.depth.x);
 
-    // The dot product of the normal and the world up vector is squared
-    // so that the blue and whitish color fade off in an exponential gradient.
     float3 color = float3(0.425, 0.76274, 1.0) * dp * dp * specular.rgb;
-    return  float4( color, alpha );
+
+    return float4(color, alpha);
 }
 
 /// ShieldFillPS()
