@@ -2243,7 +2243,7 @@ local function TryLaunch(skipNoObserversCheck)
         return
     end
     launchInProgress = true
-    if GUI and GUI.launchGameButton and not IsDestroyed(GUI.launchGameButton) then
+    if not IsDestroyed(GUI.launchGameButton) then
         GUI.launchGameButton:Disable()
     end
 
