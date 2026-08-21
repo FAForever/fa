@@ -26,7 +26,7 @@ if (Test-Path $debuggerExecutable) {
 }
 
 # Command-line arguments common for all instances
-$baseArguments = '/init "init_local_development.lua" /EnableDiskWatch /nomovie /RunWithTheWind /debugLobby /gameoptions CheatsEnabled:true GameSpeed:adjustable TeamLock:unlocked'
+$baseArguments = '/init "init_local_development.lua" /EnableDiskWatch /nomovie /RunWithTheWind /debugLobby /gameoptions CheatsEnabled:true GameSpeed:adjustable'
 # Add the players argument if we want to use autolobby
 if (-not $toLobby) {
     $baseArguments += " /players $players"
