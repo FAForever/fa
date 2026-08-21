@@ -26,8 +26,7 @@ local FadeOutDuration = 2
 --- multiplied per-frame by `win_alpha` and the row's fade progress.
 local FeedBackgroundAlpha = 0.5
 
--------------------------------------------------------------------------------
--- Feed view of the chat history shown while the main chat window is hidden.
+--#region Feed view of the chat history shown while the main chat window is hidden.
 -- Mounted as a sibling of the chat window (so its `Show`/`Hide` cascade
 -- can't reach us), but pinned to the window's line area via LazyVars.
 -- Each row carries its own age timer; rows past `fade_time` destroy
@@ -49,6 +48,7 @@ local FeedBackgroundAlpha = 0.5
 ---@field WindowVisibleObserver LazyVar<boolean>                    # derived from ChatModel.WindowVisible
 ---@field HistoryObserver       LazyVar<UIChatEntry[]>              # derived from ChatModel.History
 ---@field DebugBG?              Bitmap                              # semi-transparent overlay shown when `Debug` is true
+---@overload fun(parent: Control, window?: UIChatInterface): UIChatFeedInterface
 ChatFeedInterface = ClassUI(Group) {
 
     ---@param self UIChatFeedInterface
@@ -308,7 +308,7 @@ ChatFeedInterface = ClassUI(Group) {
     end,
 }
 
--------------------------------------------------------------------------------
+--#endregion
 --#region Debugging
 
 --- Owned by `ChatInterface`; re-importing the chat module triggers the

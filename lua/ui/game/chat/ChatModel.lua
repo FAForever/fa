@@ -1,8 +1,7 @@
 
 local Create = import("/lua/lazyvar.lua").Create
 
--------------------------------------------------------------------------------
--- Recipient constants, exported so the rest of the system never hardcodes them.
+--#region Recipient constants, exported so the rest of the system never hardcodes them.
 
 RecipientAll = 'all'
 
@@ -15,8 +14,8 @@ RecipientNotify = 'notify'
 --- Send target: a known channel constant, or an army ID for a private whisper.
 ---@alias UIChatRecipient 'all' | 'allies' | number  # number = army ID for a private message
 
--------------------------------------------------------------------------------
--- History entry.
+--#endregion
+--#region History entry.
 
 --- Location hint carried by a sim-originated message (AI brains, system
 --- messages). The UI translates this to a camera move on click without
@@ -34,7 +33,7 @@ RecipientNotify = 'notify'
 ---@field BodyColor?  string             # explicit ARGB hex for the body text; bypasses the palette lookup (used by system / synthetic lines that always render the same colour)
 ---@field ColorKey?   string             # palette key (e.g. `'all_color'`, `'priv_color'`, `'link_color'`) resolved against `ChatConfigModel.GetOptions()` at render time; ignored when `BodyColor` is set
 ---@field ArmyID      number             # sender's army index
----@field Faction     number             # faction icon index (1-based)
+---@field Faction?    number             # faction icon index (1-based). Shows observer icon by default
 ---@field Recipient   UIChatRecipient    # the target this message was directed to
 ---@field Camera?     table              # camera state (`SaveSettings` snapshot) when the sender attached their exact view
 ---@field Location?   UIChatEntryLocation # lightweight location hint from a sim-originated sender (AI brain, system message)
@@ -75,7 +74,7 @@ function GetSingleton()
     return ModelInstance --[[@as UIChatModel]]
 end
 
--------------------------------------------------------------------------------
+--#endregion
 --#region Debugging
 
 --- Hot-reload hook: rebuilds the singleton on the new module and copies

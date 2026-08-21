@@ -1,6 +1,5 @@
 
--------------------------------------------------------------------------------
--- Helpers for the `debug_chat_*` hotkeys in
+--#region Helpers for the `debug_chat_*` hotkeys in
 -- `/lua/keymap/debugKeyActions.lua`.
 
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
@@ -40,9 +39,8 @@ local function SynthEntry(overrides)
     return entry
 end
 
--------------------------------------------------------------------------------
--- Window & dialog toggles
--------------------------------------------------------------------------------
+--#endregion
+--#region Window & dialog toggles
 
 --- Debug hotkey: flips the chat window's visibility.
 function ToggleWindow()
@@ -54,9 +52,8 @@ function ToggleConfig()
     import("/lua/ui/game/chat/config/ChatConfigInterface.lua").Toggle()
 end
 
--------------------------------------------------------------------------------
--- Synthetic message injection
--------------------------------------------------------------------------------
+--#endregion
+--#region Synthetic message injection
 
 --- Debug hotkey: appends a synthetic system message.
 function AppendSystemMessage()
@@ -99,9 +96,9 @@ function AppendCameraMessage()
     }))
 end
 
--------------------------------------------------------------------------------
--- Recipient state
--------------------------------------------------------------------------------
+--#endregion
+--#region Recipient state
+
 
 --- Debug hotkey: forces the recipient back to "All".
 function SetRecipientAll()
@@ -113,16 +110,16 @@ function SetRecipientAllies()
     ChatController.SetRecipient(ChatModel.RecipientAllies)
 end
 
--------------------------------------------------------------------------------
--- History reset
--------------------------------------------------------------------------------
+--#endregion
+--#region History reset
+
 
 --- Debug hotkey: wipes the entire history log.
 function ClearHistory()
     ChatModel.GetSingleton().History:Set({})
 end
 
--------------------------------------------------------------------------------
+--#endregion
 --#region Debugging
 
 --- Hot-reload hook: re-imports this module on save.

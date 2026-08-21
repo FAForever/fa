@@ -17,12 +17,13 @@ local ObserverIcon = '/widgets/faction-icons-alpha_bmp/observer_ico.dds'
 ---@class ChatFactionBadge : Group
 ---@field Color Bitmap  # team-colour tile behind the icon
 ---@field Icon  Bitmap  # faction icon on top of the colour tile
+---@overload fun(parent: Control, factionIndex?: number, color?: Color)
 ChatFactionBadge = ClassUI(Group) {
 
     ---@param self ChatFactionBadge
     ---@param parent Control
     ---@param factionIndex? number   0-based faction index (UEF=0, Aeon=1, …); nil → observer icon
-    ---@param color? string          ARGB hex string; defaults to white
+    ---@param color? Color           ARGB hex string; defaults to white
     __init = function(self, parent, factionIndex, color)
         Group.__init(self, parent, "ChatFactionBadge")
 

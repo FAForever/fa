@@ -818,7 +818,7 @@ end
 function IsKeyDown(keyCode)
 end
 
----@param playerId? string  # if not provided, will return whether the local player is an observer
+--- Returns true if the player's focus army is observing (-1 focus or no user army in-engine).
 ---@return boolean
 function IsObserver()
 end

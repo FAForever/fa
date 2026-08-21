@@ -22,8 +22,7 @@ local Debug = false
 -- Reserve space on the right of the wrapper for the scrollbar widget.
 local ScrollbarReserve = 32
 
--------------------------------------------------------------------------------
--- A self-contained chat-lines panel: outer wrapper, inner pool of line rows,
+--#region A self-contained chat-lines panel: outer wrapper, inner pool of line rows,
 -- and the vertical scrollbar.
 --
 -- Click hooks (`OnNameClicked`, `OnBodyClicked`, `OnCameraClicked`) are
@@ -49,6 +48,7 @@ local ScrollbarReserve = 32
 ---@field OnBodyClicked     fun(entry: UIChatEntry, event: KeyEvent)                             # overridable: replace to react to a body click (default copies on Ctrl+click)
 ---@field OnCameraClicked   fun(entry: UIChatEntry, event: KeyEvent)                             # overridable: replace to override camera-link behaviour
 ---@field DebugBG?          Bitmap                                              # semi-transparent overlay shown when `Debug` is true
+---@overload fun(parent: Control): UIChatLinesInterface
 ChatLinesInterface = ClassUI(Group) {
 
     ---@param self UIChatLinesInterface
@@ -531,7 +531,7 @@ ChatLinesInterface = ClassUI(Group) {
     end,
 }
 
--------------------------------------------------------------------------------
+--#endregion
 --#region Debugging
 
 --- Hot-reload hook: re-imports this module on save.

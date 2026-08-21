@@ -43,8 +43,7 @@ local function ResolveBodyColor(entry)
     return DefaultBodyColor
 end
 
--------------------------------------------------------------------------------
--- A single chat row: team-coloured faction icon, sender name and message text.
+--#region A single chat row: team-coloured faction icon, sender name and message text.
 
 --- One row of the chat-line pool: faction badge, clickable name, clickable text. Pooled and reused.
 ---@class UIChatLineInterface : Group
@@ -55,6 +54,7 @@ end
 ---@field Text        Text
 ---@field Entry       UIChatEntry | nil
 ---@field DebugBG?    Bitmap                # semi-transparent overlay shown when `Debug` is true
+---@overload fun(parent: Control): UIChatLineInterface
 ChatLineInterface = ClassUI(Group) {
 
     ---@param self UIChatLineInterface
@@ -253,3 +253,4 @@ ChatLineInterface = ClassUI(Group) {
         self.Text:SetFont('Arial', size)
     end,
 }
+--#endregion

@@ -1,7 +1,7 @@
 ---@meta
 
---- none of this code is executed, it is for example only
-
+---@enum (key) MohoExportedClassName
+---@enum MohoExportedClass
 moho = {
     -- sim
 

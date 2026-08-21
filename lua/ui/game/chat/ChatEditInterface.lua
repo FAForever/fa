@@ -25,8 +25,7 @@ local Debug = false
 
 local MaxCommandHistorySize = 32
 
--------------------------------------------------------------------------------
--- The chat input area: a chat-bubble button, a recipient label, and an edit
+--#region The chat input area: a chat-bubble button, a recipient label, and an edit
 -- box. Pressing Enter dispatches the text to the controller. Clicking the
 -- chat-bubble button or the label opens the recipient picker (ChatListInterface).
 
@@ -45,6 +44,7 @@ local MaxCommandHistorySize = 32
 ---@field CommandHistory    string[]                          # ring of previously-sent message texts (oldest first); recalled via Up / Down when the hint is closed
 ---@field RecallEntry       number | nil                      # cursor into `CommandHistory` for the active recall walk; nil when no walk is in progress
 ---@field DebugBG?          Bitmap                            # semi-transparent overlay shown when `Debug` is true
+---@overload fun(parent: Control): UIChatEditInterface
 ChatEditInterface = ClassUI(Group) {
 
     ---@param self UIChatEditInterface
@@ -460,3 +460,4 @@ ChatEditInterface = ClassUI(Group) {
         self.Trash:Destroy()
     end,
 }
+--#endregion

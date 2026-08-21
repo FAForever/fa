@@ -37,8 +37,7 @@ local DefaultOptions = {
 }
 
 
--------------------------------------------------------------------------------
--- Option keys, exported so call sites address fields without magic strings.
+--#region Option keys, exported so call sites address fields without magic strings.
 
 KeyAllColor       = 'all_color'
 KeyAlliesColor    = 'allies_color'
@@ -53,8 +52,8 @@ KeySendType       = 'send_type'
 KeyLinks          = 'links'
 KeyMuted          = 'muted'
 
--------------------------------------------------------------------------------
--- Slider ranges, exported so the view doesn't duplicate the limits.
+--#endregion
+--#region Slider ranges, exported so the view doesn't duplicate the limits.
 
 --- Inclusive `[Min, Max]` range with a step `Inc`; consumed by the config dialog's IntegerSlider rows.
 ---@class UIChatSliderRange
@@ -124,7 +123,7 @@ function GetProfileKey()
     return ProfileKey
 end
 
--------------------------------------------------------------------------------
+--#endregion
 --#region Debugging
 
 --- Hot-reload hook: rebuilds the singleton on the new module and copies

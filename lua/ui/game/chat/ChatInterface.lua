@@ -53,8 +53,7 @@ end
 
 local DefaultRect = { Left = 8, Top = 460, Right = 430, Bottom = 720 }
 
--------------------------------------------------------------------------------
--- The main chat window: a draggable, resizable frame hosting a
+--#region The main chat window: a draggable, resizable frame hosting a
 -- `ChatLinesInterface` (line pool + scrollbar) and a `ChatEditInterface`
 -- (input area). The window owns chrome, visibility, and window-level
 -- options (`win_alpha`); pool sizing, wrapping, scrolling, and filtering
@@ -76,6 +75,7 @@ local DefaultRect = { Left = 8, Top = 460, Right = 430, Bottom = 720 }
 ---@field OptionsObserver       LazyVar<UIChatOptions>        # derived from ChatConfigModel.Committed (window-level options only)
 ---@field ChatFeedInterface     UIChatFeedInterface           # sibling feed view; visible while the window is hidden
 ---@field DebugBG?              Bitmap                        # semi-transparent overlay shown when `Debug` is true
+---@overload fun(parent: Control): UIChatInterface
 local ChatInterface = ClassUI(Window) {
 
     ---@param self UIChatInterface
@@ -393,8 +393,8 @@ local ChatInterface = ClassUI(Window) {
     end,
 }
 
--------------------------------------------------------------------------------
---  Module-level singleton and standalone entry points.
+--#endregion
+--#region  Module-level singleton and standalone entry points.
 
 --- Singleton handle; nil until `EnsureInstance` builds the window for the first time.
 ---@type UIChatInterface | nil
@@ -472,7 +472,7 @@ function OpenAndScrollLines(delta)
     ScrollLines(delta)
 end
 
--------------------------------------------------------------------------------
+--#endregion
 --#region Debugging
 
 --- Hot-reload hook: reopens the window on the freshly loaded module.
