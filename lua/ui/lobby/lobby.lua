@@ -2229,9 +2229,19 @@ local function TryLaunch(skipNoObserversCheck)
         end
 
         if anyOtherObservers and not skipNoObserversCheck then
+            if GUI and not IsDestroyed(GUI.launchGameButton) then
+                GUI.launchGameButton:Disable()
+            end
+            local function OnCancel()
+                if HostUtils and HostUtils.RefreshButtonEnabledness then
+                    HostUtils.RefreshButtonEnabledness()
+                elseif GUI and not IsDestroyed(GUI.launchGameButton) then
+                    GUI.launchGameButton:Enable()
+                end
+            end
             UIUtil.QuickDialog(GUI, "<LOC lobui_0278>Launching will kick observers because \"allow observers\" is disabled.  Continue?",
                                     "<LOC _Yes>", function() TryLaunch(true) end,
-                                    "<LOC _No>", nil, nil, nil, true,
+                                    "<LOC _No>", OnCancel, nil, nil, true,
                                     {worldCover = false, enterButton = 1, escapeButton = 2})
             return
         end
@@ -2243,7 +2253,7 @@ local function TryLaunch(skipNoObserversCheck)
         return
     end
     launchInProgress = true
-    if not IsDestroyed(GUI.launchGameButton) then
+    if GUI and not IsDestroyed(GUI.launchGameButton) then
         GUI.launchGameButton:Disable()
     end
 
@@ -2251,7 +2261,7 @@ local function TryLaunch(skipNoObserversCheck)
         launchInProgress = false
         if HostUtils and HostUtils.RefreshButtonEnabledness then
             HostUtils.RefreshButtonEnabledness()
-        elseif GUI and GUI.launchGameButton and not IsDestroyed(GUI.launchGameButton) then
+        elseif GUI and not IsDestroyed(GUI.launchGameButton) then
             GUI.launchGameButton:Enable()
         end
         return
@@ -5705,6 +5715,12 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     end
 
     lobbyComm.LaunchFailed = function(self,reasonKey)
+        launchInProgress = false
+        if HostUtils and HostUtils.RefreshButtonEnabledness then
+            HostUtils.RefreshButtonEnabledness()
+        elseif GUI and not IsDestroyed(GUI.launchGameButton) then
+            GUI.launchGameButton:Enable()
+        end
         AddChatText(LOC(Strings[reasonKey] or reasonKey))
     end
 
