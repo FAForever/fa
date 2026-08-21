@@ -1,0 +1,1 @@
+- Annotations related to the reworked chat's modules and functions used in them (#7236).
