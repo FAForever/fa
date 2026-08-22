@@ -43,7 +43,7 @@ function BaseManagerEngineerPlatoonSplit(platoon)
                 end
 
                 local engPlat = aiBrain:MakePlatoon('', '')
-                aiBrain:AssignUnitsToPlatoon(engPlat, {v}, 'Support', 'None')
+                aiBrain:AssignUnitToPlatoon(engPlat, v, 'Support', 'None')
                 engPlat:SetPlatoonData(platoon.PlatoonData)
                 v.BaseName = baseName
                 engPlat:ForkAIThread(BaseManagerSingleEngineerPlatoon)
@@ -476,7 +476,7 @@ function ConditionalBuildSuccessful(conditionalUnit)
 
     -- Assign AI
     local newPlatoon = aiBrain:MakePlatoon('', '')
-    aiBrain:AssignUnitsToPlatoon(newPlatoon, {conditionalUnit}, 'Attack', 'None')
+    aiBrain:AssignUnitToPlatoon(newPlatoon, conditionalUnit, 'Attack', 'None')
     newPlatoon:StopAI()
     newPlatoon:SetPlatoonData(selectedBuild.data.PlatoonData)
 
@@ -1279,7 +1279,7 @@ function BaseManagerTMLPlatoon(platoon)
 	for _, launcher in TMLs do
 		if not launcher.Dead then
 			local launcherPlatoon = aiBrain:MakePlatoon('', '')
-            aiBrain:AssignUnitsToPlatoon(launcherPlatoon, {launcher}, 'Attack', 'None')
+            aiBrain:AssignUnitToPlatoon(launcherPlatoon, launcher, 'Attack', 'None')
             launcherPlatoon.PlatoonData = table.deepcopy(platoon.PlatoonData)
             launcherPlatoon:ForkAIThread(BaseManagerTMLAI)
 		end
@@ -1362,7 +1362,7 @@ function BaseManagerNukePlatoon(platoon)
 	for _, silo in SMLs do
 		if not silo.Dead then
 			local siloPlatoon = aiBrain:MakePlatoon('', '')
-            aiBrain:AssignUnitsToPlatoon(siloPlatoon, {silo}, 'Support', 'None')
+            aiBrain:AssignUnitToPlatoon(siloPlatoon, silo, 'Support', 'None')
             siloPlatoon.PlatoonData = table.deepcopy(platoon.PlatoonData)
             siloPlatoon:ForkAIThread(BaseManagerNukeAI)
 		end
@@ -1528,7 +1528,7 @@ function UnitUpgradeThread(unit)
                 end
 
                 local platoon = aiBrain:MakePlatoon('', '')
-                aiBrain:AssignUnitsToPlatoon(platoon, {unit}, 'support', 'none')
+                aiBrain:AssignUnitToPlatoon(platoon, unit, 'support', 'none')
 
                 local order = {
                     TaskName = "EnhanceTask",

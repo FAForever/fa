@@ -264,7 +264,7 @@ function CreateArmyUnit(strArmy, strUnit)
         while i <= table.getn(Scenario.Platoons[tblUnit.platoon]) do
             if tblUnit.Type == currTemplate[i][1] then
                 platoon = brain:MakePlatoon('None', 'None')
-                brain:AssignUnitsToPlatoon(platoon, { unit }, currTemplate[i][4], currTemplate[i][5])
+                brain:AssignUnitToPlatoon(platoon, unit, currTemplate[i][4], currTemplate[i][5])
                 break
             end
             i = i + 1
@@ -985,7 +985,7 @@ function CreatePlatoons(strArmy, tblNode, tblResult, platoonList, currPlatoon, t
                     if tblData.type == currTemplate[i][1] and
                         platoonList[currPlatoon].squadCounter[i] < currTemplate[i][3] then
                         platoonList[currPlatoon].squadCounter[i] = platoonList[currPlatoon].squadCounter[i] + 1
-                        brain:AssignUnitsToPlatoon(platoonList[currPlatoon], { unit }, currTemplate[i][4],
+                        brain:AssignUnitToPlatoon(platoonList[currPlatoon], unit, currTemplate[i][4],
                             currTemplate[i][5])
                         inserted = true
                     end
@@ -1130,7 +1130,7 @@ function CreateArmyGroupAsPlatoon(strArmy, strGroup, formation, tblNode, platoon
                 ScenarioInfo.UnitNames[armyIndex][strName] = unit
             end
             unit.UnitName = strName
-            brain:AssignUnitsToPlatoon(platoon, { unit }, 'Attack', formation)
+            brain:AssignUnitToPlatoon(platoon, unit, 'Attack', formation)
 
             if balance then
                 ScenarioInfo.LoadBalance.Accumulator = ScenarioInfo.LoadBalance.Accumulator + 1
