@@ -12,7 +12,10 @@
       darkLink.disabled = !dark;
       document.documentElement.setAttribute('data-color-scheme', dark ? 'dark' : 'light');
       localStorage.setItem('faf-color-scheme', dark ? 'dark' : 'light');
+      btn.textContent = dark ? '☀️' : '🌙';
     }
+
+    btn.textContent = isDark() ? '☀️' : '🌙';
 
     btn.addEventListener('click', function () {
       apply(!isDark());
