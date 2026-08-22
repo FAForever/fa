@@ -21,21 +21,20 @@
 }
 
 .change {
-  font-weight: 300;
 }
 
 .old {
-  color: #d73a49;
+  color: #cf222e;
   text-decoration: line-through;
 }
 
 .new {
-  color: #2da44e;
+  color: #1a7f37;
 }
 
 [data-color-scheme="dark"] {
   .old {
-    color: #ff7b72;
+    color: #f85149;
   }
 
   .new {
