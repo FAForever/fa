@@ -1,0 +1,12 @@
+- Plethora of fixes and improvements for the reworked chat window (#7223):
+  - Let messages fade away instead of instantly closing when closing the window.
+  - Add options to mute the new unit and resource share chat messages.
+  - Unit and resource share messages now send to all allies instead of privately to the receiver.
+  - Fix not being able to see messages when observing after the game ends.
+  - Notify messages for observers show who sent them.
+  - Make the shared units camera link move the camera instantly.
+  - Allow clicking the text of a message to use its camera link (instead of only the small camera icon). Originally you could only ctrl+click the text to copy it to clipboard.
+  - Fixed live observers being unable to see ally-only and private messages.
+  - Fix not being able to click the camera link unless you opened the chat window.
+  - Chat window no longer automatically closes while the text input is being used or if moused over.
+  - Prevent loading versions < 5 of the "Emojis" mod by 4z0t since it no longer works with the chat rework.
