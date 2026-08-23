@@ -1,1 +1,0 @@
-- Fix being able to press the recall button in games with unlocked teams, where recalling is not allowed (#7237).
