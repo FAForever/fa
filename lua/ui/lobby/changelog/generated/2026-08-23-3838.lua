@@ -4,13 +4,12 @@
 --------------------------------------------------------------------------------------------------------------------------------------------
 Changelog = {
     Version = 3838,
-    Title = "Game Patch",
+    Title = "Hotfix",
     Description = {
         "# Game version 3838 (August 23, 2026)",
         "",
-        "Your introduction here",
-        "",
-        "With gratitude to all those who contributed to this patch and/or took the time to report issues,",
+        "This hotfix mainly fixes issues with the new chat window. Please report any outstanding bugs with the chat window, if you still find some. A",
+        "big shoutout to Nomander for being so quick with the bugfixes!",
         "",
         "BlackYps",
         "",
@@ -39,6 +38,9 @@ Changelog = {
         "",
         "## Contributors",
         "",
-        "With thanks to the following contributors:"
+        "With thanks to the following contributors:",
+        "",
+        "- Nomander",
+        "- BlackYps"
     }
 }
