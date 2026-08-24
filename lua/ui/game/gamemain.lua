@@ -28,6 +28,8 @@ local ordersControl = false
 
 local OnDestroyFuncs = {}
 
+ --- game's "Non-Interactive Sequence" state as synced from Sim
+ ---@type 'on' | 'off' | false
 local NISActive = false
 local isReplay = false
 local waitingDialog = false
@@ -932,6 +934,9 @@ local rangePrefs = {
 }
 
 local preNISSettings = {}
+
+--- Called by user sync to set the NIS mode state and do callbacks for the states
+---@param state 'on' | 'off'
 function NISMode(state)
     NISActive = state
     local worldView = import("/lua/ui/game/worldview.lua")
@@ -1032,6 +1037,8 @@ function ShowNISBars()
     end
 end
 
+--- Returns true if the game is in a "Non-Interactive Sequence"
+---@return boolean
 function IsNISMode()
     if NISActive == 'on' then
         return true
@@ -1120,6 +1127,55 @@ function QuickSave(filename)
                              UIUtil.ShowInfoDialog(GetFrame(0), infoStr, "<LOC _Ok>")
                          end
                      end)
+    end
+end
+
+--- Called by key action to load a special quick save file.
+---@param filename string
+function QuickLoad(filename)
+    if not SessionIsActive()
+        or not SessionIsMultiplayer()
+    then
+        --#region Duplicate code from QuickSave
+        local saveType
+        if import("/lua/ui/campaign/campaignmanager.lua").campaignMode then
+            saveType = "CampaignSave"
+        else
+            saveType = "SaveGame"
+        end
+        local path = GetSpecialFilePath(Prefs.GetCurrentProfile().Name, filename, saveType)
+        --#endregion
+
+        local statusStr = "<LOC saveload_QuickLoad>Loading Quick Save..."
+        local status = UIUtil.ShowInfoDialog(GetFrame(0), statusStr)
+
+        --#region Duplicate of `/lua/ui/dialogs/saveload.lua` `CreateLoadDialog` `DoLoad`
+        SetFrontEndData('NextOpBriefing', nil)
+        local SaveErrors = {
+            WrongVersion = '<LOC uisaveload_0005>Wrong version for savegame "%s"',
+            CantOpen = '<LOC uisaveload_0004>Couldn\'t open savegame "%s"',
+            InvalidFormat = '<LOC uisaveload_0006>"%s" is not a valid savegame',
+            InternalError = '<LOC uisaveload_0007>Internal error loading savegame "%s": %s',
+        }
+        local InternalErrors = {
+            ['eof'] = "<LOC Engine0027>EOF reached during serialization.",
+            ['noread'] = "<LOC Engine0028>Error reading file stream during serialization.",
+            ['nowrite'] = "<LOC Engine0026>Error writing data during serialization. Possibly out of disk space.",
+        }
+
+        local worked, error, detail = LoadSavedGame(path)
+        if not worked then
+            UIUtil.ShowInfoDialog(GetFrame(0),
+                -- note - the 'Unknown error...' string below is intentionally not localized because
+                -- it should never show up.  If it does, add the error string to SaveErrors.
+                LOCF(SaveErrors[error] or ('Unknown error ' .. repr(error) .. 'loading savegame %s: %s'),
+                    Basename(path, true),
+                    InternalErrors[detail] or detail),
+                "<LOC _Ok>")
+        end
+        --#endregion
+
+        status:Destroy()
     end
 end
 

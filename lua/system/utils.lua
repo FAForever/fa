@@ -78,7 +78,7 @@ if not rawget(table, 'getsize') then
 
     --- Returns actual size of a table, including string keys
     ---@param t table
-    ---@return number
+    ---@return integer
     function table.getsize(t)
         if type(t) ~= 'table' then return 0 end
         local size = 0
@@ -282,7 +282,10 @@ end
 
 --- table.sorted(t, [comp]) is the same as table.sort(t, comp) except it returns
 --- a sorted copy of t, leaving the original unchanged.
---- [comp] is an optional comparison function, defaulting to less-than.
+---@generic T
+---@param t T[]
+---@param comp? fun(v: T): boolean An optional comparison function, defaulting to less-than.
+---@return T[] copy Sorted copy of the original table
 function table.sorted(t, comp)
     local r = table.copy(t)
     TableSort(r, comp)
@@ -352,7 +355,11 @@ end
 ---   for k,v in sortedpairs(t) do
 ---       print(k,v)
 ---   end
---- @param comp is an optional comparison function, defaulting to less-than.
+--- comp is an optional comparison function, defaulting to less-than.
+---@generic K, V
+---@param t table<K, V>
+---@param comp? fun(a: K, b: K):boolean
+---@return fun(): K, V
 function sortedpairs(t, comp)
     local keys = table.keys(t, comp)
     local i=1
@@ -393,7 +400,7 @@ function table.reverse(t)
 end
 
 --- Combines a series of tables into one table. Returns a new table. The parameters are merged into the new table in order
----@see `table.assimilate`
+---@see table.assimilate
 ---@param ... table[]
 ---@return table
 function table.combine(...)
@@ -426,6 +433,9 @@ end
 --- it is useful for quickly looking up values in tables instead of looping over them
 --- table.hash { [1] = 'A',  [2] = 'B',  [3] = 'C',  [4] = 'C' } =>
 ---            { [A] = true, [B] = true, [C] = true }
+---@generic K, V
+---@param t table<K, V>
+---@return table<V, true>
 function table.hash(t)
     if not t then return {} end -- prevents looping over nil table
     local r = {}
@@ -467,9 +477,12 @@ function table.hashkeys(t, value)
     return table.keys(r)
 end
 
---- table.map(fn,t) returns a table with the same keys as t but with
---- fn function applied to each value.
-function table.map(fn, t)
+--- table.map(fn,t) returns a table with the same keys as t but with `fn` applied to each value.
+---@generic T
+---@param t T[]
+---@param fn fun(v: T): any
+---@return table
+function table.map(t, fn)
     if not t then return {} end -- prevents looping over nil table
     local r = {}
     for k,v in t do
@@ -554,9 +567,10 @@ function table.print(tbl, tblPrefix, printer)
     printer(tblPrefix.." }")
 end
 
---- Return filtered table containing every mapping from table for which fn function returns true when passed the value.
---- @param t  - is a table to filter
---- @param fn - is decision function to use to filter the table, defaults checking if a value is true or exists in table
+--- Return shallow-copied, filtered table containing every mapping from table for which function `fn` returns true when passed the value.
+---@generic K, V
+---@param t table<K, V> # table to filter
+---@param fn? fun(value: V): boolean # Value filter function. Defaults to checking if a value is truthy
 function table.filter(t, fn)
     local r = {}
     if not fn then fn = function(v) return v end end
@@ -568,8 +582,10 @@ function table.filter(t, fn)
     return r
 end
 
---- Returns total count of values that match fn function or if values exist in table
---- @param fn is optional filtering function that is applied to each value of the table
+--- Returns total count of values that match function `fn`
+---@generic K, V
+---@param t table<K, V>
+---@param fn? fun(value: V): boolean # Defaults to checking if value is truthy
 function table.count(t, fn)
     if not t then return 0 end -- prevents looping over nil table
     if not fn then fn = function(v) return v end end
@@ -604,6 +620,15 @@ end
 ---@return T
 function table.random(array)
     return array[Random(1, TableGetn(array))]
+end
+
+---Removes all elements from the table
+---@param t table
+function table.clear(t)
+    if not t then return end
+    for k, _ in t do
+        t[k] = nil
+    end
 end
 
 
@@ -660,6 +685,7 @@ end
 function StringComma(value)
     local str = value or 0
     while true do
+      local k
       str, k = string.gsub(str, "^(-?%d+)(%d%d%d)", '%1,%2')
       if k == 0 then
         break

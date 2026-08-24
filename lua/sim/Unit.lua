@@ -162,7 +162,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field ignoreDetectionFrom table<Army, true>? # Armies being given free vision to reveal beams hitting targets
 ---@field reallyDetectedBy table<Army, true>?    # Armies that detected the unit without free vision and don't need intel flushed when beam weapons stop hitting
 ---@field Weapons table<string, Weapon> # string is weapon Label
----@field WeaponInstances Weapon[]
+---@field WeaponInstances table<integer|string, Weapon> # string matches weapon label
 ---@field WeaponCount number
 ---@field CaptureProgress? number # Keeps track of capture progress to prevent sharing units being captured and to sync capture work progress bars
 ---@field oldowner? Army # After a unit is transferred, keeps track of the original Army to kill shared units when needed.
@@ -175,6 +175,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field ImmuneToStun? boolean
 ---@field Anims? Animator[] # Animators that get stopped when a unit is stunned. Not used in FAF.
 ---@field IsBeingTransferred? boolean
+---@field OnStopBeingBuiltEnhancementsThread thread?
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent, FastDecayComponent) {
 
     IsUnit = true,
@@ -2490,7 +2491,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
 
         if bp.EnhancementPresetAssigned then
-            self:ForkThread(self.CreatePresetEnhancementsThread)
+            self.OnStopBeingBuiltEnhancementsThread = self:ForkThread(self.CreatePresetEnhancementsThread)
         end
 
         -- Don't try sending a Notify message from here if we're an ACU
@@ -2555,6 +2556,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self.SiloWeapon = weapon
         self.SiloProjectile = weapon:GetProjectileBlueprint()
 
+        -- Prevent work progress set by weapons using `RenderFireClock` from
+        -- turning into silo progress after ownership transfer of a unit paused
+        -- in the silo build state without having updated progress by the engine.
+        self:SetWorkProgress(0)
+
         -- for AI events
         self.Brain:OnUnitSiloBuildStart(self, weapon)
     end,
@@ -2614,10 +2620,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         local bp = self.Blueprint
         if bp.Enhancements and bp.EnhancementPresetAssigned and bp.EnhancementPresetAssigned.Enhancements then
             for k, v in bp.EnhancementPresetAssigned.Enhancements do
-                -- Enhancements may already have been created by SimUtils.TransferUnitsOwnership
-                if not self:HasEnhancement(v) then
-                    self:CreateEnhancement(v)
-                end
+                self:CreateEnhancement(v)
             end
         end
     end,
@@ -2630,6 +2633,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         if self and not self.Dead then
             self:CreatePresetEnhancements()
         end
+        self.OnStopBeingBuiltEnhancementsThread = nil
     end,
 
     ---@param self Unit
@@ -3324,6 +3328,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
 
         self:RequestRefreshUI()
+        return true
     end,
 
     ---@param self Unit
@@ -4291,8 +4296,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end,
 
     ---@param self Unit
-    ---@param cbOldUnit Unit
-    ---@param cbNewUnit Unit
+    ---@param cbOldUnit InstigatorTriggerCallback | nil
+    ---@param cbNewUnit InstigatorTriggerCallback | nil
     AddOnCapturedCallback = function(self, cbOldUnit, cbNewUnit)
         if cbOldUnit then
             self:AddUnitCallback(cbOldUnit, 'OnCaptured')
@@ -4357,8 +4362,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     ---@param self Unit
     ---@param fn function
-    ---@param amount number
-    ---@param repeatNum number
+    ---@param amount? number Fraction of HP lost. Defaults to `-1` - any amount of damage
+    ---@param repeatNum? integer Defaults to `1` - Triggered only once
     AddOnDamagedCallback = function(self, fn, amount, repeatNum)
         local num = amount or -1
         repeatNum = repeatNum or 1
@@ -5336,8 +5341,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param location number
     OnSpecialAction = function(self, location) end,
 
+    --- Called by the engine when the unit is damaged by an army.
     ---@param self Unit
-    ---@param index integer
+    ---@param index Army
     OnDamageBy = function(self, index) end,
 
     --- Deprecated functionality

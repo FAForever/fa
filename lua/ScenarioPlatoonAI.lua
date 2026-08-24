@@ -499,8 +499,8 @@ function PatrolChainPickerThread(platoon)
     platoon:Stop()
     if data then
         if data.PatrolChains then
-            local chain = Random(1, table.getn(data.PatrolChains))
-            ScenarioFramework.PlatoonPatrolRoute(platoon, ScenarioUtils.ChainToPositions(data.PatrolChains[chain]))
+            local chain = table.random(data.PatrolChains)
+            ScenarioFramework.PlatoonPatrolRoute(platoon, ScenarioUtils.ChainToPositions(chain))
         else
             error('*SCENARIO PLATOON AI ERROR: PatrolChains not defined', 2)
         end
@@ -517,10 +517,9 @@ function SplitPatrolThread(platoon)
     platoon:Stop()
     if data then
         if data.PatrolChains then
-            local num = table.getn(data.PatrolChains)
             for _, v in platoon:GetPlatoonUnits() do
-                local chain = Random(1, num)
-                ScenarioFramework.GroupPatrolChain({v}, data.PatrolChains[chain])
+                local chain = table.random(data.PatrolChains)
+                ScenarioFramework.GroupPatrolChain({v}, chain)
             end
         else
             error('*SCENARIO PLATOON AI ERROR: PatrolChains not defined', 2)

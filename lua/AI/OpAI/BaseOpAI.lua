@@ -549,6 +549,11 @@ OpAI = ClassSimple {
         if not self:FindChildren() or not self:FindMaster() then
             return false
         end
+        -- Remove `"default_brain"` param from the condition. It's a remnant of GPG code that got refactored,
+        -- as the AIBrain is always the first param passed to the build condition
+        if parameters[1] == "default_brain" then
+            table.remove(parameters, 1)
+        end
         for _, v in self.ChildrenHandles do
             local found
 

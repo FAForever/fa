@@ -1,1 +1,0 @@
-- (#7177) Fix non-number mod version numbers erroring in rule and session init (encountered with the AutoTML mod).

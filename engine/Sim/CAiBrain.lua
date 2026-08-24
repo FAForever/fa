@@ -58,9 +58,9 @@ end
 
 --- Filteres factories that can build the platoon and returns them.
 -- Usually passed table with only one factory as AI picks the highest tech factory as a primary and others are assisting.
----@param template table # Platoon's template.
----@param factories table # containing units-factories.
----@return table tblUnits # containing units-factories.
+---@param template PlatoonTemplate # Platoon's template.
+---@param factories FactoryUnit[] # containing units-factories.
+---@return FactoryUnit[] tblUnits # containing units-factories.
 function CAiBrain:CanBuildPlatoon(template, factories)
 end
 
@@ -541,5 +541,13 @@ end
 ---@return number # actual amount taken
 function CAiBrain:TakeResource(type, amount)
 end
+
+--- Called by the engine when a unit fails unit transfer due to issues other than unit cap.
+---@type fun(self: moho.aibrain_methods)
+CAiBrain.OnFailedUnitTransfer = nil
+
+--- Called by the engine when a unit fails to create due to unit cap.
+---@type fun(self: moho.aibrain_methods)
+CAiBrain.OnUnitCapLimitReached = nil
 
 return CAiBrain
