@@ -1607,7 +1607,6 @@ function LoadOSB(buildName, strArmy, builderData)
                     for subNum, val in cond[3] do
                         table.insert(params, val)
                     end
-                    table.remove(params, 1)
                     insert = import(cond[1])[ cond[2] ](aiBrain, unpack(params))
                 end
             end
