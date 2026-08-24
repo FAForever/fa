@@ -1077,7 +1077,7 @@ function BuildBaseManagerStructure(aiBrain, eng, baseManager, levelName, buildin
                 for num, location in v do
                     -- Check if it can be built and then build
                     if num > 1 and aiBrain:CanBuildStructureAt(category, {location[1], 0, location[2]}) and baseManager:CheckUnitBuildCounter(location, buildCounter) then
-                        if not closest or VDist2(location[1], location[3], engineerPos[1], engineerPos[3]) < VDist2(closest[1], closest[3], engineerPos[1], engineerPos[3]) then
+                        if not closest or VDist2(location[1], location[2], engineerPos[1], engineerPos[3]) < VDist2(closest[1], closest[2], engineerPos[1], engineerPos[3]) then
                             closest = location
                         end
                     end
