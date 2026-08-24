@@ -1,0 +1,1 @@
+- Fixed distance check for picking the closest structure to build by the campaign AI
