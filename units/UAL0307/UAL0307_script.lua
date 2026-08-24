@@ -70,7 +70,12 @@ UAL0307 = ClassUnit(AShieldHoverLandUnit, ShieldEffectsComponent) {
     end,
 
     OnLayerChange = function(self, new, old)
-        SlowHover.OnLayerChange(self, new, old)
+        local physics = (self.Blueprint or self:GetBlueprint()).Physics
+        if physics.WaterSpeedMultiplier then
+            SlowHover.OnLayerChange(self, new, old)
+        else
+            AShieldHoverLandUnit.OnLayerChange(self, new, old)
+        end
 
         if not IsDestroyed(self.TargetPointer) then
             if self.PointerEnabled == false then
