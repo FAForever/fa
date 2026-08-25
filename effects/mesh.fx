@@ -3788,8 +3788,7 @@ float4 ShieldLegacyPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
     return output;
 }
 
-/// ShieldPS
-///
+/// UEF bubble shield
 ///
 float4 ShieldPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
 {
@@ -3829,10 +3828,16 @@ float4 ShieldPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
     colorMod = lerp(output, colorMod, sin(frac( 0.06 * time) * 3.14));
     output = lerp(colorMod, output, vertex.material.y);
 
-    output += terrainBand;
+    output += terrainBand; //needed?
 
     // Mask UV pinching at the top of the sphere
     output.a *= colorMask.a;
+
+    float3 n = normalize(vertex.normal);
+    float3 v = normalize(vertex.viewDirection);
+    float roughness = 0.2;
+    float2 reflectionFactor = PBR2(v, vertex.depth, roughness, n);
+    output.a += reflectionFactor.x * 0.4;
 
     output.a *= shieldWaterAbsorption(vertex.depth.x);
 
@@ -7692,7 +7697,7 @@ technique ShieldUEF_MedFidelity
         DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 ShieldNormalVS( 1, 3, 32, 6, 0, 0, 0.0003, 0.005, -0.001, -0.005, -0.0003, -0.0008 );
-        PixelShader = compile ps_2_0 ShieldPS();
+        PixelShader = compile ps_2_a ShieldPS();
     }
 }
 
