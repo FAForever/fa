@@ -3,9 +3,6 @@
 -- to bind this as a hotkey in your game.prefs make an action like this:
 -- UI_Lua import("/lua/keymap/smartselection.lua").smartSelect("AIR MOBILE +idle -TRANSPORTATION -BOMBER")
 
-local utils = import("/lua/system/utils.lua")
-
-
 -- sets selection as per string expression
 function smartSelect(strExpression)
 
@@ -25,7 +22,7 @@ end
 
 -- sets selection as per compiled expression
 function setSelection(expression)
-  local others = utils.StringJoin(expression.others, " ")
+  local others = string.join(expression.others, " ")
 
   ConExecute("Ui_SelectByCategory " .. others)
   local units = GetSelectedUnits()
@@ -46,10 +43,10 @@ function compile(strExpression)
   result.others = {}
   result.negatives = {}
 
-  local tokens = utils.StringSplit(strExpression, " ") -- split by space
+  local tokens = string.split(strExpression, " ") -- split by space
   for k,v in tokens do
 
-    if utils.StringStarts(v, "-") then
+    if string.startsWith(v, "-") then
       -- tokens with minus symbol are "negative"
       local withoutSymbol = string.sub(v,2)
       table.insert(result.negatives, withoutSymbol)

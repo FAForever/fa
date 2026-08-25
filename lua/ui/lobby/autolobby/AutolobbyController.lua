@@ -20,7 +20,6 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local Utils = import("/lua/system/utils.lua")
 local MapUtil = import("/lua/ui/maputil.lua")
 local GameColors = import("/lua/gamecolors.lua")
 
