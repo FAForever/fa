@@ -646,13 +646,15 @@ end)
 -- gfind was renamed to gmatch in Lua 5.1. added gmatch for additional compatibility
 rawset(string, 'gmatch', string.gfind)
 
-StringJoin = table.concat
+--- Concatenates a list of strings into one, separated by `sep`. Alias of `table.concat`.
+---@type fun(list: string[], sep?: string): string
+string.join = table.concat
 
 --- "explode" a string into a series of tokens, using a separator character `sep`
 ---@param str string
 ---@param sep? string Defaults to `:`
 ---@return string[]
-function StringSplit(str, sep)
+function string.split(str, sep)
     sep = sep or ":"
     local fields = {}
     local pattern = string.format("([^%s]+)", sep)
@@ -663,13 +665,13 @@ end
 
 --- Extracts a string between two specified strings
 ---
---- e.g. `StringExtract('/path/name_end.lua', '/', '_end', true)` --> name
+--- e.g. `string.extractBetween('/path/name_end.lua', '/', '_end', true)` --> name
 ---@param str string
 ---@param from string
 ---@param to string
 ---@param fromEnd? boolean Defaults to `false`
 ---@return string?
-function StringExtract(str, from, to, fromEnd)
+function string.extractBetween(str, from, to, fromEnd)
     local pattern = from .. '(.*)' .. to
     if fromEnd then pattern = '.*' .. pattern end
     local _, _, m = str:find(pattern)
@@ -677,10 +679,10 @@ function StringExtract(str, from, to, fromEnd)
 end
 
 --- Adds comma as thousands separator in specified value
---- e.g. StringComma(10000) --> 10,000
+--- e.g. string.commaFormat(10000) --> 10,000
 ---@param value number
 ---@return string
-function StringComma(value)
+function string.commaFormat(value)
     local str = value or 0 ---@type number | string
     while true do
       local k
@@ -697,38 +699,44 @@ end
 ---@param str string
 ---@param symbol string? # Defaults to `" "`
 ---@return string
-function StringPrepend(str, symbol)
+function string.prepend(str, symbol)
     if not symbol then symbol = ' ' end
     return symbol .. str
 end
 
 --- Splits a string with camel case to a string with separate words
---- e.g. StringSplitCamel('SupportCommanderUnit') -> 'Support Commander Unit'
+--- e.g. string.splitCamelCase('SupportCommanderUnit') -> 'Support Commander Unit'
 ---@param str string
 ---@return string
-function StringSplitCamel(str)
+function string.splitCamelCase(str)
     local first = str:sub(1, 1)
-    local split = first .. str:sub(2):gsub("[A-Z]", StringPrepend)
+    local split = first .. str:sub(2):gsub("[A-Z]", string.prepend)
     return (split:gsub("^.", string.upper))
 end
 
---- Reverses order of letters for specified string
---- e.g. StringReverse('abc123') --> 321cba
----@param str string
----@return string
-function StringReverse(str)
-    local tbl =  {}
-    ---@diagnostic disable-next-line: discard-returns
-    str:gsub(".", function(c) table.insert(tbl,c) end)
-    tbl = table.reverse(tbl)
-    return table.concat(tbl)
+
+if not rawget(string, 'reverse') then
+    -- The Moho engine's Lua runtime is Lua 5.0, which predates `string.reverse` (a Lua 5.1
+    -- addition) -- see engine/Library.lua where it is explicitly annotated as absent. This
+    -- polyfill should be defined in the engine for performance if that ever changes.
+
+    --- Reverses order of letters for specified string
+    --- e.g. string.reverse('abc123') --> 321cba
+    ---@param str string
+    ---@return string
+    function string.reverse(str)
+        local tbl = {}
+        str:gsub(".", function(c) table.insert(tbl,c) end)
+        tbl = table.reverse(tbl)
+        return table.concat(tbl)
+    end
 end
 
 --- Capitalizes each word in specified string
---- e.g. StringCapitalize('hello supreme commander') --> Hello Supreme Commander
+--- e.g. string.capitalize('hello supreme commander') --> Hello Supreme Commander
 ---@param str string
 ---@return string
-function StringCapitalize(str)
+function string.capitalize(str)
     return string.gsub(" "..str, "%W%l", string.upper):sub(2)
 end
 
@@ -736,19 +744,25 @@ end
 ---@param str string
 ---@param startString string
 ---@return boolean
-function StringStarts(str, startString)
+function string.startsWith(str, startString)
    return str:sub(1, startString:len()) == startString
 end
-
-StringStartsWith = StringStarts
 
 ---Check if a given string ends with specified string
 ---@param str string
 ---@param endString string
 ---@return boolean
-function StringEnds(str, endString)
+function string.endsWith(str, endString)
    return endString == '' or str:sub(-endString:len()) == endString
 end
+
+local name = type('')
+local mmt = {
+    __newindex = function(_, key, _)
+        error(("Attempt to set attribute '%s' on %s"):format(tostring(key), name), 2)
+    end,
+}
+setmetatable(getmetatable(''), mmt)
 
 --- Sorts two variables based on their numeric value or alpha order (strings)
 function Sort(itemA, itemB)
@@ -814,7 +828,7 @@ function GetCommandLineArgTable(option)
     local result = {}
     if args then
         for _, arg in args do
-            local pair = StringSplit(arg, ":")
+            local pair = string.split(arg, ":")
             local name, value = pair[1], pair[2]
             result[name] = value
         end
@@ -1144,3 +1158,31 @@ function vector_metatable.__mul(a, b)
         a1 * b2 - a2 * b1
     )
 end
+
+-- ==========================================================================================
+-- * Deprecated aliases - kept for backwards compatibility with code that hasn't been
+-- * updated to use the string library equivalents yet.
+-- ==========================================================================================
+
+---@deprecated Use `string.join` instead.
+StringJoin = string.join
+---@deprecated Use `string.split` instead.
+StringSplit = string.split
+---@deprecated Use `string.extractBetween` instead.
+StringExtract = string.extractBetween
+---@deprecated Use `string.commaFormat` instead.
+StringComma = string.commaFormat
+---@deprecated Use `string.prepend` instead.
+StringPrepend = string.prepend
+---@deprecated Use `string.splitCamelCase` instead.
+StringSplitCamel = string.splitCamelCase
+---@deprecated Use `string.reverse` instead.
+StringReverse = string.reverse
+---@deprecated Use `string.capitalize` instead.
+StringCapitalize = string.capitalize
+---@deprecated Use `string.startsWith` instead.
+StringStarts = string.startsWith
+---@deprecated Use `string.startsWith` instead.
+StringStartsWith = string.startsWith
+---@deprecated Use `string.endsWith` instead.
+StringEnds = string.endsWith

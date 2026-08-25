@@ -18,7 +18,7 @@ function ParseTableOfCategories(inputString)
 
     local ok, msg = pcall(
         function()
-            local categories = StringSplit(inputString, ',')
+            local categories = string.split(inputString, ',')
 
             for k, category in categories do
                 local clean = category

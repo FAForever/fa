@@ -145,7 +145,7 @@ end
 ---@param pathToScenarioInfo any
 ---@return string
 local function GetPathToFolder(pathToScenarioInfo)
-    local splits = StringSplit(pathToScenarioInfo, "/")
+    local splits = string.split(pathToScenarioInfo, "/")
     -- Remove the length of the last token (filename), and the slash character before it.
     return string.sub(pathToScenarioInfo, 1, string.len(pathToScenarioInfo) - string.len(splits[table.getn(splits)]) - 1)
 end

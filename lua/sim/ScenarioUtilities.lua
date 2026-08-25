@@ -704,7 +704,7 @@ function InitializeScenarioArmies()
     local import = import
     local GetArmyBrain = GetArmyBrain
     local SetArmyEconomy = SetArmyEconomy
-    local StringStarts = StringStarts
+    local StringStarts = string.startsWith
     local SetArmyFactionIndex = SetArmyFactionIndex
     local SetArmyColorIndex = SetArmyColorIndex
     local SetArmyAIPersonality = SetArmyAIPersonality
