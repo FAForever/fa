@@ -704,7 +704,7 @@ function InitializeScenarioArmies()
     local import = import
     local GetArmyBrain = GetArmyBrain
     local SetArmyEconomy = SetArmyEconomy
-    local StringStartsWith = StringStartsWith
+    local StringStarts = StringStarts
     local SetArmyFactionIndex = SetArmyFactionIndex
     local SetArmyColorIndex = SetArmyColorIndex
     local SetArmyAIPersonality = SetArmyAIPersonality
@@ -746,7 +746,7 @@ function InitializeScenarioArmies()
 
             local faction = tblData.faction
             if faction ~= nil then
-                if setup.Human or StringStartsWith(strArmy, "Player") then
+                if setup.Human or StringStarts(strArmy, "Player") then
                     local factionIndex = MathClamp(setup.Faction, 1, factionCount)
                     SetArmyFactionIndex(strArmy, factionIndex - 1)
                 else

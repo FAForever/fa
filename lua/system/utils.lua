@@ -646,35 +646,30 @@ end)
 -- gfind was renamed to gmatch in Lua 5.1. added gmatch for additional compatibility
 rawset(string, 'gmatch', string.gfind)
 
---- Returns items as a single string, separated by the delimiter
-function StringJoin(items, delimiter)
-    local str = "";
-    for k,v in items do
-        str = str .. v .. delimiter
-    end
-    return str
-end
+StringJoin = table.concat
 
 --- "explode" a string into a series of tokens, using a separator character `sep`
 ---@param str string
----@param sep string
+---@param sep? string Defaults to `:`
 ---@return string[]
 function StringSplit(str, sep)
-    local sep, fields = sep or ":", {}
+    sep = sep or ":"
+    local fields = {}
     local pattern = string.format("([^%s]+)", sep)
-    str:gsub(pattern, function(c) fields[table.getn(fields)+1] = c end)
+    local _ = str:gsub(pattern, function(c) fields[table.getn(fields)+1] = c end)
     return fields
 end
 
---- Returns true if the string starts with the specified value
-function StringStartsWith(stringToMatch, valueToSeek)
-    return stringToMatch:sub(1, valueToSeek:len()) == valueToSeek
-end
-
 --- Extracts a string between two specified strings
---- e.g. StringExtract('/path/name_end.lua', '/', '_end', true) --> name
-function StringExtract(str, str1, str2, fromEnd)
-    local pattern = str1 .. '(.*)' .. str2
+---
+--- e.g. `StringExtract('/path/name_end.lua', '/', '_end', true)` --> name
+---@param str string
+---@param from string
+---@param to string
+---@param fromEnd? boolean Defaults to `false`
+---@return unknown
+function StringExtract(str, from, to, fromEnd)
+    local pattern = from .. '(.*)' .. to
     if fromEnd then pattern = '.*' .. pattern end
     local _, _, m = str:find(pattern)
     return m
@@ -682,6 +677,7 @@ end
 
 --- Adds comma as thousands separator in specified value
 --- e.g. StringComma(10000) --> 10,000
+---@return string
 function StringComma(value)
     local str = value or 0
     while true do
@@ -695,6 +691,8 @@ function StringComma(value)
 end
 
 --- Prepends a string with specified symbol or one space
+---@param str string
+---@return string
 function StringPrepend(str, symbol)
     if not symbol then symbol = ' ' end
     return symbol .. str
@@ -702,6 +700,8 @@ end
 
 --- Splits a string with camel case to a string with separate words
 --- e.g. StringSplitCamel('SupportCommanderUnit') -> 'Support Commander Unit'
+---@param str string
+---@return string
 function StringSplitCamel(str)
     local first = str:sub(1, 1)
     local split = first .. str:sub(2):gsub("[A-Z]", StringPrepend)
@@ -710,25 +710,37 @@ end
 
 --- Reverses order of letters for specified string
 --- e.g. StringReverse('abc123') --> 321cba
+---@param str string
+---@return string
 function StringReverse(str)
     local tbl =  {}
-    str:gsub(".", function(c) table.insert(tbl,c) end)
+    local _ = str:gsub(".", function(c) table.insert(tbl,c) end)
     tbl = table.reverse(tbl)
     return table.concat(tbl)
 end
 
 --- Capitalizes each word in specified string
 --- e.g. StringCapitalize('hello supreme commander') --> Hello Supreme Commander
+---@param str string
+---@return string
 function StringCapitalize(str)
     return string.gsub(" "..str, "%W%l", string.upper):sub(2)
 end
 
---- Check if a given string starts with specified string
+---Check if a given string starts with specified string
+---@param str string
+---@param startString string
+---@return boolean
 function StringStarts(str, startString)
-   return StringStartsWith(str, startString)
+   return str:sub(1, startString:len()) == startString
 end
 
---- Check if a given string ends with specified string
+StringStartsWith = StringStarts
+
+---Check if a given string ends with specified string
+---@param str string
+---@param endString string
+---@return boolean
 function StringEnds(str, endString)
    return endString == '' or str:sub(-endString:len()) == endString
 end
@@ -755,7 +767,10 @@ function Sort(itemA, itemB)
     end
 end
 
--- Rounds a number to specified double precision
+---Rounds a number to specified double precision
+---@param num number
+---@param idp? number
+---@return number
 function math.round(num,idp)
     if not idp then
         return math.floor(num+.5)
@@ -766,6 +781,10 @@ function math.round(num,idp)
 end
 
 --- Clamps numeric value to specified Min and Max range
+---@param v number
+---@param min number
+---@param max number
+---@return number
 function math.clamp(v, min, max)
     if v <= min then return min end
     if v >= max then return max end
