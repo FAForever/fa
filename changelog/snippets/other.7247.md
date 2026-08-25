@@ -1,0 +1,3 @@
+- Added missing annotations to string functions
+- `StringJoin` now points to `table.concat`. Since thats exactly what it did.
+- `StringStartsWith` points directly to `StringStarts` since one of them is duplicate due oversight of existing function by someone in the past.
