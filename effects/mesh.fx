@@ -3731,11 +3731,26 @@ float4 NormalMappedInsectPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShado
     return float4( color, alpha);
 }
 
-float shieldWaterAbsorption(float depth) {
+float shieldWaterAbsorption(float depth, float3 viewDirection) {
+    // Hint: Compare with ApplyWaterColor() function
+
     float factor = 1.0;
     if (surfaceElevation > 0) {
+
         if (depth < 0) factor = 0.6;
-        factor *= 1 - tex1D(WaterRampSampler, (-depth / (surfaceElevation - abyssElevation))).w;
+
+        if (MapUsesAdvancedWater()) {
+            float scaledDepth = saturate(-depth / (surfaceElevation - abyssElevation));
+            float3 up = float3(0,1,0);
+            float oneOverCosV = 1 / max(dot(up, normalize(viewDirection)), 0.0001);
+            float inAttenuation = exp(-scaledDepth * 2);
+            float outAttenuation = exp(-scaledDepth * oneOverCosV);
+
+            // or only outAttenuation?
+            factor *= inAttenuation * outAttenuation;
+        } else {
+            factor *= 1 - tex1D(WaterRampSampler, (-depth / (surfaceElevation - abyssElevation))).w;
+        }
     }
     return factor;
 }
@@ -3886,7 +3901,7 @@ float4 ShieldLegacyPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
     // Mask UV pinching at the top of the sphere
     output.a *= colorMask.a;
 
-    output.a *= shieldWaterAbsorption(vertex.depth.x);
+    output.a *= shieldWaterAbsorption(vertex.depth.x, vertex.viewDirection);
 
     return output;
 }
@@ -3942,7 +3957,7 @@ float4 ShieldPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
     float2 reflectionFactor = PBR2(v, vertex.depth, roughness, n);
     output.a += reflectionFactor.x * 0.4;
 
-    output.a *= shieldWaterAbsorption(vertex.depth.x);
+    output.a *= shieldWaterAbsorption(vertex.depth.x, vertex.viewDirection);
 
     return output;
 }
@@ -4061,7 +4076,7 @@ float4 ShieldCybranLegacyPS( EFFECT_NORMALMAPPED_VERTEX vertex, uniform float al
 
     // Alpha
     alpha += (albedo.r + albedo2.r) * 0.2;
-    alpha *= shieldWaterAbsorption(vertex.depth.x);
+    alpha *= shieldWaterAbsorption(vertex.depth.x, vertex.viewDirection);
 
     return float4(color, alpha);
 }
@@ -4110,7 +4125,7 @@ float4 ShieldAeonLegacyPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
     color = lerp( colorMod1, color, vertex.material.y);
 
     float alpha = 0.707 * ((environment.r + environment.g + environment.b) * 0.25) + terrainBand.r;
-    alpha *= shieldWaterAbsorption(vertex.depth.x);
+    alpha *= shieldWaterAbsorption(vertex.depth.x, vertex.viewDirection);
 
     return float4(color, alpha);
 }
@@ -4147,7 +4162,7 @@ float4 ShieldAeonPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
     color = lerp( colorMod1, color, vertex.material.y);
 
     float alpha = 0.707 * ((environment.r + environment.g + environment.b) * 0.25) + terrainBand.r;
-    alpha *= shieldWaterAbsorption(vertex.depth.x);
+    alpha *= shieldWaterAbsorption(vertex.depth.x, vertex.viewDirection);
 
     return float4(color, alpha);
 }
@@ -4190,7 +4205,7 @@ float4 ShieldSeraphimLegacyPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
     float ndotv = abs(dot(vertex.viewDirection,normal));
 
     float alpha = opacity * 1.75 * (ndotv * 0.3 + clamped_dp);
-    alpha *= shieldWaterAbsorption(vertex.depth.x);
+    alpha *= shieldWaterAbsorption(vertex.depth.x, vertex.viewDirection);
 
     float3 color = float3(0.425, 0.76274, 1.0) * dp * dp * specular.rgb;
 
@@ -4226,7 +4241,7 @@ float4 ShieldSeraphimPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
     alpha *= specular.rgb;
     alpha += PBR2(v, vertex.depth, 0.2, n).x * 0.3;
     alpha *= dp * dp * opacity;
-    alpha *= shieldWaterAbsorption(vertex.depth.x);
+    alpha *= shieldWaterAbsorption(vertex.depth.x, vertex.viewDirection);
 
     float3 color = float3(0.425, 0.76274, 1.0);
 
@@ -7794,7 +7809,7 @@ technique ShieldUEF_Legacy_MedFidelity
         DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 ShieldNormalVS( 1, 3, 32, 6, 0, 0, 0.0003, 0.005, -0.001, -0.005, -0.0003, -0.0008 );
-        PixelShader = compile ps_2_0 ShieldLegacyPS();
+        PixelShader = compile ps_2_a ShieldLegacyPS();
     }
 }
 
@@ -7908,7 +7923,7 @@ technique ShieldCybran_Legacy_MedFidelity
         DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 ShieldNormalVS( 1,1,2,1, -0.01,0, -0.002,0, 0,0.0012, 0.001,-0.0015 );
-        PixelShader = compile ps_2_0 ShieldCybranLegacyPS(0.17);
+        PixelShader = compile ps_2_a ShieldCybranLegacyPS(0.17);
     }
     pass P1
     {
@@ -7917,7 +7932,7 @@ technique ShieldCybran_Legacy_MedFidelity
         RasterizerState( Rasterizer_Cull_None )
 
         VertexShader = compile vs_1_1 ShieldPositionNormalOffsetVS( 0.01, 1,1,4,1, 0.01,0, -0.002,0, 0,0.0012, 0.001,-0.003 );
-        PixelShader = compile ps_2_0 ShieldCybranLegacyPS(0.17);
+        PixelShader = compile ps_2_a ShieldCybranLegacyPS(0.17);
     }
 }
 
@@ -7961,7 +7976,7 @@ technique ShieldAeon_Legacy_MedFidelity
         DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 ShieldNormalVS( 1,12,8,3, 0,0, 0,0.032, 0.012,-0.032, 0,0.0012 );
-        PixelShader = compile ps_2_0 ShieldAeonLegacyPS();
+        PixelShader = compile ps_2_a ShieldAeonLegacyPS();
     }
 }
 
@@ -7991,7 +8006,7 @@ technique ShieldAeon_MedFidelity
         DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 ShieldNormalVS( 1,12,8,3, 0,0, 0,0.032, 0.012,-0.032, 0,0.0012 );
-        PixelShader = compile ps_2_0 ShieldAeonPS();
+        PixelShader = compile ps_2_a ShieldAeonPS();
     }
 }
 
@@ -8039,7 +8054,7 @@ technique ShieldSeraphim_Legacy_MedFidelity
         DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 ShieldNormalVS(5,1,1,11, -0.00153,-0.0159, 0,0, 0.003,-0.0045, -0.005,-0.045 );
-        PixelShader = compile ps_2_0 ShieldSeraphimLegacyPS();
+        PixelShader = compile ps_2_a ShieldSeraphimLegacyPS();
     }
 }
 
