@@ -715,37 +715,23 @@ float3 PBR(
 {
     // See https://blog.selfshadow.com/publications/s2013-shading-course/
 
-    float3 v = normalize(vertex.viewDirection);
-    float3 reflection = reflect(-v, n);
-
-    // We can't use texCUBElod so we need to use a workaround
-    float lod = roughness * 10;
-    float scale = exp2(lod);
-    float3 env_reflection = texCUBEgrad(environmentSampler, reflection, float3(scale/256, 0, 0), float3(0, scale/256, 0));
-    // This should be convolved into a proper irradiance map, but we will settle for lod 5 for now
-    scale = exp2(5);
-    float3 env_irradiance = texCUBEgrad(environmentSampler, n, float3(scale/256, 0, 0), float3(0, scale/256, 0));
-
-    float2 envBRDFlookuptexture = tex2D(anisotropicSampler, float2(dot(n, v), 1 - roughness)).rg;
-    // We don't have good ao textures to counteract fresnel highlights showing in unplausible places,
-    // so we have to tune them down a bit across the board.
-    envBRDFlookuptexture.g *= 0.5;
-
-    //////////////////////////////
-    // Compute sun light
-    //
-
     // specular reflections of dielectrics mostly disappear underwater
     if (vertex.depth.x < 0) {
         facingSpecular = facingSpecular * 0.05;
     }
     float3 F0 = lerp(float3(facingSpecular, facingSpecular, facingSpecular), albedo, metallic);
+    float3 v = normalize(vertex.viewDirection);
     float3 l = sunDirection;
-    float3 h = normalize(v + l);
     float nDotL = max(dot(n, l), 0.0);
     // Normal maps can cause an angle > 90° between n and v which would
     // cause artifacts if we don't take some countermeasures
     float nDotV = abs(dot(n, v)) + 0.001;
+
+    //////////////////////////////
+    // Compute sun light
+    //
+
+    float3 h = normalize(v + l);
 
     float shadow = ComputeShadow(vertex.shadow, hiDefShadows);
     float3 sunLight = sunDiffuse * lightMultiplier * shadow;
@@ -775,6 +761,16 @@ float3 PBR(
     kD = float3(1.0, 1.0, 1.0) - kS;
     kD *= 1.0 - metallic;
 
+    float3 reflection = reflect(-v, n);
+
+    // We can't use texCUBElod so we need to use a workaround
+    float lod = roughness * 10;
+    float scale = exp2(lod);
+    float3 env_reflection = texCUBEgrad(environmentSampler, reflection, float3(scale/256, 0, 0), float3(0, scale/256, 0));
+    // This should be convolved into a proper irradiance map, but we will settle for lod 5 for now
+    scale = exp2(5);
+    float3 env_irradiance = texCUBEgrad(environmentSampler, n, float3(scale/256, 0, 0), float3(0, scale/256, 0));
+
     // We need to do this to stay consistent with ComputeLight()
     float3 shadowColor = (1 - (sunDiffuse * shadow * nDotL + sunAmbient)) * shadowFill;
     float3 ambient = sunAmbient * lightMultiplier + shadowColor;
@@ -789,6 +785,12 @@ float3 PBR(
     env_reflection += ambient * 0.15;
 
     float3 diffuse = env_irradiance * albedo;
+
+    float2 envBRDFlookuptexture = tex2D(anisotropicSampler, float2(dot(n, v), 1 - roughness)).rg;
+    // We don't have good ao textures to counteract fresnel highlights showing in unplausible places,
+    // so we have to tune them down a bit across the board.
+    envBRDFlookuptexture.g *= 0.5;
+
     float3 specular = env_reflection * (kS * envBRDFlookuptexture.r + envBRDFlookuptexture.g);
     color += (kD * diffuse + specular) * ao;
 
