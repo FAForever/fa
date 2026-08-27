@@ -786,7 +786,7 @@ float3 PBR(
 
     float3 diffuse = env_irradiance * albedo;
 
-    float2 envBRDFlookuptexture = tex2D(anisotropicSampler, float2(dot(n, v), 1 - roughness)).rg;
+    float2 envBRDFlookuptexture = tex2D(anisotropicSampler, float2(nDotV, 1 - roughness)).rg;
     // We don't have good ao textures to counteract fresnel highlights showing in unplausible places,
     // so we have to tune them down a bit across the board.
     envBRDFlookuptexture.g *= 0.5;
