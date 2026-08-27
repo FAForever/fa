@@ -3778,7 +3778,7 @@ float2 PBR2(
     float sunReflectionFactor = numerator / denominator;
 
     float3 kS = FresnelSchlickRoughness(nDotV, F0, roughness);
-    float2 envBRDFlookuptexture = tex2D(anisotropicSampler, float2(dot(n, v), 1 - roughness)).rg;
+    float2 envBRDFlookuptexture = tex2D(anisotropicSampler, float2(nDotV, 1 - roughness)).rg;
     float envReflectionFactor = kS * envBRDFlookuptexture.r + envBRDFlookuptexture.g;
 
     return float2(envReflectionFactor, sunReflectionFactor);
