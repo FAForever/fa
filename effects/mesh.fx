@@ -4139,29 +4139,32 @@ float4 ShieldAeonPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
 
     float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
 
-    // Texture samplers
-    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy );
+    float4 mask = tex2D( albedoSampler, vertex.texcoord0.xy );
     float3 specular = tex2D( specularSampler, vertex.texcoord0.zw );
     float3 specular2 = tex2D( specularSampler, vertex.texcoord1.xy );
+    // small upward drifting details, becomes uniform when zoomed out
     float3 normal = ComputeNormal( normalsSampler, vertex.texcoord1.zw * 4, rotationMatrix);
 
     float phongAmount = saturate( dot( reflect( -vertex.viewDirection, normal), vertex.viewDirection)) * 0.6;
     float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
 
-    float3 terrainBand = albedo.b * 0.5;
-    float3 color1 = phongAmount + environment - albedo.ggg;
-    float factor1 = specular.r * lerp( 0.6, 1.3, sin(frac( 0.015 * time) * 3.14));
+    float3 color1 = phongAmount + environment - mask.ggg;
+    float factor1 = specular.r  * lerp( 0.6, 1.3, sin(frac( 0.015 * time) * 3.14));
     float factor2 = specular2.r * lerp( 2.0, 2.2, sin(frac( 0.0045 * time) * 3.14));
+    float swirls = factor1 * factor2;
 
-    float3 color = color1 * factor1 * factor2 * (normal.rgb * 0.65 + 1) * environment * albedo.a;
+    float3 color = color1 * swirls;
+    color *= (normal.rgb * 0.65 + 1) * environment;
+    // Mask UV pinching at the top of the sphere
+    color *= mask.a;
 
     // Adjust color of shield based on its health percentage
-    float3 colorMod1 = lerp(float3( 0.7, 0.3, 0.3 ), color, 0.9 );
-    float3 colorMod2 = lerp( color, colorMod1, sin(frac( 0.05 * vertex.material.x) * 3.14) );
-    color = lerp( colorMod1, color, vertex.material.y);
-    color = lerp( colorMod1, color, vertex.material.y);
+    float3 colorMod = lerp(float3( 0.7, 0.3, 0.3 ), color, 0.9 );
+    colorMod = lerp(color, colorMod, sin(frac( 0.05 * vertex.material.x) * 3.14));
+    color = lerp(colorMod, color, vertex.material.y);
 
-    float alpha = 0.707 * ((environment.r + environment.g + environment.b) * 0.25) + terrainBand.r;
+    float terrainBand = mask.b * 0.5;
+    float alpha = 0.707 * ((environment.r + environment.g + environment.b) * 0.25) + terrainBand;
     alpha *= shieldWaterAbsorption(vertex.depth.x, vertex.viewDirection);
 
     return float4(color, alpha);
@@ -7991,15 +7994,6 @@ technique ShieldAeon_MedFidelity
 >
 {
     pass P0
-    {
-        AlphaState( AlphaBlend_SrcAlpha_One_Write_RGB )
-        RasterizerState( Rasterizer_Cull_None )
-        DepthState( Depth_Enable_LessEqual_Write_None )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a EnvironmentPS();
-    }
-    pass P1
     {
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
         RasterizerState( Rasterizer_Cull_None )
