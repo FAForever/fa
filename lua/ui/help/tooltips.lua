@@ -183,15 +183,15 @@ Tooltips = {
     },
     toggle_shield = {
         title = "<LOC tooltipui0040>Shield Toggle",
-        description = "<LOC tooltipui0481>Turn the selected units shields on/off",
+        description = "<LOC tooltipui0481>Turn the selected units shields on/off. Right click to discharge.",
     },
     toggle_shield_dome = {
         title = "<LOC tooltipui0482>Shield Dome Toggle",
-        description = "<LOC tooltipui0483>Turn the selected units shield dome on/off",
+        description = "<LOC tooltipui0483>Turn the selected units shield dome on/off. Right click to discharge.",
     },
     toggle_shield_personal = {
         title = "<LOC tooltipui0484>Personal Shield Toggle",
-        description = "<LOC tooltipui0485>Turn the selected units personal shields on/off",
+        description = "<LOC tooltipui0485>Turn the selected units personal shields on/off. Right click to discharge.",
     },
     toggle_sniper = {
         title = "<LOC tooltipui0647>Sniper Toggle",
