@@ -1,0 +1,1 @@
+- Added annotations to TauntManager class
