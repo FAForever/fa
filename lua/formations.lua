@@ -938,7 +938,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable)
                         TableInsert(FormationPos, {
                             xPos * spacing, (-formationLength - offsetY) * spacing,
                             groupData.Filter,
-                            0,
+                            formationLength / 10,
                             true
                         })
                         inserted = true
