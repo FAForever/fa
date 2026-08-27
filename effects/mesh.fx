@@ -4164,7 +4164,7 @@ float4 ShieldAeonPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
     color = lerp(colorMod, color, vertex.material.y);
 
     float terrainBand = mask.b * 0.5;
-    float alpha = 0.707 * ((environment.r + environment.g + environment.b) * 0.25) + terrainBand;
+    float alpha = 0.3 + terrainBand;
     alpha *= shieldWaterAbsorption(vertex.depth.x, vertex.viewDirection);
 
     return float4(color, alpha);
@@ -7999,7 +7999,7 @@ technique ShieldAeon_MedFidelity
         RasterizerState( Rasterizer_Cull_None )
         DepthState( Depth_Enable_LessEqual_Write_None )
 
-        VertexShader = compile vs_1_1 ShieldNormalVS( 1,12,8,3, 0,0, 0,0.032, 0.012,-0.032, 0,0.0012 );
+        VertexShader = compile vs_1_1 ShieldNormalVS( 1,12,8,3, 0,0, 0,0.024, 0.009,-0.024, 0,0.001 );
         PixelShader = compile ps_2_a ShieldAeonPS();
     }
 }
