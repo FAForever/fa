@@ -145,7 +145,7 @@ function CameraTrackEntities(units, zoom, seconds)
     end
 end
 
---- See track entities
+--- See `CameraTrackEntities`
 ---@param entity Unit
 ---@param zoom number
 ---@param seconds? number
