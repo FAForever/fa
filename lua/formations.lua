@@ -48,6 +48,7 @@ local ShieldCategory = import("/lua/shared/formations/categorizeunits.lua").Shie
 local NonShieldCategory = import("/lua/shared/formations/categorizeunits.lua").NonShieldCategory
 
 local CategorizeUnits = import("/lua/shared/formations/categorizeunits.lua").CategorizeUnits
+local GetDistanceBetweenTwoPoints2 = import('/lua/utilities.lua').GetDistanceBetweenTwoPoints2
 
 local TableEmpty = table.empty
 local TableGetn = table.getn
@@ -1187,7 +1188,7 @@ function GetLargeAirPositions(unitsList, airBlock)
             local blocked = false
             for i = numResults, 1, -1 do -- Don't change this to a simple forward loop or it can take 15x as long with large numbers.
                 local data = results[i]
-                if VDist2(xPos, yPos, data.xPos, data.yPos) < radius + data.size / 2 then
+                if GetDistanceBetweenTwoPoints2(xPos, yPos, data.xPos, data.yPos) < radius + data.size / 2 then
                     blocked = true
                     break
                 end
