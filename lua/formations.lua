@@ -587,21 +587,30 @@ local TenWideSubAttackFormation = {
 }
 
 -- ============ Formation Pickers ============
----@param typeName string
+
+--- Called by the engine to determine which formation to use for user orders while traveling (distance > 200).
+--- 
+--- Seems to have no effect.
+---@param typeName FormationType
 ---@param distance Vector
 ---@return number
 function PickBestTravelFormationIndex(typeName, distance)
     LOG(_G, 'PickBestTravelFormationIndex', typeName, distance)
     if typeName == 'AirFormations' then
-        return 0;
+        return 0
     else
-        return 1;
+        return 1
     end
 end
 
----@param typeName string
+--- Called by the engine to determine which final formation to default to for user orders.
+--- 
+--- Return -1 to use the user's last used formation.
+--- 
+--- Silently fails on errors.
+---@param typeName FormationType
 ---@param distance Vector
----@return number
+---@return integer | -1
 function PickBestFinalFormationIndex(typeName, distance)
     LOG(_G, 'PickBestFinalFormationIndex', typeName, distance)
     return -1;
