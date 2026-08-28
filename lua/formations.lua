@@ -1356,7 +1356,7 @@ function BlockBuilderAirT3Bombers(unitsList, spacing)
     local chevronPos = 1
     local currRowLen = TableGetn(airBlock[whichRow])
     local chevronSize = 1
-    local chevronType = false
+    local chevronType = false ---@type false | FormationSubgroup
     local formationLength = 0
 
 
