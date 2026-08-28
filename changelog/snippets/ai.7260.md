@@ -1,1 +1,1 @@
-- Adds `aibrain:AssignUnitToPlatoon()` function for a single unit, the table passed to `AssignUnitsToPlatoon` is cached and just the single unit swapped, just like `IssueToUnit` commads work.
+- Adds `aibrain:AssignUnitToPlatoon()` function for a single unit, the table passed to `AssignUnitsToPlatoon` is cached and just the single unit swapped, just like `IssueToUnit` commads work (#7260).
