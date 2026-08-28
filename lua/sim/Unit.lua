@@ -27,6 +27,7 @@ local DebugUnitComponent = import("/lua/sim/units/components/debugunitcomponent.
 local FastDecayComponent = import("/lua/sim/units/components/fastdecayunitcomponent.lua").FastDecayComponent
 
 local GetBlueprintCaptureCost = import('/lua/shared/capturecost.lua').GetBlueprintCaptureCost
+local AssertFaParams = import('/lua/shared/fatypeutils.lua').AssertFaParams
 
 local TrashBag = TrashBag
 local TrashAdd = TrashBag.Add
@@ -4338,8 +4339,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param fn fun(self: Unit, built: Unit)
     ---@param category EntityCategory
     AddOnUnitBuiltCallback = function(self, fn, category)
-        if type(fn) ~= 'function' then error("function expected but got " .. (fn.__name or type(fn)), 2) end
-        if category.__name ~= 'EntityCategory' then error("EntityCategory expected but got " .. (category.__name or type(category)), 2) end
+        AssertFaParams(fn, 'function', category, 'EntityCategory')
         self.EventCallbacks.OnUnitBuilt = self.EventCallbacks.OnUnitBuilt or { }
         table.insert(self.EventCallbacks['OnUnitBuilt'], {category=category, cb=fn})
     end,
@@ -4379,7 +4379,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param amount? number Fraction of HP lost. Defaults to `-1` - any amount of damage
     ---@param repeatNum? integer How many times the callback can trigger. Defaults to `1` - Triggered only once
     AddOnDamagedCallback = function(self, fn, amount, repeatNum)
-        if type(fn) ~= 'function' then error("function expected but got " .. (fn.__name or type(fn)), 2) end
+        AssertFaParams(fn, 'function')
         local num = amount or -1
         repeatNum = repeatNum or 1
         self.EventCallbacks.OnDamaged = self.EventCallbacks.OnDamaged or { }
