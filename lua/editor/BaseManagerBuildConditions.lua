@@ -7,142 +7,54 @@
 -----------------------------------------------------------------
 
 local AIUtils = import("/lua/ai/aiutilities.lua")
+local Utilities = import("/lua/utilities.lua")
 
----NeedAnyStructure = BuildCondition
+local pairs = pairs
+local tableEmpty = table.empty
+local tableGetn = table.getn
+local EntityCategoryContains, ParseEntityCategory = EntityCategoryContains, ParseEntityCategory
+
+--Cached categories
+local t2factories = categories.FACTORY * categories.TECH2
+local t3factories = categories.FACTORY * categories.TECH3
+
+---Checks the base template of the base manager to see if any structure is not built.
 ---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function NeedAnyStructure(aiBrain, baseName)
-
-    if not aiBrain.BaseManagers[baseName] then
-        return false
-    end
-
     local bManager = aiBrain.BaseManagers[baseName]
-    for dNum, data in bManager.LevelNames do
-        if data.Priority > 0 then
-            local buildTemplate = aiBrain.BaseTemplates[baseName .. data.Name].Template
-            local buildList = aiBrain.BaseTemplates[baseName .. data.Name].List
-            local buildCounter = aiBrain.BaseTemplates[baseName .. data.Name].BuildCounter
+    if not bManager then return false end
 
-            if not buildTemplate or not buildList then
-                return false
-            end
-            for _, v in buildTemplate do
-                if bManager:CheckStructureBuildable(v[1][1]) then
-                    -- Get the building to build
-                    local category
-                    for catName, catData in buildList do
-                        if catData.StructureType == v[1][1] then
-                            category = catData.StructureCategory
-                            break
-                        end
-                    end
-                    -- Iterate through build locations
-                    for num, location in v do
-                        if category and num > 1 then
-                            -- Check if it can be built and then build
-                            if aiBrain:CanBuildStructureAt(category, {location[1], 0, location[2]})
-                            and bManager:CheckUnitBuildCounter(location, buildCounter) then
-                                return true
-                            end
-                        end
-                    end
+    for _, data in pairs(bManager.LevelNames) do
+        if data.Priority <= 0 then continue end
+
+        local levelName = baseName .. data.Name
+        local buildTemplate = aiBrain.BaseTemplates[levelName].Template
+        local buildList = aiBrain.BaseTemplates[levelName].List
+        local buildCounter = aiBrain.BaseTemplates[levelName].BuildCounter
+
+        if not buildTemplate or not buildList then continue end
+
+        for _, entry in pairs(buildTemplate) do
+            local structureType = entry[1][1]
+            if not bManager:CheckStructureBuildable(structureType) then continue end
+
+            ---@type BlueprintId|nil
+            local category
+            for catName, catData in pairs(buildList) do
+                if catData.StructureType == structureType then
+                    category = catData.StructureCategory
+                    break
                 end
             end
-        end
-    end
-    return false
-end
+            if not category then continue end
 
----NumUnitsLessNearBase = BuildCondition
----@param aiBrain CampaignAIBrain
----@param baseName string
----@param category EntityCategory
----@param varName string
----@return boolean
-function NumUnitsLessNearBase(aiBrain, baseName, category, varName)
-    if aiBrain.BaseManagers[baseName] == nil then
-        return false
-    else
-        local base = aiBrain.BaseManagers[baseName]
-        local unitList = aiBrain:GetUnitsAroundPoint(category, base:GetPosition(), base.Radius, 'Ally')
-        local count = 0
-        for i, unit in unitList do
-            if unit:GetAIBrain() == aiBrain then
-                count = count + 1
-            end
-        end
-        if not varName then
-            if count < base.EngineerQuantity then
-                return true
-            end
-        elseif type(varName) == 'string' then
-            if count < ScenarioInfo.VarTable[varName] then
-                return true
-            end
-        else
-            if count < varName then
-                return true
-            end
-        end
-        return false
-    end
-end
-
----@param aiBrain CampaignAIBrain
----@param baseName string
----@return boolean
-function BaseManagerNeedsEngineers(aiBrain, baseName)
-	local bManager = aiBrain.BaseManagers[baseName]
-	return bManager and bManager.EngineerQuantity > bManager.CurrentEngineerCount
-end
-
----@param aiBrain CampaignAIBrain
----@param baseName string
----@return boolean
-function ExpansionBasesNeedEngineers(aiBrain, baseName)
-    if not aiBrain.BaseManagers[baseName] then
-        return false
-    end
-    local bManager = aiBrain.BaseManagers[baseName]
-    if not bManager.ExpansionBaseData then
-        return false
-    end
-    for num, eData in bManager.ExpansionBaseData do
-        local eBaseName = eData.BaseName
-        local base = aiBrain.BaseManagers[eBaseName]
-        if base and base:GetPosition() and base.Radius then
-            local count = base.CurrentEngineerCount
-            count = count + eData.IncomingEngineers
-            if count < eData.Engineers then
-                return true
-            end
-        end
-    end
-    return false
-end
-
---- Check if specific expansion base needs engineers
----@param aiBrain CampaignAIBrain
----@param baseName string
----@param eBaseName string
----@return boolean
-function NumEngiesInExpansionBase(aiBrain, baseName, eBaseName)
-    if not aiBrain.BaseManagers[baseName] or not aiBrain.BaseManagers[eBaseName] then
-        return false
-    end
-    local bManager = aiBrain.BaseManagers[baseName]
-    if not bManager.ExpansionBaseData then
-        return false
-    end
-    for num, eData in bManager.ExpansionBaseData do
-        if eData.BaseName == eBaseName then
-            local base = aiBrain.BaseManagers[eBaseName]
-            if base and base:GetPosition() and base.Radius then
-                local count = base.CurrentEngineerCount
-                count = count + eData.IncomingEngineers
-                if count < eData.Engineers then
+            -- Iterate through build locations
+            for i = 2, tableGetn(entry) do
+                ---@type Vector
+                local pos = entry[i]
+                if aiBrain:CanBuildStructureAt(category, {pos[1], 0, pos[2]}) and bManager:CheckUnitBuildCounter(pos, buildCounter) then
                     return true
                 end
             end
@@ -151,47 +63,135 @@ function NumEngiesInExpansionBase(aiBrain, baseName, eBaseName)
     return false
 end
 
+---Compares number of `category` units belonging to `aiBrain` that are in within the base radius to `varName`
+---@param aiBrain CampaignAIBrain
+---@param baseName string
+---@param category EntityCategory
+---@param varName? string|integer If `nil` compares to `BaseManager.EngineerQuantity`, `string` to variable in `ScenarioInfo.VarTable`, `integer` to found unit count.
+---@return boolean
+function NumUnitsLessNearBase(aiBrain, baseName, category, varName)
+    local bManager = aiBrain.BaseManagers[baseName]
+    if not bManager then return false end
+
+    local unitList = aiBrain:GetUnitsAroundPoint(category, bManager.Position, bManager.Radius, 'Ally')
+    local count = 0
+    for _, unit in pairs(unitList) do
+        if unit:GetAIBrain() == aiBrain then
+            count = count + 1
+        end
+    end
+    if not varName then
+        if count < bManager.EngineerQuantity then
+            return true
+        end
+    elseif type(varName) == 'string' then
+        if count < ScenarioInfo.VarTable[varName] then
+            return true
+        end
+    else
+        if count < varName then
+            return true
+        end
+    end
+    return false
+end
+
+---Returns `true` when number of active engineers in the base is less than set maximum.
+---@param aiBrain CampaignAIBrain
+---@param baseName string
+---@return boolean
+function BaseManagerNeedsEngineers(aiBrain, baseName)
+	local bManager = aiBrain.BaseManagers[baseName]
+	return bManager and bManager.EngineerQuantity > bManager.CurrentEngineerCount
+end
+
+---Returns `true` when any of the expansions has less engineers than set in the expansion data.
+---@param aiBrain CampaignAIBrain
+---@param baseName string
+---@return boolean
+function ExpansionBasesNeedEngineers(aiBrain, baseName)
+    local bManager = aiBrain.BaseManagers[baseName]
+    if not (bManager and bManager.ExpansionBaseData) then return false end
+
+    for _, eData in pairs(bManager.ExpansionBaseData) do
+        local ebManager = aiBrain.BaseManagers[eData.BaseName]
+        if not ebManager then continue end
+
+        local count = ebManager.CurrentEngineerCount
+        count = count + eData.IncomingEngineers
+        if count < eData.Engineers then
+            return true
+        end
+    end
+    return false
+end
+
+---Check if specific expansion base needs engineers
+---@param aiBrain CampaignAIBrain
+---@param baseName string
+---@param eBaseName string
+---@return boolean
+function NumEngiesInExpansionBase(aiBrain, baseName, eBaseName)
+    local bManager = aiBrain.BaseManagers[baseName]
+    local ebManager = aiBrain.BaseManagers[eBaseName]
+    if not (bManager and ebManager and bManager.ExpansionBaseData) then return false end
+
+    for _, eData in pairs(bManager.ExpansionBaseData) do
+        if eData.BaseName ~= eBaseName then continue end
+
+        local count = ebManager.CurrentEngineerCount
+        count = count + eData.IncomingEngineers
+        if count < eData.Engineers then
+            return true
+        end
+    end
+    return false
+end
+
+---Currently unsed, as ACU is treated as engineer in the base manager.
 ---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function CDRInPoolNeedAnyStructure(aiBrain, baseName)
-    if not aiBrain.BaseManagers[baseName] then
-        return false
-    end
+    local bManager = aiBrain.BaseManagers[baseName]
+    if not bManager then return false end
+
     local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
-    local cdrUnit = false
+    ---@type ACUUnit|nil
+    local cdrUnit
     for _, v in pool:GetPlatoonUnits() do
         if not v.Dead and EntityCategoryContains(categories.COMMAND, v) then
             cdrUnit = v
         end
     end
-    if not cdrUnit then
-        return false
-    end
-    for dNum, data in aiBrain.BaseManagers[baseName].LevelNames do
-        if data.Priority > 0 then
-            local buildTemplate = aiBrain.BaseTemplates[baseName .. data.Name].Template
-            local buildList = aiBrain.BaseTemplates[baseName .. data.Name].List
-            if not buildTemplate or not buildList then
-                return false
-            end
-            for _, v in buildTemplate do
-                -- Get the building to build
-                local category
-                for catName, catData in buildList do
-                    if catData.StructureType == v[1][1] then
-                        category = catData.StructureCategory
-                        break
-                    end
+
+    if not cdrUnit then return false end
+
+    for _, data in pairs(bManager.LevelNames) do
+        if data.Priority <= 0 then continue end
+
+        local levelName = baseName .. data.Name
+        local buildTemplate = aiBrain.BaseTemplates[levelName].Template
+        local buildList = aiBrain.BaseTemplates[levelName].List
+        if not buildTemplate or not buildList then return false end
+
+        for _, entry in pairs(buildTemplate) do
+            -- Get the building to build
+            local category
+            for catName, catData in buildList do
+                if catData.StructureType == entry[1][1] then
+                    category = catData.StructureCategory
+                    break
                 end
-                if category and cdrUnit:CanBuild(category) then
-                    -- Iterate through build locations
-                    for num, location in v do
-                        -- Check if it can be built and then build
-                        if num > 1 and aiBrain:CanBuildStructureAt(category, {location[1], 0, location[2]}) then
-                            return true
-                        end
-                    end
+            end
+            if not category or not cdrUnit:CanBuild(category) then continue end
+
+            -- Iterate through build locations
+            for i = 2, tableGetn(entry) do
+                ---@type Vector
+                local pos = entry[i]
+                if aiBrain:CanBuildStructureAt(category, {pos[1], 0, pos[2]}) then
+                    return true
                 end
             end
         end
@@ -199,50 +199,50 @@ function CDRInPoolNeedAnyStructure(aiBrain, baseName)
     return false
 end
 
+---Currently unsed, as sACU is treated as engineer in the base manager.
 ---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function SubCDRInPoolNeedAnyStructure(aiBrain, baseName)
-    if not aiBrain.BaseManagers[baseName] then
-        return false
-    end
+    local bManager = aiBrain.BaseManagers[baseName]
+    if not bManager then return false end
 
     local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
-    local cdrUnit = false
+    ---@type ACUUnit|nil
+    local cdrUnit
     for _, v in pool:GetPlatoonUnits() do
         if not v.Dead and EntityCategoryContains(categories.SUBCOMMANDER, v) then
             cdrUnit = v
         end
     end
 
-    if not cdrUnit then
-        return false
-    end
+    if not cdrUnit then return false end
 
-    for dNum, data in aiBrain.BaseManagers[baseName].LevelNames do
-        if data.Priority > 0 then
-            local buildTemplate = aiBrain.BaseTemplates[baseName .. data.Name].Template
-            local buildList = aiBrain.BaseTemplates[baseName .. data.Name].List
-            if not buildTemplate or not buildList then
-                return false
-            end
-            for _, v in buildTemplate do
-                -- Get the building to build
-                local category
-                for catName, catData in buildList do
-                    if catData.StructureType == v[1][1] then
-                        category = catData.StructureCategory
-                        break
-                    end
+    for _, data in pairs(bManager.LevelNames) do
+        if data.Priority <= 0 then continue end
+
+        local levelName = baseName .. data.Name
+        local buildTemplate = aiBrain.BaseTemplates[levelName].Template
+        local buildList = aiBrain.BaseTemplates[levelName].List
+        if not buildTemplate or not buildList then return false end
+
+        for _, entry in pairs(buildTemplate) do
+            -- Get the building to build
+            local category
+            for catName, catData in buildList do
+                if catData.StructureType == entry[1][1] then
+                    category = catData.StructureCategory
+                    break
                 end
-                if category and cdrUnit:CanBuild(category) then
-                    -- Iterate through build locations
-                    for num, location in v do
-                        -- Check if it can be built and then build
-                        if num > 1 and aiBrain:CanBuildStructureAt(category, {location[1], 0, location[2]}) then
-                            return true
-                        end
-                    end
+            end
+            if not category or not cdrUnit:CanBuild(category) then continue end
+
+            -- Iterate through build locations
+            for i = 2, tableGetn(entry) do
+                ---@type Vector
+                local pos = entry[i]
+                if aiBrain:CanBuildStructureAt(category, {pos[1], 0, pos[2]}) then
+                    return true
                 end
             end
         end
@@ -250,58 +250,94 @@ function SubCDRInPoolNeedAnyStructure(aiBrain, baseName)
     return false
 end
 
+---Returns `true` if the base construction units are building any of the passed `catTable` units.
 ---@param aiBrain CampaignAIBrain
 ---@param baseName string
----@param catTable string
+---@param catTable string[] List of category strings to test, e.g. `{'MOBILE LAND', 'ALLUNITS' }`
 ---@return boolean
 function CategoriesBeingBuilt(aiBrain, baseName, catTable)
-    if not aiBrain.BaseManagers[baseName] then
-        return false
-    end
+    local bManager = aiBrain.BaseManagers[baseName]
+    if not bManager then return false end
 
-    local basePos = aiBrain.BaseManagers[baseName]:GetPosition()
-    local baseRad = aiBrain.BaseManagers[baseName].Radius
-    if not basePos or not baseRad then
-        return false
-    end
+    local basePos = bManager.Position
+    local baseRad = bManager.Radius
+    -- Faster to compare squared distances
+    local baseRadSquared = baseRad * baseRad
 
     local unitsBuilding = aiBrain:GetListOfUnits(categories.CONSTRUCTION, false)
-    for unitNum, unit in unitsBuilding do
-        if not unit.Dead and unit:IsUnitState('Building') then
-            local buildingUnit = unit.UnitBeingBuilt
-            if buildingUnit and not buildingUnit.Dead then
-                for catNum, buildeeCat in catTable do
-                    local buildCat = ParseEntityCategory(buildeeCat)
-                    if EntityCategoryContains(buildCat, buildingUnit) then
-                        local unitPos = unit:GetPosition()
-                        if unitPos and VDist2(basePos[1], basePos[3], unitPos[1], unitPos[3]) < baseRad then
-                            return true
-                        end
-                    end
-                end
+    for _, unit in pairs(unitsBuilding) do
+        if unit.Dead or not unit:IsUnitState('Building') then continue end
+
+        local buildingUnit = unit.UnitBeingBuilt
+        if not buildingUnit or buildingUnit.Dead then continue end
+
+        for _, buildeeCat in pairs(catTable) do
+            local buildCat = ParseEntityCategory(buildeeCat)
+            if not EntityCategoryContains(buildCat, buildingUnit) then continue end
+
+            local unitPos = unit:GetPosition()
+            if unitPos and Utilities.XZDistanceTwoVectorsSquared(unitPos, basePos) < baseRadSquared then
+                return true
             end
         end
     end
     return false
 end
 
---@param aiBrain ArmiesTable
----@param level number
+---Checks if the base has any T3 / T2 factories based on `level`.
+---
+---Always returns true for when `level` is `1`
+---@param aiBrain CampaignAIBrain
+---@param level number Factory tech level
 ---@param baseName string
 ---@return boolean
 function HighestFactoryLevel(aiBrain, level, baseName)
     local bManager = aiBrain.BaseManagers[baseName]
-    if not bManager then
-        return false
-    end
+    if not bManager then return false end
 
-    local t3FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH3, bManager:GetPosition(), bManager.Radius)
-    local t2FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH2, bManager:GetPosition(), bManager.Radius)
-    if t3FacList and not table.empty(t3FacList) then
-		return level == 3
-    elseif t2FacList and not table.empty(t2FacList) then
+    local position = bManager.Position
+    local radius = bManager.Radius
+    local t3fac = AIUtils.GetOwnUnitsAroundPoint(aiBrain, t3factories, position, radius)
+    local t2fac = AIUtils.GetOwnUnitsAroundPoint(aiBrain, t2factories, position, radius)
+    if table.getn(t3fac) > 0 then
+        return level == 3
+    elseif table.getn(t2fac) > 0 then
         return level == 2
     end
+
+    return true
+end
+
+--- Returns true when the highest tier factory matches `level` 
+--- Example: level = 2, type = "Land". Platoon wont be built if the base has T3 land factory.
+---@param aiBrain CampaignAIBrain
+---@param level number
+---@param baseName string
+---@param type "Air"|"Land"|"Sea"
+---@return boolean
+function HighestFactoryLevelType(aiBrain, level, baseName, type)
+    local bManager = aiBrain.BaseManagers[baseName]
+    if not bManager then return false end
+
+    local position = bManager.Position
+    local radius = bManager.Radius
+    local catCheck
+    if type == 'Air' then
+        catCheck = categories.AIR
+    elseif type == 'Land' then
+        catCheck = categories.LAND
+    elseif type == 'Sea' then
+        catCheck = categories.NAVAL
+    end
+
+    local t3fac = AIUtils.GetOwnUnitsAroundPoint(aiBrain, t3factories * catCheck, position, radius)
+    local t2fac = AIUtils.GetOwnUnitsAroundPoint(aiBrain, t2factories * catCheck, position, radius)
+    if table.getn(t3fac) > 0 then
+        return level == 3
+    elseif table.getn(t2fac) > 0 then
+        return level == 2
+    end
+
     return true
 end
 
@@ -313,12 +349,10 @@ end
 ---@return boolean
 function FactoryCountAndNeed(aiBrain, techLevel, engQuantity, pType, baseName)
     local bManager = aiBrain.BaseManagers[baseName]
-    if not bManager then
-        return false
-    end
+    if not bManager then return false end
 
     local facCat = ParseEntityCategory('FACTORY * TECH'..techLevel)
-    local facList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, facCat, bManager:GetPosition(), bManager.Radius)
+    local facList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, facCat, bManager.Position, bManager.Radius)
     local typeCount = {Air = 0, Land = 0, Sea = 0, }
     for k, v in facList do
         if EntityCategoryContains(categories.AIR, v) then
@@ -354,9 +388,9 @@ end
 ---@return boolean
 function UnfinishedBuildingsCheck(aiBrain, baseName)
     local bManager = aiBrain.BaseManagers[baseName]
-	
+
 	-- Return if the BaseManager doesn't exist, or the list is empty, or all buildings are finished
-    if not bManager or table.empty(bManager.UnfinishedBuildings) then
+    if not bManager or tableEmpty(bManager.UnfinishedBuildings) then
         return false
     end
 
@@ -372,43 +406,14 @@ function UnfinishedBuildingsCheck(aiBrain, baseName)
     end
 
     for unitName, _ in bManager.UnfinishedBuildings do
-        if ScenarioInfo.UnitNames[armyIndex][unitName] and not ScenarioInfo.UnitNames[armyIndex][unitName].Dead then
+        local unit = ScenarioInfo.UnitNames[armyIndex][unitName]
+        if unit and not unit.Dead then
             if not beingBuiltList[unitName] then
                 return true
             end
         end
     end
     return false
-end
-
----@param aiBrain CampaignAIBrain
----@param level number
----@param baseName string
----@param type string
----@return boolean
-function HighestFactoryLevelType(aiBrain, level, baseName, type)
-    local bManager = aiBrain.BaseManagers[baseName]
-    if not bManager then
-        return false
-    end
-
-    local catCheck
-    if type == 'Air' then
-        catCheck = categories.AIR
-    elseif type == 'Land' then
-        catCheck = categories.LAND
-    elseif type == 'Sea' then
-        catCheck = categories.NAVAL
-    end
-
-    local t3FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH3 * catCheck, bManager:GetPosition(), bManager.Radius)
-    local t2FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH2 * catCheck, bManager:GetPosition(), bManager.Radius)
-    if t3FacList and not table.empty(t3FacList) then
-        return level == 3
-    elseif t2FacList and not table.empty(t2FacList) then
-        return level == 2
-    end
-    return true
 end
 
 ---@param aiBrain CampaignAIBrain
@@ -489,9 +494,10 @@ end
 ---@return boolean
 function NukesEnabled(aiBrain, baseName)
     local bManager = aiBrain.BaseManagers[baseName]
-    return bManager and bManager.FunctionalityStates.Nukes 
+    return bManager and bManager.FunctionalityStates.Nukes
 end
 
---- Moved Unused Imports for mod compatibility
+-- Moved Unused Imports for mod compatibility
+
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")

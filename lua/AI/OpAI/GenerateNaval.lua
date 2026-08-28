@@ -9,76 +9,189 @@
 
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 
+local SPAI = '/lua/ScenarioPlatoonAI.lua'
+
+local unpack = unpack
+local mathFloor = math.floor
+local mathMod = math.mod
+local tableInsert = table.insert
+local tableFind = table.find
+
+---Generated data with platoon templates and builders for OpAI
+---@class GeneratedScenario: Scenario
+---@field Name string
+
+---@alias NavalOpAIChildType
+---| 'Frigate'
+---| 'Destroyer'
+---| 'Battleship'
+---| 'T3Submarine'
+---| 'T2Submarine'
+---| 'Submarine'
+---| 'Cruiser'
+---| 'LightBoat'     # Aeon AA boat
+---| 'Utility'       # Shield, stealth boats
+---| 'Fatty'         # T3 Battlecruiser / Missile ship
+---| 'Carrier'       # Aircraft carriers
+---| 'NukeSubmarine'
+
+---@alias NavalOpAIGenType
+---| 'CORE'     # Firagates, Destroyers, Battleships
+---| 'SUBS'     # T1 subs, T2 sub-hunters
+---| 'LIGHT'    # Aeon AA boat
+---| 'CRUISERS' # Cruisers
+---| 'UTILITY'  # Shield, stealth boats
+---| 'CARRIERS' # Aircraft carriers
+---| 'FATTIES'  # T3 Battlecruiser / Missile ship
+---| 'NUKESUBS' # T3 nuke subs
+
+---@alias NavalOpAIGenConversion
+---| 'FRIGATES_PER_DESTROYER'    # How many ships must exist before we converting to next tier. Defaults to `5`
+---| 'DESTROYERS_PER_BATTLESHIP' # How many ships must exist before we converting to next tier. Defaults to `5`
+---| 'CORE_TO_SUBS'              # How many core ships must be places before we convert to this type. Defaults to `2`.
+---| 'CORE_TO_CRUISERS'          # How many core ships must be places before we convert to this type. Defaults to `4`.
+---| 'CORE_TO_FATTIES'           # How many core ships must be places before we convert to this type. Defaults to `3`.
+---| 'CORE_TO_CARRIERS'          # How many core ships must be places before we convert to this type. Defaults to `3`.
+---| 'CORE_TO_LIGHT'             # How many core ships must be places before we convert to this type. Defaults to `2`.
+---| 'CORE_TO_UTILITY'           # How many core ships must be places before we convert to this type. Defaults to `2`.
+---| 'CORE_TO_NUKESUBS'          # How many core ships must be places before we convert to this type. Defaults to `3`.
+
+---@class NavalOpAIGeneratorData
+---The starting number of virtual frigate units allocated to the very first platoon template (Tier 1, Wave 1)
+---
+---Sets the baseline strength and size for the weakest naval wave. Higher values result in larger starting fleets
+---
+---If not provided, it will be calculated from the number of naval factories in the base
+---@field MaxFrigates? integer
+---The target number of virtual frigate units allocated to the final platoon template (Tier 3, final wave)
+---
+---Controls the maximum overall scaling and final size of the endgame naval force
+---
+---If not provided, it will be calculated from the number of naval factories in the base
+---@field MinFrigates? integer
+---Used to calculate `MaxFrigates` based on number of naval factories in the base.
+---
+---Used only if `MaxFrigates` is not specified.
+---
+---Defaults to `1`
+---@field MaxMultiplier? integer
+---Used to calculate `MinFrigates` based on number of naval factories in the base.
+---
+---Used only if `MinFrigates` is not specified.
+---
+---Defaults to `MaxMultiplier`
+---@field MinMultiplier? integer
+---The number of distinct platoon build waves generated within each of the 3 tech tiers (T1, T2, and T3)
+---
+---Determines total progression steps Nx3.
+---It controls the growth smooth steps: higher values create more granular progression with smaller unit increments
+---between waves,while lower values cause steeper jumps in fleet composition
+---
+---Defaults to `1`
+---@field NumLevels? integer
+---If specified, only these types will be used to generate the template
+---
+---`Frigates` can't be disabled.
+---@field EnabledTypes? NavalOpAIChildType[]
+---Disables certain childs from being added during during template generation.
+---
+---Core ships can't be disabled.
+---@field DisableTypes? table<NavalOpAIChildType, true>
+---Overrides default conversions for generating the platoon.
+---
+---@see NavalOpAIGenConversion
+---@field Overrides? table<NavalOpAIGenConversion, number>
+
 --To make life easier with factions not having identical naval units and such.
-local TIERS =
-{
+local TIERS = {
     --Tier 1 naval units
-    {
-        CORE =      {U='ues0103', C='urs0103', A='uas0103', S='xss0103'},
-        SUBS =      {U='ues0203', C='urs0203', A='uas0203', S='xss0203'},
-        LIGHT =     {                          A='uas0102',            },
+    { --              UEF        AEON       CYBRAN     SERA
+        CORE =      {'ues0103', 'uas0103', 'urs0103', 'xss0103'},
+        SUBS =      {'ues0203', 'uas0203', 'urs0203', 'xss0203'},
+        LIGHT =     { nil     , 'uas0102',  nil     ,  nil     },
     },
 
     --Tier 2 naval units
     {
-        CORE =      {U='ues0201', C='urs0201', A='uas0201', S='xss0201'},
-        SUBS =      {U='xes0102', C='xrs0204', A='xas0204', S='xss0203'},   --note seraphim have no T2 sub hunter
-        CRUISERS =  {U='ues0202', C='urs0202', A='uas0202', S='xss0202'},
-        UTILITY =   {U='xes0205', C='xrs0205',                         },
+        CORE =      {'ues0201', 'uas0201', 'urs0201', 'xss0201'},
+        SUBS =      {'xes0102', 'xas0204', 'xrs0204', 'xss0203'},   --note seraphim have no T2 sub hunter
+        CRUISERS =  {'ues0202', 'uas0202', 'urs0202', 'xss0202'},
+        UTILITY =   {'xes0205',  nil     , 'xrs0205',  nil     },
     },
 
     --Tier 3 naval units
     {
-        CORE =      {U='ues0302', C='urs0302', A='uas0302', S='xss0302'},
-        SUBS =      {U='xes0102', C='xrs0204', A='xas0204', S='xss0304'},
-        CRUISERS =  {U='ues0202', C='urs0202', A='uas0202', S='xss0202'},
-        CARRIERS =  {             C='urs0303', A='uas0303', S='xss0303'},
-        FATTIES =   {U='xes0307',              A='xas0306',            },
-        UTILITY =   {U='xes0205', C='xrs0205',                         },
-        NUKESUBS =  {U='ues0304', C='urs0304', A='uas0304',            },
+        CORE =      {'ues0302', 'uas0302', 'urs0302', 'xss0302'},
+        SUBS =      {'xes0102', 'xas0204', 'xrs0204', 'xss0304'},
+        CRUISERS =  {'ues0202', 'uas0202', 'urs0202', 'xss0202'},
+        CARRIERS =  { nil     , 'uas0303', 'urs0303', 'xss0303'},
+        FATTIES =   {'xes0307', 'xas0306',  nil     ,  nil     },
+        UTILITY =   {'xes0205',  nil     , 'xrs0205',  nil     },
+        NUKESUBS =  {'ues0304', 'uas0304', 'urs0304',  nil     },
     },
 }
 
 local BasePriority = 700
 
-local Conversions =
-{
---How many ships must exist before we convert them to one of the next-tier core ship
+---How many ships must exist before we convert them to one of the next-tier core ship
+---
+---How many core ships (frigates, destroyers, battleships) must be in a platoon before we include one of these unit types.
+local Conversions = {
     FRIGATES_PER_DESTROYER = 5,
     DESTROYERS_PER_BATTLESHIP = 5,
-
---How many core ships (frigates, destroyers, battleships) must be in a platoon before we include one of these unit types.
     CORE_TO_SUBS = 2,
     CORE_TO_CRUISERS = 4,
     CORE_TO_FATTIES = 3,
     CORE_TO_CARRIERS = 3,
-    CORE_TO_LIGHT = 0.5,
+    CORE_TO_LIGHT = 2,
     CORE_TO_UTILITY = 2,
     CORE_TO_NUKESUBS = 3,
 }
 
-function IsEnabledType(unitType, data)
-    for _, v in data.EnabledTypes do
-        if unitType == v then
-            return true
-        end
-    end
-    return false
+---Returns true if `enabledTypes` is not specified or when it contains `unitType`
+---@param unitType NavalOpAIChildType
+---@param enabledTypes? NavalOpAIChildType[]
+---@return boolean
+local function isEnabledType(unitType, enabledTypes)
+    -- Everything is enabled by default
+    if not enabledTypes then return true end
+    return tableFind(enabledTypes, unitType) ~= nil
 end
 
+---@param name NavalOpAIGenConversion
+---@param overrides? table<NavalOpAIGenConversion, number>
+---@return number
+local function getConversion(name, overrides)
+    return (overrides and overrides[name]) or Conversions[name]
+end
+
+---@param name string
+---@param levelsPerTier integer
+---@param minFrigates integer
+---@param maxFrigates integer
+---@param faction integer 1=UEF, 2=Aeon, 3=Cybran, 4=Seraphim
+---@param data NavalOpAIGeneratorData
+---@return GeneratedScenario
 function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction, data)
-    if data.Overrides then
-        for k, v in data.Overrides do
-            Conversions[k] = v
-        end
-    end
+    local enabledTypes = data.EnabledTypes
+    local overrides = data.Overrides
 
-    local allEnabled = true
-    if data.EnabledTypes then
-        allEnabled = false
-    end
+    local builders = {}
+    local Scenario = {
+        Name = name,
+        Platoons = {
+            OST_BLANK_TEMPLATE = {'OST_BLANK_TEMPLATE', ''},
+        },
+        Armies = {
+            ARMY_1 = {
+                PlatoonBuilders = {
+                    Builders = builders,
+                },
+            },
+        },
+    }
+    local masterPlatoonName = 'OSB_Master_' .. name
 
-    local Scenario = { Platoons = {}, Armies = { ARMY_1 = { PlatoonBuilders = { Builders = { } } } }, Name = name }
     local levels = levelsPerTier * 3
 
     --Frigate increment per level
@@ -89,146 +202,167 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
     local destAcc = 0
     local battAcc = 0
 
-    Scenario.Platoons['OST_BLANK_TEMPLATE'] = {'OST_BLANK_TEMPLATE', ''}
+    local TIER1, TIER2, TIER3 = TIERS[1], TIERS[2], TIERS[3]
 
     --Build the stuff
     for level = 1, levels do
         --Types of naval units in the platoon
-        local tier = math.floor((level-1)/levelsPerTier) + 1
-        local waveLevel = math.mod(level-1, levelsPerTier) + 1
-        local template = 'OST_' .. name .. '_' .. tostring(tier) .. '-' .. tostring(waveLevel) .. '_Template'
+        local tier = mathFloor((level-1)/levelsPerTier) + 1
+        local waveLevel = mathMod(level-1, levelsPerTier) + 1
+        local tpName = 'OST_' .. name .. '_' .. tier .. '-' .. waveLevel .. '_Template'
 
-        local children = {'T' .. tostring(tier)} --, 'L' .. tostring(level)}
+        ---@type OpAIChildType[]
+        local children = {'T' .. tier} --, 'L' .. tostring(level)}
 
-        Scenario.Platoons[template] = {template, ''}
+        local template = {tpName, ''}
+        Scenario.Platoons[tpName] = template
 
-        --------------------------------------------
+        --------------------------------
         -- Generate the platoon template
-        --------------------------------------------
+        --------------------------------
 
         --If we're tier 2 or higher, convert frigates to destroyers at the going rate
-        while tier >= 2 and frigAcc >= Conversions.FRIGATES_PER_DESTROYER do
-            frigAcc = frigAcc - Conversions.FRIGATES_PER_DESTROYER
+        while tier >= 2 and frigAcc >= getConversion('FRIGATES_PER_DESTROYER', overrides) do
+            frigAcc = frigAcc - getConversion('FRIGATES_PER_DESTROYER', overrides)
             destAcc = destAcc + 1
         end
 
         --If we're tier 3 or higher, convert destroyers to battleships at the going rate
-        while tier >= 3 and destAcc >= Conversions.DESTROYERS_PER_BATTLESHIP do
-            destAcc = destAcc - Conversions.DESTROYERS_PER_BATTLESHIP
+        while tier >= 3 and destAcc >= getConversion('DESTROYERS_PER_BATTLESHIP', overrides) do
+            destAcc = destAcc - getConversion('DESTROYERS_PER_BATTLESHIP', overrides)
             battAcc = battAcc + 1
         end
 
-        local numFrigates = math.floor(frigAcc)
-        local numDestroyers = math.floor(destAcc)
-        local numBattleships = math.floor(battAcc)
+        local numFrigates = mathFloor(frigAcc)
+        local numDestroyers = mathFloor(destAcc)
+        local numBattleships = mathFloor(battAcc)
 
         if numFrigates > 0 then
-            table.insert(Scenario.Platoons[template], {TIERS[1].CORE[faction], 1, numFrigates, 'attack', 'None'})
-            table.insert(children, 'Frigate')
+            tableInsert(template, {TIER1.CORE[faction], 1, numFrigates, 'Attack', 'None'})
+            tableInsert(children, 'Frigate')
         end
-        if (allEnabled or IsEnabledType('Destroyer', data)) and numDestroyers > 0 then
-            table.insert(Scenario.Platoons[template], {TIERS[2].CORE[faction], 1, numDestroyers, 'attack', 'None'})
-            table.insert(children, 'Destroyer')
+        if isEnabledType('Destroyer', enabledTypes) and numDestroyers > 0 then
+            tableInsert(template, {TIER2.CORE[faction], 1, numDestroyers, 'Attack', 'None'})
+            tableInsert(children, 'Destroyer')
         end
-        if (allEnabled or IsEnabledType('Battleship', data)) and numBattleships > 0 then
-            table.insert(Scenario.Platoons[template], {TIERS[3].CORE[faction], 1, numBattleships, 'attack', 'None'})
-            table.insert(children, 'Battleship')
+        if isEnabledType('Battleship', enabledTypes) and numBattleships > 0 then
+            tableInsert(template, {TIER3.CORE[faction], 1, numBattleships, 'Attack', 'None'})
+            tableInsert(children, 'Battleship')
         end
 
         -- Do submarines.
-        local numSubmarines = 0
-        if (allEnabled or IsEnabledType('Submarine', data)) then
-            if tier == 1 then numSubmarines = math.floor(numFrigates / Conversions.CORE_TO_SUBS)
-            elseif tier >= 2 then numSubmarines = math.floor(numDestroyers / Conversions.CORE_TO_SUBS)
-            elseif tier >= 3 then numSubmarines = math.floor(numBattleships / Conversions.CORE_TO_SUBS) end
-            if numSubmarines > 0 then
+        if isEnabledType('Submarine', enabledTypes) then
+            local numSubmarines = 0
+            if tier >= 3 then
+                numSubmarines = mathFloor(numBattleships / getConversion('CORE_TO_SUBS', overrides))
+            elseif tier >= 2 then
+                numSubmarines = mathFloor(numDestroyers / getConversion('CORE_TO_SUBS', overrides))
+            else
+                numSubmarines = mathFloor(numFrigates / getConversion('CORE_TO_SUBS', overrides))
+            end
 
+            if numSubmarines > 0 then
                 local placed = false
                 if tier == 3 and not data.DisableTypes['T3Submarine'] then
-                    table.insert(Scenario.Platoons[template], {TIERS[3].SUBS[faction], 1, numSubmarines, 'guard', 'None'})
-                    table.insert(children, 'T3Submarine')
+                    tableInsert(template, {TIER3.SUBS[faction], 1, numSubmarines, 'Guard', 'None'})
+                    tableInsert(children, 'T3Submarine')
                     placed = true
                 elseif tier >= 2 and not placed and not data.DisableTypes['T2Submarine'] then
-                    table.insert(Scenario.Platoons[template], {TIERS[2].SUBS[faction], 1, numSubmarines, 'guard', 'None'})
-                    table.insert(children, 'T2Submarine')
+                    tableInsert(template, {TIER2.SUBS[faction], 1, numSubmarines, 'Guard', 'None'})
+                    tableInsert(children, 'T2Submarine')
                 elseif not placed and not data.DisableTypes['Submarine'] then
-                    table.insert(Scenario.Platoons[template], {TIERS[1].SUBS[faction], 1, numSubmarines, 'guard', 'None'})
-                    table.insert(children, 'Submarine')
+                    tableInsert(template, {TIER1.SUBS[faction], 1, numSubmarines, 'Guard', 'None'})
+                    tableInsert(children, 'Submarine')
                 end
             end
         end
 
         -- Do cruisers.
-        local numCruisers = 0
-        if (allEnabled or IsEnabledType('Cruiser', data)) then
-            if tier == 2 then numCruisers = math.floor(numDestroyers / Conversions.CORE_TO_CRUISERS)
-            elseif tier >= 3 then numCruisers = math.floor(numBattleships / Conversions.CORE_TO_CRUISERS) end
+        if isEnabledType('Cruiser', enabledTypes) then
+            local numCruisers = 0
+            if tier == 2 then
+                numCruisers = mathFloor(numDestroyers / getConversion('CORE_TO_CRUISERS', overrides))
+            elseif tier >= 3 then
+                numCruisers = mathFloor(numBattleships / getConversion('CORE_TO_CRUISERS', overrides))
+            end
+
             if numCruisers > 0 then
-                table.insert(Scenario.Platoons[template], {TIERS[tier].CRUISERS[faction], 1, numCruisers, 'guard', 'None'})
-                table.insert(children, 'Cruiser')
+                tableInsert(template, {TIERS[tier].CRUISERS[faction], 1, numCruisers, 'Guard', 'None'})
+                tableInsert(children, 'Cruiser')
             end
         end
 
         -- Do light T1 boats only at T1. Note not every faction has light T1 boats
-        local numLight = 0
-        if (allEnabled or IsEnabledType('LightBoat', data)) then
-            if tier == 1 and TIERS[1].LIGHT[faction] then numLight = math.floor(numFrigates / Conversions.CORE_TO_LIGHT) end
+        if isEnabledType('LightBoat', enabledTypes) then
+            local numLight = 0
+            if tier == 1 and TIER1.LIGHT[faction] then
+                numLight = mathFloor(numFrigates / getConversion('CORE_TO_LIGHT', overrides))
+            end
+
             if numLight > 0 then
-                table.insert(Scenario.Platoons[template], {TIERS[1].LIGHT[faction], 1, numLight, 'guard', 'None'})
-                table.insert(children, 'LightBoat')
+                tableInsert(template, {TIER1.LIGHT[faction], 1, numLight, 'Guard', 'None'})
+                tableInsert(children, 'LightBoat')
             end
         end
 
         -- Do T2 utility boats. Cybran = stealth boat, UEF = shields. Note not every faction has a T2 utility boat.
-        local numUtility = 0
-        if (allEnabled or IsEnabledType('Utility', data)) then
-            if tier == 2 and TIERS[2].UTILITY[faction] then numUtility = math.floor(numDestroyers / Conversions.CORE_TO_UTILITY)
-            elseif tier >= 3 and TIERS[3].UTILITY[faction] then numUtility = math.floor(numBattleships / Conversions.CORE_TO_UTILITY) end
+        if isEnabledType('Utility', enabledTypes) then
+            local numUtility = 0
+            if tier == 2 and TIER2.UTILITY[faction] then
+                numUtility = mathFloor(numDestroyers / getConversion('CORE_TO_UTILITY', overrides))
+            elseif tier >= 3 and TIER3.UTILITY[faction] then
+                numUtility = mathFloor(numBattleships / getConversion('CORE_TO_UTILITY', overrides))
+            end
+
             if numUtility > 0 then
-                table.insert(Scenario.Platoons[template], {TIERS[3].UTILITY[faction], 1, numUtility, 'guard', 'None'})
-                table.insert(children, 'Utility')
+                tableInsert(template, {TIER3.UTILITY[faction], 1, numUtility, 'Guard', 'None'})
+                tableInsert(children, 'Utility')
             end
         end
 
         -- Do T3 fatties. battlecruiser, missile ship. Note Aeon and Cybran have no fatties.
-        local numFatties = 0
-        if (allEnabled or IsEnabledType('Fatty', data)) then
-            if tier >= 3 and TIERS[3].FATTIES[faction] then numFatties = math.floor(numBattleships / Conversions.CORE_TO_FATTIES) end
+        if isEnabledType('Fatty', enabledTypes) then
+            local numFatties = 0
+            if tier >= 3 and TIER3.FATTIES[faction] then
+                numFatties = mathFloor(numBattleships / getConversion('CORE_TO_FATTIES', overrides))
+            end
+
             if numFatties > 0 then
-                table.insert(Scenario.Platoons[template], {TIERS[3].FATTIES[faction], 1, numFatties, 'guard', 'None'})
-                table.insert(children, 'Fatty')
+                tableInsert(template, {TIER3.FATTIES[faction], 1, numFatties, 'Guard', 'None'})
+                tableInsert(children, 'Fatty')
             end
         end
 
         -- Do T3 carriers. Note UEF has no T3 carrier.
-        local numCarriers = 0
-        if (allEnabled or IsEnabledType('Carrier', data)) then
-            if tier >= 3 and TIERS[3].CARRIERS[faction] then numCarriers = math.floor(numBattleships / Conversions.CORE_TO_CARRIERS) end
+        if isEnabledType('Carrier', enabledTypes) then
+            local numCarriers = 0
+            if tier >= 3 and TIER3.CARRIERS[faction] then
+                numCarriers = mathFloor(numBattleships / getConversion('CORE_TO_CARRIERS', overrides))
+            end
+
             if numCarriers > 0 then
-                table.insert(Scenario.Platoons[template], {TIERS[3].CARRIERS[faction], 1, numCarriers, 'guard', 'None'})
-                table.insert(children, 'Carrier')
+                tableInsert(template, {TIER3.CARRIERS[faction], 1, numCarriers, 'Guard', 'None'})
+                tableInsert(children, 'Carrier')
             end
         end
 
         -- Do nuke subs, only if allowed. Note Seraphim has no nuke sub.
-        local numNukeSubs = 0
-        if (not allEnabled and IsEnabledType('NukeSubmarine', data)) then
-            if tier >= 3 and TIERS[3].NUKESUBS[faction] then numNukeSubs = math.floor(numBattleships / Conversions.CORE_TO_NUKESUBS) end
+        if (enabledTypes and isEnabledType('NukeSubmarine', enabledTypes)) then
+            local numNukeSubs = 0
+            if tier >= 3 and TIER3.NUKESUBS[faction] then
+                numNukeSubs = mathFloor(numBattleships / getConversion('CORE_TO_NUKESUBS', overrides))
+            end
+
             if numNukeSubs > 0 then
-                table.insert(Scenario.Platoons[template], {TIERS[3].NUKESUBS[faction], 1, numNukeSubs, 'guard', 'None'})
-                table.insert(children, 'NukeSubmarine')
+                tableInsert(template, {TIER3.NUKESUBS[faction], 1, numNukeSubs, 'Guard', 'None'})
+                tableInsert(children, 'NukeSubmarine')
             end
         end
 
-        --------------------------------------------
         -- Create the child platoon builder
-        --------------------------------------------
-
-        Scenario.Armies.ARMY_1.PlatoonBuilders.Builders['OSB_Child_' .. name .. '_' .. tostring(tier) .. '-' .. tostring(waveLevel)] =
-        {
-            PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua','DefaultOSBasePatrol',{'default_platoon'},{'default_platoon'}},
-            PlatoonTemplate = template,
-            --Priority = nPriority+level,
+        builders['OSB_Child_' .. name .. '_' .. tier .. '-' .. waveLevel] = {
+            PlatoonAIFunction = {SPAI, 'DefaultOSBasePatrol', {'default_platoon'}, {'default_platoon'}},
+            PlatoonTemplate = tpName,
             Priority = BasePriority + tier,
             InstanceCount = 1,
             LocationType = 'MAIN',
@@ -250,8 +384,8 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
             PlatoonData = {
                 {
                     type = 5, name = 'AMPlatoons', value = {
-                        {type = 2, name = 'String_0',  value = 'OSB_Master_' .. name},
-                        {type = 2, name = 'APPEND_FleetChildren',  value = 'OSB_Master_' .. name},
+                        {type = 2, name = 'String_0',  value = masterPlatoonName},
+                        {type = 2, name = 'APPEND_FleetChildren',  value = masterPlatoonName},
                     }
                 },
             },
@@ -259,26 +393,22 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
             ChildrenType = { unpack(children) },
         }
 
-        --------------------------------------------
         --Increment the number of frigates and continue
-        --------------------------------------------
 
         frigAcc = frigAcc + frigInc
     end
 
-    --------------------------------------------
     -- Create the master platoon builder
-    --------------------------------------------
-    Scenario.Armies.ARMY_1.PlatoonBuilders.Builders['OSB_Master_' .. name] =
-    {
+
+    builders[masterPlatoonName] = {
         PlatoonTemplate = 'OST_BLANK_TEMPLATE',
         Priority = BasePriority + 1 + levels,
         InstanceCount = 1,
         LocationType = 'MAIN',
         BuildTimeOut = -1,
         PlatoonType = 'Sea',
-        RequiresConstruction = true,
-        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua','DefaultOSBasePatrol',{'default_platoon'},{'default_platoon'}},
+        RequiresConstruction = false,
+        PlatoonAIFunction = {SPAI, 'DefaultOSBasePatrol', {'default_platoon'}, {'default_platoon'}},
         BuildConditions = {
             {
                 '/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
@@ -286,7 +416,7 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
                 {'default_master'}
             },
             {
-                '/lua/ai/opai/GenerateNaval.lua', 'FleetIsBuilt',
+                '/lua/ai/opai/generatenaval.lua', 'FleetIsBuilt',
                 {'default_master'},
                 {'default_master'},
             },
@@ -314,37 +444,20 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
     return Scenario
 end
 
-
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
----- function: FleetIsBuilt = BuildCondition   doc = "Please work function docs."
-----
----- parameter 0: string   aiBrain     = "default_brain"
----- parameter 1: string   master     = "default_master"
-----
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain CampaignAIBrain
+---@param master string
+---@return boolean
 function FleetIsBuilt(aiBrain, master)
     local fleetCounter = ScenarioFramework.AMPlatoonCounter(aiBrain, master..'_FleetChildren')
 
-    if fleetCounter >= 1 then
-        return true
-    else
-        return false
-    end
+    return fleetCounter >= 1
 end
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
----- function: ChildShouldBuild = BuildCondition   doc = "Please work function docs."
-----
----- parameter 0: string   aiBrain     = "default_brain"
----- parameter 1: string   master     = "default_master"
-----
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain CampaignAIBrain
+---@param master string
+---@return boolean
 function ChildShouldBuild(aiBrain, master)
     local fleetCounter = ScenarioFramework.AMPlatoonCounter(aiBrain, master..'_FleetChildren')
 
-    if fleetCounter < 1 then
-        return true
-    else
-        return false
-    end
+    return fleetCounter < 1
 end
