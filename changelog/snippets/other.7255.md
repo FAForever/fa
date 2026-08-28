@@ -1,1 +1,0 @@
-- Annotate the TauntManager class (#7255).

@@ -1,1 +1,0 @@
-- Fix chat messages not showing in replays (#7257).

@@ -1,1 +1,0 @@
-- Add `aibrain:AssignUnitToPlatoon()` function for a single unit, where the table passed to `AssignUnitsToPlatoon` is cached and just the single unit swapped, just like how the `IssueToUnit` commands work (#7260).
