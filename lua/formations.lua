@@ -865,7 +865,7 @@ function GuardFormation(formationUnits)
     return FormationPos
 end
 
--- =========== LAND BLOCK BUILDING =================
+--#region Land Block Building
 
 ---@param unitsList table<LandCategoryNames | NavalCategoryNames | SubCategoryNames, FormationLayerFootprints> | FormationLayerCommonData
 ---@param categoryTable EntityCategory[]
@@ -1107,8 +1107,9 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable)
 
     return FormationPos
 end
+--#endregion
+--#region Air Block Building
 
--- ============ AIR BLOCK BUILDING =============
 ---@param unitsList table<AirCategoryNames, FormationLayerFootprints> | FormationLayerCommonData
 ---@param airBlock FormationBlockAir # ChevronSize defaults to 5
 ---@param spacing? number defaults to 1
@@ -1421,4 +1422,5 @@ function GetChevronPosition(chevronPos, currCol, formationLen)
     xPos = xPos + blockOff
     return xPos, yPos
 end
+--#endregion
 --#endregion
