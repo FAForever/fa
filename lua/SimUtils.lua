@@ -1437,8 +1437,12 @@ function DisableAI(self)
             if not unit.Dead then
                 local handle = unit.PlatoonHandle
                 if handle and self:PlatoonExists(handle) then
-                    handle:Stop()
-                    handle:PlatoonDisbandNoAssign()
+                    if handle.Stop then
+                        handle:Stop()
+                    end
+                    if handle.PlatoonDisbandNoAssig then
+                        handle:PlatoonDisbandNoAssign()
+                    end
                 end
                 IssueStop({ unit })
                 IssueToUnitClearCommands(unit)
