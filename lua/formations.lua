@@ -1135,7 +1135,7 @@ end
 
 ---@param unitsList table<AirCategoryNames, FormationLayerFootprints> | FormationLayerCommonData
 ---@param airBlock FormationBlockAir
----@return FormationPos[]
+---@return FormationLargeAirPos[]
 function GetLargeAirPositions(unitsList, airBlock)
     local sizeCounts = {}
     local footprintCounts = unitsList.FootprintCounts
@@ -1152,7 +1152,7 @@ function GetLargeAirPositions(unitsList, airBlock)
     local currRowLen = 0
     local wideRow = false
     local formationLength = -1
-    local results = {}
+    local results = {} ---@type FormationLargeAirPos[]
     local numResults = 0
     for size, count in sizeCounts do
         local radius = size / 2
@@ -1194,6 +1194,13 @@ function GetLargeAirPositions(unitsList, airBlock)
                 end
             end
             if not blocked then
+                ---@class FormationLargeAirPos
+                ---@field row integer
+                ---@field col integer
+                ---@field xPos number
+                ---@field yPos number
+                ---@field size integer # footprint size max
+
                 TableInsert(results, {row = whichRow, col = whichCol, xPos = xPos, yPos = yPos, size = size})
                 count = count - 1
                 numResults = numResults + 1
