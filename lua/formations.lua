@@ -1381,7 +1381,7 @@ function GetLargeAirPositions(unitsList, airBlock)
     return results
 end
 
----@param chevronPos Vector
+---@param chevronPos number
 ---@param currCol number
 ---@param formationLen number
 ---@return number xPos
