@@ -62,6 +62,9 @@ ComboFormations = {
 
 ---@type FormationPos[]
 local FormationPos = {} -- list to be returned
+
+--#region Formation caching
+
 local FormationCache = {}
 local MaxCacheSize = 30
 
@@ -107,13 +110,14 @@ function CacheResults(results, formationUnits, formationType)
     end
     TableInsert(cache, 1, {Results = results, Units = formationUnits, UnitCount = TableGetn(formationUnits)})
 end
+--#endregion
+--#region Formation Block Data
+--#region Land Data
 
--- =========================================
--- ================ LAND DATA ==============
--- =========================================
 local RemainingCategory = { 'RemainingCategory', }
 
--- === SUB GROUP ORDERING ===
+--#region Subgroup ordering
+
 local Bots = { 'Bot4', 'Bot3', 'Bot2', 'Bot1', }
 local Tanks = { 'Tank4', 'Tank3', 'Tank2', 'Tank1', }
 local DF = { 'Tank4', 'Bot4', 'Tank3', 'Bot3', 'Tank2', 'Bot2', 'Tank1', 'Bot1', }
@@ -123,17 +127,17 @@ local AA = { 'AA3', 'AA2', 'AA1', }
 local Util = { 'Util4', 'Util3', 'Util2', 'Util1', }
 local Com = { 'Com4', 'Com3', 'Com2', 'Com1', }
 local Shield = { 'Shields', }
+--#endregion
+--#region Land Block Types
 
--- === LAND BLOCK TYPES =
 local DFFirst = { DF, T1Art, AA, Shield, Com, Util, RemainingCategory }
 local ShieldFirst = { Shield, AA, DF, T1Art, Com, Util, RemainingCategory }
 local AAFirst = { AA, DF, T1Art, Shield, Com, Util, RemainingCategory }
 local ArtFirst = { Art, DF, AA, Shield, Com, Util, RemainingCategory }
 local T1ArtFirst = { T1Art, DF, AA, Shield, Com, Util, RemainingCategory }
 local UtilFirst = { Util, AA, Shield, DF, T1Art, Com, RemainingCategory }
-
-
--- === LAND BLOCKS ===
+--#endregion
+--#region Land Blocks
 
 -- === 3 Wide Attack Block / 3 Units ===
 local ThreeWideAttackFormationBlock = {
@@ -308,12 +312,11 @@ local EightRowAttackFormationBlock = {
     -- eight row
     { AAFirst, ShieldFirst, ArtFirst, AAFirst, ShieldFirst, ArtFirst, ShieldFirst, AAFirst, ShieldFirst, ArtFirst, ArtFirst, ShieldFirst, AAFirst, ShieldFirst, ArtFirst, ShieldFirst, AAFirst, ArtFirst, ShieldFirst, AAFirst },
 }
+--#endregion
+--#endregion
+--#region Air Data
+--#region Subgroup Ordering
 
--- =========================================
--- ================ AIR DATA ===============
--- =========================================
-
--- === SUB GROUP ORDERING ===
 local GroundAttack = { 'Ground3', 'Ground2', 'Ground1', }
 local Transports = { 'Trans3', 'Trans2', 'Trans1', }
 local Bombers = { 'Bomb3', 'Bomb2', 'Bomb1', }
@@ -323,8 +326,9 @@ local AntiNavy = { 'AN3', 'AN2', 'AN1', }
 local Intel = { 'AIntel3', 'AIntel2', 'AIntel1', }
 local ExperAir = { 'AExper', }
 local EngAir = { 'AEngineer', }
+--#endregion
+--#region Air Block Arrangement
 
--- === Air Block Arrangement ===
 local ChevronSlot = { AntiAir, ExperAir, AntiNavy, GroundAttack, Bombers, Intel, Transports, EngAir, RemainingCategory }
 local StratSlot = { T3Bombers }
 
@@ -380,14 +384,12 @@ local GrowthChevronBlock = {
     { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
     { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, }, -- 7 -> 9 at 545 units
 }
+--#endregion
+--#endregion
+--#region Naval Data
 
+--#region Subgroup Ordering
 
-
--- =========================================
--- ============== NAVAL DATA ===============
--- =========================================
-
--- === SUB GROUP ORDERING ===
 local Frigates = { 'FrigateCount', 'LightCount', }
 local Destroyers = { 'DestroyerCount', }
 local Cruisers = { 'CruiserCount', }
@@ -396,8 +398,9 @@ local Subs = { 'SubCount', }
 local NukeSubs = { 'NukeSubCount', }
 local Carriers = { 'CarrierCount', }
 local Sonar = {'MobileSonarCount', }
+--#endregion
+--#region Naval Block Types
 
--- === NAVAL BLOCK TYPES =
 local FrigatesFirst = { Frigates, Destroyers, Battleships, Cruisers, Carriers, NukeSubs, Sonar, RemainingCategory }
 local DestroyersFirst = { Destroyers, Frigates, Battleships, Cruisers, Carriers, NukeSubs, Sonar, RemainingCategory }
 local CruisersFirst = { Cruisers, Carriers, Battleships, Destroyers, Frigates, NukeSubs, Sonar, RemainingCategory }
@@ -407,8 +410,8 @@ local LargestFirstAA = { Carriers, Battleships, Cruisers, Destroyers, Frigates, 
 local SmallestFirstAA = { Cruisers, Frigates, Destroyers, Sonar, Carriers, Battleships, NukeSubs, RemainingCategory }
 local Subs = { Subs, NukeSubs, RemainingCategory }
 local SonarFirst = { Sonar, Carriers, Cruisers, Battleships, Destroyers, Frigates, NukeSubs, Sonar, RemainingCategory }
-
--- === NAVAL BLOCKS ===
+--#endregion
+--#region Naval Blocks
 
 -- === Three Naval Growth Formation Block ==
 local ThreeNavalGrowthFormation = {
@@ -470,10 +473,8 @@ local NineNavalGrowthFormation = {
     -- fifth row
     { DestroyersFirst, DestroyersFirst, SmallestFirstAA, SmallestFirstAA, CruisersFirst, SmallestFirstAA, SmallestFirstAA, DestroyersFirst, DestroyersFirst },
 }
-
--- ==============================================
--- ============ Naval Attack Formation===========
--- ==============================================
+--#endregion
+--#region Naval Attack Formation
 
 -- === Five Wide Naval Attack Formation Block ==
 local FiveWideNavalAttackFormation = {
@@ -520,10 +521,9 @@ local ElevenWideNavalAttackFormation = {
     -- fourth row
     { DestroyersFirst, SmallestFirstAA, LargestFirstDF, SonarFirst, LargestFirstAA, CruisersFirst, LargestFirstAA, SonarFirst, LargestFirstDF, SmallestFirstAA, DestroyersFirst },
 }
+--#endregion
+--#region Sub Growth Formation
 
--- ==============================================
--- ============ Sub Growth Formation===========
--- ==============================================
 -- === Four Wide Growth Subs Formation ===
 local FourWideSubGrowthFormation = {
     LineBreak = 0.5,
@@ -547,11 +547,8 @@ local EightWideSubGrowthFormation = {
     { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
     { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
 }
-
-
--- ==============================================
--- ============ Sub Attack Formation===========
--- ==============================================
+--#endregion
+--#region Sub Attack Formation
 
 -- === Four Wide Subs Formation ===
 local FourWideSubAttackFormation = {
@@ -585,8 +582,10 @@ local TenWideSubAttackFormation = {
     { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
     { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
 }
-
--- ============ Formation Pickers ============
+--#endregion
+--#endregion
+--#endregion
+--#region UI-Side Formation Pickers
 
 --- Called by the engine to determine which formation to use for user orders while traveling (distance > 200).
 --- 
@@ -615,10 +614,9 @@ function PickBestFinalFormationIndex(typeName, distance)
     LOG(_G, 'PickBestFinalFormationIndex', typeName, distance)
     return -1;
 end
+--#endregion
+--#region Sim-Side Formation Functions
 
--- ================ THE GUTS ====================
--- ============ Formation Functions =============
--- ==============================================
 ---@param formationUnits Unit[]
 ---@return FormationPos[]
 function AttackFormation(formationUnits)
@@ -1404,3 +1402,4 @@ function GetChevronPosition(chevronPos, currCol, formationLen)
     xPos = xPos + blockOff
     return xPos, yPos
 end
+--#endregion
