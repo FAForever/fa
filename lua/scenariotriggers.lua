@@ -22,6 +22,7 @@ local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 
 ---@alias ArmyStatType
 ---| "Units_Active"
+---| "Units_BeingBuilt"
 ---| "Units_Killed"
 ---| "Units_History"
 ---| "Enemies_Killed"
@@ -315,7 +316,7 @@ end
 ---@param callback fun(blip: Blip)
 ---@param aiBrain AIBrain
 ---@param reconType string
----@param blip? Blip|false
+---@param blip? Unit|false
 ---@param value boolean
 ---@param category EntityCategory
 ---@param onceOnly boolean
