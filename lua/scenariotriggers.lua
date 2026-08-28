@@ -22,6 +22,7 @@ local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 
 ---@alias ArmyStatType
 ---| "Units_Active"
+---| "Units_BeingBuilt"
 ---| "Units_Killed"
 ---| "Units_History"
 ---| "Enemies_Killed"
