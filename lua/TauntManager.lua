@@ -33,8 +33,8 @@ local tableRandom = table.random
 ---@field Active boolean
 ---@field Name string Name of the taunt manager
 ---@field TauntingCharacter? Unit
----@field protected FileName string
----@field protected FileData table<string, DialogueTable>
+---@field protected FileName? string
+---@field protected FileData? table<string, DialogueTable>
 ---@field protected CustomTaunts table<string, integer>
 ---@field protected PlayedTaunts table<string, boolean> Keeps track of taunt that were already played
 ---@field protected TauntNumber integer
