@@ -116,7 +116,10 @@ Button = ClassUI(Bitmap) {
                     self:SetTexture(self.mHighlight)
                     self:OnRolloverEvent('exit')
                     self:OnClick(event.Modifiers)
-                    self:Play()
+                    -- OnClick event may destroy us, ex: eschandler's QuickDialog
+                    if not IsDestroyed(self) then
+                        self:Play()
+                    end
                 end
             end
             dragger.OnCancel = function(dragger)
