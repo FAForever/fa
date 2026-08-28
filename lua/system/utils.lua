@@ -677,12 +677,14 @@ end
 
 --- Adds comma as thousands separator in specified value
 --- e.g. StringComma(10000) --> 10,000
+---@param value number
 ---@return string
 function StringComma(value)
-    local str = value or 0
+    local str = value or 0 ---@type number | string
     while true do
       local k
       str, k = string.gsub(str, "^(-?%d+)(%d%d%d)", '%1,%2')
+      ---@cast str string
       if k == 0 then
         break
       end
