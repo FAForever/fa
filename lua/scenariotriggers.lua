@@ -315,7 +315,7 @@ end
 ---@param callback fun(blip: Blip)
 ---@param aiBrain AIBrain
 ---@param reconType string
----@param blip? Blip|false
+---@param blip? Unit|false
 ---@param value boolean
 ---@param category EntityCategory
 ---@param onceOnly boolean
