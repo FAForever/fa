@@ -1,1 +1,1 @@
-- Your explanation here... [Don't forget to change the category in the filename] (#7257).
+- Fix chat messages not showing in replays (#7257).
