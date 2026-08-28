@@ -2378,7 +2378,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         local aiBrain = self:GetAIBrain()
         for k, v in aiBrain.UnitBuiltTriggerList do
             if v.Callback == callback then
-                callback(self)
+                local ok, msg = pcall(callback, self)
+                if not ok then
+                    WARN('Error running UnitBuiltPercentage callback', msg)
+                end
                 aiBrain.UnitBuiltTriggerList[k] = nil
             end
         end

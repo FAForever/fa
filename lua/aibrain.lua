@@ -17,6 +17,7 @@ local UpdateUnitCap = SimUtils.UpdateUnitCap
 local SimPingOnArmyDefeat = import("/lua/simping.lua").OnArmyDefeat
 local RecallOnArmyDefeat = import("/lua/sim/recall.lua").OnArmyDefeat
 local FakeTeleportUnits = import("/lua/scenarioframework.lua").FakeTeleportUnits
+local AssertFaParams = import("/lua/shared/fatypeutils.lua").AssertFaParams
 
 local StorageManagerBrainComponent = import("/lua/aibrains/components/storagemanagerbraincomponent.lua").StorageManagerBrainComponent
 local FactoryManagerBrainComponent = import("/lua/aibrains/components/factorymanagerbraincomponent.lua").FactoryManagerBrainComponent
@@ -335,14 +336,14 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         end
     end,
 
+    --- Adds callback that runs once when a unit in `category` reaches `percent`
+    --- build progress.
     ---@param self AIBrain
     ---@param callback fun(unit:Unit)
     ---@param category EntityCategory
     ---@param percent number
     AddUnitBuiltPercentageCallback = function(self, callback, category, percent)
-        if not callback or not category or not percent then
-            error('*ERROR: Attempt to add UnitBuiltPercentageCallback but invalid data given', 2)
-        end
+        AssertFaParams(callback, 'function', category, 'EntityCategory', percent, 'number')
 
         local unitBuiltTriggerList = self.UnitBuiltTriggerList
         if not unitBuiltTriggerList then
