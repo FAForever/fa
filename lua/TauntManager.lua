@@ -10,8 +10,10 @@
 local TriggerFile = import("/lua/scenariotriggers.lua")
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 
-local pairs, type = pairs, type
-local ForkThread, WaitSeconds = ForkThread, WaitSeconds
+local pairs = pairs
+local type = type
+local ForkThread = ForkThread
+local WaitSeconds = WaitSeconds
 local mathCeil = math.ceil
 local tableEmpty = table.empty
 local tableInsert = table.insert
