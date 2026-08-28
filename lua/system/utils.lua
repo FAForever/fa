@@ -694,6 +694,7 @@ end
 
 --- Prepends a string with specified symbol or one space
 ---@param str string
+---@param symbol string? # Defaults to `" "`
 ---@return string
 function StringPrepend(str, symbol)
     if not symbol then symbol = ' ' end
