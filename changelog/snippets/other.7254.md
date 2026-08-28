@@ -1,0 +1,1 @@
+- Fix annotations in cinematics.lua (#7254).
