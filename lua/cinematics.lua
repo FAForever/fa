@@ -127,6 +127,7 @@ function CameraTrackEntities(units, zoom, seconds)
     if army ~= -1 then
         for i, v in units do
             if army ~= v.Army then
+                ---@cast units Blip[]
                 units[i] = v:GetBlip(army)
             end
         end
