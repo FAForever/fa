@@ -35,6 +35,7 @@ function SetInvincible(area, invinBool)
                 table.insert(checkAreas, ScenarioUtils.AreaToRect(v))
             end
         elseif area then
+            ---@cast area -table
             table.insert(checkAreas, ScenarioUtils.AreaToRect(area))
         end
 
