@@ -4192,26 +4192,31 @@ float4 ShieldSeraphimPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
     float4 uvaddress = tex2D( normalsSampler, vertex.texcoord1.xy );
     float2 texcoord = vertex.texcoord0.xy + (uvaddress.rb * 0.1);
     float4 specular = tex2D( specularSampler, texcoord );
+    float3 albedo = tex2D(albedoSampler, vertex.texcoord0.zw);
+    float3 n = normalize(vertex.normal);
+    float3 v = normalize(vertex.viewDirection);
 
-    float relative_height = abs(dot(float4(0,1,0,0), normalize(vertex.normal)));
+    float relative_height = abs(dot(float4(0,1,0,0), n));
     float height_cutoff = 0.753;
-    float opacity;
-    if( relative_height < height_cutoff ){
-        opacity = 1.0;
-    } else {
-        // Decrease the factor linearly to 0.3 at the top
-        opacity = 1.0 - 0.7 * (relative_height - height_cutoff) / (1.0 - height_cutoff);
-    }
+    // Decrease the opacity linearly to 0 at the top
+    float opacity = saturate((1.0 - relative_height) / (1.0 - height_cutoff));;
 
-    const float max_brightness = 0.453;
     float dp = abs(cos(dot(float4(0,1,0,0), normal)));
-    float clamped_dp = max_brightness - clamp((1.0 - dp), 0, max_brightness);
-    float ndotv = abs(dot(vertex.viewDirection,normal));
+    float clamped_dp = max(dp - 0.547, 0) * 1.75;
+    float ndotv = abs(dot(v, normal));
 
-    float alpha = opacity * 1.75 * (ndotv * 0.3 + clamped_dp);
+    float alpha = ndotv * 0.2 + clamped_dp;
+    alpha *= specular.rgb;
+    alpha += PBR2(v, vertex.depth, 0.2, n).x * 0.3;
+    alpha *= dp * dp * opacity;
     alpha *= shieldWaterAbsorption(vertex.depth.x);
 
-    float3 color = float3(0.425, 0.76274, 1.0) * dp * dp * specular.rgb;
+    float3 color = float3(0.425, 0.76274, 1.0);
+
+    // Adjust color of shield based on its health percentage
+    float3 colorMod = lerp(color, float3(1.0, 0.6, 0.2), albedo.g * 1.5);
+    colorMod = lerp(color, colorMod, (sin(frac( 0.03 * time) * PI * 2) + 1) * 0.5);
+    color = lerp(colorMod, color, vertex.material.y);
 
     return float4(color, alpha);
 }
@@ -8036,21 +8041,12 @@ technique ShieldSeraphim_MedFidelity
     pass P0
     {
         AlphaState( AlphaBlend_SrcAlpha_One_Write_RGB )
-        RasterizerState( Rasterizer_Cull_None )
-        DepthState( Depth_Enable_LessEqual_Write_None )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a EnvironmentPS();
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_One_Write_RGB )
 
         RasterizerState( Rasterizer_Cull_None )
         DepthState( Depth_Enable_LessEqual_Write_None )
 
-        VertexShader = compile vs_1_1 ShieldNormalVS(5,1,1,11, -0.00153,-0.0159, 0,0, 0.003,-0.0045, -0.005,-0.045 );
-        PixelShader = compile ps_2_0 ShieldSeraphimPS();
+        VertexShader = compile vs_1_1 ShieldNormalVS(5,1,1,11, -0.00153,-0.0159, 0,0.005, 0.003,-0.0045, -0.005,-0.045 );
+        PixelShader = compile ps_2_a ShieldSeraphimPS();
     }
 }
 
