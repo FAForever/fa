@@ -4,11 +4,11 @@
 --------------------------------------------------------------------------------------------------------------------------------------------
 Changelog = {
     Version = 3839,
-    Title = "Game Patch",
+    Title = "Hotfix",
     Description = {
         "# Game version 3839 (August 28, 2026)",
         "",
-        "Your introduction here",
+        "Chat messages were not showing up in replays, due to an oversight, which made another hotfix necessary.",
         "",
         "With gratitude to all those who contributed to this patch and/or took the time to report issues,",
         "",
@@ -49,6 +49,10 @@ Changelog = {
         "",
         "## Contributors",
         "",
-        "With thanks to the following contributors:"
+        "With thanks to the following contributors:",
+        "",
+        "- HotCheese",
+        "- Nomander",
+        "- Speed2"
     }
 }
