@@ -23,6 +23,24 @@
 ---@field [4] integer # moveDelay: engine initiates pathfinding with a delay, with lower numbers going first
 ---@field [5] boolean # rotate: unknown 
 
+---@class FormationBlock
+---@field [integer] FormationBlockType[] # Row, column format
+
+---@class FormationBlockType
+---@field [integer] FormationSubgroup
+
+---@class FormationSubgroup
+---@field [integer] FormationCategoryNames
+
+---@class FormationBlockAir : FormationBlock
+---@field RepeatAllRows? boolean
+---@field HomogenousBlocks? boolean
+---@field ChevronSize? number
+
+---@class FormationBlockLand : FormationBlock
+---@field LineBreak? number
+---@field HomogenousRows? boolean
+
 local LandCategories = import("/lua/shared/formations/categorizeunits.lua").LandCategories
 local NavalCategories = import("/lua/shared/formations/categorizeunits.lua").NavalCategories
 local SubCategories = import("/lua/shared/formations/categorizeunits.lua").SubCategories
@@ -848,8 +866,8 @@ function GuardFormation(formationUnits)
 end
 
 -- =========== LAND BLOCK BUILDING =================
----@param unitsList table
----@param formationBlock any
+---@param unitsList table<LandCategoryNames | NavalCategoryNames | SubCategoryNames, FormationLayerFootprints> | FormationLayerCommonData
+---@param formationBlock FormationBlockLand
 ---@param categoryTable EntityCategory[]
 ---@return FormationPos[]
 function BlockBuilderLand(unitsList, formationBlock, categoryTable)
@@ -978,7 +996,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable)
     return FormationPos
 end
 
----@param unitsList table
+---@param unitsList table<LandCategoryNames | NavalCategoryNames | SubCategoryNames, FormationLayerFootprints> | FormationLayerCommonData
 ---@param categoryTable EntityCategory[]
 ---@param currRowLen number
 ---@return number
@@ -1090,8 +1108,8 @@ function GetColSpot(rowLen, col)
 end
 
 -- ============ AIR BLOCK BUILDING =============
----@param unitsList table
----@param airBlock any
+---@param unitsList table<AirCategoryNames, FormationLayerFootprints> | FormationLayerCommonData
+---@param airBlock FormationBlockAir # ChevronSize defaults to 5
 ---@param spacing? number defaults to 1
 ---@return FormationPos[]
 function BlockBuilderAir(unitsList, airBlock, spacing)
@@ -1199,7 +1217,7 @@ function BlockBuilderAir(unitsList, airBlock, spacing)
     return FormationPos
 end
 
----@param unitsList table
+---@param unitsList table<AirCategoryNames, FormationLayerFootprints> | FormationLayerCommonData
 ---@param spacing number? number defaults to 1
 ---@return FormationPos[]
 function BlockBuilderAirT3Bombers(unitsList, spacing)
@@ -1207,7 +1225,7 @@ function BlockBuilderAirT3Bombers(unitsList, spacing)
     --Some parts can be improved, but I just want stable and working version, so I did minimum adjustments and that's it.
 
     spacing = (spacing or 1) * unitsList.Scale
-    local airBlock = {}
+    local airBlock ---@type FormationBlockAir
 
     if unitsList.Bomb3[1].Count > 20 then
         airBlock = {
@@ -1306,8 +1324,8 @@ function BlockBuilderAirT3Bombers(unitsList, spacing)
     return FormationPos
 end
 
----@param unitsList table
----@param airBlock any
+---@param unitsList table<AirCategoryNames, FormationLayerFootprints> | FormationLayerCommonData
+---@param airBlock FormationBlockAir
 ---@return FormationPos[]
 function GetLargeAirPositions(unitsList, airBlock)
     local sizeCounts = {}
