@@ -1,1 +1,0 @@
-- Fixed Faction index build condition for campaign platoons, causing some platoons not being built properly

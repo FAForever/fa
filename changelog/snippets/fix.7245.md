@@ -1,1 +1,0 @@
-- Fix damage and splash radius modifiers not applying to weapons such as nukes that have splash damage with falloff (#7245).
