@@ -656,7 +656,8 @@ function StringSplit(str, sep)
     sep = sep or ":"
     local fields = {}
     local pattern = string.format("([^%s]+)", sep)
-    local _ = str:gsub(pattern, function(c) fields[table.getn(fields)+1] = c end)
+    ---@diagnostic disable-next-line: discard-returns
+    str:gsub(pattern, function(c) fields[table.getn(fields)+1] = c end)
     return fields
 end
 
@@ -717,7 +718,8 @@ end
 ---@return string
 function StringReverse(str)
     local tbl =  {}
-    local _ = str:gsub(".", function(c) table.insert(tbl,c) end)
+    ---@diagnostic disable-next-line: discard-returns
+    str:gsub(".", function(c) table.insert(tbl,c) end)
     tbl = table.reverse(tbl)
     return table.concat(tbl)
 end
