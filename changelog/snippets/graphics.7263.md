@@ -1,1 +1,1 @@
-- Your explanation here... [Don't forget to change the category in the filename] (#XYZW).
+- Double the resolution of the shield dome mesh and clean up the shader code (#7263).
