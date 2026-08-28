@@ -32,7 +32,7 @@ local tableRandom = table.random
 ---@class TauntManager
 ---@field Active boolean
 ---@field Name string Name of the taunt manager
----@field TauntingCharacter Unit|nil
+---@field TauntingCharacter? Unit
 ---@field protected FileName string
 ---@field protected FileData table<string, DialogueTable>
 ---@field protected CustomTaunts table<string, integer>
