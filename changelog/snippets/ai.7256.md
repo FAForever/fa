@@ -1,0 +1,1 @@
+- Add guards for platoon function calls in the DisablAI function to stop errors during the OnDefeat call.
