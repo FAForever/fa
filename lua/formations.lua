@@ -1110,6 +1110,103 @@ end
 --#endregion
 --#region Air Block Building
 
+---@param chevronPos number
+---@param currCol number
+---@param formationLen number
+---@return number xPos
+---@return number yPos
+function GetChevronPosition(chevronPos, currCol, formationLen)
+    local offset = MathFloor(chevronPos / 2)
+    local xPos = offset * 0.5
+    if MathMod(chevronPos, 2) == 0 then
+        xPos = -xPos
+    end
+    local column = MathFloor(currCol / 2)
+    local yPos = (-offset + column * column) * 0.86603
+    yPos = yPos - formationLen * 1.73205
+    local blockOff = MathFloor(currCol / 2) * 2.5
+    if MathMod(currCol, 2) == 1 then
+        blockOff = -blockOff
+    end
+    xPos = xPos + blockOff
+    return xPos, yPos
+end
+
+---@param unitsList table<AirCategoryNames, FormationLayerFootprints> | FormationLayerCommonData
+---@param airBlock FormationBlockAir
+---@return FormationPos[]
+function GetLargeAirPositions(unitsList, airBlock)
+    local sizeCounts = {}
+    local footprintCounts = unitsList.FootprintCounts
+    for fs, count in footprintCounts do
+        local size = footprintCounts[fs]
+        if size > 1 then
+            sizeCounts[size] = (sizeCounts[size] or 0) + count
+        end
+    end
+
+    local numRows = TableGetn(airBlock)
+    local whichRow = 0
+    local whichCol = 0
+    local currRowLen = 0
+    local wideRow = false
+    local formationLength = -1
+    local results = {}
+    local numResults = 0
+    for size, count in sizeCounts do
+        local radius = size / 2
+        while count > 0 do
+            if whichCol >= currRowLen or count == 1 then
+                if whichRow >= numRows then
+                    if airBlock.RepeatAllRows then
+                        whichRow = 1
+                        currRowLen = TableGetn(airBlock[whichRow])
+                    end
+                else
+                    whichRow = whichRow + 1
+                    currRowLen = TableGetn(airBlock[whichRow])
+                end
+                formationLength = formationLength + 1
+                whichCol = 1
+                local x, y = GetChevronPosition(1, currRowLen, formationLength)
+                wideRow = MathAbs(x) >= radius
+            else
+                whichCol = whichCol + 2
+            end
+
+            if count == 2 and whichCol == 1 and wideRow then
+                continue
+            end
+
+            local xPos, yPos = GetChevronPosition(1, whichCol, formationLength)
+            if whichCol ~= 1 and MathAbs(xPos) < radius then
+                continue
+            end
+
+            -- Exponential complexity isn't fun but this should run in under 0.03 seconds on a slow CPU with 500 CZARs.
+            local blocked = false
+            for i = numResults, 1, -1 do -- Don't change this to a simple forward loop or it can take 15x as long with large numbers.
+                local data = results[i]
+                if VDist2(xPos, yPos, data.xPos, data.yPos) < radius + data.size / 2 then
+                    blocked = true
+                    break
+                end
+            end
+            if not blocked then
+                TableInsert(results, {row = whichRow, col = whichCol, xPos = xPos, yPos = yPos, size = size})
+                count = count - 1
+                numResults = numResults + 1
+                if whichCol ~= 1 then
+                    TableInsert(results, {row = whichRow, col = whichCol - 1, xPos = -xPos, yPos = yPos, size = size})
+                    count = count - 1
+                    numResults = numResults + 1
+                end
+            end
+        end
+    end
+    return results
+end
+
 ---@param unitsList table<AirCategoryNames, FormationLayerFootprints> | FormationLayerCommonData
 ---@param airBlock FormationBlockAir # ChevronSize defaults to 5
 ---@param spacing? number defaults to 1
@@ -1326,101 +1423,5 @@ function BlockBuilderAirT3Bombers(unitsList, spacing)
     return FormationPos
 end
 
----@param unitsList table<AirCategoryNames, FormationLayerFootprints> | FormationLayerCommonData
----@param airBlock FormationBlockAir
----@return FormationPos[]
-function GetLargeAirPositions(unitsList, airBlock)
-    local sizeCounts = {}
-    local footprintCounts = unitsList.FootprintCounts
-    for fs, count in footprintCounts do
-        local size = footprintCounts[fs]
-        if size > 1 then
-            sizeCounts[size] = (sizeCounts[size] or 0) + count
-        end
-    end
-
-    local numRows = TableGetn(airBlock)
-    local whichRow = 0
-    local whichCol = 0
-    local currRowLen = 0
-    local wideRow = false
-    local formationLength = -1
-    local results = {}
-    local numResults = 0
-    for size, count in sizeCounts do
-        local radius = size / 2
-        while count > 0 do
-            if whichCol >= currRowLen or count == 1 then
-                if whichRow >= numRows then
-                    if airBlock.RepeatAllRows then
-                        whichRow = 1
-                        currRowLen = TableGetn(airBlock[whichRow])
-                    end
-                else
-                    whichRow = whichRow + 1
-                    currRowLen = TableGetn(airBlock[whichRow])
-                end
-                formationLength = formationLength + 1
-                whichCol = 1
-                local x, y = GetChevronPosition(1, currRowLen, formationLength)
-                wideRow = MathAbs(x) >= radius
-            else
-                whichCol = whichCol + 2
-            end
-
-            if count == 2 and whichCol == 1 and wideRow then
-                continue
-            end
-
-            local xPos, yPos = GetChevronPosition(1, whichCol, formationLength)
-            if whichCol ~= 1 and MathAbs(xPos) < radius then
-                continue
-            end
-
-            -- Exponential complexity isn't fun but this should run in under 0.03 seconds on a slow CPU with 500 CZARs.
-            local blocked = false
-            for i = numResults, 1, -1 do -- Don't change this to a simple forward loop or it can take 15x as long with large numbers.
-                local data = results[i]
-                if VDist2(xPos, yPos, data.xPos, data.yPos) < radius + data.size / 2 then
-                    blocked = true
-                    break
-                end
-            end
-            if not blocked then
-                TableInsert(results, {row = whichRow, col = whichCol, xPos = xPos, yPos = yPos, size = size})
-                count = count - 1
-                numResults = numResults + 1
-                if whichCol ~= 1 then
-                    TableInsert(results, {row = whichRow, col = whichCol - 1, xPos = -xPos, yPos = yPos, size = size})
-                    count = count - 1
-                    numResults = numResults + 1
-                end
-            end
-        end
-    end
-    return results
-end
-
----@param chevronPos number
----@param currCol number
----@param formationLen number
----@return number xPos
----@return number yPos
-function GetChevronPosition(chevronPos, currCol, formationLen)
-    local offset = MathFloor(chevronPos / 2)
-    local xPos = offset * 0.5
-    if MathMod(chevronPos, 2) == 0 then
-        xPos = -xPos
-    end
-    local column = MathFloor(currCol / 2)
-    local yPos = (-offset + column * column) * 0.86603
-    yPos = yPos - formationLen * 1.73205
-    local blockOff = MathFloor(currCol / 2) * 2.5
-    if MathMod(currCol, 2) == 1 then
-        blockOff = -blockOff
-    end
-    xPos = xPos + blockOff
-    return xPos, yPos
-end
 --#endregion
 --#endregion
