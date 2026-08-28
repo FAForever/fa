@@ -12,6 +12,17 @@
 
 ---@alias UnitFormations 'AttackFormation' | 'GrowthFormation' | 'NoFormation' | 'None' | 'none'
 
+--- Table names that the engine accesses to get formation function names
+--- based on the motion type of the units a formation is being made for.
+---@alias FormationType 'SurfaceFormations' | 'AirFormations' | 'ComboFormations'
+
+---@class FormationPos
+---@field [1] number # xPos
+---@field [2] number # yPos
+---@field [3] EntityCategory # Category filter to use to assign units
+---@field [4] integer # moveDelay: engine initiates pathfinding with a delay, with lower numbers going first
+---@field [5] boolean # rotate: unknown 
+
 local LandCategories = import("/lua/shared/formations/categorizeunits.lua").LandCategories
 local NavalCategories = import("/lua/shared/formations/categorizeunits.lua").NavalCategories
 local SubCategories = import("/lua/shared/formations/categorizeunits.lua").SubCategories
@@ -49,6 +60,7 @@ ComboFormations = {
     'GrowthFormation',
 }
 
+---@type FormationPos[]
 local FormationPos = {} -- list to be returned
 local FormationCache = {}
 local MaxCacheSize = 30
@@ -81,7 +93,7 @@ function GetCachedResults(formationUnits, formationType)
     return false
 end
 
----@param results TLaserBotProjectile
+---@param results FormationPos[]
 ---@param formationUnits Unit[]
 ---@param formationType UnitFormations
 function CacheResults(results, formationUnits, formationType)
@@ -597,7 +609,7 @@ end
 -- ============ Formation Functions =============
 -- ==============================================
 ---@param formationUnits Unit[]
----@return table
+---@return FormationPos[]
 function AttackFormation(formationUnits)
     local cachedResults = GetCachedResults(formationUnits, 'AttackFormation')
     if cachedResults then
@@ -656,7 +668,7 @@ function AttackFormation(formationUnits)
 end
 
 ---@param formationUnits Unit[]
----@return table
+---@return FormationPos[]
 function GrowthFormation(formationUnits)
     local cachedResults = GetCachedResults(formationUnits, 'GrowthFormation')
     if cachedResults then
@@ -741,7 +753,7 @@ function GrowthFormation(formationUnits)
 end
 
 ---@param formationUnits Unit[]
----@return table
+---@return FormationPos[]
 function GuardFormation(formationUnits)
     -- Not worth caching GuardFormation because it's almost never called repeatedly with the same units.
     local FormationPos = {}
@@ -830,7 +842,7 @@ end
 ---@param unitsList table
 ---@param formationBlock any
 ---@param categoryTable EntityCategory[]
----@return table
+---@return FormationPos[]
 function BlockBuilderLand(unitsList, formationBlock, categoryTable)
     local spacing = unitsList.Scale
     local numRows = TableGetn(formationBlock)
@@ -1072,7 +1084,7 @@ end
 ---@param unitsList table
 ---@param airBlock any
 ---@param spacing? number defaults to 1
----@return table
+---@return FormationPos[]
 function BlockBuilderAir(unitsList, airBlock, spacing)
     spacing = (spacing or 1) * unitsList.Scale
     local numRows = TableGetn(airBlock)
@@ -1180,7 +1192,7 @@ end
 
 ---@param unitsList table
 ---@param spacing number? number defaults to 1
----@return table
+---@return FormationPos[]
 function BlockBuilderAirT3Bombers(unitsList, spacing)
     --This is modified copy of BlockBuilderAir(). This function is used only for t3 bombers.
     --Some parts can be improved, but I just want stable and working version, so I did minimum adjustments and that's it.
@@ -1287,7 +1299,7 @@ end
 
 ---@param unitsList table
 ---@param airBlock any
----@return table
+---@return FormationPos[]
 function GetLargeAirPositions(unitsList, airBlock)
     local sizeCounts = {}
     local footprintCounts = unitsList.FootprintCounts
