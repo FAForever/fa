@@ -177,6 +177,7 @@ end
 ---@param newCommandMode CommandMode
 ---@param data CommandModeData
 function StartCommandMode(newCommandMode, data)
+    LOG('StartCommandMode', newCommandMode, repr(data), debug.traceback())
     -- clean up previous command mode
     if commandMode then
         EndCommandMode(true)
@@ -205,6 +206,7 @@ function EndCommandMode(isCancel)
         modeData.isCancel = isCancel or false
 
         -- ???
+        LOG('end command mode iscancel', isCancel, 'modedata', repr(modeData), '\n'..debug.traceback())
         if modeData.isCancel then
             ClearBuildTemplates()
         end
