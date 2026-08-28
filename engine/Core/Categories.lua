@@ -129,6 +129,7 @@ categories = {
 
     --- Allows this unit to be built by engineers
     NEEDMOBILEBUILD = categoryValue,
+    --- Unit doesn't use a formation when assisting other units
     NOFORMATION = categoryValue,
     --- Prevents splash damage being applied to the entity
     NOSPLASHDAMAGE = categoryValue,
@@ -372,7 +373,7 @@ categories = {
 ---| "NAVALCARRIER"
 ---| "NAVAL"
 ---| "NEEDMOBILEBUILD"
----| "NOFORMATION"
+---| "NOFORMATION" # Unit doesn't use a formation when assisting other units
 ---| "NOSPLASHDAMAGE"
 ---| "NUKE"
 ---| "NUKESUB"
