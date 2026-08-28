@@ -1,1 +1,1 @@
-- Add guards for platoon function calls in the DisableAI function to stop errors during the OnDefeat call.
+- Fix error when an army is defeated related to missing AI platoon functions (#7256).
