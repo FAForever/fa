@@ -58,7 +58,7 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field Human boolean
 ---@field Civilian boolean
 ---@field Trash TrashBag
----@field UnitBuiltTriggerList table
+---@field UnitBuiltTriggerList UnitBuiltTrigger[]
 ---@field PingCallbackList { CallbackFunction: fun(self: AIBrain, pingData: SyncPingData), PingType: PingTypeLowercase }[]
 ---@field BrainType 'Human' | 'AI'
 ---@field CustomUnits { [string]: EntityId[] }
@@ -345,17 +345,18 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     AddUnitBuiltPercentageCallback = function(self, callback, category, percent)
         AssertFaParams(callback, 'function', category, 'EntityCategory', percent, 'number')
 
-        local unitBuiltTriggerList = self.UnitBuiltTriggerList
-        if not unitBuiltTriggerList then
-            unitBuiltTriggerList = {}
-            self.UnitBuiltTriggerList = unitBuiltTriggerList
-        end
-
-        table.insert(unitBuiltTriggerList, {
+        ---@class UnitBuiltTrigger
+        local trigger = {
             Callback = callback,
             Category = category,
             Percent = percent
-        })
+        }
+        local unitBuiltTriggerList = self.UnitBuiltTriggerList
+        if not unitBuiltTriggerList then
+            self.UnitBuiltTriggerList = { trigger }
+        else
+            table.insert(unitBuiltTriggerList, trigger)
+        end
     end,
 
     ---@param self AIBrain
