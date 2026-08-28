@@ -866,6 +866,118 @@ function GuardFormation(formationUnits)
 end
 
 -- =========== LAND BLOCK BUILDING =================
+
+---@param unitsList table<LandCategoryNames | NavalCategoryNames | SubCategoryNames, FormationLayerFootprints> | FormationLayerCommonData
+---@param categoryTable EntityCategory[]
+---@param currRowLen number
+---@return number
+function GetLandRowModifer(unitsList, categoryTable, currRowLen)
+    local unitTotal = unitsList.UnitTotal
+    if unitTotal >= currRowLen or MathMod(unitTotal, 2) == MathMod(currRowLen, 2) then
+        return 0
+    end
+
+    local sizeTotal = 0
+    local footprintSizes = unitsList.FootprintSizes
+    for group, _ in categoryTable do
+        for fs, data in unitsList[group] do
+            sizeTotal = sizeTotal + footprintSizes[fs] * data.Count
+        end
+    end
+    if sizeTotal < currRowLen then -- This doesn't allow for large units hanging over the sides, but it's too hard to handle that correctly.
+        return 1
+    else
+        return 0
+    end
+end
+
+---@param occupiedSpaces boolean[][]
+---@param size number
+---@param rowNum number
+---@param whichCol number
+---@param currRowLen number
+---@param remainingUnits number
+---@return boolean
+function IsLandSpaceOccupied(occupiedSpaces, size, rowNum, whichCol, currRowLen, remainingUnits)
+    local evenRowLen = MathMod(currRowLen, 2) == 0
+    local evenSize = MathMod(size, 2) == 0
+
+    if whichCol == 1 and (not evenRowLen) and evenSize and remainingUnits > 1 then -- Don't put an even-sized unit in the middle of an odd-length row unless it's the last unit
+        return true
+    end
+    if whichCol > currRowLen - MathFloor(size / 2) * 2 and size <= MathFloor(currRowLen / 2) then -- Don't put a large unit at the end of a row unless the row is too narrow
+        return true
+    end
+    for y = 0, size - 1, 1 do
+        local yPos = rowNum + y
+        if not occupiedSpaces[yPos] then
+            continue
+        end
+        if whichCol == 1 and evenRowLen == evenSize then
+            for x = 0, size - 1, 1 do
+                if occupiedSpaces[yPos][whichCol + x] then
+                    return true
+                end
+            end
+        else
+            for x = 0, (size - 1) * 2, 2 do
+                if occupiedSpaces[yPos][whichCol + x] then
+                    return true
+                end
+            end
+        end
+    end
+    return false
+end
+
+---@param occupiedSpaces boolean[][]
+---@param size number
+---@param rowNum number
+---@param whichCol number
+---@param currRowLen number
+function OccupyLandSpace(occupiedSpaces, size, rowNum, whichCol, currRowLen)
+    local evenRowLen = MathMod(currRowLen, 2) == 0
+    local evenSize = MathMod(size, 2) == 0
+
+    for y = 0, size - 1, 1 do
+        local yPos = rowNum + y
+        if not occupiedSpaces[yPos] then
+            occupiedSpaces[yPos] = {}
+        end
+        local occupiedYPos = occupiedSpaces[yPos]
+        if whichCol == 1 and evenRowLen == evenSize then
+            for x = 0, size - 1, 1 do
+                occupiedYPos[whichCol + x] = true
+            end
+        else
+            for x = 0, (size - 1) * 2, 2 do
+                occupiedYPos[whichCol + x] = true
+            end
+        end
+    end
+end
+
+---@param rowLen number
+---@param col number
+---@return number
+function GetColSpot(rowLen, col)
+    local len = rowLen
+    if MathMod(rowLen, 2) == 1 then
+        len = rowLen + 1
+    end
+    local colType = 'left'
+    if MathMod(col, 2) == 0 then
+        colType = 'right'
+    end
+    local colSpot = MathFloor(col / 2)
+    local halfSpot = len/2
+    if colType == 'left' then
+        return halfSpot - colSpot
+    else
+        return halfSpot + colSpot
+    end
+end
+
 ---@param unitsList table<LandCategoryNames | NavalCategoryNames | SubCategoryNames, FormationLayerFootprints> | FormationLayerCommonData
 ---@param formationBlock FormationBlockLand
 ---@param categoryTable EntityCategory[]
@@ -994,117 +1106,6 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable)
     end
 
     return FormationPos
-end
-
----@param unitsList table<LandCategoryNames | NavalCategoryNames | SubCategoryNames, FormationLayerFootprints> | FormationLayerCommonData
----@param categoryTable EntityCategory[]
----@param currRowLen number
----@return number
-function GetLandRowModifer(unitsList, categoryTable, currRowLen)
-    local unitTotal = unitsList.UnitTotal
-    if unitTotal >= currRowLen or MathMod(unitTotal, 2) == MathMod(currRowLen, 2) then
-        return 0
-    end
-
-    local sizeTotal = 0
-    local footprintSizes = unitsList.FootprintSizes
-    for group, _ in categoryTable do
-        for fs, data in unitsList[group] do
-            sizeTotal = sizeTotal + footprintSizes[fs] * data.Count
-        end
-    end
-    if sizeTotal < currRowLen then -- This doesn't allow for large units hanging over the sides, but it's too hard to handle that correctly.
-        return 1
-    else
-        return 0
-    end
-end
-
----@param occupiedSpaces boolean[][]
----@param size number
----@param rowNum number
----@param whichCol number
----@param currRowLen number
----@param remainingUnits number
----@return boolean
-function IsLandSpaceOccupied(occupiedSpaces, size, rowNum, whichCol, currRowLen, remainingUnits)
-    local evenRowLen = MathMod(currRowLen, 2) == 0
-    local evenSize = MathMod(size, 2) == 0
-
-    if whichCol == 1 and (not evenRowLen) and evenSize and remainingUnits > 1 then -- Don't put an even-sized unit in the middle of an odd-length row unless it's the last unit
-        return true
-    end
-    if whichCol > currRowLen - MathFloor(size / 2) * 2 and size <= MathFloor(currRowLen / 2) then -- Don't put a large unit at the end of a row unless the row is too narrow
-        return true
-    end
-    for y = 0, size - 1, 1 do
-        local yPos = rowNum + y
-        if not occupiedSpaces[yPos] then
-            continue
-        end
-        if whichCol == 1 and evenRowLen == evenSize then
-            for x = 0, size - 1, 1 do
-                if occupiedSpaces[yPos][whichCol + x] then
-                    return true
-                end
-            end
-        else
-            for x = 0, (size - 1) * 2, 2 do
-                if occupiedSpaces[yPos][whichCol + x] then
-                    return true
-                end
-            end
-        end
-    end
-    return false
-end
-
----@param occupiedSpaces boolean[][]
----@param size number
----@param rowNum number
----@param whichCol number
----@param currRowLen number
-function OccupyLandSpace(occupiedSpaces, size, rowNum, whichCol, currRowLen)
-    local evenRowLen = MathMod(currRowLen, 2) == 0
-    local evenSize = MathMod(size, 2) == 0
-
-    for y = 0, size - 1, 1 do
-        local yPos = rowNum + y
-        if not occupiedSpaces[yPos] then
-            occupiedSpaces[yPos] = {}
-        end
-        local occupiedYPos = occupiedSpaces[yPos]
-        if whichCol == 1 and evenRowLen == evenSize then
-            for x = 0, size - 1, 1 do
-                occupiedYPos[whichCol + x] = true
-            end
-        else
-            for x = 0, (size - 1) * 2, 2 do
-                occupiedYPos[whichCol + x] = true
-            end
-        end
-    end
-end
-
----@param rowLen number
----@param col number
----@return number
-function GetColSpot(rowLen, col)
-    local len = rowLen
-    if MathMod(rowLen, 2) == 1 then
-        len = rowLen + 1
-    end
-    local colType = 'left'
-    if MathMod(col, 2) == 0 then
-        colType = 'right'
-    end
-    local colSpot = MathFloor(col / 2)
-    local halfSpot = len/2
-    if colType == 'left' then
-        return halfSpot - colSpot
-    else
-        return halfSpot + colSpot
-    end
 end
 
 -- ============ AIR BLOCK BUILDING =============
