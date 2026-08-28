@@ -306,7 +306,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
             platoon.Base = nearestBase
             platoon.Brain = self
             setmetatable(platoon, import("/lua/aibrains/platoons/platoon-simple-engineer.lua").AIPlatoonEngineerSimple)
-            self:AssignUnitsToPlatoon(platoon, { unit }, 'Support', 'GrowthFormation')
+            self:AssignUnitToPlatoon(platoon, unit , 'Support', 'GrowthFormation')
             ChangeState(platoon, platoon.Start)
         end
 
