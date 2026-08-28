@@ -648,7 +648,7 @@ function EngineersBuildPlatoon(platoon)
                         end
                        )
                     end
-                    aiBrain:AssignUnitsToPlatoon(aiBrain.EngBuiltPlatoonList[buildingPlatoon], {unitBeingBuilt}, 'Attack', 'NoFormation')
+                    aiBrain:AssignUnitToPlatoon(aiBrain.EngBuiltPlatoonList[buildingPlatoon], unitBeingBuilt, 'Attack', 'NoFormation')
                 end
             end
             buildingPlatoon = false
@@ -1018,9 +1018,7 @@ function ReturnTransportsToPool(platoon, data)
         return
     end
 
-    for _, unit in transports do
-        aiBrain:AssignUnitsToPlatoon(tPool, {unit}, 'Scout', 'None')
-    end
+    aiBrain:AssignUnitsToPlatoon(tPool, transports, 'Scout', 'None')
 
     -- If a route or chain was given, reverse it on return
     if data.TransportRoute then
@@ -1869,7 +1867,7 @@ function GetLoadTransports(platoon)
     for _, unit in unitsToDrop do
         if not unit.Dead and not unit:IsUnitState('Attached') then
             unit:Kill()
-            -- aiBrain:AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
+            -- aiBrain:AssignUnitToPlatoon(pool, unit, 'Unassigned', 'None')
         end
     end
 
@@ -2228,7 +2226,7 @@ function GetTransportsThread(platoon)
                     for i = 1, table.getn(sortedList) do
                         if transportsNeeded then
                             local id = sortedList[i].Id
-                            aiBrain:AssignUnitsToPlatoon(platoon, {sortedList[i].Unit}, 'Scout', 'GrowthFormation')
+                            aiBrain:AssignUnitToPlatoon(platoon, sortedList[i].Unit, 'Scout', 'GrowthFormation')
                             numTransports = numTransports + 1
                             if not transSlotTable[id] then
                                 transSlotTable[id] = GetNumTransportSlots(sortedList[i].Unit)

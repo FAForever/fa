@@ -26,12 +26,13 @@ local CAiBrain = {}
 function CAiBrain:AssignThreatAtPosition(position, threat, decay, threatType)
 end
 
---- Assigns a unit to a platoon
+--- Assigns units to a platoon
 ---@param platoon moho.platoon_methods | string Either a reference to a platoon, or the unique name of the platoon
----@param unit Unit
+---@param units Unit[]
 ---@param squad PlatoonSquads
 ---@param formation UnitFormations
-function CAiBrain:AssignUnitsToPlatoon(platoon, unit, squad, formation)
+---@return UnitFormations #Returns the name of the formation
+function CAiBrain:AssignUnitsToPlatoon(platoon, units, squad, formation)
 end
 
 --- Orders factories to build a platoon.
