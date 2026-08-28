@@ -1440,7 +1440,7 @@ function DisableAI(self)
                     if handle.Stop then
                         handle:Stop()
                     end
-                    if handle.PlatoonDisbandNoAssig then
+                    if handle.PlatoonDisbandNoAssign then
                         handle:PlatoonDisbandNoAssign()
                     end
                 end
