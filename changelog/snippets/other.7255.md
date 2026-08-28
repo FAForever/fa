@@ -1,1 +1,1 @@
-- Added annotations to TauntManager class
+- Annotate the TauntManager class (#7255).
