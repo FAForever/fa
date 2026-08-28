@@ -9,6 +9,7 @@
 local UIUtil = import("/lua/ui/uiutil.lua")
 local Prefs = import("/lua/user/prefs.lua")
 
+---@type Popup | false
 local quickDialog = false
 
 -- Terminate the game in a vaguely graceful fashion. This may or may not reduce the amount of times
