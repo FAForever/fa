@@ -249,7 +249,7 @@ TauntManager = ClassSimple {
         TriggerFile.CreateArmyIntelTrigger(callback, lookingBrain, 'LOSNow', false, true, category, true, targetBrain)
     end,
 
-    ---TODO: figure out how exactly the trigger works with unit set, as they are no examples in the codebase.
+    ---Plays a taunt when Player sees `unit`
     ---@param self TauntManager
     ---@param diagData string|string[] Name of the dialogue or a list of names for the taunt. If it's a list, the taunt is picked randomly each time it's played. This name must be defined in the provided taunt file.
     ---@param unit Unit
@@ -258,7 +258,7 @@ TauntManager = ClassSimple {
         TriggerFile.CreateArmyIntelTrigger(callback, ArmyBrains[1], 'LOSNow', unit, true, categories.ALLUNITS, true, unit:GetAIBrain())
     end,
 
-    ---TODO: figure out how exactly the trigger works with unit set, as they are no examples in the codebase.
+    ---Plays a taunt when `lookingBrain` sees `unit`
     ---@param self TauntManager
     ---@param diagData string|string[] Name of the dialogue or a list of names for the taunt. If it's a list, the taunt is picked randomly each time it's played. This name must be defined in the provided taunt file.
     ---@param unit Unit
