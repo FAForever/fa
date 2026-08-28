@@ -1,1 +1,1 @@
-- Your explanation here... [Don't forget to change the category in the filename] (#7258).
+- Fix `DiskGetFileInfo` crashing to desktop with non-string parameters (#7258). This would rarely cause a crash when joining a lobby right as a host launches the game.
