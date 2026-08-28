@@ -824,7 +824,7 @@ local _beatFunctions = {}
 
 --- Adds a function callback that will be called on sim beats.
 ---@param cb fun()
----@param throttle boolean # Limits callback to 10 times per second to reduce UI load when speeding up sim/replay
+---@param throttle boolean? # Limits callback to 10 times per second to reduce UI load when speeding up sim/replay
 ---@param key any # Optional key for removing callbacks by a key
 function AddBeatFunction(cb, throttle, key)
     table.insert(_beatFunctions, { fn = cb, throttle = throttle == true, key = key })
