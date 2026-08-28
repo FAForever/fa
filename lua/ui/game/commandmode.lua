@@ -212,11 +212,7 @@ function EndCommandMode(isCancel)
         -- add information to modeData for end behavior
         modeData.isCancel = isCancel or false
 
-        -- ???
-        LOG('end command mode iscancel', isCancel, 'modedata', repr(modeData), '\n'..debug.traceback())
-        if modeData.isCancel then
-            ClearBuildTemplates()
-        end
+        ClearBuildTemplates()
 
         -- regain selection if we were cheating in units
         if modeData.cheat and modeData.selection then
