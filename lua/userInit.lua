@@ -89,6 +89,7 @@ Prefetcher = CreatePrefetchSet()
 local FileCache = {}
 local oldDiskGetFileInfo = DiskGetFileInfo
 function DiskGetFileInfo(file)
+    if type(file) ~= 'string' then error('string expected but got ' .. type(file), 2) end
     if FileCache[file] == nil then
         FileCache[file] = oldDiskGetFileInfo(file) or false
     end
