@@ -591,6 +591,7 @@ local TenWideSubAttackFormation = {
 ---@param distance Vector
 ---@return number
 function PickBestTravelFormationIndex(typeName, distance)
+    LOG(_G, 'PickBestTravelFormationIndex', typeName, distance)
     if typeName == 'AirFormations' then
         return 0;
     else
@@ -602,6 +603,7 @@ end
 ---@param distance Vector
 ---@return number
 function PickBestFinalFormationIndex(typeName, distance)
+    LOG(_G, 'PickBestFinalFormationIndex', typeName, distance)
     return -1;
 end
 
