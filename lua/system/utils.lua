@@ -667,7 +667,7 @@ end
 ---@param from string
 ---@param to string
 ---@param fromEnd? boolean Defaults to `false`
----@return unknown
+---@return string?
 function StringExtract(str, from, to, fromEnd)
     local pattern = from .. '(.*)' .. to
     if fromEnd then pattern = '.*' .. pattern end
