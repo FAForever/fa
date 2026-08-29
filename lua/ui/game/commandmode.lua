@@ -139,6 +139,9 @@ local issuedOneCommand = false
 local startBehaviors = {}
 local endBehaviors = {}
 
+local reverseMoveCMIsActive = false
+local ReverseMoveEnabledUnits = {}
+
 --- Callback triggers when command mode starts
 ---@param behavior fun(mode?: CommandMode, data?: CommandModeData)
 ---@param identifier? string
@@ -181,6 +184,10 @@ function StartCommandMode(newCommandMode, data)
     if commandMode then
         EndCommandMode(true)
     end
+    
+    if data.isReverseMove then
+        reverseMoveCMIsActive = true
+    end
 
     -- update our local state
     commandMode = newCommandMode
@@ -198,7 +205,9 @@ function EndCommandMode(isCancel)
     if ignoreSelection then
         return
     end
-
+    
+    reverseMoveCMIsActive = false
+    
     -- in case we want to end the command mode, without knowing it has already ended or not
     if modeData then
         -- add information to modeData for end behavior
@@ -647,6 +656,62 @@ local function OnStopIssued(command)
     EnhancementQueueFile.clearEnhancements(command.Units)
 end
 
+local function EnableReverseMove(command)
+    local EnableReverseMoveFor = {}
+    
+    for _,unit in command.Units do
+        local bp = unit:GetBlueprint()
+        if bp.Physics.MaxSpeedReverse and bp.Physics.MaxSpeedReverse > 0 then
+            local commandQueue = unit:GetCommandQueue()
+            local queueLength = TableGetN(commandQueue)
+            local entityID = unit:GetEntityId()
+            
+            -- make reverse move a single command without being able to queue it or combine with other commands
+            -- this is the easiest way to avoid making some complex tracking system for the queue that
+            -- contains different orders including reverse move.
+            if queueLength > 1 then
+                for k, cmd in commandQueue do
+                    if k ~= queueLength then
+                        DeleteCommand(cmd.ID)
+                    end
+                end
+            end
+            
+            ReverseMoveEnabledUnits[entityID] = unit
+            TableInsert(EnableReverseMoveFor, entityID)
+        end
+    end
+    
+    local cb = { Func = 'ForceReverseMove', Args = { Enable = true, ShowMsg = false, Units = EnableReverseMoveFor } }
+    SimCallback(cb, false)
+end
+
+-- If there are any units on the map with ReverseMove enabled (ReverseMoveEnabledUnits is not empty)
+-- then we have to check if these units are in the command.Units list every time OnCommandIssued is triggered (without reverseMoveCMIsActive)
+-- and if yes - disable reverse move for them via SimCallback.
+local function DisableReverseMove(command)
+    -- remove dead units
+    for k, u in ReverseMoveEnabledUnits do
+        if u:IsDead() then
+            ReverseMoveEnabledUnits[k] = nil
+        end
+    end
+    
+    local disableReverseMoveFor = {}
+    for _,unit in command.Units do
+        local id = unit:GetEntityId()
+        if ReverseMoveEnabledUnits[id] then
+            TableInsert(disableReverseMoveFor, id)
+            ReverseMoveEnabledUnits[id] = nil
+        end
+    end
+    
+    if not TableEmpty(disableReverseMoveFor) then
+        local cb = { Func = 'ForceReverseMove', Args = { Enable = false, ShowMsg = false, Units = disableReverseMoveFor} }
+        SimCallback(cb, false)
+    end
+end
+
 -- Callbacks for different command types, nil values for reference to functions that don't exist yet
 local OnCommandIssuedCallback = {
     None = nil,
@@ -694,6 +759,12 @@ function OnCommandIssued(command)
         issuedOneCommand = true
     end
 
+    if reverseMoveCMIsActive then
+        EnableReverseMove(command)
+    elseif not TableEmpty(ReverseMoveEnabledUnits) then
+        DisableReverseMove(command)
+    end
+    
     -- If our callback returns true or we don't have a command type, we skip the rest of our logic
     if (OnCommandIssuedCallback[command.CommandType] and OnCommandIssuedCallback[command.CommandType](command))
     or command.CommandType == 'None' then

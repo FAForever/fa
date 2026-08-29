@@ -842,6 +842,38 @@ do
 
 end
 
+do
+
+    ---@param data { Enable: boolean, ShowMsg: boolean }
+    ---@param selection Unit[]
+    Callbacks.ForceReverseMove = function(data, selection)
+        -- verify selection
+        if not data.Units then
+            selection = SecureUnits(selection)
+        else
+            selection = SecureUnits(data.Units)
+        end
+        
+        if (not selection) or TableEmpty(selection) then
+            return
+        end
+        
+        for k, unit in selection do
+            if unit.Blueprint.Physics.MaxSpeedReverse and unit.Blueprint.Physics.MaxSpeedReverse > 0 then
+                unit:ForceReverseMove(data.Enable)
+            end
+        end
+
+        if data.ShowMsg then
+            if data.Enable == true then
+                print(string.format("Force reverse move ENABLED for %d units", table.getn(selection)))
+            else
+                print(string.format("Force reverse move DISABLED for %d units", table.getn(selection)))
+            end
+        end
+    end
+end
+
 --#endregion
 
 

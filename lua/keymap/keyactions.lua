@@ -1653,7 +1653,15 @@ local keyActionsOrdersAdvanced = {
     ['shift_discharge'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DischargeShields()',
         category = 'ordersAdvanced',
-    }
+    },
+    ['reverse_move'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").StartReverseMoveCommandMode()',
+        category = 'ordersAdvanced',
+    },
+    ['shift_reverse_move'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").StartReverseMoveCommandMode()',
+        category = 'ordersAdvanced',
+    },
 }
 
 local keyActionsOrdersQueueBased = {

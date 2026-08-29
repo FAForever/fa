@@ -3,6 +3,7 @@
 local Prefs = import("/lua/user/prefs.lua")
 local SelectionUtils = import("/lua/ui/game/selection.lua")
 local SetIgnoreSelection = import("/lua/ui/game/gamemain.lua").SetIgnoreSelection
+local StartCommandMode = import("/lua/ui/game/commandmode.lua").StartCommandMode
 
 local lockZoomEnable = false
 function lockZoom()
@@ -555,6 +556,10 @@ end
 
 AIPlatoonSimpleStructureBehavior = function()
     SimCallback({ Func = 'AIPlatoonSimpleStructureBehavior', Args = {} }, true)
+end
+
+function StartReverseMoveCommandMode()
+    StartCommandMode("order", {name = "RULEUCC_Move", isReverseMove = true})
 end
 
 StoreCameraPosition = function()
