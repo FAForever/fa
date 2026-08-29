@@ -130,6 +130,19 @@ end
 function table.empty2(table)
 end
 
+---@generic T
+---@param list any
+---@param callback fun(key: integer, value: any):T|nil
+---@return T|nil
+function table.foreachi(list, callback) end
+
+---@generic T
+---@param list T[]
+---@return integer
+---@nodiscard
+function table.getn(list)
+end
+
 --- Returns the size of a list
 ---@param list table
 ---@return integer
