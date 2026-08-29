@@ -1183,6 +1183,18 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
     end,
 
+    ---@param self Unit
+    UpdateShieldAssistersConsumption = function(self)
+        if self.Blueprint.CategoriesHash["SHIELD"] then
+            local myShield = self.MyShield
+            if myShield.AssistCostEnergyPerBuildRate and myShield.AssistCostMassPerBuildRate then
+                for _, unit in self.Repairers do
+                    unit:UpdateConsumptionValues()
+                end
+            end
+        end
+    end,
+
     -- Called when we start building a unit, turn on/off, get/lose bonuses, or on
     -- any other change that might affect our build rate or resource use.
     ---@param self Unit
@@ -1225,12 +1237,62 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                     time, energy, mass = focus:GetBuildCosts(focus.SiloProjectile)
                     energy = (energy / siloBuildRate) * (self:GetBuildRate() or 0)
                     mass = (mass / siloBuildRate) * (self:GetBuildRate() or 0)
-                else
-                    time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
-                    if self:IsUnitState('Repairing') and focus.isFinishedUnit then -- also applies to shield assisting
+                elseif self:IsUnitState('Repairing') and focus.isFinishedUnit then
+                    -- repairing a unit or assisting a shield
+                    local function SetDefaultRepairCosts()
+                        time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
                         energy = energy * repairRatio
                         mass = mass * repairRatio
                     end
+
+                    if not focus.Blueprint.CategoriesHash["SHIELD"] then
+                        -- units without SHIELD category cannot be shield assisted
+                        SetDefaultRepairCosts()
+                    else
+                        local focusShield = focus.MyShield
+                        local shieldAssistEnergy = focusShield.AssistCostEnergyPerBuildRate
+                        local shieldAssistMass = focusShield.AssistCostMassPerBuildRate
+
+                        if not focusShield
+                            -- units default to repair cost for shield assist costs
+                            or not shieldAssistEnergy
+                            or not shieldAssistMass
+                            -- units not focused on a shield that is up cannot be shield assisted
+                            or not focusShield:IsUp()
+                            or not focus:GetFocusUnit() == nil
+                        then
+                            SetDefaultRepairCosts()
+                        else
+                            -- Determine what we are repairing, since they have different costs
+                            local repairingFocusUnit = focus:GetMaxHealth() > focus:GetHealth()
+                            local repairingFocusShield = focusShield:GetMaxHealth() > focusShield:GetHealth()
+
+                            if repairingFocusUnit then
+                                SetDefaultRepairCosts()
+                                -- Engine splits repair effect 50/50 so reduce costs in that case
+                                if repairingFocusShield then
+                                    energy = energy * 0.5
+                                    mass = mass * 0.5
+                                end
+                            end
+
+                            if repairingFocusShield then
+                                local buildRate = self:GetBuildRate()
+                                -- Engine splits repair effect 50/50 so reduce costs in that case
+                                if repairingFocusUnit then
+                                    shieldAssistEnergy = shieldAssistEnergy * 0.5
+                                    shieldAssistMass = shieldAssistMass * 0.5
+                                end
+                                energy = energy + shieldAssistEnergy * buildRate * time
+                                mass = mass + shieldAssistMass * buildRate * time
+                            end
+                        end
+                    end
+                else
+                    -- building a unit
+                    time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
+                    energy = energy * repairRatio
+                    mass = mass * repairRatio
                 end
             end
 
@@ -1436,6 +1498,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         -- inform the brain of the event
         self.Brain:OnUnitHealthChanged(self, new, old)
+
+        -- Manage shield assisters: unit is damaged/no longer damaged so assist consumption changes
+        if new == 1 or old == 1 then
+            self:UpdateShieldAssistersConsumption()
+        end
     end,
 
     ---@param self Unit
@@ -4551,8 +4618,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
     end,
 
+    --- Called by the engine to determine whether or not the unit's shield can be assisted
     ---@param self Unit
-    ---@return boolean
+    ---@return boolean?
     ShieldIsOn = function(self)
         if self.MyShield then
             return self.MyShield:IsOn()
@@ -5300,6 +5368,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     OnShieldDisabled = function(self) 
         -- for AI events
         self.Brain:OnUnitShieldDisabled(self)
+
+        -- Manage shield assisters: shield is disabled and cannot be assisted anymore
+        self:UpdateShieldAssistersConsumption()
     end,
 
     -- Called by the brain when the unit registered itself

@@ -463,6 +463,19 @@
 --- If this shield is one that unequivocally protects all attached units.
 --- Should not be defined with `AntiArtilleryShield`, `PersonalBubble`, or `PersonalShield`.
 ---@field TransportShield? boolean
+--- How much HP/s is restored per unit of buildpower assisting the shield. 
+--- Overrides `RegenAssistMult` during blueprint loading.
+---@field RegenPerBuildRate number
+--- The energy cost per second per unit of buildpower assisting the shield.
+--- Must be present alongside `AssistCostMassPerBuildRate` to have an effect.
+--- If both shield and unit HP are damaged, the costs/effects are split equally between HP repair cost
+--- and shield assist cost.
+---@field AssistCostEnergyPerBuildRate number
+--- The mass cost per second per unit of buildpower assisting the shield.
+--- Must be present alongside `AssistCostEnergyPerBuildRate` to have an effect.
+--- If both shield and unit HP are damaged, the costs/effects are split equally between HP repair cost
+--- and shield assist cost.
+---@field AssistCostMassPerBuildRate number
 
 ---@class UnitBlueprintBlinkingLightsData
 ---@field BLBone Bone
