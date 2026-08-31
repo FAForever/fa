@@ -395,7 +395,7 @@ end
 ---
 --- In the game options you can add a second adapter under the 'Video' tab.
 --- 
---- See also `GetNumRootFrames()` to determine the number of root frames. 
+---@see GetNumRootFrames to determine the number of root frames. 
 --- 
 --- See also the following modules that manage these frames:
 --- - Primary adapter: lua\ui\game\worldview.lua
@@ -828,7 +828,7 @@ end
 
 ---@param playerId? string  # if not provided, will return whether the local player is an observer
 ---@return boolean
-function IsObserver()
+function IsObserver(playerId)
 end
 
 --- Issue a factory build or upgrade command to your selection
@@ -1177,7 +1177,7 @@ end
 
 ---
 ---@param list RangeOverlay[]
----@see `/lua/ui/game/RangeOverlayParams.lua`
+---see `/lua/ui/game/RangeOverlayParams.lua`
 function SetOverlayFilters(list)
 end
 

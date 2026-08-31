@@ -37,6 +37,11 @@ Button = ClassUI(Bitmap) {
         self:Loop(true)
     end,
 
+    ---@param self Button
+    ---@param normal FileName
+    ---@param active FileName
+    ---@param highlight FileName
+    ---@param disabled FileName
     SetNewTextures = function(self, normal, active, highlight, disabled)
         self.mNormal = normal
         self.mActive = active
@@ -44,6 +49,7 @@ Button = ClassUI(Bitmap) {
         self.mDisabled = disabled
     end,
 
+    ---@param self Button
     ApplyTextures = function(self)
         if self._isDisabled and self.mDisabled then
             self:SetTexture(self.mDisabled)
@@ -57,6 +63,7 @@ Button = ClassUI(Bitmap) {
         self:Play()
     end,
 
+    ---@param self Button
     OnDisable = function(self)
         -- it probably makes sense to enable this, but I'll leave the behavior as-is for now
         --self.mMouseOver = false
@@ -67,13 +74,18 @@ Button = ClassUI(Bitmap) {
         self:ApplyTextures()
     end,
 
+    ---@param self Button
+    ---@param state "enter"|"exit"|"down"
     OnRolloverEvent = function(self, state)
     end,
 
+    ---@param self Button
     OnEnable = function(self)
         self:ApplyTextures()
     end,
 
+    ---@param self Button
+    ---@param event KeyEvent
     HandleEvent = function(self, event)
         if self._isDisabled then
             if not self:IsHitTestDisabled() then
@@ -142,6 +154,8 @@ Button = ClassUI(Bitmap) {
         return false
     end,
 
+    ---@param self Button
+    ---@param modifiers KeyModifiers
     OnClick = function(self, modifiers) end
 
 }

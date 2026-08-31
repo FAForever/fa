@@ -3,14 +3,13 @@
 ---@class moho.aipersonality_methods
 local CAiPersonality = {}
 
----
----@param a number
----@param b number
+---@param a integer
+---@param b integer
+---@return integer delay
 function CAiPersonality:AdjustDelay(a, b)
 end
 
----
---  CAiPersonality:GetAirUnitsEmphasis()
+---@return number
 function CAiPersonality:GetAirUnitsEmphasis()
 end
 
@@ -24,8 +23,7 @@ end
 function CAiPersonality:GetAttackFrequency()
 end
 
----
---  CAiPersonality:GetBotUnitsEmphasis()
+---@return number
 function CAiPersonality:GetBotUnitsEmphasis()
 end
 
@@ -129,8 +127,7 @@ end
 function CAiPersonality:GetRepeatAttackFrequency()
 end
 
----
---  CAiPersonality:GetSeaUnitsEmphasis()
+---@return number
 function CAiPersonality:GetSeaUnitsEmphasis()
 end
 
@@ -154,8 +151,7 @@ end
 function CAiPersonality:GetSurvivalEmphasis()
 end
 
----
---  CAiPersonality:GetTankUnitsEmphasis()
+---@return number
 function CAiPersonality:GetTankUnitsEmphasis()
 end
 

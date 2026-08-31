@@ -12,6 +12,7 @@
 ---@field FocusArmyChanged? { new: integer, old: integer }
 ---@field Cheaters? { [integer]: integer, CheatsEnabled: boolean } # Created by the engine. Array part is cheating command source indices.
 ---@field Events? SyncEventData # used by UI mods such as supreme score board
+---@field Reclaim table<EntityId, {mass: number, position: Vector}|false>
 Sync = { }
 
 local SyncDefaults = {

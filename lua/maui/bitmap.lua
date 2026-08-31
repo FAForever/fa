@@ -38,6 +38,8 @@ local LazyVarCreate = import("/lua/lazyvar.lua").Create
 ---@class Bitmap : moho.bitmap_methods, Control, InternalObject
 ---@field _filename BitmapTexture
 ---@field _color LazyVar<Color>
+---@field BitmapWidth fun(): integer
+---@field BitmapHeight fun(): integer
 ---@overload fun(parent: Control, filename: Lazy<FileName>?, debugname: string?): Bitmap
 Bitmap = ClassUI(moho.bitmap_methods, Control) {
     ---@param self Bitmap

@@ -23,15 +23,16 @@ local upgradeTab = import("/lua/keymap/upgradetab.lua").upgradeTab
 local ModifyBuildables = import("/lua/ui/notify/enhancementqueue.lua").ModifyBuildablesForACU
 
 local unitkeygroups
+local cycleMap
 local cyclePos
-local cycleThread = false
+local cycleThread
 local cycleLastName
 local cycleLastMaxPos
 local cycleButtons = {}
 local oldSelection
 
 local modifiersKeys = {}
-local worldview = import("/lua/ui/game/worldview.lua").viewLeft
+local worldview = import("/lua/ui/game/worldview.lua").viewLeft--[[@as WorldView]]
 local oldHandleEvent = worldview.HandleEvent
 
 ---@param selection UserUnit[]
@@ -76,7 +77,7 @@ function initCycleButtons(values)
 end
 
 function initCycleMap()
-    cycleMap = Group(GetFrame(0))
+    cycleMap = Group(GetFrame(0)--[[@as Frame]])
 
     cycleMap.Depth:Set(1000) --always on top
     LayoutHelpers.SetDimensions(cycleMap, 400, 150)
@@ -85,57 +86,57 @@ function initCycleMap()
     cycleMap:DisableHitTest()
     cycleMap:Hide()
 
-    cycle_Panel_tl = Bitmap(cycleMap)
+    local cycle_Panel_tl = Bitmap(cycleMap)
     cycle_Panel_tl:SetTexture('/textures/ui/hotbuild/cycle-panel-bg-tl.dds')
     cycle_Panel_tl.Top:Set(cycleMap.Top)
     cycle_Panel_tl.Left:Set(cycleMap.Left)
     cycle_Panel_tl.Width:Set(40)
 
-    cycle_Panel_bl = Bitmap(cycleMap)
+    local cycle_Panel_bl = Bitmap(cycleMap)
     cycle_Panel_bl:SetTexture('/textures/ui/hotbuild/cycle-panel-bg-bl.dds')
     cycle_Panel_bl.Bottom:Set(cycleMap.Bottom)
     cycle_Panel_bl.Left:Set(cycleMap.Left)
     cycle_Panel_bl.Width:Set(40)
 
-    cycle_Panel_l = Bitmap(cycleMap)
+    local cycle_Panel_l = Bitmap(cycleMap)
     cycle_Panel_l:SetTexture('/textures/ui/hotbuild/cycle-panel-bg-l.dds')
     cycle_Panel_l.Top:Set(cycle_Panel_tl.Bottom)
     cycle_Panel_l.Bottom:Set(cycle_Panel_bl.Top)
     cycle_Panel_l.Left:Set(cycleMap.Left)
     cycle_Panel_l.Width:Set(40)
 
-    cycle_Panel_tr = Bitmap(cycleMap)
+    local cycle_Panel_tr = Bitmap(cycleMap)
     cycle_Panel_tr:SetTexture('/textures/ui/hotbuild/cycle-panel-bg-tr.dds')
     cycle_Panel_tr.Top:Set(cycleMap.Top)
     cycle_Panel_tr.Right:Set(cycleMap.Right)
     cycle_Panel_tr.Width:Set(40)
 
-    cycle_Panel_br = Bitmap(cycleMap)
+    local cycle_Panel_br = Bitmap(cycleMap)
     cycle_Panel_br:SetTexture('/textures/ui/hotbuild/cycle-panel-bg-br.dds')
     cycle_Panel_br.Bottom:Set(cycleMap.Bottom)
     cycle_Panel_br.Right:Set(cycleMap.Right)
     cycle_Panel_br.Width:Set(40)
 
-    cycle_Panel_r = Bitmap(cycleMap)
+    local cycle_Panel_r = Bitmap(cycleMap)
     cycle_Panel_r:SetTexture('/textures/ui/hotbuild/cycle-panel-bg-r.dds')
     cycle_Panel_r.Top:Set(cycle_Panel_tr.Bottom)
     cycle_Panel_r.Bottom:Set(cycle_Panel_br.Top)
     cycle_Panel_r.Right:Set(cycleMap.Right)
     cycle_Panel_r.Width:Set(40)
 
-    cycle_Panel_t = Bitmap(cycleMap)
+    local cycle_Panel_t = Bitmap(cycleMap)
     cycle_Panel_t:SetTexture('/textures/ui/hotbuild/cycle-panel-bg-t.dds')
     cycle_Panel_t.Top:Set(cycleMap.Top)
     cycle_Panel_t.Left:Set(cycle_Panel_l.Right)
     cycle_Panel_t.Right:Set(cycle_Panel_r.Left)
 
-    cycle_Panel_b = Bitmap(cycleMap)
+    local cycle_Panel_b = Bitmap(cycleMap)
     cycle_Panel_b:SetTexture('/textures/ui/hotbuild/cycle-panel-bg-b.dds')
     cycle_Panel_b.Bottom:Set(cycleMap.Bottom)
     cycle_Panel_b.Left:Set(cycle_Panel_l.Right)
     cycle_Panel_b.Right:Set(cycle_Panel_r.Left)
 
-    cycle_Panel_m = Bitmap(cycleMap)
+    local cycle_Panel_m = Bitmap(cycleMap)
     cycle_Panel_m:SetTexture('/textures/ui/hotbuild/cycle-panel-bg-m.dds')
     cycle_Panel_m.Top:Set(cycle_Panel_t.Bottom)
     cycle_Panel_m.Bottom:Set(cycle_Panel_b.Top)
@@ -285,7 +286,7 @@ function availableTemplate(allTemplates, buildable)
 end
 
 --- A 'hack' to allow us to detect whether the `ButtonRelease` event was from a left-click
-factoryHotkeyLastClickWasLeft = false
+local factoryHotkeyLastClickWasLeft = false
 
 function factoryHotkey(units, count, selection, exFacUnits)
     CommandMode.StartCommandMode("build", {name = ''})
@@ -345,6 +346,7 @@ end
 function hideCycleMap()
     if (cycleThread) then
         KillThread(cycleThread)
+        cycleThread = nil
     end
 
     cycleMap:SetNeedsFrameUpdate(false)

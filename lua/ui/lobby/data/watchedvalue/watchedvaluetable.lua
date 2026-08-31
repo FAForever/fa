@@ -25,6 +25,7 @@ LoggedChanges = {}
 
 --- A flat, fixed-keyset table eagerly populated with WatchedValues
 ---@class WatchedValueTable
+---@field pairs fun(): table, any, nil
 WatchedValueTable = ClassSimple {
     __init = function(self, initialMapping)
         -- Where the values are really stored (__index and friends only apply if the keys are absent)

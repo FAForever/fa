@@ -28,7 +28,7 @@ local AReactonCannonProjectileCreateImpactEffects = AReactonCannonProjectile.Cre
 ADFReactonCannon01 = ClassProjectile(AReactonCannonProjectile) {
 
     ---@param self ADFReactonCannon01
-    ---@param army number
+    ---@param army Army
     ---@param EffectTable table
     ---@param EffectScale number
     CreateImpactEffects = function(self, army, EffectTable, EffectScale)

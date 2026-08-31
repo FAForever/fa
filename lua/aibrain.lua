@@ -257,7 +257,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
     ---@param self AIBrain
     ---@param key string
-    ---@param sound SoundHandle
+    ---@param sound? SoundHandle
     PlayVOSound = function(self, key, sound)
         if not self.VOSounds[key] then
             WARN("PlayVOSound: " .. key .. " not found")

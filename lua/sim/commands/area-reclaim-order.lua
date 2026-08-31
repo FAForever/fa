@@ -31,7 +31,7 @@ local StringFormat = string.format
 
 local IssueReclaim = IssueReclaim
 
-local GetCurrentCommandSourceArmy = import("/lua/SimUtils.lua").GetCurrentCommandSourceArmy
+local GetCurrentCommandSourceArmy = import("/lua/simutils.lua").GetCurrentCommandSourceArmy
 
 ---@type table<EntityId, boolean>
 local distances = { }

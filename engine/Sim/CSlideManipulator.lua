@@ -8,28 +8,26 @@ local CSlideManipulator = {}
 function CSlideManipulator:BeenDestroyed()
 end
 
----
---  CSlideManipulator:SetAcceleration(acc)
+---@param acc number
 function CSlideManipulator:SetAcceleration(acc)
 end
 
----
---  CSlideManipulator:SetDeceleration(dec)
+---@param dec number
 function CSlideManipulator:SetDeceleration(dec)
 end
 
----
---  CSlideManipulator:SetGoal(goal_x, goal_y, goal_z)
-function CSlideManipulator:SetGoal(goal_x,  goal_y,  goal_z)
+---@param x number
+---@param y number
+---@param z number
+---@return self
+function CSlideManipulator:SetGoal(x, y, z)
 end
 
----
---  CSlideManipulator:SetSpeed(speed)
+---@param speed number
 function CSlideManipulator:SetSpeed(speed)
 end
 
----
---  CSlideManipulator:SetWorldUnits(bool)
+---@param bool boolean
 function CSlideManipulator:SetWorldUnits(bool)
 end
 

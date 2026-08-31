@@ -501,8 +501,8 @@ XSL0001 = ClassUnit(ACUUnit) {
     ---@param self XSL0001
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementT3EngineeringRemove = function(self, bp)
-        local bp = self.Blueprint.Economy.BuildRate
-        if not bp then return end
+        local br = self.Blueprint.Economy.BuildRate
+        if not br then return end
         self:RestoreBuildRestrictions()
         if Buff.HasBuff(self, 'SeraphimACUT3BuildRate') then
             Buff.RemoveBuff(self, 'SeraphimACUT3BuildRate')
@@ -515,7 +515,8 @@ XSL0001 = ClassUnit(ACUUnit) {
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementBlastAttack = function(self, bp)
         local wep = self:GetWeaponByLabel('ChronotronCannon')
-        wep:AddDamageRadiusMod(bp.NewDamageRadius or 5)
+        ---@cast wep -nil
+        wep:AddDamageRadiusMod(bp.NewgeRadius or 5)
         wep:AddDamageMod(bp.AdditionalDamage)
     end,
 
@@ -523,6 +524,7 @@ XSL0001 = ClassUnit(ACUUnit) {
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementBlastAttackRemove = function(self, bp)
         local wep = self:GetWeaponByLabel('ChronotronCannon')
+        ---@cast wep -nil
         wep:AddDamageRadiusMod(-self.Blueprint.Enhancements['BlastAttack'].NewDamageRadius) -- unlimited AOE bug fix by brute51 [117]
         wep:AddDamageMod(-self.Blueprint.Enhancements['BlastAttack'].AdditionalDamage)
     end,
@@ -531,11 +533,14 @@ XSL0001 = ClassUnit(ACUUnit) {
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementRateOfFire = function(self, bp)
         local wep = self:GetWeaponByLabel('ChronotronCannon')
+        ---@cast wep -nil
         wep:ChangeRateOfFire(bp.NewRateOfFire or 2)
         wep:ChangeMaxRadius(bp.NewMaxRadius or 44)
         local oc = self:GetWeaponByLabel('OverCharge')
+        ---@cast oc -nil
         oc:ChangeMaxRadius(bp.NewMaxRadius or 44)
         local aoc = self:GetWeaponByLabel('AutoOverCharge')
+        ---@cast aoc -nil
         aoc:ChangeMaxRadius(bp.NewMaxRadius or 44)
     end,
 
@@ -543,13 +548,16 @@ XSL0001 = ClassUnit(ACUUnit) {
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementRateOfFireRemove = function(self, bp)
         local wep = self:GetWeaponByLabel('ChronotronCannon')
+        ---@cast wep -nil
         local bpDisrupt = self.Blueprint.Weapon[1].RateOfFire
         wep:ChangeRateOfFire(bpDisrupt or 1)
         bpDisrupt = self.Blueprint.Weapon[1].MaxRadius
         wep:ChangeMaxRadius(bpDisrupt or 22)
         local oc = self:GetWeaponByLabel('OverCharge')
+        ---@cast oc -nil
         oc:ChangeMaxRadius(bpDisrupt or 22)
         local aoc = self:GetWeaponByLabel('AutoOverCharge')
+        ---@cast aoc -nil
         aoc:ChangeMaxRadius(bpDisrupt or 22)
     end,
 

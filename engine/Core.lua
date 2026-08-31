@@ -401,7 +401,7 @@ function RegisterUnitBlueprint(spec)
 end
 
 --- Resumes the thread after suspending it, does nothing if the thread wasn't suspended
----@see # Counterpart of SuspendCurrentThread
+---@see SuspendCurrentThread # Counterpart of SuspendCurrentThread
 ---@param thread thread
 function ResumeThread(thread)
 end

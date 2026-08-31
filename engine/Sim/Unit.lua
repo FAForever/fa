@@ -51,6 +51,7 @@ local Unit = {}
 ---| "MakingAttackRun"
 ---| "HoldingPattern"
 ---| "SiloBuildingAmmo"
+---| "Sacrificing"
 
 ---@class UnitCommand
 ---@field _c_object userdata
@@ -273,10 +274,13 @@ end
 function Unit:GetShieldRatio()
 end
 
+---@class UnitStat
+---@field Value number
+
 --- Returns the unit's specific statistics
 ---@param statName string
 ---@param defaultVal? number
----@return number
+---@return UnitStat
 function Unit:GetStat(statName, defaultVal)
 end
 

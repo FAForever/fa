@@ -11,6 +11,7 @@
 ---- Base Templates                       --
 ----------------------------------------------------------------------------------
 
+---@type table<integer, table<{[1]:string,[2]:BlueprintId}>[]>
 BuildingTemplates =
 {
     -- UEF Building List
@@ -1139,6 +1140,9 @@ BuildingTemplates =
     }
 }
 
+---@alias RebuildTemplateEntry { [1]: BlueprintId, [2]: BlueprintId } UpgradesTo = UpgradesFrom
+
+---@type table<integer, RebuildTemplateEntry[]>
 RebuildStructuresTemplate = {
     -- UEF
     {

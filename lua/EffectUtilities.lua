@@ -113,7 +113,7 @@ end
 ---@deprecated
 --- Creates all effects in a table, with an offset from an entity
 ---@param obj BoneObject
----@param army number
+---@param army Army
 ---@param effectTable FileName[] Emitter blueprint names
 ---@param x number
 ---@param y number
@@ -130,7 +130,7 @@ end
 ---@deprecated
 --- Creates all effects in a table, with random offsets from an entity
 ---@param obj BoneObject
----@param army number
+---@param army Army
 ---@param effectTable FileName[] Emitter blueprint names
 ---@param xRange number
 ---@param yRange number
@@ -148,7 +148,7 @@ end
 --- Creates all effects in a table at an entity's bone
 ---@param obj BoneObject
 ---@param bone Bone
----@param army number
+---@param army Army
 ---@param effectTable FileName[] Emitter blueprint names
 ---@return moho.IEffect[] emitters
 function CreateBoneEffects(obj, bone, army, effectTable)
@@ -163,7 +163,7 @@ end
 --- Creates all effects in a table at an entity's bone, with offset
 ---@param obj BoneObject
 ---@param bone Bone
----@param army number
+---@param army Army
 ---@param effectTable FileName[] Emitter blueprint names
 ---@param x number
 ---@param y number
@@ -180,7 +180,7 @@ end
 --- Creates all effects in a table at each bone in a table for an entity
 ---@param obj BoneObject
 ---@param boneTable Bone[]
----@param army number
+---@param army Army
 ---@param effectTable FileName[] Emitter blueprint names
 function CreateBoneTableEffects(obj, boneTable, army, effectTable)
     for _, bone in boneTable do
@@ -194,7 +194,7 @@ end
 ---@param obj BoneObject
 ---@param boneTable Bone[]
 ---@param effectTable FileName[] Emitter blueprint names
----@param army number
+---@param army Army
 ---@param min number
 ---@param max number
 function CreateBoneTableRangedScaleEffects(obj, boneTable, effectTable, army, min, max)
@@ -208,7 +208,7 @@ end
 ---@deprecated
 --- Creates a number of random effects out of a table at an entity
 ---@param obj BoneObject
----@param army number
+---@param army Army
 ---@param effectTable FileName[] Emitter blueprint names
 ---@param numEffects integer
 ---@return moho.IEffect[] emitters
@@ -1152,7 +1152,7 @@ end
 
 --- Gets the teleport location, based on the terrain height and terrain type offset
 ---@param loc Vector
----@return table|nil
+---@return Vector
 function TeleportLocationToSurface(loc)
     -- Takes the given location, adjust the Y value to the surface height on that location
     local pos = TableCopy(loc)

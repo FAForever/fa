@@ -39,7 +39,7 @@ local ValidBuildersType = {
 
 --- Register a builder group, or override an existing builder group
 ---@param spec BuilderGroupSpec
----@return string String reference to the builder group
+---@return string? #String reference to the builder group
 function BuilderGroup (spec)
 
     -- it should be a table
