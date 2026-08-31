@@ -8,8 +8,8 @@ local ScenarioFramework = import("/lua/scenarioframework.lua")
 local ScenarioPlatoonAI = import("/lua/scenarioplatoonai.lua")
 
 ---LandAssaultChildCountDifficulty = BuildCondition   doc = "Please work function docs."
----@param aiBrain AIBrain default_brain
----@param master string default_master
+---@param aiBrain CampaignAIBrain
+---@param master string
 ---@return boolean
 function LandAssaultChildCountDifficulty(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master)
@@ -28,7 +28,7 @@ function LandAssaultChildCountDifficulty(aiBrain, master)
 end
 
 ---LandAssaultMasterCountDifficulty = BuildCondition   doc = "Please work function docs."
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param master string
 ---@return boolean
 function LandAssaultMasterCountDifficulty(aiBrain, master)
@@ -84,7 +84,7 @@ function LandAssaultAttack(platoon)
 end
 
 ---LandAssaultTransport = BuildCondition   doc = "Please work function docs."
----@param aiBrain AIBrain default_brain
+---@param aiBrain CampaignAIBrain
 ---@param tCount number[] default_transport_count
 ---@return boolean
 function LandAssaultTransport(aiBrain, tCount)

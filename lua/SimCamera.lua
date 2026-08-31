@@ -12,24 +12,29 @@
 
 ---@class SimCameraEvent
 ---@field Name string
----@field Type string
+---@field Type? string
 ---@field Exec string
 
 local SyncCameraRequest = import("/lua/simsyncutils.lua").SyncCameraRequest
 
 SingleEvent = import("/lua/system/singleevent.lua").SingleEvent
--- Name / Object table for cameras
+---@type table<string, SimCamera>
 Cameras = {}
 
--- The user layer calls this via SimCallback when the camera finishes moving to its target.
+---The user layer calls this via SimCallback when the camera finishes moving to its target.
+---@param name string
 function OnCameraFinish(name)
     --LOG('Signal')
     Cameras[name]:EventSet()
 end
 
 ---@class SimCamera : SingleEvent
+---@field CameraName string
+---@field Callback { Func: string, Args: string }
 ---@overload fun(name: string): SimCamera
 SimCamera = Class(SingleEvent) {
+    ---@param self SimCamera
+    ---@param name string
     __init = function(self,name)
         self.CameraName = name
         self.Callback = {
@@ -39,12 +44,18 @@ SimCamera = Class(SingleEvent) {
         Cameras[name] = self
     end,
 
+    ---@param self SimCamera
+    ---@param val number
+    ---@deprecated
     ScaleMoveVelocity = function(self,val)
         WARN('ScaleMoveVelocity is defunct. Please remove.')
     end,
 
+    ---Move the camera to a rectangle
+    ---@param rectRegion Rectangle
+    ---@param seconds? number
     MoveTo = function(self,rectRegion,seconds)
-        request = {
+        local request = {
             Name = self.CameraName,
             Type = 'CAMERA_MOVE',
             Region = rectRegion,
@@ -54,8 +65,12 @@ SimCamera = Class(SingleEvent) {
         SyncCameraRequest(request)
     end,
 
+    --- Move the camera to the position of a marker.
+    ---@param self SimCamera
+    ---@param marker Marker
+    ---@param seconds? number Defaults to 0, which will snap the camera to the marker.
     MoveToMarker = function(self,marker,seconds)
-        request = {
+        local request = {
             Name = self.CameraName,
             Type = 'CAMERA_MOVE',
             Marker = marker,
@@ -65,8 +80,10 @@ SimCamera = Class(SingleEvent) {
         SyncCameraRequest(request)
     end,
 
+    ---@param self SimCamera
+    ---@param rectRegion Rectangle
     SyncPlayableRect = function(self,rectRegion)
-        request = {
+        local request = {
             Name = self.CameraName,
             Type = 'CAMERA_SYNC_PLAYABLE_RECT',
             Region = rectRegion,
@@ -74,8 +91,10 @@ SimCamera = Class(SingleEvent) {
         SyncCameraRequest(request)
     end,
 
+    ---@param self SimCamera
+    ---@param marker Marker
     SnapToMarker = function(self,marker)
-        request = {
+        local request = {
             Name = self.CameraName,
             Type = 'CAMERA_SNAP',
             Marker = marker,
@@ -83,8 +102,12 @@ SimCamera = Class(SingleEvent) {
         SyncCameraRequest(request)
     end,
 
+    ---@param self SimCamera
+    ---@param units (Unit|Blip)[]
+    ---@param zoom number
+    ---@param seconds? number
     TrackEntities = function(self, units, zoom, seconds)
-        request = {
+        local request = {
             Name = self.CameraName,
             Type = 'CAMERA_TRACK_ENTITIES',
             Ents = {},
@@ -98,8 +121,14 @@ SimCamera = Class(SingleEvent) {
         SyncCameraRequest(request)
     end,
 
+    --- Similar to `TrackEntities`, but this gives more control with the pitchAdjust parameter.
+    ---@param ent Unit
+    ---@param pitchAdjust number
+    ---@param zoom number
+    ---@param seconds? number
+    ---@param transition? number
     NoseCam = function(self, ent, pitchAdjust, zoom, seconds, transition)
-        local idNum = false
+        local idNum
         if ent:GetAIBrain():GetArmyIndex() ~= ArmyBrains[1]:GetArmyIndex() then
             local entBlip = ent:GetBlip(1)
             if entBlip then
@@ -109,7 +138,7 @@ SimCamera = Class(SingleEvent) {
             idNum = ent:GetEntityId()
         end
         if idNum then
-            request = {
+            local request = {
                 Name = self.CameraName,
                 Type = 'CAMERA_NOSE_CAM',
                 Entity = idNum,
@@ -125,9 +154,11 @@ SimCamera = Class(SingleEvent) {
         end
     end,
 
+    ---@param self SimCamera
+    ---@param accModeName UserCameraAccelerationModes
     SetAccMode = function(self,accModeName)
         --LOG('Camera:SetAccMode')
-        request = {
+        local request = {
             Name = self.CameraName,
             Type = 'CAMERA_SET_ACC_MODE',
             Data = accModeName,
@@ -136,9 +167,12 @@ SimCamera = Class(SingleEvent) {
         SyncCameraRequest(request)
     end,
 
+    ---@param self SimCamera
+    ---@param zoom number
+    ---@param seconds? number
     SetZoom = function(self,zoom,seconds)
         --LOG('Camera:SetZoom')
-        request = {
+        local request = {
             Name = self.CameraName,
             Type = 'CAMERA_SET_ZOOM',
             Zoom = zoom,
@@ -148,13 +182,17 @@ SimCamera = Class(SingleEvent) {
         SyncCameraRequest(request)
     end,
 
+    ---@param self SimCamera
+    ---@param location Vector
+    ---@param unitHeading number
+    ---@param headingRate number
     SpinAroundUnit = function(self, location, unitHeading, headingRate )
         local marker = {
             orientation = VECTOR3( unitHeading, .35, 0 ),
             position = location,
             zoom = FLOAT( 75 ),
         }
-        request = {
+        local request = {
             Name = self.CameraName,
             Type = 'CAMERA_UNIT_SPIN',
             Marker = marker,
@@ -164,8 +202,11 @@ SimCamera = Class(SingleEvent) {
         SyncCameraRequest(request)
     end,
 
+    ---@param self SimCamera
+    ---@param headingRate number
+    ---@param zoomRate? number
     Spin = function(self,headingRate,zoomRate)
-        request = {
+        local request = {
             Name = self.CameraName,
             Type = 'CAMERA_SPIN',
             HeadingRate = headingRate,
@@ -174,30 +215,37 @@ SimCamera = Class(SingleEvent) {
         SyncCameraRequest(request)
     end,
 
+    ---@param self SimCamera
     HoldRotation = function(self)
         SyncCameraRequest({ Name = self.CameraName, Exec = 'HoldRotation' })
     end,
 
+    ---@param self SimCamera
     RevertRotation = function(self)
         SyncCameraRequest( { Name = self.CameraName, Exec = 'RevertRotation' } )
     end,
 
+    ---@param self SimCamera
     UseGameClock = function(self)
         SyncCameraRequest( { Name = self.CameraName, Exec = 'UseGameClock' } )
     end,
 
+    ---@param self SimCamera
     UseSystemClock = function(self)
         SyncCameraRequest( { Name = self.CameraName, Exec = 'UseSystemClock' } )
     end,
 
+    ---@param self SimCamera
     EnableEaseInOut = function(self)
         SyncCameraRequest( { Name = self.CameraName, Exec = 'EnableEaseInOut' } )
     end,
 
+    ---@param self SimCamera
     DisableEaseInOut = function(self)
         SyncCameraRequest( { Name = self.CameraName, Exec = 'DisableEaseInOut' } )
     end,
 
+    ---@param self SimCamera
     Reset = function(self)
         SyncCameraRequest( {Name=self.CameraName, Exec='Reset'} )
     end,

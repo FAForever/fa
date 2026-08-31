@@ -17,10 +17,10 @@
 ---@field GlobalSquads PlatoonTemplateSquad[]
 
 ---@class PlatoonTemplateFactionalSquad
----@field UEF PlatoonTemplateSquad?
----@field Cybran PlatoonTemplateSquad?
----@field Seraphim PlatoonTemplateSquad?
----@field Aeon PlatoonTemplateSquad?
+---@field UEF? PlatoonTemplateSquad[]
+---@field Cybran? PlatoonTemplateSquad[]
+---@field Seraphim? PlatoonTemplateSquad[]
+---@field Aeon? PlatoonTemplateSquad[]
 
 ---@class PlatoonTemplateFactionalSpec
 ---@field Name string Unique identifier for the platoon template, used as a string reference
@@ -38,7 +38,7 @@ PlatoonTemplates = {}
 
 --- Register a platoon template, or override an existing platoon template
 ---@param spec PlatoonTemplateSpec
----@return string
+---@return string?
 PlatoonTemplate = function(spec)
 
     -- it should be a table

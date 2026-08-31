@@ -23,7 +23,7 @@ local function BuilderSortLambda(a, b)
     return a.Priority > b.Priority
 end
 
----@class AIBuilderData
+---@class BuilderData
 ---@field Builders Builder[]
 ---@field NeedSort boolean
 
@@ -31,7 +31,7 @@ end
 --- and find builders as the base is trying to figure out what to do
 ---@class BuilderManager
 ---@field Brain AIBrain                                     # A reference to the brain that this manager belongs to
----@field BuilderData table<BuilderType, AIBuilderData>     # List of builders that is managed by this manager
+---@field BuilderData table<BuilderType, BuilderData>     # List of builders that is managed by this manager
 ---@field BuilderCheckInterval number   # Interval (in seconds)
 ---@field BuilderList boolean           # Is true when there is at least one builder in this manager
 ---@field BuilderThread? thread         # Thread that runs the loop, does not exist when the manager is not active
@@ -116,7 +116,7 @@ BuilderManager = ClassSimple {
     --- Adds an abstract builder to the manager
     ---@param self BuilderManager
     ---@param newBuilder Builder
-    ---@param builderType BuilderType
+    ---@param builderType? BuilderType
     AddInstancedBuilder = function(self, newBuilder, builderType)
         -- can't proceed without a builder
         if not newBuilder then

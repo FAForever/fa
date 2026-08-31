@@ -1025,7 +1025,8 @@ Callbacks.CheatSpawnUnit = function(data)
             local unit = CreateUnitHPR(data.bpId, data.army, pos[1], pos[2], pos[3], 0, data.yaw, 0)
             local unitbp = __blueprints[data.bpId]
             if data.CreateTarmac and unit.CreateTarmac and unitbp.Display and unitbp.Display.Tarmacs then
-                unit:CreateTarmac(true, true, true, false, false)
+                ---@cast unit StructureUnit
+                unit:CreateTarmac(true, true, true)
             end
             if data.UnitIconCameraMode then
                 local size = math.max(

@@ -18,6 +18,7 @@ local TableGetn = table.getn
 ---@field Radius number
 ---@field LocationType LocationType
 ---@field RallyPoint Vector | false
+---@field FactoryList FactoryUnit[]
 ---@field LocationActive boolean
 ---@field RandomSamePriority boolean
 ---@field PlatoonListEmpty boolean
@@ -29,13 +30,11 @@ FactoryBuilderManager = Class(BuilderManager) {
     ---@param location Vector
     ---@param radius number
     ---@param useCenterPoint boolean
-    ---@return boolean
     Create = function(self, brain, lType, location, radius, useCenterPoint)
         BuilderManager.Create(self,brain, lType, location, radius)
 
         if not lType or not location or not radius then
             error('*FACTORY BUILDER MANAGER ERROR: Invalid parameters; requires locationType, location, and radius')
-            return false
         end
 
         local builderTypes = { 'Air', 'Land', 'Sea', 'Gate', }
@@ -66,7 +65,7 @@ FactoryBuilderManager = Class(BuilderManager) {
         while true do
             if self.LocationActive and self.RallyPoint then
                 -- LOG('*AI DEBUG: Checking Active Rally Point')
-                local newRally = false
+                local newRally
                 local bestDist = 99999
                 local rallyheight = GetTerrainHeight(self.RallyPoint[1], self.RallyPoint[3])
                 if self.Brain:GetNumUnitsAroundPoint(categories.STRUCTURE, self.RallyPoint, 15, 'Ally') > 0 then
@@ -241,7 +240,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@param unit Unit
+    ---@param unit FactoryUnit
     ---@param bType string
     SetupNewFactory = function(self,unit,bType)
         self:SetupFactoryCallbacks({unit}, bType)
@@ -249,7 +248,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@param factories string[]
+    ---@param factories FactoryUnit[]
     ---@param bType string
     SetupFactoryCallbacks = function(self,factories,bType)
         for k,v in factories do

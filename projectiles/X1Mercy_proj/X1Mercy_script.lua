@@ -53,8 +53,7 @@ X1Mercy = Class(AMiasmaProjectile) {
         end
         
         --Vision for when projectile impacts
-        ---@type VisionMarkerOpti
-        local entity = VisionMarker({Owner = self})
+        local entity = VisionMarker()
     
         local px, py, pz = self:GetPositionXYZ()
         entity:UpdatePosition(px, pz)

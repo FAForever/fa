@@ -60,7 +60,7 @@ local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 --- before the triggering unit / group.
 ---@see CreateMutlipleAreaTrigger() to pass in multiple areas
 ---@param callback NamedAreaTriggerCallback | AreaTriggerCallback
----@param area Area | Rectangle
+---@param area AreaName | Rectangle
 ---@param category EntityCategory
 ---@param onceOnly? boolean
 ---@param lessThan? boolean
@@ -77,7 +77,7 @@ end
 --- you have an odd shaped area as an area trigger
 ---@see CreateAreaTrigger() to pass in a single area and information regarding arguments
 ---@param callback NamedAreaTriggerCallback | AreaTriggerCallback
----@param areas (Area | Rectangle)[]
+---@param areas (AreaName | Rectangle)[]
 ---@param category EntityCategory
 ---@param onceOnly? boolean
 ---@param lessThan? boolean
@@ -420,7 +420,7 @@ function CreateUnitNearTypeTriggerThread(callback, unit, brain, category, distan
         else
             local position = unit:GetPosition()
             for _, triggerUnit in brain:GetListOfUnits(category, false) do
-                if VDist3(position, catUnit:GetPosition()) < distance and not triggerUnit:IsBeingBuilt() then
+                if VDist3(position, triggerUnit:GetPosition()) < distance and not triggerUnit:IsBeingBuilt() then
                     if name then
                         callback(TriggerManager, name, unit, triggerUnit)
                     else

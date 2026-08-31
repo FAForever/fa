@@ -173,7 +173,7 @@ local function GetTemplateEntry(index)
 end
 
 --- Validates the template in-place, returns whether the process succeeded
----@see 'ConvertTemplate' for an alternative version that also converts the template
+---@see ConvertTemplate for an alternative version that also converts the template
 ---@param template ContextBasedTemplate
 ---@param buildableUnits table<BlueprintId, boolean>
 ---@param prefix 'ua' | 'ue' | 'ur' | 'xs' | 'xn'
@@ -199,7 +199,7 @@ local function ValidateTemplate(template, buildableUnits, prefix)
 end
 
 --- Converts the template by creating a copy, resulting in a new template that is faction independent
----@see 'ValidateTemplate' for an alternative that just validates
+---@see ValidateTemplate for an alternative that just validates
 ---@param template ContextBasedTemplate
 ---@param cache UIBuildTemplate
 ---@return UIBuildTemplate

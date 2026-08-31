@@ -602,11 +602,14 @@ UEL0001 = ClassUnit(ACUUnit) {
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementHeavyAntiMatterCannon = function(self, bp)
         local wep = self:GetWeaponByLabel('RightZephyr')
+        ---@cast wep -nil
         wep:AddDamageMod(bp.ZephyrDamageMod)
         wep:ChangeMaxRadius(bp.NewMaxRadius or 44)
         local oc = self:GetWeaponByLabel('OverCharge')
+        ---@cast oc -nil
         oc:ChangeMaxRadius(bp.NewMaxRadius or 44)
         local aoc = self:GetWeaponByLabel('AutoOverCharge')
+        ---@cast aoc -nil
         aoc:ChangeMaxRadius(bp.NewMaxRadius or 44)
     end,
 
@@ -616,12 +619,16 @@ UEL0001 = ClassUnit(ACUUnit) {
         local bp = self.Blueprint.Enhancements['HeavyAntiMatterCannon']
         if not bp then return end
         local wep = self:GetWeaponByLabel('RightZephyr')
+        ---@cast wep -nil
         wep:AddDamageMod(-bp.ZephyrDamageMod)
         local bpDisrupt = self.Blueprint.Weapon[1].MaxRadius
+        ---@cast bpDisrupt -nil
         wep:ChangeMaxRadius(bpDisrupt or 22)
         local oc = self:GetWeaponByLabel('OverCharge')
+        ---@cast oc -nil
         oc:ChangeMaxRadius(bpDisrupt or 22)
         local aoc = self:GetWeaponByLabel('AutoOverCharge')
+        ---@cast aoc -nil
         aoc:ChangeMaxRadius(bpDisrupt or 22)
     end,
 

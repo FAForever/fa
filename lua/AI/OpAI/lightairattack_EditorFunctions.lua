@@ -7,7 +7,7 @@
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 
 --- LightAirChildCountDifficulty = BuildCondition   doc = "Please work function docs."
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param master string
 ---@return boolean
 function LightAirChildCountDifficulty(aiBrain, master)
@@ -27,7 +27,7 @@ function LightAirChildCountDifficulty(aiBrain, master)
 end
 
 --- LightAirMasterCountDifficulty = BuildCondition   doc = "Please work function docs."
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param master string
 ---@return boolean
 function LightAirMasterCountDifficulty(aiBrain, master)

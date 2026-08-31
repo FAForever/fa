@@ -29,4 +29,4 @@
 --- the sound cue inside of the sound bank to use
 ---@field Cue string
 --- unknown usage
----@field LodCutoff SoundLodCutoff
+---@field LodCutoff? SoundLodCutoff

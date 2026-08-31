@@ -104,7 +104,7 @@ UnitTeleportEffect01 = Class(NullShell) {
     end,
 
     ---@param self UnitTeleportEffect01
-    ---@param army number
+    ---@param army Army
     CreateQuantumEnergy = function(self, army)
         for k, v in EffectTemplate.CommanderQuantumGateInEnergy do
             CreateEmitterOnEntity(self, army, v)
@@ -112,7 +112,7 @@ UnitTeleportEffect01 = Class(NullShell) {
     end,
 
     ---@param self UnitTeleportEffect01
-    ---@param army number
+    ---@param army Army
     CreateFlares = function(self, army)
         local numFlares = 45
         local angle = (2 * math.pi) / numFlares

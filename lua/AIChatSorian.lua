@@ -15,7 +15,7 @@ function AIChat(group, text, sender)
             return
         end
         ChatTo:Set(group)
-        msg = { to = ChatTo(), Chat = true }
+        local msg = { to = ChatTo(), Chat = true }
         msg.text = LOC(text) or text
         msg.aisender = sender
         local armynumber = GetArmyData(sender)

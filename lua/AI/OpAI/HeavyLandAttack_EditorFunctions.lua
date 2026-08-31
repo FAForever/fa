@@ -8,8 +8,8 @@
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 
 ---HeavyLandAttackChildDirectFire = BuildCondition   doc = "Please work function docs."
----@param aiBrain AIBrain default_brain
----@param master string default_master
+---@param aiBrain CampaignAIBrain
+---@param master string
 ---@return boolean
 function HeavyLandAttackChildDirectFire(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master..'_DirectFireChildren')
@@ -34,8 +34,8 @@ function HeavyLandAttackChildDirectFire(aiBrain, master)
 end
 
 ---HeavyLandAttackChildArtillery = BuildCondition   doc = "Please work function docs."
----@param aiBrain AIBrain default_brain
----@param master string default_master
+---@param aiBrain CampaignAIBrain
+---@param master string
 ---@return boolean
 function HeavyLandAttackChildArtillery(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master..'_ArtilleryChildren')
@@ -60,8 +60,8 @@ function HeavyLandAttackChildArtillery(aiBrain, master)
 end
 
 ---HeavyLandAttackChildAntiAir = BuildCondition   doc = "Please work function docs."
----@param aiBrain AIBrain default_brain
----@param master string default_master
+---@param aiBrain CampaignAIBrain
+---@param master string
 ---@return boolean
 function HeavyLandAttackChildAntiAir(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master..'_AntiAirChildren')
@@ -84,8 +84,8 @@ function HeavyLandAttackChildAntiAir(aiBrain, master)
 end
 
 ---HeavyLandAttackChildDefensive = BuildCondition   doc = "Please work function docs."
----@param aiBrain AIBrain default_brain
----@param master string default_master
+---@param aiBrain CampaignAIBrain
+---@param master string
 ---@return boolean
 function HeavyLandAttackChildDefensive(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master..'_DefensiveChildren')
@@ -108,7 +108,7 @@ function HeavyLandAttackChildDefensive(aiBrain, master)
 end
 
 ---HeavyLandAttackMasterCountDifficulty = BuildCondition   doc = "Please work function docs."
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param master string
 ---@return boolean
 function HeavyLandAttackMasterCountDifficulty(aiBrain, master)
