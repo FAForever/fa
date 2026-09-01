@@ -1,1 +1,1 @@
-- (#7095) Randomise flight height of air units, within bounds.
+- Slightly randomize flight height of air units so they look nicer (#7095).
