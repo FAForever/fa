@@ -1439,6 +1439,10 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").ToggleHardMove()',
         category = 'orders',
     },
+    ['move_persistent'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").PersistentCommandModeAction("StartCommandMode order RULEUCC_Move")',
+        category = 'orders',
+    },
     ['nuke'] = {
         action = 'StartCommandMode order RULEUCC_Nuke',
         category = 'orders',
@@ -1653,7 +1657,11 @@ local keyActionsOrdersAdvanced = {
     ['shift_discharge'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DischargeShields()',
         category = 'ordersAdvanced',
-    }
+    },
+    ['move_persistent_distributing_no_clear'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").StartPersistentFormationlessMoveNoClearCmds()',
+        category = 'ordersAdvanced',
+    },
 }
 
 local keyActionsOrdersQueueBased = {

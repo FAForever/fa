@@ -693,3 +693,42 @@ SelectCommander = function(zoomTo)
         UIZoomTo(selectedUnits, 0)
     end
 end
+
+--- After running the given action, make the current command mode persistent,
+--- which means it doesn't end when shift is not pressed, and instead ends with right click.
+--- 
+--- If there is no current command mode, the action should start a command mode.
+--- 
+--- The action can be a function to call with given args or a string for a console command.
+---@generic T
+---@param action fun(...: T) | string
+---@param ... T # arguments for the action
+PersistentCommandModeAction = function(action, ...)
+    local CM = import('/lua/ui/game/commandmode.lua')
+    if iscallable(action) then
+        ---@cast action function
+        action(unpack(arg))
+    else
+        ---@cast action string
+        ConExecute(action)
+    end
+    CM.SetPersistentMode(true)
+end
+
+StartFormationlessMoveNoClearCmds = function()
+    local CM = import('/lua/ui/game/commandmode.lua')
+    CM.StartCommandMode('order', { name = "RULEUCC_Move" })
+    CM.SetOnCommandIssuedCallback('Move', "FormationlessMove", function(command)
+        local cqueue = command.Units[1]:GetCommandQueue()
+        import("/lua/ui/game/hotkeys/distribute-queue.lua").DistributeOrders(false)
+        DeleteCommand(cqueue[table.getn(cqueue)].ID)
+        return false
+    end)
+    CM.AddEndBehavior(function (mode, data)
+        CM.SetOnCommandIssuedCallback('Move', 'FormationlessMove', nil)
+    end)
+end
+
+StartPersistentFormationlessMoveNoClearCmds = function ()
+    PersistentCommandModeAction(StartFormationlessMoveNoClearCmds)
+end

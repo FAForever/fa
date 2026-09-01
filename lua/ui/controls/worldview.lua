@@ -987,6 +987,14 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldVie
             end
         end
 
+        if event.Type == 'ButtonPress' and event.Modifiers.Right then
+            local CM = import('/lua/ui/game/commandmode.lua')
+            local modeData = CM.GetCommandMode()[2]
+            if modeData.persistent then
+                CM.SetPersistentMode(false)
+            end
+        end
+
         return false
     end,
 

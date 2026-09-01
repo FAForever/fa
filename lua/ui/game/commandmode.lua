@@ -83,7 +83,7 @@ local MathAtan = math.atan
 
 ---@class MeshInfo
 ---@field Position Vector
----@field Blueprint string
+---@field BlueprintID string
 ---@field TextureName string
 ---@field ShaderName string
 ---@field UniformScale number
@@ -102,10 +102,10 @@ local MathAtan = math.atan
 ---@class CommandModeDataBase
 ---@field cursor? CommandCap        # Similar to the field 'name'
 ---@field altCursor? string          # Allows for an alternative cursor
+---@field persistent? boolean
 
 ---@class CommandModeDataOrder : CommandModeDataBase
 ---@field name CommandCap
----@field consistent boolean    # Allows command mode to remain after you issue a command, without queueing the commands
 
 ---@class CommandModeDataBuild : CommandModeDataBase
 ---@field name string # blueprint id of the unit being built
@@ -648,6 +648,7 @@ local function OnStopIssued(command)
 end
 
 -- Callbacks for different command types, nil values for reference to functions that don't exist yet
+---@type table<UserCommandType, (fun(command: UserCommand): skipFeedback: boolean) | nil>
 local OnCommandIssuedCallback = {
     None = nil,
     Stop = OnStopIssued,
@@ -683,22 +684,36 @@ local OnCommandIssuedCallback = {
     Repair = OnRepairIssued,
 }
 
+---@type table<UserCommandType, table<string, fun(command: UserCommand): skipFeedback: boolean> | nil>
+local HashedOnCommandIssuedCallbacks = {}
+
 --- Called by the engine when a new command has been issued by the player.
--- @param command Information surrounding the command that has been issued, such as its CommandType or its Target.
 ---@param command UserCommand
 function OnCommandIssued(command)
-    -- not command.Clear = when we hold shift, to queue up multiple commands.
-    if not command.Clear then
+    -- `command.Clear = false` when we hold shift, to queue up multiple commands.
+    local commandClear = command.Clear
+    if not commandClear then
         -- signal for OnCommandModeBeat to end commandMode at the next beat
         -- potentially removable? dont see the effect
         issuedOneCommand = true
     end
 
-    -- If our callback returns true or we don't have a command type, we skip the rest of our logic
-    if (OnCommandIssuedCallback[command.CommandType] and OnCommandIssuedCallback[command.CommandType](command))
-    or command.CommandType == 'None' then
+    -- If one of our callbacks returns true or we don't have a command type, we skip the rest of our logic
+    local commandType = command.CommandType
+    local defaultCallback = OnCommandIssuedCallback[commandType]
+    local cbRet = defaultCallback and defaultCallback(command)
+    local callbacks = HashedOnCommandIssuedCallbacks[commandType]
+    if callbacks then
+        for _, callback in callbacks do
+            cbRet = callback(command) or cbRet
+        end
+    end
+
+    if cbRet
+        or commandType == 'None'
+    then
         -- we do still need to end the commandmode for things like HotBuild.
-        if command.Clear then
+        if commandClear and not modeData.persistent then
             -- but only when not using the cheat menu, which should stay open.
             if modeData and not modeData.cheat or not modeData then
                 EndCommandMode(true)
@@ -706,12 +721,14 @@ function OnCommandIssued(command)
         end
         return
     end
-    
-    if command.Clear then
+
+    if commandClear and not modeData.persistent then
         EndCommandMode(true)
-        if command.CommandType ~= 'Stop'
-        and TableGetN(command.Units) == 1
-        and checkBadClean(command.Units[1]) then
+
+        if commandType ~= 'Stop'
+            and TableGetN(command.Units) == 1
+            and checkBadClean(command.Units[1])
+        then
             watchForQueueChange(command.Units[1])
         end
     end
@@ -722,13 +739,39 @@ end
 --- ???
 --- Ensures the command mode ends when one one command should be passed through?
 function OnCommandModeBeat()
-    if issuedOneCommand and not IsKeyDown('Shift')
+    if issuedOneCommand
+        and not IsKeyDown('Shift')
+        and modeData and not modeData.persistent
     then
         EndCommandMode(true)
     end
 end
 
 GameMain.AddBeatFunction(OnCommandModeBeat)
+
+---@param enable boolean
+function SetPersistentMode(enable)
+    if modeData then
+        modeData.persistent = enable or nil
+    else
+        WARN('SetPersistentMode run without mode data enabled! Check your command logic.', debug.traceback())
+    end
+end
+
+--- Set a callback by string identifier for when a command of a certain type is issued.
+--- 
+--- If the callback returns true, it skips feedback blip and enhancement queue check logic.
+---@param type UserCommandType
+---@param callback nil | fun(command: UserCommand): skipFeedback: boolean
+---@param id string
+function SetOnCommandIssuedCallback(type, id, callback)
+    local callbacks = HashedOnCommandIssuedCallbacks[type]
+    if not callbacks and callback then
+        HashedOnCommandIssuedCallbacks[type] = { [id] = callback }
+    elseif callbacks then
+        callbacks[id] = callback
+    end
+end
 
 -- kept for mod backwards compatibility
 local Dragger = import("/lua/maui/dragger.lua").Dragger
