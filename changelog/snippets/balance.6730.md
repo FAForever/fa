@@ -1,0 +1,3 @@
+- (#6730) The Seraphim ACU's Refracting Chronotron Amplifier (splash gun) upgrade is moved to the right arm, with the Chronotron Accelerator (speed gun) as the prerequisite.
+
+  The upgrade is underused due to competing with both the Tech 3 and Regen Aura upgrades, which are more versatile options. Additionally, both of these upgrades are also cheaper, which means that by the time you can upgrade the splash gun, you face the additional barrier of entry of having to remove two very useful upgrades. This PR aims to promote the use of the splash gun by reducing the barrier of entry for getting it.

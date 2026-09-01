@@ -525,6 +525,14 @@ XSL0001 = ClassUnit(ACUUnit) {
         local wep = self:GetWeaponByLabel('ChronotronCannon')
         wep:AddDamageRadiusMod(-self.Blueprint.Enhancements['BlastAttack'].NewDamageRadius) -- unlimited AOE bug fix by brute51 [117]
         wep:AddDamageMod(-self.Blueprint.Enhancements['BlastAttack'].AdditionalDamage)
+        local bpDisrupt = self.Blueprint.Weapon[1].RateOfFire
+        wep:ChangeRateOfFire(bpDisrupt or 1)
+        bpDisrupt = self.Blueprint.Weapon[1].MaxRadius
+        wep:ChangeMaxRadius(bpDisrupt or 22)
+        local oc = self:GetWeaponByLabel('OverCharge')
+        oc:ChangeMaxRadius(bpDisrupt or 22)
+        local aoc = self:GetWeaponByLabel('AutoOverCharge')
+        aoc:ChangeMaxRadius(bpDisrupt or 22)
     end,
 
     ---@param self XSL0001
