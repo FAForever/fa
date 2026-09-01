@@ -1,0 +1,5 @@
+- (#6850) Create a new `UniqueAffectCalculation` table in Buffs.lua, which allows a buff to have a unique calculation for how much it adds/multiplies an effect, while letting all other buffs that use the effect to calculate independently (unlike the old `UniqeBuffs` table).
+
+  An example is the Seraphim regen aura which adds regeneration to a unit by a percent of its max HP with maximum amounts based on tech level. Previously it was hijacking the entire multiplier calculation for the regen effect and also had to calculate additive regeneration effects from other buffs. Now it is refactoed to use the new system so it works without affecting the multipliers from other buffs and doesn't have to calculate the additive effects of other buffs.
+
+  Note for mod developers: If your mod relies on the regen multiplier effect to be based on unit HP, and isn't using the `SeraphimACURegenAura` or `SeraphimACUAdvancedRegenAura` buff names, it will break since the multiplier will be multiplying the additive effect of regen buffs.
