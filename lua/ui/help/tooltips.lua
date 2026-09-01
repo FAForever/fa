@@ -847,6 +847,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0283>UI Scale",
         description = "<LOC OPTIONS_0284>Changes the size of all UI elements. (requires game restart)",
     },
+    options_show_allied_intel_in_strategic_overlay = {
+        title = "<LOC Show_Allied_Intel_Title>Show Allied Intel in Strategic Overlay",
+        description = "<LOC Show_Allied_Intel_Description>Toggles the display of allied intel in the strategic overlay.",
+    },
     options_subtitles = {
         title = "<LOC OPTIONS_0151>Display Subtitles",
         description = "<LOC OPTIONS_0152>Toggles the display of subtitles during movies",
