@@ -557,6 +557,10 @@ AIPlatoonSimpleStructureBehavior = function()
     SimCallback({ Func = 'AIPlatoonSimpleStructureBehavior', Args = {} }, true)
 end
 
+function SetForceReclaim(enable, showMsg)
+    SimCallback({ Func = 'ForceReclaim', Args = { Enable = enable, ShowMsg = showMsg or true} }, true)
+end
+
 StoreCameraPosition = function()
     local camera = GetCamera('WorldCamera')
     local settings = camera:SaveSettings()
