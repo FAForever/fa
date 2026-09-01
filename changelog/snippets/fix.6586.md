@@ -1,0 +1,1 @@
+(#6586) Firestate toggle hotkey shows instant response on the order button ui instead of the half second delay it had previously.
