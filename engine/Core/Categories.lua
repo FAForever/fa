@@ -83,6 +83,7 @@ categories = {
     DIRECTFIRE = categoryValue,
     DRAGBUILD = categoryValue,
     DUMMYGSRWEAPON = categoryValue,
+    --- Used in blueprint lua.
     DUMMYUNIT = categoryValue,
     ECONOMIC = categoryValue,
     ENERGYPRODUCTION = categoryValue,
@@ -106,10 +107,12 @@ categories = {
     HOVER = categoryValue,
     HYDROCARBON = categoryValue,
     INDIRECTFIRE = categoryValue,
+    --- Makes engine not show command queue for this unit. Also used in lua code.
     INSIGNIFICANTUNIT = categoryValue,
     INTEL = categoryValue,
     INTELJAMMERPRESET = categoryValue,
     INTELLIGENCE = categoryValue,
+    --- Used by props to make them not take damage
     INVULNERABLE = categoryValue,
     ISPREENHANCEDUNIT = categoryValue,
     LAND = categoryValue,
@@ -170,6 +173,7 @@ categories = {
     RESEARCH = categoryValue,
     SATELLITE = categoryValue,
     SCOUT = categoryValue,
+    --- Allows unit to be selected.
     SELECTABLE = categoryValue,
     SERAPHIM = categoryValue,
     SHIELD = categoryValue,
@@ -224,11 +228,15 @@ categories = {
     TRANSPORTBUILTBYTIER3FACTORY = categoryValue,
     TRANSPORTFOCUS = categoryValue,
     UEF = categoryValue,
+    -- Does not do anything.
+    -- Remove SELECTABLE category or use `Unit:SetUnSelectable` to make unit unselectable.
     UNSELECTABLE = categoryValue,
+    -- Makes unit not appear in unit creation debug dialog.
     UNSPAWNABLE = categoryValue,
     UNTARGETABLE = categoryValue,
     USEBUILDPRESETS = categoryValue,
     VERIFYMISSILEUI = categoryValue,
+    --- Allows engine to spot this unit with intel for other armies.
     VISIBLETORECON = categoryValue,
     VOLATILE = categoryValue,
     WALL = categoryValue,
@@ -330,6 +338,7 @@ categories = {
 ---| "DIRECTFIRE"
 ---| "DRAGBUILD"
 ---| "DUMMYGSRWEAPON"
+--- Used in blueprint lua.
 ---| "DUMMYUNIT"
 ---| "ECONOMIC"
 ---| "ENERGYPRODUCTION"
@@ -351,10 +360,12 @@ categories = {
 ---| "HOVER"
 ---| "HYDROCARBON"
 ---| "INDIRECTFIRE"
+--- Makes engine not show command queue for this unit. Also used in lua code.
 ---| "INSIGNIFICANTUNIT"
 ---| "INTEL"
 ---| "INTELJAMMERPRESET"
 ---| "INTELLIGENCE"
+--- Used by props to make them not take damage
 ---| "INVULNERABLE"
 ---| "ISPREENHANCEDUNIT"
 ---| "LAND"
@@ -410,6 +421,7 @@ categories = {
 ---| "RESEARCH"
 ---| "SATELLITE"
 ---| "SCOUT"
+--- Allows unit to be selected.
 ---| "SELECTABLE"
 ---| "SERAPHIM"
 ---| "SHIELD"
@@ -463,11 +475,16 @@ categories = {
 ---| "TRANSPORTBUILTBYTIER3FACTORY"
 ---| "TRANSPORTFOCUS"
 ---| "UEF"
+--- Does not do anything.
+--- Remove SELECTABLE category or use `Unit:SetUnSelectable` to make unit unselectable.
 ---| "UNSELECTABLE"
+--- Makes unit not appear in unit creation debug dialog.
 ---| "UNSPAWNABLE"
+--- Makes unit not targetable in UI for engine.
 ---| "UNTARGETABLE"
 ---| "USEBUILDPRESETS"
 ---| "VERIFYMISSILEUI"
+--- Allows engine to spot this unit with intel for other armies.
 ---| "VISIBLETORECON"
 ---| "VOLATILE"
 ---| "WALL"

@@ -628,6 +628,15 @@ local function PostProcessUnit(unit)
             unit.Display.AnimationDeath = nil
         end
     end
+
+    if isAir then
+        local airBp = unit.Air
+        if airBp and airBp.EnableVisionWhileFalling == nil
+            and unit.CategoriesHash["SCOUT"]
+        then
+            airBp.EnableVisionWhileFalling = true
+        end
+    end
 end
 
 --- Feature: re-apply the ability to land on water

@@ -51,7 +51,7 @@ VizMarker = Class(Entity) {
         if self.Radar != false then
             self:InitIntel(self.Army, 'Radar', self.Radius)
             self:EnableIntel('Radar')
-        end        
+        end
         if self.Vision != false then
             self:InitIntel(self.Army, 'Vision', self.Radius)
             self:EnableIntel('Vision')
@@ -81,17 +81,18 @@ VizMarker = Class(Entity) {
 }
 local PositionCache = { 0, 0, 0 }
 
---- Performance-wise a better alternative to the regular vision marker. 
+--- Performance-wise a better alternative to the regular vision marker.
 ---@class VisionMarkerOpti : Entity
+---@overload fun(spec: EntitySpec): VisionMarkerOpti
 VisionMarkerOpti = Class(Entity) {
 
     --- Update all intel types
-    ---@see `UpdateIntel` if you intend to apply only one intel type
-    ---@see `UpdatePosition`and `UpdateDuration` for additional functionality
+    ---@see VisionMarkerOpti.UpdateIntel if you intend to apply only one intel type
+    ---@see VisionMarkerOpti.UpdatePosition and `UpdateDuration` for additional functionality
     ---@param self VisionMarkerOpti
-    ---@param lifetime number       # Duration of the intel, if set to -1 it lasts indefinitely
+    ---@param lifetime number?      # Duration of the intel, if set to -1 it lasts indefinitely
     ---@param army number           # Army that we're creating intel for
-    ---@param radius number         # Radius of the intel type(s)
+    ---@param radius integer         # Radius of the intel type(s)
     ---@param vision? boolean       # Intel type is enabled when true, disabled when false and left alone when nil
     ---@param waterVision? boolean  # Intel type is enabled when true, disabled when false and left alone when nil
     ---@param radar? boolean        # Intel type is enabled when true, disabled when false and left alone when nil
@@ -108,29 +109,34 @@ VisionMarkerOpti = Class(Entity) {
         if waterVision then
             self:InitIntel(army, 'WaterVision', radius)
             self:EnableIntel('WaterVision')
-        elseif waterVision == false then 
+        elseif waterVision == false then
             self:DisableIntel('WaterVision')
         end
 
         if radar then
             self:InitIntel(army, 'Radar', radius)
             self:EnableIntel('Radar')
-        elseif radar == false then 
+        elseif radar == false then
             self:DisableIntel('Radar')
         end
 
         if sonar then
             self:InitIntel(army, 'Sonar', radius)
             self:EnableIntel('Sonar')
-        elseif sonar == false then 
+        elseif sonar == false then
             self:DisableIntel('Sonar')
         end
 
         if omni then
             self:InitIntel(army, 'Omni', radius)
             self:EnableIntel('Omni')
-        elseif omni == false then 
+        elseif omni == false then
             self:DisableIntel('Omni')
+        end
+
+        if lifetime >= 0 then
+            ---@cast lifetime -nil
+            self:UpdateDuration(lifetime)
         end
     end,
 
@@ -140,15 +146,15 @@ VisionMarkerOpti = Class(Entity) {
     ---@param z number
     UpdatePosition = function(self, x, z)
         PositionCache[1] = x
+        -- cache[2] doesn't need update since intel is independent of height
         PositionCache[3] = z
-        PositionCache[2] = GetTerrainHeight(x, z)
         Warp(self, PositionCache)
     end,
 
     --- Update one specific intel type
     ---@param self VisionMarkerOpti
     ---@param army number
-    ---@param radius number
+    ---@param radius integer
     ---@param type IntelType
     ---@param enable boolean Intel type is enabled when true and disabled otherwise
     UpdateIntel = function(self, army, radius, type, enable)
