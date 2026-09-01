@@ -39,15 +39,14 @@ UnitBlueprint{
         "AIR",
         "BOMB",
         "BOMBER",
-        "CANNOTUSEAIRSTAGING",
         "MOBILE",
         "PRODUCTDL",
         "RECLAIMABLE",
         "SELECTABLE",
         "SHOWATTACKRETICLE",
         "TECH2",
-        "TRANSPORTBUILTBYTIER2FACTORY",
-        "TRANSPORTBUILTBYTIER3FACTORY",
+        "BUILTBYTIER2FACTORY",
+        "BUILTBYTIER3FACTORY",
         "VISIBLETORECON",
     },
     Defense = {
@@ -117,7 +116,11 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
+            RULEUCC_CallTransport = true,
+            RULEUCC_Dock = true,
+            RULEUCC_Guard = true,
             RULEUCC_Move = true,
+            RULEUCC_Patrol = true,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
         },
@@ -133,7 +136,7 @@ UnitBlueprint{
     Physics = {
         AttackElevation = 0.5,
         Elevation = 12,
-        FuelRechargeRate = 0,
+        FuelRechargeRate = 5,
         FuelUseTime = 400,
         GroundCollisionOffset = -0.25,
         MaxSpeed = 13,
@@ -159,6 +162,7 @@ UnitBlueprint{
     Weapon = {
         {
             AboveWaterTargetsOnly = true,
+            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound { Bank = 'UAAWeapon', Cue = 'UAA0304_Bomb_Quark', LodCutoff = 'Weapon_LodCutoff' },
             },
@@ -202,7 +206,7 @@ UnitBlueprint{
             RateOfFire = 10/1, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 35,
-            TargetCheckInterval = 999999,
+            TargetCheckInterval = 1,
             TargetPriorities = {
                 "TECH4",
                 "TECH3 STRUCTURE",
@@ -211,7 +215,7 @@ UnitBlueprint{
                 "(ALLUNITS - SPECIALLOWPRI)",
             },
             TargetRestrictDisallow = "UNTARGETABLE",
-            TrackingRadius = 0.5,
+            TrackingRadius = 1.1,
             TurretBoneMuzzle = "DAA0206",
             TurretBonePitch = "DAA0206",
             TurretBoneYaw = "DAA0206",
