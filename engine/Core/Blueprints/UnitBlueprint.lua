@@ -240,6 +240,8 @@
 ---@field LiftFactor number
 --- maximum airspeed
 ---@field MaxAirspeed number
+--- cap for the elevation variation (absolute units)
+---@field MaxAbsoluteElevationDelta? number
 --- minimum combat airspeed
 ---@field MinAirspeed? number
 --- time to predict ahead for moving targets
@@ -250,6 +252,8 @@
 ---@field RandomMaxChangeCombatStateTime? number
 --- random min time to switch combat state in seconds for winged aircraft. Defaults to 3
 ---@field RandomMinChangeCombatStateTime? number
+--- random variation of the Elevation value (relative number)
+---@field RelativeElevationDelta? number
 --- distance from target at which to start turning to align with it
 ---@field StartTurnDistance number
 --- Length of time in seconds allowed for sustained turn before we re-try a different approach. Defaults to 10

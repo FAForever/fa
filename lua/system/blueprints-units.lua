@@ -131,6 +131,12 @@ end
 --- Post process a unit
 ---@param unit UnitBlueprint
 local function PostProcessUnit(unit)
+    -- insert default values
+    if unit.CategoriesHash['AIR'] then
+        unit.Air.MaxAbsoluteElevationDelta = unit.Air.MaxAbsoluteElevationDelta or 2
+        unit.Air.RelativeElevationDelta = unit.Air.RelativeElevationDelta or 0.05
+    end
+
     if table.find(unit.Categories, "SUBCOMMANDER") then
         table.insert(unit.Categories, "SACU_BEHAVIOR")
     end
