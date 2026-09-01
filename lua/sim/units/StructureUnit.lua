@@ -590,6 +590,7 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
     ---@param self StructureUnit
     ---@param unitBeingBuilt Unit
     ---@param order string
+    ---@return boolean
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Check for death loop
         if not UnitOnStartBuild(self, unitBeingBuilt, order) then
