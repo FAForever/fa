@@ -52,16 +52,18 @@ AirUnit = ClassUnit(MobileUnit) {
         end
 
         local blueprintAir = blueprint.Air
-        local minVal = 1.00 - blueprintAir.RelativeElevationDelta
-        local maxVal = 1.00 + blueprintAir.RelativeElevationDelta
+        local relativeElevationDelta = blueprintAir and blueprintAir.RelativeElevationDelta or 0.05
+        local minVal = 1.00 - relativeElevationDelta
+        local maxVal = 1.00 + relativeElevationDelta
         local elevationMultiplier = Random() * (maxVal - minVal) + minVal
 
         local newElevation
 
+        local maxElevationDelta = blueprintAir and blueprintAir.MaxAbsoluteElevationDelta or 2.5
         if elevationMultiplier > 1 then
-            newElevation = math.min(originalElevation * elevationMultiplier, originalElevation + blueprintAir.MaxElevationDelta)
+            newElevation = math.min(originalElevation * elevationMultiplier, originalElevation + maxElevationDelta)
         else
-            newElevation = math.max(originalElevation * elevationMultiplier, originalElevation - blueprintAir.MaxElevationDelta)
+            newElevation = math.max(originalElevation * elevationMultiplier, originalElevation - maxElevationDelta)
         end
 
         self:SetElevation(newElevation)
