@@ -16,6 +16,7 @@ local Button = import("/lua/maui/button.lua").Button
 local Edit = import("/lua/maui/edit.lua").Edit
 local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
 local Keymapping = import("/lua/keymap/defaultkeymap.lua").defaultKeyMap
+local getCurrentKeyBinding = import("/lua/keymap/keymapper.lua").GetCurrentKeyBinding
 
 local mouseoverDisplay = false
 local createThread = false
@@ -62,12 +63,10 @@ function CreateMouseoverDisplay(parent, ID, delay, extended, width, forced, padd
             text = TooltipInfo['Tooltips'][ID]['title']
             body = TooltipInfo['Tooltips'][ID]['description']
             if TooltipInfo['Tooltips'][ID]['keyID'] and TooltipInfo['Tooltips'][ID]['keyID'] ~= "" then
-                for i, v in Keymapping do
-                    if v == TooltipInfo['Tooltips'][ID]['keyID'] then
-                        local properkeyname = import("/lua/ui/dialogs/keybindings.lua").FormatKeyName(i)
-                        text = LOCF("%s (%s)", text, properkeyname)
-                        break
-                    end
+                local currentKeyBinding = getCurrentKeyBinding(TooltipInfo['Tooltips'][ID]['keyID'])
+                if currentKeyBinding then
+                    local properkeyname = import("/lua/ui/dialogs/keybindings.lua").FormatKeyName(currentKeyBinding)
+                    text = LOCF("%s (%s)", text, properkeyname)
                 end
             end
         else
@@ -123,13 +122,14 @@ function CreateMouseoverDisplay(parent, ID, delay, extended, width, forced, padd
         end
     end
 
-    -- some hack
+    -- A hack to color the text in the team colors tooltip. TODO: don't do this hack
     if ID == "mfd_defense" then
+        -- start from the end of the table since the beginning can be wrapped lines of text
         local size = table.getn(mouseoverDisplay.desc)
-        mouseoverDisplay.desc[size]:SetColor('ffff0000')
-        mouseoverDisplay.desc[size-1]:SetColor('ffffff00')
-        mouseoverDisplay.desc[size-2]:SetColor('ff00ff00')
-        mouseoverDisplay.desc[size-3]:SetColor('ff4f77f4')
+        mouseoverDisplay.desc[size]:SetColor('ffff0000') -- Enemy Units
+        mouseoverDisplay.desc[size-1]:SetColor('ffffff00') -- Neutral Units
+        mouseoverDisplay.desc[size-2]:SetColor('ff00ff00') -- Allied Units
+        mouseoverDisplay.desc[size-3]:SetColor('ff4f77f4') -- Your Units
     end
 
     -- adding smooth popup animation to the tooltip 
