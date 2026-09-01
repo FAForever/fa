@@ -7631,6 +7631,8 @@ OPTIONS_0283="UI Scale"
 OPTIONS_0284="Changes the size of all UI elements. (requires game restart)"
 OPTIONS_0285="Automatic Extractor Selection"
 OPTIONS_0286="After selecting an engineer, hover the mouse over a mass extractor spot to auto preselect a mass extractor for building"
+OPTIONS_0287="Show Lifebars Only When Damaged"
+OPTIONS_0288="When on, lifebars only appear once a unit takes damage. Hides them on full-HP units. Provides an FPS gain in dense crowds."
 
 lobui_0414 = "%d Build Restrictions"
 lobui_0415 = "1 Build Restriction"
