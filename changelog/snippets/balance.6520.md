@@ -1,0 +1,2 @@
+- (#6520) Increase the DoT time of the Aeon T3 Static Artillery (Emissary) to make it possible to block 2 Emissaries with a reasonable amount of buildpower repairing the shield.
+  - Emissary DoTTime: 1 second -> 3.8 seconds
