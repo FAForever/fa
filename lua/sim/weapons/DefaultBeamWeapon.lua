@@ -295,12 +295,13 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
     ---@return boolean
     EconomySupportsBeam = function(self)
         local aiBrain = self.Brain
-        local energyIncome = aiBrain:GetEconomyIncome('ENERGY') * 10
+        local energyRate = aiBrain:GetEconomyTrend('ENERGY') * 10
         local energyStored = aiBrain:GetEconomyStored('ENERGY')
         local energyReq = self:GetWeaponEnergyRequired()
         local energyDrain = self:GetWeaponEnergyDrain()
+        local drainDuration = math.floor(energyReq / energyDrain)
 
-        if energyStored < energyReq and energyIncome < energyDrain then
+        if (energyDrain - energyRate) * drainDuration > energyStored then
             return false
         end
         return true
