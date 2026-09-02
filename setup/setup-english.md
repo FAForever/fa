@@ -170,10 +170,10 @@ After you acquire the replay, you need to match the game version to run it. This
 
         Example command (uses debugger and immediately launches replay):
         ```cmd
-        "C:\ProgramData\FAForever\replaydata\bin\FADeepProbe.exe" ForgedAlliance.exe /init "init_dev.lua" /EnableDiskWatch /nomovie /showlog /log "dev.log" /RunWithTheWind /replay "C:/ProgramData/FAForever/cache/temp.scfareplay"
+        "C:\ProgramData\FAForever\replaydata\bin\FADeepProbe.exe" ForgedAlliance.exe /init "init_local_development.lua" /EnableDiskWatch /nomovie /showlog /log "dev.log" /RunWithTheWind /replay "C:/ProgramData/FAForever/cache/temp.scfareplay"
         ```
         
-        Make sure to add `init_dev.lua` to the replay directory, or change the path to the init file in the normal game directory.
+        Make sure to add `init_local_development.lua` to the replay directory, or change the path to the init file in the normal game directory.
 
     - Alternatively you can modify the `fa_path.lua` game version number directly, but this doesn't change the version of binary patches applied to the exe.
 
