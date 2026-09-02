@@ -144,23 +144,55 @@ The arguments are passed along by the debugger. The change to the bash script is
 
 ## Running a replay
 
-A hard crash may only show up in a replay. You'll need to use the debugger to investigate. You want to run the replay using the debugger. This requires two steps: match the game version of the replay and acquire the replay itself.
+If you want to investigate a bug in a replay, you can run it with the debugger and your own debug code. This requires two steps:
+### Acquire the replay:
+FAF downloads `.fafreplay` files, but the game only recognizes `.scfareplay` files. 
+- You can unpack `.fafreplay` into `.scfareplay` by starting the replay from the client and then immediately closing it, resulting in a temporary reply file at `C:/ProgramData/FAForever/cache/temp.scfareplay`.
 
-The game version depends on the game type. Checkout the repository to the correct branch:
+- Alternatively, you can download `.fafreplay` from `https://replay.faforever.com/<REPLAY_ID>` and unpack it using the [Rust FAF replay parser](https://crates.io/crates/faf-replay-parser) with `fafreplay unpack <REPLAY>`.
 
-- `FAF`: `deploy/faf`
-- `FAF Beta`: `deploy/fafbeta`
-- `FAF Develop`: `deploy/fafdevelop`
+    - Storing the unpacked replay here allows the in-game replay dialog to see it: `%USERPROFILE%/Documents/My Games/Gas Powered Games/Supreme Commander Forged Alliance/replays/%PROFILE_NAME%`
 
-Unlike the `.fafreplay` files you can get from and view with the faf client, the base game which you will run to test and debug only recognizes the `.scfareplay` extension for replays. To convert a `.fafreplay` to the `.scfareplay` extension you can start the replay with the faf client and immediately close it. The client will have created a temporary version of your replay with the `.scfareplay` format in the cache folder of the client:
+        `%PROFILE_NAME%` is the in-game profile name.
 
-- `C:/ProgramData/FAForever/cache/temp.scfareplay`
+### Matching game data
+After you acquire the replay, you need to match the game version to run it. This has two parts:
+1. **Matching the Lua repository version.**
 
-Copy that replay to the replays folder of the game:
+    Simply checkout the repository to the correct branch for the game type:
+    - `FAF`: `deploy/faf`
+    - `FAF Beta`: `deploy/fafbeta`
+    - `FAF Develop`: `deploy/fafdevelop`
 
-- `C:/Users/%USER_NAME%/Documents/My Games/Gas Powered Games/Supreme Commander Forged Alliance/replays/%PROFILE_NAME%`
+2. **Matching the game version numbers**
 
-Note that the last path is incomplete: you need replace `%USER_NAME%` with your systems profile name and `%PROFILE_NAME%` with the profile name you use in the game. You can launch the game using the bat files as described earlier.
+    The game version numbers in the replay file header and in `../fa_path.lua` (a file one directory down from the game exe) must match.
+
+    - The simplest way is to run the replay using the client, and then launching the replay's game exe with the dev init file. In addition to correcting the version number, this downloads the correct version of the patched exe for the replay.
+
+        Example command (uses debugger and immediately launches replay):
+        ```cmd
+        "C:\ProgramData\FAForever\replaydata\bin\FADeepProbe.exe" ForgedAlliance.exe /init "init_dev.lua" /EnableDiskWatch /nomovie /showlog /log "dev.log" /RunWithTheWind /replay "C:/ProgramData/FAForever/cache/temp.scfareplay"
+        ```
+        
+        Make sure to add `init_dev.lua` to the replay directory, or change the path to the init file in the normal game directory.
+
+    - Alternatively you can modify the `fa_path.lua` game version number directly, but this doesn't change the version of binary patches applied to the exe.
+
+### Running the replay
+After you have done the two steps above, you can launch the game with an additional command line argument to launch straight into the replay:
+
+- `/replay "C:/ProgramData/FAForever/cache/temp.scfareplay"`
+
+If your game is already open, you can launch the replay using this script that runs from your clipboard (`Ctrl+Shift+V`):
+```lua
+local replay = "C:/ProgramData/FAForever/cache/temp.scfareplay"
+if LaunchReplaySession(replay) then
+	SetFrontEndData('replay_filename', replay)
+else
+	WARN(string.format('Issue starting replay "%s"', replay))
+end
+```
 
 ## Starting a singleplayer session quickly
 
