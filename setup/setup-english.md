@@ -135,7 +135,8 @@ FADeepProbe.exe /init "init_local_development.lua" /EnableDiskWatch /showlog /lo
 
 The arguments are passed along by the debugger. The change to the bash script is similar. When the game crashes the debugger will try and inform you in the log what happened.
 
-## Running a replay
+Running a replay
+----------------
 
 If you want to investigate a bug in a replay, you can run it with the debugger and your own debug code. This requires two steps:
 ### Acquire the replay:
