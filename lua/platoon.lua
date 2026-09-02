@@ -55,6 +55,10 @@ Platoon = Class(moho.platoon_methods) {
     NeedCoolDown = false,
     LastAttackDestination = {},
 
+    __init = function(self)
+        import('/lua/shared/DebugUtils.lua').ReplaceTableWithTrackedTable(self)
+    end,
+
     ---@param self Platoon
     ---@param plan table
     OnCreate = function(self, plan)

@@ -1349,6 +1349,12 @@ function DisableAI(self)
             if not unit.Dead then
                 local handle = unit.PlatoonHandle
                 if handle and self:PlatoonExists(handle) then
+                    if not handle.Stop or not handle.PlatoonDisbandNoAssign then
+                        WARN(repr(handle, {meta = true, depth = 2}))
+                        handle:__ProxyPrintAllData()
+                        SimConExecute('UI_Lua SessionRequestPause()')
+                        error('Platoon has no stop or PlatoonDisbandNoAssign')
+                    end
                     handle:Stop()
                     handle:PlatoonDisbandNoAssign()
                 end
