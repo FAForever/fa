@@ -728,6 +728,8 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     import("/lua/ui/game/unitview.lua").OnSelection(newSelection)
 end
 
+--- Called by the engine when we have a current factory set for queue display.
+---@see SetCurrentFactoryForQueueDisplay
 ---@param newQueue UIBuildQueue
 function OnQueueChanged(newQueue)
     -- update the Lua representation of the queue
