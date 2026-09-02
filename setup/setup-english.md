@@ -158,6 +158,10 @@ After you acquire the replay, you need to match the game version to run it. This
     - `FAF Beta`: `deploy/fafbeta`
     - `FAF Develop`: `deploy/fafdevelop`
 
+    For older game versions, you can check out easily by git tag: `git checkout <version_number>`
+
+    For example: `git checkout 3834`
+
 2. **Matching the game version numbers**
 
     The game version numbers in the replay file header and in `../fa_path.lua` (a file one directory down from the game exe) must match.
