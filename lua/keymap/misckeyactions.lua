@@ -703,7 +703,7 @@ function RestartSessionOrReplay()
             print(msg)
             WARN(msg)
         end
-    else
+    elseif SessionIsActive() and SessionCanRestart() then
         RestartSession()
     end
 end
