@@ -693,3 +693,17 @@ SelectCommander = function(zoomTo)
         UIZoomTo(selectedUnits, 0)
     end
 end
+
+function RestartSessionOrReplay()
+    if SessionIsReplay() then
+        local ok = LaunchReplaySession(GetFrontEndData('replay_filename'))
+        if not ok then
+            local filename = tostring(GetFrontEndData('replay_filename'))
+            local msg = string.format('Issue starting replay "%s"', filename)
+            print(msg)
+            WARN(msg)
+        end
+    else
+        RestartSession()
+    end
+end

@@ -214,7 +214,7 @@ local keyActionsDebug = {
         category = 'game',
     },
     ['debug_restart_session'] = {
-        action = "UI_Lua if SessionIsReplay() then LaunchReplaySession(GetFrontEndData('replay_filename')) else RestartSession() end",
+        action = "UI_Lua import('/lua/keymap/misckeyactions.lua').RestartSessionOrReplay()",
         category = 'debug',
     },
     ['debug_toggle_pannels'] = {
