@@ -20,6 +20,7 @@ function UpdateDialog(beatNumber, strings)
     if doesntCare or dialog then
         return
     end
+    SessionRequestPause()
 
     local dialogContent = Group(GetFrame(0))
     LayoutHelpers.SetDimensions(dialogContent, 400, 320)
