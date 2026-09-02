@@ -214,7 +214,7 @@ local keyActionsDebug = {
         category = 'game',
     },
     ['debug_restart_session'] = {
-        action = 'UI_Lua RestartSession()',
+        action = "UI_Lua if SessionIsReplay() then LaunchReplaySession(GetFrontEndData('replay_filename')) else RestartSession() end",
         category = 'debug',
     },
     ['debug_toggle_pannels'] = {
