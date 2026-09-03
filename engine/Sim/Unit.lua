@@ -221,8 +221,10 @@ end
 function Unit:GetHealth()
 end
 
---- Returns the navigator object of this unit
----@return Navigator
+--- Returns the navigator object of this unit. 
+--- 
+--- Returns `nil` for immobile units.
+---@return Navigator?
 function Unit:GetNavigator()
 end
 
