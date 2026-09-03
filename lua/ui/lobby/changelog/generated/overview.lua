@@ -6,6 +6,13 @@
 Overview = {
     Changelogs = {
         {
+            Version = 1,
+            Name = "Upcoming changes",
+            Date = "2026-09-03",
+            URL = "http://faforever.github.io/fa/changelog/fafdevelop",
+            Path = "/lua/ui/lobby/changelog/generated/fafdevelop.lua"
+        },
+        {
             Version = 3839,
             Name = "3839 - Hotfix",
             Date = "2026-08-28",
