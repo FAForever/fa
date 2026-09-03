@@ -50,6 +50,22 @@
 -- note that these object span both the sim and user states
 ---@alias GoalObject moho.manipulator_methods | EconomyEvent | Camera
 
+---@class FileInfo
+---@field IsFolder boolean
+---@field ReadOnly boolean
+---@field SizeBytes integer
+---@field TimeStamp string # unsigned 64 bit int in lowercase hexadecimal
+---@field WriteTime FileInfo.WriteTime
+
+---@class FileInfo.WriteTime
+---@field year integer
+---@field month integer
+---@field mday integer # month day
+---@field wday integer # week day
+---@field hour integer
+---@field minute integer
+---@field second integer
+
 ---@unknown
 function AITarget()
 end
@@ -101,7 +117,7 @@ end
 
 --- returns a table of information for the given file, or `false` if the file doesn't exist
 ---@param filename FileName
----@return table | false
+---@return FileInfo | false
 function DiskGetFileInfo(filename)
 end
 
