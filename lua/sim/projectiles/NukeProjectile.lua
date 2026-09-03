@@ -122,13 +122,15 @@ NukeProjectile = ClassProjectile(NullShell) {
         NullShell.OnImpact(self, TargetType, TargetEntity)
     end,
 
+    --- Copies ProjectileDamaged event callbacks from the launcher to an internal table, sets
+    --- our collision shape to a 2 radius sphere, and then forks `self.MovementThread`.
     ---@param self NukeProjectile
     LauncherCallbacks = function(self)
         local launcher = self.Launcher
         if launcher and not launcher.Dead and launcher.EventCallbacks.ProjectileDamaged then
-            self.ProjectileDamaged = {}
-            for k, v in launcher.EventCallbacks.ProjectileDamaged do
-                table.insert(self.ProjectileDamaged, v)
+            self.ProjectileDamaged = {} ---@type fun(self: NukeProjectile)[]
+            for _, cb in launcher.EventCallbacks.ProjectileDamaged do
+                table.insert(self.ProjectileDamaged, cb)
             end
         end
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
@@ -142,8 +144,12 @@ NukeProjectile = ClassProjectile(NullShell) {
     ---@param damageType DamageType
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         if self.ProjectileDamaged then
-            for k, v in self.ProjectileDamaged do
-                v(self)
+            for i, cb in self.ProjectileDamaged do
+                local ok, msg = pcall(cb, self)
+                if not ok then
+                    WARN(string.format('Error running NukeProjectile ProjectileDamaged callback: %s', msg))
+                    table.remove(self.ProjectileDamaged, i)
+                end
             end
         end
         NullShell.DoTakeDamage(self, instigator, amount, vector, damageType)

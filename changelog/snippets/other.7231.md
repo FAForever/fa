@@ -1,0 +1,1 @@
+- Add graceful error handling for various sim and UI callbacks (#7231).

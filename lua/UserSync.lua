@@ -142,13 +142,13 @@ function OnSync()
     end
 
     -- old sync callbacks
-    for k, callback in SyncCallbacks do 
+    for k, callback in SyncCallbacks do
         local ok, msg = pcall(callback, Sync)
 
         -- if it fails, kick it out
         if not ok then
             SyncCallbacks[k] = nil
-            WARN(msg)
+            WARN(string.format('Error running Sync callback (id "%s"): %s', k, msg))
         end
     end
 
@@ -157,7 +157,11 @@ function OnSync()
         local callbacks = HashedSyncCallbacks[k]
         if callbacks then
             for l, callback in callbacks do
-                callback(data)
+                local ok, msg = pcall(callback, data)
+                if not ok then
+                    callbacks[l] = nil
+                    WARN(string.format('Error running Sync.%s callback (id "%s"): %s', k, l, msg))
+                end
             end
         end
     end

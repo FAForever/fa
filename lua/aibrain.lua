@@ -17,6 +17,7 @@ local UpdateUnitCap = SimUtils.UpdateUnitCap
 local SimPingOnArmyDefeat = import("/lua/simping.lua").OnArmyDefeat
 local RecallOnArmyDefeat = import("/lua/sim/recall.lua").OnArmyDefeat
 local FakeTeleportUnits = import("/lua/scenarioframework.lua").FakeTeleportUnits
+local AssertFaParams = import("/lua/shared/fatypeutils.lua").AssertFaParams
 
 local StorageManagerBrainComponent = import("/lua/aibrains/components/storagemanagerbraincomponent.lua").StorageManagerBrainComponent
 local FactoryManagerBrainComponent = import("/lua/aibrains/components/factorymanagerbraincomponent.lua").FactoryManagerBrainComponent
@@ -60,8 +61,8 @@ local cachedPlatoonUnit = {}
 ---@field Human boolean
 ---@field Civilian boolean
 ---@field Trash TrashBag
----@field UnitBuiltTriggerList table
----@field PingCallbackList { CallbackFunction: fun(pingData: any), PingType: string }[]
+---@field UnitBuiltTriggerList UnitBuiltTrigger[]
+---@field PingCallbackList { CallbackFunction: fun(self: AIBrain, pingData: SyncPingData), PingType: PingTypeLowercase }[]
 ---@field BrainType 'Human' | 'AI'
 ---@field CustomUnits { [string]: EntityId[] }
 ---@field CommanderKilledBy Army        # Which army last killed one of our commanders. Used for transfering to killer in `demoralization` (Assassination) and `decapitation` victory.
@@ -338,26 +339,27 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         end
     end,
 
+    --- Adds callback that runs once when a unit in `category` reaches `percent`
+    --- build progress.
     ---@param self AIBrain
     ---@param callback fun(unit:Unit)
     ---@param category EntityCategory
     ---@param percent number
     AddUnitBuiltPercentageCallback = function(self, callback, category, percent)
-        if not callback or not category or not percent then
-            error('*ERROR: Attempt to add UnitBuiltPercentageCallback but invalid data given', 2)
-        end
+        AssertFaParams(callback, 'function', category, 'EntityCategory', percent, 'number')
 
-        local unitBuiltTriggerList = self.UnitBuiltTriggerList
-        if not unitBuiltTriggerList then
-            unitBuiltTriggerList = {}
-            self.UnitBuiltTriggerList = unitBuiltTriggerList
-        end
-
-        table.insert(unitBuiltTriggerList, {
+        ---@class UnitBuiltTrigger
+        local trigger = {
             Callback = callback,
             Category = category,
             Percent = percent
-        })
+        }
+        local unitBuiltTriggerList = self.UnitBuiltTriggerList
+        if not unitBuiltTriggerList then
+            self.UnitBuiltTriggerList = { trigger }
+        else
+            table.insert(unitBuiltTriggerList, trigger)
+        end
     end,
 
     ---@param self AIBrain
@@ -586,8 +588,8 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     --#region ping functionality
 
     ---@param self AIBrain
-    ---@param callback function
-    ---@param pingType string
+    ---@param callback fun(self: AIBrain, pingData: SyncPingData)
+    ---@param pingType PingTypeLowercase
     AddPingCallback = function(self, callback, pingType)
         if callback and pingType then
             table.insert(self.PingCallbackList, { CallbackFunction = callback, PingType = pingType })
@@ -595,15 +597,19 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     end,
 
     ---@param self AIBrain
-    ---@param pingData table
+    ---@param pingData SyncPingData
     DoPingCallbacks = function(self, pingData)
-        for _, v in self.PingCallbackList do
-            v.CallbackFunction(self, pingData)
+        for i, v in self.PingCallbackList do
+            local ok, msg = pcall(v.CallbackFunction, self, pingData)
+            if not ok then
+                self.PingCallbackList[i] = nil
+                WARN('Error running AI brain ping callback:', msg)
+            end
         end
     end,
 
     ---@param self AIBrain
-    ---@param pingData table
+    ---@param pingData SyncPingData
     DoAIPing = function(self, pingData)
         if self.Sorian then
             if pingData.Type then

@@ -7,7 +7,7 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 ---@class SyncPingData
 ---@field Owner integer # Army index of who sent the ping
 ---@field Location Vector # position
----@field Type PingType
+---@field Type PingTypeLowercase
 ---@field Lifetime number
 ---@field Ring FileName
 ---@field ArrowColor 'yellow' | 'blue' | 'red'

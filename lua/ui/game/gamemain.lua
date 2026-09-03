@@ -17,6 +17,10 @@ local Movie = import("/lua/maui/movie.lua").Movie
 local Prefs = import("/lua/user/prefs.lua")
 local options = Prefs.GetFromCurrentProfile('options')
 
+local GetSimRate = GetSimRate
+local GetSystemTimeSeconds = GetSystemTimeSeconds
+local pcall = pcall
+
 local controls = import("/lua/ui/controls.lua").Get()
 
 local gameParent = controls.gameParent
@@ -26,7 +30,9 @@ local mapGroup = controls.map
 local mfdControl = controls.mfd
 local ordersControl = false
 
-local OnDestroyFuncs = {}
+--- Callbacks to run in WldUiProvider.DestroyGameInterface
+---@see WldUIProvider.DestroyGameInterface
+local OnDestroyFuncs = {} ---@type fun()[]
 
  --- game's "Non-Interactive Sequence" state as synced from Sim
  ---@type 'on' | 'off' | false
@@ -547,7 +553,10 @@ function CreateWldUIProvider()
     provider.DestroyGameInterface = function(self)
         if gameParent then gameParent:Destroy() end
         for _, func in OnDestroyFuncs do
-            func()
+            local ok, msg = pcall(func)
+            if not ok then
+                WARN('Error running OnUIDestroyed function:', msg)
+            end
         end
         import("/lua/ui/game/rallypoint.lua").ClearAllRallyPoints()
     end
@@ -558,6 +567,9 @@ function CreateWldUIProvider()
 
 end
 
+--- Add callback to run when the the world UI provider is destroyed.
+---@see WldUIProvider.DestroyGameInterface
+---@param func fun()
 function AddOnUIDestroyedFunction(func)
     table.insert(OnDestroyFuncs, func)
 end
@@ -806,23 +818,23 @@ function OnUserPause(pause)
     end
 end
 
+---@type { fn: fun(), throttle: boolean, key: any }[]
 local _beatFunctions = {}
 
--- Adds a function callback that will be called on sim beats
--- @param fn       - specifies function callback
--- @param throttle - specifies whether never to run a function more than 10 times per second
---                   to reduce UI load when speeding up sim / replay
--- @param key      - specifies optional key used later for removing callbacks by a key
-function AddBeatFunction(fn, throttle, key)
-    table.insert(_beatFunctions, {fn = fn, throttle = throttle == true, key = key})
+--- Adds a function callback that will be called on sim beats.
+---@param cb fun()
+---@param throttle boolean? # Limits callback to 10 times per second to reduce UI load when speeding up sim/replay
+---@param key any # Optional key for removing callbacks by a key
+function AddBeatFunction(cb, throttle, key)
+    table.insert(_beatFunctions, { fn = cb, throttle = throttle == true, key = key })
 end
 
--- Removes a function callback from calling on sim beats
--- @param fn  - specifies function callback
--- @param key - specifies optional key associated with function callback
-function RemoveBeatFunction(fn, key)
-    for i,v in _beatFunctions do
-        if v.fn == fn then
+--- Removes the first found function callback from calling on sim beats
+---@param cb fun() # function to compare to for removal. Has priority over `key`
+---@param key any # key to compare to for removal
+function RemoveBeatFunction(cb, key)
+    for i, v in _beatFunctions do
+        if v.fn == cb then
             table.remove(_beatFunctions, i)
             break
         end
@@ -833,23 +845,31 @@ function RemoveBeatFunction(fn, key)
     end
 end
 
--- Calls function callbacks that were added previously, whenever the sim beat occurs
-local last = 0
+local next = 0
+--- Called by the engine whenever the sim beat occurs.
 function OnBeat()
-    local rate = GetSimRate()
     local throttle = false
 
-    if rate > 0 then
-        if GetSystemTimeSeconds() - last < 0.1 then
+    if GetSimRate() > 0 then
+        local sysTime = GetSystemTimeSeconds()
+        if sysTime < next then
             throttle = true
         else
-            last = GetSystemTimeSeconds()
+            next = sysTime + 0.1
         end
     end
 
-    for i,v in _beatFunctions do
+    for i, v in _beatFunctions do
         if v.throttle and throttle then continue end
-        if v.fn then v.fn() end
+        local fn = v.fn
+        if fn then
+            local ok, msg = pcall(fn)
+            if not ok then
+                _beatFunctions[i] = nil
+                local keyStr = v.key and string.format(' (key "%s")', tostring(v.key)) or ''
+                WARN(string.format('Error running OnBeat callback%s: %s', keyStr, msg))
+            end
+        end
     end
 end
 

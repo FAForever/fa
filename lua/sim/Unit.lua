@@ -27,6 +27,7 @@ local DebugUnitComponent = import("/lua/sim/units/components/debugunitcomponent.
 local FastDecayComponent = import("/lua/sim/units/components/fastdecayunitcomponent.lua").FastDecayComponent
 
 local GetBlueprintCaptureCost = import('/lua/shared/capturecost.lua').GetBlueprintCaptureCost
+local AssertFaParams = import('/lua/shared/fatypeutils.lua').AssertFaParams
 
 local TrashBag = TrashBag
 local TrashAdd = TrashBag.Add
@@ -139,7 +140,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field Dead? boolean
 ---@field UnitId UnitId
 ---@field EntityId EntityId
----@field EventCallbacks table<string, function[]>
+---@field EventCallbacks table<string, (fun(self: Unit, param: any) | { category: EntityCategory, cb: fun(self: Unit, built: Unit )})[]>
 ---@field Buffs UnitBuffsTable
 ---@field EngineFlags? table<string, any>
 ---@field TerrainType TerrainType
@@ -2378,7 +2379,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         local aiBrain = self:GetAIBrain()
         for k, v in aiBrain.UnitBuiltTriggerList do
             if v.Callback == callback then
-                callback(self)
+                local ok, msg = pcall(callback, self)
+                if not ok then
+                    WARN('Error running UnitBuiltPercentage callback', msg)
+                end
                 aiBrain.UnitBuiltTriggerList[k] = nil
             end
         end
@@ -4166,7 +4170,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     -- UNIT CALLBACKS
     -------------------------------------------------------------------------------------------
     ---@param self Unit
-    ---@param fn function
+    ---@param fn fun(self: Unit, param: any)
     ---@param type string
     AddUnitCallback = function(self, fn, type)
         self.EventCallbacks[type] = self.EventCallbacks[type] or { }
@@ -4177,9 +4181,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param type string
     ---@param param any
     DoUnitCallbacks = function(self, type, param)
-        if self.EventCallbacks[type] then
-            for num, cb in self.EventCallbacks[type] do
-                cb(self, param)
+        local callbacks = self.EventCallbacks[type]
+        if callbacks then
+            for num, cb in callbacks do
+                local ok, msg = pcall(cb, self, param)
+                if not ok then
+                    callbacks[num] = nil
+                    WARN(string.format('Error running unit "%s" callback: %s', type, msg))
+                end
             end
         end
     end,
@@ -4327,27 +4336,32 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end,
 
     ---@param self Unit
-    ---@param fn function
+    ---@param fn fun(self: Unit, built: Unit)
     ---@param category EntityCategory
     AddOnUnitBuiltCallback = function(self, fn, category)
+        AssertFaParams(fn, 'function', category, 'EntityCategory')
         self.EventCallbacks.OnUnitBuilt = self.EventCallbacks.OnUnitBuilt or { }
         table.insert(self.EventCallbacks['OnUnitBuilt'], {category=category, cb=fn})
     end,
 
     ---@param self Unit
-    ---@param unit Unit
-    DoOnUnitBuiltCallbacks = function(self, unit)
-        if self.EventCallbacks.OnUnitBuilt then 
-            for _, v in self.EventCallbacks.OnUnitBuilt do
-                if unit and not unit.Dead and EntityCategoryContains(v.category, unit) then
-                    v.cb(self, unit)
+    ---@param built Unit
+    DoOnUnitBuiltCallbacks = function(self, built)
+        if self.EventCallbacks.OnUnitBuilt and built and not built.Dead then
+            for i, v in self.EventCallbacks.OnUnitBuilt do
+                if EntityCategoryContains(v.category, built) then
+                    local ok, msg = pcall(v.cb, self, built)
+                    if not ok then
+                        self.EventCallbacks.OnUnitBuilt[i] = nil
+                        WARN(string.format('Error running OnUnitBuilt callback: %s', msg))
+                    end
                 end
             end
         end
     end,
 
     ---@param self Unit
-    ---@param fn function
+    ---@param fn fun(self: Unit, built: Unit)
     RemoveCallback = function(self, fn)
         for k, v in self.EventCallbacks do
             if type(v) == "table" then
@@ -4363,8 +4377,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param self Unit
     ---@param fn function
     ---@param amount? number Fraction of HP lost. Defaults to `-1` - any amount of damage
-    ---@param repeatNum? integer Defaults to `1` - Triggered only once
+    ---@param repeatNum? integer How many times the callback can trigger. Defaults to `1` - Triggered only once
     AddOnDamagedCallback = function(self, fn, amount, repeatNum)
+        AssertFaParams(fn, 'function')
         local num = amount or -1
         repeatNum = repeatNum or 1
         self.EventCallbacks.OnDamaged = self.EventCallbacks.OnDamaged or { }
@@ -4375,10 +4390,19 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param instigator Unit
     DoOnDamagedCallbacks = function(self, instigator)
         if self.EventCallbacks.OnDamaged then
-            for num, callback in self.EventCallbacks.OnDamaged do
-                if (callback.Called < callback.Repeat or callback.Repeat == -1) and (callback.Amount == -1 or (1 - self:GetHealthPercent() > callback.Amount)) then
-                    callback.Called = callback.Called + 1
-                    callback.Func(self, instigator)
+            for i, callback in self.EventCallbacks.OnDamaged do
+                local called = callback.Called
+                local callLimit = callback.Repeat
+                local amount = callback.Amount
+                if (callLimit == -1 or called < callLimit)
+                    and (amount == -1 or (1 - self:GetHealthPercent() > amount))
+                then
+                    callback.Called = called + 1
+                    local ok, msg = pcall(callback.Func, self, instigator)
+                    if not ok then
+                        self.EventCallbacks.OnDamaged[i] = nil
+                        WARN('Error running Unit OnDamaged callback: ', msg)
+                    end
                 end
             end
         end
