@@ -147,7 +147,6 @@ function resetCycle(commandMode, modeData)
     -- Commandmode = false is when a building is built (left click with mouse)
     -- modeData.isCancel = false is when building is aborted by a right click... whyever
     -- modeData.isCancel = true when "canceling" by releasing shift
-    LOG('hotbuild reset cycle', commandMode, repr(modeData))
     if commandMode == false or (not modeData) or not (modeData.isCancel) then
         -- Set to 0, first one is 1 but it will be incremented!
         cyclePos = 0

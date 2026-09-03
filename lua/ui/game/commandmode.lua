@@ -177,7 +177,6 @@ end
 ---@param newCommandMode CommandMode
 ---@param data CommandModeData
 function StartCommandMode(newCommandMode, data)
-    LOG('StartCommandMode', newCommandMode, repr(data), debug.traceback())
     -- clean up previous command mode
     if commandMode then
         EndCommandMode(true)
