@@ -11,6 +11,29 @@
 -- Set up global diskwatch table (you can add callbacks to it to be notified of disk changes)
 __diskwatch = {}
 
+local GetTime = GetSystemTimeSecondsOnlyForProfileUse or GetSystemTimeSeconds
+local type = type
+local rawget = rawget
+local oldsetmetatable = _G.setmetatable
+local newSetmetatable = function(t, mt)
+    if type(t) == 'table' then
+        local tracker = rawget(t, '__tracker')
+        if tracker then
+            table.insert(tracker.assignments,
+                string.format('[%0f] Assign "<metatable>" as %s\n from %s'
+                , GetTime()
+                , repr(mt)
+                , debug.traceback()
+            ))
+            oldsetmetatable(tracker.target, mt)
+            return t
+        end
+    end
+    return oldsetmetatable(t, mt)
+end
+setmetatable = newSetmetatable
+_setmetatable = oldsetmetatable
+
 -- Set up custom Lua weirdness
 doscript '/lua/system/config.lua'
 
