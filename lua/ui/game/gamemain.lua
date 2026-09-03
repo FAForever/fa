@@ -387,8 +387,10 @@ function AdjustFrameRate()
     ConExecute("SC_FrameTimeClamp " .. (1000 / fps))
 end
 
+---@type WldUIProvider | false
 local provider = false
 
+---@return Movie
 local function LoadDialog(parent)
     local movieFile = '/movies/UEF_load.sfd'
     local color = 'FFbadbdb'
@@ -442,10 +444,7 @@ function CreateWldUIProvider()
 
     provider = WldUIProvider()
 
-    local loadingDialog = false
-    local frame1Logo = false
-
-    local lastTime = 0
+    local loadingDialog = false ---@type Movie | false
 
     provider.StartLoadingDialog = function(self)
         GetCursor():Hide()
@@ -536,10 +535,6 @@ function CreateWldUIProvider()
 
     provider.CreateGameInterface = function(self, inIsReplay)
         isReplay = inIsReplay
-        if frame1Logo then
-            frame1Logo:Destroy()
-            frame1Logo = false
-        end
         CreateUI(isReplay)
         if not import("/lua/ui/campaign/campaignmanager.lua").campaignMode then
             HideGameUI('on')
