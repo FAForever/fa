@@ -6,7 +6,6 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local utils = import("/lua/system/utils.lua")
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Group = import("/lua/maui/group.lua").Group
@@ -365,7 +364,7 @@ function AdjustFrameRate()
     if type(primaryAdapter) == 'string' then
         if primaryAdapter ~= 'windowed' then
             -- the value for the option is formatted as `width,height,fps`
-            local data = utils.StringSplit(primaryAdapter, ',')
+            local data = string.split(primaryAdapter, ',')
             local hz = tonumber(data[3])
             if hz then
                 fps = hz
@@ -375,7 +374,7 @@ function AdjustFrameRate()
             -- can't use `Prefs` because `options_overrides` isn't stored in a profile
             local allAdapterOptions = GetPreference('options_overrides.primary_adapter.custom.states')
             for _, option in allAdapterOptions do
-                local data = utils.StringSplit(option.key, ',')
+                local data = string.split(option.key, ',')
                 local hz = tonumber(data[3])
                 if hz and hz > fps then
                     fps = hz
