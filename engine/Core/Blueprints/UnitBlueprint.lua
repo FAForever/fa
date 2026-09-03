@@ -952,9 +952,7 @@
 ---@field RegenPerSecond number
 --- Which unit categories are buffed by the aura
 ---@field UnitCategory UnparsedCategory
----
---- Used by RAS SACU to add damage to their death weapon
----@field DeathWeaponDamageAdd number
+
 
 
 

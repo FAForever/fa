@@ -1,1 +1,0 @@
-- Document engine-side details of `UnitWeapon:CanFire()` (#7045).

@@ -18,22 +18,26 @@ local ProfileKey = "chatoptions"
 ---@field send_type      boolean  # false = all, true = allies
 ---@field links          boolean  # show camera-link messages
 ---@field muted          table<number, boolean>   # armyID -> true when muted; absent = not muted
+---@field muteSharedUnits boolean
+---@field muteSharedResources boolean
 
 --- Factory defaults; merged on top of any saved profile during `SetupSingleton`.
 ---@type UIChatOptions
 local DefaultOptions = {
-    all_color       = 1,
-    allies_color    = 2,
-    priv_color      = 3,
-    link_color      = 4,
-    notify_color    = 8,
-    font_size       = 14,
-    fade_time       = 15,
-    win_alpha       = 1.0,
-    feed_background = false,
-    send_type       = false,
-    links           = true,
-    muted           = {},
+    all_color           = 1,
+    allies_color        = 2,
+    priv_color          = 3,
+    link_color          = 4,
+    notify_color        = 8,
+    font_size           = 14,
+    fade_time           = 15,
+    win_alpha           = 1.0,
+    feed_background     = false,
+    send_type           = false,
+    links               = true,
+    muted               = {},
+    muteSharedUnits     = false,
+    muteSharedResources = false,
 }
 
 
@@ -52,6 +56,8 @@ KeyFeedBackground = 'feed_background'
 KeySendType       = 'send_type'
 KeyLinks          = 'links'
 KeyMuted          = 'muted'
+KeyMuteSharedUnits = 'muteSharedUnits'
+KeyMuteSharedResources = 'muteSharedResources'
 
 -------------------------------------------------------------------------------
 -- Slider ranges, exported so the view doesn't duplicate the limits.

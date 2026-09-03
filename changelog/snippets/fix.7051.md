@@ -1,1 +1,0 @@
-- Fix a unit-transfer exploit that adds silo progress to nuke subs and the Seraphim battleship for free (#7051).
