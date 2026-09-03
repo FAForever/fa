@@ -288,7 +288,7 @@ end
 factoryHotkeyLastClickWasLeft = false
 
 function factoryHotkey(units, count, selection, exFacUnits)
-    CommandMode.StartCommandMode("build", {name = ''})
+    CommandMode.StartCommandMode("build", { name = '' })
 
     -- Another 'hack' that is, uuhh - a hack. Override the event handle of the world view. If it doesn't
     -- return false then the event is captured and the engine ignores it (no orders are issued when clicking, etc)
@@ -353,22 +353,81 @@ function hideCycleMap()
     cycleMap:SetAlpha(1, true)
 end
 
+-- Restrict a hotbuild selection mapping to matching units in the current
+-- selection. Leave the selection unchanged when none of its units match.
+function selectUnitsWith(mapping)
+    local oldSelection = GetSelectedUnits()
+    if not oldSelection then return end
+
+    local blueprintIds = unitkeygroups[mapping]
+    if not blueprintIds then return end
+    blueprintIds = table.hash(blueprintIds)
+
+    local newSelection = {}
+    for _, unit in oldSelection do
+        local id = unit:GetBlueprint().BlueprintId
+        if blueprintIds[id] then
+            table.insert(newSelection, unit)
+        end
+    end
+
+    if table.getsize(newSelection) > 0 then
+        SelectUnits(newSelection)
+    end
+end
+
 -- The actual key action callback, called each time a 'Hotbuild' category action is activated
 function buildAction(name)
+    local selection = GetSelectedUnits()
+    if not selection then return end
+
+    -- Some mappings contain both unit blueprints and "_upgrade". Upgrade
+    -- selected structures before treating the mapping as a unit selection key,
+    -- or another entry in the mapping may be selected instead.
+    local values = unitkeygroups[name]
+    local upgradeStructures = EntityCategoryFilterDown(
+        categories.MASSEXTRACTION
+        + (categories.RADAR * categories.STRUCTURE)
+        + (categories.SHIELD * categories.STRUCTURE)
+        + categories.ENGINEERSTATION,
+        selection
+    )
+    if values and table.find(values, "_upgrade") and not table.empty(upgradeStructures) then
+        SelectUnits(upgradeStructures)
+        buildActionUpgrade()
+        SelectUnits(selection)
+        return
+    end
+
     local modifier = ""
     if IsKeyDown("Shift") then
         modifier = "Shift"
     elseif IsKeyDown("MENU") then -- IsKeyDown("Alt") doesn't work, engine error
         modifier = "Alt"
     end
-    local selection = GetSelectedUnits()
-    if selection then
-        -- If current selection is engineer or commander or megalith
-        if not table.empty(EntityCategoryFilterDown(categories.ENGINEER - categories.STRUCTURE + categories.xrl0403, selection)) then
-            buildActionBuilding(name, modifier)
-        else -- Buildqueue or normal applying all the command
-            buildActionUnit(name, modifier)
-        end
+
+    -- The Megalith builds its units as construction eggs. It has CONSTRUCTION
+    -- and a BuildableCategory, but deliberately has no ENGINEER category.
+    -- Exclude factories here because their construction orders use the
+    -- factory one-click path below.
+    local builders = EntityCategoryFilterDown(
+        (categories.ENGINEER + categories.CONSTRUCTION)
+        - categories.STRUCTURE
+        - categories.FACTORY
+        - categories.EXTERNALFACTORY,
+        selection
+    )
+    local factories = EntityCategoryFilterDown(categories.FACTORY + categories.EXTERNALFACTORY, selection)
+    local selectionCount = table.getsize(selection)
+
+    -- Only enter a build mode when every selected unit belongs to the same
+    -- builder type. Mixed selections retain the hotbuild filtering behavior.
+    if selectionCount > 0 and table.getsize(builders) == selectionCount then
+        buildActionBuilding(name, modifier)
+    elseif selectionCount > 0 and table.getsize(factories) == selectionCount then
+        buildActionUnit(name, modifier)
+    else
+        selectUnitsWith(name)
     end
 end
 
@@ -553,6 +612,52 @@ function buildActionTemplate(modifier)
     SetActiveBuildTemplate(template.templateData)
 end
 
+local function GetUnitTech(unitId)
+    local bp = __blueprints[unitId]
+    if not bp then return 0 end
+    local cats = bp.CategoriesHash
+    if not cats then
+        local arr = bp.Categories
+        if not arr then return 0 end
+        cats = {}
+        for _, c in arr do cats[c] = true end
+    end
+    if cats['EXPERIMENTAL'] then return 4 end
+    if cats['TECH3'] then return 3 end
+    if cats['TECH2'] then return 2 end
+    if cats['TECH1'] then return 1 end
+    return 0
+end
+
+local function GetFactoryTech(selection)
+    local sharedTech = nil
+    for _, unit in selection do
+        local bp = unit:GetBlueprint()
+        if not bp then return nil end
+        local cats = bp.CategoriesHash
+        if not cats then
+            local arr = bp.Categories
+            if not arr then return nil end
+            cats = {}
+            for _, c in arr do cats[c] = true end
+        end
+        if not cats['FACTORY'] then return nil end
+        local t = nil
+        if cats['EXPERIMENTAL'] then t = 4
+        elseif cats['TECH3'] then t = 3
+        elseif cats['TECH2'] then t = 2
+        elseif cats['TECH1'] then t = 1
+        end
+        if not t then return nil end
+        if sharedTech == nil then
+            sharedTech = t
+        elseif sharedTech ~= t then
+            return nil
+        end
+    end
+    return sharedTech
+end
+
 function buildActionUnit(name, modifier)
     LOG("buildActionUnit")
     LOG(" - " .. name)
@@ -593,6 +698,41 @@ function buildActionUnit(name, modifier)
     local maxPos = table.getsize(effectiveValues)
     if maxPos == 0 then
         return
+    end
+
+    -- External-factory parents (Fatboy, carriers, Tempest, and similar units)
+    -- are selected instead of their attached factory entity. Use the attached
+    -- factory for tech detection so they follow the same one-click path as
+    -- ordinary factories.
+    local factorySelection = TranslateExFacUnits(selection) or selection
+    local sharedTech = GetFactoryTech(factorySelection)
+    if sharedTech and maxPos > 1 then
+        local targetTech = Construction.GetCurrentTechTab() or sharedTech
+        local targetPos = nil
+        for i, unitId in effectiveValues do
+            if GetUnitTech(unitId) == targetTech then
+                targetPos = i
+                break
+            end
+        end
+
+        if targetPos then
+            cycleLastName = nil
+            cycleUnits(maxPos, name, effectiveValues, selection, modifier)
+            cyclePos = targetPos
+
+            hotbuildCyclePreview(maxPos, false)
+
+            local unit = effectiveValues[cyclePos]
+            local filteredUnits = TranslateExFacUnits(selection)
+            if filteredUnits then
+                IssueBlueprintCommandToUnits(filteredUnits, "UNITCOMMAND_BuildFactory", unit, count)
+            else
+                IssueBlueprintCommand("UNITCOMMAND_BuildFactory", unit, count)
+            end
+            Construction.RefreshUI()
+            return
+        end
     end
 
     cycleUnits(maxPos, name, effectiveValues, selection, modifier)
