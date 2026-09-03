@@ -665,6 +665,22 @@ options = {
                     },
                 },
             },
+            
+            {
+                title = '<LOC FACTORY_SHARE_ASSIST>Factories share "Assist" to units',
+                key = 'factoryShareAssist',
+                type = 'toggle',
+                default = "true",
+                set = function(key, value, startup)
+                    ConExecute("ui_ShareFactoryAssistCommandToUnits " .. value)
+                end,
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>", key = "false" },
+                        { text = "<LOC _On>", key = "true" },
+                    },
+                },
+            },
 
             {
                 title = "<LOC ASSIST_TO_UPGRADE>Hold alt to force attack move",
