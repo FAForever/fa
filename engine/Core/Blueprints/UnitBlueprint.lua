@@ -1120,6 +1120,9 @@
 ---@field Elevation number
 --- if true, terrain under building's skirt will be flattened
 ---@field FlattenSkirt boolean
+--- Determines what cells this unit occupies for pathfinding.
+--- Mobile units are forced to use the closest footprint spec that is defined in `footprints.lua`.
+--- Structures can define their own footprints.
 ---@field Footprint FootprintBlueprint
 --- unit fuels up at this rate per second. Required for air staging to undock automatically.
 ---@field FuelRechargeRate number
@@ -1155,7 +1158,7 @@
 --- Used by some build animations to scale their effects
 ---@field MeshExtentsZ number
 ---@field MinSpeedPercent number
---- method of locomotion
+--- method of locomotion. Defaults to "RULEUMT_None" if MaxSpeed = 0.
 ---@field MotionType UnitMotionType
 --- The occupy rectangles of the unit that will override the footprint. Every 4 numbers in the
 --- array define a occupation rectangle for the override (offsetX, offsetZ, sizeX, sizeZ).

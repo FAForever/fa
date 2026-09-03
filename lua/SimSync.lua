@@ -8,6 +8,9 @@
 ---@class SyncTable: table
 ---@field EnhanceRestrict table<Enhancement, true>
 ---@field Ping SyncPingData[]
+---@field Score GameScoreData # Filtered based on game state.
+---@field FocusArmyChanged? { new: integer, old: integer }
+---@field Cheaters? { [integer]: integer, CheatsEnabled: boolean } # Created by the engine. Array part is cheating command source indices.
 ---@field Events? SyncEventData # used by UI mods such as supreme score board
 Sync = { }
 
@@ -37,6 +40,7 @@ UnitData = {}
 ---@type EnhancementSyncTable
 SimUnitEnhancements = {}
 
+--- Called by the engine every sim beat
 function ResetSyncTable()
     local sync = Sync
     for k, v in sync do
@@ -149,6 +153,9 @@ function OnPostLoad()
     Sync.IsSavedGame = true
 end
 
+--- Called by the engine when the focus army changes
+---@param new integer
+---@param old integer
 function NoteFocusArmyChanged(new, old)
     import("/lua/simping.lua").OnArmyChange()
     import("/lua/sim/recall.lua").OnArmyChange()

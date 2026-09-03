@@ -71,6 +71,7 @@ local GlobalGetArmiesTable = _G.GetArmiesTable
 
 --- Allows UI elements to be updated when the cache is updated by adding a callback via Observable:AddObserver()
 local Cached = PostprocessArmiesTable(GlobalGetArmiesTable())
+---@type Observer<ArmiesTable>
 Observable = import("/lua/shared/observable.lua").Create()
 Observable:Set(Cached)
 
