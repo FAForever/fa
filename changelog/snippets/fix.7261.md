@@ -1,0 +1,1 @@
+- Always clear build templates when ending command mode (#7261). This fixes build templates that were canceled by right click appearing when cheating in units.

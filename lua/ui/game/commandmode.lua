@@ -193,8 +193,15 @@ function StartCommandMode(newCommandMode, data)
 end
 
 --- Called when the command mode ends and deconstructs all the data.
----@param isCancel boolean # set when we're at the end of (a sequence of) order(s), is usually always true. False when the mode is ended with right click, except for "ping" mode.
+---@param isCancel boolean # set when we're at the end of (a sequence of) order(s), is usually always true.
 function EndCommandMode(isCancel)
+    -- isCancel = false when:
+    -- - the mode is ended with right click, except for "ping" mode.
+    -- - new mode with same name is started by console command
+    -- - when the selection changes
+    -- - unit is removed from extra select list
+    -- - lua calls it with false
+
     if ignoreSelection then
         return
     end
@@ -204,10 +211,7 @@ function EndCommandMode(isCancel)
         -- add information to modeData for end behavior
         modeData.isCancel = isCancel or false
 
-        -- ???
-        if modeData.isCancel then
-            ClearBuildTemplates()
-        end
+        ClearBuildTemplates()
 
         -- regain selection if we were cheating in units
         if modeData.cheat and modeData.selection then
