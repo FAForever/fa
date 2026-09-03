@@ -286,7 +286,7 @@ function CAiBrain:GetEconomyStored(resource)
 end
 
 --- Returns the ratio between resource in storage to maximum storage amout.
----@param resource 'ENERGY' | 'MASS'
+---@param resource ResourceType
 ---@return number
 function CAiBrain:GetEconomyStoredRatio(resource)
 end
@@ -299,7 +299,7 @@ end
 
 --- Returns current resource usage.
 -- When stalling, this number is same as the current income.
----@param resource 'ENERGY' | 'MASS'
+---@param resource ResourceType
 ---@return number
 function CAiBrain:GetEconomyUsage(resource)
 end
@@ -432,13 +432,13 @@ function CAiBrain:GetUnitsAroundPoint(category, position, radius, alliance)
 end
 
 --- Gives resources to brain.
----@param type 'ENERGY' | 'MASS'
+---@param type ResourceType
 ---@param amount number
 function CAiBrain:GiveResource(type, amount)
 end
 
 --- Gives storage to brain.
----@param type 'ENERGY' | 'MASS'
+---@param type ResourceType
 ---@param amount number
 function CAiBrain:GiveStorage(type, amount)
 end
@@ -537,7 +537,7 @@ function CAiBrain:SetUpAttackVectorsToArmy(category)
 end
 
 --- Removes resources from brain.
----@param type 'ENERGY' | 'MASS'
+---@param type ResourceType
 ---@param amount number # how much to take.
 ---@return number # actual amount taken
 function CAiBrain:TakeResource(type, amount)
