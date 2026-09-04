@@ -10,10 +10,10 @@ TempTemplate = Prefs.GetFromCurrentProfile('build_template_temporary')
 ---@return boolean success
 function SaveTemporaryTemplate(template)
     TemplateUtils.CenterTemplateForBuildModeBp(template)
-    local ok = TemplateUtils.VerifyTemplate(template)
+    local ok, msg = TemplateUtils.VerifyTemplate(template)
     if not ok then
-        print('Temporary Template is empty/malformed. See moholog for details.')
-        WARN(string.format('Temporary Template is empty/malformed. Template:\n%s\n%s', repr(template), debug.traceback()))
+        print('Template being saved as Temporary Template is invalid. See moholog for details.')
+        WARN(string.format('Template being saved as Temporary Template is invalid. Template:\n%s\n%s\n%s', msg, repr(template), debug.traceback()))
         return false
     end
     TempTemplate = template
