@@ -5,6 +5,10 @@ local CancelCountdown = CancelCountdown
 local ForkThread = ForkThread
 local KillThread = KillThread
 
+---@class ToggleSelfDestructData
+---@field owner number
+---@field noDelay boolean
+
 -- prevent magic numbers
 local countdownDuration = 5
 
@@ -20,7 +24,7 @@ local function SelfDestructThread(unit)
 end
 
 --- Toggles the destruction of the units
----@param data { owner: number, noDelay: boolean }
+---@param data ToggleSelfDestructData
 ---@param units? Unit[]
 function ToggleSelfDestruct(data, units)
 
