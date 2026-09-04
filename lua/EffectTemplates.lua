@@ -1,4 +1,3 @@
----@diagnostic disable:local-limit
 -- ****************************************************************************
 -- **
 -- **  File     :  /data/lua/effecttemplates.lua

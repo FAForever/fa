@@ -22,8 +22,7 @@ AIFGuidedMissile02 = ClassProjectile(AGuidedMissileProjectile) {
         end
 
         --Vision for when projectile impacts
-        ---@type VisionMarkerOpti
-        local entity = VisionMarker({ Owner = self })
+        local entity = VisionMarker()
 
         local px, py, pz = self:GetPositionXYZ()
         entity:UpdatePosition(px, pz)

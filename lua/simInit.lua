@@ -44,7 +44,8 @@ doscript '/lua/SimHooks.lua'
 -- Set up the sync table and some globals for use by scenario functions
 doscript '/lua/SimSync.lua'
 
-local syncStartPositions = false -- This is held here because the Sync table iFBlobas cleared between SetupSession() and BeginSession()
+---@type table<string, Vector>
+local syncStartPositions -- This is held here because the Sync table iFBlobas cleared between SetupSession() and BeginSession()
 
 function ShuffleStartPositions(syncNewPositions)
     local markers = ScenarioInfo.Env.Scenario.MasterChain._MASTERCHAIN_.Markers
@@ -112,11 +113,20 @@ function SetupSession()
     -- ScenarioInfo is a table filled in by the engine with fields from the _scenario.lua
     -- file we're using for this game. We use it to store additional global information
     -- needed by our scenario.
+
+    --- Army index to table of platoon names to platoon handles. The name comes from the save.lua file.
+    ---@type table<integer, table<string, Platoon>>
     ScenarioInfo.PlatoonHandles = {}
+    --- Army index to table of unit group names to unit group tables. The name comes from the save.lua file.
+    ---@type table<integer, table<string, Unit[]>>
     ScenarioInfo.UnitGroups = {}
+    --- Army index to table of unit names to unit handles. The name comes from the save.lua file.
+    ---@type table<integer, table<string, Unit>>
     ScenarioInfo.UnitNames = {}
 
     ScenarioInfo.VarTable = {}
+
+    ---@type table<string, integer|boolean>
     ScenarioInfo.OSPlatoonCounter = {}
     ScenarioInfo.BuilderTable = { Air = {}, Land = {}, Sea = {}, Gate = {} }
     ScenarioInfo.BuilderTable.AddedPlans = {}
@@ -205,6 +215,7 @@ function SetupSession()
     doscript('/lua/dataInit.lua')
     doscript(ScenarioInfo.save, ScenarioInfo.Env)
 
+    ---@type Scenario
     Scenario = ScenarioInfo.Env.Scenario
 
     local spawn = ScenarioInfo.Options.TeamSpawn

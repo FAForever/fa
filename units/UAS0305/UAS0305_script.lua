@@ -41,7 +41,7 @@ UAS0305 = ClassUnit(ASeaUnit) {
                     
                     for kb, vBone in vTypeGroup.Bones do
                         for ke, vEffect in effects do
-                            emit = CreateAttachedEmitter(self, vBone, self.Army, vEffect):ScaleEmitter(vTypeGroup.Scale or 1)
+                            local emit = CreateAttachedEmitter(self, vBone, self.Army, vEffect):ScaleEmitter(vTypeGroup.Scale or 1)
                             if vTypeGroup.Offset then
                                 emit:OffsetEmitter(vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0,vTypeGroup.Offset[3] or 0)
                             end

@@ -6,6 +6,7 @@ local AIBuildUnits = import("/lua/ai/aibuildunits.lua")
 local Utilities = import("/lua/utilities.lua")
 
 -- upvalue scope for performance
+local pairs, ipairs = pairs, ipairs
 local TableGetn = table.getn
 local TableInsert = table.insert
 local TableRandom = table.random
@@ -944,30 +945,33 @@ AIBrain = Class(StandardBrain) {
         return false
     end,
 
+    ---Returns a list of factories working in the base `location`
+    ---
+    ---It's all primary factories + factories assisting them.
+    ---
+    ---This might exclude factories that were not grabbed by the base yet or are upgrading.
     ---@param self CampaignAIBrain
     ---@param location string
-    ---@return FactoryUnit[] | false
+    ---@return FactoryUnit[]
     PBMGetAllFactories = function(self, location)
-        if not location then
-            return false
-        end
-        for num, loc in self.PBM.Locations do
-            if loc.LocationType == location then
-                local facs = {}
-                for k, v in loc.PrimaryFactories do
-                    TableInsert(facs, v)
-                    if not v.Dead then
-                        for fNum, fac in v:GetGuards() do
-                            if EntityCategoryContains(factoryCategories, fac) then
-                                TableInsert(facs, fac)
-                            end
-                        end
+        for _, loc in pairs(self.PBM.Locations) do
+            if loc.LocationType ~= location then continue end
+
+            local facs = {}
+            for _, v in pairs(loc.PrimaryFactories) do
+                TableInsert(facs, v)
+                if v.Dead then continue end
+
+                for _, fac in pairs(v:GetGuards()) do
+                    if EntityCategoryContains(factoryCategories, fac) then
+                        TableInsert(facs, fac)
                     end
                 end
-                return facs
             end
+            return facs
         end
-        return false
+
+        return {}
     end,
 
     --- Removes a build location based on it area

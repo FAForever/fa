@@ -70,7 +70,7 @@ end
 function EndOperation(success, allPrimary, allSecondary, allBonus)
     if allSecondary == nil then allSecondary = false end
     if allBonus == nil then allBonus = false end
-    local opFile = string.gsub(ScenarioInfo.Options.ScenarioFile, 'scenario', 'operation')
+    local opFile = string.gsub(ScenarioInfo.Options.ScenarioFile, 'scenario', 'operation')--[[@as FileName]]
     local opData
     if DiskGetFileInfo(opFile) then
         opData = import(opFile)
@@ -287,7 +287,7 @@ function GiveUnitToArmy(unit, army, triggerOnGiven)
     IgnoreRestrictions(true)
 
     local newUnit = ChangeUnitArmy(unit, army)
-    local newBrain = ArmyBrains[army]
+    local newBrain = ArmyBrains[army]--[[@as CampaignAIBrain]]
     if not newBrain.IgnoreArmyCaps then
         SetIgnoreArmyUnitCap(army, false)
     end
@@ -388,9 +388,11 @@ function GetCatUnitsInArea(cat, area, brain)
         area = ScenarioUtils.AreaToRect(area)
     end
 
+    ---@type Unit[]|nil
     local entities = GetUnitsInRect(area)
     local result = {}
     if entities then
+        ---@type Unit[]
         local filteredList = EntityCategoryFilterDown(cat, entities)
 
         for _, entity in filteredList do
@@ -1216,7 +1218,7 @@ end
 ---@param x number
 ---@param z number
 ---@param lifetime number
----@param army number
+---@param army Army
 ---@return VizMarker
 function CreateVisibleArea(radius, x, z, lifetime, army)
     local spec = {
@@ -1230,7 +1232,7 @@ function CreateVisibleArea(radius, x, z, lifetime, army)
 end
 
 -- Sets the playable area for an operation to `rect`. Can be an area name or rectangle.
----@param rect Area | Rectangle
+---@param rect AreaName | Rectangle
 ---@param voFlag? boolean # defaults to `true`
 function SetPlayableArea(rect, voFlag)
     if voFlag == nil then
@@ -1745,7 +1747,7 @@ function KillBaseInAreaThread(units)
 end
 
 ---
----@param area Area
+---@param area AreaName
 ---@param callback? fun()
 ---@param duration? number
 function StartOperationJessZoom(area, callback, duration)
@@ -1954,8 +1956,8 @@ end
 ---@field markerCam boolean allows the NIS to use a marker rather than a unit
 ---@field resetCam boolean disables the interpolation at the end of the NIS, needed for NISs that appear outside of the playable area.
 ---@field overrideCam boolean allows an NIS to interrupt an NIS that is currently playing (typically used for end of operation cameras)
----@field playableAreaIn Area
----@field playableAreaOut Area
+---@field playableAreaIn string
+---@field playableAreaOut string
 ---@field vizRadius number (ogrids)
 
 ---------------
@@ -2113,7 +2115,7 @@ end
 
 --- Sets all `units` that are in `army` to be able to take damage and be killed. Flags if they weren't able
 --- to previously: `UndamagableFlagSet` for CanTakeDamage and `UnKillableFlagSet` for CanBeKilled.
----@param army number
+---@param army Army
 ---@param units Unit[]
 function FlagUnkillableSelect(army, units)
     for _, unit in units do
@@ -2159,7 +2161,7 @@ function FlagUnkillable(army, exceptions)
 end
 
 --- Reverts all units in `army` that had their `UnKillableFlagSet` or `UndamagableFlagSet`
----@param army number
+---@param army Army
 function UnflagUnkillable(army)
     local units = ArmyBrains[army]:GetListOfUnits(categories.ALLUNITS, false)
     for _, unit in units do
@@ -2243,7 +2245,7 @@ function AntiOffMapMainThread()
                     -- This is to make sure that we only do this check for air units
                     if not unit.OffMapThread and EntityCategoryContains(categories.AIR, unit) then
                         -- This is to make it so it only impacts player armies, not AI or civilian or mission map armies
-                        if IsHumanUnit(unit) then
+                        if unit.Brain.Human then
                             unit.OffMapThread = unit:ForkThread(MoveOnMapThread)
                         else
                             -- So that we don't bother checking each AI unit more than once
@@ -2334,12 +2336,7 @@ end
 ---@param unit Unit
 ---@return boolean
 function IsHumanUnit(unit)
-    for _, army in ScenarioInfo.ArmySetup do
-        if army.ArmyIndex == unit.Army then
-            return army.Human
-        end
-    end
-    return false
+    return unit.Brain.Human
 end
 
 --- Returns if the unit is in the playable area

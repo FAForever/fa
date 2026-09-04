@@ -5,7 +5,7 @@ local THeavyPlasmaCannonProjectile = import("/lua/terranprojectiles.lua").THeavy
 TDFPlasmaHeavy03 = ClassProjectile(THeavyPlasmaCannonProjectile) {
 
 	---@param self TDFPlasmaHeavy03
-	---@param army number
+	---@param army Army
 	---@param EffectTable table
 	---@param EffectScale number
     CreateImpactEffects = function( self, army, EffectTable, EffectScale )

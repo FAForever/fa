@@ -4,7 +4,7 @@
 local CAiBrain = {}
 
 ---@alias BrainArcType 'high' | 'low' | 'none'
----@alias BrainThreatType 'Overall' | 'OverallNotAssigned' | 'StructuresNotMex' | 'Structures' | 'Naval' | 'Air' | 'Land' | 'Experimental' | 'Commander' | 'Artillery' | 'AntiAir' | 'AntiSurface' | 'AntiSub' | 'Economy' | 'Unknown'
+---@alias BrainThreatType 'Overall' | 'OverallNotAssigned' | 'StructuresNotMex' | 'Surface' | 'Structures' | 'Naval' | 'Air' | 'Land' | 'Experimental' | 'Commander' | 'Artillery' | 'AntiAir' | 'AntiSurface' | 'AntiSub' | 'Economy' | 'Unknown'
 
 ---@class BrainPositionThreat
 ---@field [1] number x
@@ -22,7 +22,7 @@ local CAiBrain = {}
 ---@param position Vector
 ---@param threat number
 ---@param decay number
----@param threatType BrainThreatType
+---@param threatType? BrainThreatType
 function CAiBrain:AssignThreatAtPosition(position, threat, decay, threatType)
 end
 
@@ -102,7 +102,9 @@ end
 function CAiBrain:DecideWhatToBuild(builder, buildingType, buildingTemplate)
 end
 
---- Disbands the platoon
+---Destroys the platoon **without** destroying it's units.
+---
+---@see moho.platoon_methods.Destroy for destroying the platoon with it's units.
 ---@param platoon Platoon
 function CAiBrain:DisbandPlatoon(platoon)
 end
@@ -184,6 +186,8 @@ end
 -- return x, z
 
 --- Returns the army start position
+--- 
+---@see SetArmyStart
 ---@return number Xcoordinate
 ---@return number Zcoordinate
 function CAiBrain:GetArmyStartPos()
@@ -218,15 +222,15 @@ end
 function CAiBrain:GetArmyStat(statName, defaultValue)
 end
 
----@unknown
+---@return table
 function CAiBrain:GetAttackVectors()
 end
 
---- Returns a list of factories at a location
----@param location? table table with location, it's not a position but location created by PBMAddBuildLocation function
+--- Returns a list of factories, optionally filtered by distance from `positoin`.
+---@param position? Vector
 ---@param radius? number
 ---@return FactoryUnit[]
-function CAiBrain:GetAvailableFactories(location, radius)
+function CAiBrain:GetAvailableFactories(position, radius)
 end
 
 ---@alias AIBrainBlueprintStatUnits
@@ -256,7 +260,7 @@ function CAiBrain:GetBlueprintStat(statName, category)
 end
 
 --- Return this brain's current enemy.
----@return number -- target army's number
+---@return AIBrain? -- target army brain
 function CAiBrain:GetCurrentEnemy()
 end
 
@@ -306,7 +310,7 @@ end
 
 --- Returns the faction of the army represented by this brain.
 -- 1 UEF, 2 Aeon, 3 Cybran, 4 Seraphim. 5 custom faction like Nomads
----@return number
+---@return integer
 function CAiBrain:GetFactionIndex()
 end
 
@@ -333,7 +337,7 @@ end
 --- This function does **not** take into account intel.
 ---@param category EntityCategory
 ---@param needToBeIdle boolean
----@param requireBuilt boolean Appears to be not functional
+---@param requireBuilt? boolean Appears to be not functional
 ---@return Unit[]
 function CAiBrain:GetListOfUnits(category, needToBeIdle, requireBuilt)
 end
@@ -348,23 +352,28 @@ end
 function CAiBrain:GetNoRushTicks()
 end
 
---- TODO.
--- Probably has to do something with first param of MakePlatoon().
----@return number
-function CAiBrain:GetNumPlatoonsTemplateNamed()
+---Returns a number of active platoons with `name`
+---@see moho.aibrain_methods.MakePlatoon
+---@param name string
+---@return integer
+function CAiBrain:GetNumPlatoonsTemplateNamed(name)
 end
 
---- TODO.
----@return number
-function CAiBrain:GetNumPlatoonsWithAI()
+---TODO: The name is most likely the AI Plan passed when making the platoon
+---@see moho.aibrain_methods.MakePlatoon
+---@param name string
+---@return integer
+function CAiBrain:GetNumPlatoonsWithAI(name)
 end
 
---- Returns the number of units around a position that match the categories
+---Returns the number of units in `radius` from `position` that match the `category` and `alliance`.
+---
+---Based on intel.
 ---@param category EntityCategory
 ---@param position Vector
 ---@param radius number
 ---@param alliance AllianceStatus
----@return number
+---@return integer
 function CAiBrain:GetNumUnitsAroundPoint(category, position, radius, alliance)
 end
 
@@ -374,8 +383,10 @@ function CAiBrain:GetPersonality()
 end
 
 --- Returns platoon by unique name.
----@param name string unique platoon's name set by platoon:UniquelyNamePlatoon(name) function.
----@return Platoon
+---
+---@see moho.platoon_methods.UniquelyNamePlatoon To set the name.
+---@param name string
+---@return Platoon?
 function CAiBrain:GetPlatoonUniquelyNamed(name)
 end
 
@@ -455,9 +466,14 @@ end
 function CAiBrain:IsOpponentAIRunning()
 end
 
---- Creates a new platoon.
----@param name string # unique name for platoon
----@param aiPlan string # to follow for this platoon or '', the function for the plan is in '/lua/platoon.lua'.
+---Creates a new platoon.
+---
+---@see moho.aibrain_methods.GetNumPlatoonsTemplateNamed To get number of platoons with `name`.
+---@see moho.aibrain_methods.GetPlatoonsList To get all plattons
+---@see moho.aibrain_methods.GetPlatoonUniquelyNamed To get platoon by a unique name.
+---@see moho.platoon_methods.UniquelyNamePlatoon To set platoon's unique name.
+---@param name string Name of the platoon. Can be shared by more platoons.
+---@param aiPlan string # to follow for this platoon or `''`, the function for the plan is in '/lua/platoon.lua'.
 ---@return Platoon
 function CAiBrain:MakePlatoon(name, aiPlan)
 end
@@ -473,10 +489,12 @@ end
 ---@param platoon Platoon
 ---@param squad PlatoonSquads
 ---@param alliance AllianceType
+---@param compareType 'LeastDefended'|'Closest'|'Furthest'|'HighestValue'
 ---@param category EntityCategory
----@param compareType any
----@return Vector
-function CAiBrain:PickBestAttackVector(platoon, squad, alliance, category, compareType)
+---@param unknown1? string
+---@param unknown2? string
+---@return Vector?
+function CAiBrain:PickBestAttackVector(platoon, squad, alliance, compareType, category, unknown1, unknown2)
 end
 
 --- Returns true if platoon exists.
@@ -514,8 +532,8 @@ function CAiBrain:SetArmyStatsTrigger(statName, triggerName, compareType, value,
 end
 
 --- Set the current enemy for this brain to attack.
----@param armyIndex Army
-function CAiBrain:SetCurrentEnemy(armyIndex)
+---@param aiBrain AIBrain
+function CAiBrain:SetCurrentEnemy(aiBrain)
 end
 
 --- Set the current plan for this brain to run.
@@ -533,6 +551,7 @@ function CAiBrain:SetResourceSharing(bool)
 end
 
 --- TODO.
+---@param category? EntityCategory
 function CAiBrain:SetUpAttackVectorsToArmy(category)
 end
 

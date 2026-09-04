@@ -148,10 +148,13 @@ LoadIntoTransports = function(units, transports, clearCommands, doPrint)
     local remainingTech1UnitCount = table.getn(remainingTech1Units)
 
     local unitsToLoadTech3Head = 1
+    ---@type Unit[]
     local unitsToLoadTech3 = {}
     local unitsToLoadTech2Head = 1
+    ---@type Unit[]
     local unitsToLoadTech2 = {}
     local unitsToLoadTech1Head = 1
+    ---@type Unit[]
     local unitsToLoadTech1 = {}
 
     -- start loading in units

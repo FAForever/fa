@@ -15,7 +15,7 @@ CIFMolecularResonanceShell01 = ClassProjectile(CIFMolecularResonanceShell) {
 	end,
 
     ---@param self CIFMolecularResonanceShell01
-    ---@param army number
+    ---@param army Army
     ---@param EffectTable table
     ---@param EffectScale number
     CreateImpactEffects = function( self, army, EffectTable, EffectScale )

@@ -27,7 +27,7 @@ SBOOhwalliBombEffect01 = Class(EmitterProjectile) {
 		local position = self:GetPosition()
 
         -- create vision
-        local marker = VisionMarkerOpti({ Owner = self })
+        local marker = VisionMarkerOpti()
         marker:UpdatePosition(position[1], position[3])
         marker:UpdateDuration(6)
         marker:UpdateIntel(army, 5, 'Vision', true)

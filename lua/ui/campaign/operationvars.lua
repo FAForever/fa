@@ -8,27 +8,28 @@
 
 function MakeOpVars(thisID, factionKey, sequenceID)
 	local opStrings = import('/maps/' .. thisID .. '/' .. thisID .. '_strings.lua')
-	
+
+	local op_text, op_success, op_fail
 	-- if briefing data exists (use 'rawget' to bypass missing global error if it doesn't exist)
 	if rawget(opStrings, 'BriefingData') then											
 		op_text = opStrings.BriefingData
 	else
 		op_text = {{phase = 1, character = 'NO_DATA', text = 'ERROR - NO BRIEFING DATA'}}
 	end
-	
+
 	if rawget(opStrings, string.format("%s%02d_DB01_010", factionKey, sequenceID)) then
 		op_success = opStrings[string.format("%s%02d_DB01_010", factionKey, sequenceID)]
 	else
 		op_success = {{phase = 1, character = 'NO_DATA', text = 'ERROR - NO SUCCESS DATA'}}
 	end
-	
-	
+
+
 	if rawget(opStrings, string.format("%s%02d_DB01_020", factionKey, sequenceID)) then
 		op_fail = opStrings[string.format("%s%02d_DB01_020", factionKey, sequenceID)]
 	else
 		op_fail = {{phase = 1, character = 'NO_DATA', text = 'ERROR - NO FAILURE DATA'}}
 	end
-	
+
 	return {op_long_name = opStrings.OPERATION_NAME	,
 			op_num = sequenceID,
 			op_movies = import("/lua/ui/campaign/campaignmoviedata.lua").campaignData[thisID],

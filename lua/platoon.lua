@@ -55,10 +55,12 @@ local SUtils = import("/lua/ai/sorianutilities.lua")
 ---@field [4] PlatoonSquads
 ---@field [5] UnitFormations
 
+---Platoon Template can have any number of squad templates, starting from index 3.
+---The Lua annotations don't support this, when the first 2 indexes are different type.
 ---@class PlatoonTemplate
 ---@field [1] string Platoon name
 ---@field [2] string Plan name
----@field [integer] PlatoonSquadTemplate
+---@field [3] PlatoonSquadTemplate
 
 ---@class Platoon : moho.platoon_methods
 ---@field PlatoonData table
@@ -74,6 +76,7 @@ local SUtils = import("/lua/ai/sorianutilities.lua")
 ---@field BuilderHandle PlatoonBuilder
 ---@field DistressCall boolean
 ---@field UsingTransport boolean
+---@field squadCounter integer[]
 Platoon = Class(moho.platoon_methods) {
     NeedCoolDown = false,
     LastAttackDestination = {},
@@ -93,6 +96,7 @@ Platoon = Class(moho.platoon_methods) {
         self.CreationTime = GetGameTimeSeconds()
     end,
 
+    ---Creates a deep copy of the PlatoonData table and assigns it to the platoon.
     ---@param self Platoon
     ---@param dataTable table
     SetPlatoonData = function(self, dataTable)
