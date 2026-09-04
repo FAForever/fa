@@ -100,7 +100,8 @@
 ---@field Physics UnitBlueprintPhysics
 ---@field Transport? UnitBlueprintTransport
 ---@field Veteran? UnitBlueprintVeterancy
----@field Weapon? WeaponBlueprint[]
+--- The weapon in the first index controls unit AI. Weapons with `DummyWeapon = true` must be at the end of the table.
+---@field Weapon? WeaponBlueprint[] 
 ---@field ModWeapon? WeaponBlueprint[] # Used during blueprint loading to mod `Weapon` table
 ---@field Wreckage? UnitBlueprintWreckage
 ---
@@ -806,6 +807,7 @@
 ---@field SelectionMeshScaleY? number
 ---@field SelectionMeshScaleZ? number
 ---@field UniformScale? number
+---@field UISelection? SoundHandle
 
 ---@class UnitBlueprintEnhancements : table<Enhancement, UnitBlueprintEnhancement>
 ---@field Slots table<EnhancementSlot, {name: UnlocalizedString, x: number, y: number}>
@@ -951,9 +953,7 @@
 ---@field RegenPerSecond number
 --- Which unit categories are buffed by the aura
 ---@field UnitCategory UnparsedCategory
----
---- Used by RAS SACU to add damage to their death weapon
----@field DeathWeaponDamageAdd number
+
 
 
 
@@ -1121,6 +1121,9 @@
 ---@field Elevation number
 --- if true, terrain under building's skirt will be flattened
 ---@field FlattenSkirt boolean
+--- Determines what cells this unit occupies for pathfinding.
+--- Mobile units are forced to use the closest footprint spec that is defined in `footprints.lua`.
+--- Structures can define their own footprints.
 ---@field Footprint FootprintBlueprint
 --- unit fuels up at this rate per second. Required for air staging to undock automatically.
 ---@field FuelRechargeRate number
@@ -1156,7 +1159,7 @@
 --- Used by some build animations to scale their effects
 ---@field MeshExtentsZ number
 ---@field MinSpeedPercent number
---- method of locomotion
+--- method of locomotion. Defaults to "RULEUMT_None" if MaxSpeed = 0.
 ---@field MotionType UnitMotionType
 --- The occupy rectangles of the unit that will override the footprint. Every 4 numbers in the
 --- array define a occupation rectangle for the override (offsetX, offsetZ, sizeX, sizeZ).

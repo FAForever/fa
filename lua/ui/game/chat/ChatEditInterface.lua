@@ -15,6 +15,7 @@ local ChatCompletion = import("/lua/ui/game/chat/ChatCompletion.lua")
 local ChatUtils = import("/lua/ui/game/chat/ChatUtils.lua")
 local ChatListInterface = import("/lua/ui/game/chat/ChatListInterface.lua").ChatListInterface
 local ChatCommandHintInterface = import("/lua/ui/game/chat/ChatCommandHintInterface.lua").ChatCommandHintInterface
+local AddUnicodeCharToEditText = import("/lua/utf.lua").AddUnicodeCharToEditText
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
@@ -162,6 +163,9 @@ ChatEditInterface = ClassUI(Group) {
         ---@param keycode number     # OS-level VK_* code
         ---@param event KeyEvent
         self.EditBox.OnNonTextKeyPressed = function(_, keycode, event)
+            -- Accept Unicode characters that arrive via the non-text key path
+            -- before handling navigation shortcuts.
+            if AddUnicodeCharToEditText(self.EditBox, keycode) then return end
             ChatController.NotifyActivity()
             local chatInterface = import("/lua/ui/game/chat/ChatInterface.lua")
             local mods = event and event.Modifiers
@@ -192,6 +196,14 @@ ChatEditInterface = ClassUI(Group) {
                     self:RecallNext()
                 end
             end
+        end
+
+        self.EditBox.OnKeyboardFocusChange = function(_)
+            self.HasKeyboardFocus = false
+        end
+
+        self.EditBox.OnLoseKeyboardFocus = function(_)
+            self.HasKeyboardFocus = false
         end
 
         local model = ChatModel.GetSingleton()
@@ -441,12 +453,14 @@ ChatEditInterface = ClassUI(Group) {
     --- Gives keyboard focus to the edit box.
     ---@param self UIChatEditInterface
     AcquireFocus = function(self)
+        self.HasKeyboardFocus = true
         self.EditBox:AcquireFocus()
     end,
 
     --- Releases keyboard focus from the edit box.
     ---@param self UIChatEditInterface
     AbandonFocus = function(self)
+        self.HasKeyboardFocus = false
         self.EditBox:AbandonFocus()
     end,
 

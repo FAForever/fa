@@ -230,6 +230,7 @@ keyDescriptions = {
     ['cam_free'] = "<LOC key_desc_0104>Toggles camera free mode",
 
     ['quick_save'] = "<LOC key_desc_0130>Save the game to a special quick save file",
+    ['quick_load'] = "<LOC key_desc_quick_load>Load the game from the special quick save file",
     ['mouse_help'] = "<LOC key_desc_0132>Turn the mouse button help icon on/off",
 
     ['create_build_template'] = "<LOC key_desc_0181>Create a build template based on the current selection",
@@ -555,8 +556,8 @@ keyDescriptions = {
     ['shift_filter_highest_engineer_and_assist'] = '<LOC key_desc_shift_filter_highest_engineer_and_assist>Filter engineers by tech level and majority faction',
     ['abort_navigation'] = '<LOC key_abort_navigation>Interrupt pathfinding of engineers',
     ['shift_abort_navigation'] = '<LOC key_abort_navigation>Interrupt pathfinding of engineers',
-    ['discharge_shields'] = '<LOC key_discharge_shields>Discharge shields',
-    ['shift_discharge_shields'] = '<LOC key_discharge_shields>Discharge shields',
+    ['discharge'] = '<LOC key_discharge_shields>Discharge shields',
+    ['shift_discharge'] = '<LOC key_discharge_shields>Discharge shields',
     ['spreadattack'] = '<LOC key_desc_distribute_orders>Distribute orders',
     ['shift_spreadattack'] = '<LOC key_desc_shift_distribute_orders>Distribute orders',
     ['spreadattack_context'] = '<LOC key_desc_distribute_orders>Distribute orders from the unit beneath the mouse cursor',

@@ -5,6 +5,8 @@
 -- upvalues for performance
 local ArmyBrains = ArmyBrains
 local GetCurrentCommandSource = GetCurrentCommandSource
+local TableEmpty = table.empty
+local KillThread = KillThread
 
 ------------------------------------------------------------------------------------------------------------------------
 --#region General Unit Transfer Scripts
@@ -14,6 +16,7 @@ local CreateWreckage = import("/lua/wreckage.lua").CreateWreckage
 local transferUnbuiltCategory = categories.ALLUNITS
 local transferUnitsCategory = categories.ALLUNITS - categories.INSIGNIFICANTUNIT
 local buildersCategory = categories.ALLUNITS - categories.CONSTRUCTION - categories.ENGINEER
+local engineersCategory = categories.ENGINEER - categories.SUBCOMMANDER - categories.COMMAND
 
 ---@class FactoryRebuildData
 ---@field FacRebuild_Progress number # progress -- save current progress for some later checks
@@ -289,7 +292,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
 
         -- B E F O R E
         local orientation = unit:GetOrientation()
-        local workprogress = unit:GetWorkProgress()
+        local siloWorkProgress = unit:IsUnitState("SiloBuildingAmmo") and unit:GetWorkProgress() or 0
         local numNukes = unit:GetNukeSiloAmmoCount() -- nuclear missiles; SML or SMD
         local numTacMsl = unit:GetTacticalSiloAmmoCount()
         local massKilled = unit.VetExperience
@@ -326,11 +329,8 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
             local unitEnh = SimUnitEnhancements[unit.EntityId]
             if unitEnh then
                 activeEnhancements = {}
-                for i, enh in unitEnh do
-                    activeEnhancements[i] = enh
-                end
-                if not activeEnhancements[1] then
-                    activeEnhancements = nil
+                for slot, enh in unitEnh do
+                    activeEnhancements[slot] = enh
                 end
             end
         end
@@ -420,8 +420,20 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         end
 
         if activeEnhancements then
-            for _, enh in activeEnhancements do
-                newUnit:CreateEnhancement(enh)
+            local thread = newUnit.OnStopBeingBuiltEnhancementsThread
+            if thread then KillThread(thread) end
+            if TableEmpty(activeEnhancements) then
+                newUnit.OnStopBeingBuiltEnhancementsThread = nil
+            else
+                newUnit.OnStopBeingBuiltEnhancementsThread = newUnit:ForkThread(function()
+                    WaitTicks(1)
+                    if newUnit and not newUnit.Dead and not IsDestroyed(newUnit) then
+                        for _, enh in activeEnhancements do
+                            newUnit:CreateEnhancement(enh)
+                        end
+                    end
+                    newUnit.OnStopBeingBuiltEnhancementsThread = nil
+                end)
             end
         end
 
@@ -448,7 +460,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         end
 
         if newUnit.Blueprint.CategoriesHash["SILO"] then
-            newUnit:GiveNukeSiloBlocks(workprogress)
+            newUnit:GiveNukeSiloBlocks(siloWorkProgress)
         end
 
         local newShield = newUnit.MyShield
@@ -738,6 +750,7 @@ function GiveUnitsToPlayer(data, units)
     if manualShare == 'none' or table.empty(units) then
         return
     end
+    ---@cast units -nil
     local toArmy = data.To
     local owner = units[1].Army
     if OkayToMessWithArmy(owner) and IsAlly(owner, toArmy) then
@@ -774,6 +787,7 @@ function GiveUnitsToPlayer(data, units)
             local area = { x0 = x0 - pad, x1 = x1 + pad, y0 = z0 - pad, y1 = z1 + pad }
             local fromBrain = ArmyBrains[owner]
             local fromName = fromBrain.Nickname or tostring(owner)
+            local toName = ArmyBrains[toArmy].Nickname or tostring(toArmy)
 
             -- Specialize the wording when every shared unit is an engineer
             -- — "shared 5 engineers" reads more naturally than "shared 5
@@ -781,33 +795,30 @@ function GiveUnitsToPlayer(data, units)
             -- transfers fall through to the generic noun.
             local allEngineers = true
             for _, unit in transferredUnits do
-                if not EntityCategoryContains(categories.ENGINEER, unit) then
+                if not EntityCategoryContains(engineersCategory, unit) then
                     allEngineers = false
                     break
                 end
             end
 
-            local locKey, fallback
-            if allEngineers then
-                if count == 1 then
-                    locKey, fallback = 'chat_engineers_received_one', '%s shared an engineer with you.'
+            local msg, args
+            if count == 1 then
+                if allEngineers then
+                    msg = '<LOC chat_engineers_received_one>%s sent %s an engineer'
                 else
-                    locKey, fallback = 'chat_engineers_received_many', '%s shared %d engineers with you.'
+                    msg = "<LOC chat_units_received_one>%s sent %s a unit"
                 end
+                args = { fromName, toName }
             else
-                if count == 1 then
-                    locKey, fallback = 'chat_units_received_one', '%s shared a unit with you.'
+                if allEngineers then
+                    msg = "<LOC chat_engineers_received_many>%s sent %s %d engineers"
                 else
-                    locKey, fallback = 'chat_units_received_many', '%s shared %d units with you.'
+                    msg = "<LOC chat_units_received_many>%s sent %s %d units"
                 end
+                args = { fromName, toName, count }
             end
 
-            local args = count == 1 and { fromName } or { fromName, count }
-            fromBrain:SendChatToPlayer(toArmy,
-                '<LOC ' .. locKey .. '>' .. fallback,
-                args,
-                { Area = area }
-            )
+            fromBrain:SendChatToAllies(msg, args, { Area = area }, 'ReceiveUnits')
         end
     end
 end
@@ -992,7 +1003,18 @@ end
 -- shortly thereafter due to the army being defeated (as is common), we then
 -- have an opportunity to see the final game state as observers before everything
 -- would have blown up.
+--
+-- This should be longer than `AbandonedArmyGracePeriod`
 EndGameGracePeriod = 10
+
+-- Seconds to wait after an army has been abandoned (the player disconnected)
+-- before processing its units. This gives a small opportunity to avoid the ACU
+-- explosion, and prevents disconnecting players from providing the server with
+-- a cut-off replay due to the sim on their client instantly killing all other ACUs
+-- and reporting a game over state.
+--
+-- This should be shorter than `EndGameGracePeriod`
+AbandonedArmyGracePeriod = 3
 
 -- Set to true in `AbstractVictoryCondition.EndGame` to prevent killing units after a
 -- team is victorious but before the sim is stopped.
@@ -1008,6 +1030,16 @@ local function KillUnits(toKill)
             end
         end
     end
+end
+
+--- Asynchronously kills all given units after a delay, if not already dead.
+---@param toKill Entity[]
+---@param delaySec number
+local function DelayedKillUnits(toKill, delaySec)
+    ForkThread(function ()
+        WaitSeconds(delaySec)
+        KillUnits(toKill)
+    end)
 end
 
 ---@param self AIBrain
@@ -1251,13 +1283,17 @@ MinimumShareTime = 5 * 60 * 10 -- 5 minutes
 function KillUnsafeCommanders(commanders, tick)
     tick = tick or GetGameTick()
     local safeCommanders = {}
+    local unsafeCommanders = {}
     for _, com in commanders do
         if com.LastTickDamaged and com.LastTickDamaged + CommanderSafeTime > tick then
-            com:Kill()
+            table.insert(unsafeCommanders, com)
         else
             table.insert(safeCommanders, com)
         end
     end
+
+    DelayedKillUnits(unsafeCommanders, AbandonedArmyGracePeriod)
+
     return safeCommanders
 end
 
@@ -1305,8 +1341,7 @@ function KillArmyOnDelayedRecall(self, shareOption, shareTime)
             local safeCommanders = KillUnsafeCommanders(sharedCommanders)
 
             if not table.empty(safeCommanders) then
-                -- note: this adds 3 seconds to the grace period
-                FakeTeleportUnits(safeCommanders, true)
+                ForkThread(FakeTeleportUnits, safeCommanders, true)
             end
         end
     end
@@ -1345,8 +1380,6 @@ function KillAbandonedArmy(self, shareOption, shareAcuOption, victoryOption)
         shareOption = ScenarioInfo.Options.Share
     end
 
-    -- Don't apply instant-effect disconnect rules for players/ACUs that might be defeated soon,
-    -- and might have intentionally disconnected.
     if shareAcuOption == 'Explode' or shareAcuOption == 'Recall' then
         local safeCommanders
         local commanders = self:GetListOfUnits(categories.COMMAND, false)
@@ -1354,7 +1387,7 @@ function KillAbandonedArmy(self, shareOption, shareAcuOption, victoryOption)
             safeCommanders = KillUnsafeCommanders(commanders)
         else
             -- explode all the ACUs so they don't get shared
-            KillUnits(commanders)
+            DelayedKillUnits(commanders, AbandonedArmyGracePeriod)
         end
 
         -- Only handle Assassination victory, as in other settings the player is unlikely to be defeated soon
@@ -1364,8 +1397,7 @@ function KillAbandonedArmy(self, shareOption, shareAcuOption, victoryOption)
 
         -- non-assassination modes can have armies abandon without commanders
         if shareAcuOption == 'Recall' and not table.empty(safeCommanders) then
-            -- note: this adds 3 seconds to the grace period
-            FakeTeleportUnits(safeCommanders, true)
+            ForkThread(FakeTeleportUnits, safeCommanders, true)
         end
 
         KillArmy(self, shareOption)
@@ -1554,22 +1586,19 @@ function GiveResourcesToPlayer(data)
     local energy = math.floor(energyGiven)
     local toArmy = data.To --[[@as integer]]
     local fromName = fromBrain.Nickname or tostring(data.From)
+    local toName = toBrain.Nickname or tostring(toArmy)
+    local msg, args
     if mass > 0 and energy > 0 then
-        fromBrain:SendChatToPlayer(toArmy,
-            "<LOC chat_resources_received_both>%s sent you %d mass and %d energy.",
-            { fromName, mass, energy }
-        )
+        msg = "<LOC chat_resources_received_both>%s sent %s %d mass and %d energy."
+        args = { fromName, toName, mass, energy }
     elseif mass > 0 then
-        fromBrain:SendChatToPlayer(toArmy,
-            "<LOC chat_resources_received_mass>%s sent you %d mass.",
-            { fromName, mass }
-        )
+        msg = "<LOC chat_resources_received_mass>%s sent %s %d mass."
+        args = { fromName, toName, mass }
     elseif energy > 0 then
-        fromBrain:SendChatToPlayer(toArmy,
-            "<LOC chat_resources_received_energy>%s sent you %d energy.",
-            { fromName, energy }
-        )
+        msg = "<LOC chat_resources_received_energy>%s sent %s %d energy."
+        args = { fromName, toName, energy }
     end
+    fromBrain:SendChatToAllies(msg, args, nil, 'ReceiveResources')
 end
 
 ---@param data {From: Army, To: Army}

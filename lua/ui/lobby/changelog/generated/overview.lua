@@ -6,6 +6,27 @@
 Overview = {
     Changelogs = {
         {
+            Version = 3839,
+            Name = "3839 - Hotfix",
+            Date = "2026-08-28",
+            URL = "http://faforever.github.io/fa/changelog/3839",
+            Path = "/lua/ui/lobby/changelog/generated/2026-08-28-3839.lua"
+        },
+        {
+            Version = 3838,
+            Name = "3838 - Hotfix",
+            Date = "2026-08-23",
+            URL = "http://faforever.github.io/fa/changelog/3838",
+            Path = "/lua/ui/lobby/changelog/generated/2026-08-23-3838.lua"
+        },
+        {
+            Version = 3837,
+            Name = "3837 - Game Patch",
+            Date = "2026-08-14",
+            URL = "http://faforever.github.io/fa/changelog/3837",
+            Path = "/lua/ui/lobby/changelog/generated/2026-08-14-3837.lua"
+        },
+        {
             Version = 3836,
             Name = "3836 - Game Patch",
             Date = "2026-05-15",

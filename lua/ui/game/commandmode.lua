@@ -258,6 +258,9 @@ end
 local commandModeTable = {}
 
 --- Retrieves the current command mode information.
+--- 
+--- Called by the engine for worldview right click action, left click action, and
+--- engine worldview HandleEvent.
 ---@return CommandModeTable
 function GetCommandMode()
     commandModeTable[1] = commandMode
@@ -411,7 +414,7 @@ local function OnGuardUpgrade(guardees, unit)
 
     if upgradeRadarTech2 and
         EntityCategoryContains(categories.STRUCTURE * categories.RADAR * categories.TECH2, unit) and
-        unitBlueprint.Economy.ConsumptionPerSecondEnergy > unit:GetEconData().energyConsumed -- check for any adjacency
+        unitBlueprint.Economy.MaintenanceConsumptionPerSecondEnergy > unit:GetEconData().energyConsumed -- check for any adjacency
     then
         ForkThread(UpgradeUnit, unit)
         return

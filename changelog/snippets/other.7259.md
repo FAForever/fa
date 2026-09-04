@@ -1,0 +1,1 @@
+- Annotate `formations.lua` (#7259).
