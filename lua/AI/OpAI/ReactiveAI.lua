@@ -44,6 +44,7 @@ TrackingCategories = {
 }
 
 ---@class ReactiveAI : OpAI
+---@overload fun(): ReactiveAI
 ReactiveAI = Class(OpAI) {
 
     ---@param self OpAI
@@ -212,7 +213,7 @@ ReactiveAI = Class(OpAI) {
 ---@param reactionType any
 ---@param name string
 ---@param data any
----@return any
+---@return ReactiveAI
 function CreateReactiveAI(brain, location, triggeringEventType, reactionType, name, data)
     local reactAI = ReactiveAI()
     reactAI:Create(brain, location, triggeringEventType, reactionType, name, data)

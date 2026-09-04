@@ -35,6 +35,7 @@ local BMPT = '/lua/ai/opai/basemanagerplatoonthreads.lua'
 ---| "LightArtillery"       # T1 Arty
 ---| "MobileAntiAir"        # T1 MAA
 ---| "HeavyTanks"           # T2 Tanks
+---| "RangeBots"            # T2 Cybran/UEF bots
 ---| "AmphibiousTanks"      # T2 Amphibious tanks
 ---| "MobileShields"        # T2/T3 Mobile shield
 ---| "MobileStealth"        # T2 Stealth field
@@ -63,6 +64,9 @@ local BMPT = '/lua/ai/opai/basemanagerplatoonthreads.lua'
 ---| "T3Submarines"         # T3 Sera submarine
 ---| "TorpedoBoats"         # T2 UEF Torpedo boat
 ---| "BattleCruisers"
+---| "T1"                   # T1 ships in NavalOpAI from generated templates 
+---| "T2"                   # T2 ships in NavalOpAI from generated templates 
+---| "T3"                   # T3 ships in NavalOpAI from generated templates 
 ---| "All"
 
 ---@alias OpAILockType
