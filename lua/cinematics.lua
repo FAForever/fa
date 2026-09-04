@@ -24,31 +24,7 @@ function IsOpEnded()
     end
 end
 
---- To be used when starting a cinematic / NIS
-function EnterNISMode()
-    ScenarioInfo.Camera = SimCamera('WorldCamera')
-    LockInput()
-    ScenarioInfo.Camera:UseGameClock()
-    Sync.NISMode = 'on'
-    ScenarioInfo.OpEnded = true
-    -- Take Away UI
-    -- Set Game Speed to normal
-end
-
---- Used at the end of a cinematic / NIS
-function ExitNISMode()
-    -- Set Game Speed to user value
-    -- Restore UI
-    ScenarioInfo.OpEnded = false
-    CameraRevertRotation()
-    Sync.NISMode = 'off'
-    ScenarioInfo.Camera:UseSystemClock()
-    SetInvincible(nil, true)
-    UnlockInput()
-    ScenarioInfo.Camera = nil
-end
-
----@param area Area|Area[]
+---@param area AreaName|AreaName[]|nil
 ---@param invinBool? boolean
 function SetInvincible(area, invinBool)
     if not invinBool then
@@ -59,6 +35,7 @@ function SetInvincible(area, invinBool)
                 table.insert(checkAreas, ScenarioUtils.AreaToRect(v))
             end
         elseif area then
+            ---@cast area -table
             table.insert(checkAreas, ScenarioUtils.AreaToRect(area))
         end
 
@@ -77,6 +54,15 @@ function SetInvincible(area, invinBool)
             ScenarioFramework.UnflagUnkillable(v)
         end
     end
+end
+
+--- Used by other functions to make sure that they don't return before the camera is done moving.
+function WaitForCamera()
+    -- Wait for it to be done
+    ScenarioInfo.Camera:WaitFor()
+
+    -- Reset the event tracker, so that the next camera action can be waited for
+    ScenarioInfo.Camera:EventReset()
 end
 
 --- This will move the camera to the position of a marker.
@@ -121,12 +107,12 @@ function CameraMoveToRectangle(rectangle, seconds)
     end
 end
 
---- See track entities
----@param entity Unit
----@param zoom number
+--- This will move the camera to an area
+---@param area string
 ---@param seconds? number
-function CameraTrackEntity(entity, zoom, seconds)
-    CameraTrackEntities({entity}, zoom, seconds)
+function CameraMoveToArea(area, seconds)
+    local rectangle = ScenarioUtils.AreaToRect(area)
+    CameraMoveToRectangle(rectangle, seconds)
 end
 
 --- This will make the camera track a group of entities.
@@ -141,6 +127,7 @@ function CameraTrackEntities(units, zoom, seconds)
     if army ~= -1 then
         for i, v in units do
             if army ~= v.Army then
+                ---@cast units Blip[]
                 units[i] = v:GetBlip(army)
             end
         end
@@ -156,6 +143,14 @@ function CameraTrackEntities(units, zoom, seconds)
         -- Wait for it to be done
         WaitForCamera()
     end
+end
+
+--- See `CameraTrackEntities`
+---@param entity Unit
+---@param zoom number
+---@param seconds? number
+function CameraTrackEntity(entity, zoom, seconds)
+    CameraTrackEntities({entity}, zoom, seconds)
 end
 
 --- Similar to CameraTrackEntity, but this gives more control with the pitchAdjust parameter.
@@ -213,11 +208,26 @@ function CameraRevertRotation()
     ScenarioInfo.Camera:RevertRotation()
 end
 
---- Used by other functions to make sure that they don't return before the camera is done moving.
-function WaitForCamera()
-    -- Wait for it to be done
-    ScenarioInfo.Camera:WaitFor()
+--- To be used when starting a cinematic / NIS
+function EnterNISMode()
+    ScenarioInfo.Camera = SimCamera('WorldCamera')
+    LockInput()
+    ScenarioInfo.Camera:UseGameClock()
+    Sync.NISMode = 'on'
+    ScenarioInfo.OpEnded = true
+    -- Take Away UI
+    -- Set Game Speed to normal
+end
 
-    -- Reset the event tracker, so that the next camera action can be waited for
-    ScenarioInfo.Camera:EventReset()
+--- Used at the end of a cinematic / NIS
+function ExitNISMode()
+    -- Set Game Speed to user value
+    -- Restore UI
+    ScenarioInfo.OpEnded = false
+    CameraRevertRotation()
+    Sync.NISMode = 'off'
+    ScenarioInfo.Camera:UseSystemClock()
+    SetInvincible(nil, true)
+    UnlockInput()
+    ScenarioInfo.Camera = nil
 end

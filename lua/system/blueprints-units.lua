@@ -693,6 +693,7 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
         efBlueprint.SelectionMeshScaleY = unit.ExternalFactory.SelectionMeshScaleY or 3
         efBlueprint.SelectionMeshScaleZ = unit.ExternalFactory.SelectionMeshScaleZ or 1
         efBlueprint.Display.UniformScale = unit.ExternalFactory.UniformScale or 1.6
+        efBlueprint.Audio = { UISelection = unit.ExternalFactory.UISelection or unit.Audio.UISelection }
 
         -- add our select button override
         if not efBlueprint.General.OrderOverrides then

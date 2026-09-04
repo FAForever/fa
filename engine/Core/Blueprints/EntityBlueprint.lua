@@ -87,3 +87,4 @@
 ---@field OccupancyCaps? number
 ---@field SizeX? number
 ---@field SizeZ? number
+---@field SizeMax? integer # Added by unit blueprint postprocessing. Defaults to 1.

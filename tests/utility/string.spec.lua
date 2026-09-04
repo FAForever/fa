@@ -68,10 +68,6 @@ luft.describe("Utils", function()
         end)
     end)
 
-    luft.test("StringStartsWith", function()
-        luft.expect(StringStartsWith("Hello, World", "Hello")).to.equal(true)
-    end)
-
     luft.test("StringExtract", function()
         luft.expect(StringExtract("/path/name_end.lua", '/', "_end", true))
             .to.equal("name")

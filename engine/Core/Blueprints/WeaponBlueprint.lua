@@ -37,8 +37,14 @@
 ---@field AimsStraightOnDisable boolean
 --- always recheck for better target regardless of whether you already have one or not
 ---@field AlwaysRecheckTarget boolean
+--- animation played by the weapon's Rack Salvo Charge Sequence
+---@field AnimationCharge? FileName
+--- How fast the charge animation runs
+---@field AnimationChargeRate? number
 --- animation played by the weapon's Rack Salvo Reload Sequence
 ---@field AnimationReload? FileName
+--- How fast the reload animation runs
+---@field AnimationReloadRate? number
 --- if an anti-artillery shield will block this projectile
 ---@field ArtilleryShieldBlocks? boolean
 --- information about the audio files used by the weapon
@@ -214,7 +220,8 @@
 --- sets `AlwaysRecheckTarget = false` and prevents automatic target resetting
 --- so that bombers don't retarget halfway through a bombing run
 ---@field NeedToComputeBombDrop? boolean
---- if the unit is set as "busy" while the weapon charges
+--- Controls whether the unit is set as "busy" while the weapon charges/reloads/fires. Set to `true` to allow
+--- other weapons to fire/unit actions to occur while this weapon is working.
 ---@field NotExclusive? boolean
 ---@field NoPause any unused
 --- The damage that the inner ring of the nuke does in each segment. The outer damage will also end
@@ -281,7 +288,9 @@
 ---@field RateOfFire number
 --- if this weapon will find new target on miss events
 ---@field ReTargetOnMiss? boolean
---- if `true`, will set the orange work progress bar to display the reload progress of this weapon
+--- if `true`, will set the orange work progress bar to display the reload progress of this weapon.
+--- Should not be used for units with silo weapons, as the work progress of the reload will transfer
+--- as silo build progress after unit transfer.
 ---@field RenderFireClock? boolean
 --- used by the XSL0402 (Othuy "lighting storm") to define the time to re-aquire a new target before going
 --- through the next lighting strike process
@@ -374,6 +383,8 @@
 --- as a moble artillery unit or when a unit is required to be stationary during an unpack / repack
 --- sequence.
 ---@field WeaponUnpackLocksMotion? boolean
+--- Deprecated. Use `WeaponUnpackLocksMotion` instead.
+---@field WeaponUnpackLockMotion? boolean
 --- time the unit will take to unpack the weapon
 ---@field WeaponUnpackTimeout? number
 --- if the weapon must unpack before it's ready to fire

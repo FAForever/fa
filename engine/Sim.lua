@@ -861,11 +861,12 @@ function IssueFormMove(units, position, formation, degrees)
 end
 
 --- Orders a group of units to patrol to a position in formation
+---
+--- Does NOT return `SimCommand`
 --- @param units Unit[]
 --- @param position Vector
 --- @param formation UnitFormations     # Unit formation to use as defined in `formations.lua`
 --- @param degrees number               # Orientation the platoon takes when it reaches the position. South is 0 degrees, east is 90 degrees, etc.
---- @return SimCommand
 function IssueFormPatrol(units, position, formation, degrees)
 end
 
@@ -1194,6 +1195,19 @@ end
 ---@param army Army
 ---@param ignore boolean
 function SetIgnorePlayableRect(army, ignore)
+end
+
+--- Changes the distance at which the default navigator switches to a lower resolution
+--- pathfinding grid (from "personal" per-unit waypoints to waypoints shared by many units),
+--- typically resulting in units moving in columns over large distances instead of maintaining their formation.
+---
+--- Default engine value is 50.
+---
+--- Useful console commands for debugging: "dbg navwaypoints", "dbg navpath", "dbg navsteering"
+---
+--- Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/132
+---@param distance number
+function SetNavigatorPersonalPosMaxDistance(distance)
 end
 
 --- sets the playable area of a map

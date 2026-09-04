@@ -586,7 +586,9 @@ end
 -- will be using personal positioning instead of waypoints for any move order (doesn't affect "formation move").
 -- useful console commands for debugging: "dbg navwaypoints", "dbg navpath", "dbg navsteering"
 function SetupPathfinding()
-    SetNavigatorPersonalPosMaxDistance(9999)
+    if rawget(_G, "SetNavigatorPersonalPosMaxDistance") then
+        SetNavigatorPersonalPosMaxDistance(9999)
+    end
 end
 
 -- these imports break cycle dependencies of import sequences of mods

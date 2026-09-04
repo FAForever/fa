@@ -9,6 +9,7 @@
 local UIUtil = import("/lua/ui/uiutil.lua")
 local Prefs = import("/lua/user/prefs.lua")
 
+---@type Popup | false
 local quickDialog = false
 
 -- Terminate the game in a vaguely graceful fashion. This may or may not reduce the amount of times
@@ -72,12 +73,18 @@ function HandleEsc(quit_game)
             return
         end
         GetCursor():Show()
+        local text3, fn3
+        if SessionIsActive() and SessionCanRestart() then
+            text3= "Restart Session"
+            fn3 = function () RestartSession() end
+        end
         quickDialog = UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0000>Are you sure you'd like to quit?",
             "<LOC _Yes>", function() SafeQuit() end,
             "<LOC _No>", function() quickDialog:Destroy() quickDialog = false end,
-            nil, nil,
+            text3, fn3,
             true,
-            {escapeButton = 2, enterButton = 1, worldCover = true})
+            {escapeButton = 2, enterButton = 1, OnlyWorldCover = true}
+        )
     end
 
     if quit_game then
