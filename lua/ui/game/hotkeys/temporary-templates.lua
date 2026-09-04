@@ -42,6 +42,12 @@ local function TryBuildTemporaryTemplateForUnits(units)
         print('No Temporary Template is saved.')
         return false
     end
+    local ok, msg = TemplateUtils.VerifyTemplate(template)
+    if not ok then
+        print('Tried to use Temporary Template that is invalid. See moholog for details.')
+        WARN(string.format('Tried to use Temporary Template that is invalid. Template:\n%s\n%s\n%s', msg, repr(template), debug.traceback()))
+        return false
+    end
 
     if table.empty(units) then
         if cheatsEnabled ~= 'true' then
