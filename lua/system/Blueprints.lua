@@ -934,6 +934,7 @@ function PreModBlueprints(all_bps)
                 local insertPos = bpWeapon.AddIndex
                 MergeWeaponByLabel(bp, mergeLabel, insertPos, bpWeapon)
             end
+            bp.ModWeapon = nil
         end
 
         BlueprintLoaderUpdateProgress()
@@ -1002,14 +1003,18 @@ function MergeWeaponByLabel(baseBp, label, insertPos, newBp)
     end
 
     local firstDummyIndex
+    local merged = false
     for i, w in weaponTable do
         if w.Label == label then
             weaponTable[i] = BlueprintMerged(w, newBp)
-            return
+            merged = true
         end
         if w.DummyWeapon then
             firstDummyIndex = i
         end
+    end
+    if merged then
+        return
     end
 
     local finalInsertIndex = firstDummyIndex or TableGetn(weaponTable) + 1
