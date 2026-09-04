@@ -1,6 +1,6 @@
 Hello dear contributor,
 
-it's good to have you here. Things here run a bit differently than you might expect. That's why we set up this document for your information. Please take the time to read it. We promise that it won't waste your time and provides actually useful and relevant information.
+It's good to have you here. Things here run a bit differently than you might expect, that's why we set up this document for your information. Please take the time to read it. We promise that it won't waste your time and provides actually useful and relevant information.
 If after reading you feel this isn't true, please let us know, so we can improve the document.
 
 
@@ -14,7 +14,7 @@ Feel free to ask for a follow-up after 2-4 weeks if you haven't heard back from 
 Being in charge also means you carry responsibility for the change you are introducing. When later it turns out there are some issues with it, you are expected to contribute to fixing the bugs.
 
 If you plan a bigger change, make sure to discuss the feature first. This way you can avoid spending time on something that would ultimately be denied integration. You can open an issue to lay out the problem that you want to fix, but this is not strictly required.
-We discuss changes on our discord, so start a discussion there and link the discussion in the PR description once a conclusion has been reached.
+We discuss changes on our discord, so start a discussion there and link the discussion in the PR description once a conclusion has been reached. You can also open a discussion on our [forum](https://forum.faforever.com/).
 
 ### Technical info
 
@@ -27,7 +27,7 @@ Useful tooling:
 Each PR needs a [snippet](https://faforever.github.io/fa/development/changelog) for the changelog file of the release.
 We have an automatic workflow that adds a snippet template and tries to guess the category based on the PR tags. It also converts the PR to a draft.
 When you have made all the changes you intended to do and have updated the snippet text, you can mark the PR as ready for review by removing the draft status from the PR.
-You can request reviews from people that a knowledgable in the domains of the code you changed (See below).
+You can request reviews from people who are knowledgable in the domains of the code you changed (See below).
 
 ## About reviews
 
@@ -38,14 +38,14 @@ There are various ways to consider a change to be greenlighted:
 - The game team lead has made a decision
 - The discussion on discord has concluded positively.
 
-If a feature changes the balance of the gameplay, then the balance team has to also be in favor. If there was a discussion on discord, a link to it should be inserted into the PR description, so people can later find it.
+If a feature changes the balance of the gameplay, then the balance team has to also be in favor. If there was a discussion on discord and/or the forum, a link to it should be inserted into the PR description, so people can later find it.
 
 Sometimes it's necessary to test changes in a real game to be able to decide if integrating them is a good idea. To do this we can deploy changes to the fafbeta game mode to test them.
 
 Once there is approval from a conceptual point of view, tick the box in the PR description. This way possible reviewers know that a technical review is the only step left to do when they have a look at the overview list of PRs.
 Reviewers don't like to spend time on PRs that might never make it into the game, so they will probably ignore PRs that don't have this box set.
 
-Try to keep PRs small to make reviews easier and consider splitting big features into multiple PRs.
+Nobody likes to review huge PRs. Try to keep PRs small to make reviews easier. If you have to make extensive changes, consider splitting them into one PR that only contains refactoring without any functional changes and one that contains the actual changes to functionality. You can also try splitting big features into multiple PRs.
 
 
 ## How to do a review:
