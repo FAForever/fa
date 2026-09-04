@@ -9,6 +9,8 @@ local tableHash = table.hash
 local GetUnitCommandData = GetUnitCommandData
 local EntityCategoryGetUnitList = EntityCategoryGetUnitList
 
+local __blueprints = __blueprints
+
 -- Utilities that help work with UI build template data
 
 --#region Data calculation functions
