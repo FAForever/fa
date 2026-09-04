@@ -198,14 +198,22 @@ end
 --#endregion
 --#region Template validation functions
 
---- Returns true if the template has anything in the first building's blueprint id index.
+--- Returns true if the template is composed of valid blueprints.
+--- 
+--- Returns false with a reason otherwise.
 ---@param template UIBuildTemplate
 ---@nodiscard
 ---@return boolean
+---@return string?
 function VerifyTemplate(template)
-    local firstBpId = template[3][1]
-    if not firstBpId then
-        return false
+    for i = 3, tableGetN(template) do
+        local bpId = template[i][1]
+        if not bpId then
+            return false, 'nil blueprint at index ' .. i
+        end
+        if not __blueprints[bpId] then
+            return false, 'unknown blueprint "' .. bpId .. '" at index ' .. i
+        end
     end
 
     return true
