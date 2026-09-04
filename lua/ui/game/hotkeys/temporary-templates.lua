@@ -97,4 +97,4 @@ end
 local function OnExit(exitType)
     Prefs.SetToCurrentProfile('build_template_temporary', TempTemplate)
 end
-import('/lua/ui/override/Exit.lua').AddOnExitCallback('TemporaryTemplateOnExit', OnExit)
+import('/lua/ui/override/exit.lua').AddOnExitCallback('TemporaryTemplateOnExit', OnExit)
