@@ -7,7 +7,7 @@
 
 local Prefs = import("/lua/user/prefs.lua")
 local UIUtil = import("/lua/ui/uiutil.lua")
-local TemplateUtils = import('/lua/ui/templateUtils.lua')
+local TemplateUtils = import('/lua/ui/templateutils.lua')
 
 ---@type UIBuildTemplateData[]
 local templates = Prefs.GetFromCurrentProfile('build_templates') or {}

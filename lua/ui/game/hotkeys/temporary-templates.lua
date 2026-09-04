@@ -1,6 +1,6 @@
 local Prefs = import('/lua/user/prefs.lua')
 local CM = import("/lua/ui/game/commandmode.lua")
-local TemplateUtils = import('/lua/ui/templateUtils.lua')
+local TemplateUtils = import('/lua/ui/templateutils.lua')
 
 local cheatsEnabled = SessionGetScenarioInfo().Options.CheatsEnabled
 ---@type UIBuildTemplate | nil
