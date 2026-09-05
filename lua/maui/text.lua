@@ -33,6 +33,10 @@ Text = ClassUI(moho.text_methods, Control) {
         self._color.OnDirty = function(var)
             self:SetNewColor(var())
         end
+
+        self._truncationText = "..."
+        self._fullText = nil
+        self._truncationEnabled = false
     end,
 
     OnInit = function(self)
@@ -41,13 +45,84 @@ Text = ClassUI(moho.text_methods, Control) {
         self:SetClipToWidth(false)
     end,
 
+    --- Direct Engine SetText() that changes what text is displayed
+    ---@type function
+    ---@type fun(self: Text, str: string | number)
+    SetDisplayText = moho.text_methods.SetText,
+
+    --- Direct Engine GetText() for getting the current displayed value
+    ---@type function
+    ---@return string
+    GetDisplayText = moho.text_methods.GetText,
+
+    --- FAF extensible SetText() that uses SetDisplayText() but can retain it's original text for fancy text display setups like truncation
+    ---@param text string | number
+    SetText = function(self, text)
+        self:SetDisplayText(text)
+        self._fullText = text
+        if self._truncationEnabled then
+            self:_applyTruncation()
+        end
+    end,
+
+    --- FAF extensible GetText() that retrieves raw original text that isn't modified for display
+    ---@return string
+    GetText = function(self)
+        return self._fullText
+    end,
+
+    --- Sets custom truncation trailing characters like "..." or "-".
+    ---@param text string | number
+    SetTruncationText = function(self, text)
+        self._truncationText = tostring(text)
+    end,
+
+    ---@param enabled boolean
+    SetTruncationEnabled = function(self, enabled)
+        self._truncationEnabled = enabled
+    end,
+
     SetClipToWidth = function(self, clipToWidth)
         if clipToWidth then
             self.Width:Set(function() return self.Right() - self.Left() end)
+
+            self.Width.OnDirty = function()
+                if self._truncationEnabled then
+                    self:_applyTruncation()
+                end
+            end
         else
             self.Width:Set(function() return math.floor(self.TextAdvance()) end)
+            self.Width.OnDirty = nil
         end
         self:SetNewClipToWidth(clipToWidth)
+    end,
+
+    --- Internal function to fit the truncation string inside the max width
+    _applyTruncation = function(self)
+        local maxWidth = self.Width()
+        if not maxWidth or maxWidth <= 0 then
+            return
+        end
+
+        -- ellipsis is the trailing '...' on truncated text
+        local ellipsis = self._truncationText
+        local str = self._fullText
+        if str == nil then return end
+        -- restore full text if it now fits
+        if self:GetStringAdvance(str) <= maxWidth then
+            self:SetDisplayText(str)
+            return
+        end
+
+        --iterate until string + ellipsis fit
+        local i = STR_Utf8Len(str)
+        while i > 0 and self:GetStringAdvance(str .. ellipsis) > maxWidth do
+            str = STR_Utf8SubString(str, 1, i - 1)
+            i = i - 1
+        end
+
+        self:SetDisplayText(str .. ellipsis)
     end,
 
     -- lazy var support

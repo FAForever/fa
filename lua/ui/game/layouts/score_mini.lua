@@ -66,6 +66,10 @@ function SetLayout()
     controls.timeIcon:SetTexture(UIUtil.UIFile('/game/unit_view_icons/time.dds'))
     LayoutHelpers.RightOf(controls.time, controls.timeIcon)
 
+    LayoutHelpers.RightOf(controls.gameSpeed, controls.time, 4)
+
+    LayoutHelpers.AtLeftTopIn(controls.gameQuality, controls.bgTop, 138, 6)
+
     LayoutHelpers.AtRightTopIn(controls.unitIcon, controls.bgTop, 10, 6)
     controls.unitIcon:SetTexture(UIUtil.UIFile('/dialogs/score-overlay/tank_bmp.dds'))
     LayoutHelpers.LeftOf(controls.units, controls.unitIcon)

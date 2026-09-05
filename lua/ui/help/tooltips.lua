@@ -1817,6 +1817,14 @@ Tooltips = {
         title = "<LOC tooltipui0473>Game Time",
         description = "",
     },
+    score_game_speed ={
+        title = "<LOC tooltipui0738>Game Speed",
+        description = "<LOC tooltipui0739>[your requested speed] / [actual game speed]",
+    },
+    score_game_quality = {
+        title = "<LOC tooltipui0740>Game Quality",
+        description = "<LOC tooltipui0741>Estimated game quality",
+    },
     score_units = {
         title = "<LOC tooltipui0474>Unit Count",
         description = "<LOC tooltipui0507>Current and maximum unit counts",
