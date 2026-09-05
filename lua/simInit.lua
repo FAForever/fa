@@ -26,6 +26,8 @@ doscript '/lua/system/GlobalBuilderTemplate.lua'
 doscript '/lua/system/GlobalBuilderGroup.lua'
 doscript '/lua/system/GlobalBaseTemplate.lua'
 
+doscript '/lua/system/categories.lua'
+
 GameOverListeners = {}
 WaitTicks = coroutine.yield
 
