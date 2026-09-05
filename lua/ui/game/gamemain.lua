@@ -28,11 +28,13 @@ local ordersControl = false
 
 local OnDestroyFuncs = {}
 
+ --- game's "Non-Interactive Sequence" state as synced from Sim
+ ---@type 'on' | 'off' | false
 local NISActive = false
 local isReplay = false
 local waitingDialog = false
 
-local sendChat = import("/lua/ui/game/chat.lua").ReceiveChatFromSim
+local sendChat = import("/lua/ui/game/chat/ChatController.lua").OnReceive
 local oldData = {}
 local lastObserving
 
@@ -87,7 +89,6 @@ function SetLayout(layout)
     import("/lua/ui/game/score.lua").SetLayout()
     import("/lua/ui/game/tabs.lua").SetLayout()
     import("/lua/ui/game/controlgroups.lua").SetLayout()
-    import("/lua/ui/game/chat.lua").SetLayout()
     import("/lua/ui/game/minimap.lua").SetLayout()
     import("/lua/ui/game/massfabs.lua").SetLayout()
     import("/lua/ui/game/recall.lua").SetLayout()
@@ -164,6 +165,9 @@ function CreateUI(isReplay)
     import("/lua/system/performance.lua")
     import("/lua/ui/game/cursor/depth.lua")
     import("/lua/ui/game/cursor/hover.lua")
+    pcall(function() -- wrap in pcall since it is likely to be modded
+        import("/lua/ui/game/hotkeys/context-based-templates.lua").LoadDefaultTemplates()
+    end)
 
     -- casting tools
 
@@ -187,9 +191,9 @@ function CreateUI(isReplay)
     ConExecute('d3d_WindowsCursor on')
 
     -- tweak decal properties
-    ConExecute("ren_ViewError 0.004")           -- standard value of 0.003, the higher the value the less flickering but the less accurate the terrain is      
-    ConExecute("ren_ClipDecalLevel 4")          -- standard value of 2, causes a lot of clipping
-    ConExecute("ren_DecalFadeFraction 0.25")    -- standard value of 0.5, causes decals to suddenly pop into screen
+    ConExecute("ren_ViewError 0.004") -- standard value of 0.003, the higher the value the less flickering but the less accurate the terrain is      
+    ConExecute("ren_ClipDecalLevel 4") -- standard value of 2, causes a lot of clipping
+    ConExecute("ren_DecalFadeFraction 0.25") -- standard value of 0.5, causes decals to suddenly pop into screen
 
     local focusArmy = GetFocusArmy()
 
@@ -298,8 +302,8 @@ function CreateUI(isReplay)
     import("/lua/ui/game/consoleecho.lua").CreateConsoleEcho(mapGroup)
     import("/lua/ui/game/build_templates.lua").Init()
     import("/lua/ui/game/taunt.lua").Init()
+    import("/lua/ui/game/chat/ChatController.lua").Init()
 
-    import("/lua/ui/game/chat.lua").SetupChatLayout(windowGroup)
     import("/lua/ui/game/minimap.lua").CreateMinimap(windowGroup)
 
     if import("/lua/ui/campaign/campaignmanager.lua").campaignMode then
@@ -386,8 +390,10 @@ function AdjustFrameRate()
     ConExecute("SC_FrameTimeClamp " .. (1000 / fps))
 end
 
+---@type WldUIProvider | false
 local provider = false
 
+---@return Movie
 local function LoadDialog(parent)
     local movieFile = '/movies/UEF_load.sfd'
     local color = 'FFbadbdb'
@@ -441,10 +447,7 @@ function CreateWldUIProvider()
 
     provider = WldUIProvider()
 
-    local loadingDialog = false
-    local frame1Logo = false
-
-    local lastTime = 0
+    local loadingDialog = false ---@type Movie | false
 
     provider.StartLoadingDialog = function(self)
         GetCursor():Hide()
@@ -481,6 +484,7 @@ function CreateWldUIProvider()
             WaitSeconds(.15)
             HideGameUI('off')
         end
+
         local loadingPref = Prefs.GetFromCurrentProfile('LoadingFaction')
         local factions = import("/lua/factions.lua").Factions
         local texture = '/UEF_load.dds'
@@ -498,7 +502,7 @@ function CreateWldUIProvider()
         background.OnFrame = function(self, delta)
             self.time = self.time + delta
             if self.time > 1.5 then
-                local newAlpha = self:GetAlpha() - (delta/2)
+                local newAlpha = self:GetAlpha() - (delta / 2)
                 if newAlpha < 0 then
                     newAlpha = 0
                     self:Destroy()
@@ -535,10 +539,6 @@ function CreateWldUIProvider()
 
     provider.CreateGameInterface = function(self, inIsReplay)
         isReplay = inIsReplay
-        if frame1Logo then
-            frame1Logo:Destroy()
-            frame1Logo = false
-        end
         CreateUI(isReplay)
         if not import("/lua/ui/campaign/campaignmanager.lua").campaignMode then
             HideGameUI('on')
@@ -591,14 +591,16 @@ function DeselectSelens(selection)
 end
 
 --- A cache used with ObserveSelection to prevent continuous table allocations
+---@class SelectionChangedData
 local cachedSelection = {
-    oldSelection = { },
-    newSelection = { },
-    added = { },
-    removed = { },
+    oldSelection = {}, ---@type UserUnit[]
+    newSelection = {}, ---@type UserUnit[]
+    added = {},        ---@type UserUnit[]
+    removed = {},      ---@type UserUnit[]
 }
 
 --- Observable to allow mods to do something with a new selection
+---@type Observer<SelectionChangedData>
 ObserveSelection = import("/lua/shared/observable.lua").Create()
 
 local hotkeyLabelsOnSelectionChanged = false
@@ -650,7 +652,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         -- documentation
         local bp = newSelection[1]:GetBlueprint()
         local upgradesTo = nil
-        local potentialUpgrades = upgradeTab[bp.BlueprintId] or {bp.General.UpgradesTo}
+        local potentialUpgrades = upgradeTab[bp.BlueprintId] or { bp.General.UpgradesTo }
         if potentialUpgrades then
             local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(newSelection)
             for _, upgr in potentialUpgrades do
@@ -690,7 +692,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
             import("/lua/ui/game/orders.lua").SetAvailableOrders(availableOrders, availableToggles, newSelection)
         end
         -- TODO change the current command mode if no longer available? or set to nil?
-        import("/lua/ui/game/construction.lua").OnSelection(buildableCategories,newSelection,isOldSelection)
+        import("/lua/ui/game/construction.lua").OnSelection(buildableCategories, newSelection, isOldSelection)
     end
 
     if not isOldSelection then
@@ -700,7 +702,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
             local factories = EntityCategoryFilterDown(categories.STRUCTURE * categories.FACTORY, added) -- find all newly selected factories
             for _, factory in factories do
                 if not factory.HasBeenSelected then
-                    factory:ProcessInfo('SetRepeatQueue','true')
+                    factory:ProcessInfo('SetRepeatQueue', 'true')
                     factory.HasBeenSelected = true
                 end
             end
@@ -725,6 +727,8 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     import("/lua/ui/game/unitview.lua").OnSelection(newSelection)
 end
 
+--- Called by the engine when we have a current factory set for queue display.
+---@see SetCurrentFactoryForQueueDisplay
 ---@param newQueue UIBuildQueue
 function OnQueueChanged(newQueue)
     -- update the Lua representation of the queue
@@ -735,15 +739,16 @@ function OnQueueChanged(newQueue)
     end
 end
 
+
 --- Called by the engine after the sim confirmed that the game is indeed paused. This is run on all instances that are connected to the lobby.
 ---@param pausedBy integer   # The index of the client in the clients list (that you get via `GetSessionClients`)
 ---@param timeoutsRemaining number
 function OnPause(pausedBy, timeoutsRemaining)
     import("/lua/ui/game/pause.lua").OnPause(pausedBy, timeoutsRemaining)
 
-    PauseSound("World",true)
-    PauseSound("Music",true)
-    PauseVoice("VO",true)
+    PauseSound("World", true)
+    PauseSound("Music", true)
+    PauseVoice("VO", true)
     import("/lua/ui/game/tabs.lua").OnPause(true, pausedBy, timeoutsRemaining)
     import("/lua/ui/game/missiontext.lua").OnGamePause(true)
 end
@@ -751,8 +756,8 @@ end
 -- Called after the Sim has confirmed that the game has resumed.
 local ResumedBy = nil
 
---- Transmitted via a Chat command by another user to inform Lua who sent the resume command. 
----@param sender string # The name of the player that resumed the game. 
+--- Transmitted via a Chat command by another user to inform Lua who sent the resume command.
+---@param sender string # The name of the player that resumed the game.
 function SendResumedBy(sender)
     if not ResumedBy then ResumedBy = sender end
 end
@@ -761,9 +766,9 @@ end
 function OnResume()
     import("/lua/ui/game/pause.lua").OnResume()
 
-    PauseSound("World",false)
-    PauseSound("Music",false)
-    PauseVoice("VO",false)
+    PauseSound("World", false)
+    PauseSound("Music", false)
+    PauseVoice("VO", false)
     import("/lua/ui/game/tabs.lua").OnPause(false, ResumedBy)
     import("/lua/ui/game/missiontext.lua").OnGamePause(false)
     ResumedBy = nil
@@ -813,14 +818,14 @@ local _beatFunctions = {}
 --                   to reduce UI load when speeding up sim / replay
 -- @param key      - specifies optional key used later for removing callbacks by a key
 function AddBeatFunction(fn, throttle, key)
-    table.insert(_beatFunctions, {fn = fn, throttle = throttle == true, key = key})
+    table.insert(_beatFunctions, { fn = fn, throttle = throttle == true, key = key })
 end
 
 -- Removes a function callback from calling on sim beats
 -- @param fn  - specifies function callback
 -- @param key - specifies optional key associated with function callback
 function RemoveBeatFunction(fn, key)
-    for i,v in _beatFunctions do
+    for i, v in _beatFunctions do
         if v.fn == fn then
             table.remove(_beatFunctions, i)
             break
@@ -846,7 +851,7 @@ function OnBeat()
         end
     end
 
-    for i,v in _beatFunctions do
+    for i, v in _beatFunctions do
         if v.throttle and throttle then continue end
         if v.fn then v.fn() end
     end
@@ -932,6 +937,9 @@ local rangePrefs = {
 }
 
 local preNISSettings = {}
+
+--- Called by user sync to set the NIS mode state and do callbacks for the states
+---@param state 'on' | 'off'
 function NISMode(state)
     NISActive = state
     local worldView = import("/lua/ui/game/worldview.lua")
@@ -941,7 +949,7 @@ function NISMode(state)
         import("/lua/ui/game/consoleecho.lua").ToggleOutput(false)
         import("/lua/ui/game/multifunction.lua").PreNIS()
         import("/lua/ui/game/tooltip.lua").DestroyMouseoverDisplay()
-        import("/lua/ui/game/chat.lua").OnNISBegin()
+        import("/lua/ui/game/chat/ChatInterface.lua").Close()
         import("/lua/ui/game/unitviewdetail.lua").OnNIS()
         HideGameUI(state)
         ShowNISBars()
@@ -959,7 +967,7 @@ function NISMode(state)
         ConExecute('UI_NisRenderIcons false')
         ConExecute('ren_SelectBoxes false')
         for i, v in rangePrefs do
-            ConExecute(i..' false')
+            ConExecute(i .. ' false')
         end
         preNISSettings.gameSpeed = GetGameSpeed()
         if preNISSettings.gameSpeed ~= 0 then
@@ -984,9 +992,9 @@ function NISMode(state)
         ConExecute('ren_SelectBoxes true')
         for i, v in rangePrefs do
             if Prefs.GetFromCurrentProfile(i) == nil then
-                ConExecute(i..' true')
+                ConExecute(i .. ' true')
             else
-                ConExecute(i..' '..tostring(Prefs.GetFromCurrentProfile(i)))
+                ConExecute(i .. ' ' .. tostring(Prefs.GetFromCurrentProfile(i)))
             end
         end
         if GetGameSpeed() ~= preNISSettings.gameSpeed then
@@ -1032,6 +1040,8 @@ function ShowNISBars()
     end
 end
 
+--- Returns true if the game is in a "Non-Interactive Sequence"
+---@return boolean
 function IsNISMode()
     if NISActive == 'on' then
         return true
@@ -1044,7 +1054,7 @@ function HideNISBars()
     NISControls.barTop:SetNeedsFrameUpdate(true)
     NISControls.barTop.OnFrame = function(self, delta)
         if delta then
-            local newAlpha = self:GetAlpha()*.8
+            local newAlpha = self:GetAlpha() * .8
             if newAlpha < .1 then
                 NISControls.barBot:Destroy()
                 NISControls.barBot = false
@@ -1069,8 +1079,14 @@ end
 
 --- Called by the engine as (chat) messages are received.
 ---@param sender string     # username
----@param data table        
+---@param data table
 function ReceiveChat(sender, data)
+    -- console output ends up as a chat message, hence we early exit here
+    if data.ConsoleOutput then
+        print(LOCF("%s %s", sender, data.ConsoleOutput))
+        return
+    end
+
     if data.Identifier then
 
         -- we highly encourage to use the 'Identifier' field to quickly identify the correct function
@@ -1108,12 +1124,61 @@ function QuickSave(filename)
         local statusStr = "<LOC saveload_0002>Quick Save in progress..."
         local status = UIUtil.ShowInfoDialog(GetFrame(0), statusStr)
         InternalSaveGame(path, filename, function(worked, errmsg)
-                         status:Destroy()
-                         if not worked then
-                             infoStr = LOC("<LOC uisaveload_0008>Save failed! ") .. errmsg
-                             UIUtil.ShowInfoDialog(GetFrame(0), infoStr, "<LOC _Ok>")
-                         end
-                     end)
+            status:Destroy()
+            if not worked then
+                local infoStr = LOC("<LOC uisaveload_0008>Save failed! ") .. errmsg
+                UIUtil.ShowInfoDialog(GetFrame(0), infoStr, "<LOC _Ok>")
+            end
+        end)
+    end
+end
+
+--- Called by key action to load a special quick save file.
+---@param filename string
+function QuickLoad(filename)
+    if not SessionIsActive()
+        or not SessionIsMultiplayer()
+    then
+        --#region Duplicate code from QuickSave
+        local saveType
+        if import("/lua/ui/campaign/campaignmanager.lua").campaignMode then
+            saveType = "CampaignSave"
+        else
+            saveType = "SaveGame"
+        end
+        local path = GetSpecialFilePath(Prefs.GetCurrentProfile().Name, filename, saveType)
+        --#endregion
+
+        local statusStr = "<LOC saveload_QuickLoad>Loading Quick Save..."
+        local status = UIUtil.ShowInfoDialog(GetFrame(0), statusStr)
+
+        --#region Duplicate of `/lua/ui/dialogs/saveload.lua` `CreateLoadDialog` `DoLoad`
+        SetFrontEndData('NextOpBriefing', nil)
+        local SaveErrors = {
+            WrongVersion = '<LOC uisaveload_0005>Wrong version for savegame "%s"',
+            CantOpen = '<LOC uisaveload_0004>Couldn\'t open savegame "%s"',
+            InvalidFormat = '<LOC uisaveload_0006>"%s" is not a valid savegame',
+            InternalError = '<LOC uisaveload_0007>Internal error loading savegame "%s": %s',
+        }
+        local InternalErrors = {
+            ['eof'] = "<LOC Engine0027>EOF reached during serialization.",
+            ['noread'] = "<LOC Engine0028>Error reading file stream during serialization.",
+            ['nowrite'] = "<LOC Engine0026>Error writing data during serialization. Possibly out of disk space.",
+        }
+
+        local worked, error, detail = LoadSavedGame(path)
+        if not worked then
+            UIUtil.ShowInfoDialog(GetFrame(0),
+                -- note - the 'Unknown error...' string below is intentionally not localized because
+                -- it should never show up.  If it does, add the error string to SaveErrors.
+                LOCF(SaveErrors[error] or ('Unknown error ' .. repr(error) .. 'loading savegame %s: %s'),
+                    Basename(path, true),
+                    InternalErrors[detail] or detail),
+                "<LOC _Ok>")
+        end
+        --#endregion
+
+        status:Destroy()
     end
 end
 
@@ -1143,7 +1208,7 @@ function UiBeat()
         import("/lua/ui/game/economy.lua").ToggleEconPanel(not observing)
     end
     if HasCommandLineArg("/syncreplay") and HasCommandLineArg("/gpgnet") then
-        GpgNetSend("BEAT",GameTick(),GetGameSpeed())
+        GpgNetSend("BEAT", GameTick(), GetGameSpeed())
     end
 end
 
@@ -1167,7 +1232,15 @@ SendChat = function()
                     if newChat then
                         chat.oldTime = GetGameTimeSeconds()
                         table.insert(oldData, chat)
-                        sendChat(chat.sender, chat.msg)
+                        -- Sim-side `ConsoleOutput` messages are log-only —
+                        -- they never open a chat line. The new receive path
+                        -- drops non-`Chat` messages, so handle the print
+                        -- here instead of in the controller.
+                        if chat.msg.ConsoleOutput then
+                            print(LOCF("%s %s", chat.sender or "nil sender", chat.msg.ConsoleOutput))
+                        else
+                            sendChat(chat.sender, chat.msg)
+                        end
                     end
                 end
                 UnitData.Chat = {}

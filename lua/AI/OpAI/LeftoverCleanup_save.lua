@@ -96,8 +96,8 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/leftovercleanup_editorfunctions.lua', 'LeftoverCleanupBC',
-                                {'default_brain','default_location_type'},
-                                {'default_brain','default_location_type'}
+                                {'default_location_type'},
+                                {'default_location_type'}
                             },
                         },
                         PlatoonData = {

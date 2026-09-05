@@ -570,6 +570,16 @@ local function ScriptButtonOrderBehavior(self, modifiers, subState)
     end
 end
 
+--Allow the right button on shieldtoggle to disharge the shields
+local function ShieldToggleOrderBehavior(self, modifiers, subState)
+    if modifiers and modifiers.Right then
+        SimCallback({ Func = "DischargeShields", Args = {} }, true)
+        return
+    end
+
+    ScriptButtonOrderBehavior(self, modifiers, subState)
+end
+
 local function ScriptButtonInitFunction(control, unitList, subCheck)
     local result = nil
     local mixed = false
@@ -891,7 +901,7 @@ local function disPauseFunc()
 end
 
 local function NukeBtnText(button)
-    if not currentSelection[1] or currentSelection[1].Dead then return '' end
+    if not currentSelection[1] or IsDestroyed(currentSelection[1]) then return '' end
     if table.getsize(currentSelection) > 1 then
         button.buttonText:SetColor('fffff600')
         return '?'
@@ -907,7 +917,7 @@ local function NukeBtnText(button)
 end
 
 local function TacticalBtnText(button)
-    if not currentSelection[1] or currentSelection[1].Dead then return '' end
+    if not currentSelection[1] or IsDestroyed(currentSelection[1]) then return '' end
     if table.getsize(currentSelection) > 1 then
         button.buttonText:SetColor('fffff600')
         return '?'
@@ -999,7 +1009,7 @@ end
 
 function EnterOverchargeMode()
     local unit = currentSelection[1]
-    if not unit or unit.Dead or unit:IsOverchargePaused() then return end
+    if not unit or IsDestroyed(unit) or unit:IsOverchargePaused() then return end
     local bp = unit:GetBlueprint()
     local weapon = FindOCWeapon(unit:GetBlueprint())
     if not weapon then return end
@@ -1012,7 +1022,7 @@ end
 
 local function OverchargeFrame(self, deltaTime)
     local unit = currentSelection[1]
-    if not unit or unit.Dead then return end
+    if not unit or IsDestroyed(unit) then return end
     local weapon = FindOCWeapon(unit:GetBlueprint())
     if not weapon then
         self:SetNeedsFrameUpdate(false)
@@ -1133,7 +1143,7 @@ local defaultOrdersTable = {
     ExFac = {                       helpText = "external_factory",  bitmapId = 'exfac',                 preferredSlot = 10,  behavior = ExternalFactoryBehavior},
 
     -- Unit toggle rules
-    RULEUTC_ShieldToggle = {        helpText = "toggle_shield",     bitmapId = 'shield',                preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 0},
+    RULEUTC_ShieldToggle = {        helpText = "toggle_shield",     bitmapId = 'shield',                preferredSlot = 8,  behavior = ShieldToggleOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 0},
     RULEUTC_WeaponToggle = {        helpText = "toggle_weapon",     bitmapId = 'toggle-weapon',         preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 1},
     RULEUTC_JammingToggle = {       helpText = "toggle_jamming",    bitmapId = 'jamming',               preferredSlot = 9,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 2},
     RULEUTC_IntelToggle = {         helpText = "toggle_intel",      bitmapId = 'intel',                 preferredSlot = 9,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 3},

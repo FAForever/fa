@@ -23,6 +23,7 @@ local FactoryManagerBrainComponent = import("/lua/aibrains/components/factoryman
 local JammerManagerBrainComponent = import("/lua/aibrains/components/jammermanagerbraincomponent.lua").JammerManagerBrainComponent
 local StatManagerBrainComponent = import("/lua/aibrains/components/statmanagerbraincomponent.lua").StatManagerBrainComponent
 local EnergyManagerBrainComponent = import("/lua/aibrains/components/energymanagerbraincomponent.lua").EnergyManagerBrainComponent
+local AIChatBrainComponent = import("/lua/aibrains/components/ChatBrainComponent.lua").AIChatBrainComponent
 
 ---@class TriggerSpec
 ---@field Callback function
@@ -37,7 +38,6 @@ local EnergyManagerBrainComponent = import("/lua/aibrains/components/energymanag
 ---@field Position Vector
 ---@field TaggedBy Unit
 
----@class PlatoonTable
 ---@alias AIResult "defeat" | "draw" | "victor"
 ---@alias BrainState "Defeat" | "Draw" | "InProgress" | "Recalled" | "Victory"
 ---@alias BrainType "AI" | "Human"
@@ -48,8 +48,11 @@ local EnergyManagerBrainComponent = import("/lua/aibrains/components/energymanag
 local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
 local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
 local CategoriesDummyUnit = categories.DUMMYUNIT
+--- Cached table for assigning a single unit to a platoon, to avoid creating a new table every time.
+---@type { [1]: Unit }
+local cachedPlatoonUnit = {}
 
----@class AIBrain: FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent, EnergyManagerBrainComponent, StorageManagerBrainComponent, moho.aibrain_methods
+---@class AIBrain: FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent, EnergyManagerBrainComponent, StorageManagerBrainComponent, AIChatBrainComponent, moho.aibrain_methods
 ---@field AI boolean
 ---@field Name string           # Army name
 ---@field Nickname string       # Player / AI / character name
@@ -66,7 +69,7 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field LastUnitKilledBy Army         # Which army last killed one of our units. Used for transfering to killer in other victory conditions.
 ---@field Army integer # Cached `GetArmyIndex` engine call
 AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent,
-    EnergyManagerBrainComponent, StorageManagerBrainComponent, moho.aibrain_methods) {
+    EnergyManagerBrainComponent, StorageManagerBrainComponent, AIChatBrainComponent, moho.aibrain_methods) {
 
     Status = 'InProgress',
 
@@ -221,7 +224,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     end,
 
     ---@param self AIBrain
-    ---@param blip any the unit (could be fake) in question
+    ---@param blip Blip
     ---@param reconType ReconTypes
     ---@param val boolean
     OnIntelChange = function(self, blip, reconType, val)
@@ -644,6 +647,18 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
         -- retrieve units, excluding insignificant units
         return BrainGetListOfUnits(self, cats - CategoriesDummyUnit, needToBeIdle, requireBuilt)
+    end,
+
+    --- Assigns a single unit to a platoon
+    ---@param self AIBrain
+    ---@param platoon Platoon | string Either a reference to a platoon, or the unique name of the platoon
+    ---@param unit Unit
+    ---@param squad PlatoonSquads
+    ---@param formation UnitFormations
+    ---@return UnitFormations #Returns the name of the formation
+    AssignUnitToPlatoon = function(self, platoon, unit, squad, formation)
+        cachedPlatoonUnit[1] = unit
+        return self:AssignUnitsToPlatoon(platoon, cachedPlatoonUnit, squad, formation)
     end,
 
     --#endregion

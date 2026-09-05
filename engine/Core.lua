@@ -10,8 +10,8 @@
 ---@class VectorBase
 ---@field [1] number    # x
 ---@field [2] number    # y
----@field x number
----@field y number
+---@field x number Read only value. Changing it has no effect on the vector. Set `[1]` instead.
+---@field y number Read only value. Changing it has no effect on the vector. Set `[2]` instead.
 
 ---@class Quaternion : VectorBase
 ---@operator mul(Quaternion): Quaternion
@@ -28,7 +28,7 @@
 ---@operator mul(number): Vector
 ---@operator unm: Vector
 ---@field [3] number    # z
----@field z number
+---@field z number Read only value. Changing it has no effect on the vector. Set `[3]` instead.
 
 ---@class Vector2 : VectorBase
 ---@operator add(Vector2): Vector2
@@ -50,6 +50,22 @@
 -- note that these object span both the sim and user states
 ---@alias GoalObject moho.manipulator_methods | EconomyEvent | Camera
 
+---@class FileInfo
+---@field IsFolder boolean
+---@field ReadOnly boolean
+---@field SizeBytes integer
+---@field TimeStamp string # unsigned 64 bit int in lowercase hexadecimal
+---@field WriteTime FileInfo.WriteTime
+
+---@class FileInfo.WriteTime
+---@field year integer
+---@field month integer
+---@field mday integer # month day
+---@field wday integer # week day
+---@field hour integer
+---@field minute integer
+---@field second integer
+
 ---@unknown
 function AITarget()
 end
@@ -66,9 +82,10 @@ end
 function Basename(fullPath, stripExtension)
 end
 
---- likely used for debugging, but the use is unknown
----@unknown
-function BeginLoggingStats()
+--- Begins the SupComMark performance benchmark.
+---@see EndLoggingStats # End the benchmark and save results to disk.
+---@param filename string # The name (with extension) for the resulting timestamped benchmark filename.
+function BeginLoggingStats(filename)
 end
 
 --- called during blueprint loading to update the loading animation
@@ -100,7 +117,7 @@ end
 
 --- returns a table of information for the given file, or `false` if the file doesn't exist
 ---@param filename FileName
----@return table | false
+---@return FileInfo | false
 function DiskGetFileInfo(filename)
 end
 
@@ -111,8 +128,9 @@ end
 function DiskToLocal(SysOrLocalPath)
 end
 
---- stops logging stats and optionally exits the application
----@param exit boolean
+--- Ends the SupComMark performance benchmark and saves the results to disk.
+---@see BeginLoggingStats # Begin the benchmark
+---@param exit boolean? # Exits the application iff `false`.
 function EndLoggingStats(exit)
 end
 
@@ -136,7 +154,7 @@ end
 
 ---@overload fun(category: EntityCategory, units: UserUnit[]): UserUnit[]
 ---@overload fun(category: EntityCategory, unitIds: UnitId[]): UnitId[]       
---- filters a list of (user) units or unit ids to only those that match the given category.
+--- filters a list of (user) units or unit blueprint ids to only those that match the given category.
 ---@param category EntityCategory
 ---@param units Unit[]
 ---@return Unit[]

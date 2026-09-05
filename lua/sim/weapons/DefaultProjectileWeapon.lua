@@ -2,7 +2,7 @@ local Weapon = import("/lua/sim/weapon.lua").Weapon
 
 -- upvalue globals for performance
 local GetSurfaceHeight = GetSurfaceHeight
-local VDist2 = VDist2
+local GetDistPoints2D = import("/lua/utilities.lua").GetDistanceBetweenTwoPoints2
 
 local EntityMethods = moho.entity_methods
 local EntityGetPosition = EntityMethods.GetPosition
@@ -21,7 +21,7 @@ local MathSqrt = math.sqrt
 
 -- Most weapons derive from this class, including beam weapons later in this file
 ---@class DefaultProjectileWeapon : Weapon
----@field RecoilManipulators? TrashBag
+---@field RecoilManipulators? TrashBag | Slider[]
 ---@field CurrentSalvoNumber number
 ---@field CurrentRackSalvoNumber number
 ---@field CurrentSalvoData? WeaponSalvoData
@@ -32,6 +32,14 @@ local MathSqrt = math.sqrt
 ---@field EconDrain? moho.EconomyEvent
 ---@field AdjEnergyMod number? # Energy drain multiplier from buffs
 ---@field AdjRoFMod number? # Firerate multiplier from buffs
+---@field WeaponCanFire boolean
+---@field UnpackAnimator Animator?
+---@field RackRecoilReturnSpeed number?
+---@field NumMuzzles number
+---@field NumRackBones number
+---@field StateName string?
+---@field WeaponWantEnabled boolean?
+---@field WeaponAimWantEnabled boolean?
 DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     FxRackChargeMuzzleFlash = {},
@@ -48,7 +56,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     -- Called when the weapon is created, almost always when the owning unit is created
     ---@param self DefaultProjectileWeapon
-    ---@return boolean
     OnCreate = function(self)
         Weapon.OnCreate(self)
 
@@ -100,7 +107,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local strg = '*ERROR: You can not have a RackRecoilDistance with a MuzzleSalvoDelay not equal to 0, aborting weapon setup.  Weapon: '
                 .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
-            return false
+            return
         end
 
         -- Ensure firing cycle is compatible internally
@@ -117,7 +124,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local strg = '*ERROR: The total time to fire muzzles is longer than the RateOfFire allows, aborting weapon setup.  Weapon: '
                 .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
-            return false
+            return
         end
 
         if bp.EnergyChargeForFirstShot == false then
@@ -196,12 +203,13 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     ---@return number
     CalculateBallisticAcceleration = function(self, projectile)
         local launcher = projectile:GetLauncher()
+        ---@cast launcher -Entity
         if not launcher then -- fail-fast
             return 4.9 -- Return the default gravity value if some calculations fail
         end
 
         local UnitGetVelocity = UnitGetVelocity
-        local VDist2 = VDist2
+        local GetDistPoints2D = GetDistPoints2D
         -- Get projectile position and velocity
         -- velocity will need to be multiplied by 10 due to being returned /tick instead of /s
         local projPosX, projPosY, projPosZ = EntityGetPositionXYZ(projectile)
@@ -225,7 +233,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local target = UnitGetTargetEntity(launcher)
             if target then -- target is a unit / prop
                 targetPos = EntityGetPosition(target)
-                if not target.IsProp then
+                if target.IsUnit then
+                    ---@cast target Unit
                     targetVelX, targetVelY, targetVelZ = UnitGetVelocity(target)
                 end
             else -- target is a position i.e. attack ground
@@ -238,15 +247,16 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 if not targetPos then
                     return 4.9
                 end
-                if target and not target.IsProp then
+                if target and target.IsUnit then
+                    ---@cast target Unit
                     targetVelX, targetVelY, targetVelZ = UnitGetVelocity(target)
                 end
                 local targetPosX, targetPosZ = targetPos[1], targetPos[3]
-                local distVel = VDist2(projVelX, projVelZ, targetVelX, targetVelZ)
+                local distVel = GetDistPoints2D(projVelX, projVelZ, targetVelX, targetVelZ)
                 if distVel == 0 then
                     return 4.9
                 end
-                local distPos = VDist2(projPosX, projPosZ, targetPosX, targetPosZ)
+                local distPos = GetDistPoints2D(projPosX, projPosZ, targetPosX, targetPosZ)
                 do
                     local dropShort = self.DropBombShortRatio
                     if dropShort then
@@ -279,7 +289,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     data.target = nil
                     targetPos = data.targetPos
                 else
-                    if not target.IsProp then
+                    if target.IsUnit then
+                        ---@cast target Unit
                         targetVelX, targetVelY, targetVelZ = UnitGetVelocity(target)
                     end
                     targetPos = EntityGetPosition(target)
@@ -312,14 +323,14 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         -- calculate flat (exclude y-axis) distance and velocity between projectile and target
         -- velocity will eventually need to multiplied by 10 due to being per tick instead of per second
-        local distVel = VDist2(projVelX, projVelZ, targetVelX, targetVelZ)
+        local distVel = GetDistPoints2D(projVelX, projVelZ, targetVelX, targetVelZ)
         if distVel == 0 then
             return 4.9
         end
         local targetPosX, targetPosZ = targetPos[1], targetPos[3]
 
         -- calculate the distance for this particular bomb
-        local distPos = VDist2(projPosX, projPosZ, targetPosX, targetPosZ)
+        local distPos = GetDistPoints2D(projPosX, projPosZ, targetPosX, targetPosZ)
         do
             local dropShort = self.DropBombShortRatio
             if dropShort then
@@ -533,13 +544,15 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         -- Deal with owner's audio cues
         local unitBP = self.unit:GetBlueprint()
         local unitBPAudio = unitBP.Audio
-        local activate = unitBPAudio.Activate
-        if activate then
-            self:PlaySound(activate)
-        end
-        local open = unitBPAudio.Open
-        if open then
-            self:PlaySound(open)
+        if unitBPAudio then
+            local activate = unitBPAudio.Activate
+            if activate then
+                self:PlaySound(activate)
+            end
+            local open = unitBPAudio.Open
+            if open then
+                self:PlaySound(open)
+            end
         end
 
         -- Deal with the Weapon's audio and animations
@@ -723,6 +736,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     -- Weapon States
 
     -- Idle state is when the weapon has no target and is done with any animations or unpacking
+    ---@class DefaultProjectileWeapon_IdleState : DefaultProjectileWeapon, State
     IdleState = State {
 
         StateName = 'IdleState',
@@ -730,6 +744,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
+        ---@param self DefaultProjectileWeapon_IdleState
         Main = function(self)
             local unit = self.unit
             if unit.Dead then return end
@@ -755,6 +770,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon_IdleState
         OnGotTarget = function(self)
             Weapon.OnGotTarget(self)
 
@@ -784,6 +800,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon_IdleState
         OnFire = function(self)
 
             local bp = self.Blueprint
@@ -804,6 +821,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     },
 
     -- This state is for when the weapon is charging before firing
+    ---@class DefaultProjectileWeapon_RackSalvoChargeState : DefaultProjectileWeapon, State
     RackSalvoChargeState = State {
 
         StateName = 'RackSalvoChargeState',
@@ -811,6 +829,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
+        ---@param self DefaultProjectileWeapon_RackSalvoChargeState
         Main = function(self)
             local unit = self.unit
             local bp = self.Blueprint
@@ -834,11 +853,13 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon_RackSalvoChargeState
         OnFire = function(self)
         end,
     },
 
     -- This state is for when the weapon is ready to fire
+    ---@class DefaultProjectileWeapon_RackSalvoFireReadyState : DefaultProjectileWeapon, State
     RackSalvoFireReadyState = State {
 
         StateName = 'RackSalvoFireReadyState',
@@ -846,6 +867,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
+        ---@param self DefaultProjectileWeapon_RackSalvoFireReadyState
         Main = function(self)
 
             -- We change the state on counted projectiles because we won't get another OnFire call.
@@ -913,6 +935,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon_RackSalvoFireReadyState
         OnFire = function(self)
             if self.WeaponCanFire then
                 ChangeState(self, self.RackSalvoFiringState)
@@ -921,6 +944,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     },
 
     -- This state is for when the weapon is actually in the process of firing
+    ---@class DefaultProjectileWeapon_RackSalvoFiringState : DefaultProjectileWeapon, State
     RackSalvoFiringState = State {
 
         StateName = 'RackSalvoFiringState',
@@ -929,22 +953,26 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponAimWantEnabled = true,
 
         -- Render the fire recharge bar
-        ---@param self DefaultProjectileWeapon
+        ---@param self DefaultProjectileWeapon_RackSalvoFiringState
         ---@param rateOfFire number
         RenderClockThread = function(self, rateOfFire)
             local unit = self.unit
             local clockTime = math.round(10 * rateOfFire)
             local totalTime = clockTime
-            while clockTime >= 0 and
-                not self:BeenDestroyed() and
-                not unit.Dead do
-                unit:SetWorkProgress(1 - clockTime / totalTime)
+            while clockTime >= 0
+                and not self:BeenDestroyed()
+                and not unit.Dead
+            do
+                -- do not override work progress that is used for replenishing silo ammo upon unit transfer
+                if not unit:IsUnitState("SiloBuildingAmmo") then
+                    unit:SetWorkProgress(1 - clockTime / totalTime)
+                end
                 clockTime = clockTime - 1
                 WaitSeconds(0.1)
             end
         end,
 
-        ---@param self DefaultProjectileWeapon
+        ---@param self DefaultProjectileWeapon_RackSalvoFiringState
         ---@param rateOfFire number
         DisabledWhileReloadingThread = function(self, rateOfFire)
 
@@ -970,6 +998,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon_RackSalvoFiringState
         Main = function(self)
             local unit = self.unit
             unit:SetBusy(true)
@@ -1014,7 +1043,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 if bp.FixedSpreadRadius then
                     local weaponPos = unit:GetPosition()
                     local targetPos = self:GetCurrentTargetPos()
-                    local distance = VDist2(weaponPos[1], weaponPos[3], targetPos[1], targetPos[3])
+                    local distance = GetDistPoints2D(weaponPos[1], weaponPos[3], targetPos[1], targetPos[3])
 
                     -- This formula was obtained empirically and somehow it works :)
                     local randomness = 12 * bp.FixedSpreadRadius / distance
@@ -1157,6 +1186,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon_RackSalvoFiringState
         OnLostTarget = function(self)
             -- Override the default OnLostTarget but not inherited ones
             -- the inherited ones are needed for beam weapons to stop firing: https://github.com/FAForever/fa/pull/4863
@@ -1194,12 +1224,14 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         -- Set a bool so we won't fire if the target reticle is moved
+        ---@param self DefaultProjectileWeapon_RackSalvoFiringState
         OnHaltFire = function(self)
             self.HaltFireOrdered = true
         end,
     },
 
     -- This state is for when the weapon is reloading
+    ---@class DefaultProjectileWeapon_RackSalvoReloadState : DefaultProjectileWeapon, State
     RackSalvoReloadState = State {
 
         StateName = 'RackSalvoReloadState',
@@ -1207,6 +1239,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
+        ---@param self DefaultProjectileWeapon_RackSalvoReloadState
         Main = function(self)
             local unit = self.unit
             unit:SetBusy(true)
@@ -1240,9 +1273,11 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon_RackSalvoReloadState
         OnFire = function(self)
         end,
 
+        ---@param self DefaultProjectileWeapon_RackSalvoReloadState
         OnLostTarget = function(self)
             -- Override default OnLostTarget to prevent bypassing reload time by switching to idle state immediately
             local unit = self.unit
@@ -1255,6 +1290,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     },
 
     -- This state is for weapons which have to unpack before firing
+    ---@class DefaultProjectileWeapon_WeaponUnpackingState : DefaultProjectileWeapon, State
     WeaponUnpackingState = State {
 
         StateName = 'WeaponUnpackingState',
@@ -1262,6 +1298,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponWantEnabled = false,
         WeaponAimWantEnabled = false,
 
+        ---@param self DefaultProjectileWeapon_WeaponUnpackingState
         Main = function(self)
             local unit = self.unit
             unit:SetBusy(true)
@@ -1280,11 +1317,13 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon_WeaponUnpackingState
         OnFire = function(self)
         end,
     },
 
     -- This state is for weapons which have to pack up before moving or whatever
+    ---@class DefaultProjectileWeapon_WeaponPackingState : DefaultProjectileWeapon, State
     WeaponPackingState = State {
 
         StateName = 'WeaponPackingState',
@@ -1292,7 +1331,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
-        ---@param self DefaultProjectileWeapon
+        ---@param self DefaultProjectileWeapon_WeaponPackingState
         Main = function(self)
             local unit = self.unit
 
@@ -1311,7 +1350,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             ChangeState(self, self.IdleState)
         end,
 
-        ---@param self DefaultProjectileWeapon
+        ---@param self DefaultProjectileWeapon_WeaponPackingState
         OnGotTarget = function(self)
             Weapon.OnGotTarget(self)
 
@@ -1325,7 +1364,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
-        ---@param self DefaultProjectileWeapon
+        ---@param self DefaultProjectileWeapon_WeaponPackingState
         OnFire = function(self)
             local bp = self.Blueprint
             if -- triggers when we use the distribute orders feature to distribute TMLs / SMLs launch orders
@@ -1341,13 +1380,16 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     },
 
     -- This state is entered only when the owner of the weapon is dead
+    ---@class DefaultProjectileWeapon_DeadState : DefaultProjectileWeapon, State
     DeadState = State {
 
         StateName = 'DeadState',
 
+        ---@param self DefaultProjectileWeapon_DeadState
         OnEnterState = function(self)
         end,
 
+        ---@param self DefaultProjectileWeapon_DeadState
         Main = function(self)
         end,
     },

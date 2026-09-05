@@ -6,12 +6,17 @@
 local TableInsert = table.insert
 
 -- setup for a basic meta table
----@class Observer
+
+--- Object that connects callbacks with data updates
+---@class Observer<T>
+---@field Listeners table<string|integer, fun(val: T)>
 local ObservableMeta = {}
 ObservableMeta.__index = ObservableMeta
 
 --- Adds an observer that is updated when the value is subject is set.
----@param callback function A function that receives the value as its first argument.
+---@generic T
+---@param self Observer<T>
+---@param callback fun(val: T) | nil A function that receives the value as its first argument.
 ---@param name? string Optional name to be able to reference the callback later on
 function ObservableMeta:AddObserver(callback, name)
     if name then
@@ -22,6 +27,9 @@ function ObservableMeta:AddObserver(callback, name)
 end
 
 --- Sets the value of the subject and notifies all observers with the updated value.
+---@generic T
+---@param self Observer<T>
+---@param value T
 function ObservableMeta:Set(value)
     for k, callback in self.Listeners do
         callback(value)
@@ -29,6 +37,7 @@ function ObservableMeta:Set(value)
 end
 
 --- Constructs an observable as described by the observable pattern
+---@return Observer
 function Create()
     local observable = {
         Listeners = {},

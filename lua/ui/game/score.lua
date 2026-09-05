@@ -7,6 +7,7 @@
 --*****************************************************************************
 
 -- current score will contain the most recent score update from the sync
+---@type GameScoreData | false
 currentScores = false
 
 local UIUtil = import("/lua/ui/uiutil.lua")
@@ -20,7 +21,7 @@ local Grid = import("/lua/maui/grid.lua").Grid
 local Prefs = import("/lua/user/prefs.lua")
 local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
 local Tooltip = import("/lua/ui/game/tooltip.lua")
-local FindClients = import("/lua/ui/game/chat.lua").FindClients
+local FindClients = import("/lua/ui/game/chat/ChatController.lua").FindClients
 local scoreMini = import(UIUtil.GetLayoutFilename('score'))
 
 controls = import("/lua/ui/controls.lua").Get()

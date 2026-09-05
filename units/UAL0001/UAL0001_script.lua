@@ -37,10 +37,12 @@ UAL0001 = ClassUnit(ACUUnit) {
         AutoOverCharge = ClassWeapon(ADFOverchargeWeapon) {},
     },
 
+    ---@param self UAL0001
     __init = function(self)
         ACUUnit.__init(self, 'RightDisruptor')
     end,
 
+    ---@param self UAL0001
     OnCreate = function(self)
         ACUUnit.OnCreate(self)
         self:SetCapturable(false)
@@ -56,6 +58,7 @@ UAL0001 = ClassUnit(ACUUnit) {
         self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
     end,
 
+    ---@param self UAL0001
     OnStopBeingBuilt = function(self, builder, layer)
         ACUUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetWeaponEnabledByLabel('RightDisruptor', true)
@@ -63,18 +66,13 @@ UAL0001 = ClassUnit(ACUUnit) {
         self:ForkThread(self.GiveInitialResources)
     end,
 
+    ---@param self UAL0001
+    ---@param unitBeingBuilt Unit
+    ---@param order BuildOrderType
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         EffectUtil.CreateAeonCommanderBuildingEffects(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
 
-    -- Wide ACUs seasonal event
-    --- Called when the unit gains a level of veterancy
-    ---@param self UAL0001
-    AddVetLevel = function(self)
-        ACUUnit.AddVetLevel(self)
-        local temp = string.format('/meshes/aeon/Aeon%d_mesh', self.VetLevel)
-        self:SetMesh(temp, true)
-    end,
 
     ---------------------------------------------------------------------------
     --#region Enhancements

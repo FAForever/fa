@@ -5,6 +5,14 @@
 --*
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
+
+-- This file implements the main lobby screen
+-- To see the options/map selection screen, see mapselect.lua
+-- For mods, modsmanager.lua
+-- For unit restrictions, unitsmanager.lua
+-- For "patchnotes" screen, changelog.lua
+-- For load game screen, saveload.lua CreateLoadDialog
+
 local GameVersion = import("/lua/version.lua").GetVersion
 local UIUtil = import("/lua/ui/uiutil.lua")
 local MenuCommon = import("/lua/ui/menus/menucommon.lua")
@@ -41,7 +49,6 @@ local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 local CountryTooltips = import("/lua/ui/help/tooltips-country.lua").tooltip
 local SetUtils = import("/lua/system/setutils.lua")
 local JSON = import("/lua/system/dkson.lua").json
-local Changelog = import("/lua/ui/lobby/changelog.lua")
 local UTF =  import("/lua/utf.lua")
 -- Uveso - aitypes inside aitypes.lua are now also available as a function.
 local aitypes
@@ -49,14 +56,9 @@ local AIKeys = {}
 local AIStrings = {}
 local AITooltips = {}
 
--- TODO: remove these console commands before release
--- The following is enabled on non-production branches to assist with debugging for ICE/WebRTC issues
-local versionNumber, versionType, versionCommit = import("/lua/version.lua").GetVersionData()
-if versionType != "FAF" then
-    WARN("Enabling network debug console commands")
-    ConExecute("net_LogPackets")
-    ConExecute("net_DebugLevel 10")
-end
+
+
+local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 
 function GetAITypes()
     AIKeys = {}
@@ -82,10 +84,32 @@ if HasCommandLineArg("/syncreplay") and HasCommandLineArg("/gpgnet") then
     IsSyncReplayServer = true
 end
 
-local globalOpts = import("/lua/ui/lobby/lobbyoptions.lua").globalOpts
-local teamOpts = import("/lua/ui/lobby/lobbyoptions.lua").teamOptions
-local AIOpts = import("/lua/ui/lobby/lobbyoptions.lua").AIOpts
+local lobbyOptions = import("/lua/ui/lobby/lobbyoptions.lua")
+local globalOpts = lobbyOptions.globalOpts
+local teamOpts = lobbyOptions.teamOptions
+local AIOpts = lobbyOptions.AIOpts
 local gameColors = import("/lua/gamecolors.lua").GameColors
+
+-- Table mapping option keys to mods that use them
+--
+-- Format: `{ [optionKey] = { modUID = modName, modUID = modName, ... } }`
+---@type table<string, table<string, string>>
+local ModOptionMapping = {}
+
+-- Set of option keys from the original/default lobbyOptions.lua
+-- Used to distinguish default options from mod-added options
+---@type table<string, true>
+local DefaultOptionKeys = {}
+
+-- Initialize DefaultOptionKeys with the original lobbyOptions.lua options
+local function initOptionKeys(...)
+    for _, optionTable in ipairs(arg) do
+        for _, option in optionTable do
+            DefaultOptionKeys[option.key] = true
+        end
+    end
+end
+initOptionKeys(globalOpts, teamOpts, AIOpts)
 
 local numOpenSlots = LobbyComm.maxPlayerSlots
 
@@ -94,14 +118,21 @@ function ImportModAIOptions()
     local simMods = import("/lua/mods.lua").AllMods()
     local OptionData
     local alreadyStored
-    for Index, ModData in simMods do
+    for _, ModData in simMods do
         if exists(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua') then
             OptionData = import(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua').AIOpts
-            for s, t in OptionData do
+            for _, t in OptionData do
                 -- check, if we have this option already stored
                 alreadyStored = false
-                for k, v in AIOpts do
+                for _, v in AIOpts do
                     if v.key == t.key then
+                        if DebugComponent.EnabledLogging then
+                            LOG(string.format(
+                                'Found duplicate mod option "%s" in mod "%s"'
+                                , t.key
+                                , ModData.name
+                            ))
+                        end
                         alreadyStored = true
                         break
                     end
@@ -109,6 +140,11 @@ function ImportModAIOptions()
                 if not alreadyStored then
                     table.insert(AIOpts, t)
                 end
+
+                -- Initialize the option's mod set
+                ModOptionMapping[t.key] = ModOptionMapping[t.key] or {}
+                -- Track that this option is used by this mod
+                ModOptionMapping[t.key][ModData.uid] = ModData.name
             end
         end
     end
@@ -118,12 +154,35 @@ ImportModAIOptions()
 -- Maps faction identifiers to their names.
 local FACTION_NAMES = {[1] = "uef", [2] = "aeon", [3] = "cybran", [4] = "seraphim", [5] = "random" }
 
+--- Helper function: Returns true if the given option key exists in the default lobbyOptions.lua
+---@param optionKey string
+---@return boolean
+local function IsDefaultOption(optionKey)
+    return DefaultOptionKeys[optionKey] ~= nil
+end
+
+--- Helper function: Returns true if the given option is used by any of the given mods
+---@param optionKey string
+---@param enabledModUIDs table<string, nonnil> # `table<modUID, unused>`
+---@return boolean
+local function IsOptionUsedByGivenMods(optionKey, enabledModUIDs)
+    local modUIDsUsingOpt = ModOptionMapping[optionKey]
+    if not modUIDsUsingOpt then return false end
+    for modUID, _ in modUIDsUsingOpt do
+        if enabledModUIDs[modUID] then
+            return true
+        end
+    end
+    return false
+end
+
 local rehostPlayerOptions = {} -- Player options loaded from preset, used for rehosting
 
 local formattedOptions = {}
 local nonDefaultFormattedOptions = {}
 local LrgMap = false
 
+---@type UILobbyHostUtils
 local HostUtils
 local mapPreviewSlotSwapFrom = 0
 local mapPreviewSlotSwap = false
@@ -219,7 +278,7 @@ local commands = {
 
 local Strings = LobbyComm.Strings
 
----@type LobbyComm
+---@type UILobbyCommunication
 local lobbyComm = false
 local localPlayerName = ""
 local gameName = ""
@@ -1043,9 +1102,10 @@ function SetSlotInfo(slotNum, playerInfo)
         GUI.connectdialog:Close()
         GUI.connectdialog = nil
 
-        -- Changelog, if necessary.
-        if Changelog.OpenChangelog() then
-            Changelog.Changelog(GetFrame(0))
+        -- ChangelogDialog, if necessary.
+        local changelogDialogManager = import("/lua/ui/lobby/changelog/changelogdialog.lua")
+        if changelogDialogManager.ShouldOpenChangelog() then
+            changelogDialogManager.CreateChangelogDialog(GetFrame(0))
         end
     end
 
@@ -2275,14 +2335,52 @@ local function TryLaunch(skipNoObserversCheck)
 
         HostUtils.SendArmySettingsToServer()
 
+        --#region Filter GameOptions to remove options from disabled mods
+
+        local enabledModUIDs = Mods.GetSelectedMods()
+
+        -- Remove options from disabled mods
+        -- Only remove options that are not in the default lobbyOptions.lua
+        local keysToRemove = {}
+        for optionKey, _ in gameInfo.GameOptions do
+            -- Skip if this is a default option (always keep default options)
+            if not IsDefaultOption(optionKey) and ModOptionMapping[optionKey] then
+                -- Check if this option is used by an enabled mod
+                local isUsed = IsOptionUsedByGivenMods(optionKey, enabledModUIDs)
+
+                -- If NOT used, mark for removal
+                if not isUsed then
+                    table.insert(keysToRemove, optionKey)
+                    if DebugComponent.EnabledSpewing then
+                        SPEW(string.format('Option "%s" marked for removal because none of these mods are enabled: "%s"'
+                            , optionKey
+                            , table.concat(table.values(ModOptionMapping[optionKey]))
+                        ))
+                    end
+                end
+            end
+        end
+        if DebugComponent.EnabledLogging then
+            LOG(string.format("%d options marked for removal", table.getsize(keysToRemove)))
+        end
+
+        -- Remove the marked keys from GameOptions
+        for _, key in keysToRemove do
+            gameInfo.GameOptions[key] = nil
+        end
+        --#endregion
+
         -- Tell everyone else to launch and then launch ourselves.
         -- TODO: Sending gamedata here isn't necessary unless lobbyComm is fucking stupid and allows
         -- out-of-order message delivery.
         -- Downlord: I use this in clients now to store the rehost preset. So if you're going to remove this, please
         -- check if rehosting still works for non-host players.
+        ---@see UIlobbyMessageHandlers.Launch
         lobbyComm:BroadcastData({ Type = 'Launch', GameInfo = gameInfo })
 
         -- set the mods
+        -- We don't broadcast them because its a huge table of type ModInfo[]
+        -- Clients will set their mods independently in the `Launch` message handler
         gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
 
         SetWindowedLobby(false)
@@ -2291,8 +2389,6 @@ local function TryLaunch(skipNoObserversCheck)
 
         -- launch the game
         lobbyComm:LaunchGame(gameInfo)
-
-        
     end
 
     LaunchGame()
@@ -3331,7 +3427,7 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtBottomIn(GUI.patchnotesButton, GUI.optionsPanel, -51)
     LayoutHelpers.AtHorizontalCenterIn(GUI.patchnotesButton, GUI.optionsPanel, -55)
     GUI.patchnotesButton.OnClick = function(self, event)
-        Changelog.Changelog(GUI)
+        import("/lua/ui/lobby/changelog/changelogdialog.lua").CreateChangelogDialog(GUI)
     end
 
     -- Create mission briefing button
@@ -4501,11 +4597,15 @@ function setupChatEdit(chatPanel)
     end
 
     GUI.chatEdit.OnEscPressed = function(self, text)
+
+        local changelogDialogManager = import("/lua/ui/lobby/changelog/changelogdialog.lua")
+        local changelogDialogIsOpen = changelogDialogManager.IsOpen()
+
         -- The default behaviour buggers up our escape handlers. Just delegate the escape push to
         -- the escape handling mechanism.
-        if HasCommandLineArg("/gpgnet") or Changelog.isOpen then
+        if HasCommandLineArg("/gpgnet") or changelogDialogIsOpen then
             -- Quit to desktop
-            EscapeHandler.HandleEsc(not Changelog.isOpen)
+            EscapeHandler.HandleEsc(not changelogDialogIsOpen)
         else
             -- Back to main menu
             GUI.exitButton.OnClick()
@@ -5088,7 +5188,7 @@ local FromSubjectOrHost = function(data)
     return false
 end
 
---
+---@class UIlobbyMessageHandlers
 local MessageHandlers = {
     -- Update player options. Either the host reconfiguring, or users tweaking their own settings.
     PlayerOptions = {
@@ -6825,6 +6925,7 @@ function InitHostUtils()
         return
     end
 
+    ---@class UILobbyHostUtils
     HostUtils = {
         --- Cause a player's ready box to become unchecked.
         --

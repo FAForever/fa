@@ -1,0 +1,1 @@
+- Fix error when worldview with render shapes is destroyed (#7210).

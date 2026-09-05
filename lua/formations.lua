@@ -12,6 +12,43 @@
 
 ---@alias UnitFormations 'AttackFormation' | 'GrowthFormation' | 'NoFormation' | 'None' | 'none'
 
+--- Table names that the engine accesses to get formation function names
+--- based on the motion type of the units a formation is being made for.
+---@alias FormationType 'SurfaceFormations' | 'AirFormations' | 'ComboFormations'
+
+---@class FormationPos
+---@field [1] number # xPos
+---@field [2] number # yPos
+---@field [3] EntityCategory # Category filter to use to assign units
+---@field [4] integer # moveDelay: engine initiates pathfinding with a delay, with lower numbers going first
+---@field [5] boolean # rotate: unknown 
+
+---@class FormationBlock
+---@field [integer] FormationBlockType[] # Row, column format
+
+---@class FormationBlockType
+---@field [integer] FormationSubgroup
+
+---@class FormationSubgroup
+---@field [integer] FormationCategoryNames
+
+---@class FormationBlockAir : FormationBlock
+---@field RepeatAllRows? boolean
+---@field HomogenousBlocks? boolean
+---@field ChevronSize? number
+
+---@class FormationBlockLand : FormationBlock
+---@field LineBreak? number
+---@field HomogenousRows? boolean
+
+local LandCategories = import("/lua/shared/formations/categorizeunits.lua").LandCategories
+local NavalCategories = import("/lua/shared/formations/categorizeunits.lua").NavalCategories
+local SubCategories = import("/lua/shared/formations/categorizeunits.lua").SubCategories
+local ShieldCategory = import("/lua/shared/formations/categorizeunits.lua").ShieldCategory
+local NonShieldCategory = import("/lua/shared/formations/categorizeunits.lua").NonShieldCategory
+
+local CategorizeUnits = import("/lua/shared/formations/categorizeunits.lua").CategorizeUnits
+local GetDistanceBetweenTwoPoints2 = import('/lua/utilities.lua').GetDistanceBetweenTwoPoints2
 
 local TableEmpty = table.empty
 local TableGetn = table.getn
@@ -42,7 +79,11 @@ ComboFormations = {
     'GrowthFormation',
 }
 
+---@type FormationPos[]
 local FormationPos = {} -- list to be returned
+
+--#region Formation caching
+
 local FormationCache = {}
 local MaxCacheSize = 30
 
@@ -74,7 +115,7 @@ function GetCachedResults(formationUnits, formationType)
     return false
 end
 
----@param results TLaserBotProjectile
+---@param results FormationPos[]
 ---@param formationUnits Unit[]
 ---@param formationType UnitFormations
 function CacheResults(results, formationUnits, formationType)
@@ -88,63 +129,14 @@ function CacheResults(results, formationUnits, formationType)
     end
     TableInsert(cache, 1, {Results = results, Units = formationUnits, UnitCount = TableGetn(formationUnits)})
 end
+--#endregion
+--#region Formation Block Data
+--#region Land Data
 
--- =========================================
--- ================ LAND DATA ==============
--- =========================================
 local RemainingCategory = { 'RemainingCategory', }
 
--- === LAND CATEGORIES ===
-local DirectFire = (categories.DIRECTFIRE - (categories.CONSTRUCTION + categories.SNIPER + categories.WEAKDIRECTFIRE)) * categories.LAND
-local Sniper = categories.SNIPER * categories.LAND
-local Artillery = (categories.ARTILLERY + categories.INDIRECTFIRE - categories.SNIPER) * categories.LAND
-local AntiAir = (categories.ANTIAIR - (categories.EXPERIMENTAL + categories.DIRECTFIRE + categories.SNIPER + Artillery)) * categories.LAND
-local Construction = ((categories.COMMAND + categories.CONSTRUCTION + categories.ENGINEER) - (DirectFire + Sniper + Artillery)) * categories.LAND
-local UtilityCat = (((categories.RADAR + categories.COUNTERINTELLIGENCE) - categories.DIRECTFIRE) + categories.SCOUT) * categories.LAND
-local ShieldCat = categories.uel0307 + categories.ual0307 + categories.xsl0307
+--#region Subgroup ordering
 
--- === TECH LEVEL LAND CATEGORIES ===
-local LandCategories = {
-    Shields = ShieldCat,
-
-    Bot1 = (DirectFire * categories.TECH1) * categories.BOT - categories.SCOUT,
-    Bot2 = (DirectFire * categories.TECH2) * categories.BOT - categories.SCOUT,
-    Bot3 = (DirectFire * categories.TECH3) * categories.BOT - categories.SCOUT,
-    Bot4 = (DirectFire * categories.EXPERIMENTAL) * categories.BOT - categories.SCOUT,
-
-    Tank1 = (DirectFire * categories.TECH1) - categories.BOT - categories.SCOUT,
-    Tank2 = (DirectFire * categories.TECH2) - categories.BOT - categories.SCOUT,
-    Tank3 = (DirectFire * categories.TECH3) - categories.BOT - categories.SCOUT,
-    Tank4 = (DirectFire * categories.EXPERIMENTAL) - categories.BOT - categories.SCOUT,
-
-    Sniper1 = (Sniper * categories.TECH1) - categories.SCOUT,
-    Sniper2 = (Sniper * categories.TECH2) - categories.SCOUT,
-    Sniper3 = (Sniper * categories.TECH3) - categories.SCOUT,
-    Sniper4 = (Sniper * categories.EXPERIMENTAL) - categories.SCOUT,
-
-    Art1 = Artillery * categories.TECH1,
-    Art2 = Artillery * categories.TECH2,
-    Art3 = Artillery * categories.TECH3,
-    Art4 = Artillery * categories.EXPERIMENTAL,
-
-    AA1 = AntiAir * categories.TECH1,
-    AA2 = AntiAir * categories.TECH2,
-    AA3 = AntiAir * categories.TECH3,
-
-    Com1 = Construction * categories.TECH1,
-    Com2 = Construction * categories.TECH2,
-    Com3 = Construction - (categories.TECH1 + categories.TECH2 + categories.EXPERIMENTAL),
-    Com4 = Construction * categories.EXPERIMENTAL,
-
-    Util1 = (UtilityCat * categories.TECH1) + categories.OPERATION,
-    Util2 = UtilityCat * categories.TECH2,
-    Util3 = UtilityCat * categories.TECH3,
-    Util4 = UtilityCat * categories.EXPERIMENTAL,
-
-    RemainingCategory = categories.LAND - (DirectFire + Sniper + Construction + Artillery + AntiAir + UtilityCat + ShieldCat)
-}
-
--- === SUB GROUP ORDERING ===
 local Bots = { 'Bot4', 'Bot3', 'Bot2', 'Bot1', }
 local Tanks = { 'Tank4', 'Tank3', 'Tank2', 'Tank1', }
 local DF = { 'Tank4', 'Bot4', 'Tank3', 'Bot3', 'Tank2', 'Bot2', 'Tank1', 'Bot1', }
@@ -154,17 +146,17 @@ local AA = { 'AA3', 'AA2', 'AA1', }
 local Util = { 'Util4', 'Util3', 'Util2', 'Util1', }
 local Com = { 'Com4', 'Com3', 'Com2', 'Com1', }
 local Shield = { 'Shields', }
+--#endregion
+--#region Land Block Types
 
--- === LAND BLOCK TYPES =
 local DFFirst = { DF, T1Art, AA, Shield, Com, Util, RemainingCategory }
 local ShieldFirst = { Shield, AA, DF, T1Art, Com, Util, RemainingCategory }
 local AAFirst = { AA, DF, T1Art, Shield, Com, Util, RemainingCategory }
 local ArtFirst = { Art, DF, AA, Shield, Com, Util, RemainingCategory }
 local T1ArtFirst = { T1Art, DF, AA, Shield, Com, Util, RemainingCategory }
 local UtilFirst = { Util, AA, Shield, DF, T1Art, Com, RemainingCategory }
-
-
--- === LAND BLOCKS ===
+--#endregion
+--#region Land Blocks
 
 -- === 3 Wide Attack Block / 3 Units ===
 local ThreeWideAttackFormationBlock = {
@@ -339,55 +331,11 @@ local EightRowAttackFormationBlock = {
     -- eight row
     { AAFirst, ShieldFirst, ArtFirst, AAFirst, ShieldFirst, ArtFirst, ShieldFirst, AAFirst, ShieldFirst, ArtFirst, ArtFirst, ShieldFirst, AAFirst, ShieldFirst, ArtFirst, ShieldFirst, AAFirst, ArtFirst, ShieldFirst, AAFirst },
 }
+--#endregion
+--#endregion
+--#region Air Data
+--#region Subgroup Ordering
 
--- =========================================
--- ================ AIR DATA ===============
--- =========================================
-
--- === AIR CATEGORIES ===
-local GroundAttackAir = (categories.AIR * categories.GROUNDATTACK) - categories.ANTIAIR
-local TransportationAir = categories.AIR * categories.TRANSPORTATION - categories.GROUNDATTACK
-local BomberAir = categories.AIR * categories.BOMBER
-local AAAir = categories.AIR * categories.ANTIAIR
-local AntiNavyAir = categories.AIR * categories.ANTINAVY
-local IntelAir = categories.AIR * (categories.SCOUT + categories.RADAR)
-local ExperimentalAir = categories.AIR * categories.EXPERIMENTAL
-local EngineerAir = categories.AIR * categories.ENGINEER
-
--- === TECH LEVEL AIR CATEGORIES ===
-local AirCategories = {
-    Ground1 = GroundAttackAir * categories.TECH1,
-    Ground2 = GroundAttackAir * categories.TECH2,
-    Ground3 = GroundAttackAir * categories.TECH3,
-
-    Trans1 = TransportationAir * categories.TECH1,
-    Trans2 = TransportationAir * categories.TECH2,
-    Trans3 = TransportationAir* categories.TECH3,
-
-    Bomb1 = BomberAir * categories.TECH1,
-    Bomb2 = BomberAir * categories.TECH2,
-    Bomb3 = BomberAir * categories.TECH3,
-
-    AA1 = AAAir * categories.TECH1,
-    AA2 = AAAir * categories.TECH2,
-    AA3 = AAAir * categories.TECH3,
-
-    AN1 = AntiNavyAir * categories.TECH1,
-    AN2 = AntiNavyAir * categories.TECH2,
-    AN3 = AntiNavyAir * categories.TECH3,
-
-    AIntel1 = IntelAir * categories.TECH1,
-    AIntel2 = IntelAir * categories.TECH2,
-    AIntel3 = IntelAir * categories.TECH3,
-
-    AExper = ExperimentalAir,
-
-    AEngineer = EngineerAir,
-
-    RemainingCategory = categories.AIR - (GroundAttackAir + TransportationAir + BomberAir + AAAir + AntiNavyAir + IntelAir + ExperimentalAir + EngineerAir)
-}
-
--- === SUB GROUP ORDERING ===
 local GroundAttack = { 'Ground3', 'Ground2', 'Ground1', }
 local Transports = { 'Trans3', 'Trans2', 'Trans1', }
 local Bombers = { 'Bomb3', 'Bomb2', 'Bomb1', }
@@ -397,8 +345,9 @@ local AntiNavy = { 'AN3', 'AN2', 'AN1', }
 local Intel = { 'AIntel3', 'AIntel2', 'AIntel1', }
 local ExperAir = { 'AExper', }
 local EngAir = { 'AEngineer', }
+--#endregion
+--#region Air Block Arrangement
 
--- === Air Block Arrangement ===
 local ChevronSlot = { AntiAir, ExperAir, AntiNavy, GroundAttack, Bombers, Intel, Transports, EngAir, RemainingCategory }
 local StratSlot = { T3Bombers }
 
@@ -454,49 +403,12 @@ local GrowthChevronBlock = {
     { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, },
     { ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, ChevronSlot, }, -- 7 -> 9 at 545 units
 }
+--#endregion
+--#endregion
+--#region Naval Data
 
+--#region Subgroup Ordering
 
-
--- =========================================
--- ============== NAVAL DATA ===============
--- =========================================
-
-local LightAttackNaval = categories.LIGHTBOAT
-local FrigateNaval = categories.FRIGATE
-local SubNaval = categories.T1SUBMARINE + categories.T2SUBMARINE + (categories.TECH3 * categories.SUBMERSIBLE * categories.ANTINAVY * categories.NAVAL - categories.NUKE)
-local DestroyerNaval = categories.DESTROYER
-local CruiserNaval = categories.CRUISER
-local BattleshipNaval = categories.BATTLESHIP
-local CarrierNaval = categories.NAVALCARRIER
-local NukeSubNaval = categories.NUKESUB - SubNaval
-local MobileSonar = categories.MOBILESONAR
-local DefensiveBoat = categories.DEFENSIVEBOAT
-local RemainingNaval = categories.NAVAL - (LightAttackNaval + FrigateNaval + SubNaval + DestroyerNaval + CruiserNaval + BattleshipNaval +
-                        CarrierNaval + NukeSubNaval + DefensiveBoat + MobileSonar)
-
-
--- === TECH LEVEL LAND CATEGORIES ===
-local NavalCategories = {
-    LightCount = LightAttackNaval,
-    FrigateCount = FrigateNaval,
-
-    CruiserCount = CruiserNaval,
-    DestroyerCount = DestroyerNaval,
-
-    BattleshipCount = BattleshipNaval,
-    CarrierCount = CarrierNaval,
-
-    NukeSubCount = NukeSubNaval,
-    MobileSonarCount = MobileSonar + DefensiveBoat,
-
-    RemainingCategory = RemainingNaval,
-}
-
-local SubCategories = {
-    SubCount = SubNaval,
-}
-
--- === SUB GROUP ORDERING ===
 local Frigates = { 'FrigateCount', 'LightCount', }
 local Destroyers = { 'DestroyerCount', }
 local Cruisers = { 'CruiserCount', }
@@ -505,8 +417,9 @@ local Subs = { 'SubCount', }
 local NukeSubs = { 'NukeSubCount', }
 local Carriers = { 'CarrierCount', }
 local Sonar = {'MobileSonarCount', }
+--#endregion
+--#region Naval Block Types
 
--- === NAVAL BLOCK TYPES =
 local FrigatesFirst = { Frigates, Destroyers, Battleships, Cruisers, Carriers, NukeSubs, Sonar, RemainingCategory }
 local DestroyersFirst = { Destroyers, Frigates, Battleships, Cruisers, Carriers, NukeSubs, Sonar, RemainingCategory }
 local CruisersFirst = { Cruisers, Carriers, Battleships, Destroyers, Frigates, NukeSubs, Sonar, RemainingCategory }
@@ -516,8 +429,8 @@ local LargestFirstAA = { Carriers, Battleships, Cruisers, Destroyers, Frigates, 
 local SmallestFirstAA = { Cruisers, Frigates, Destroyers, Sonar, Carriers, Battleships, NukeSubs, RemainingCategory }
 local Subs = { Subs, NukeSubs, RemainingCategory }
 local SonarFirst = { Sonar, Carriers, Cruisers, Battleships, Destroyers, Frigates, NukeSubs, Sonar, RemainingCategory }
-
--- === NAVAL BLOCKS ===
+--#endregion
+--#region Naval Blocks
 
 -- === Three Naval Growth Formation Block ==
 local ThreeNavalGrowthFormation = {
@@ -579,10 +492,8 @@ local NineNavalGrowthFormation = {
     -- fifth row
     { DestroyersFirst, DestroyersFirst, SmallestFirstAA, SmallestFirstAA, CruisersFirst, SmallestFirstAA, SmallestFirstAA, DestroyersFirst, DestroyersFirst },
 }
-
--- ==============================================
--- ============ Naval Attack Formation===========
--- ==============================================
+--#endregion
+--#region Naval Attack Formation
 
 -- === Five Wide Naval Attack Formation Block ==
 local FiveWideNavalAttackFormation = {
@@ -629,10 +540,9 @@ local ElevenWideNavalAttackFormation = {
     -- fourth row
     { DestroyersFirst, SmallestFirstAA, LargestFirstDF, SonarFirst, LargestFirstAA, CruisersFirst, LargestFirstAA, SonarFirst, LargestFirstDF, SmallestFirstAA, DestroyersFirst },
 }
+--#endregion
+--#region Sub Growth Formation
 
--- ==============================================
--- ============ Sub Growth Formation===========
--- ==============================================
 -- === Four Wide Growth Subs Formation ===
 local FourWideSubGrowthFormation = {
     LineBreak = 0.5,
@@ -656,11 +566,8 @@ local EightWideSubGrowthFormation = {
     { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
     { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
 }
-
-
--- ==============================================
--- ============ Sub Attack Formation===========
--- ==============================================
+--#endregion
+--#region Sub Attack Formation
 
 -- === Four Wide Subs Formation ===
 local FourWideSubAttackFormation = {
@@ -694,31 +601,41 @@ local TenWideSubAttackFormation = {
     { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
     { Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs, Subs },
 }
+--#endregion
+--#endregion
+--#endregion
+--#region UI-Side Formation Pickers
 
--- ============ Formation Pickers ============
----@param typeName string
+--- Called by the engine to determine which formation to use for user orders while traveling (distance > 200).
+--- 
+--- Seems to have no effect.
+---@param typeName FormationType
 ---@param distance Vector
 ---@return number
 function PickBestTravelFormationIndex(typeName, distance)
     if typeName == 'AirFormations' then
-        return 0;
+        return 0
     else
-        return 1;
+        return 1
     end
 end
 
----@param typeName string
+--- Called by the engine to determine which final formation to default to for user orders.
+--- 
+--- Return -1 to use the user's last used formation.
+--- 
+--- Silently fails on errors.
+---@param typeName FormationType
 ---@param distance Vector
----@return number
+---@return integer | -1
 function PickBestFinalFormationIndex(typeName, distance)
     return -1;
 end
+--#endregion
+--#region Sim-Side Formation Functions
 
--- ================ THE GUTS ====================
--- ============ Formation Functions =============
--- ==============================================
 ---@param formationUnits Unit[]
----@return table
+---@return FormationPos[]
 function AttackFormation(formationUnits)
     local cachedResults = GetCachedResults(formationUnits, 'AttackFormation')
     if cachedResults then
@@ -777,7 +694,7 @@ function AttackFormation(formationUnits)
 end
 
 ---@param formationUnits Unit[]
----@return table
+---@return FormationPos[]
 function GrowthFormation(formationUnits)
     local cachedResults = GetCachedResults(formationUnits, 'GrowthFormation')
     if cachedResults then
@@ -862,18 +779,16 @@ function GrowthFormation(formationUnits)
 end
 
 ---@param formationUnits Unit[]
----@return table
+---@return FormationPos[]
 function GuardFormation(formationUnits)
     -- Not worth caching GuardFormation because it's almost never called repeatedly with the same units.
     local FormationPos = {}
 
-    local shieldCategory = ShieldCat
-    local nonShieldCategory = categories.ALLUNITS - shieldCategory
     local footprintCounts = {}
     local remainingUnits = TableGetn(formationUnits)
     local remainingShields = 0
     for _, u in formationUnits do
-        if EntityCategoryContains(ShieldCat, u) then
+        if EntityCategoryContains(ShieldCategory, u) then
             remainingShields = remainingShields + 1
         end
 
@@ -936,11 +851,11 @@ function GuardFormation(formationUnits)
         local offsetX = sizeMult * MathSin(ringPosition)
         local offsetY = -sizeMult * MathCos(ringPosition)
         if shieldsInRing > 0 and unitCount >= nextShield then
-            TableInsert(FormationPos, { offsetX, offsetY, shieldCategory, 0, rotate })
+            TableInsert(FormationPos, { offsetX, offsetY, ShieldCategory, 0, rotate })
             remainingShields = remainingShields - 1
             nextShield = nextShield + unitsPerShield
         else
-            TableInsert(FormationPos, { offsetX, offsetY, nonShieldCategory, 0, rotate })
+            TableInsert(FormationPos, { offsetX, offsetY, NonShieldCategory, 0, rotate })
         end
         unitCount = unitCount + 1
         remainingUnits = remainingUnits - 1
@@ -949,11 +864,123 @@ function GuardFormation(formationUnits)
     return FormationPos
 end
 
--- =========== LAND BLOCK BUILDING =================
----@param unitsList table
----@param formationBlock any
+--#region Land Block Building
+
+---@param unitsList table<LandCategoryNames | NavalCategoryNames | SubCategoryNames, FormationLayerFootprints> | FormationLayerCommonData
 ---@param categoryTable EntityCategory[]
----@return table
+---@param currRowLen number
+---@return number
+function GetLandRowModifer(unitsList, categoryTable, currRowLen)
+    local unitTotal = unitsList.UnitTotal
+    if unitTotal >= currRowLen or MathMod(unitTotal, 2) == MathMod(currRowLen, 2) then
+        return 0
+    end
+
+    local sizeTotal = 0
+    local footprintSizes = unitsList.FootprintSizes
+    for group, _ in categoryTable do
+        for fs, data in unitsList[group] do
+            sizeTotal = sizeTotal + footprintSizes[fs] * data.Count
+        end
+    end
+    if sizeTotal < currRowLen then -- This doesn't allow for large units hanging over the sides, but it's too hard to handle that correctly.
+        return 1
+    else
+        return 0
+    end
+end
+
+---@param occupiedSpaces boolean[][]
+---@param size number
+---@param rowNum number
+---@param whichCol number
+---@param currRowLen number
+---@param remainingUnits number
+---@return boolean
+function IsLandSpaceOccupied(occupiedSpaces, size, rowNum, whichCol, currRowLen, remainingUnits)
+    local evenRowLen = MathMod(currRowLen, 2) == 0
+    local evenSize = MathMod(size, 2) == 0
+
+    if whichCol == 1 and (not evenRowLen) and evenSize and remainingUnits > 1 then -- Don't put an even-sized unit in the middle of an odd-length row unless it's the last unit
+        return true
+    end
+    if whichCol > currRowLen - MathFloor(size / 2) * 2 and size <= MathFloor(currRowLen / 2) then -- Don't put a large unit at the end of a row unless the row is too narrow
+        return true
+    end
+    for y = 0, size - 1, 1 do
+        local yPos = rowNum + y
+        if not occupiedSpaces[yPos] then
+            continue
+        end
+        if whichCol == 1 and evenRowLen == evenSize then
+            for x = 0, size - 1, 1 do
+                if occupiedSpaces[yPos][whichCol + x] then
+                    return true
+                end
+            end
+        else
+            for x = 0, (size - 1) * 2, 2 do
+                if occupiedSpaces[yPos][whichCol + x] then
+                    return true
+                end
+            end
+        end
+    end
+    return false
+end
+
+---@param occupiedSpaces boolean[][]
+---@param size number
+---@param rowNum number
+---@param whichCol number
+---@param currRowLen number
+function OccupyLandSpace(occupiedSpaces, size, rowNum, whichCol, currRowLen)
+    local evenRowLen = MathMod(currRowLen, 2) == 0
+    local evenSize = MathMod(size, 2) == 0
+
+    for y = 0, size - 1, 1 do
+        local yPos = rowNum + y
+        if not occupiedSpaces[yPos] then
+            occupiedSpaces[yPos] = {}
+        end
+        local occupiedYPos = occupiedSpaces[yPos]
+        if whichCol == 1 and evenRowLen == evenSize then
+            for x = 0, size - 1, 1 do
+                occupiedYPos[whichCol + x] = true
+            end
+        else
+            for x = 0, (size - 1) * 2, 2 do
+                occupiedYPos[whichCol + x] = true
+            end
+        end
+    end
+end
+
+---@param rowLen number
+---@param col number
+---@return number
+function GetColSpot(rowLen, col)
+    local len = rowLen
+    if MathMod(rowLen, 2) == 1 then
+        len = rowLen + 1
+    end
+    local colType = 'left'
+    if MathMod(col, 2) == 0 then
+        colType = 'right'
+    end
+    local colSpot = MathFloor(col / 2)
+    local halfSpot = len/2
+    if colType == 'left' then
+        return halfSpot - colSpot
+    else
+        return halfSpot + colSpot
+    end
+end
+
+---@param unitsList table<LandCategoryNames | NavalCategoryNames | SubCategoryNames, FormationLayerFootprints> | FormationLayerCommonData
+---@param formationBlock FormationBlockLand
+---@param categoryTable EntityCategory[]
+---@return FormationPos[]
 function BlockBuilderLand(unitsList, formationBlock, categoryTable)
     local spacing = unitsList.Scale
     local numRows = TableGetn(formationBlock)
@@ -1079,123 +1106,117 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable)
 
     return FormationPos
 end
+--#endregion
+--#region Air Block Building
 
----@param unitsList table
----@param categoryTable EntityCategory[]
----@param currRowLen number
----@return number
-function GetLandRowModifer(unitsList, categoryTable, currRowLen)
-    local unitTotal = unitsList.UnitTotal
-    if unitTotal >= currRowLen or MathMod(unitTotal, 2) == MathMod(currRowLen, 2) then
-        return 0
+---@param chevronPos number
+---@param currCol number
+---@param formationLen number
+---@return number xPos
+---@return number yPos
+function GetChevronPosition(chevronPos, currCol, formationLen)
+    local offset = MathFloor(chevronPos / 2)
+    local xPos = offset * 0.5
+    if MathMod(chevronPos, 2) == 0 then
+        xPos = -xPos
     end
-
-    local sizeTotal = 0
-    local footprintSizes = unitsList.FootprintSizes
-    for group, _ in categoryTable do
-        for fs, data in unitsList[group] do
-            sizeTotal = sizeTotal + footprintSizes[fs] * data.Count
-        end
+    local column = MathFloor(currCol / 2)
+    local yPos = (-offset + column * column) * 0.86603
+    yPos = yPos - formationLen * 1.73205
+    local blockOff = MathFloor(currCol / 2) * 2.5
+    if MathMod(currCol, 2) == 1 then
+        blockOff = -blockOff
     end
-    if sizeTotal < currRowLen then -- This doesn't allow for large units hanging over the sides, but it's too hard to handle that correctly.
-        return 1
-    else
-        return 0
-    end
+    xPos = xPos + blockOff
+    return xPos, yPos
 end
 
----@param occupiedSpaces boolean[][]
----@param size number
----@param rowNum number
----@param whichCol number
----@param currRowLen number
----@param remainingUnits number
----@return boolean
-function IsLandSpaceOccupied(occupiedSpaces, size, rowNum, whichCol, currRowLen, remainingUnits)
-    local evenRowLen = MathMod(currRowLen, 2) == 0
-    local evenSize = MathMod(size, 2) == 0
-
-    if whichCol == 1 and (not evenRowLen) and evenSize and remainingUnits > 1 then -- Don't put an even-sized unit in the middle of an odd-length row unless it's the last unit
-        return true
-    end
-    if whichCol > currRowLen - MathFloor(size / 2) * 2 and size <= MathFloor(currRowLen / 2) then -- Don't put a large unit at the end of a row unless the row is too narrow
-        return true
-    end
-    for y = 0, size - 1, 1 do
-        local yPos = rowNum + y
-        if not occupiedSpaces[yPos] then
-            continue
+---@param unitsList table<AirCategoryNames, FormationLayerFootprints> | FormationLayerCommonData
+---@param airBlock FormationBlockAir
+---@return FormationLargeAirPos[]
+function GetLargeAirPositions(unitsList, airBlock)
+    local sizeCounts = {}
+    local footprintCounts = unitsList.FootprintCounts
+    for fs, count in footprintCounts do
+        local size = footprintCounts[fs]
+        if size > 1 then
+            sizeCounts[size] = (sizeCounts[size] or 0) + count
         end
-        if whichCol == 1 and evenRowLen == evenSize then
-            for x = 0, size - 1, 1 do
-                if occupiedSpaces[yPos][whichCol + x] then
-                    return true
+    end
+
+    local numRows = TableGetn(airBlock)
+    local whichRow = 0
+    local whichCol = 0
+    local currRowLen = 0
+    local wideRow = false
+    local formationLength = -1
+    local results = {} ---@type FormationLargeAirPos[]
+    local numResults = 0
+    for size, count in sizeCounts do
+        local radius = size / 2
+        while count > 0 do
+            if whichCol >= currRowLen or count == 1 then
+                if whichRow >= numRows then
+                    if airBlock.RepeatAllRows then
+                        whichRow = 1
+                        currRowLen = TableGetn(airBlock[whichRow])
+                    end
+                else
+                    whichRow = whichRow + 1
+                    currRowLen = TableGetn(airBlock[whichRow])
+                end
+                formationLength = formationLength + 1
+                whichCol = 1
+                local x, y = GetChevronPosition(1, currRowLen, formationLength)
+                wideRow = MathAbs(x) >= radius
+            else
+                whichCol = whichCol + 2
+            end
+
+            if count == 2 and whichCol == 1 and wideRow then
+                continue
+            end
+
+            local xPos, yPos = GetChevronPosition(1, whichCol, formationLength)
+            if whichCol ~= 1 and MathAbs(xPos) < radius then
+                continue
+            end
+
+            -- Exponential complexity isn't fun but this should run in under 0.03 seconds on a slow CPU with 500 CZARs.
+            local blocked = false
+            for i = numResults, 1, -1 do -- Don't change this to a simple forward loop or it can take 15x as long with large numbers.
+                local data = results[i]
+                if GetDistanceBetweenTwoPoints2(xPos, yPos, data.xPos, data.yPos) < radius + data.size / 2 then
+                    blocked = true
+                    break
                 end
             end
-        else
-            for x = 0, (size - 1) * 2, 2 do
-                if occupiedSpaces[yPos][whichCol + x] then
-                    return true
+            if not blocked then
+                ---@class FormationLargeAirPos
+                ---@field row integer
+                ---@field col integer
+                ---@field xPos number
+                ---@field yPos number
+                ---@field size integer # footprint size max
+
+                TableInsert(results, {row = whichRow, col = whichCol, xPos = xPos, yPos = yPos, size = size})
+                count = count - 1
+                numResults = numResults + 1
+                if whichCol ~= 1 then
+                    TableInsert(results, {row = whichRow, col = whichCol - 1, xPos = -xPos, yPos = yPos, size = size})
+                    count = count - 1
+                    numResults = numResults + 1
                 end
             end
         end
     end
-    return false
+    return results
 end
 
----@param occupiedSpaces boolean[][]
----@param size number
----@param rowNum number
----@param whichCol number
----@param currRowLen number
-function OccupyLandSpace(occupiedSpaces, size, rowNum, whichCol, currRowLen)
-    local evenRowLen = MathMod(currRowLen, 2) == 0
-    local evenSize = MathMod(size, 2) == 0
-
-    for y = 0, size - 1, 1 do
-        local yPos = rowNum + y
-        if not occupiedSpaces[yPos] then
-            occupiedSpaces[yPos] = {}
-        end
-        local occupiedYPos = occupiedSpaces[yPos]
-        if whichCol == 1 and evenRowLen == evenSize then
-            for x = 0, size - 1, 1 do
-                occupiedYPos[whichCol + x] = true
-            end
-        else
-            for x = 0, (size - 1) * 2, 2 do
-                occupiedYPos[whichCol + x] = true
-            end
-        end
-    end
-end
-
----@param rowLen number
----@param col number
----@return number
-function GetColSpot(rowLen, col)
-    local len = rowLen
-    if MathMod(rowLen, 2) == 1 then
-        len = rowLen + 1
-    end
-    local colType = 'left'
-    if MathMod(col, 2) == 0 then
-        colType = 'right'
-    end
-    local colSpot = MathFloor(col / 2)
-    local halfSpot = len/2
-    if colType == 'left' then
-        return halfSpot - colSpot
-    else
-        return halfSpot + colSpot
-    end
-end
-
--- ============ AIR BLOCK BUILDING =============
----@param unitsList table
----@param airBlock any
+---@param unitsList table<AirCategoryNames, FormationLayerFootprints> | FormationLayerCommonData
+---@param airBlock FormationBlockAir # ChevronSize defaults to 5
 ---@param spacing? number defaults to 1
----@return table
+---@return FormationPos[]
 function BlockBuilderAir(unitsList, airBlock, spacing)
     spacing = (spacing or 1) * unitsList.Scale
     local numRows = TableGetn(airBlock)
@@ -1301,15 +1322,15 @@ function BlockBuilderAir(unitsList, airBlock, spacing)
     return FormationPos
 end
 
----@param unitsList table
+---@param unitsList table<AirCategoryNames, FormationLayerFootprints> | FormationLayerCommonData
 ---@param spacing number? number defaults to 1
----@return table
+---@return FormationPos[]
 function BlockBuilderAirT3Bombers(unitsList, spacing)
     --This is modified copy of BlockBuilderAir(). This function is used only for t3 bombers.
     --Some parts can be improved, but I just want stable and working version, so I did minimum adjustments and that's it.
 
     spacing = (spacing or 1) * unitsList.Scale
-    local airBlock = {}
+    local airBlock ---@type FormationBlockAir
 
     if unitsList.Bomb3[1].Count > 20 then
         airBlock = {
@@ -1333,7 +1354,7 @@ function BlockBuilderAirT3Bombers(unitsList, spacing)
     local chevronPos = 1
     local currRowLen = TableGetn(airBlock[whichRow])
     local chevronSize = 1
-    local chevronType = false
+    local chevronType = false ---@type false | FormationSubgroup
     local formationLength = 0
 
 
@@ -1408,283 +1429,5 @@ function BlockBuilderAirT3Bombers(unitsList, spacing)
     return FormationPos
 end
 
----@param unitsList table
----@param airBlock any
----@return table
-function GetLargeAirPositions(unitsList, airBlock)
-    local sizeCounts = {}
-    local footprintCounts = unitsList.FootprintCounts
-    for fs, count in footprintCounts do
-        local size = footprintCounts[fs]
-        if size > 1 then
-            sizeCounts[size] = (sizeCounts[size] or 0) + count
-        end
-    end
-
-    local numRows = TableGetn(airBlock)
-    local whichRow = 0
-    local whichCol = 0
-    local currRowLen = 0
-    local wideRow = false
-    local formationLength = -1
-    local results = {}
-    local numResults = 0
-    for size, count in sizeCounts do
-        local radius = size / 2
-        while count > 0 do
-            if whichCol >= currRowLen or count == 1 then
-                if whichRow >= numRows then
-                    if airBlock.RepeatAllRows then
-                        whichRow = 1
-                        currRowLen = TableGetn(airBlock[whichRow])
-                    end
-                else
-                    whichRow = whichRow + 1
-                    currRowLen = TableGetn(airBlock[whichRow])
-                end
-                formationLength = formationLength + 1
-                whichCol = 1
-                local x, y = GetChevronPosition(1, currRowLen, formationLength)
-                wideRow = MathAbs(x) >= radius
-            else
-                whichCol = whichCol + 2
-            end
-
-            if count == 2 and whichCol == 1 and wideRow then
-                continue
-            end
-
-            local xPos, yPos = GetChevronPosition(1, whichCol, formationLength)
-            if whichCol ~= 1 and MathAbs(xPos) < radius then
-                continue
-            end
-
-            -- Exponential complexity isn't fun but this should run in under 0.03 seconds on a slow CPU with 500 CZARs.
-            local blocked = false
-            for i = numResults, 1, -1 do -- Don't change this to a simple forward loop or it can take 15x as long with large numbers.
-                local data = results[i]
-                if VDist2(xPos, yPos, data.xPos, data.yPos) < radius + data.size / 2 then
-                    blocked = true
-                    break
-                end
-            end
-            if not blocked then
-                TableInsert(results, {row = whichRow, col = whichCol, xPos = xPos, yPos = yPos, size = size})
-                count = count - 1
-                numResults = numResults + 1
-                if whichCol ~= 1 then
-                    TableInsert(results, {row = whichRow, col = whichCol - 1, xPos = -xPos, yPos = yPos, size = size})
-                    count = count - 1
-                    numResults = numResults + 1
-                end
-            end
-        end
-    end
-    return results
-end
-
----@param chevronPos Vector
----@param currCol number
----@param formationLen number
----@return number xPos
----@return number yPos
-function GetChevronPosition(chevronPos, currCol, formationLen)
-    local offset = MathFloor(chevronPos / 2)
-    local xPos = offset * 0.5
-    if MathMod(chevronPos, 2) == 0 then
-        xPos = -xPos
-    end
-    local column = MathFloor(currCol / 2)
-    local yPos = (-offset + column * column) * 0.86603
-    yPos = yPos - formationLen * 1.73205
-    local blockOff = MathFloor(currCol / 2) * 2.5
-    if MathMod(currCol, 2) == 1 then
-        blockOff = -blockOff
-    end
-    xPos = xPos + blockOff
-    return xPos, yPos
-end
-
--- ========= UNIT SORTING ==========
----@param unitsList table
----@return any
-function CalculateSizes(unitsList)
-    local largestFootprint = 1
-    local smallestFootprints = {}
-
-    local typeGroups = {
-        Land = {
-            GridSizeFraction = 2.75,
-            GridSizeAbsolute = 2,
-            MinSeparationFraction = 2.25,
-            Types = {'Land'}
-        },
-
-        Air = {
-            GridSizeFraction = 1.3,
-            GridSizeAbsolute = 2,
-            MinSeparationFraction = 1,
-            Types = {'Air'}
-        },
-
-        Sea = {
-            GridSizeFraction = 1.75,
-            GridSizeAbsolute = 4,
-            MinSeparationFraction = 1.15,
-            Types = {'Naval', 'Subs'}
-        },
-    }
-
-    for group, data in typeGroups do
-        local groupFootprintCounts = {}
-        local largestForGroup = 1
-        local numSizes = 0
-        local unitTotal = 0
-        for _, type in data.Types do
-            unitTotal = unitTotal + unitsList[type].UnitTotal
-            for fs, count in unitsList[type].FootprintCounts do
-                groupFootprintCounts[fs] = (groupFootprintCounts[fs] or 0) + count
-                largestFootprint = math.max(largestFootprint, fs)
-                largestForGroup = math.max(largestForGroup, fs)
-                numSizes = numSizes + 1
-            end
-        end
-
-        smallestFootprints[group] = largestForGroup
-        if numSizes > 0 then
-            local minCount = unitTotal / 2
-            local smallerUnitCount = 0
-            for fs, count in groupFootprintCounts do
-                smallerUnitCount = smallerUnitCount + count
-                if smallerUnitCount >= minCount then
-                    smallestFootprints[group] = fs -- Base the grid size on the median unit size to avoid a few small units shrinking a formation of large untis
-                    break
-                end
-            end
-        end
-    end
-
-    for group, data in typeGroups do
-        local gridSize = math.max(smallestFootprints[group] * data.GridSizeFraction, smallestFootprints[group] + data.GridSizeAbsolute)
-        for _, type in data.Types do
-            local unitData = unitsList[type]
-
-             -- A distance of 1 in formation coordinates translates to (largestFootprint + 2) in world coordinates.
-             -- Unfortunately the engine separates land/naval units from air units and calls the formation function separately for both groups.
-             -- That means if a CZAR and some light tanks are selected together, the tank formation will be scaled by the CZAR's size and we can't compensate.
-            unitData.Scale = gridSize / (largestFootprint + 2)
-
-            for fs, count in unitData.FootprintCounts do
-                local size = math.ceil(fs * data.MinSeparationFraction / gridSize)
-                unitData.FootprintSizes[fs] = size
-                unitData.AreaTotal = unitData.AreaTotal + count * size * size
-            end
-        end
-    end
-
-    return unitsList
-end
-
--- reusable table for categorizing units in a formation 
-local UnitsList = {Land = {}, Air = {}, Naval = {}, Subs = {}}
--- map layers to categories
-local CategoryTables = {Land = LandCategories, Air = AirCategories, Naval = NavalCategories, Subs = SubCategories}
--- initialize the layer tables
-for unitType, categoriesForType in CategoryTables do
-    local typeData = UnitsList[unitType]
-    for unitTypeCategory, _ in categoriesForType do
-        typeData[unitTypeCategory] = {}
-    end
-    typeData.FootprintCounts = {}
-    typeData.FootprintSizes = {}
-end
-
--- place units into formation categories, accumulate (unit type) & (unit type footprint counts by size), and map unit type category footprint size categories from blueprint id to global category of blueprint id
----@param formationUnits Unit[]
----@return table
-function CategorizeUnits(formationUnits)
-    local categoryTables = CategoryTables
-
-    -- flush the table
-    for unitType, categoriesForType in categoryTables do
-        local typeData = UnitsList[unitType]
-        for unitTypeCategory, _ in categoriesForType do
-            local typeDataCategory = typeData[unitTypeCategory]
-            for k in pairs(typeDataCategory) do
-                typeDataCategory[k] = nil
-            end
-        end
-
-        local footprintCounts = typeData.FootprintCounts
-        for k in pairs(footprintCounts) do
-            footprintCounts[k] = nil
-        end
-
-        local footprintSizes = typeData.FootprintSizes
-        for k in pairs(footprintSizes) do
-            footprintSizes[k] = nil
-        end
-
-        typeData.UnitTotal = 0
-        typeData.AreaTotal = 0
-        typeData.Scale = nil -- set elsewhere in formations logic
-    end
-
-    -- Loop through each unit to get its category and size
-    for _, u in formationUnits do
-        local identified = false
-        for type, table in categoryTables do
-            for cat, _ in table do
-                if EntityCategoryContains(table[cat], u) then
-                    local bp = u:GetBlueprint()
-                    local fs = math.max(bp.Footprint.SizeX, bp.Footprint.SizeZ)
-                    local id = bp.BlueprintId
-
-                    if not UnitsList[type][cat][fs] then
-                        UnitsList[type][cat][fs] = {Count = 0, Categories = {}}
-                    end
-                    UnitsList[type][cat][fs].Count = UnitsList[type][cat][fs].Count + 1
-                    UnitsList[type][cat][fs].Categories[id] = categories[id]
-                    UnitsList[type].FootprintCounts[fs] = (UnitsList[type].FootprintCounts[fs] or 0) + 1
-
-                    if cat == "RemainingCategory" then
-                        LOG('*FORMATION DEBUG: Unit ' .. tostring(u:GetBlueprint().BlueprintId) .. ' does not match any ' .. type .. ' categories.')
-                    end
-                    UnitsList[type].UnitTotal = UnitsList[type].UnitTotal + 1
-                    identified = true
-                    break
-                end
-            end
-
-            if identified then
-                break
-            end
-        end
-        if not identified then
-            WARN('*FORMATION DEBUG: Unit ' .. u.UnitId .. ' was excluded from the formation because its layer could not be determined.')
-        end
-    end
-
-    -- Loop through each category and combine the types within into a single filter category for each size
-    for type, table in categoryTables do
-        for cat, _ in table do
-            if UnitsList[type][cat] then
-                for fs, data in UnitsList[type][cat] do
-                    local filter = nil
-                    for _, category in data.Categories do
-                        if not filter then
-                            filter = category
-                        else
-                            filter = filter + category
-                        end
-                    end
-                    UnitsList[type][cat][fs] = {Count = data.Count, Filter = filter}
-                end
-            end
-        end
-    end
-
-    CalculateSizes(UnitsList)
-
-    return UnitsList
-end
+--#endregion
+--#endregion

@@ -31,41 +31,28 @@ local OverchargeProjectileOnImpact = OverchargeProjectile.OnImpact
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
 -- Aeon Mortar
----@class ADFOverCharge01 : ALaserBotProjectile, OverchargeProjectile
-ADFOverCharge01 = ClassProjectile(ALaserBotProjectile, OverchargeProjectile) {
+---@class TDFOverCharge01 : ALaserBotProjectile, OverchargeProjectile
+TDFOverCharge01 = ClassProjectile(ALaserBotProjectile, OverchargeProjectile) {
     PolyTrail = '/effects/emitters/aeon_commander_overcharge_trail_01_emit.bp',
     FxTrails = EffectTemplate.ACommanderOverchargeFXTrail01,
     FxImpactUnit = EffectTemplate.ACommanderOverchargeHit01,
     FxImpactProp = EffectTemplate.ACommanderOverchargeHit01,
     FxImpactLand = EffectTemplate.ACommanderOverchargeHit01,
 
-    ---@param self ADFOverCharge01
+    ---@param self TDFOverCharge01
     OnCreate = function(self)
-        -- Nyan cat seasonal event
-        local vx, vy, vz, w = unpack(self:GetOrientation())
-        if vz >= 0 then
-            self.FxTrails = {
-                '/effects/emitters/nyan_trail.bp',
-                '/effects/emitters/nyan_01.bp'
-            }
-        else
-            self.FxTrails = {
-                '/effects/emitters/nyan_trail.bp',
-                '/effects/emitters/nyan_02.bp'
-            }
-        end
-
         ALaserBotProjectileOnCreate(self)
         OverchargeProjectileOnCreate(self)
     end,
 
-    ---@param self ADFOverCharge01
+    ---@param self TDFOverCharge01
     ---@param targetType string
     ---@param targetEntity Prop|Unit
     OnImpact = function(self, targetType, targetEntity)
+        -- we need to run this the overcharge logic before running the usual on impact because
+        -- that is where the damage is determined
         OverchargeProjectileOnImpact(self, targetType, targetEntity)
         ALaserBotProjectileOnImpact(self, targetType, targetEntity)
-    
     end,
 }
-TypeClass = ADFOverCharge01
+TypeClass = TDFOverCharge01

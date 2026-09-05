@@ -568,14 +568,6 @@ XSL0001 = ClassUnit(ACUUnit) {
             WARN("Missing enhancement: ", enh, " for unit: ", self:GetUnitId(), " note that the function name should be called: ", ref)
         end
     end,
-
-    -- Wide ACUs seasonal event
-    ---@param self UEL0001
-    AddVetLevel = function(self)
-        ACUUnit.AddVetLevel(self)
-        local temp = string.format('/meshes/seraphim/Sera%d_mesh', self.VetLevel)
-        self:SetMesh(temp, true)
-    end,
 }
 
 TypeClass = XSL0001
