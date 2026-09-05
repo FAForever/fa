@@ -5,6 +5,7 @@ local mathMin = math.min
 local mathMax = math.max
 local tableGetN = table.getn
 local tableHash = table.hash
+local type = type
 
 local GetUnitCommandData = GetUnitCommandData
 local EntityCategoryGetUnitList = EntityCategoryGetUnitList
@@ -208,17 +209,24 @@ end
 ---@return boolean
 ---@return string?
 function VerifyTemplate(template)
+    if type(template) ~= 'table' then
+        return false, 'expected "table", got "' .. type(template) .. '"'
+    end
     local templateN = tableGetN(template)
     if templateN < 3 then
         return false, 'no buildings in template'
     end
     for i = 3, templateN do
-        local bpId = template[i][1]
+        local building = template[i]
+        if type(building) ~= 'table' then
+            return false, 'building at index ' .. i .. ' is not a table'
+        end
+        local bpId = building[1]
         if not bpId then
-            return false, 'nil blueprint at index ' .. i
+            return false, 'nil blueprint for building at index ' .. i
         end
         if not __blueprints[bpId] then
-            return false, 'unknown blueprint "' .. bpId .. '" at index ' .. i
+            return false, 'unknown blueprint "' .. tostring(bpId) .. '" for building at index ' .. i
         end
     end
 
