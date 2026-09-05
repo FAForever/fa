@@ -165,12 +165,9 @@ function CreateUI(isReplay)
     import("/lua/system/performance.lua")
     import("/lua/ui/game/cursor/depth.lua")
     import("/lua/ui/game/cursor/hover.lua")
-    pcall(
-        function()
-            -- may be hooked and what not, in order to prevent complete UI failures I encapsulate it into a pcall
-            import("/lua/ui/game/hotkeys/context-based-templates.lua").LoadDefaultTemplates()
-        end
-    )
+    pcall(function() -- wrap in pcall since it is likely to be modded
+        import("/lua/ui/game/hotkeys/context-based-templates.lua").LoadDefaultTemplates()
+    end)
 
     -- casting tools
 
