@@ -208,7 +208,11 @@ end
 ---@return boolean
 ---@return string?
 function VerifyTemplate(template)
-    for i = 3, tableGetN(template) do
+    local templateN = tableGetN(template)
+    if templateN < 3 then
+        return false, 'no buildings in template'
+    end
+    for i = 3, templateN do
         local bpId = template[i][1]
         if not bpId then
             return false, 'nil blueprint at index ' .. i
