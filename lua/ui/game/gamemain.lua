@@ -1126,7 +1126,7 @@ function QuickSave(filename)
         InternalSaveGame(path, filename, function(worked, errmsg)
             status:Destroy()
             if not worked then
-                infoStr = LOC("<LOC uisaveload_0008>Save failed! ") .. errmsg
+                local infoStr = LOC("<LOC uisaveload_0008>Save failed! ") .. errmsg
                 UIUtil.ShowInfoDialog(GetFrame(0), infoStr, "<LOC _Ok>")
             end
         end)
