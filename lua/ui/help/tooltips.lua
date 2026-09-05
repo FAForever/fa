@@ -659,7 +659,7 @@ Tooltips = {
         description = "<LOC OPTIONS_0118>Shows full, partial or no description when the unit icon is moused over",
     },
     options_assist_to_upgrade = {
-        title = "<LOC ASSIST_TO_UPGRADE_TITLE>Assist to Upgrade",
+        title = "<LOC ASSIST_TO_UPGRADE_TITLE>Assist to upgrade extractors",
         description = "<LOC ASSIST_TO_UPGRADE_DESCRIPTION>When enabled, mass extractors automatically queue and pause their upgrade when you issue an assist order.",
     },
     options_alt_to_force_attack_move = {
