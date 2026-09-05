@@ -1,1 +1,7 @@
-- (#7044) Options: add missing tooltips.
+- Add missing tooltips for the following game options (#7044):
+  - Invert middle mouse button
+  - Reclaim batching threshold
+  - Painting duration when observing
+  - Assist to upgrade radars
+  - Default to repeat build
+  - Show player names
