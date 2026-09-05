@@ -6,45 +6,14 @@
 ----------------------------------------------------------------------------
 
 local Prefs = import("/lua/user/prefs.lua")
-local templates = Prefs.GetFromCurrentProfile('build_templates') or {}
 local UIUtil = import("/lua/ui/uiutil.lua")
+local TemplateUtils = import('/lua/ui/templateutils.lua')
 
-local function TemplateAxisOffset(unitbp, axe)
-    return (math.mod(math.ceil(unitbp.Footprint and unitbp.Footprint[axe] or unitbp[axe] or 1), 2) == 1 and 0 or 0.5)
-end
+---@type UIBuildTemplateData[]
+local templates = Prefs.GetFromCurrentProfile('build_templates') or {}
 
-function CreateBuildTemplate()
-    GenerateBuildTemplateFromSelection()
-    local template = GetActiveBuildTemplate()
-    ClearBuildTemplates()
-    if next(template) then
-        local str1bp = __blueprints[ template[3][1] ]
-        local s1Xoffset = TemplateAxisOffset(str1bp, 'SizeX')
-        local s1Yoffset = TemplateAxisOffset(str1bp, 'SizeZ')
-        if s1Xoffset ~= 0 or s1Yoffset ~= 0 then
-            for i=3, table.getn(template) do
-                local str = template[i]
-                str[3] = str[3] + s1Xoffset
-                str[4] = str[4] + s1Yoffset
-            end
-        end
-        AddTemplate(template)
-    end
-end
-
-function Init()
-    import("/lua/ui/game/gamemain.lua").RegisterChatFunc(ReceiveTemplate, 'Template')
-end
-
-function ReceiveTemplate(sender, msg)
-    if Prefs.GetOption('accept_build_templates') ~= 'yes' then return end
-    local tab = import("/lua/ui/game/construction.lua").GetTabByID('templates')
-    if tab then
-        import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC('<LOC template_0000>Build Template Received'), tab, LOCF('<LOC template_0001>From %s', sender))
-    end
-    AddTemplate(msg.data)
-end
-
+---@param template UIBuildTemplate
+---@return string
 function GetInitialName(template)
     for _, entry in template do
         if type(entry) ~= 'table' then continue end
@@ -52,39 +21,70 @@ function GetInitialName(template)
     end
 end
 
+---@param template UIBuildTemplate
+---@return 'default' | UnitId
 function GetInitialIcon(template)
     for _, entry in template do
-        if type(entry) == 'table' and UIUtil.UIFile('/icons/units/' .. entry[1] .. '_icon.dds', true) then
+        if type(entry) == 'table' and UIUtil.UIFile('/icons/units/' .. entry[1] .. '_icon.dds' --[[@as FileName]], true) then
             return entry[1] -- Original or modded unit found
         end
     end
     return 'default' -- If we don't find a valid IconName; return string 'default'
 end
 
+---@param newTemplate UIBuildTemplate
 function AddTemplate(newTemplate)
     table.insert(templates, {templateData = newTemplate, name = GetInitialName(newTemplate), icon = GetInitialIcon(newTemplate)})
     Prefs.SetToCurrentProfile('build_templates', templates)
 end
 
+--#region Template Module functions
+-- These functions must have the same name as the ones in build_templates.lua
+-- due to the implementation of construction.lua.
+
+--- Creates a new build template and saves it.
+function CreateBuildTemplate()
+    GenerateBuildTemplateFromSelection()
+    local template = GetActiveBuildTemplate()
+    ClearBuildTemplates()
+    if next(template) then
+        TemplateUtils.OffsetTemplateForBuildModeBp(template)
+        AddTemplate(template)
+    end
+end
+
+--- Returns build templates from prefs.
+---@return UIBuildTemplateData[]
 function GetTemplates()
     return Prefs.GetFromCurrentProfile('build_templates')
 end
 
+--- Removes the build template with the given ID (an array index).
+---@param templateID integer
 function RemoveTemplate(templateID)
     table.remove(templates, templateID)
     Prefs.SetToCurrentProfile('build_templates', templates)
 end
 
+--- Renames the build template with the given ID (an array index).
+---@param templateID integer
+---@param name string
 function RenameTemplate(templateID, name)
     templates[templateID].name = name
     Prefs.SetToCurrentProfile('build_templates', templates)
 end
 
+--- Removes the build template with the given ID (an array index).
+---@param templateID integer
+---@param iconPath FileName
 function SetTemplateIcon(templateID, iconPath)
     templates[templateID].icon = iconPath
     Prefs.SetToCurrentProfile('build_templates', templates)
 end
 
+--- Shares to another army the build template with the given ID (an array index).
+---@param templateID integer
+---@param armyIndex integer
 function SendTemplate(templateID, armyIndex)
     armyIndex = armyIndex
     if table.getn(templates[templateID].templateData) > 22 then
@@ -95,6 +95,11 @@ function SendTemplate(templateID, armyIndex)
     SessionSendChatMessage(armyIndex, {Template = true, data = templates[templateID].templateData})
 end
 
+--- Sets a hotkey for the build template with the given ID (an array index).
+--- 
+--- Returns false if the hotkey is already in use by another build template.
+---@param templateID integer
+---@param key Keycode
 function SetTemplateKey(templateID, key)
     for i, template in templates do
         if i ~= templateID and template.key == key then
@@ -106,7 +111,32 @@ function SetTemplateKey(templateID, key)
     return true
 end
 
+--- Removes the hotkey for the build template with the given ID (an array index).
+---@param templateID integer
 function ClearTemplateKey(templateID)
     templates[templateID].key = nil
     Prefs.SetToCurrentProfile('build_templates', templates)
 end
+--#endregion
+
+--- Registered chat function for receiving templates from SendTemplate
+---@param sender string
+---@param msg table
+function ReceiveTemplate(sender, msg)
+    if Prefs.GetOption('accept_build_templates') ~= 'yes' then return end
+    local tab = import("/lua/ui/game/construction.lua").GetTabByID('templates')
+    if tab then
+        import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC('<LOC template_0000>Build Template Received'), tab, LOCF('<LOC template_0001>From %s', sender))
+    end
+    AddTemplate(msg.data)
+end
+
+--- Called in `gamemain.lua` `CreateUI`
+function Init()
+    import("/lua/ui/game/gamemain.lua").RegisterChatFunc(ReceiveTemplate, 'Template')
+end
+
+
+--#region Backwards compatibility
+local TemplateAxisOffset = TemplateUtils.GetTemplateAlignmentAxisOffsetForBp
+--#endregion

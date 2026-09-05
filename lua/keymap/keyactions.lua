@@ -1653,7 +1653,11 @@ local keyActionsOrdersAdvanced = {
     ['shift_discharge'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DischargeShields()',
         category = 'ordersAdvanced',
-    }
+    },
+    ['temporary_template_use_or_create'] = {
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/temporary-templates.lua").UseOrCreateTemporaryTemplate()',
+        category = 'ordersAdvanced',
+    },
 }
 
 local keyActionsOrdersQueueBased = {

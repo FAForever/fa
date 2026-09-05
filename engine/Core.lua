@@ -154,7 +154,7 @@ end
 
 ---@overload fun(category: EntityCategory, units: UserUnit[]): UserUnit[]
 ---@overload fun(category: EntityCategory, unitIds: UnitId[]): UnitId[]       
---- filters a list of (user) units or unit ids to only those that match the given category.
+--- filters a list of (user) units or unit blueprint ids to only those that match the given category.
 ---@param category EntityCategory
 ---@param units Unit[]
 ---@return Unit[]
