@@ -1,0 +1,1 @@
+- Add functions for UI mods to add or remove context-based templates on the fly (#7004).
