@@ -221,8 +221,10 @@ end
 function Unit:GetHealth()
 end
 
---- Returns the navigator object of this unit
----@return Navigator
+--- Returns the navigator object of this unit. 
+--- 
+--- Returns `nil` for immobile units.
+---@return Navigator?
 function Unit:GetNavigator()
 end
 
@@ -235,6 +237,7 @@ end
 
 --- Returns number of factory/engineer build orders that fit in the specified category
 ---@param category EntityCategory
+---@return integer
 function Unit:GetNumBuildOrders(category)
 end
 
@@ -284,7 +287,7 @@ function Unit:GetTacticalSiloAmmoCount()
 end
 
 --- Returns our target unit if we have one
----@return Entity | Unit | nil
+---@return Entity | Unit | Prop | nil
 function Unit:GetTargetEntity()
 end
 
@@ -733,5 +736,26 @@ end
 ---@return boolean
 function Unit:TransportHasSpaceFor(target)
 end
+
+--- Called by the engine when the unit takes >= 2 times as much damage due to armor multi or handicap divisor.
+---@type fun(self: Unit, type: DamageType)
+Unit.OnExtraDamageDealt = nil
+
+--- Called by the engine when a unit changes motion state,
+--- usually when it attaches/detaches from other entities such as transports.
+---@type fun(self: Unit, new: MotionState, old: MotionState)
+Unit.OnMotionStateChange = nil
+
+--- Called by the engine when the unit starts refueling at an air staging platform.
+---@type fun(self: Unit)
+Unit.OnStartRefueling = nil
+
+--- Called by the engine when the unit runs out of fuel.
+---@type fun(self: Unit)
+Unit.OnRunOutOfFuel = nil
+
+--- Called by the engine when the unit was out of fuel and recharges fuel (either by air staging or by landing).
+---@type fun(self: Unit)
+Unit.OnGotFuel = nil
 
 return Unit

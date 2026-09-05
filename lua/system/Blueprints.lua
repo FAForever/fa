@@ -1001,33 +1001,46 @@ function MergeWeaponByLabel(baseBp, label, insertPos, newBp)
         return
     end
 
+    local firstDummyIndex
     for i, w in weaponTable do
         if w.Label == label then
             weaponTable[i] = BlueprintMerged(w, newBp)
             return
         end
+        if w.DummyWeapon then
+            firstDummyIndex = i
+        end
     end
 
+    local finalInsertIndex = firstDummyIndex or TableGetn(weaponTable) + 1
     if insertPos then
-        local size = table.getn(weaponTable)
-        if insertPos > size + 1 then
-            WARN("Tried to insert a weapon bp in a position beyond the end of the Weapon array! Inserting at the end instead.")
-            TableInsert(weaponTable, newBp)
+        if firstDummyIndex and insertPos > firstDummyIndex then
+            WARN(string.format("Tried to insert weapon with label `%s` for unit %s at a position %d beyond the first dummy weapon of the Weapon array! Inserting before the dummy weapon at: %d"
+                , tostring(newBp.Label)
+                , baseBp.BlueprintId
+                , insertPos
+                , firstDummyIndex
+            ))
+        elseif insertPos > finalInsertIndex then
+            WARN(string.format("Tried to insert weapon with label `%s` for unit %s at a position %d beyond the end of the Weapon array! Inserting at the end instead."
+                , tostring(newBp.Label)
+                , baseBp.BlueprintId
+                , insertPos
+            ))
         else
-            TableInsert(weaponTable, insertPos, newBp)
+            finalInsertIndex = insertPos
         end
-    else
-        TableInsert(weaponTable, newBp)
     end
+    TableInsert(weaponTable, finalInsertIndex, newBp)
 end
 
 --#endregion
 
 local NewDummies = {}
 
-local function GetFoot(bp, axe) return math.ceil(bp.Footprint and bp.Footprint[axe] or bp[axe] or 1) end
-local function GetSkirt(bp, axe) return math.max((bp.Physics and bp.Physics['Skirt'..axe] or 1), GetFoot(bp, axe)) end
-local function GetOffset(bp, axe) return (bp.Physics and bp.Physics['SkirtOffset'..axe] or 0) end
+local function GetFoot(bp, axis) return math.ceil(bp.Footprint and bp.Footprint[axis] or bp[axis] or 1) end
+local function GetSkirt(bp, axis) return math.max((bp.Physics and bp.Physics['Skirt'..axis] or 1), GetFoot(bp, axis)) end
+local function GetOffset(bp, axis) return (bp.Physics and bp.Physics['SkirtOffset'..axis] or 0) end
 
 local function ReduceFoot(val)
     local modded = math.mod(val, 2)

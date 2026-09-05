@@ -13,6 +13,7 @@
 ---@field Args table
 
 local SimUtils = import("/lua/simutils.lua")
+local ChatUtils = import("/lua/chatutils.lua")
 local SimPing = import("/lua/simping.lua")
 local SimTriggers = import("/lua/scenariotriggers.lua")
 local SUtils = import("/lua/ai/sorianutilities.lua")
@@ -43,6 +44,8 @@ local IssueAggressiveMove = IssueAggressiveMove
 local IssueGuard = IssueGuard
 local IssueFerry = IssueFerry
 
+local GetCurrentCommandSourceArmy = SimUtils.GetCurrentCommandSourceArmy
+
 -- upvalue categories for performance
 local CategoriesTransportation = categories.TRANSPORTATION
 
@@ -64,7 +67,18 @@ function DoCallback(name, data, units)
 
     local timeTaken = GetSystemTimeSecondsOnlyForProfileUse() - start
     if (timeTaken > 0.005) then
-        SPEW(string.format("Time to process %s from %d: %f", name, timeTaken, GetCurrentCommandSource() or -2))
+        local commandSourceNickname
+        local commandSourceArmy = GetCurrentCommandSourceArmy()
+        if commandSourceArmy then
+            commandSourceNickname = tostring(ArmyBrains[commandSourceArmy].Nickname)
+        else
+            commandSourceNickname = string.format("Observer (source %d)", GetCurrentCommandSource())
+        end
+        SPEW(string.format("Time to process \"%s\" from %s: %f"
+            , name
+            , commandSourceNickname
+            , timeTaken
+        ))
     end
 end
 
@@ -149,6 +163,8 @@ Callbacks.GiveUnitsToPlayer = SimUtils.GiveUnitsToPlayer
 
 Callbacks.GiveResourcesToPlayer = SimUtils.GiveResourcesToPlayer
 
+Callbacks.SendChatMessage = ChatUtils.SendChatMessage
+
 Callbacks.SetResourceSharing = SimUtils.SetResourceSharing
 
 Callbacks.RequestAlliedVictory = SimUtils.RequestAlliedVictory
@@ -166,7 +182,34 @@ Callbacks.UpdateMarker = SimPing.UpdateMarker
 
 Callbacks.FactionSelection = ScenarioFramework.OnFactionSelect
 
-Callbacks.ToggleSelfDestruct = import("/lua/selfdestruct.lua").ToggleSelfDestruct
+---@param data ToggleSelfDestructData
+---@param units Unit[]
+Callbacks.ToggleSelfDestruct = function(data, units)
+    -- prevent malformed input
+    if (not units) or (table.getn(units) == 0) then
+        return
+    end
+
+    -- prevent abuse
+    if (not data) or (not data.owner) or (not OkayToMessWithArmy(data.owner)) then
+        return
+    end
+
+    -- moderation rule: if you self destruct with one or more ACUs in the selection when playing full 
+    -- share, then you only self destruct the ACUs. This does not make it impossible to abuse, but it 
+    -- does introduce a simple guardrail. 
+    if ScenarioInfo.Options.Share == "FullShare" then
+        local commandUnits = EntityCategoryFilterDown(categories.COMMAND, SecureUnits(units))
+        if table.getn(commandUnits) > 0 then
+            import("/lua/selfdestruct.lua").ToggleSelfDestruct(data, commandUnits)
+            return
+        end
+    end
+
+    -- otherwise just pass it through as usual
+    import("/lua/selfdestruct.lua").ToggleSelfDestruct(data, units)
+end
+
 
 Callbacks.MarkerOnScreen = import("/lua/simcameramarkers.lua").MarkerOnScreen
 
@@ -640,7 +683,7 @@ do
         -- verify selection
         selection = SecureUnits(selection)
         if (not selection) or TableEmpty(selection) then
-            if (GetFocusArmy() == GetCurrentCommandSource()) then
+            if (GetFocusArmy() == GetCurrentCommandSourceArmy()) then
                 print("Unable to interrupt path finding")
             end
 
@@ -650,7 +693,7 @@ do
         -- only apply this to engineers
         local engineers = EntityCategoryFilterDown(categories.ENGINEER + categories.COMMAND, selection)
         if table.empty(engineers) then
-            if (GetFocusArmy() == GetCurrentCommandSource()) then
+            if (GetFocusArmy() == GetCurrentCommandSourceArmy()) then
                 print("Unable to interrupt path finding")
             end
 
@@ -663,7 +706,7 @@ do
         local commandSourceGuard = CommandSourceGuards[commandSource]
 
         if commandSourceGuard and commandSourceGuard + 5 >= gameTick then
-            if (GetFocusArmy() == GetCurrentCommandSource()) then
+            if (GetFocusArmy() == GetCurrentCommandSourceArmy()) then
                 print("Unable to interrupt path finding")
             end
 
@@ -686,7 +729,7 @@ do
         -- verify selection
         selection = SecureUnits(selection)
         if (not selection) or TableEmpty(selection) then
-            if (GetFocusArmy() == GetCurrentCommandSource()) then
+            if (GetFocusArmy() == GetCurrentCommandSourceArmy()) then
                 print("Unable to discharge")
             end
 
@@ -705,7 +748,7 @@ do
         end
 
         if table.empty(unitsWithShields) then
-            if (GetFocusArmy() == GetCurrentCommandSource()) then
+            if (GetFocusArmy() == GetCurrentCommandSourceArmy()) then
                 print("Unable to discharge")
             end
 
@@ -718,7 +761,7 @@ do
         local commandSourceGuard = CommandSourceGuards[commandSource]
 
         if commandSourceGuard and commandSourceGuard + 5 >= gameTick then
-            if (GetFocusArmy() == GetCurrentCommandSource()) then
+            if (GetFocusArmy() == GetCurrentCommandSourceArmy()) then
                 print("Unable to discharge")
             end
 
@@ -837,7 +880,7 @@ do
     ---@param data UIShareableBrushStrokeCallbackMessage
     local SyncPainting = function(data)
         -- used to determine the color of the painting
-        data.ShareablePainting.PeerName = GetArmyBrain(GetCurrentCommandSource()).Nickname
+        data.ShareablePainting.PeerName = GetArmyBrain(GetCurrentCommandSourceArmy()).Nickname
 
         Sync.SharePaintingBrushStroke = Sync.SharePaintingBrushStroke or {}
         table.insert(Sync.SharePaintingBrushStroke, data)
@@ -846,7 +889,7 @@ do
     ---@param data UIShareableBrushStrokeCallbackMessage
     Callbacks.SharePaintingBrushStroke = function(data)
         local focusArmy = GetFocusArmy()
-        local currentCommandSource = GetCurrentCommandSource()
+        local currentCommandSourceArmy = GetCurrentCommandSourceArmy()
 
         -- spectators are able to see all paintings. We take into account
         -- the original focus army because spectators can change focus army
@@ -856,7 +899,7 @@ do
         end
 
         -- allies are able to see each others paintings
-        if IsAlly(focusArmy, currentCommandSource) then
+        if IsAlly(focusArmy, currentCommandSourceArmy) then
             SyncPainting(data)
             return
         end
@@ -881,7 +924,6 @@ end
 local function PassesAIAntiCheatCheck()
     return ScenarioInfo.GameHasAIs or PassesAntiCheatCheck()
 end
-
 
 local SpawnedMeshes = {}
 
@@ -1417,8 +1459,14 @@ end
 ---@param data CallbackModeratorEventData
 Callbacks.ModeratorEvent = function(data)
     -- show up in the game logs
-    local brain = GetArmyBrain(GetCurrentCommandSource())
-    SPEW(string.format("Moderator event for %s: %s", tostring(brain.Nickname), tostring(data.Message)))
+    local commandSourceNickname
+    local commandSourceArmy = GetCurrentCommandSourceArmy()
+    if commandSourceArmy then
+        commandSourceNickname = tostring(GetArmyBrain(commandSourceArmy).Nickname)
+    else
+        commandSourceNickname = string.format("Observer (source %d)", GetCurrentCommandSource())
+    end
+    SPEW(string.format("Moderator event for %s: %s", commandSourceNickname, tostring(data.Message)))
 end
 
 --#endregion

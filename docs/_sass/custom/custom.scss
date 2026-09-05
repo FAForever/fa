@@ -1,0 +1,43 @@
+.unit-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 2rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.unit-icon {
+  width: 64px;
+  height: 64px;
+}
+
+.unit-name {
+  display: inline-block;
+}
+
+.change-category {
+  font-weight: 600;
+}
+
+.change {
+}
+
+.old {
+  color: #cf222e;
+  text-decoration: line-through;
+}
+
+.new {
+  color: #1a7f37;
+}
+
+[data-color-scheme="dark"] {
+  .old {
+    color: #f85149;
+  }
+
+  .new {
+    color: #3fb950;
+  }
+}

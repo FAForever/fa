@@ -1,1 +1,0 @@
-- (#6889) Improve annotations of the entity category functions

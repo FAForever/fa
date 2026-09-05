@@ -43,7 +43,7 @@ function BaseManagerEngineerPlatoonSplit(platoon)
                 end
 
                 local engPlat = aiBrain:MakePlatoon('', '')
-                aiBrain:AssignUnitsToPlatoon(engPlat, {v}, 'Support', 'None')
+                aiBrain:AssignUnitToPlatoon(engPlat, v, 'Support', 'None')
                 engPlat:SetPlatoonData(platoon.PlatoonData)
                 v.BaseName = baseName
                 engPlat:ForkAIThread(BaseManagerSingleEngineerPlatoon)
@@ -476,7 +476,7 @@ function ConditionalBuildSuccessful(conditionalUnit)
 
     -- Assign AI
     local newPlatoon = aiBrain:MakePlatoon('', '')
-    aiBrain:AssignUnitsToPlatoon(newPlatoon, {conditionalUnit}, 'Attack', 'None')
+    aiBrain:AssignUnitToPlatoon(newPlatoon, conditionalUnit, 'Attack', 'None')
     newPlatoon:StopAI()
     newPlatoon:SetPlatoonData(selectedBuild.data.PlatoonData)
 
@@ -1077,7 +1077,7 @@ function BuildBaseManagerStructure(aiBrain, eng, baseManager, levelName, buildin
                 for num, location in v do
                     -- Check if it can be built and then build
                     if num > 1 and aiBrain:CanBuildStructureAt(category, {location[1], 0, location[2]}) and baseManager:CheckUnitBuildCounter(location, buildCounter) then
-                        if not closest or VDist2(location[1], location[3], engineerPos[1], engineerPos[3]) < VDist2(closest[1], closest[3], engineerPos[1], engineerPos[3]) then
+                        if not closest or VDist2(location[1], location[2], engineerPos[1], engineerPos[3]) < VDist2(closest[1], closest[2], engineerPos[1], engineerPos[3]) then
                             closest = location
                         end
                     end
@@ -1230,8 +1230,9 @@ function GetScoutingPath(bManager, unit)
             currX = currX + 48
         end
         -- Determine which poitnts the unit can actually path to
+        local unitPosition = unit:GetPosition()
         for k, v in possiblePoints do
-            if AIUtils.CheckUnitPathingEx(v, unit:GetPosition(), unit) then
+            if AIUtils.CheckUnitPathingEx(v, unitPosition, unit) then
                 TableInsert(pathablePoints, v)
             end
         end
@@ -1252,10 +1253,8 @@ function BaseManagerScoutingAI(platoon)
         local numPoints = TableGetn(pathablePoints)
         if numPoints > 0 then
             platoon:Stop()
-        end
 
-        local count = 0
-        if numPoints > 0 then
+            local count = 0
             while count < 10 do
                 local pickNum = Random(1, numPoints)
                 platoon:MoveToLocation(pathablePoints[pickNum], false)
@@ -1280,7 +1279,7 @@ function BaseManagerTMLPlatoon(platoon)
 	for _, launcher in TMLs do
 		if not launcher.Dead then
 			local launcherPlatoon = aiBrain:MakePlatoon('', '')
-            aiBrain:AssignUnitsToPlatoon(launcherPlatoon, {launcher}, 'Attack', 'None')
+            aiBrain:AssignUnitToPlatoon(launcherPlatoon, launcher, 'Attack', 'None')
             launcherPlatoon.PlatoonData = table.deepcopy(platoon.PlatoonData)
             launcherPlatoon:ForkAIThread(BaseManagerTMLAI)
 		end
@@ -1363,7 +1362,7 @@ function BaseManagerNukePlatoon(platoon)
 	for _, silo in SMLs do
 		if not silo.Dead then
 			local siloPlatoon = aiBrain:MakePlatoon('', '')
-            aiBrain:AssignUnitsToPlatoon(siloPlatoon, {silo}, 'Support', 'None')
+            aiBrain:AssignUnitToPlatoon(siloPlatoon, silo, 'Support', 'None')
             siloPlatoon.PlatoonData = table.deepcopy(platoon.PlatoonData)
             siloPlatoon:ForkAIThread(BaseManagerNukeAI)
 		end
@@ -1529,7 +1528,7 @@ function UnitUpgradeThread(unit)
                 end
 
                 local platoon = aiBrain:MakePlatoon('', '')
-                aiBrain:AssignUnitsToPlatoon(platoon, {unit}, 'support', 'none')
+                aiBrain:AssignUnitToPlatoon(platoon, unit, 'support', 'none')
 
                 local order = {
                     TaskName = "EnhanceTask",

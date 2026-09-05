@@ -1,5 +1,20 @@
 ---@meta
 
+-- Engine internal states for Tactical/Nuke fire tasks:
+-- State 0: Check range
+-- Move the unit within min/max range.
+-- Then go to State 1 if we need ammo or State 2 if we don't.
+-- State 1: Building ammo
+-- Checks every 10 ticks if ammo is loaded, afterwards transitioning to State 2.
+-- State 2: Waiting to fire
+-- If unit not busy, give a fire command and increment State. Always waits 3 ticks afterwards.
+-- State 3: Firing
+-- Check if unit busy, in which case increment State. Always waits 3 ticks afterwards.
+-- State 4: Finished firing
+-- If unit not busy, end the task, otherwise wait 3 ticks.
+
+-- Only weapons with `ManualFire = true` and `OverChargeWeapon = false` in their blueprint can be used for tactical/nuke fire orders.
+
 ---@class moho.weapon_methods
 local UnitWeapon = {}
 
@@ -8,7 +23,43 @@ local UnitWeapon = {}
 function UnitWeapon:BeenDestroyed()
 end
 
---- Returns true if the weapon is aiming at the target as allowed by the FiringTolerance blueprint value and the target is within the weapon's range
+--- `UnitWeapon:CanFire` calls this engine `CanFire` function that is used in the firing cycle, alongside
+--- the self-explanatory `HasTarget`, `HasSiloAmmo`, and `TargetSolutionStatusGun() == TRS_Available` calls.
+---
+--- Lua pseudocode describing the engine `CanFire` function's logic.
+--- Underscore prefixes indicate engine fields/functions.
+--[[
+if
+    !unit:IsStunned()
+    and !unit:IsUnitState("Busy")
+    and !unit.Blueprint.Air.CanFly or unit.Layer == "Air"
+    and !unit.Blueprint.AI.NeedUnpack or unit:IsUnitState("Immobile")
+    and weapon:_CheckWaterDepthFiringRestrictions()
+then
+    if !unit.Blueprint.Air.Winged then 
+        return weapon._AimOnTarget -- aim on target in terms of firing tolerance
+    end 
+    if !weapon.Blueprint.AutoInitiateAttackCommand 
+      or unit:_GetSpeed() >= 0.25 * unit.Blueprint.MaxAirSpeed * unit._SpeedMult
+    then
+        if !weapon.Blueprint.NeedToComputeBombDrop or !weapon:_HasTarget() then 
+            return weapon._AimOnTarget 
+        end
+        if unit:IsUnitState("MakingAttackRun") then
+            -- Involves weapon BombDropThreshold and unit PredictAheadForBombDrop
+            if weapon:_UnitIsInBombDropZone() then
+                return weapon._AimOnTarget 
+            end 
+        end
+    end
+end
+return false
+]]
+
+--- Returns true if the weapon has a target and it can fire at it, identical to the engine's firing conditions.
+---
+--- This includes having a target, ammo, a firing solution for the target, aiming within firing tolerance, unit
+--- not being busy or stunned, and a list of other conditions based on blueprint values.
 ---@return boolean
 function UnitWeapon:CanFire()
 end
@@ -176,5 +227,9 @@ end
 ---@return boolean
 function UnitWeapon:WeaponHasTarget()
 end
+
+--- Called by the engine to check if the weapon is allowed to fire.
+---@type fun(self: Weapon): boolean
+UnitWeapon.CanWeaponFire = nil
 
 return UnitWeapon

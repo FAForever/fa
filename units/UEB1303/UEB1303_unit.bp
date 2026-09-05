@@ -93,6 +93,14 @@ UnitBlueprint{
     LifeBarOffset = 0.95,
     LifeBarSize = 2.5,
     Physics = {
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = true,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
         MaxGroundVariation = 1.1,
@@ -118,7 +126,7 @@ UnitBlueprint{
         {
             Damage = 5000,
             DamageFriendly = true,
-            DamageRadius = 14,
+            DamageRadius = 10,
             DamageType = "DeathExplosion",
             DisplayName = "Death Weapon",
             DummyWeapon = true,

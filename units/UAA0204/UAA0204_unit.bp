@@ -66,7 +66,6 @@ UnitBlueprint{
     Display = {
         Abilities = {
             "<LOC ability_sonar>Sonar",
-            "<LOC ability_depthcharge>Depth Charges",
         },
         LayerChangeEffects = {
             AirLand = {
@@ -196,7 +195,7 @@ UnitBlueprint{
             AutoInitiateAttackCommand = true,
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
-            Damage = 187.5,
+            Damage = 150,
             DamageType = "Normal",
             DisplayName = "Harmonic Torpedo",
             FireTargetLayerCapsTable = {
@@ -211,7 +210,7 @@ UnitBlueprint{
             MaxRadius = 42,
             MinRadius = 4,
             MuzzleSalvoDelay = 0.2,
-            MuzzleSalvoSize = 4,
+            MuzzleSalvoSize = 5,
             MuzzleVelocity = 0,
             ProjectileId = "/projectiles/AANTorpedo03/AANTorpedo03_proj.bp",
             ProjectileLifetime = 20,
@@ -235,12 +234,12 @@ UnitBlueprint{
             RateOfFire = 10/100, --10/integer interval in ticks
             TargetPriorities = {
                 "CRUISER",
-                "(NAVAL * TECH2 * SHIELD)",
-                "(STRUCTURE * DEFENSE * ANTIAIR)",
-                "(TECH3 * NAVAL * CARRIER)",
+                "NAVAL TECH2 SHIELD",
+                "STRUCTURE DEFENSE ANTIAIR",
+                "TECH3 NAVAL CARRIER",
                 "SUBMERSIBLE",
-                "NAVAL * TECH2",
-                "NAVAL * TECH3",
+                "NAVAL TECH2",
+                "NAVAL TECH3",
                 "MOBILE",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",
                 "ALLUNITS",

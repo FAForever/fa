@@ -1,0 +1,141 @@
+# Copyright (c) 2026 FAForever
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+
+# This workflow creates a pull request with all the necessary changes to deploy a new patch.
+# The changelog gets generated based on the staging/faf branch.
+
+name: Prepare release
+
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        type: string
+        description: The date of the patch (yyyy-mm-dd). Leave empty to use today's date. Make sure that the staging/faf branch points to the correct commit.
+        required: false
+        default: ""
+
+jobs:
+  generate-changelog:
+    name: Create changelog of staging/faf branch
+    uses: ./.github/workflows/docs-generate-changelog.yaml
+    with:
+      branch: staging/faf
+
+  release-preparation:
+    name: Prepare files for patch
+    runs-on: ubuntu-latest
+    needs: generate-changelog
+    outputs:
+      branch: ${{ steps.branch.outputs.branch }}
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout FA repository
+        uses: actions/checkout@v6
+        with:
+          ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
+          ref: staging/faf
+
+      - name: Determine next patch version
+        id: version
+        run: |
+          CURRENT_VERSION=$(grep 'Version' lua/version.lua | grep -o '[0-9]\+')
+          NEXT_VERSION=$((CURRENT_VERSION + 1))
+          echo "old_version=$CURRENT_VERSION" >> "$GITHUB_OUTPUT"
+          echo "version=$NEXT_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Create branch
+        id: branch
+        run: |
+          BRANCH="changelog${{ steps.version.outputs.version }}"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          if git ls-remote --heads origin "$BRANCH" | grep -q .; then
+            echo "Branch '$BRANCH' already exists. Aborting workflow."
+            exit 1
+          fi
+          git checkout -b "$BRANCH"
+
+      - name: Update version number
+        run: |
+          sed -i "s/${{ steps.version.outputs.old_version }}/${{ steps.version.outputs.version }}/g" lua/version.lua
+          sed -i "s/${{ steps.version.outputs.old_version }}/${{ steps.version.outputs.version }}/g" mod_info.lua
+
+          git config user.name github-actions
+          git config user.email actions@github.com
+          git add lua/version.lua mod_info.lua
+          git commit -m "Bump game version to ${{ steps.version.outputs.version }}"
+
+      - name: Download changelog artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: changelog-faf
+          path: changelog/snippets
+
+      - name: Create changelog post
+        working-directory: changelog/snippets
+        env:
+          PATCHDATE: ${{ inputs.date }}
+        run: |
+          if [ -z "$PATCHDATE" ]; then
+            PATCHDATE=$(date +%Y-%m-%d)
+          fi
+          DATE=$(date -d "$PATCHDATE" +%Y-%m-%d)
+          DAY=$(date -d "$PATCHDATE" +%d)
+          MONTH=$(date -d "$PATCHDATE" +%B)
+          YEAR=$(date -d "$PATCHDATE" +%Y)
+          FILE="${{ github.workspace }}/docs/_posts/$DATE-${{ steps.version.outputs.version }}.md"
+          cat sections/template-header-patch.md >> $FILE
+          sed -i "s/XYZW/${{ steps.version.outputs.version }}/g" $FILE
+          sed -i "s/Day/$DAY/g" $FILE
+          sed -i "s/Month/$MONTH/g" $FILE
+          sed -i "s/Year/$YEAR/g" $FILE
+          cat changelog-faf.md >> $FILE
+          cat sections/template-footer.md >> $FILE
+          
+          git add ${{ github.workspace }}/docs/_posts
+          git commit -m "Add Markdown changelog for version ${{ steps.version.outputs.version }}"
+
+      - name: Remove snippets
+        run: |
+          rm -f changelog/snippets/*.md
+          git add changelog/snippets
+          git commit -m "Delete changelog snippets"
+
+      - name: Push branch
+        run: |
+          git push origin "${{ steps.branch.outputs.branch }}"
+        # The push also triggers docs-synchronize-changelog.yaml
+
+      - name: Create Pull Request
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const version = "${{ steps.version.outputs.version }}";
+            const branch = "${{ steps.branch.outputs.branch }}";
+            
+            await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Changelog ${version}`,
+              head: branch,
+              base: "develop",
+              body: `Automated changelog and version bump for game version ${version}.`
+            });

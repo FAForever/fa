@@ -198,6 +198,17 @@ keyDescriptions = {
     ['chat_line_up'] = '<LOC key_desc_0089>Chat line up',
     ['chat_line_down'] = '<LOC key_desc_0090>Chat line down',
 
+    ['debug_chat_window'] = '<LOC key_desc_debug_chat_window>Toggle the chat window',
+    ['debug_chat_config'] = '<LOC key_desc_debug_chat_config>Toggle the chat options dialog',
+    ['debug_chat_append_system_message'] = '<LOC key_desc_debug_chat_append_system_message>Append a synthetic system message to the chat',
+    ['debug_chat_append_short_message'] = '<LOC key_desc_debug_chat_append_short_message>Append a short synthetic chat message',
+    ['debug_chat_append_long_message'] = '<LOC key_desc_debug_chat_append_long_message>Append a long synthetic chat message (tests text wrapping)',
+    ['debug_chat_append_burst'] = '<LOC key_desc_debug_chat_append_burst>Append ten synthetic chat messages in a burst (tests scrolling)',
+    ['debug_chat_append_camera_message'] = '<LOC key_desc_debug_chat_append_camera_message>Append a chat message with a location hint at the current camera focus',
+    ['debug_chat_set_recipient_all'] = '<LOC key_desc_debug_chat_set_recipient_all>Set the chat recipient to all',
+    ['debug_chat_set_recipient_allies'] = '<LOC key_desc_debug_chat_set_recipient_allies>Set the chat recipient to allies',
+    ['debug_chat_clear_history'] = '<LOC key_desc_debug_chat_clear_history>Clear the chat history',
+
     ['switch_skin_up'] = '<LOC key_desc_0091>Rotate skins up',
     ['switch_skin_down'] = '<LOC key_desc_0092>Rotate skins down',
     ['switch_layout_up'] = '<LOC key_desc_0093>Rotate layouts up',
@@ -219,6 +230,7 @@ keyDescriptions = {
     ['cam_free'] = "<LOC key_desc_0104>Toggles camera free mode",
 
     ['quick_save'] = "<LOC key_desc_0130>Save the game to a special quick save file",
+    ['quick_load'] = "<LOC key_desc_quick_load>Load the game from the special quick save file",
     ['mouse_help'] = "<LOC key_desc_0132>Turn the mouse button help icon on/off",
 
     ['create_build_template'] = "<LOC key_desc_0181>Create a build template based on the current selection",
@@ -544,8 +556,8 @@ keyDescriptions = {
     ['shift_filter_highest_engineer_and_assist'] = '<LOC key_desc_shift_filter_highest_engineer_and_assist>Filter engineers by tech level and majority faction',
     ['abort_navigation'] = '<LOC key_abort_navigation>Interrupt pathfinding of engineers',
     ['shift_abort_navigation'] = '<LOC key_abort_navigation>Interrupt pathfinding of engineers',
-    ['discharge_shields'] = '<LOC key_discharge_shields>Discharge shields',
-    ['shift_discharge_shields'] = '<LOC key_discharge_shields>Discharge shields',
+    ['discharge'] = '<LOC key_discharge_shields>Discharge shields',
+    ['shift_discharge'] = '<LOC key_discharge_shields>Discharge shields',
     ['spreadattack'] = '<LOC key_desc_distribute_orders>Distribute orders',
     ['shift_spreadattack'] = '<LOC key_desc_shift_distribute_orders>Distribute orders',
     ['spreadattack_context'] = '<LOC key_desc_distribute_orders>Distribute orders from the unit beneath the mouse cursor',
@@ -569,4 +581,5 @@ keyDescriptions = {
     ['create_build_template_16'] = '<LOC key_desc_create_build_template_02>Create a 16x16 chunk template',
     ['create_build_template_32'] = '<LOC key_desc_create_build_template_02>Create a 32x32 chunk template',
 
+    ['temporary_template_use_or_create'] = '<LOC key_desc_temporary_template_create_or_use>Save a temporary template from the current selection or use the saved temporary template.',
 }

@@ -1193,7 +1193,7 @@ function AIEngineersAssistFactories(aiBrain, engineers, factories)
             IssueGuard({unit}, factoryData[key].Factory)
             factoryData[key].NumGuards = factoryData[key].NumGuards + 1
         else
-            aiBrain:AssignUnitsToPlatoon('ArmyPool', {unit}, 'Unassigned', 'NoFormation')
+            aiBrain:AssignUnitToPlatoon('ArmyPool', unit, 'Unassigned', 'NoFormation')
         end
     end
 
@@ -1702,7 +1702,7 @@ function GetTransports(platoon, units)
         for i = 1, table.getn(sortedList) do
             if transportsNeeded and table.empty(sortedList[i].Unit:GetCargo()) and not sortedList[i].Unit:IsUnitState('TransportLoading') then
                 local id = sortedList[i].Id
-                aiBrain:AssignUnitsToPlatoon(platoon, {sortedList[i].Unit}, 'Scout', 'GrowthFormation')
+                aiBrain:AssignUnitToPlatoon(platoon, sortedList[i].Unit, 'Scout', 'GrowthFormation')
                 numTransports = numTransports + 1
                 if not transSlotTable[id] then
                     transSlotTable[id] = GetNumTransportSlots(sortedList[i].Unit)
@@ -1796,7 +1796,7 @@ function UseTransports(units, transports, location, transportPlatoon)
     for num, unit in units do
         if not unit.Dead then
             if unit:IsUnitState('Attached') then
-                aiBrain:AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
+                aiBrain:AssignUnitToPlatoon(pool, unit, 'Unassigned', 'None')
             elseif EntityCategoryContains(categories.url0306 + categories.DEFENSE, unit) then
                 table.insert(shields, unit)
             elseif unit:GetBlueprint().Transport.TransportClass == 3 then
@@ -1880,7 +1880,7 @@ function UseTransports(units, transports, location, transportPlatoon)
     for k, unit in units do
         if not unit.Dead and not EntityCategoryContains(categories.TRANSPORTATION, unit) then
             if not unit:IsUnitState('Attached') then
-                aiBrain:AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
+                aiBrain:AssignUnitToPlatoon(pool, unit, 'Unassigned', 'None')
             end
         elseif not unit.Dead and EntityCategoryContains(categories.TRANSPORTATION, unit) and table.empty(unit:GetCargo()) then
             ReturnTransportsToPool({unit}, true)
@@ -1891,7 +1891,7 @@ function UseTransports(units, transports, location, transportPlatoon)
     -- If some transports have no units return to pool
     for k, t in transports do
         if not t.Dead and table.empty(t:GetCargo()) then
-            aiBrain:AssignUnitsToPlatoon('ArmyPool', {t}, 'Scout', 'None')
+            aiBrain:AssignUnitToPlatoon('ArmyPool', t, 'Scout', 'None')
             table.remove(transports, k)
         end
     end
@@ -2043,7 +2043,7 @@ function ReturnTransportsToPool(units, move)
     local safePath, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Air', unit:GetPosition(), position, 200)
     for k, unit in units do
         if not unit.Dead and EntityCategoryContains(categories.TRANSPORTATION, unit) then
-            aiBrain:AssignUnitsToPlatoon('ArmyPool', {unit}, 'Scout', 'None')
+            aiBrain:AssignUnitToPlatoon('ArmyPool', unit, 'Scout', 'None')
             if move then
                 if safePath then
                     for _, p in safePath do
@@ -2969,7 +2969,7 @@ function UseTransportsGhetto(units, transports)
     for num, unit in units do
         if not unit.Dead then
             if unit:IsUnitState('Attached') then
-                aiBrain:AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
+                aiBrain:AssignUnitToPlatoon(pool, unit, 'Unassigned', 'None')
             elseif EntityCategoryContains(categories.url0306 + categories.DEFENSE, unit) then
                 table.insert(shields, unit)
             elseif unit:GetBlueprint().Transport.TransportClass == 3 then
@@ -3054,7 +3054,7 @@ function UseTransportsGhetto(units, transports)
     for k, unit in units do
         if not unit.Dead and not EntityCategoryContains(categories.TRANSPORTATION, unit) then
             if not unit:IsUnitState('Attached') then
-                aiBrain:AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
+                aiBrain:AssignUnitToPlatoon(pool, unit, 'Unassigned', 'None')
             end
         elseif not unit.Dead and EntityCategoryContains(categories.TRANSPORTATION, unit) and table.empty(unit:GetCargo()) then
             ReturnTransportsToPool({unit}, true)

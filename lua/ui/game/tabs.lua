@@ -585,7 +585,7 @@ function BuildContent(contentID)
         return
     end
     import("/lua/ui/game/multifunction.lua").CloseMapDialog()
-    import("/lua/ui/game/chat.lua").CloseChatConfig()
+    import("/lua/ui/game/chat/config/ChatConfigInterface.lua").Close()
     activeTab = contentID
     for _, tab in controls.tabs do
         if tab.Data.content == contentID then
@@ -1271,5 +1271,8 @@ function UpdateModeDisplay()
 end
 
 FocusArmyChanged = function()
-    ClearModeText()
+    -- Avoid clearing the score screen button at the end of the game due to being switched to observer.
+    if not SessionIsGameOver() then
+        ClearModeText()
+    end
 end

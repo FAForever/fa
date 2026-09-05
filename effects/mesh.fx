@@ -2094,68 +2094,6 @@ VERTEXNORMAL_VERTEX EffectVertexNormalLoFiVS(
     return vertex;
 }
 
-/// FourUVTexShiftScaleVS
-///
-/// Vertex normal lighting only
-EFFECT_VERTEX FourUVTexShiftScaleVS(
-    float3 position : POSITION0,
-    float3 normal : NORMAL0,
-    float3 UnusedTangent : TANGENT,     // tighten up the linkages for D3D10
-    float3 UnusedBinormal : BINORMAL,
-    float4 texcoord0 : TEXCOORD0,
-    int boneIndex[4] : BLENDINDICES,
-    float3 row0 : TEXCOORD1,
-    float3 row1 : TEXCOORD2,
-    float3 row2 : TEXCOORD3,
-    float3 row3 : TEXCOORD4,
-    anim_t anim : TEXCOORD5,
-    float4 material : TEXCOORD6,
-    float4 color : COLOR0,
-    uniform float texScale0,
-    uniform float texScale1,
-    uniform float texScale2,
-    uniform float texScale3,
-    uniform float texXshift0,
-    uniform float texYshift0,
-    uniform float texXshift1,
-    uniform float texYshift1,
-    uniform float texXshift2,
-    uniform float texYshift2,
-    uniform float texXshift3,
-    uniform float texYshift3
-)
-{
-    EFFECT_VERTEX vertex = (EFFECT_VERTEX)0;
-    CompatSwizzle(color);
-
-    float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
-
-    vertex.position = mul( float4(position,1), worldMatrix);
-    vertex.depth = vertex.position.y - surfaceElevation;
-    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
-    vertex.normal = normalize( mul( normal, (float3x3)worldMatrix));
-
-    vertex.texcoord0 = texcoord0;
-    vertex.texcoord1 = texcoord0;
-    vertex.color = color;
-    vertex.material = float4( time - material.x, material.yzw);
-
-    vertex.texcoord0.xy *= texScale0;
-    vertex.texcoord0.zw *= texScale1;
-    vertex.texcoord1.xy *= texScale2;
-    vertex.texcoord1.zw *= texScale3;
-    vertex.texcoord0.x += (vertex.material.x * texXshift0);
-    vertex.texcoord0.y += (vertex.material.x * texYshift0);
-    vertex.texcoord0.z += (vertex.material.x * texXshift1);
-    vertex.texcoord0.w += (vertex.material.x * texYshift1);
-    vertex.texcoord1.x += (vertex.material.x * texXshift2);
-    vertex.texcoord1.y += (vertex.material.x * texYshift2);
-    vertex.texcoord1.z += (vertex.material.x * texXshift3);
-    vertex.texcoord1.w += (vertex.material.x * texYshift3);
-
-    return vertex;
-}
-
 EFFECT_NORMALMAPPED_VERTEX ShieldNormalVS(
     float3 position : POSITION0,
     float3 normal : NORMAL0,
@@ -2196,20 +2134,18 @@ EFFECT_NORMALMAPPED_VERTEX ShieldNormalVS(
     vertex.viewDirection = normalize(vertex.viewDirection);
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
-    vertex.texcoord0 = texcoord0;
-    vertex.texcoord1 = texcoord0;
-    vertex.color = color;
-    vertex.material = float4( time - material.x, material.yzw);
-
     float3x3 rotationMatrix = (float3x3)worldMatrix;
     vertex.normal = mul( normal, rotationMatrix);
     vertex.tangent = mul( tangent, rotationMatrix);
     vertex.binormal = mul( binormal, rotationMatrix);
 
-    vertex.texcoord0.xy *= texScale0;
-    vertex.texcoord0.zw *= texScale1;
-    vertex.texcoord1.xy *= texScale2;
-    vertex.texcoord1.zw *= texScale3;
+    vertex.color = color;
+    vertex.material = float4( time - material.x, material.yzw);
+
+    vertex.texcoord0.xy = texcoord0 * texScale0;
+    vertex.texcoord0.zw = texcoord0 * texScale1;
+    vertex.texcoord1.xy = texcoord0 * texScale2;
+    vertex.texcoord1.zw = texcoord0 * texScale3;
     vertex.texcoord0.x += (vertex.material.x * texXshift0);
     vertex.texcoord0.y += (vertex.material.x * texYshift0);
     vertex.texcoord0.z += (vertex.material.x * texXshift1);
@@ -2222,7 +2158,8 @@ EFFECT_NORMALMAPPED_VERTEX ShieldNormalVS(
     return vertex;
 }
 
-EFFECT_VERTEX ShieldPositionNormalOffsetVS(
+// Almost identical to ShieldNormalVS. Should be removed if possible
+EFFECT_NORMALMAPPED_VERTEX ShieldPositionNormalOffsetVS(
     float3 position : POSITION0,
     float3 normal : NORMAL0,
     float3 UnusedTangent : TANGENT,  // tighten up linkages for D3D10
@@ -2251,7 +2188,7 @@ EFFECT_VERTEX ShieldPositionNormalOffsetVS(
     uniform float texYshift3
 )
 {
-    EFFECT_VERTEX vertex = (EFFECT_VERTEX)0;
+    EFFECT_NORMALMAPPED_VERTEX vertex = (EFFECT_NORMALMAPPED_VERTEX)0;
     CompatSwizzle(color);
 
     int bone = anim.y + boneIndex[0];
@@ -2265,15 +2202,13 @@ EFFECT_VERTEX ShieldPositionNormalOffsetVS(
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
     vertex.normal = normalize( mul( normal, (float3x3)worldMatrix));
 
-    vertex.texcoord0 = texcoord0;
-    vertex.texcoord1 = texcoord0;
     vertex.color = color;
     vertex.material = float4( time - material.x, material.yzw);
 
-    vertex.texcoord0.xy *= texScale0;
-    vertex.texcoord0.zw *= texScale1;
-    vertex.texcoord1.xy *= texScale2;
-    vertex.texcoord1.zw *= texScale3;
+    vertex.texcoord0.xy = texcoord0 * texScale0;
+    vertex.texcoord0.zw = texcoord0 * texScale1;
+    vertex.texcoord1.xy = texcoord0 * texScale2;
+    vertex.texcoord1.zw = texcoord0 * texScale3;
     vertex.texcoord0.x += (vertex.material.x * texXshift0);
     vertex.texcoord0.y += (vertex.material.x * texYshift0);
     vertex.texcoord0.z += (vertex.material.x * texXshift1);
@@ -3808,49 +3743,52 @@ float shieldWaterAbsorption(float depth) {
 /// ShieldPS
 ///
 ///
-float4 ShieldPS( EFFECT_VERTEX vertex ) : COLOR
+float4 ShieldPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
 {
     if ( 1 == mirrored ) clip(vertex.depth);
 
     float4 colorMask = tex2D( albedoSampler, vertex.texcoord0.xy);
+    float terrainBand = colorMask.b * 0.95;
     float4 albedo = tex2D( albedoSampler, vertex.texcoord0.zw);
-    float3 normal = tex2D( secondarySampler, vertex.texcoord1.xy ).gaa * 2 - 1;
-    normal.z = sqrt( 1 - normal.x*normal.x - normal.y*normal.y );
+    float3 secondary = tex2D( secondarySampler, vertex.texcoord1.xy ).gaa * 2 - 1;
+    secondary.z = sqrt(1 - secondary.x * secondary.x - secondary.y * secondary.y);
     float3 specular = tex2D( specularSampler, vertex.texcoord1.zw );
 
-    // Combine albedo and normal sampler for a final color
-    float4 color = float4( mul( albedo.rgr, normal.rgb ) + float3( 0, 0, 0.25), 1.0);
+    // Combine albedo and secondary sampler for a final color
+    float3 color = mul(albedo.rgr, secondary.rgb) + float3( 0, 0, 0.25);
 
     // Using the specular sampler, with 3 layers of noise in color chanels modulate the
     // alpha channel for the current pixel
-    if( specular.g <= albedo.r )
-    {
+    float alpha;
+    if( specular.g <= albedo.r ) {
         if( specular.b >= albedo.g )
-            color.a = ( color.b >= normal.b ) ? 0.12 : lerp( 0.05, 0, sin(frac( 0.01 * time) * 3.14) );
+            alpha = ( color.b >= secondary.b ) ? 0.12 : lerp( 0.05, 0, sin(frac( 0.01 * time) * 3.14) );
         else
-            color.a = ( normal.b >= albedo.r ) ? 0.2 : lerp( 0.01, 0.1, sin(frac( 0.01 * time) * 3.14) );
-    }
-    else
-    {
+            alpha = ( secondary.b >= albedo.r ) ? 0.2 : lerp( 0.01, 0.1, sin(frac( 0.01 * time) * 3.14) );
+    } else {
         if( specular.r >= albedo.r )
-            color.a = ( specular.b >= albedo.r ) ? 0.025 : 0.1;
+            alpha = ( specular.b >= albedo.r ) ? 0.025 : 0.1;
         else
-            color.a = ( specular.g >= albedo.g ) ? 0.02 : lerp( 0.37, 0.46, sin(frac( 0.01 * time) * 3.14) );
+            alpha = ( specular.g >= albedo.g ) ? 0.02 : lerp( 0.37, 0.46, sin(frac( 0.01 * time) * 3.14) );
     }
 
-    color.rgb += float3( 0, 0, 0.15 );
+    color += float3(0, 0, 0.15);
+
+    float4 output = float4(color, alpha);
 
     // Adjust color of shield based on its health percentage
-    float4 colorMod1 = lerp(float4( 0.5, 0.0, 0.0, 0.05 ), color, 0.5);
-    colorMod1 = lerp( color, colorMod1 + color, sin(frac( 0.06 * time) * 3.14) );
-    color = lerp( colorMod1, color, vertex.material.y );
-    color += (colorMask.b * 0.95);
+    float4 colorMod = float4(0.25, 0.0, 0.0, 0.025) + output * 1.5;
+    colorMod = lerp(output, colorMod, sin(frac( 0.06 * time) * 3.14));
+    output = lerp(colorMod, output, vertex.material.y);
 
-    // Add in our alpha channel to mask UV pinching at the top of the sphere
-    color.a *= colorMask.a;// * 0.75;
-    color.a *= shieldWaterAbsorption(vertex.depth.x);
+    output += terrainBand;
 
-    return color;
+    // Mask UV pinching at the top of the sphere
+    output.a *= colorMask.a;
+
+    output.a *= shieldWaterAbsorption(vertex.depth.x);
+
+    return output;
 }
 
 float4 ShieldLoFiPS( LOFIEFFECT_VERTEX vertex ) : COLOR
@@ -3878,7 +3816,7 @@ float4 ShieldLoFiPS( LOFIEFFECT_VERTEX vertex ) : COLOR
 /// ShieldCybranPS
 ///
 ///
-float4 ShieldCybranPS( EFFECT_VERTEX vertex, uniform float alpha ) : COLOR
+float4 ShieldCybranPS( EFFECT_NORMALMAPPED_VERTEX vertex, uniform float alpha ) : COLOR
 {
     if ( 1 == mirrored ) clip(vertex.depth);
 
@@ -3887,42 +3825,37 @@ float4 ShieldCybranPS( EFFECT_VERTEX vertex, uniform float alpha ) : COLOR
     float3 specular = tex2D( specularSampler, vertex.texcoord1.xy );
     float3 specular2 = tex2D( specularSampler, vertex.texcoord1.zw );
 
-    // Color wackiness
-    float3 color2 = (albedo2.b * specular2.g * 3 );
-    float3 color3 = specular2.g * albedo.a;
-    float3 color4 = ((albedo2.g - specular2.b ) * specular.b) * albedo.a;
-    float3 finalColor = float3( 0.05, 0.0, 0.3 ) + color4 - color2 * color3;
+    float3 color1 = albedo2.b * specular2.g * 3 * specular2.g * albedo.a;
+    float3 color2 = (albedo2.g - specular2.b) * specular.b * albedo.a;
+    float3 color = float3( 0.05, 0.0, 0.3 ) + color2 - color1;
 
     // Adjust color of shield based on its health percentage
-    float3 colorMod1 = lerp(float3( 0.2, 0, 0.0 ), finalColor, 0.5);
-    colorMod1 = lerp( finalColor, (colorMod1 - finalColor) + (color4 + colorMod1), sin(frac( 0.06 * vertex.material.x) * 3.14) );
-    finalColor = lerp( colorMod1, finalColor, vertex.material.y);
+    float3 colorMod1 = lerp(float3( 0.2, 0, 0.0 ), color, 0.5);
+    colorMod1 = lerp( color, (colorMod1 - color) + (color2 + colorMod1), sin(frac( 0.06 * vertex.material.x) * 3.14) );
+    color = lerp( colorMod1, color, vertex.material.y);
 
-    finalColor += (albedo.r + albedo2.r) * 0.1;
-    finalColor -= (1 - albedo.a);
+    color += (albedo.r + albedo2.r) * 0.1;
+    color -= (1 - albedo.a);
 
-    float clradd = (finalColor.r + finalColor.g + finalColor.b);
-
-    if (clradd < 0.1)
-    {
-        finalColor = float3( 0.15, 0.15, 0.3 );
-    }
-    else
-    {
-        if (clradd > 0.1)
-        {
-            if (clradd < 0.2)
-                finalColor = specular.b;
+    float colorMask = (color.r + color.g + color.b);
+    if (colorMask < 0.1) {
+        // Add base color
+        color = float3( 0.15, 0.15, 0.3 );
+    } else {
+        if (colorMask > 0.1) {
+            if (colorMask < 0.2)
+                // Add outlines to islands
+                color = specular.b;
         }
     }
 
-    finalColor += ((albedo.r + albedo2.r) * float3( 0.0, 0.0, 0.3 ));
+    color += ((albedo.r + albedo2.r) * float3( 0.0, 0.0, 0.3 ));
 
     // Alpha
     alpha += (albedo.r + albedo2.r) * 0.2;
     alpha *= shieldWaterAbsorption(vertex.depth.x);
 
-    return float4(finalColor, alpha);
+    return float4(color, alpha);
 }
 
 float4 ShieldCybranLoFiPS( LOFIEFFECT_VERTEX vertex, uniform float alpha ) : COLOR
@@ -3956,29 +3889,26 @@ float4 ShieldAeonPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
     float3 specular2 = tex2D( specularSampler, vertex.texcoord1.xy );
     float3 normal = ComputeNormal( normalsSampler, vertex.texcoord1.zw * 4, rotationMatrix);
 
-    float dotLightNormal = dot(sunDirection,normal);
     float phongAmount = saturate( dot( reflect( -vertex.viewDirection, normal), vertex.viewDirection)) * 0.6;
     float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
 
-    // Magic
     float3 terrainBand = albedo.b * 0.5;
     float3 color1 = phongAmount + environment - albedo.ggg;
-    float3 color2 = (specular.rrr) * lerp( 0.6, 1.3, sin(frac( 0.015 * time) * 3.14));
-    float3 color3 = (specular2.rrr) * lerp( 2.0, 2.2, sin(frac( 0.0045 * time) * 3.14));
+    float factor1 = specular.r * lerp( 0.6, 1.3, sin(frac( 0.015 * time) * 3.14));
+    float factor2 = specular2.r * lerp( 2.0, 2.2, sin(frac( 0.0045 * time) * 3.14));
 
-    float3 finalColor = (color1 * color2) * color3;
-    float3 color4 = (finalColor * normal.rgb) * 0.65 + finalColor;
-    finalColor = color4 * environment * albedo.a;
+    float3 color = color1 * factor1 * factor2 * (normal.rgb * 0.65 + 1) * environment * albedo.a;
 
     // Adjust color of shield based on its health percentage
-    float3 colorMod1 = lerp(float3( 0.7, 0.3, 0.3 ), finalColor, 0.9 );
-    float3 colorMod2 = lerp( finalColor, colorMod1, sin(frac( 0.05 * vertex.material.x) * 3.14) );
-    finalColor = lerp( colorMod1, finalColor, vertex.material.y);
+    float3 colorMod1 = lerp(float3( 0.7, 0.3, 0.3 ), color, 0.9 );
+    float3 colorMod2 = lerp( color, colorMod1, sin(frac( 0.05 * vertex.material.x) * 3.14) );
+    color = lerp( colorMod1, color, vertex.material.y);
+    color = lerp( colorMod1, color, vertex.material.y);
 
     float alpha = 0.707 * ((environment.r + environment.g + environment.b) * 0.25) + terrainBand.r;
     alpha *= shieldWaterAbsorption(vertex.depth.x);
 
-    return float4( lerp( colorMod1, finalColor, vertex.material.y), alpha);
+    return float4(color, alpha);
 }
 
 float4 ShieldAeonLoFiPS( LOFIEFFECT_VERTEX vertex, uniform float alpha ) : COLOR
@@ -3998,49 +3928,35 @@ float4 ShieldAeonLoFiPS( LOFIEFFECT_VERTEX vertex, uniform float alpha ) : COLOR
 ///
 float4 ShieldSeraphimPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
 {
-    if ( 1 == mirrored )
-        clip(vertex.depth);
+    if ( 1 == mirrored ) clip(vertex.depth);
 
-    float4 normal_pixel = tex2D( normalsSampler, vertex.texcoord1.zw );
     float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal );
     float3 normal = ComputeNormal( normalsSampler, vertex.texcoord1.zw, rotationMatrix );
     float4 uvaddress = tex2D( normalsSampler, vertex.texcoord1.xy );
     float2 texcoord = vertex.texcoord0.xy + (uvaddress.rb * 0.1);
     float4 specular = tex2D( specularSampler, texcoord );
 
-    float m = abs( normal_pixel.g - 0.5 );
+    float relative_height = abs(dot(float4(0,1,0,0), normalize(vertex.normal)));
+    float height_cutoff = 0.753;
+    float opacity;
+    if( relative_height < height_cutoff ){
+        opacity = 1.0;
+    } else {
+        // Decrease the factor linearly to 0.3 at the top
+        opacity = 1.0 - 0.7 * (relative_height - height_cutoff) / (1.0 - height_cutoff);
+    }
+
     const float max_brightness = 0.453;
-    float dp = abs( cos(dot( float4(0,1,0,0), normal )) );
-    float channel_color = max_brightness - clamp((1.0 - dp), 0, max_brightness );
-    float t = abs(dot(float4(0,1,0,0), normalize(vertex.normal)));
-    float time_cutoff = 0.753;
-    float dp2 = abs(dot(vertex.viewDirection,normal));
+    float dp = abs(cos(dot(float4(0,1,0,0), normal)));
+    float clamped_dp = max_brightness - clamp((1.0 - dp), 0, max_brightness);
+    float ndotv = abs(dot(vertex.viewDirection,normal));
 
-    ///If we are not close enough to the top of the shield dome...
-    if( t < time_cutoff )
-    {
-        m = 1.0;	/// This alpha multiple won't change alpha (So we are not fading to near transparency yet).
-    }
-    else
-    {
-        // NOTE: From right to left in the equation.
-        // Get a percentage multiple of how close we are to the top of the dome from the
-        // point where we want to start an alpha gradient to (close to) transparency. Using that
-        // we mutliply by 0.7 in order to get a percentage of a percentage multiple that is less than one.
-        // Then that is all subtracted from one, the closer we are to the top of the dome, the more we
-        // are subtracting 0.7 from 1.0 and the closer our final percentage multiple is to 0.4, where the
-        // final percentage multiple ('m') starts out at one. 0.7 is used to ensure that we do not go to complete
-        // transparency and retain some feeling of a sphere around the top area of the dome.
-        m = 1.0 - 0.7 * (t - time_cutoff) / (1.0 - time_cutoff);
-    }
-
-    ///Compute the final translucency value.
-    float alpha = m *( dp2 * 0.3 + channel_color )*1.75;
+    float alpha = opacity * 1.75 * (ndotv * 0.3 + clamped_dp);
     alpha *= shieldWaterAbsorption(vertex.depth.x);
 
-    // Multiples(0.425,0.76274,1.0) are to give a blue tint. The dot product of the normal and the world up vector is squared
-    // so that the blue and whitish color fade off in an exponential gradient.
-    return  float4( 0.425 * dp * dp * specular.r, 0.76274 * dp * dp * specular.g, 1.0 * dp * dp * specular.b, alpha );
+    float3 color = float3(0.425, 0.76274, 1.0) * dp * dp * specular.rgb;
+
+    return float4(color, alpha);
 }
 
 /// ShieldFillPS()
@@ -7598,7 +7514,7 @@ technique ShieldUEF_MedFidelity
         RasterizerState( Rasterizer_Cull_None )
         DepthState( Depth_Enable_LessEqual_Write_None )
 
-        VertexShader = compile vs_1_1 FourUVTexShiftScaleVS( 1, 3, 32, 6, 0, 0, 0.0003, 0.005, -0.001, -0.005, -0.0003, -0.0008 );
+        VertexShader = compile vs_1_1 ShieldNormalVS( 1, 3, 32, 6, 0, 0, 0.0003, 0.005, -0.001, -0.005, -0.0003, -0.0008 );
         PixelShader = compile ps_2_0 ShieldPS();
     }
 }
@@ -7643,7 +7559,7 @@ technique ShieldCybran_MedFidelity
         RasterizerState( Rasterizer_Cull_None )
         DepthState( Depth_Enable_LessEqual_Write_None )
 
-        VertexShader = compile vs_1_1 FourUVTexShiftScaleVS( 1,1,2,1, -0.01,0, -0.002,0, 0,0.0012, 0.001,-0.0015 );
+        VertexShader = compile vs_1_1 ShieldNormalVS( 1,1,2,1, -0.01,0, -0.002,0, 0,0.0012, 0.001,-0.0015 );
         PixelShader = compile ps_2_0 ShieldCybranPS(0.17);
     }
     pass P1
@@ -8521,7 +8437,7 @@ float4 NomadsPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
 
 /// Bubble shield
 ///
-float4 ShieldNomadsPS( EFFECT_VERTEX vertex ) : COLOR
+float4 ShieldNomadsPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
 {
     if ( 1 == mirrored ) clip(vertex.depth);
 
@@ -9157,7 +9073,7 @@ technique ShieldNomads_MedFidelity
         RasterizerState( Rasterizer_Cull_None )
         DepthState( Depth_Enable_LessEqual_Write_None )
 
-        VertexShader = compile vs_1_1 FourUVTexShiftScaleVS(
+        VertexShader = compile vs_1_1 ShieldNormalVS(
             1,  // ?
             1,  // size and number of albedo's simultaniously
             32,  // ?
@@ -9222,7 +9138,7 @@ technique ShieldNomadsStealth_MedFidelity
         RasterizerState( Rasterizer_Cull_None )
         DepthState( Depth_Enable_LessEqual_Write_None )
 
-        VertexShader = compile vs_1_1 FourUVTexShiftScaleVS(
+        VertexShader = compile vs_1_1 ShieldNormalVS(
             1,  // ?
             3,  // size and number of albedo's simultaniously
             32,  // ?

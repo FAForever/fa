@@ -100,7 +100,8 @@
 ---@field Physics UnitBlueprintPhysics
 ---@field Transport? UnitBlueprintTransport
 ---@field Veteran? UnitBlueprintVeterancy
----@field Weapon? WeaponBlueprint[]
+--- The weapon in the first index controls unit AI. Weapons with `DummyWeapon = true` must be at the end of the table.
+---@field Weapon? WeaponBlueprint[] 
 ---@field ModWeapon? WeaponBlueprint[] # Used during blueprint loading to mod `Weapon` table
 ---@field Wreckage? UnitBlueprintWreckage
 ---
@@ -175,7 +176,8 @@
 ---@field ShowAssistRangeOnSelect? boolean
 --- range for staging platforms to look for planes to repair and refuel when they are on patrol
 ---@field StagingPlatformScanRadius? number
---- some target bones setup for other units to aim at instead of the default center pos
+--- Names of bones for other units to try to aim at instead of the default center pos.
+--- The center pos is calculated using Size values but doesn't use CollisionOffset values.
 ---@field TargetBones string[]
 
 
@@ -805,6 +807,7 @@
 ---@field SelectionMeshScaleY? number
 ---@field SelectionMeshScaleZ? number
 ---@field UniformScale? number
+---@field UISelection? SoundHandle
 
 ---@class UnitBlueprintEnhancements : table<Enhancement, UnitBlueprintEnhancement>
 ---@field Slots table<EnhancementSlot, {name: UnlocalizedString, x: number, y: number}>
@@ -1078,7 +1081,7 @@
 ---@field SpoofRadius { Max: number, Min: number }
 --- used by XSL0101 (Selen) to define how it needs to sit still while its cloak is enabled for it to work
 ---@field StealthWaitTime? number
---- how far the unit can see above water and land
+--- how far the unit can see above water and land. Defaults to 10.
 ---@field VisionRadius number
 --- used by XSA0101 (Seraphim T1 air scout) to set its vision radius when it crashes
 ---@field VisionRadiusOnDeath? number
@@ -1118,6 +1121,9 @@
 ---@field Elevation number
 --- if true, terrain under building's skirt will be flattened
 ---@field FlattenSkirt boolean
+--- Determines what cells this unit occupies for pathfinding.
+--- Mobile units are forced to use the closest footprint spec that is defined in `footprints.lua`.
+--- Structures can define their own footprints.
 ---@field Footprint FootprintBlueprint
 --- unit fuels up at this rate per second. Required for air staging to undock automatically.
 ---@field FuelRechargeRate number
@@ -1153,7 +1159,7 @@
 --- Used by some build animations to scale their effects
 ---@field MeshExtentsZ number
 ---@field MinSpeedPercent number
---- method of locomotion
+--- method of locomotion. Defaults to "RULEUMT_None" if MaxSpeed = 0.
 ---@field MotionType UnitMotionType
 --- The occupy rectangles of the unit that will override the footprint. Every 4 numbers in the
 --- array define a occupation rectangle for the override (offsetX, offsetZ, sizeX, sizeZ).
