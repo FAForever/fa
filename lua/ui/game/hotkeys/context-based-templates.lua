@@ -532,13 +532,11 @@ end
 
 --- Called by the module manager when this module becomes dirty
 function __moduleinfo.OnDirty()
-    print("Disk changes detected for context based templates module...")
-
     -- force a reload
     ForkThread(
         function()
             local newModule = import("/lua/ui/game/hotkeys/context-based-templates.lua")
-
+            SPEW('Re-registering templates in new context-based templates module.')
             -- re-register the templates in the new module
             for k = 1, TableGetn(Templates) do
                 newModule.RegisterTemplate(Templates[k])
