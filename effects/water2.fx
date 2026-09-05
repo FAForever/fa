@@ -371,6 +371,17 @@ float3 calculateSunReflection(float3 R, float3 v, float3 n)
 	return color;
 }
 
+// https://www.unrealengine.com/blog/physically-based-shading-on-mobile
+half EnvBRDFApprox( half SpecularColor, half Roughness, half NDotV )
+{
+	const half4 c0 = { -1, -0.0275, -0.572, 0.022 };
+	const half4 c1 = { 1, 0.0425, 1.04, -0.04 };
+	half4 r = Roughness * c0 + c1;
+	half a004 = min( r.x * r.x, exp2( -9.28 * NDotV ) ) * r.x + r.y;
+	half2 AB = half2( -1.04, 1.04 ) * a004 + r.zw;
+	return SpecularColor * AB.x + AB.y;
+}
+
 float4 HighFidelityPS( VS_OUTPUT inV, 
 					   uniform bool alphaTestEnable, 
 					   uniform int alphaFunc, 
@@ -406,9 +417,7 @@ float4 HighFidelityPS( VS_OUTPUT inV,
     
     // scale, bias and normalize
     float3 N = 2.0 * sum.xyz - 4.0;
-    N = normalize(N.xzy); 
-        
-	float3 R = reflect(-viewVector, N);
+    N = normalize(N.xzy);
 
     // get the correct coordinate for sampling refraction and reflection
     float2 refractionPos = screenPos;
@@ -429,7 +438,12 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 	// so we have to resort to an approximation using the refractionPos
 	float4 unitReflections = tex2D(ReflectionSampler, refractionPos);
 
-	float4 skyReflection = texCUBE(SkySampler, R);
+	float3 R = reflect(-viewVector, N);
+	float roughness = 0.5;
+    // We can't use texCUBElod so we need to use a workaround
+    float lod = roughness * 10;
+    float scale = exp2(lod);
+    float3 skyReflection = texCUBEgrad(SkySampler, R, float3(scale/256, 0, 0), float3(0, scale/256, 0));
 	// The alpha channel acts as a mask for unit parts above the water and probably
 	// uses unitReflectionAmount as the positive value of the mask
     float3 reflections = lerp(skyReflection.rgb, unitReflections.rgb, saturate(unitReflections.a));
@@ -437,6 +451,7 @@ float4 HighFidelityPS( VS_OUTPUT inV,
    	// Schlick approximation for fresnel
     float NDotV = saturate(dot(viewVector, N));
     float fresnel = FresnelSchlick(NDotV, 0.08);
+    fresnel = EnvBRDFApprox(0.08, roughness, NDotV);
 
 	// the default value of 1.5 is way to high, but we want to preserve manually set values in existing maps
 	if (skyreflectionAmount == 1.5)
