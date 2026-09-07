@@ -49,8 +49,10 @@ UAL0307 = ClassUnit(AShieldHoverLandUnit, ShieldEffectsComponent) {
     end,
 
     DisablePointer = function(self)
-        self.TargetPointer:SetFireTargetLayerCaps('None') --this disables the stop feature - note that its reset on layer change!
-        self.PointerRestartThread = self.Trash:Add(ForkThread(self.PointerRestart,self))
+        if not IsDestroyed(self.TargetPointer) then            
+            self.TargetPointer:SetFireTargetLayerCaps('None') --this disables the stop feature - note that its reset on layer change!
+            self.PointerRestartThread = self.Trash:Add(ForkThread(self.PointerRestart,self))
+        end
     end,
 
     PointerRestart = function(self)

@@ -54,10 +54,12 @@ URL0306 = ClassUnit(CLandUnit) {
     end,
 
     DisablePointer = function(self)
-        self.TargetPointer:SetFireTargetLayerCaps('None') --this disables the stop feature - note that its reset on layer change!
-        local thread = ForkThread(self.PointerRestart,self)
-        self.Trash:Add(thread)
-        self.PointerRestartThread = thread
+        if not IsDestroyed(self.TargetPointer) then
+            self.TargetPointer:SetFireTargetLayerCaps('None') --this disables the stop feature - note that its reset on layer change!
+            local thread = ForkThread(self.PointerRestart,self)
+            self.Trash:Add(thread)
+            self.PointerRestartThread = thread
+        end
     end,
 
     PointerRestart = function(self)

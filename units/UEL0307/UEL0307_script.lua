@@ -85,8 +85,10 @@ UEL0307 = ClassUnit(TShieldLandUnit, ShieldEffectsComponent) {
     end,
 
     DisablePointer = function(self)
-        self.TargetPointer:SetFireTargetLayerCaps('None') --this disables the stop feature - note that its reset on layer change!
-        self.PointerRestartThread = self:ForkThread(self.PointerRestart)
+        if not IsDestroyed(self.TargetPointer) then
+            self.TargetPointer:SetFireTargetLayerCaps('None') --this disables the stop feature - note that its reset on layer change!
+            self.PointerRestartThread = self:ForkThread(self.PointerRestart)
+        end
     end,
 
     PointerRestart = function(self)
