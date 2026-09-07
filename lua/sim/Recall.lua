@@ -493,7 +493,7 @@ local function SyncRecallStatusThread()
 end
 
 function SyncRecallStatus()
-    if UserRecallStatusThread then
+    if not IsDestroyed(UserRecallStatusThread) then
         ResumeThread(UserRecallStatusThread) -- force update the existing thread
     else
         UserRecallStatusThread = ForkThread(SyncRecallStatusThread)
