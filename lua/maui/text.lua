@@ -58,10 +58,11 @@ Text = ClassUI(moho.text_methods, Control) {
     --- FAF extensible SetText() that uses SetDisplayText() but can retain it's original text for fancy text display setups like truncation
     ---@param text string
     SetText = function(self, text)
-        self:SetDisplayText(text)
         self._fullText = text
         if self._truncationEnabled then
             self:_applyTruncation()
+        else
+            self:SetDisplayText(self._fullText)
         end
     end,
 
