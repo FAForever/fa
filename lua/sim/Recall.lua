@@ -19,6 +19,11 @@ local SyncAnnouncement = import("/lua/simdiplomacy.lua").SyncAnnouncement
 ---| "vote"
 ---| "observer"
 
+---@class AIBrain
+---@field package LastRecallRequestTime number
+---@field package LastRecallVoteTime number
+---@field package RecallVote boolean
+
 function init()
     if not ScenarioInfo.TeamGame then
         SyncCannotRequestRecall("scenario")
