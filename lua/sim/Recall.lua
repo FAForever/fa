@@ -124,7 +124,7 @@ function ArmyRecallRequestCooldown(army)
     if brain:IsDefeated() then
         return "observer"
     end
-    if ScenarioInfo.RecallDisabled then
+    if ScenarioInfo.RecallDisabled or not ScenarioInfo.TeamGame then
         return "scenario"
     end
     if brain.RecallVote ~= nil then
