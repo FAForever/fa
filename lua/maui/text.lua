@@ -79,15 +79,21 @@ Text = ClassUI(moho.text_methods, Control) {
 
     ---@param enabled boolean
     SetTruncationEnabled = function(self, enabled)
+
+        -- prevent recursive OnDirty wrappers
+        if self._truncationEnabled == enabled then
+            return
+        end
+
         self._truncationEnabled = enabled
-         if enabled then
+        if enabled then
             -- Preserve any existing OnDirty callback before adding _applyTruncation
             if not self._originalWidthOnDirty then
                 self._originalWidthOnDirty = self.Width.OnDirty
             end
 
             self.Width.OnDirty = function(var)
-                
+
                 if self._originalWidthOnDirty then
                     self._originalWidthOnDirty(var)
                 end
