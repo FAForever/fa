@@ -45,7 +45,7 @@ Text = ClassUI(moho.text_methods, Control) {
         self:SetClipToWidth(false)
     end,
 
-    --- Direct Engine SetText() that changes what text is displayed
+    --- Directly sets what text is displayed.
     ---@type fun(self: Text, str: string | number)
     SetDisplayText = moho.text_methods.SetText,
 
@@ -54,7 +54,8 @@ Text = ClassUI(moho.text_methods, Control) {
     ---@return string
     GetDisplayText = moho.text_methods.GetText,
 
-    --- FAF extensible SetText() that uses SetDisplayText() but can retain it's original text for fancy text display setups like truncation
+    --- Sets what text *should* be displayed; actual displayed text is affected by operations like truncation.
+    ---@see Text.SetDisplayText # To directly set the displayed text.
     ---@param text string | number
     SetText = function(self, text)
         self._fullText = tostring(text)
