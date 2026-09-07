@@ -339,6 +339,7 @@ Callbacks.FlagShield = function(data, units)
     if units and target then
         for k, u in units do
             if not IsDestroyed(u) and u.PointerEnabled == true then
+                ---@cast u UAL0307 | UEL0307 | URL0306 | XSL0307
                 u.PointerEnabled = false --turn the pointer flag off
                 u:DisablePointer() --turn the pointer off
             end
