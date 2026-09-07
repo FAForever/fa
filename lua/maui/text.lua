@@ -46,8 +46,7 @@ Text = ClassUI(moho.text_methods, Control) {
     end,
 
     --- Direct Engine SetText() that changes what text is displayed
-    ---@type function
-    ---@type fun(self: Text, str: string)
+    ---@type fun(self: Text, str: string | number)
     SetDisplayText = moho.text_methods.SetText,
 
     --- Direct Engine GetText() for getting the current displayed value
