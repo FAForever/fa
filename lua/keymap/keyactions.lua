@@ -1507,6 +1507,10 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/ui/game/construction.lua").ToggleUnitPause()',
         category = 'orders',
     },
+    ['shift_pause_unit'] = {
+        action = 'UI_Lua import("/lua/ui/game/construction.lua").ToggleUnitPause()',
+        category = 'orders',
+    },
     ['pause_unit_all'] = {
         action = 'UI_Lua import("/lua/ui/game/construction.lua").ToggleUnitPauseAll()',
         category = 'orders',
@@ -1572,6 +1576,10 @@ local keyActionsOrders = {
         category = 'orders',
     },
     ['toggle_repeat_build'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").ToggleRepeatBuild()',
+        category = 'orders',
+    },
+    ['shift_toggle_repeat_build'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").ToggleRepeatBuild()',
         category = 'orders',
     },
