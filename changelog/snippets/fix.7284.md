@@ -1,1 +1,1 @@
-- Your explanation here... [Don't forget to change the category in the filename] (#7284).
+- Fix error when issuing an assist order to a mobile shield/deceiver with a destroyed unit in the selection (#7284). This should fix mobile shields sometimes stopping in range of enemies while assisting another unit, instead of continuing to move.
