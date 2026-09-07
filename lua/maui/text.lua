@@ -101,6 +101,9 @@ Text = ClassUI(moho.text_methods, Control) {
 
                 self:_applyTruncation()
             end
+
+            -- Apply truncation immediately so SetText() and SetTruncationEnabled() order doesn't matter
+            self:_applyTruncation()
         else
             -- Restore to the original OnDirty callback if it exists, otherwise set it to nil
             if self._originalWidthOnDirty then
