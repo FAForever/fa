@@ -55,9 +55,9 @@ Text = ClassUI(moho.text_methods, Control) {
     GetDisplayText = moho.text_methods.GetText,
 
     --- FAF extensible SetText() that uses SetDisplayText() but can retain it's original text for fancy text display setups like truncation
-    ---@param text string
+    ---@param text string | number
     SetText = function(self, text)
-        self._fullText = text
+        self._fullText = tostring(text)
         if self._truncationEnabled then
             self:_applyTruncation()
         else
