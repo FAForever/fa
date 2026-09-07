@@ -106,12 +106,14 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
     ---@param self XRL0302
     TrackTargetThread = function(self)
         local navigator = self:GetNavigator()
+        if not navigator then return end
         local weapon = self:GetWeaponByLabel('Suicide')
+        if not weapon then return end
 
         while not IsDestroyed(self) do
 
             -- adjust behavior of the weapon so it only fires when we're trying to attack something
-            if weapon then
+            if not IsDestroyed(weapon) then
                 if (
                     -- we're trying to attack
                     self:IsUnitState('Attacking') or
@@ -129,7 +131,7 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
             local command = self:GetCommandQueue()[1]
             if command and command.commandType == 10 then
                 local target = command.target
-                if target then
+                if not IsDestroyed(target) then
                     navigator:SetDestUnit(target)
                     navigator:SetSpeedThroughGoal(true)
                 end
