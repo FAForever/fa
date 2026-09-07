@@ -45,7 +45,7 @@ Sometimes it's necessary to test changes in a real game to be able to decide if 
 Once there is approval from a conceptual point of view, tick the box in the PR description. This way possible reviewers know that a technical review is the only step left to do when they have a look at the overview list of PRs.
 Reviewers don't like to spend time on PRs that might never make it into the game, so they will probably ignore PRs that don't have this box set.
 
-Nobody likes to review huge PRs. Try to keep PRs small to make reviews easier. If you have to make extensive changes, consider splitting them into one PR that only contains refactoring without any functional changes and one that contains the actual changes to functionality. You can also try splitting big features into multiple PRs.
+Nobody likes to review huge PRs. Try to keep PRs small to make reviews easier. If you have to make extensive changes, consider splitting them into multiple [stacked PRs](https://docs.github.com/en/pull-requests/get-started/about-stacked-prs), or for medium-sized changes, into easy-to-review "atomic" commits. For example, you can split extensive changes into PRs/commits for refactors that do not change functionality, and into PRs/commits that change one piece of functionality at a time.
 
 
 ## How to do a review:
