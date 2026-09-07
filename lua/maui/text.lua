@@ -35,7 +35,7 @@ Text = ClassUI(moho.text_methods, Control) {
         end
 
         self._truncationText = "..."
-        self._fullText = nil
+        self._fullText = ""
         self._truncationEnabled = false
     end,
 
@@ -47,7 +47,7 @@ Text = ClassUI(moho.text_methods, Control) {
 
     --- Direct Engine SetText() that changes what text is displayed
     ---@type function
-    ---@type fun(self: Text, str: string | number)
+    ---@type fun(self: Text, str: string)
     SetDisplayText = moho.text_methods.SetText,
 
     --- Direct Engine GetText() for getting the current displayed value
@@ -56,7 +56,7 @@ Text = ClassUI(moho.text_methods, Control) {
     GetDisplayText = moho.text_methods.GetText,
 
     --- FAF extensible SetText() that uses SetDisplayText() but can retain it's original text for fancy text display setups like truncation
-    ---@param text string | number
+    ---@param text string
     SetText = function(self, text)
         self:SetDisplayText(text)
         self._fullText = text
@@ -72,7 +72,7 @@ Text = ClassUI(moho.text_methods, Control) {
     end,
 
     --- Sets custom truncation trailing characters like "..." or "-".
-    ---@param text string | number
+    ---@param text string
     SetTruncationText = function(self, text)
         self._truncationText = tostring(text)
     end,
@@ -82,18 +82,37 @@ Text = ClassUI(moho.text_methods, Control) {
         self._truncationEnabled = enabled
     end,
 
+    ---@param clipToWidth boolean
     SetClipToWidth = function(self, clipToWidth)
         if clipToWidth then
             self.Width:Set(function() return self.Right() - self.Left() end)
 
-            self.Width.OnDirty = function()
-                if self._truncationEnabled then
+            if self._truncationEnabled then
+                -- Preserve any existing OnDirty callback before adding _applyTruncation
+                if not self._originalWidthOnDirty then
+                    self._originalWidthOnDirty = self.Width.OnDirty
+                end
+
+                self.Width.OnDirty = function()
+
+                    if self._originalWidthOnDirty then
+                        self._originalWidthOnDirty()
+                    end
+
                     self:_applyTruncation()
                 end
             end
         else
             self.Width:Set(function() return math.floor(self.TextAdvance()) end)
-            self.Width.OnDirty = nil
+
+            -- Restore to the original OnDirty callback if it exists, otherwise set it to nil
+            if self._originalWidthOnDirty then
+                self.Width.OnDirty = self._originalWidthOnDirty
+                self._originalWidthOnDirty = nil
+            else
+                self.Width.OnDirty = nil
+            end
+
         end
         self:SetNewClipToWidth(clipToWidth)
     end,
