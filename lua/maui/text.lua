@@ -80,31 +80,21 @@ Text = ClassUI(moho.text_methods, Control) {
     ---@param enabled boolean
     SetTruncationEnabled = function(self, enabled)
         self._truncationEnabled = enabled
-    end,
+         if enabled then
+            -- Preserve any existing OnDirty callback before adding _applyTruncation
+            if not self._originalWidthOnDirty then
+                self._originalWidthOnDirty = self.Width.OnDirty
+            end
 
-    ---@param clipToWidth boolean
-    SetClipToWidth = function(self, clipToWidth)
-        if clipToWidth then
-            self.Width:Set(function() return self.Right() - self.Left() end)
-
-            if self._truncationEnabled then
-                -- Preserve any existing OnDirty callback before adding _applyTruncation
-                if not self._originalWidthOnDirty then
-                    self._originalWidthOnDirty = self.Width.OnDirty
+            self.Width.OnDirty = function(var)
+                
+                if self._originalWidthOnDirty then
+                    self._originalWidthOnDirty(var)
                 end
 
-                self.Width.OnDirty = function()
-
-                    if self._originalWidthOnDirty then
-                        self._originalWidthOnDirty()
-                    end
-
-                    self:_applyTruncation()
-                end
+                self:_applyTruncation()
             end
         else
-            self.Width:Set(function() return math.floor(self.TextAdvance()) end)
-
             -- Restore to the original OnDirty callback if it exists, otherwise set it to nil
             if self._originalWidthOnDirty then
                 self.Width.OnDirty = self._originalWidthOnDirty
@@ -112,7 +102,16 @@ Text = ClassUI(moho.text_methods, Control) {
             else
                 self.Width.OnDirty = nil
             end
+        end
 
+    end,
+
+    ---@param clipToWidth boolean
+    SetClipToWidth = function(self, clipToWidth)
+        if clipToWidth then
+            self.Width:Set(function() return self.Right() - self.Left() end)
+        else
+            self.Width:Set(function() return math.floor(self.TextAdvance()) end)
         end
         self:SetNewClipToWidth(clipToWidth)
     end,
