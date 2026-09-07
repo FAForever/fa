@@ -127,6 +127,7 @@ Text = ClassUI(moho.text_methods, Control) {
     _applyTruncation = function(self)
         local maxWidth = self.Width()
         if not maxWidth or maxWidth <= 0 then
+            self:SetDisplayText(self._fullText)
             return
         end
 
