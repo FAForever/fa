@@ -15,6 +15,7 @@ local DamageArea = DamageArea
 local CreateEmitterAtBone = CreateEmitterAtBone
 local CreateDecal = CreateDecal
 local CreateLightParticle = CreateLightParticle
+local IsDestroyed = IsDestroyed
 
 local DeathWeaponKamikaze = ClassWeapon(Weapon) {
     OnFire = function(self)
