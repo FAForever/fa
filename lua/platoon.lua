@@ -14,6 +14,7 @@ local AIUtils = import("/lua/ai/aiutilities.lua")
 local TransportUtils = import("/lua/ai/transportutilities.lua")
 local Utilities = import("/lua/utilities.lua")
 local AIBuildStructures = import("/lua/ai/aibuildstructures.lua")
+local FormationCommands = import("/lua/sim/formationcommands.lua")
 local UpgradeTemplates = import("/lua/upgradetemplates.lua")
 local Behaviors = import("/lua/ai/aibehaviors.lua")
 local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
@@ -28,6 +29,7 @@ local tableEmpty = table.empty
 local tableSort = table.sort
 local tableCopy = table.copy
 
+local pairs, ipairs = pairs, ipairs
 local ForkThread, unpack = ForkThread, unpack
 
 local GetGameTimeSeconds = GetGameTimeSeconds
@@ -77,6 +79,7 @@ local SUtils = import("/lua/ai/sorianutilities.lua")
 Platoon = Class(moho.platoon_methods) {
     NeedCoolDown = false,
     LastAttackDestination = {},
+    SquadNames = {'Attack', 'Artillery', 'Guard', 'Scout', 'Support','Unassigned'},
 
     ---@param self Platoon
     ---@param plan table
@@ -97,6 +100,14 @@ Platoon = Class(moho.platoon_methods) {
     ---@param dataTable table
     SetPlatoonData = function(self, dataTable)
         self.PlatoonData = tableDeepcopy(dataTable)
+    end,
+
+    --- Tries to get formation saved in `PlatoonData`
+    ---@param self Platoon
+    ---@return UnitFormations #Defaults to `AttackFormation`
+    GetFormationFromPlatoonData = function(self)
+        local data = self.PlatoonData
+        return data and (data.OverrideFormation or data.UseFormation) or 'AttackFormation'
     end,
 
     ---@param self Platoon
@@ -4138,176 +4149,70 @@ Platoon = Class(moho.platoon_methods) {
     ---@param self Platoon
     ---@param path Vector[] path A table of positions, preferably of type Vector. Converted otherwise.
     ---@param formation? UnitFormations self.PlatoonData.UseFormation The formation to apply, such as GrowthFormation, AttackFormation or NoFormation.
-    ---@return PlatoonCommand[]
+    ---@return SimCommand[]
     IssuePatrolAlongRoute = function(self, path, formation)
-
-        -- check for optional / default values
-        local formation = formation or self.PlatoonData.UseFormation or 'NoFormation'
-
-        -- check if the parameters are correct
-        if not path or not (type(path) == 'table') then
-            error("IssuePatrolAlongRoute: The path is not a table. For paths with only one node, use { node } as the path.")
-            return { }
-        end
+        formation = formation or self.PlatoonData.UseFormation or 'NoFormation'
 
         if tableEmpty(path) then
-            error("IssuePatrolAlongRoute: The path is empty.");
-            return { }
+            WARN("Platoon:IssuePatrolAlongRoute: The path is empty.")
+            return {}
         end
 
         -- keep track of all the commands we issued
-        local commands = { }
+        local commands = {}
 
         -- we have no formation, further computations are not required. We use this
         -- shortcut because calling IssueFormPatrol() with no formation causes them
         -- to not move at all.
         if formation == 'NoFormation' then
             local units = self:GetPlatoonUnits()
-            for k, node in path do
-                local command = IssuePatrol(units, node)
+            for _, pos in ipairs(path) do
+                local command = IssuePatrol(units, pos)
                 tableInsert(commands, command)
             end
 
             return commands
         end
 
-        -- check if we have a path of tables, instead to a path of vectors. A lot of the functionality provided by
-        -- this library generates lists of tables instead of lists of vectors. Functionality in this file requires
-        -- a list of vectors. Convert it if neccesary.
-        if not path[1].x then
-            local oldPath = path
-            path = {}
-            for k, node in oldPath do
-                tableInsert(path, Vector(node[1], node[2], node[3]))
-            end
-        end
-
-        -- store locally for better performance
-        local count = tableGetn(path)
-        local GetAngleCCW = Utilities.GetAngleCCW
-        local GetDirectionVector = Utilities.GetDirectionVector
-
-        -- pre-compute the angles
-        local angles = { }
-        for k = 1, count do
-
-            local curr = path[k - 1]
-            local next = path[k]
-
-            -- if we're trying to look before the first node of the path, use the last node instead
-            if k - 1 < 1 then
-                curr = path[count]
-            end
-
-            -- base orientation when the angle is 0 for the function IssueFormMove
-            local base = Vector( 0, 0, 1 )
-            local direction = GetDirectionVector(next, curr)
-            local angle = GetAngleCCW(base, direction)
-            angles[k] = angle
-        end
-
-        -- move over the path in formation
+        local angles = FormationCommands.GetAnglesForRoute(path)
         local units = self:GetPlatoonUnits()
 
-        for k = 1, count do
-            local point = path[k]
-            local angle = angles[k]
-            local command = IssueFormPatrol(units, point, formation, angle)
-            tableInsert(commands, command)
-        end
-
-        return commands
+        return FormationCommands.UnitsFormationOrder(units, IssueFormPatrol, path, angles, formation)
     end,
 
     --- Aggressive-moves the platoon along the path, orientating at each node to match the line from the previous node to the current node.
     ---@param self Platoon
     ---@param path Vector[]
     ---@param formation? UnitFormations
-    ---@return PlatoonCommand[]
+    ---@return SimCommand[]
     IssueAggressiveMoveAlongRoute = function(self, path, formation)
-        -- check for optional / default values
-        local formation = formation or self.PlatoonData.UseFormation or 'NoFormation'
-
-        -- check if the parameters are correct
-        if not path or not (type(path) == 'table') then
-            error("IssueAggressiveMoveAlongRoute: The path is not a table. For paths with only one node, use { node } as the path.")
-            return { }
-        end
+        formation = formation or self.PlatoonData.UseFormation or 'NoFormation'
 
         if tableEmpty(path) then
-            error("IssueAggressiveMoveAlongRoute: The path is empty.");
-            return { }
+            WARN("Platoon:IssueAggressiveMoveAlongRoute: The path is empty.")
+            return {}
         end
 
         -- keep track of all the commands we issued
-        local commands = { }
+        local commands = {}
 
         -- we have no formation, further computations are not required. We use this
-        -- shortcut because calling IssueFormAggressiveMove() with no formation causes
-        -- them to not move at all.
+        -- shortcut because calling IssueFormPatrol() with no formation causes them
+        -- to not move at all.
         if formation == 'NoFormation' then
-            -- store the commands / orders
             local units = self:GetPlatoonUnits()
-
-            for k, node in path do
-                local command = IssueAggressiveMove(units, node)
+            for _, pos in ipairs(path) do
+                local command = IssueAggressiveMove(units, pos)
                 tableInsert(commands, command)
             end
 
             return commands
         end
 
-        -- check if we have a path of tables, instead of a path of vectors. A lot of the functionality provided by
-        -- this library generates lists of tables instead of lists of vectors. Functionality in this file requires
-        -- a list of vectors. Convert it if neccesary.
-        if not path[1].x then
-            local oldPath = path
-            path = {}
-            for k, node in oldPath do
-                tableInsert(path, Vector(node[1], node[2], node[3]))
-            end
-        end
-
-        -- store locally for better performance
-        local count = tableGetn(path)
-        local GetAngleCCW = Utilities.GetAngleCCW
-        local GetDirectionVector = Utilities.GetDirectionVector
-
-        -- pre-compute the angles
-        local angles = { }
-        for k = 1, count do
-
-            local curr = path[k - 1]
-            local next = path[k]
-
-            -- if we're trying to look before the first node of the path, use the platoons current position instead
-            if k - 1 < 1 then
-                local pos = self:GetPlatoonPosition()
-                if not pos then
-                    error("IssueAggressiveMoveAlongRoute: The platoon has no position.")
-                    return { }
-                end
-                curr = Vector(pos[1], pos[2], pos[3])
-            end
-
-            -- base orientation when the angle is 0
-            local base = Vector( 0, 0, 1 )
-            local direction = GetDirectionVector(next, curr)
-            local angle = GetAngleCCW(base, direction)
-            angles[k] = angle
-        end
-
-        -- move over the path, store the commands
+        local angles = FormationCommands.GetAnglesForRoute(path, self:GetPlatoonPosition())
         local units = self:GetPlatoonUnits()
 
-        for k = 1, count do
-            local point = path[k]
-            local angle = angles[k]
-            local command = IssueFormAggressiveMove(units, point, formation, angle)
-            tableInsert(commands, command)
-        end
-
-        return commands
+        FormationCommands.UnitsFormationOrder(units, IssueFormAggressiveMove, path, angles, formation)
     end,
 
     --- Moves the platoon along the path, orientating at each node to match the line from the previous node to the current node.
@@ -4316,89 +4221,44 @@ Platoon = Class(moho.platoon_methods) {
     ---@param formation? UnitFormations self.PlatoonData.UseFormation The formation to apply, such as GrowthFormation, AttackFormation or NoFormation.
     ---@return PlatoonCommand[]
     IssueMoveAlongRoute = function(self, path, formation)
-        -- check for optional / default values
-        local formation = formation or self.PlatoonData.UseFormation or 'NoFormation'
-
-        -- check if the parameters are correct
-        if not path or not (type(path) == 'table') then
-            error("IssueMoveAlongRoute: The path is not a table. For paths with only one node, use { node } as the path.")
-            return { }
-        end
+        formation = formation or self.PlatoonData.UseFormation or 'NoFormation'
 
         if tableEmpty(path) then
-            error("IssueMoveAlongRoute: The path is empty.");
-            return { }
+            WARN("Platoon:IssueMoveAlongRoute: The path is empty.")
+            return {}
         end
 
         -- keep track of all the commands we issued
-        local commands = { }
+        local commands = {}
 
         -- we have no formation, further computations are not required. We use this
-        -- shortcut because calling IssueFormMove() with no formation causes them
+        -- shortcut because calling IssueFormPatrol() with no formation causes them
         -- to not move at all.
         if formation == 'NoFormation' then
-            -- store the commands / orders
             local units = self:GetPlatoonUnits()
-            for k, node in path do
-                local command = IssueMove(units, node)
+            for _, pos in ipairs(path) do
+                local command = IssueMove(units, pos)
                 tableInsert(commands, command)
             end
 
             return commands
         end
 
-        -- check if we have a path of tables, instead of a path of vectors. A lot of the functionality provided by
-        -- this library generates lists of tables instead of lists of vectors. Functionality in this file requires
-        -- a list of vectors. Convert it if neccesary.
-        if not path[1].x then
-            local oldPath = path
-            path = {}
-            for k, node in oldPath do
-                tableInsert(path, Vector(node[1], node[2], node[3]))
-            end
-        end
-
-        -- store locally for better performance
-        local count = tableGetn(path)
-        local GetAngleCCW = Utilities.GetAngleCCW
-        local GetDirectionVector = Utilities.GetDirectionVector
-
-        -- pre-compute the angles
-        local angles = { }
-        for k = 1, count do
-
-            local curr = path[k - 1]
-            local next = path[k]
-
-            -- if we're trying to look before the first node of the path, use the platoons current position instead
-            if k - 1 < 1 then
-                local pos = self:GetPlatoonPosition()
-                if not pos then
-                    error("IssueMoveAlongRoute: The platoon has no position.")
-                    return { }
-                end
-                curr = Vector(pos[1], pos[2], pos[3])
-            end
-
-            -- base orientation when the angle is 0
-            local base = Vector( 0, 0, 1 )
-            local direction = GetDirectionVector(next, curr)
-            local angle = GetAngleCCW(base, direction)
-            angles[k] = angle
-        end
-
-        -- move over the path, store the commands
+        local angles = FormationCommands.GetAnglesForRoute(path, self:GetPlatoonPosition())
         local units = self:GetPlatoonUnits()
 
-        for k = 1, count -1 do
-            local point = path[k]
-            local angle = angles[k]
-            local command = IssueFormMove(units, point, formation, angle)
-            tableInsert(commands, command)
-        end
+        -- Last command should be aggressive move
+        local numPositions = tableGetn(path)
+        ---@type Vector
+        local lastPos = tableRemove(path, numPositions)
 
-        -- aggressive move for the final path node
-        tableInsert(commands, IssueFormAggressiveMove(units, path[count], formation, angles[count]))
+        if numPositions > 1 then
+            local moveCommands = FormationCommands.UnitsFormationOrder(units, IssueFormMove, path, angles, formation)
+            for _, c in moveCommands do
+                tableInsert(commands, c)
+            end
+        end
+        tableInsert(commands, IssueFormAggressiveMove(units, lastPos, formation, angles[numPositions]))
 
         return commands
     end,
