@@ -56,16 +56,19 @@ URL0306 = ClassUnit(CLandUnit) {
     DisablePointer = function(self)
         if not IsDestroyed(self.TargetPointer) then
             self.TargetPointer:SetFireTargetLayerCaps('None') --this disables the stop feature - note that its reset on layer change!
-            local thread = ForkThread(self.PointerRestart,self)
+            local thread = ForkThread(self.PointerRestart, self)
             self.Trash:Add(thread)
             self.PointerRestartThread = thread
         end
     end,
 
     PointerRestart = function(self)
-        --sadly i couldnt find some way of doing this without a thread. dont know where to check if its still assisting other than this.
         while self.PointerEnabled == false do
             WaitTicks(11)
+            if IsDestroyed(self) or IsDestroyed(self.TargetPointer) then
+                break
+            end
+
             if not self:GetGuardedUnit() then
                 self.PointerEnabled = true
                 self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self.Layer]) --this resets the stop feature - note that its reset on layer change!

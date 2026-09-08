@@ -51,12 +51,11 @@ UAL0307 = ClassUnit(AShieldHoverLandUnit, ShieldEffectsComponent) {
     DisablePointer = function(self)
         if not IsDestroyed(self.TargetPointer) then            
             self.TargetPointer:SetFireTargetLayerCaps('None') --this disables the stop feature - note that its reset on layer change!
-            self.PointerRestartThread = self.Trash:Add(ForkThread(self.PointerRestart,self))
+            self.PointerRestartThread = self.Trash:Add(ForkThread(self.PointerRestart, self))
         end
     end,
 
     PointerRestart = function(self)
-        --sadly i couldnt find some way of doing this without a thread. dont know where to check if its still assisting other than this.
         while self.PointerEnabled == false do
             WaitTicks(11)
             if IsDestroyed(self) or IsDestroyed(self.TargetPointer) then
