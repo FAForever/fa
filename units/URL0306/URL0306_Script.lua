@@ -79,8 +79,10 @@ URL0306 = ClassUnit(CLandUnit) {
     OnLayerChange = function(self, new, old)
         CLandUnit.OnLayerChange(self, new, old)
 
-        if self.PointerEnabled == false then
-            self.TargetPointer:SetFireTargetLayerCaps('None') --since its reset on layer change we need to do this. unfortunate.
+        if not IsDestroyed(self.TargetPointer) then
+            if self.PointerEnabled == false then
+                self.TargetPointer:SetFireTargetLayerCaps('None') --since its reset on layer change we need to do this. unfortunate.
+            end
         end
     end,
 }

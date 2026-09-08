@@ -79,6 +79,7 @@ XSL0307 = ClassUnit(SShieldHoverLandUnit, ShieldEffectsComponent) {
         else
             SShieldHoverLandUnit.OnLayerChange(self, new, old)
         end
+
         if not IsDestroyed(self.TargetPointer) then
             if self.PointerEnabled == false then
                 self.TargetPointer:SetFireTargetLayerCaps('None')
