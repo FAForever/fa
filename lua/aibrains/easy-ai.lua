@@ -74,15 +74,6 @@ local StandardBrainOnUnitStopBeingBuilt = StandardBrain.OnUnitStopBeingBuilt
 ---@field EngineerManager AIEngineerManager
 ---@field StructureManager AIStructureManager
 
----@class TriggerSpec
----@field Callback function
----@field ReconTypes ReconTypes
----@field Blip boolean
----@field Value boolean
----@field Category EntityCategory
----@field OnceOnly boolean
----@field TargetAIBrain AIBrain
-
 ---@class EasyAIBrain: AIBrain, AIBrainEconomyComponent
 ---@field AIBaseTemplates EasyAIBrainBaseTemplates
 ---@field GridReclaim AIGridReclaim

@@ -31,6 +31,7 @@ function DockDamaged(ratio, clear)
     local commandMode = import("/lua/ui/game/commandmode.lua")
 
     local selection = GetSelectedUnits()
+    ---@type UserUnit[]
     local dockableUnits = EntityCategoryFilterDown(categories.AIR - categories.CANNOTUSEAIRSTAGING, selection)
     local damaged = {}
     local damagedCount = 0

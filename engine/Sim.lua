@@ -7,7 +7,6 @@
 ---@alias Task table
 ---@alias CSimSoundManager any
 ---@alias EconomyEvent moho.EconomyEvent
----@alias ArmyPlans any
 
 ---@alias Faction
 ---| 0 # UEF
@@ -31,7 +30,7 @@
 
 ---@alias Object Blip | CollisionBeam | moho.entity_methods | moho.prop_methods | moho.projectile_methods | moho.unit_methods
 ---@alias BoneObject moho.entity_methods | moho.prop_methods | moho.projectile_methods | moho.unit_methods
----@alias ReclaimObject moho.prop_methods | moho.unit_methods
+---@alias ReclaimObject Prop | Unit
 ---@alias TargetObject moho.prop_methods | moho.unit_methods | moho.projectile_methods
 
 ---@type AIBrain[]
@@ -1146,10 +1145,9 @@ end
 function SetArmyOutOfGame(army)
 end
 
---- Unfinished function related to AI, is not used
----@deprecated
+---Sets a file with army plans the AI will use to run.
 ---@param army Army
----@param plans ArmyPlans
+---@param plans FileName Path to the file with army plans.
 function SetArmyPlans(army, plans)
 end
 
@@ -1160,6 +1158,8 @@ function SetArmyShowScore(army, show)
 end
 
 --- Sets the army starting position for the initial unit.
+--- 
+---@see AIBrain.GetArmyStartPos
 ---@param army Army
 ---@param x number
 ---@param z number

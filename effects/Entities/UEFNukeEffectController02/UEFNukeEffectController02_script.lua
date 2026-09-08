@@ -146,7 +146,7 @@ UEFNukeEffectController01 = Class(NullShell) {
     end,
 
     ---@param self UEFNukeEffectController01
-    ---@param army number
+    ---@param army Army
     CreateGroundPlumeConvectionEffects = function(self, army)
         for k, v in EffectTemplate.TNukeGroundConvectionEffects01 do
             CreateEmitterAtEntity(self, army, v)

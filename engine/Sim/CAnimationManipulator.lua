@@ -8,60 +8,54 @@ local CAnimationManipulator = {}
 function CAnimationManipulator:GetAnimationDuration()
 end
 
----
---  fraction = AnimationManipulator:GetAnimationFraction()
+---@return number fraction 0-1
 function CAnimationManipulator:GetAnimationFraction()
 end
 
----
---  time = AnimationManipulator:GetAnimationTime()
+---@return number time
 function CAnimationManipulator:GetAnimationTime()
 end
 
----
---  rate = AnimationManipulator:GetRate()
+---@return number rate
 function CAnimationManipulator:GetRate()
 end
 
---  AnimManipulator:PlayAnim(entity, animName, looping=false)
-
 ---@param animName FileName Must be a full file path.
----@param looping boolean? Defaults to false
-function CAnimationManipulator:PlayAnim(animName,  looping)
+---@param looping boolean? Defaults to `false`
+---@return self
+function CAnimationManipulator:PlayAnim(animName, looping)
 end
 
----
---  AnimationManipulator:SetAnimationFraction(fraction)
+---@param fraction number 0-1
 function CAnimationManipulator:SetAnimationFraction(fraction)
 end
 
----
---  AnimationManipulator:SetAnimationTime(fraction)
+---@param fraction number
 function CAnimationManipulator:SetAnimationTime(fraction)
 end
 
----
---  AnimationManipulator:SetBoneEnabled(bone, value, include_decscendants=true)
-function CAnimationManipulator:SetBoneEnabled(bone,  value,  include_decscendants)
+---@param bone Bone
+---@param value boolean
+---@param include_decscendants? boolean Defaults to `true`
+function CAnimationManipulator:SetBoneEnabled(bone, value, include_decscendants)
 end
 
----
---  AnimationManipulator:SetDirectionalAnim(bool)
+---@param bool boolean
 function CAnimationManipulator:SetDirectionalAnim(bool)
 end
 
----
---  AnimationManipulator:SetDisableOnSignal(bool)
+---@param bool boolean
 function CAnimationManipulator:SetDisableOnSignal(bool)
 end
 
----
---  AnimationManipulator:SetOverwriteMode(bool)
+---@param bool boolean
 function CAnimationManipulator:SetOverwriteMode(bool)
 end
 
----
---  AnimationManipulator:SetRate(rate)Set the relative rate at which this anim plays; 1.0 is normal speed.Rate can be negative to play backwards or 0 to pause.
+---Set the relative rate at which this anim plays
+---1.0 is normal speed. Rate can be negative to play backwards or 0 to pause.
+---@param rate number
+---@return self
 function CAnimationManipulator:SetRate(rate)
 end
 

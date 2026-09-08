@@ -13,6 +13,10 @@ local CANNaniteTorpedoWeapon = import("/lua/cybranweapons.lua").CANNaniteTorpedo
 local CIFSmartCharge = import("/lua/cybranweapons.lua").CIFSmartCharge
 
 ---@class URS0201 : CSeaUnit
+---@field SwitchAnims boolean
+---@field Walking boolean
+---@field IsWaiting boolean
+---@field AnimManip? moho.AnimationManipulator
 URS0201 = ClassUnit(CSeaUnit) {
     SwitchAnims = true,
     Walking = false,
@@ -51,10 +55,15 @@ URS0201 = ClassUnit(CSeaUnit) {
         end
     end,
 
+    ---@param self URS0201
+    ---@return boolean
     ShallSink = function(self)
         return true
     end,
 
+    ---@param self URS0201
+    ---@param new Layer
+    ---@param old Layer
     LayerChangeTrigger = function(self, new, old)
         local bp = self.Blueprint or self:GetBlueprint()
         if new == 'Land' then
@@ -73,6 +82,8 @@ URS0201 = ClassUnit(CSeaUnit) {
         end
     end,
 
+    ---@param self URS0201
+    ---@param land boolean
     TransformThread = function(self, land)
         local bp = self.Blueprint
         local scale = bp.Display.UniformScale or 1
@@ -114,6 +125,10 @@ URS0201 = ClassUnit(CSeaUnit) {
         end
     end,
 
+    ---@param self URS0201
+    ---@param instigator Unit
+    ---@param type string
+    ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
         self.Trash:Destroy()
         self.Trash = TrashBag()
@@ -126,11 +141,13 @@ URS0201 = ClassUnit(CSeaUnit) {
         CSeaUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
 
+    ---@param self URS0201
+    ---@param overkillRatio number
     DeathThread = function(self, overkillRatio)
         if self.Layer ~= 'Water' and not self.IsWaiting then
             self:PlayUnitSound('Destroyed')
             if self.PlayDestructionEffects then
-                self:CreateDestructionEffects(self, overkillRatio)
+                self:CreateDestructionEffects(overkillRatio)
             end
 
             if self.ShowUnitDestructionDebris and overkillRatio then
@@ -147,12 +164,12 @@ URS0201 = ClassUnit(CSeaUnit) {
             WaitTicks(21)
 
             if self.PlayDestructionEffects then
-                self:CreateDestructionEffects(self, overkillRatio)
+                self:CreateDestructionEffects(overkillRatio)
             end
             WaitTicks(11)
 
             if self.PlayDestructionEffects then
-                self:CreateDestructionEffects(self, overkillRatio)
+                self:CreateDestructionEffects(overkillRatio)
             end
             self:CreateWreckage(0)
             self:Destroy()

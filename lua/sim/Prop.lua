@@ -13,8 +13,9 @@ local TableInsert = table.insert
 
 ---@class Prop : moho.prop_methods
 ---@field Trash TrashBag
----@field EntityId number
+---@field EntityId string
 ---@field Blueprint PropBlueprint
+---@field IsProp true
 ---@field CachePosition Vector
 ---@field MaxMassReclaim number
 ---@field MaxEnergyReclaim number
@@ -22,6 +23,8 @@ local TableInsert = table.insert
 ---@field ReclaimLeft number
 ---@field SyncData? table
 ---@field Extents? table
+---@field EventCallbacks? table<PropCallbackTypes, fun(prop: Prop, params: any)[]>
+---@field CanBeKilled boolean
 Prop = Class(moho.prop_methods) {
 
     IsProp = true,
@@ -230,7 +233,7 @@ Prop = Class(moho.prop_methods) {
     ---@param sizex number The width of the box.
     ---@param sizey number The height of the box.
     ---@param sizez number The length of the box.
-    ---@param radius number The radius of the sphere.
+    ---@param radius? number The radius of the sphere.
     SetPropCollision = function(self, shape, centerx, centery, centerz, sizex, sizey, sizez, radius)
         if radius and shape == 'Sphere' then
             self:SetCollisionShape(shape, centerx, centery, centerz, radius)
@@ -434,7 +437,7 @@ Prop = Class(moho.prop_methods) {
         self.CanTakeDamage = val
     end,
 
-    ---@see use `prop.CanBeKilled` directly instead
+    ---@see Prop.CanBeKilled field to read directly instead
     ---@deprecated
     ---@param self Prop
     ---@param val any
@@ -442,7 +445,7 @@ Prop = Class(moho.prop_methods) {
         self.CanBeKilled = val
     end,
 
-    ---@see compare with `prop.CanBeKilled` directly instead
+    ---@see Prop.CanBeKilled to compare with directly
     ---@deprecated
     ---@param self Prop
     ---@return boolean

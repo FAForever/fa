@@ -1259,7 +1259,7 @@ end
 -- Good for AoE type attacks
 ---@param aiBrain AIBrain           # aiBrain for experimental
 ---@param experimental Unit         # the unit itself
----@return nil                      # position of best place to attack, nil if nothing found
+---@return Vector?                  # position of best place to attack, nil if nothing found
 GetHighestThreatClusterLocation = function(aiBrain, experimental)
     if not aiBrain or not experimental then
         return nil
@@ -1271,7 +1271,7 @@ GetHighestThreatClusterLocation = function(aiBrain, experimental)
     for _, threat in threatTable do
         if threat[3] > 0 then
             local unitsAtLocation = aiBrain:GetUnitsAroundPoint(ParseEntityCategory('COMMAND'), {threat[1], 0, threat[2]}, ScenarioInfo.size[1] / 16, 'Enemy')
-            local validUnit = false
+            local validUnit
             for _, unit in unitsAtLocation do
                 if not unit.Dead then
                     validUnit = unit
@@ -1377,10 +1377,11 @@ function CDRHideBehavior(aiBrain, cdr)
         cdr.GoingHome = false
         cdr.Fighting = false
         cdr.Upgrading = false
-        
-        local category = false
+
+        ---@type EntityCategory
+        local category
         local runShield = false
-        local runPos = false
+        local runPos
         local nmaShield = aiBrain:GetNumUnitsAroundPoint(categories.SHIELD * categories.STRUCTURE, cdr:GetPosition(), 100, 'Ally')
         local nmaPD = aiBrain:GetNumUnitsAroundPoint(categories.DIRECTFIRE * categories.DEFENSE, cdr:GetPosition(), 100, 'Ally')
         local nmaAA = aiBrain:GetNumUnitsAroundPoint(categories.ANTIAIR * categories.DEFENSE, cdr:GetPosition(), 100, 'Ally')
@@ -1415,10 +1416,10 @@ end
 ---@param dest Vector
 ---@param aggro any
 ---@param pathDist any
----@return boolean
+---@return PlatoonCommand?
 ExpPathToLocation = function(aiBrain, platoon, layer, dest, aggro, pathDist)
     local NavUtils = import("/lua/sim/navutils.lua")
-    local cmd = false
+    local cmd
     local platoonUnits = platoon:GetPlatoonUnits()
     platoon.PlatoonSurfaceThreat = platoon:GetPlatoonThreat('Surface', categories.ALLUNITS)
     local path, reason = NavUtils.PathToWithThreatThreshold(layer, platoon:GetPlatoonPosition(), dest, aiBrain, NavUtils.ThreatFunctions.AntiSurface, platoon.PlatoonSurfaceThreat * 10, aiBrain.IMAPConfig.Rings)
@@ -1447,7 +1448,7 @@ end
 ---@param platoon Platoon
 ---@return boolean
 function InWaterCheck(platoon)
-    local t4Pos = platoon:GetPlatoonPosition()
+    local t4Pos = platoon:GetPlatoonPosition()--[[@as Vector]]
     local inWater = GetTerrainHeight(t4Pos[1], t4Pos[3]) < GetSurfaceHeight(t4Pos[1], t4Pos[3])
 
     return inWater

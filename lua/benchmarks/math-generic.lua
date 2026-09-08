@@ -11,6 +11,7 @@
 
 -- Conclusion: we should uplift these functions whenever possible.
 
+---@diagnostic disable: discard-returns
 
 ModuleName = "Generic math"
 BenchmarkData = {

@@ -10,16 +10,14 @@ do
     local EntityCategoryFilterDown = EntityCategoryFilterDown
     local CategoriesNoDummyUnits = categories.ALLUNITS - categories.DUMMYUNIT
 
-    --- Retrieves all units in a rectangle, Excludes dummy units, such as the Cybran Build Drone, by default.
-    -- @param rectangle The rectangle to look for units in {x0, z0, x1, z1}.
-    -- @return nil if none found or a table.
-    -- OR
-    -- @param tlx Top left x coordinate.
-    -- @param tlz Top left z coordinate.
-    -- @param brx Bottom right x coordinate.
-    -- @param brz Bottom right z coordinate.
-    -- @return nil if none found or a table.
     local oldGetUnitsInRect = _G.GetUnitsInRect
+    ---Retrieves all units in a rectangle, Excludes dummy units, such as the Cybran Build Drone, by default.
+    ---@param rtlx number Top left x coordinate.
+    ---@param tlz number Top left z coordinate.
+    ---@param brx number Bottom right x coordinate.
+    ---@param brz number Bottom right z coordinate.
+    ---@return Unit[]|nil
+    ---@overload fun(rectangle: Rectangle): Unit[]|nil
     _G.GetUnitsInRect = function(rtlx, tlz, brx, brz)
 
         -- try and retrieve units
@@ -60,10 +58,12 @@ do
     -- implementation of https://github.com/FAForever/FA-Binary-Patches/pull/29
     local oldIssueBuildMobile = _G.IssueBuildMobile
     _G.IssueBuildMobile = function(units, position, blueprintID, table)
+        ---@diagnostic disable-next-line: redundant-parameter
         oldIssueBuildMobile(units, position, blueprintID, table, false)
     end
 
     _G.IssueBuildAllMobile = function(units, position, blueprintID, table)
+        ---@diagnostic disable-next-line: redundant-parameter
         oldIssueBuildMobile(units, position, blueprintID, table, true)
     end
 end

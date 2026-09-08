@@ -296,12 +296,13 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     ---@param self Projectile
     ---@param instigator Unit
     ---@param type string
-    ---@param overkillRatio number
+    ---@param overkillRatio? number
     OnKilled = function(self, instigator, type, overkillRatio)
 
         -- callbacks for launcher to have an idea what is going on for AIs
         local launcher = self.Launcher
         if not IsDestroyed(launcher) then
+            ---@cast launcher -nil
             launcher:OnMissileIntercepted(self:GetCurrentTargetPosition(), instigator, self:GetPosition(), self)
 
             -- keep track of the number of intercepted missiles
@@ -623,7 +624,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     ---@param instigator Unit | Projectile # The launcher, and if it doesn't exist, the projectile itself
     ---@param DamageData WeaponDamageTable # passed by the weapon
     ---@param targetEntity Unit | Prop | nil # nil if hitting terrain
-    ---@param cachedPosition Vector # A cached position that is passed to prevent table allocations, can not be used in fork threads and / or after a yield statement
+    ---@param cachedPosition? Vector # A cached position that is passed to prevent table allocations, can not be used in fork threads and / or after a yield statement
     DoDamage = function(self, instigator, DamageData, targetEntity, cachedPosition)
 
         -- this may be a cached vector, we can not send this to threads or use after waiting statements!
@@ -838,7 +839,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
 
     --- Called by Lua to create the impact effects
     ---@param self Projectile
-    ---@param army number
+    ---@param army Army
     ---@param effectTable string[]
     ---@param effectScale? number
     CreateImpactEffects = function(self, army, effectTable, effectScale)
@@ -860,7 +861,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
 
     --- Called by Lua to create the terrain effects
     ---@param self  Projectile
-    ---@param army number
+    ---@param army Army
     ---@param effectTable string[]
     ---@param effectScale? number
     CreateTerrainEffects = function(self, army, effectTable, effectScale)

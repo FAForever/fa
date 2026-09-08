@@ -985,7 +985,7 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
         end
 
         -- presumably, if we're here, we've gotten transports
-        local transportLocation = false
+        local transportLocation
 
         --DUNCAN - try the destination directly? Only do for engineers (eg skip last move is true)
         if bSkipLastMove then
@@ -1079,13 +1079,12 @@ end
 --- set platoon.MovementLayer to the most restrictive movement layer
 --- of a given platoon, and return a representative unit
 ---@param platoon Platoon       # platoon to find best target for
----@return boolean              # The most restrictive layer of movement for a given platoon (string)
+---@return Unit?                # The most restrictive layer of movement for a given platoon
 function GetMostRestrictiveLayer(platoon)
-    -- in case the platoon is already destroyed return false.
     if not platoon then
-        return false
+        return
     end
-    local unit = false
+    local unit
     platoon.MovementLayer = 'Air'
     for k,v in platoon:GetPlatoonUnits() do
         if not v.Dead then
@@ -1120,13 +1119,12 @@ end
 ---@param optThreatWeight any           # the importance of threat when choosing a path. High weight generates longer, safer paths.
 ---@param optMaxMarkerDist any          # the maximum distance away a platoon should look for a pathing marker
 ---@param testPathDist any              # Descriptor needed
----@return boolean
----@return string
----@return table                        # a table of locations representing the safest path to get to the specified destination
+---@return Vector[]?                    # a table of locations representing the safest path to get to the specified destination
+---@return string? reason               # Reason if the path was not found.
 function PlatoonGenerateSafePathTo(aiBrain, platoonLayer, start, destination, optThreatWeight, optMaxMarkerDist, testPathDist)
     -- if we don't have markers for the platoonLayer, then we can't build a path.
     if not GetPathGraphs()[platoonLayer] then
-        return false, 'NoGraph'
+        return nil, 'NoGraph'
     end
     local location = start
     optMaxMarkerDist = optMaxMarkerDist or 250
@@ -1140,16 +1138,16 @@ function PlatoonGenerateSafePathTo(aiBrain, platoonLayer, start, destination, op
 
     --Get the closest path node at the platoon's position
     local startNode = GetClosestPathNodeInRadiusByLayer(location, optMaxMarkerDist, platoonLayer)
-    if not startNode then return false, 'NoStartNode' end
+    if not startNode then return nil, 'NoStartNode' end
 
     --Get the matching path node at the destiantion
     local endNode = GetClosestPathNodeInRadiusByGraph(destination, optMaxMarkerDist, startNode.graphName)
-    if not endNode then return false, 'NoEndNode' end
+    if not endNode then return nil, 'NoEndNode' end
 
     --Generate the safest path between the start and destination
     -- The original AI is using the vanilla version of GeneratePath. No cache, ugly (AStarLoopBody) code, but reacts faster on new situations.
     local path = GeneratePath(aiBrain, startNode, endNode, ThreatTable[platoonLayer], optThreatWeight, destination, location)
-    if not path then return false, 'NoPath' end
+    if not path then return nil, 'NoPath' end
 
     -- Insert the path nodes (minus the start node and end nodes, which are close enough to our start and destination) into our command queue.
     for i,node in path.path do
@@ -1201,11 +1199,11 @@ end
 ---@param location Vector           # location to search around
 ---@param radius number             # radius around location to search in
 ---@param layer string              # layer to use to generate safe path... e.g. 'Air', 'Land', etc.
----@return boolean                  # Closest pathing node's name else false
+---@return table                    # Closest pathing node's name else false
 function GetClosestPathNodeInRadiusByLayer(location, radius, layer)
 
     local bestDist = radius*radius
-    local bestMarker = false
+    local bestMarker
 
     local graphTable =  GetPathGraphs()[layer]
 
@@ -1423,14 +1421,14 @@ end
 
 --- Checks to see if platoon can path to destination using path graphs. Used to save precious precious CPU cycles compared to CanPathTo
 ---@param unit Unit             # platoon to check pathing for
----@param destPos number        # destination of platoon
+---@param destPos Vector        # destination of platoon
 ---@param layer Layer           # layer name to check for pathing on.
 ---@return boolean              # true, end node position if successful. nil otherwise
 ---@return unknown
 function CanGraphTo(unit, destPos, layer)
     local position = unit:GetPosition()
     local startNode = GetClosestPathNodeInRadiusByLayer(position, 100, layer)
-    local endNode = false
+    local endNode
 
     if startNode then
         endNode = GetClosestPathNodeInRadiusByGraph(destPos, 100, startNode.graphName)
@@ -1478,7 +1476,7 @@ end
 ---@param tMin number
 ---@param tMax number
 ---@param tRing number
----@return unknown
+---@return Unit?
 function AIFindUnitRadiusThreat(aiBrain, alliance, priTable, position, radius, tMin, tMax, tRing)
     local catTable = {}
     local unitTable = {}
@@ -1502,8 +1500,8 @@ function AIFindUnitRadiusThreat(aiBrain, alliance, priTable, position, radius, t
         checkThreat = true
     end
 
-    local distance = false
-    local retUnit = false
+    local distance
+    local retUnit
     for tNum, catList in unitTable do
         for num, unit in catList do
             if not unit.Dead then
@@ -1525,10 +1523,8 @@ function AIFindUnitRadiusThreat(aiBrain, alliance, priTable, position, radius, t
                 end
             end
         end
-        if retUnit then
-            return retUnit
-        end
     end
+    return retUnit
 end
 
 GetSurfaceThreatAtPosition = function(aiBrain, position, range )
@@ -1566,6 +1562,7 @@ function InWaterCheck(platoon)
     GetMostRestrictiveLayer(platoon)
     if platoon.MovementLayer == 'Air' then return false end
     local platPos = platoon:GetPlatoonPosition()
+    if not platPos then return false end
     local inWater = GetTerrainHeight(platPos[1], platPos[3]) < GetSurfaceHeight(platPos[1], platPos[3])
     return inWater
 end

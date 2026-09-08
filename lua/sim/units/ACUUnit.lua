@@ -189,16 +189,17 @@ ACUUnit = ClassUnit(CommandUnit) {
         end
     end,
 
-    -- Store weapon status on upgrade. Ignore default and OC, which are dealt with elsewhere
+    ---Store weapon status on upgrade. Ignore default and OC, which are dealt with elsewhere
+    ---
+    ---Unless lockOut specified, updates the 'Permanent record' of whether a weapon is enabled. With it specified,
+    ---the changing of the weapon on/off state is more... temporary. For example, when building something.
     ---@param self ACUUnit
     ---@param label string
     ---@param enable boolean
-    ---@param lockOut boolean? # If enabled, weapon's state won't be remembered for later restoration in `self.WeaponEnabled`
+    ---@param lockOut? boolean # If enabled, weapon's state won't be remembered for later restoration in `self.WeaponEnabled`
     SetWeaponEnabledByLabel = function(self, label, enable, lockOut)
         CommandUnit.SetWeaponEnabledByLabel(self, label, enable)
 
-        -- Unless lockOut specified, updates the 'Permanent record' of whether a weapon is enabled. With it specified,
-        -- the changing of the weapon on/off state is more... temporary. For example, when building something.
         if label ~= self.rightGunLabel and label ~= 'OverCharge' and label ~= 'AutoOverCharge' and not lockOut then
             self.WeaponEnabled[label] = enable
         end

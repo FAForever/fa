@@ -11,6 +11,7 @@ local Prop = import("/lua/sim/prop.lua").Prop
 local CreateProp = CreateProp
 
 ---@class Wreckage : Prop
+---@field AssociatedBP BlueprintId BlueprintID of the unit
 Wreckage = Class(Prop) {
 
     IsWreckage = true,
@@ -62,7 +63,7 @@ Wreckage = Class(Prop) {
     ---@return Wreckage
     Clone = function(self)
         local clone = CreateWreckage(
-            __blueprints[self.AssociatedBP],
+            __blueprints[self.AssociatedBP]--[[@as UnitBlueprint]],
             self.CachePosition,
             self:GetOrientation(),
             self.MaxMassReclaim,
@@ -116,7 +117,7 @@ Wreckage = Class(Prop) {
 ---@param deathHitBox? table
 ---@return Wreckage
 function CreateWreckage(bp, position, orientation, mass, energy, timeMult, deathHitBox)
-    local prop = CreateProp(position, bp.Wreckage.Blueprint)
+    local prop = CreateProp(position, bp.Wreckage.Blueprint)--[[@as Wreckage]]
     prop:SetOrientation(orientation, true)
     prop:SetScale(bp.Display.UniformScale)
 

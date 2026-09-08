@@ -165,6 +165,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field WeaponInstances table<integer|string, Weapon> # string matches weapon label
 ---@field WeaponCount number
 ---@field CaptureProgress? number # Keeps track of capture progress to prevent sharing units being captured and to sync capture work progress bars
+---@field originalBuilder? Unit
 ---@field oldowner? Army # After a unit is transferred, keeps track of the original Army to kill shared units when needed.
 ---@field TransferUpgradeProgress? boolean # Keeps track of upgrades for unit transfer
 ---@field UpgradeBuildTime? number # Keeps track of upgrades for unit transfer
@@ -176,6 +177,27 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field Anims? Animator[] # Animators that get stopped when a unit is stunned. Not used in FAF.
 ---@field IsBeingTransferred? boolean
 ---@field OnStopBeingBuiltEnhancementsThread thread?
+---@field ActiveConsumption boolean
+---@field MaintenanceConsumption? boolean
+---@field EnergyMaintenanceConsumptionOverride? number
+---@field BuildRateOverride? number
+---@field Captors? table<string, Unit>
+---@field CaptureEffectsBag? TrashBag
+---@field DamageEffectsBag? {[1]: TrashBag, [2]: TrashBag, [3]: TrashBag}
+---@field ReclaimEffectsBag? TrashBag
+---@field MovementEffectsBag? TrashBag
+---@field UpgradeEffectsBag? TrashBag
+---@field TeleportFxBag? TrashBag
+---@field MovementEffectsExist? boolean
+---@field WorkItem? UnitBlueprintEnhancement
+---@field WorkItemBuildCostEnergy? number
+---@field WorkItemBuildCostMass? number
+---@field WorkItemBuildTime? number
+---@field TeleportDrain? moho.EconomyEvent
+---@field ToggleCaps? ToggleCap[]
+---@field DeathWeaponEnabled? boolean If not set, it is treated as enabled
+---@field Sinking? boolean
+---@field Detector? moho.CollisionManipulator
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent, FastDecayComponent) {
 
     IsUnit = true,
@@ -476,8 +498,21 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     -------------------------------------------------------------------------------------------
     ---- TOGGLES
     -------------------------------------------------------------------------------------------
+
+    ---@alias UnitScriptBit
+    ---| 0 # Shield toggle
+    ---| 1 # Weapon toggle
+    ---| 2 # Jamming toggle
+    ---| 3 # Intel toggle
+    ---| 4 # Production toggle
+    ---| 5 # Stealth toggle
+    ---| 6 # Generic pause
+    ---| 7 # Special toggle
+    ---| 8 # Cloak toggle
+
+    ---Toggle on
     ---@param self Unit
-    ---@param bit number
+    ---@param bit UnitScriptBit
     OnScriptBitSet = function(self, bit)
         if bit == 0 then -- Shield toggle
             self:PlayUnitAmbientSound('ActiveLoop')
@@ -522,8 +557,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
     end,
 
+    ---Toggle off
     ---@param self Unit
-    ---@param bit number
+    ---@param bit UnitScriptBit
     OnScriptBitClear = function(self, bit)
         if bit == 0 then -- Shield toggle
             self:StopUnitAmbientSound('ActiveLoop')
@@ -898,7 +934,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self:SetUnitState('Reclaiming', false)
         self.EntityBeingReclaimed = nil
 
-        if target.IsProp then
+        if target and target.IsProp then
+            ---@cast target -Unit
             target:UpdateReclaimLeft()
         end
 
@@ -956,7 +993,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end,
 
     ---@param self Unit
-    ---@param target Unit | Prop
+    ---@param target Unit | Prop | nil
     StopReclaimEffects = function(self, target)
         if self.ReclaimEffectsBag then
             self.ReclaimEffectsBag:Destroy()
@@ -994,7 +1031,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                 newUnitCallbacks = self.EventCallbacks.OnCapturedNewUnit
             end
 
-            local captorBrain = false
+            local captorBrain
 
             -- Ignore army cap during unit transfer in Campaign
             if ScenarioInfo.CampaignMode then
@@ -1396,7 +1433,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param self Unit
     ---@param instigator Unit
     ---@param amount number
-    ---@param vector Vector
+    ---@param vector? Vector
     ---@param damageType DamageType
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         VeterancyComponent.DoTakeDamage(self, instigator, amount, vector, damageType)
@@ -1456,6 +1493,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
 
         local damageEffectsBags = self.DamageEffectsBag
+        ---@cast damageEffectsBags -nil
         if newHealth < oldHealth then
             local amount = self.Blueprint.SizeDamageEffects
             if oldHealth == 0.75 then
@@ -1833,9 +1871,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end,
 
     ---@param self Unit
-    ---@param high number
-    ---@param low number
-    ---@param chassis any
+    ---@param high boolean
+    ---@param low boolean
+    ---@param chassis boolean
     CreateUnitDestructionDebris = function(self, high, low, chassis)
         local HighDestructionParts = table.getn(self.DestructionPartsHighToss)
         local LowDestructionParts = table.getn(self.DestructionPartsLowToss)
@@ -1988,7 +2026,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     ---@param self Unit
     ---@param overkillRatio number
-    ---@param instigator Unit
+    ---@param instigator? Unit
     DeathThread = function(self, overkillRatio, instigator)
         local isNaval = EntityCategoryContains(categories.NAVAL, self)
         local shallSink = self:ShallSink()
@@ -2205,7 +2243,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     -- Generic function for showing a table of bones
     ---@param self Unit
-    ---@param bones Bone List of bones
+    ---@param bones Bone[] List of bones
     ---@param children boolean True/False to show child bones
     ShowBones = function(self, bones, children)
         for _, v in bones do
@@ -2483,6 +2521,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         -- Prevent UI mods from violating game/scenario restrictions
         local id = self.UnitId
         local index = self.Army
+        ---@cast index -string
         if not ScenarioInfo.CampaignMode and Game.IsRestricted(id, index) then
             WARN('Unit.OnStopBeingBuilt() Army ' ..index.. ' cannot create restricted unit: ' .. (bp.Description or id))
             if self ~= nil then self:Destroy() end
@@ -3110,7 +3149,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end,
 
     ---@param self Unit
-    ---@param built Unit
+    ---@param built? Unit
     StopBuildingEffects = function(self, built)
         local buildEffectsBag = self.BuildEffectsBag
         if buildEffectsBag then
@@ -4039,7 +4078,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                 costs = buildMassCosts
             end
 
-            duration = (0.1 * costs * reclaimTimeMultiplier) / buildrate
+            local duration = (0.1 * costs * reclaimTimeMultiplier) / buildrate
             if duration < 0 then
                 duration = 1
             end
@@ -4401,6 +4440,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         Main = function(self)
         end,
 
+        ---@param self Unit
+        ---@param work any
         OnWorkEnd = function(self, work)
             self:ClearWork()
             self:SetActiveConsumptionInactive()
@@ -4418,7 +4459,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     -- BUFFS
     -------------------------------------------------------------------------------------------
     ---@param self Unit
-    ---@param buffTable BlueprintBuff[]
+    ---@param buffTable BlueprintBuff
     ---@param stunOrigin? Vector # Defaults to position of `self`
     AddBuff = function(self, buffTable, stunOrigin)
         local bt = buffTable.BuffType
@@ -4467,7 +4508,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end,
 
     ---@param self Unit
-    ---@param buffTable BlueprintBuff[]
+    ---@param buffTable BlueprintBuff
     ---@param weapon Weapon
     AddWeaponBuff = function(self, buffTable, weapon)
         local bt = buffTable.BuffType
@@ -4557,10 +4598,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         if self.MyShield then
             return self.MyShield:IsOn()
         end
+        return false
     end,
 
     ---@param self Unit
-    ---@return string
+    ---@return ShieldType
     GetShieldType = function(self)
         if self.MyShield then
             return self.MyShield.ShieldType or 'Unknown'
@@ -4715,13 +4757,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     -- Animation when being dropped from a transport.
     ---@param self Unit
-    ---@param rate number
+    ---@param rate? number
     TransportAnimation = function(self, rate)
         self:ForkThread(self.TransportAnimationThread, rate)
     end,
 
     ---@param self Unit
-    ---@param rate number
+    ---@param rate? number
     TransportAnimationThread = function(self, rate)
         local bp = self.Blueprint.Display
         local animbp
@@ -5066,11 +5108,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self:UpdateStat(key, value)
     end,
 
-    --- Updates a statistic that you can retrieve on the UI side using `userunit:GetStat`.
+    --- Updates a statistic for the UI.
     --- Relies on an assembly patch to be functional, without it this setup causes the game to crash.
     ---@param self Unit
     ---@param key string
     ---@param value number
+    ---@see UserUnit.GetStat to get the stats in on the UI side
     UpdateStat = function(self, key, value)
         -- With thanks to 4z0t the `SetStat` function no longer hard-crashes when the value doesn't exist. Instead, it returns 'true' 
         -- when the stat doesn't exist. If it doesn't exist then we can use `GetStat` to initialize it. This makes no sense, therefore
