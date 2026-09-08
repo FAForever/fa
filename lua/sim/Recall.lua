@@ -25,20 +25,16 @@ local SyncAnnouncement = import("/lua/simdiplomacy.lua").SyncAnnouncement
 ---@field package RecallVote boolean
 
 function init()
-    if not ScenarioInfo.TeamGame then
-        SyncCannotRequestRecall("scenario")
-    else
-        -- setup sim recall state in the brains
-        local playerCooldown = PlayerGateCooldown - PlayerRequestCooldown
-        local teamCooldown = PlayerGateCooldown - TeamVoteCooldown
-        for _, brain in ArmyBrains do
-            brain.LastRecallRequestTime = playerCooldown
-            brain.LastRecallVoteTime = teamCooldown
-        end
-
-        -- setup user recall state notifier in this thread
-        SyncRecallStatus()
+    -- setup sim recall state in the brains
+    local playerCooldown = PlayerGateCooldown - PlayerRequestCooldown
+    local teamCooldown = PlayerGateCooldown - TeamVoteCooldown
+    for _, brain in ArmyBrains do
+        brain.LastRecallRequestTime = playerCooldown
+        brain.LastRecallVoteTime = teamCooldown
     end
+
+    -- setup user recall state notifier in this thread
+    SyncRecallStatus()
 end
 
 function OnArmyChange()
