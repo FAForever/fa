@@ -1,28 +1,36 @@
+local IsDestroyed = IsDestroyed
+local WaitTicks = WaitTicks
+
 --- Intellisense helper class
 ---@class TargetPointerUnit : TargetPointerComponent, Unit
 
 --- Component that allows disabling a unit's AI-controlling weapon so that it
 --- doesn't stop at a distance when guarding another unit.
 ---@class TargetPointerComponent
----@field TargetPointer Weapon?
----@field TargetLayerCaps table<Layer, FireTargetCategory>?
----@field PointerEnabled boolean?
+---@field package TargetPointer Weapon?
+---@field package PointerEnabled boolean?
 TargetPointerComponent = ClassSimple {
     --- Call this at the end of the unit's `OnStartBeingBuilt` function.
     ---@param self TargetPointerUnit
     InitializeTargetPointer = function(self)
-        self.TargetPointer = self:GetWeapon(1)
-        self.TargetLayerCaps = self.Blueprint.Weapon[1].FireTargetLayerCapsTable
-        self.PointerEnabled = true
+        local weapon = self.WeaponInstances[1]
+        if weapon then
+            self.TargetPointer = weapon
+            self.PointerEnabled = true
+        else
+            self:DebugWarn('Does not have weapon for target pointer!')
+        end
     end,
 
     --- Call this at the end of the unit's `OnLayerChange` function.
     ---@param self TargetPointerUnit
     OverrideTargetPointerLayerCaps = function(self)
-        if not IsDestroyed(self.TargetPointer) then
+        local targetPointer = self.TargetPointer
+        if not IsDestroyed(targetPointer) then
+            ---@cast targetPointer -nil
             if self.PointerEnabled == false then
                 -- Override the caps from default `weapon.lua` layer change behavior
-                self.TargetPointer:SetFireTargetLayerCaps('None')
+                targetPointer:SetFireTargetLayerCaps('None')
             end
         end
     end,
@@ -31,11 +39,11 @@ TargetPointerComponent = ClassSimple {
     --- stopping at a distance when guarding another unit.
     ---@param self TargetPointerUnit
     DisablePointer = function(self)
-        if not IsDestroyed(self.TargetPointer) then
-            self.TargetPointer:SetFireTargetLayerCaps('None') --this disables the stop feature - note that its reset on layer change!
-            local thread = ForkThread(self.PointerRestart, self)
-            self.Trash:Add(thread)
-            self.PointerRestartThread = thread
+        local targetPointer = self.TargetPointer
+        if not IsDestroyed(targetPointer) then
+            ---@cast targetPointer -nil
+            targetPointer:SetFireTargetLayerCaps('None') --this disables the stop feature - note that its reset on layer change!
+            self.PointerRestartThread = self:ForkThread(self.PointerRestart, self)
         end
     end,
 
@@ -43,16 +51,19 @@ TargetPointerComponent = ClassSimple {
     ---@package -- FIXME: Should be private but extension doesnt work with that
     ---@param self TargetPointerUnit
     PointerRestart = function(self)
+        local targetPointer = self.TargetPointer
         while self.PointerEnabled == false do
             WaitTicks(11)
-            if IsDestroyed(self) or IsDestroyed(self.TargetPointer) then
-                break
+            if IsDestroyed(self) or IsDestroyed(targetPointer) then
+                return
             end
+            ---@cast targetPointer -nil
 
             if not self:GetGuardedUnit() then
                 self.PointerEnabled = true
-                 -- this resets the stop feature - note that its reset on layer change!
-                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self.Layer])
+                -- this resets the stop feature - note that its reset on layer change!
+                targetPointer:SetValidTargetsForCurrentLayer(self.Layer)
+                return
             end
         end
     end,
