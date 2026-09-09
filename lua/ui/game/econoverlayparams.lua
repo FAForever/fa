@@ -1,5 +1,4 @@
-local Prefs = import('/lua/user/prefs.lua')
-local scale = 2
+local scale = import('/lua/user/prefs.lua').GetOption('econ_overlay_scale')
 local scaleSuffix = {
     [0.8] = '_0.8x',
     [1] = '',
