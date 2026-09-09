@@ -155,30 +155,19 @@ ResourceMapPreview = ClassUI(Group) {
         -- Add the wreckage, if activated. (done first so the important things appear on top)
         local wreckagemarkers = {}
         if enableWreckage then
-            local armies = mapdata.Scenario.Armies
-
-            for _, army in armies do
-                -- This is so spectacularly brittle it's magnificent.
-                if army.Units and army.Units.Units and army.Units.Units.WRECKAGE and army.Units.Units.WRECKAGE.Units then
-                    for k, v in army.Units.Units.WRECKAGE.Units do
-                        -- Some maps have extra entities in the Units list, representing groups.
-                        -- Very annoying, so let's check for the fields we care about.
-                        if v.Position then
-                            local marker = self.wreckageIconPool:Get()
-                            table.insert(wreckagemarkers, marker)
-                            if scenarioInfo.hidePreviewMarkers then
-                                marker:Hide()
-                            else
-                                marker:Show()
-                            end
-
-                            -- Yes, these ones have a capital Position, but the others have a lowercase.
-                            LayoutHelpers.AtLeftTopIn(marker, self.mapPreview,
-                                xOffset + (v.Position[1] / mWidth) * (self.size - 2) * xFactor,
-                                yOffset + (v.Position[3] / mHeight) * (self.size - 2) * yFactor)
-                        end
-                    end
+            for _, pos in MapUtil.GetWreckagePositions(mapdata.Scenario) do
+                local marker = self.wreckageIconPool:Get()
+                table.insert(wreckagemarkers, marker)
+                if scenarioInfo.hidePreviewMarkers then
+                    marker:Hide()
+                else
+                    marker:Show()
                 end
+
+                -- Yes, these ones have a capital Position, but the others have a lowercase.
+                LayoutHelpers.AtLeftTopIn(marker, self.mapPreview,
+                    xOffset + (pos[1] / mWidth) * (self.size - 2) * xFactor,
+                    yOffset + (pos[3] / mHeight) * (self.size - 2) * yFactor)
             end
         end
         self.wreckagemarkers = wreckagemarkers

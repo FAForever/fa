@@ -586,4 +586,58 @@ function GetStartPositionsFromScenario(scenarioInfo, scenarioSave)
     return output
 end
 
+---Returns all units' (leaf nodes) positions under the specified group.
+---@param tblNode? table
+---@param positions? Vector[]
+---@return Vector[]
+local function extractUnitPositions(tblNode, positions)
+    positions = positions or {}
+    if not tblNode then return positions end
+
+    for strName, tblData in pairs(tblNode.Units) do
+        if tblData.type == 'GROUP' then
+            positions = extractUnitPositions(tblData, positions)
+        else
+            table.insert(positions, tblData.Position)
+        end
+    end
+
+    return positions
+end
+
+---Extracts wreckage positions from all groups that contain `"wreck"` in their name.
+---@param tblNode? table
+---@param positions? Vector[]
+---@return Vector[]
+local function extractPositionsFromWreckageGroups(tblNode, positions)
+    positions = positions or {}
+    if not tblNode then return positions end
+
+    for strName, tblData in pairs(tblNode.Units) do
+        if tblData.type == 'GROUP' then
+            if string.find(string.lower(strName), "wreck") then
+                positions = extractUnitPositions(tblData, positions)
+            else
+                positions = extractPositionsFromWreckageGroups(tblData, positions)
+            end
+        end
+    end
+
+    return positions
+end
+
+---Returns all unit wreckage positions. Extracted from army groups that contain `"wreck"` in their name.
+---@param scenario UIScenarioSaveFile
+---@return Vector[]
+function GetWreckagePositions(scenario)
+    ---@type Vector[]
+    local positions = {}
+
+    for _, army in pairs(scenario.Armies) do
+        positions = extractPositionsFromWreckageGroups(army.Units, positions)
+    end
+
+    return positions
+end
+
 --#endregion

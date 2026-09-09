@@ -1,0 +1,1 @@
+- Improved wreckae detection for lobby map preview. (#7269)
