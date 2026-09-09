@@ -1060,7 +1060,7 @@ options = {
             },
 
             {
-                title = "<LOC OPTIONS_ECON_OVERLAY_SCALE>Scale Economy Overlay",
+                title = "<LOC OPTIONS_ECON_OVERLAY_SCALE_TITLE>Scale Economy Overlay",
                 key = 'econ_overlay_scale',
                 type = 'toggle',
                 default = 1.0,
