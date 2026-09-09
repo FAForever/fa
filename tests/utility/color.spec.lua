@@ -2,6 +2,8 @@
 --** Shared under the MIT license
 --**************************************************************************************************
 
+require "./tests/packages/fafMockLibrary.lua"
+
 local luft = require "./tests/packages/luft"
 
 -- color library
