@@ -15,6 +15,7 @@ local DamageArea = DamageArea
 local CreateEmitterAtBone = CreateEmitterAtBone
 local CreateDecal = CreateDecal
 local CreateLightParticle = CreateLightParticle
+local IsDestroyed = IsDestroyed
 
 local DeathWeaponKamikaze = ClassWeapon(Weapon) {
     OnFire = function(self)
@@ -106,30 +107,30 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
     ---@param self XRL0302
     TrackTargetThread = function(self)
         local navigator = self:GetNavigator()
+        if not navigator then return end
         local weapon = self:GetWeaponByLabel('Suicide')
+        if not weapon then return end
 
-        while not IsDestroyed(self) do
+        while not IsDestroyed(self) and not IsDestroyed(weapon) do
 
             -- adjust behavior of the weapon so it only fires when we're trying to attack something
-            if weapon then
-                if (
-                    -- we're trying to attack
-                    self:IsUnitState('Attacking') or
-                        -- engineer trying to take us
-                        self:IsUnitState('BeingCaptured') or self:IsUnitState('BeingReclaimed')
-                    )
-                then
-                    weapon:SetEnabled(true)
-                else
-                    weapon:SetEnabled(false)
-                end
+            if (
+                -- we're trying to attack
+                self:IsUnitState('Attacking') or
+                    -- engineer trying to take us
+                    self:IsUnitState('BeingCaptured') or self:IsUnitState('BeingReclaimed')
+                )
+            then
+                weapon:SetEnabled(true)
+            else
+                weapon:SetEnabled(false)
             end
 
             -- adjust behavior of tracking a target so that we speed through the target instead of bump into it
             local command = self:GetCommandQueue()[1]
             if command and command.commandType == 10 then
                 local target = command.target
-                if target then
+                if not IsDestroyed(target) then
                     navigator:SetDestUnit(target)
                     navigator:SetSpeedThroughGoal(true)
                 end
