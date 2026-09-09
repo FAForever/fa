@@ -19,7 +19,7 @@ We discuss changes on our discord, so start a discussion there and link the disc
 ### Technical info
 
 - Target the `develop` branch.
-- Don't forget to add appropriate tags.
+- Don't forget to add appropriate tags. We also encourage you to use the status tags to signal the state of your PR, especially when you are waiting for someone else to do something.
 
 Useful tooling:
 -  [ScreenToGif](https://www.screentogif.com/): Free, open source screen recorder that can export to MP4. If the changes are visual, these can help you tell us exactly what the changes imply!
