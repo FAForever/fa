@@ -11,9 +11,10 @@
 local TShieldLandUnit = import("/lua/terranunits.lua").TShieldLandUnit
 local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
+local TargetPointerComponent = import("/lua/sim/units/components/TargetPointerComponent.lua").TargetPointerComponent
 
----@class UEL0307 : TShieldLandUnit
-UEL0307 = ClassUnit(TShieldLandUnit, ShieldEffectsComponent) {
+---@class UEL0307 : TShieldLandUnit, ShieldEffectsComponent, TargetPointerComponent
+UEL0307 = ClassUnit(TShieldLandUnit, ShieldEffectsComponent, TargetPointerComponent) {
 
     Weapons = {
         TargetPointer = ClassWeapon(DefaultProjectileWeapon) {},
@@ -33,9 +34,7 @@ UEL0307 = ClassUnit(TShieldLandUnit, ShieldEffectsComponent) {
     OnStopBeingBuilt = function(self, builder, layer)
         TShieldLandUnit.OnStopBeingBuilt(self, builder, layer)
 
-        self.TargetPointer = self:GetWeapon(1) --save the pointer weapon for later - this is extra clever since the pointer weapon has to be first!
-        self.TargetLayerCaps = self:GetBlueprint().Weapon[1].FireTargetLayerCapsTable --we save this to the unit table so dont have to call every time.
-        self.PointerEnabled = true --a flag to let our thread know whether we should turn on our pointer.
+        self:InitializeTargetPointer()
     end,
 
     OnShieldEnabled = function(self)
@@ -84,35 +83,11 @@ UEL0307 = ClassUnit(TShieldLandUnit, ShieldEffectsComponent) {
         end
     end,
 
-    DisablePointer = function(self)
-        if not IsDestroyed(self.TargetPointer) then
-            self.TargetPointer:SetFireTargetLayerCaps('None') --this disables the stop feature - note that its reset on layer change!
-            self.PointerRestartThread = self:ForkThread(self.PointerRestart)
-        end
-    end,
-
-    PointerRestart = function(self)
-        while not self.PointerEnabled do
-            WaitTicks(11)
-            if IsDestroyed(self) or IsDestroyed(self.TargetPointer) then
-                break
-            end
-
-            if not self:GetGuardedUnit() then
-                self.PointerEnabled = true
-                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self.Layer]) --this resets the stop feature - note that its reset on layer change!
-            end
-        end
-    end,
 
     OnLayerChange = function(self, new, old)
         TShieldLandUnit.OnLayerChange(self, new, old)
 
-        if not IsDestroyed(self.TargetPointer) then
-            if self.PointerEnabled == false then
-                self.TargetPointer:SetFireTargetLayerCaps('None') --since its reset on layer change we need to do this. unfortunate.
-            end
-        end
+        self:OverrideTargetPointerLayerCaps()
     end,
 }
 

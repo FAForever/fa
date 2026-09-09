@@ -6,9 +6,10 @@
 local CLandUnit = import("/lua/cybranunits.lua").CLandUnit
 local EffectUtil = import("/lua/effectutilities.lua")
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
+local TargetPointerComponent = import("/lua/sim/units/components/TargetPointerComponent.lua").TargetPointerComponent
 
----@class URL0306 : CLandUnit
-URL0306 = ClassUnit(CLandUnit) {
+---@class URL0306 : CLandUnit, TargetPointerComponent
+URL0306 = ClassUnit(CLandUnit, TargetPointerComponent) {
     Weapons = {
         TargetPointer = ClassWeapon(DefaultProjectileWeapon) {},
     },
@@ -31,9 +32,7 @@ URL0306 = ClassUnit(CLandUnit) {
         CLandUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
 
-        self.TargetPointer = self:GetWeapon(1)
-        self.TargetLayerCaps = self.Blueprint.Weapon[1].FireTargetLayerCapsTable
-        self.PointerEnabled = true
+        self:InitializeTargetPointer()
     end,
 
     ---@param self RadarJammerUnit
@@ -53,37 +52,10 @@ URL0306 = ClassUnit(CLandUnit) {
         self.IntelFxOn = false
     end,
 
-    DisablePointer = function(self)
-        if not IsDestroyed(self.TargetPointer) then
-            self.TargetPointer:SetFireTargetLayerCaps('None') --this disables the stop feature - note that its reset on layer change!
-            local thread = ForkThread(self.PointerRestart, self)
-            self.Trash:Add(thread)
-            self.PointerRestartThread = thread
-        end
-    end,
-
-    PointerRestart = function(self)
-        while self.PointerEnabled == false do
-            WaitTicks(11)
-            if IsDestroyed(self) or IsDestroyed(self.TargetPointer) then
-                break
-            end
-
-            if not self:GetGuardedUnit() then
-                self.PointerEnabled = true
-                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self.Layer]) --this resets the stop feature - note that its reset on layer change!
-            end
-        end
-    end,
-
     OnLayerChange = function(self, new, old)
         CLandUnit.OnLayerChange(self, new, old)
 
-        if not IsDestroyed(self.TargetPointer) then
-            if self.PointerEnabled == false then
-                self.TargetPointer:SetFireTargetLayerCaps('None') --since its reset on layer change we need to do this. unfortunate.
-            end
-        end
+        self:OverrideTargetPointerLayerCaps()
     end,
 }
 

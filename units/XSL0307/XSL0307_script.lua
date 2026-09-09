@@ -6,9 +6,10 @@ local SShieldHoverLandUnit = import("/lua/seraphimunits.lua").SShieldHoverLandUn
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
 local SlowHover = import("/lua/defaultunits.lua").SlowHoverLandUnit
 local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
+local TargetPointerComponent = import("/lua/sim/units/components/TargetPointerComponent.lua").TargetPointerComponent
 
----@class XSL0307 : SShieldHoverLandUnit, ShieldEffectsComponent
-XSL0307 = ClassUnit(SShieldHoverLandUnit, ShieldEffectsComponent) {
+---@class XSL0307 : SShieldHoverLandUnit, ShieldEffectsComponent, TargetPointerComponent
+XSL0307 = ClassUnit(SShieldHoverLandUnit, ShieldEffectsComponent, TargetPointerComponent) {
 
     Weapons = {
         TargetPointer = ClassWeapon(DefaultProjectileWeapon) {},
@@ -29,9 +30,7 @@ XSL0307 = ClassUnit(SShieldHoverLandUnit, ShieldEffectsComponent) {
     OnStopBeingBuilt = function(self, builder, layer)
         SShieldHoverLandUnit.OnStopBeingBuilt(self, builder, layer)
 
-        self.TargetPointer = self:GetWeapon(1) --save the pointer weapon for later - this is extra clever since the pointer weapon has to be first!
-        self.TargetLayerCaps = self.Blueprint.Weapon[1].FireTargetLayerCapsTable --we save this to the unit table so dont have to call every time.
-        self.PointerEnabled = true --a flag to let our thread know whether we should turn on our pointer.
+        self:InitializeTargetPointer()
     end,
 
     ---@param self XSL0307
@@ -47,31 +46,6 @@ XSL0307 = ClassUnit(SShieldHoverLandUnit, ShieldEffectsComponent) {
     end,
 
     ---@param self XSL0307
-    DisablePointer = function(self)
-        if not IsDestroyed(self.TargetPointer) then
-            self.TargetPointer:SetFireTargetLayerCaps('None')
-
-            local thread = ForkThread(self.PointerRestart, self)
-            self.Trash:Add(thread)
-            self.PointerRestartThread = thread
-        end
-    end,
-
-    ---@param self XSL0307
-    PointerRestart = function(self)
-        while self.PointerEnabled == false do
-            WaitTicks(11)
-            if IsDestroyed(self) or IsDestroyed(self.TargetPointer) then
-                break
-            end
-            if not self:GetGuardedUnit() then
-                self.PointerEnabled = true
-                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self.Layer])
-            end
-        end
-    end,
-
-    ---@param self XSL0307
     OnLayerChange = function(self, new, old)
         local physics = (self.Blueprint or self:GetBlueprint()).Physics
         if physics.WaterSpeedMultiplier then
@@ -80,11 +54,7 @@ XSL0307 = ClassUnit(SShieldHoverLandUnit, ShieldEffectsComponent) {
             SShieldHoverLandUnit.OnLayerChange(self, new, old)
         end
 
-        if not IsDestroyed(self.TargetPointer) then
-            if self.PointerEnabled == false then
-                self.TargetPointer:SetFireTargetLayerCaps('None')
-            end
-        end
+        self:OverrideTargetPointerLayerCaps()
     end,
 }
 
