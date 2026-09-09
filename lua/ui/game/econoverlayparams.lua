@@ -8,6 +8,8 @@ local scaleSuffix = {
     [2] = '_2.0x',
 }
 local suffix = scaleSuffix[scale or 1] or ''
+---@param number number
+---@return integer
 local function ScaleNumber(number)
     return math.floor(number * scale)
 end
