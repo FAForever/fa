@@ -23,3 +23,10 @@ EconOverlayParams = {
     energyTopOffset = ScaleNumber(13.0),
     massTopOffset = ScaleNumber(1.0),
 }
+
+local scaleOptionItem = import('/lua/options/optionslogic.lua').FindOptionItem('econ_overlay_scale')
+if scaleOptionItem then
+    -- engine only imports this file once per application opening
+    -- which means once imported, it needs a restart to be updated
+    scaleOptionItem.restart = true
+end
