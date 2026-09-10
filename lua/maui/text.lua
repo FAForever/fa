@@ -45,17 +45,18 @@ Text = ClassUI(moho.text_methods, Control) {
         self:SetClipToWidth(false)
     end,
 
-    --- Directly sets what text is displayed.
+    --- Directly sets displayed text
+    ---@see Text.SetText # To set the raw text
     ---@type fun(self: Text, str: string | number)
     SetDisplayText = moho.text_methods.SetText,
 
-    --- Direct Engine GetText() for getting the current displayed value
-    ---@type function
-    ---@return string
+    --- Directly gets the current displayed text
+    ---@see Text.SetText # To get the raw text
+    ---@type fun(self: Text): string
     GetDisplayText = moho.text_methods.GetText,
 
-    --- Sets what text *should* be displayed; actual displayed text is affected by operations like truncation.
-    ---@see Text.SetDisplayText # To directly set the displayed text.
+    --- Sets the raw text; actual displayed text is affected by operations like truncation
+    ---@see Text.SetDisplayText # To directly set the displayed text
     ---@param text string | number
     SetText = function(self, text)
         self._fullText = tostring(text)
@@ -66,7 +67,8 @@ Text = ClassUI(moho.text_methods, Control) {
         end
     end,
 
-    --- FAF extensible GetText() that retrieves raw original text that isn't modified for display
+    --- Get the raw text before operations like truncation
+    ---@see Text.GetDisplayText # To directly get the displayed text
     ---@return string
     GetText = function(self)
         return self._fullText
