@@ -78,7 +78,7 @@ UnitBlueprint{
             "<LOC ability_deathaoe>Volatile",
         },
         AnimationWalk = "/units/ual0001/ual0001_awalk.sca",
-        AnimationWalkRate = 2.5,
+        AnimationWalkRate = 1.14,
         IdleEffects = {
             Seabed = {
                 Effects = {
@@ -132,7 +132,7 @@ UnitBlueprint{
                                 TreadMarks = "CommanderPrint_albedo",
                                 TreadMarksSizeX = 0.5,
                                 TreadMarksSizeZ = 0.5,
-                                TreadOffset = { 0.15, 0, 0.5 },
+                                TreadOffset = { 0.28, 0, 0.6 },
                             },
                             Type = "FootFall02",
                         },
@@ -144,7 +144,7 @@ UnitBlueprint{
                                 TreadMarks = "CommanderPrint_albedo",
                                 TreadMarksSizeX = 0.5,
                                 TreadMarksSizeZ = 0.5,
-                                TreadOffset = { -0.15, 0, 0.5 },
+                                TreadOffset = { -0.28, 0, 0.6 },
                             },
                             Type = "FootFall02",
                         },
@@ -192,7 +192,7 @@ UnitBlueprint{
                 Weight = 100,
             },
         },
-        UniformScale = 0.018,
+        UniformScale = 0.019,
         WarpInEffect = {
             HideBones = {
                 "Back_Upgrade",
