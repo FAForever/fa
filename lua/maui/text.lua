@@ -136,8 +136,7 @@ Text = ClassUI(moho.text_methods, Control) {
             return
         end
 
-        -- ellipsis is the trailing '...' on truncated text
-        local ellipsis = self._truncationText
+        local truncationText = self._truncationText
         local str = self._fullText
         if str == nil then return end
         -- restore full text if it now fits
@@ -146,14 +145,14 @@ Text = ClassUI(moho.text_methods, Control) {
             return
         end
 
-        --iterate until string + ellipsis fit
+        --iterate until string + truncation text fit
         local i = STR_Utf8Len(str)
-        while i > 0 and self:GetStringAdvance(str .. ellipsis) > maxWidth do
+        while i > 0 and self:GetStringAdvance(str .. truncationText) > maxWidth do
             str = STR_Utf8SubString(str, 1, i - 1)
             i = i - 1
         end
 
-        self:SetDisplayText(str .. ellipsis)
+        self:SetDisplayText(str .. truncationText)
     end,
 
     -- lazy var support
