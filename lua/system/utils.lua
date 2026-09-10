@@ -94,6 +94,7 @@ end
 ---@generic T
 ---@param t T
 ---@return T
+---@nodiscard
 function table.copy(t)
     if type(t) ~= 'table' then return t end
 
