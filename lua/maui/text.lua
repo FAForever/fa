@@ -59,6 +59,10 @@ Text = ClassUI(moho.text_methods, Control) {
     ---@see Text.SetDisplayText # To directly set the displayed text
     ---@param text string | number
     SetText = function(self, text)
+        local t_text = type(text)
+        if t_text ~= "string" and t_text ~= "number" then
+            error('Expected string or number but got ' .. t_text, 2)
+        end
         self._fullText = tostring(text)
         if self._truncationEnabled then
             self:_applyTruncation()
