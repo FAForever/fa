@@ -30,7 +30,7 @@ module Jekyll
       <<~HTML
       <div class="unit-header">
         <img class="unit-icon"
-             src="/assets/icons/#{icon_name}">
+             src="../assets/icons/#{icon_name}">
         <span class="unit-name">#{name}</span>
       </div>
       HTML

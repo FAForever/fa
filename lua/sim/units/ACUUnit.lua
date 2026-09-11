@@ -2,10 +2,11 @@ local CommandUnit = import("/lua/sim/units/commandunit.lua").CommandUnit
 
 ---@class ACUUnit : CommandUnit
 ---@field LastTickDamaged? number
+---@field WeaponEnabled table<string, boolean> # Tracks enabled state of weapons so that it is restored correctly after stopping engineering actions
 ACUUnit = ClassUnit(CommandUnit) {
     -- The "commander under attack" warnings.
     ---@param self ACUUnit
-    ---@param bpShield any
+    ---@param bpShield UnitBlueprintDefenseShield
     CreateShield = function(self, bpShield)
         CommandUnit.CreateShield(self, bpShield)
 
@@ -14,13 +15,14 @@ ACUUnit = ClassUnit(CommandUnit) {
         -- Mutate the OnDamage function for this one very special shield.
         local oldApplyDamage = self.MyShield.ApplyDamage
         self.MyShield.ApplyDamage = function(...)
+            ---@diagnostic disable-next-line: param-type-mismatch
             oldApplyDamage(unpack(arg))
             aiBrain:OnPlayCommanderUnderAttackVO()
         end
     end,
 
     ---@param self ACUUnit
-    ---@param enh string
+    ---@param enh Enhancement
     CreateEnhancement = function(self, enh)
         CommandUnit.CreateEnhancement(self, enh)
 
@@ -29,11 +31,11 @@ ACUUnit = ClassUnit(CommandUnit) {
     end,
 
     ---@param self ACUUnit
-    ---@param work string
+    ---@param work Enhancement
     ---@return boolean
     OnWorkBegin = function(self, work)
         local legalWork = CommandUnit.OnWorkBegin(self, work)
-        if not legalWork then return end
+        if not legalWork then return false end
 
         self:SendNotifyMessage('started', work)
 
@@ -43,7 +45,7 @@ ACUUnit = ClassUnit(CommandUnit) {
     end,
 
     ---@param self ACUUnit
-    ---@param work string
+    ---@param work Enhancement
     OnWorkFail = function(self, work)
         self:SendNotifyMessage('cancelled', work)
         self:SetImmobile(false)
@@ -97,16 +99,14 @@ ACUUnit = ClassUnit(CommandUnit) {
     end,
 
     ---@param self ACUUnit
-    ---@param instigator Unit
-    ---@param type string
+    ---@param instigator Unit | Projectile
+    ---@param type DamageType
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
         CommandUnit.OnKilled(self, instigator, type, overkillRatio)
 
         -- If there is a killer, and it's not me
         if instigator and instigator.Army ~= self.Army then
-            local instigatorBrain = ArmyBrains[instigator.Army]
-
             Sync.EnforceRating = true
             WARN("ACU kill detected. Time requirement for rating games will now be removed.")
 
@@ -115,27 +115,33 @@ ACUUnit = ClassUnit(CommandUnit) {
             --     'DeathExplosion' - when normal unit is killed
             --     'Nuke' - when Paragon is killed
             --     'Deathnuke' - when ACU is killed
-            if IsAlly(self.Army, instigator.Army) and
-                not
-                ((type == 'DeathExplosion' or type == 'Nuke' or type == 'Deathnuke') and not instigator.SelfDestructed) then
+            if IsAlly(self.Army, instigator.Army)
+                and not (type == 'DeathExplosion' or type == 'Nuke' or type == 'Deathnuke')
+            then
                 WARN('Teamkill detected')
                 Sync.Teamkill = { killTime = GetGameTimeSeconds(), instigator = instigator.Army, victim = self.Army }
             end
 
-            -- prepare sync
-            local sync = Sync
-            local events = sync.Events or {}
-            sync.Events = events
-            local acuDestroyed = events.ACUDestroyed or {}
-            events.ACUDestroyed = acuDestroyed
-
-            -- sync the event
-            table.insert(acuDestroyed, {
+            -- Provides ACU kill info to UI mods (ex: Supreme Score Board)
+            ---@class Sync.Event.ACUDestroyed
+            local acuDestroyedEvent = {
                 Timestamp = GetGameTimeSeconds(),
                 InstigatorArmy = instigator.Army,
                 KilledArmy = self.Army
-            })
+            }
 
+            local sync = Sync
+            local events = sync.Events
+            if not events then
+                sync.Events = { ACUDestroyed = { acuDestroyedEvent } }
+            else
+                local acuDestroyed = events.ACUDestroyed
+                if not acuDestroyed then
+                    events.ACUDestroyed = { acuDestroyedEvent }
+                else
+                    table.insert(acuDestroyed, acuDestroyedEvent)
+                end
+            end
         end
         self.Brain.CommanderKilledBy = (instigator or self).Army
         self.Brain.CommanderKilledTick = GetGameTick()
@@ -149,7 +155,7 @@ ACUUnit = ClassUnit(CommandUnit) {
         self:SetWeaponEnabledByLabel('AutoOverCharge', false)
 
         -- Ugly hack to re-initialise auto-OC once a task finishes
-        local wep = self:GetWeaponByLabel('AutoOverCharge')
+        local wep = self:GetWeaponByLabel('AutoOverCharge') --[[@as OverchargeWeapon]]
         wep:SetAutoOvercharge(wep.AutoMode)
     end,
 
@@ -165,8 +171,8 @@ ACUUnit = ClassUnit(CommandUnit) {
         WaitTicks(1)
         local bp = self.Blueprint
         local aiBrain = self:GetAIBrain()
-        aiBrain:GiveResource('Energy', bp.Economy.StorageEnergy)
-        aiBrain:GiveResource('Mass', bp.Economy.StorageMass)
+        aiBrain:GiveResource('ENERGY', bp.Economy.StorageEnergy)
+        aiBrain:GiveResource('MASS', bp.Economy.StorageMass)
     end,
 
     ---@param self ACUUnit
@@ -187,7 +193,7 @@ ACUUnit = ClassUnit(CommandUnit) {
     ---@param self ACUUnit
     ---@param label string
     ---@param enable boolean
-    ---@param lockOut boolean
+    ---@param lockOut boolean? # If enabled, weapon's state won't be remembered for later restoration in `self.WeaponEnabled`
     SetWeaponEnabledByLabel = function(self, label, enable, lockOut)
         CommandUnit.SetWeaponEnabledByLabel(self, label, enable)
 

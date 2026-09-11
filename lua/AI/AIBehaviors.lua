@@ -37,7 +37,7 @@ function CDRRunAway(aiBrain, cdr)
             local canTeleport = cdr:HasEnhancement('Teleporter')
             local runSpot, prevSpot
             local plat = aiBrain:MakePlatoon('', '')
-            aiBrain:AssignUnitsToPlatoon(plat, {cdr}, 'support', 'None')
+            aiBrain:AssignUnitToPlatoon(plat, cdr, 'support', 'None')
             cdr.PlatoonHandle = plat
             cdr.PlatoonHandle.BuilderName = 'CDRRunAway'
             repeat
@@ -132,7 +132,7 @@ function CDROverCharge(aiBrain, cdr)
             cdr.UnitBeingBuiltBehavior = cdr.UnitBeingBuilt
         end
         local plat = aiBrain:MakePlatoon('', '')
-        aiBrain:AssignUnitsToPlatoon(plat, {cdr}, 'support', 'None')
+        aiBrain:AssignUnitToPlatoon(plat, cdr, 'support', 'None')
         cdr.PlatoonHandle = plat
         cdr.PlatoonHandle.BuilderName = 'CDROverCharge'
         plat:Stop()
@@ -260,7 +260,7 @@ function CDRReturnHome(aiBrain, cdr)
     local loc = cdr.CDRHome
     if not cdr.Initializing and not cdr.Dead and VDist2Sq(cdrPos[1], cdrPos[3], loc[1], loc[3]) > distSqAway then
         local plat = aiBrain:MakePlatoon('', '')
-        aiBrain:AssignUnitsToPlatoon(plat, {cdr}, 'support', 'None')
+        aiBrain:AssignUnitToPlatoon(plat, cdr, 'support', 'None')
         cdr.PlatoonHandle = plat
         cdr.PlatoonHandle.BuilderName = 'CDRReturnHome'
         repeat
@@ -334,7 +334,7 @@ function CommanderThread(cdr, platoon)
         and not cdr:IsUnitState("Upgrading") and not cdr:IsUnitState('BlockCommandQueue') then
             if not cdr.EngineerBuildQueue or table.empty(cdr.EngineerBuildQueue) then
                 local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
-                aiBrain:AssignUnitsToPlatoon(pool, {cdr}, 'Unassigned', 'None')
+                aiBrain:AssignUnitToPlatoon(pool, cdr, 'Unassigned', 'None')
             elseif cdr.EngineerBuildQueue and not table.empty(cdr.EngineerBuildQueue) then
                 if not cdr.NotBuildingThread then
                     cdr.NotBuildingThread = cdr:ForkThread(platoon.WatchForNotBuilding)
@@ -385,7 +385,7 @@ function CommanderThreadImproved(cdr, platoon)
                 -- get the global armypool platoon
                 local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                 -- assing the CDR to the armypool
-                aiBrain:AssignUnitsToPlatoon(pool, {cdr}, 'Unassigned', 'None')
+                aiBrain:AssignUnitToPlatoon(pool, cdr, 'Unassigned', 'None')
             -- if we have a BuildQueue then continue building
             elseif cdr.EngineerBuildQueue and not table.empty(cdr.EngineerBuildQueue) then
                 if not cdr.NotBuildingThread then
@@ -450,7 +450,7 @@ function AirUnitRefitThread(unit, plan, data)
                     end
                     if closest then
                         local plat = aiBrain:MakePlatoon('', '')
-                        aiBrain:AssignUnitsToPlatoon(plat, {unit}, 'Attack', 'None')
+                        aiBrain:AssignUnitToPlatoon(plat, unit, 'Attack', 'None')
                         IssueStop({unit})
                         IssueToUnitClearCommands(unit)
                         IssueTransportLoad({unit}, closest)
@@ -502,7 +502,7 @@ function AirStagingThread(unit)
                         plat.PlatoonData = {}
                         plat.PlatoonData = v.PlatoonData
                     end
-                    aiBrain:AssignUnitsToPlatoon(plat, {v}, 'Attack', 'GrowthFormation')
+                    aiBrain:AssignUnitToPlatoon(plat, v, 'Attack', 'GrowthFormation')
                 end
             end
         end
@@ -971,7 +971,7 @@ function FatBoyBuildCheck(self)
     end
 
     if unitBeingBuilt and not unitBeingBuilt.Dead then
-        aiBrain:AssignUnitsToPlatoon(experimental.NewPlatoon, {unitBeingBuilt}, 'Attack', 'NoFormation')
+        aiBrain:AssignUnitToPlatoon(experimental.NewPlatoon, unitBeingBuilt, 'Attack', 'NoFormation')
         IssueToUnitClearCommands(unitBeingBuilt)
         IssueGuard({unitBeingBuilt}, experimental)
     end
@@ -1083,7 +1083,7 @@ TempestBehavior = function(self)
                 testHeading = unit:GetHeading()
                 unit.BuiltUnitCount = unit.BuiltUnitCount + 1
                 ScenarioFramework.CreateUnitDestroyedTrigger(TempestUnitDeath, unitBeingBuilt)
-                aiBrain:AssignUnitsToPlatoon(self, {unitBeingBuilt}, 'Attack', 'GrowthFormation')
+                aiBrain:AssignUnitToPlatoon(self, unitBeingBuilt, 'Attack', 'GrowthFormation')
                 IssueToUnitClearCommands(unitBeingBuilt)
                 unitBeingBuilt:ForkThread(TempestBuiltUnitMoveOut, position, testHeading)
             end

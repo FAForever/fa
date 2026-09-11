@@ -129,6 +129,7 @@ categories = {
 
     --- Allows this unit to be built by engineers
     NEEDMOBILEBUILD = categoryValue,
+    --- Unit doesn't use a formation when assisting other units
     NOFORMATION = categoryValue,
     --- Prevents splash damage being applied to the entity
     NOSPLASHDAMAGE = categoryValue,
@@ -149,6 +150,7 @@ categories = {
     OVERLAYOMNI = categoryValue,
     OVERLAYRADAR = categoryValue,
     OVERLAYSONAR = categoryValue,
+    -- Allows unit to reclaim and repair on patrol/aggressive move tasks.
     PATROLHELPER = categoryValue,
     PERSONALSHIELD = categoryValue,
     POD = categoryValue,
@@ -371,7 +373,7 @@ categories = {
 ---| "NAVALCARRIER"
 ---| "NAVAL"
 ---| "NEEDMOBILEBUILD"
----| "NOFORMATION"
+---| "NOFORMATION" # Unit doesn't use a formation when assisting other units
 ---| "NOSPLASHDAMAGE"
 ---| "NUKE"
 ---| "NUKESUB"

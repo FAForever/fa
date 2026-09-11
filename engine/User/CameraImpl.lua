@@ -55,7 +55,7 @@ end
 
 --- Transforms the camera to be able to view the entire region
 ---@param region Rectangle
----@param seconds? number
+---@param seconds? number # Do not set to 0; that causes the camera to zoom onto the center of the map instead of the cursor
 function CameraImpl:MoveToRegion(region, seconds)
 end
 

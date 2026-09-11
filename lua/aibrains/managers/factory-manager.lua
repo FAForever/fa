@@ -387,7 +387,7 @@ AIFactoryManager = ClassSimple {
             setmetatable(platoon, self:GetFactoryPlatoonMetaTable())
             platoon.Base = self.Base
             platoon.Brain = self.Brain
-            self.Brain:AssignUnitsToPlatoon(platoon, { unit }, 'Unassigned', 'None')
+            self.Brain:AssignUnitToPlatoon(platoon, unit, 'Unassigned', 'None')
             ChangeState(platoon, platoon.Start)
         end
     end,

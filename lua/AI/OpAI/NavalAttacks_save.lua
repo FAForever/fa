@@ -532,12 +532,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -560,12 +560,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -588,12 +588,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -616,12 +616,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -644,12 +644,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -672,12 +672,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -700,12 +700,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -728,12 +728,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -756,12 +756,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -784,12 +784,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -812,12 +812,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -840,12 +840,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -868,12 +868,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -896,12 +896,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -924,12 +924,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -952,12 +952,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -980,12 +980,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -1008,12 +1008,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -1036,12 +1036,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -1064,12 +1064,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -1092,12 +1092,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -1120,12 +1120,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -1148,12 +1148,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -1176,12 +1176,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -1204,12 +1204,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -1232,12 +1232,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -1264,16 +1264,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 2, 3, 0 },
-                                {'default_brain', '2','3', 0 }
+                                { 2, 3, 0 },
+                                { '2','3', 0 }
                             },
                         },
                         PlatoonData = {
@@ -1296,16 +1296,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 2, 3, 0 },
-                                {'default_brain', '2','3', 0 }
+                                { 2, 3, 0 },
+                                { '2','3', 0 }
                             },
                         },
                         PlatoonData = {
@@ -1328,16 +1328,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1, 3, 0 },
-                                {'default_brain', '1','3', 0 }
+                                { 1, 3, 0 },
+                                { '1','3', 0 }
                             },
                         },
                         PlatoonData = {
@@ -1360,16 +1360,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 2, 3, 4 },
-                                {'default_brain', '2','3','4' }
+                                { 2, 3, 4 },
+                                { '2','3','4' }
                             },
                         },
                         PlatoonData = {
@@ -1392,16 +1392,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1, 2, 3 },
-                                {'default_brain', '1','2','3' }
+                                { 1, 2, 3 },
+                                { '1','2','3' }
                             },
                         },
                         PlatoonData = {
@@ -1424,16 +1424,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 2, 3, 0 },
-                                {'default_brain', '2','3', 0 }
+                                { 2, 3, 0 },
+                                { '2','3', 0 }
                             },
                         },
                         PlatoonData = {
@@ -1456,16 +1456,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 2, 3, 0 },
-                                {'default_brain', '2','3', 0 }
+                                { 2, 3, 0 },
+                                { '2','3', 0 }
                             },
                         },
                         PlatoonData = {
@@ -1488,16 +1488,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 2, 3, 0 },
-                                {'default_brain', '2','3', 0 }
+                                { 2, 3, 0 },
+                                { '2','3', 0 }
                             },
                         },
                         PlatoonData = {
@@ -1520,16 +1520,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1, 3, 0 },
-                                {'default_brain', '1','3', 0 }
+                                { 1, 3, 0 },
+                                { '1','3', 0 }
                             },
                         },
                         PlatoonData = {
@@ -1552,16 +1552,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1, 3, 0 },
-                                {'default_brain', '1','3', 0 }
+                                { 1, 3, 0 },
+                                { '1','3', 0 }
                             },
                         },
                         PlatoonData = {
@@ -1584,16 +1584,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1, 3, 0 },
-                                {'default_brain', '1','3', 0 }
+                                { 1, 3, 0 },
+                                { '1','3', 0 }
                             },
                         },
                         PlatoonData = {
@@ -1616,16 +1616,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 2, 3, 4, 0 },
-                                {'default_brain', '2','3','4','0' }
+                                { 2, 3, 4, 0 },
+                                { '2','3','4','0' }
                             },
                         },
                         PlatoonData = {
@@ -1648,16 +1648,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 2, 3, 4, 0 },
-                                {'default_brain', '2','3','4','0' }
+                                { 2, 3, 4, 0 },
+                                { '2','3','4','0' }
                             },
                         },
                         PlatoonData = {
@@ -1684,16 +1684,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 2, 0 },
-                                {'default_brain', '2', '0' }
+                                { 2, 0 },
+                                { '2', '0' }
                             },
                         },
                         PlatoonData = {
@@ -1716,16 +1716,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 2, 0 },
-                                {'default_brain', '2', '0' }
+                                { 2, 0 },
+                                { '2', '0' }
                             },
                         },
                         PlatoonData = {
@@ -1748,16 +1748,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 2, 0 },
-                                {'default_brain', '2', '0' }
+                                { 2, 0 },
+                                { '2', '0' }
                             },
                         },
                         PlatoonData = {
@@ -1780,16 +1780,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 2, 0 },
-                                {'default_brain', '2', '0' }
+                                { 2, 0 },
+                                { '2', '0' }
                             },
                         },
                         PlatoonData = {
@@ -1812,16 +1812,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 2, 0 },
-                                {'default_brain', '2', '0' }
+                                { 2, 0 },
+                                { '2', '0' }
                             },
                         },
                         PlatoonData = {
@@ -1844,16 +1844,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 2, 0 },
-                                {'default_brain', '2', '0' }
+                                { 2, 0 },
+                                { '2', '0' }
                             },
                         },
                         PlatoonData = {
@@ -1876,16 +1876,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 2, 0 },
-                                {'default_brain', '2', '0' }
+                                { 2, 0 },
+                                { '2', '0' }
                             },
                         },
                         PlatoonData = {
@@ -1908,16 +1908,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 2, 0 },
-                                {'default_brain', '2', '0' }
+                                { 2, 0 },
+                                { '2', '0' }
                             },
                         },
                         PlatoonData = {
@@ -1940,16 +1940,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 2, 0 },
-                                {'default_brain', '2', '0' }
+                                { 2, 0 },
+                                { '2', '0' }
                             },
                         },
                         PlatoonData = {
@@ -1972,16 +1972,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 2, 0 },
-                                {'default_brain', '2', '0' }
+                                { 2, 0 },
+                                { '2', '0' }
                             },
                         },
                         PlatoonData = {
@@ -2008,16 +2008,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 3, 0 },
-                                {'default_brain', '3', '0' }
+                                { 3, 0 },
+                                { '3', '0' }
                             },
                         },
                         PlatoonData = {
@@ -2043,16 +2043,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 4, 0 },
-                                {'default_brain', '4', '0' }
+                                { 4, 0 },
+                                { '4', '0' }
                             },
                         },
                         PlatoonData = {
@@ -2075,16 +2075,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 4, 0 },
-                                {'default_brain', '4', '0' }
+                                { 4, 0 },
+                                { '4', '0' }
                             },
                         },
                         PlatoonData = {
@@ -2107,16 +2107,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 4, 0 },
-                                {'default_brain', '4', '0' }
+                                { 4, 0 },
+                                { '4', '0' }
                             },
                         },
                         PlatoonData = {
@@ -2139,16 +2139,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 4, 0 },
-                                {'default_brain', '4', '0' }
+                                { 4, 0 },
+                                { '4', '0' }
                             },
                         },
                         PlatoonData = {
@@ -2175,16 +2175,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1, 0 },
-                                {'default_brain', '1', '0' }
+                                { 1, 0 },
+                                { '1', '0' }
                             },
                         },
                         PlatoonData = {
@@ -2207,16 +2207,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1, 0 },
-                                {'default_brain', '1', '0' }
+                                { 1, 0 },
+                                { '1', '0' }
                             },
                         },
                         PlatoonData = {
@@ -2239,16 +2239,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1, 0 },
-                                {'default_brain', '1', '0' }
+                                { 1, 0 },
+                                { '1', '0' }
                             },
                         },
                         PlatoonData = {
@@ -2271,16 +2271,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1, 0 },
-                                {'default_brain', '1', '0' }
+                                { 1, 0 },
+                                { '1', '0' }
                             },
                         },
                         PlatoonData = {
@@ -2303,16 +2303,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1, 0 },
-                                {'default_brain', '1', '0' }
+                                { 1, 0 },
+                                { '1', '0' }
                             },
                         },
                         PlatoonData = {
@@ -2335,16 +2335,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1, 0 },
-                                {'default_brain', '1', '0' }
+                                { 1, 0 },
+                                { '1', '0' }
                             },
                         },
                         PlatoonData = {
@@ -2367,16 +2367,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1, 0 },
-                                {'default_brain', '1', '0' }
+                                { 1, 0 },
+                                { '1', '0' }
                             },
                         },
                         PlatoonData = {
@@ -2399,16 +2399,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1, 0 },
-                                {'default_brain', '1', '0' }
+                                { 1, 0 },
+                                { '1', '0' }
                             },
                         },
                         PlatoonData = {
@@ -2431,16 +2431,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1, 0 },
-                                {'default_brain', '1', '0' }
+                                { 1, 0 },
+                                { '1', '0' }
                             },
                         },
                         PlatoonData = {
@@ -2463,16 +2463,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1, 0 },
-                                {'default_brain', '1', '0' }
+                                { 1, 0 },
+                                { '1', '0' }
                             },
                         },
                         PlatoonData = {
@@ -2495,16 +2495,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1, 0 },
-                                {'default_brain', '1', '0' }
+                                { 1, 0 },
+                                { '1', '0' }
                             },
                         },
                         PlatoonData = {
@@ -2527,16 +2527,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1, 0 },
-                                {'default_brain', '1', '0' }
+                                { 1, 0 },
+                                { '1', '0' }
                             },
                         },
                         PlatoonData = {
@@ -2563,18 +2563,18 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/ai/opai/NavalAttacks_editorfunctions.lua', 'NavalAttacksMasterCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonBuildCallbacks = {
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMUnlockPlatoon',
-                                {'default_brain','default_platoon'},
-                                {'default_brain','default_platoon'}
+                                {'default_platoon'},
+                                {'default_platoon'}
                             },
                         },
                         PlatoonAddFunctions = {

@@ -7,6 +7,7 @@
 --*****************************************************************************
 
 -- current score will contain the most recent score update from the sync
+---@type GameScoreData | false
 currentScores = false
 
 local UIUtil = import("/lua/ui/uiutil.lua")

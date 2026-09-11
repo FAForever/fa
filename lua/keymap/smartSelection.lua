@@ -49,7 +49,7 @@ function compile(strExpression)
   local tokens = utils.StringSplit(strExpression, " ") -- split by space
   for k,v in tokens do
 
-    if utils.StringStartsWith(v, "-") then
+    if utils.StringStarts(v, "-") then
       -- tokens with minus symbol are "negative"
       local withoutSymbol = string.sub(v,2)
       table.insert(result.negatives, withoutSymbol)

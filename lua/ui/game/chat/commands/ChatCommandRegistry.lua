@@ -12,7 +12,7 @@ local Types = import("/lua/ui/game/chat/commands/ChatCommandTypes.lua")
 --- Per-invocation context handed to `Accept` and `Execute`. Holds model + controller + raw input.
 ---@class UIChatCommandContext
 ---@field Model      UIChatModel
----@field Controller table
+---@field Controller table          # /chat/ChatController.lua module
 ---@field SourceText string
 
 --- A registered slash-command: name, optional aliases/params/gates, and the dispatcher's hooks.

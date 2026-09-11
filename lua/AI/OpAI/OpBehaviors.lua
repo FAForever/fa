@@ -58,7 +58,7 @@ function CDROverChargeThread( cdr )
                     cdr.UnitBeingBuiltBehavior = cdr:GetUnitBeingBuilt()
                 end
                 plat = aiBrain:MakePlatoon( '', '' )
-                aiBrain:AssignUnitsToPlatoon( plat, {cdr}, 'support', 'None' )
+                aiBrain:AssignUnitToPlatoon( plat, cdr, 'support', 'None' )
                 plat:Stop()
                 local priList = { categories.COMMAND, categories.EXPERIMENTAL, categories.TECH3 * categories.INDIRECTFIRE,
                     categories.TECH3 * categories.MOBILE, categories.TECH2 * categories.INDIRECTFIRE, categories.MOBILE * categories.TECH2,
@@ -150,7 +150,7 @@ function CDRRepairBuildingUnit( cdr, plat )
     end
     if not cdr:IsDead() and not ( cdr.Fighting or cdr.Running or cdr.GivingUp or cdr.Leashing or cdr.Cornered ) then
         local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
-        aiBrain:AssignUnitsToPlatoon( pool, {cdr}, 'Unassigned', 'None' )
+        aiBrain:AssignUnitToPlatoon( pool, cdr, 'Unassigned', 'None' )
     end
 end
 
@@ -178,7 +178,7 @@ function CDRLeashThread(cdr)
             local cdrPos = cdr:GetPosition()
             if VDist2( cdrPos[1], cdrPos[3], loc[1], loc[3] ) > rad then
                 local plat = aiBrain:MakePlatoon( '', '' )
-                aiBrain:AssignUnitsToPlatoon( plat, {cdr}, 'support', 'none' )
+                aiBrain:AssignUnitToPlatoon( plat, cdr, 'support', 'none' )
                 plat:Stop()
                 plat:MoveToLocation( loc, false )
                 cdr.Leashing = true
@@ -220,7 +220,7 @@ function CDRRunAwayThread( cdr )
                 end
                 cdr.Running = true
                 local plat = aiBrain:MakePlatoon( '', '' )
-                aiBrain:AssignUnitsToPlatoon( plat, {cdr}, 'support', 'None' )
+                aiBrain:AssignUnitToPlatoon( plat, cdr, 'support', 'None' )
                 repeat
                     plat:Stop()
                     cmd = plat:MoveToLocation( runSpot, false )

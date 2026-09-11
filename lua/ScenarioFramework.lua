@@ -50,6 +50,18 @@ function ExitGame()
     Sync.RequestingExit = true
 end
 
+--- Ends an operation where the data is already provided in table form (just a wrapper for sync)
+---@param opData table
+function EndOperationT(opData)
+    Sync.OperationComplete = opData
+end
+
+local function endOperationThread(tbl)
+    WaitSeconds(3) -- Wait for the stats to be synced
+    UnlockInput()
+    EndOperationT(tbl)
+end
+
 --- Ends an operation
 ---@param success boolean instructs UI which dialog to show
 ---@param allPrimary boolean
@@ -68,7 +80,7 @@ function EndOperation(success, allPrimary, allSecondary, allBonus)
     local victoryCondition = import("/lua/sim/victorycondition/VictoryConditionSingleton.lua").GetSingleton()
     victoryCondition:EndGame()
 
-    ForkThread(EndOperationThread, {
+    ForkThread(endOperationThread, {
         success = success,
         difficulty = ScenarioInfo.Options.Difficulty,
         allPrimary = allPrimary,
@@ -79,11 +91,7 @@ function EndOperation(success, allPrimary, allSecondary, allBonus)
     })
 end
 
-function EndOperationThread(tbl)
-    WaitSeconds(3) -- Wait for the stats to be synced
-    UnlockInput()
-    EndOperationT(tbl)
-end
+
 
 ---@alias FactionSelectData {Faction: "aeon" | "cybran" | "uef"}
 
@@ -112,12 +120,6 @@ function OnFactionSelect(data)
     else
         WARN('I chose ', data.Faction, ' but I dont have a callback set!')
     end
-end
-
---- Ends an operation where the data is already provided in table form (just a wrapper for sync)
----@param opData table
-function EndOperationT(opData)
-    Sync.OperationComplete = opData
 end
 
 CreateAreaTrigger = TriggerFile.CreateAreaTrigger
@@ -160,60 +162,12 @@ end
 
 CreateUnitDeathTrigger = TriggerFile.CreateUnitDeathTrigger
 
---- Sets a unit's death to be paused. It is unpaused globally, since this usually only
---- happens to one unit at a time (e.g. the camera zooms in an ACU before it explodes)
----@param unit Unit
-function PauseUnitDeath(unit)
-    if unit and not unit.Dead then
-        unit.OnKilled = OverrideKilled
-        unit.CanBeKilled = false
-        unit.DoTakeDamage = OverrideDoDamage
-    end
-end
-
---- An override for `Unit.DoTakeDamage` to hold on to the final blow and then release it
---- on the unit once its death is unpaused
----@param self Unit
----@param instigator Unit
----@param amount number
----@param vector any
----@param damageType DamageType
-function OverrideDoDamage(self, instigator, amount, vector, damageType)
-    local preAdjHealth = self:GetHealth()
-    self:AdjustHealth(instigator, -amount)
-    local health = self:GetHealth()
-    if (health <= 0 or amount > preAdjHealth) and not self.KilledFlag then
-        self.KilledFlag = true
-        if damageType == 'Reclaimed' then
-            self:Destroy()
-        else
-            local excessDamageRatio = 0.0
-            -- Calculate the excess damage amount
-            local excess = preAdjHealth - amount
-            local maxHealth = self:GetMaxHealth()
-            if excess < 0 and maxHealth > 0 then
-                excessDamageRatio = -excess / maxHealth
-            end
-            IssueToUnitClearCommands(self)
-            ForkThread(UnlockAndKillUnitThread, self, instigator, damageType, excessDamageRatio)
-        end
-    end
-end
-function UnlockAndKillUnitThread(self, instigator, damageType, excessDamageRatio)
-    self:DoUnitCallbacks('OnKilled')
-    while PauseUnitDeathActive do
-        WaitSeconds(1)
-    end
-    self.CanBeKilled = true
-    self:Kill(instigator, damageType, excessDamageRatio)
-end
-
 --- An override for `Unit.OnKilled` to make unit death pausing work
 ---@param self Unit
 ---@param instigator Unit
 ---@param type any
 ---@param overkillRatio number
-function OverrideKilled(self, instigator, type, overkillRatio)
+local function overrideKilled(self, instigator, type, overkillRatio)
     if not self.CanBeKilled then
         self:DoTakeDamage(instigator, 1000000, nil, 'Normal')
         return
@@ -262,6 +216,58 @@ function OverrideKilled(self, instigator, type, overkillRatio)
     self:DisableUnitIntel('Killed')
     self:ForkThread(self.DeathThread, overkillRatio, instigator)
 end
+
+local function unlockAndKillUnitThread(self, instigator, damageType, excessDamageRatio)
+    self:DoUnitCallbacks('OnKilled')
+    while PauseUnitDeathActive do
+        WaitSeconds(1)
+    end
+    self.CanBeKilled = true
+    self:Kill(instigator, damageType, excessDamageRatio)
+end
+
+--- An override for `Unit.DoTakeDamage` to hold on to the final blow and then release it
+--- on the unit once its death is unpaused
+---@param self Unit
+---@param instigator Unit
+---@param amount number
+---@param vector any
+---@param damageType DamageType
+local function overrideDoDamage(self, instigator, amount, vector, damageType)
+    local preAdjHealth = self:GetHealth()
+    self:AdjustHealth(instigator, -amount)
+    local health = self:GetHealth()
+    if (health <= 0 or amount > preAdjHealth) and not self.KilledFlag then
+        self.KilledFlag = true
+        if damageType == 'Reclaimed' then
+            self:Destroy()
+        else
+            local excessDamageRatio = 0.0
+            -- Calculate the excess damage amount
+            local excess = preAdjHealth - amount
+            local maxHealth = self:GetMaxHealth()
+            if excess < 0 and maxHealth > 0 then
+                excessDamageRatio = -excess / maxHealth
+            end
+            IssueToUnitClearCommands(self)
+            ForkThread(unlockAndKillUnitThread, self, instigator, damageType, excessDamageRatio)
+        end
+    end
+end
+
+--- Sets a unit's death to be paused. It is unpaused globally, since this usually only
+--- happens to one unit at a time (e.g. the camera zooms in an ACU before it explodes)
+---@param unit Unit
+function PauseUnitDeath(unit)
+    if unit and not unit.Dead then
+        unit.OnKilled = overrideKilled
+        unit.CanBeKilled = false
+        unit.DoTakeDamage = overrideDoDamage
+    end
+end
+
+
+
 
 --- Transfers `unit` to `army`, ignoring unit restrictions
 ---@param unit Unit
@@ -397,6 +403,15 @@ function GetCatUnitsInArea(cat, area, brain)
     return result
 end
 
+--- Goes through every unit in `group` and kills them with explosions
+---@param units Unit[]
+function KillGroup(units)
+    for _, unit in pairs(units) do
+        if unit.Dead then continue end
+        unit:Kill()
+    end
+end
+
 --- Goes through every unit in `group` and destroys them without explosions
 ---@param units Unit[]
 function DestroyGroup(units)
@@ -417,10 +432,10 @@ CreateUnitNearTypeTrigger = TriggerFile.CreateUnitNearTypeTrigger
 
 -- platoon functions REQUIRE `squad` to be non-nil when present
 
--- Orders a platoon to move along a route
+--- Orders a platoon to move along a route
 ---@param platoon Platoon
 ---@param route (MarkerName | Vector)[]
----@param squad? string
+---@param squad? PlatoonSquads
 function PlatoonMoveRoute(platoon, route, squad)
     for _, node in route do
         if type(node) == 'string' then
@@ -437,7 +452,7 @@ end
 --- Orders platoon to patrol a route
 ---@param platoon Platoon
 ---@param route (MarkerName | Vector)[]
----@param squad? string
+---@param squad? PlatoonSquads
 function PlatoonPatrolRoute(platoon, route, squad)
     for _, node in route do
         if type(node) == 'string' then
@@ -454,7 +469,7 @@ end
 --- Orders a platoon to attack-move along a route
 ---@param platoon Platoon
 ---@param route (MarkerName | Vector)[]
----@param squad? string
+---@param squad? PlatoonSquads
 function PlatoonAttackRoute(platoon, route, squad)
     for _, node in route do
         if type(node) == 'string' then
@@ -471,47 +486,25 @@ end
 --- Orders a platoon to move along a chain
 ---@param platoon Platoon
 ---@param chain ChainName
----@param squad? string
+---@param squad? PlatoonSquads
 function PlatoonMoveChain(platoon, chain, squad)
-    for _, pos in ScenarioUtils.ChainToPositions(chain) do
-        if squad then
-            platoon:MoveToLocation(pos, false, squad)
-        else
-            platoon:MoveToLocation(pos, false)
-        end
-    end
+    PlatoonMoveRoute(platoon, ScenarioUtils.ChainToPositions(chain), squad)
 end
 
 --- Orders a platoon to patrol along a chain
 ---@param platoon Platoon
 ---@param chain ChainName
----@param squad? string
+---@param squad? PlatoonSquads
 function PlatoonPatrolChain(platoon, chain, squad)
-    for _, pos in ScenarioUtils.ChainToPositions(chain) do
-        if squad then
-            platoon:Patrol(pos, squad)
-        else
-            platoon:Patrol(pos)
-        end
-    end
+    PlatoonPatrolRoute(platoon, ScenarioUtils.ChainToPositions(chain), squad)
 end
 
 --- Orders a platoon to attack-move through a chain
 ---@param platoon Platoon
 ---@param chain ChainName
----@param squad? string
----@return PlatoonCommand # the last attack-move command
+---@param squad? PlatoonSquads
 function PlatoonAttackChain(platoon, chain, squad)
-    local cmd
-    for _, pos in ScenarioUtils.ChainToPositions(chain) do
-        if squad then
-            cmd = platoon:AggressiveMoveToLocation(pos, squad)
-        else
-            cmd = platoon:AggressiveMoveToLocation(pos)
-        end
-    end
-
-    return cmd
+    PlatoonAttackRoute(platoon, ScenarioUtils.ChainToPositions(chain), squad)
 end
 
 --- Orders a group to patrol along a chain
@@ -563,17 +556,9 @@ function GroupMoveChain(units, chain)
     end
 end
 
---- Makes `units` to have their work progress start at `0.0` and scale to `1.0` over `time`
 ---@param units Unit[]
 ---@param time number
-function GroupProgressTimer(units, time)
-    ForkThread(GroupProgressTimerThread, units, time)
-end
-
----
----@param units Unit[]
----@param time number
-function GroupProgressTimerThread(units, time)
+local function groupProgressTimerThread(units, time)
     local currTime = 0
     while currTime < time do
         local prog = currTime / time
@@ -587,52 +572,55 @@ function GroupProgressTimerThread(units, time)
     end
 end
 
----Adds a dialogue to the dialogue queue to be played.
----@param dialogueTable DialogueTable
----@param callback? fun()|false Function to call when the dialogue ends
----@param critical? boolean Critical dialogues will always play. Non critical ones can be flushed by [FlushDialogueQueue]
----@param speaker? Unit If this unit is dead the dialogue won't play.
-function Dialogue(dialogueTable, callback, critical, speaker)
-    if not (speaker and speaker.Dead) then
-        local dTable = table.deepcopy(dialogueTable)
-        if callback then
-            dTable.Callback = callback
-        end
-        if critical then
-            dTable.Critical = critical
-        end
-        if ScenarioInfo.DialogueLock == nil then
-            ScenarioInfo.DialogueLock = false
-            ScenarioInfo.DialogueLockPosition = 0
-            ScenarioInfo.DialogueQueue = {}
-            ScenarioInfo.DialogueFinished = {}
-        end
-        table.insert(ScenarioInfo.DialogueQueue, dTable)
-        if not ScenarioInfo.DialogueLock then
-            ScenarioInfo.DialogueLock = true
-            ForkThread(PlayDialogue)
-        end
-    end
+--- Makes `units` to have their work progress start at `0.0` and scale to `1.0` over `time`
+---@param units Unit[]
+---@param time number
+function GroupProgressTimer(units, time)
+    ForkThread(groupProgressTimerThread, units, time)
 end
 
---- Removes non critical dialogues from the queue
-function FlushDialogueQueue()
-    if ScenarioInfo.DialogueQueue then
-        for _, dialogue in ScenarioInfo.DialogueQueue do
-            dialogue.Flushed = true
-        end
+---
+---@param entryData Transmission
+local function addTransmissionData(entryData)
+    SimUIVars.SaveEntry(entryData)
+end
+
+---Syncs text to be display with video to the UI
+---@param text string
+local function displayVideoText(text)
+    if not Sync.VideoText then
+        Sync.VideoText = {}
+    end
+    table.insert(Sync.VideoText, text)
+end
+
+---Currently there's no UI code to display text only
+---@param text string
+function DisplayMissionText(text)
+    if not Sync.MissionText then
+        Sync.MissionText = {}
+    end
+    table.insert(Sync.MissionText, text)
+end
+
+---
+---@param name string
+local function waitForDialogue(name)
+    while not ScenarioInfo.DialogueFinished[name] do
+        WaitTicks(1)
     end
 end
 
 --- This function sends movie data to the sync table and saves it off for reloading in save games
 ---@param movieTable MovieTable
 ---@param text string
-function SetupMFDSync(movieTable, text)
-    DisplayVideoText(text)
+local function setupMFDSync(movieTable, text)
+    displayVideoText(text)
     Sync.PlayMFDMovie = {movieTable[1], movieTable[2], movieTable[3], movieTable[4]}
     ScenarioInfo.DialogueFinished[movieTable[1]] = false
 
     local tempText = LOC(text)
+    ---@cast tempText -nil
     local tempData = {}
     local nameStart = tempText:find(']')
     if nameStart ~= nil then
@@ -643,7 +631,7 @@ function SetupMFDSync(movieTable, text)
         tempData.text = tempText
         LOG("ERROR: Unable to find name in string: " .. text .. " (" .. tempText .. ")")
     end
-    -- `GetGameTime()` would be the perfect thing to use here--unfortunately, that's sim-side only
+
     local seconds = GetGameTimeSeconds()
     local MathFloor = math.floor
     local hours = MathFloor(seconds / 3600)
@@ -661,18 +649,12 @@ function SetupMFDSync(movieTable, text)
         tempData.color = 'ffffffff'
     end
 
-    AddTransmissionData(tempData)
-    WaitForDialogue(movieTable[1])
-end
-
----
----@param entryData Transmission
-function AddTransmissionData(entryData)
-    SimUIVars.SaveEntry(entryData)
+    addTransmissionData(tempData)
+    waitForDialogue(movieTable[1])
 end
 
 --- The actual thread used by `Dialogue`
-function PlayDialogue()
+local function playDialogue()
     while not table.empty(ScenarioInfo.DialogueQueue) do
         local dialogueTable = table.remove(ScenarioInfo.DialogueQueue, 1)
         if not dialogueTable then
@@ -704,7 +686,7 @@ function PlayDialogue()
                         else
                             movieData = {'/movies/' .. vid, bank, cue, dialogue.faction}
                         end
-                        SetupMFDSync(movieData, text)
+                        setupMFDSync(movieData, text)
                     end
                     if delay and delay > 0 then
                         WaitSeconds(delay)
@@ -723,11 +705,40 @@ function PlayDialogue()
     ScenarioInfo.DialogueLock = false
 end
 
----
----@param name string
-function WaitForDialogue(name)
-    while not ScenarioInfo.DialogueFinished[name] do
-        WaitTicks(1)
+---Adds a dialogue to the dialogue queue to be played.
+---@param dialogueTable DialogueTable
+---@param callback? fun()|false Function to call when the dialogue ends
+---@param critical? boolean Critical dialogues will always play. Non critical ones can be flushed by [FlushDialogueQueue]
+---@param speaker? Unit If this unit is dead the dialogue won't play.
+function Dialogue(dialogueTable, callback, critical, speaker)
+    if not (speaker and speaker.Dead) then
+        local dTable = table.deepcopy(dialogueTable)
+        if callback then
+            dTable.Callback = callback
+        end
+        if critical then
+            dTable.Critical = critical
+        end
+        if ScenarioInfo.DialogueLock == nil then
+            ScenarioInfo.DialogueLock = false
+            ScenarioInfo.DialogueLockPosition = 0
+            ScenarioInfo.DialogueQueue = {}
+            ScenarioInfo.DialogueFinished = {}
+        end
+        table.insert(ScenarioInfo.DialogueQueue, dTable)
+        if not ScenarioInfo.DialogueLock then
+            ScenarioInfo.DialogueLock = true
+            ForkThread(playDialogue)
+        end
+    end
+end
+
+--- Removes non critical dialogues from the queue
+function FlushDialogueQueue()
+    if ScenarioInfo.DialogueQueue then
+        for _, dialogue in ScenarioInfo.DialogueQueue do
+            dialogue.Flushed = true
+        end
     end
 end
 
@@ -747,24 +758,6 @@ function PlayTaunt(head, taunt)
     Sync.MPTaunt = {head, taunt}
 end
 
----
----@param text string
-function DisplayMissionText(text)
-    if not Sync.MissionText then
-        Sync.MissionText = {}
-    end
-    table.insert(Sync.MissionText, text)
-end
-
----
----@param text string
-function DisplayVideoText(text)
-    if not Sync.VideoText then
-        Sync.VideoText = {}
-    end
-    table.insert(Sync.VideoText, text)
-end
-
 --- Plays an NIS
 ---@param pathToMovie string
 function PlayNIS(pathToMovie)
@@ -773,9 +766,18 @@ function PlayNIS(pathToMovie)
     end
 end
 
+---@param callback fun()
+local function endGameWaitThread(callback)
+    while not ScenarioInfo.DialogueFinished['EndGameMovie'] do
+        WaitTicks(1)
+    end
+    callback()
+    ScenarioInfo.DialogueFinished['EndGameMovie'] = false
+end
+
 ---
 ---@param faction string
----@param callback fun()
+---@param callback? fun()
 function PlayEndGameMovie(faction, callback)
     if not Sync.EndGameMovie then
         Sync.EndGameMovie = faction
@@ -785,18 +787,8 @@ function PlayEndGameMovie(faction, callback)
             ScenarioInfo.DialogueFinished = {}
         end
         ScenarioInfo.DialogueFinished['EndGameMovie'] = false
-        ForkThread(EndGameWaitThread, callback)
+        ForkThread(endGameWaitThread, callback)
     end
-end
-
----
----@param callback fun()
-function EndGameWaitThread(callback)
-    while not ScenarioInfo.DialogueFinished['EndGameMovie'] do
-        WaitTicks(1)
-    end
-    callback()
-    ScenarioInfo.DialogueFinished['EndGameMovie'] = false
 end
 
 --- Plays an XACT sound if needed--currently all VOs are videos
@@ -1022,7 +1014,6 @@ function FakeGateInUnit(unit, callback, bonesToHide)
             unit:SetMesh(bp.Display.MeshBlueprint, true)
         end
     else
-        LOG ('debug:non commander')
         unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
         unit:PlayUnitSound('GateCharge')
         WaitSeconds(2)
@@ -1218,7 +1209,6 @@ function CreateVisibleAreaAtUnit(radius, atUnit, lifetime, army)
     return VizMarker(spec)
 end
 
-
 --- Creates a visible area for `army` at `x`,`z` of `radius` size.
 --- If `lifetime` is 0, the entity lasts forever, otherwise, for `lifetime` seconds.
 --- Returns a `VizMarker` so you can destroy it later if you want.
@@ -1267,24 +1257,12 @@ function SetPlayableArea(rect, voFlag)
 
     SetPlayableRect(x0, y0, x1, y1)
     if voFlag then
-        ForkThread(PlayableRectCameraThread, rect)
         SyncVoice({Cue = 'Computer_Computer_MapExpansion_01380', Bank = 'XGG'})
     end
 
     import("/lua/simsync.lua").SyncPlayableRect(rect)
     Sync.NewPlayableArea = {x0, y0, x1, y1}
     ForkThread(GenerateOffMapAreas)
-end
-
---- unused
-function PlayableRectCameraThread(rect)
---    local cam = import("/lua/simcamera.lua").SimCamera('WorldCamera')
---    LockInput()
---    cam:UseGameClock()
---    cam:SyncPlayableRect(rect)
---    cam:MoveTo(rect, 1)
---    cam:WaitFor()
---    UnLockInput()
 end
 
 --- Sets platoon to only be built once
@@ -1456,8 +1434,9 @@ function SetLoyalistColor(army)
 end
 
 ---
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param name string
+---@return integer
 function AMPlatoonCounter(aiBrain, name)
     local platoonCount = aiBrain.AttackData.PlatoonCount
     local count = platoonCount[name]
@@ -1961,47 +1940,6 @@ function MissionNISCameraThread(unit, blendTime, holdTime, orientationOffset, po
     end
 end
 
---- NIS Garbage
----@param unit UnitInfo | Unit
----@param camInfo CamInfo
-function OperationNISCamera(unit, camInfo)
-    if camInfo.markerCam then
-        ForkThread(OperationNISCameraThread, unit, camInfo)
-    else
-        local unitInfo = {Position = unit:GetPosition(), Heading = unit:GetHeading()}
-        ForkThread(OperationNISCameraThread, unitInfo, camInfo)
-    end
-end
-
---- CDR Death (pass `hold` only if it's a mid-operation death)--resets death pausin
----@param unit Unit
----@param holdTime? number
-function CDRDeathNISCamera(unit, holdTime)
-    PauseUnitDeathActive = true
-    local camInfo = {
-        blendTime = 1,
-        holdTime = holdTime,
-        orientationOffset = {math.pi, 0.7, 0 },
-        positionOffset = {0, 1, 0 },
-        zoomVal = 65,
-        vizRadius = 10,
-    }
-    if not camInfo.holdTime then
-        camInfo.blendTime = 2.5
-        camInfo.spinSpeed = 0.03
-        camInfo.overrideCam = true
-    end
-    local unitInfo = {Position = unit:GetPosition(), Heading = unit:GetHeading()}
-    ForkThread(OperationNISCameraThread, unitInfo, camInfo)
-end
-
---- For op intro (currently not used)
----@param unit Unit
-function IntroductionNISCamera(unit)
-    local unitInfo = {Position = unit:GetPosition(), Heading = unit:GetHeading()}
-    ForkThread(OperationNISCameraThread, unitInfo, camInfo)
-end
-
 ---@class UnitInfo
 ---@field Position Vector
 ---@field Heading Vector
@@ -2026,7 +1964,7 @@ end
 --- Applies `camInfo` settings onto `unitInfo`. Will unpause unit deaths when finished (or is already busy).
 ---@param unitInfo UnitInfo | Vector # can be `Vector` when `camInfo.markerCam` is set
 ---@param camInfo CamInfo
-function OperationNISCameraThread(unitInfo, camInfo)
+local function operationNISCameraThread(unitInfo, camInfo)
     if not ScenarioInfo.NIS or camInfo.overrideCam then
         local cam = import("/lua/simcamera.lua").SimCamera('WorldCamera')
 
@@ -2120,6 +2058,47 @@ function OperationNISCameraThread(unitInfo, camInfo)
 
     end
     PauseUnitDeathActive = false
+end
+
+--- NIS Garbage
+---@param unit UnitInfo | Unit
+---@param camInfo CamInfo
+function OperationNISCamera(unit, camInfo)
+    if camInfo.markerCam then
+        ForkThread(operationNISCameraThread, unit, camInfo)
+    else
+        local unitInfo = {Position = unit:GetPosition(), Heading = unit:GetHeading()}
+        ForkThread(operationNISCameraThread, unitInfo, camInfo)
+    end
+end
+
+--- CDR Death (pass `hold` only if it's a mid-operation death)--resets death pausin
+---@param unit Unit
+---@param holdTime? number
+function CDRDeathNISCamera(unit, holdTime)
+    PauseUnitDeathActive = true
+    local camInfo = {
+        blendTime = 1,
+        holdTime = holdTime,
+        orientationOffset = {math.pi, 0.7, 0 },
+        positionOffset = {0, 1, 0 },
+        zoomVal = 65,
+        vizRadius = 10,
+    }
+    if not camInfo.holdTime then
+        camInfo.blendTime = 2.5
+        camInfo.spinSpeed = 0.03
+        camInfo.overrideCam = true
+    end
+    local unitInfo = {Position = unit:GetPosition(), Heading = unit:GetHeading()}
+    ForkThread(operationNISCameraThread, unitInfo, camInfo)
+end
+
+--- For op intro (currently not used)
+---@param unit Unit
+function IntroductionNISCamera(unit)
+    local unitInfo = {Position = unit:GetPosition(), Heading = unit:GetHeading()}
+    ForkThread(operationNISCameraThread, unitInfo, camInfo)
 end
 
 ---

@@ -766,7 +766,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSk
                         local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                         for _,v in overflow do
                             if not v.Dead then
-                                aiBrain:AssignUnitsToPlatoon(pool, {v}, 'Unassigned', 'None')
+                                aiBrain:AssignUnitToPlatoon(pool, v, 'Unassigned', 'None')
                             end
                         end
                         units = goodunits
@@ -943,7 +943,7 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
                         local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                         for _,v in overflow do
                             if not v.Dead then
-                                aiBrain:AssignUnitsToPlatoon(pool, {v}, 'Unassigned', 'None')
+                                aiBrain:AssignUnitToPlatoon(pool, v, 'Unassigned', 'None')
                             end
                         end
                         units = goodunits

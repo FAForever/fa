@@ -78,6 +78,34 @@ function AppendLocalSystemMessage(text)
     }
 end
 
+---------------------------------------------------------------------------
+-- Filtering
+
+--- Whether an entry should be shown by chat interfaces according to options
+---@param entry UIChatEntry
+---@return boolean
+IsValidEntry = function(entry)
+    -- Gates on the per-army mute map and the `links` option. Camera
+    -- or Location both qualify as "link" messages: either surfaces
+    -- the camera-link affordance on the row.
+    if entry == nil then return false end
+    local options = ChatConfigModel.GetOptions()
+    if options.muted and entry.ArmyID and options.muted[entry.ArmyID] then
+        return false
+    end
+    if (entry.Camera or entry.Location) and options.links == false then
+        return false
+    end
+    if entry.Type == 'ReceiveResources' and options.muteSharedResources then
+        return false
+    end
+    if entry.Type == 'ReceiveUnits' and options.muteSharedUnits then
+        return false
+    end
+    return true
+end
+
+
 -------------------------------------------------------------------------------
 -- Slash commands
 
@@ -120,18 +148,16 @@ local function FindClientsAsObserver(armiesTable)
     local result = {}
     for index, client in GetSessionClients() do
         if not client.connected then continue end
-        local playerIsObserver = true
+        local clientIsObserver = true
         for _, player in armiesTable do
-            if player.outOfGame and player.human and player.nickname == client.name then
-                table.insert(result, index)
-                playerIsObserver = false
-                break
-            elseif player.nickname == client.name then
-                playerIsObserver = false
+            if player.nickname == client.name then
+                if not (player.human and player.outOfGame) then
+                    clientIsObserver = false
+                end
                 break
             end
         end
-        if playerIsObserver then
+        if clientIsObserver then
             table.insert(result, index)
         end
     end
@@ -148,26 +174,24 @@ end
 ---@return number[]
 local function FindClientsAsPlayer(armiesTable, focus, armyID)
     local result = {}
-    local srcs = {}
+    local sendSrc = {}
+    local nHumanArmies = 0
     for army, info in armiesTable do
-        if armyID then
-            if army == armyID then
-                for _, cmdsrc in info.authorizedCommandSources do
-                    srcs[cmdsrc] = true
-                end
-                break
-            end
-        else
-            if IsAlly(focus, army) then
-                for _, cmdsrc in info.authorizedCommandSources do
-                    srcs[cmdsrc] = true
-                end
+        if info.human then nHumanArmies = nHumanArmies + 1 end
+        if (armyID and armyID == army)
+            or (not armyID and IsAlly(focus, army))
+        then
+            for _, cmdsrc in info.authorizedCommandSources do
+                sendSrc[cmdsrc] = true
             end
         end
     end
     for index, client in GetSessionClients() do
         for _, cmdsrc in client.authorizedCommandSources do
-            if srcs[cmdsrc] then
+            if sendSrc[cmdsrc]
+                -- observers have a source greater than the number of player armies
+                or cmdsrc > nHumanArmies
+            then
                 table.insert(result, index)
                 break
             end
@@ -217,11 +241,22 @@ local ToStrings = ChatUtils.ToStrings
 -------------------------------------------------------------------------------
 -- Chat line construction
 
+---@class ChatLineArgs
+---@field Name string
+---@field Text? string
+---@field ArmyData? table
+---@field IsObserver? boolean
+---@field Recipient UIChatRecipient
+---@field Camera? table
+---@field Location? UIChatEntryLocation
+---@field Id? string
+---@field Type? ChatMessageType
+
 --- Builds a `UIChatEntry` from a sender's army data + message metadata and
 --- appends it to the model history. Fields with natural defaults (colour,
 --- army ID, faction icon) fall back when the army data is missing or the
 --- sender is an observer.
----@param args { Name: string, Text?: string, ArmyData?: table, IsObserver?: boolean, Recipient: UIChatRecipient, Camera?: table, Location?: UIChatEntryLocation, Id?: string }
+---@param args ChatLineArgs
 local function AppendChatLine(args)
     local armyData = args.ArmyData or {}
     -- Observers have no `faction`, fall through to the tail icon in
@@ -254,6 +289,7 @@ local function AppendChatLine(args)
         Camera    = args.Camera,
         Location  = args.Location,
         Id        = args.Id,
+        Type      = args.Type,
     }
 end
 
@@ -279,24 +315,19 @@ end
 --- message, dedupes against history, delegates Notify-subsystem messages,
 --- resolves the sender's army data, and appends a chat line.
 ---@param sender string
----@param msg ChatPayload
+---@param msg any
 function OnReceive(sender, msg)
     if type(sender) ~= 'string' or sender == '' then
         sender = 'nil sender'
     end
 
     if not ChatPayload.IsValidPayload(msg) then return end
+    ---@cast msg ChatPayload
     if IsDuplicateMessage(msg) then return end
 
     -- only apply LOCf when Args are present, otherwise players can randomly send localized messages by including format specifiers in their text.
     if msg.Args then
         msg.text = LOCF(msg.text, unpack(msg.Args))
-    end
-
-    -- Notify owns the display decision for `to='notify'`. Only fall
-    -- through to rendering a chat line if it returns false.
-    if msg.to == ChatModel.RecipientNotify and not import("/lua/ui/notify/notify.lua").processIncomingMessage(sender, msg) then
-        return
     end
 
     local armyData = GetArmyData(sender)
@@ -308,16 +339,29 @@ function OnReceive(sender, msg)
     -- peer claiming Observer while resolving to a real army is malformed.
     -- Drop the message entirely rather than stripping the flag, which
     -- would let manipulated traffic render under a different label.
-    if msg.Observer and armyData then return end
+    if not SessionIsGameOver() and msg.Observer and armyData then return end
+
+    if msg.to == ChatModel.RecipientNotify then
+        -- ignore unwanted messages
+        if not import("/lua/ui/notify/notify.lua").processIncomingMessage(sender, msg) then
+            return
+        -- if we are an observer, display the message as sent from the player making the upgrade
+        elseif GetFocusArmy() == -1 then
+            local armyInfo = GetArmyData(msg.notifyFrom)
+            if armyInfo then
+                sender = armyInfo.nickname or armyInfo.name
+                armyData = armyInfo
+            end
+        end
+    end
 
     local to = msg.to
     local descriptor = ToStrings[to] or ToStrings.private
     local towho = msg.Observer and LOC("<LOC lobui_0692>to observers:") or LOC(descriptor.text)
 
     local name
-    if type(to) == 'number' and SessionIsReplay() then
-        -- In a replay, private messages need the full routing so
-        -- spectators can attribute the conversation.
+    if type(to) == 'number' and (SessionIsReplay() or IsObserver() or GetFocusArmy() == -1) then
+        -- Full routing so that observers can see who private messages are sent to
         name = string.format("%s %s %s:", sender, LOC(ToStrings.to.text),
             (GetArmyData(to) or {}).nickname or tostring(to))
     else
@@ -333,6 +377,7 @@ function OnReceive(sender, msg)
         Camera     = msg.camera,
         Location   = msg.location,
         Id         = msg.Id,
+        Type       = msg.Type
     }
 end
 
@@ -372,6 +417,7 @@ local function OnEcho(senderData, recipientData, msg)
         Camera    = msg.camera,
         Location  = msg.location,
         Id        = msg.Id,
+        Type      = msg.Type,
     }
 end
 
@@ -418,7 +464,10 @@ function Send(text, attachCamera)
     -- Observers can't target a private recipient. Bail before stamping
     -- an id or firing sim callbacks for a message the engine would
     -- refuse anyway.
-    if focusArmy == -1 and type(recipient) == 'number' then return end
+    if focusArmy == -1 and type(recipient) == 'number' then
+        AppendLocalSystemMessage(LOC("<LOC chat_private_message_as_observer>Cannot privately message as observer."))
+        return
+    end
 
     -- Flag observer broadcasts so receivers render "to observers:".
     -- Both delivery paths need to see this, so set it before either

@@ -92,7 +92,7 @@ local VectorCached = Vector(0, 0, 0)
 ---@field Blueprint ProjectileBlueprint
 ---@field Army Army
 ---@field Trash TrashBag
----@field Launcher Unit
+---@field Launcher Unit? # May be dead or destroyed when the projectile impacts
 ---@field OriginalTarget? Unit | Blip
 ---@field DamageData WeaponDamageTable
 ---@field MyDepthCharge? DepthCharge    # If weapon blueprint has a (valid) `DepthCharge` field
@@ -338,26 +338,27 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         local blueprintDisplay = blueprint.Display
         local blueprintCategoriesHash = blueprint.CategoriesHash
 
-        -- callbacks for launcher to have an idea what is going on for AIs
-        if blueprintCategoriesHash['TACTICAL'] or blueprintCategoriesHash['STRATEGIC'] then
+        --- Usually the launcher will be the instigator but if it has been deleted
+        --- use ourselves since this projectile is still associated with an army.
+        ---@type Unit | Projectile
+        local instigator = self
+        if not IsDestroyed(launcher) then
+            ---@cast launcher -nil
+            instigator = launcher
 
-            -- we have a target, but got caught by terrain
-            if targetType == 'Terrain' then
-                if not IsDestroyed(launcher) then
+            -- callbacks for launcher to have an idea what is going on for AIs
+            if blueprintCategoriesHash['TACTICAL'] or blueprintCategoriesHash['STRATEGIC'] then
+                -- we have a target, but got caught by terrain
+                if targetType == 'Terrain' then
                     launcher:OnMissileImpactTerrain(self:GetCurrentTargetPosition(), position)
-                end
 
                 -- we have a target, but got caught by an (unexpected) shield
-            elseif targetType == 'Shield' then
-                if not IsDestroyed(launcher) then
+                elseif targetType == 'Shield' then
+                    ---@cast targetEntity Shield
                     launcher:OnMissileImpactShield(self:GetCurrentTargetPosition(), targetEntity.Owner, position)
                 end
             end
         end
-
-        -- Try to use the launcher as instigator first. If its been deleted, use ourselves (this
-        -- projectile is still associated with an army)
-        local instigator = launcher or self
 
         -- localize information for performance
         local vcx, vcy, vcz = EntityGetPositionXYZ(self)
@@ -619,7 +620,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
 
     --- Called by Lua to process the damage logic of a projectile
     ---@param self Projectile
-    ---@param instigator Unit # The launcher, and if it doesn't exist, the projectile itself
+    ---@param instigator Unit | Projectile # The launcher, and if it doesn't exist, the projectile itself
     ---@param DamageData WeaponDamageTable # passed by the weapon
     ---@param targetEntity Unit | Prop | nil # nil if hitting terrain
     ---@param cachedPosition Vector # A cached position that is passed to prevent table allocations, can not be used in fork threads and / or after a yield statement
@@ -732,7 +733,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         if self.InnerRing and self.OuterRing then
             local damageType = DamageData.DamageType or 'Nuke'
             self.InnerRing:DoNukeDamage(
-                self.Launcher,
+                instigator,
                 self:GetPosition(), -- can't use cachedPosition here: breaks invariant
                 self.Brain,
                 self.Army,
@@ -740,7 +741,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
             )
 
             self.OuterRing:DoNukeDamage(
-                self.Launcher,
+                instigator,
                 self:GetPosition(), -- can't use cachedPosition here: breaks invariant
                 self.Brain,
                 self.Army,

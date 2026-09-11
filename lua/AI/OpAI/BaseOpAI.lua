@@ -549,6 +549,11 @@ OpAI = ClassSimple {
         if not self:FindChildren() or not self:FindMaster() then
             return false
         end
+        -- Remove `"default_brain"` param from the condition. It's a remnant of GPG code that got refactored,
+        -- as the AIBrain is always the first param passed to the build condition
+        if parameters[1] == "default_brain" then
+            table.remove(parameters, 1)
+        end
         for _, v in self.ChildrenHandles do
             local found
 
@@ -595,7 +600,7 @@ OpAI = ClassSimple {
 
     ---Add Functions for PBM Platoons; FormCallbacks for AM Platoons
     ---@param self OpAI
-    ---@param fileName FileName|function
+    ---@param fileName fun(self: Platoon) | FileName
     ---@param funcName? string
     ---@param bName? string
     ---@return boolean
@@ -620,8 +625,8 @@ OpAI = ClassSimple {
 
     ---Adds a function to run when the platoon is formed.
     ---@param self OpAI
-    ---@param filename any
-    ---@param funcName string
+    ---@param filename fun(self: Platoon) | FileName
+    ---@param funcName? string
     ---@param builderName? string
     AddFormCallback = function(self, filename, funcName, builderName)
         builderName = builderName or self.MasterName

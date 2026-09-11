@@ -8,11 +8,17 @@
 
 -- types that originate from the map
 
----@alias MarkerChain Marker[]                 # Name reference to a marker chain as defined in the map
----@class Area: string                          # Name reference to a area as defined in the map
+---@class MarkerChain
+---@field Markers Marker[]       # Name reference to a marker chain as defined in the map
+---@class Area: string           # Name reference to a area as defined in the map
 
----@class Marker: string                        # Name reference to a marker as defined in the map
----@field position Vector                       # A { x, y, z } array-based table
+---@class Marker: string         # Name reference to a marker as defined in the map
+---@field position Vector        # A { x, y, z } array-based table
+---@field orientation Vector     # heading, pitch, roll
+---@field type string
+---@field color string
+---@field prop string
+---@field resource boolean|nil
 
 -- types commonly used in repository
 
@@ -21,7 +27,7 @@
 ---@class BuildCondition
 ---@field [1] FileName
 ---@field [2] FunctionName
----@field [3] any
+---@field [3] table
 
 ---@class FileFunctionRef
 ---@field [1] FileName
@@ -38,13 +44,15 @@
 ---@field [2] FunctionName
 
 ---@class PlatoonData
----@field TransportReturn Marker                # Location for transports to return to
----@field PatrolChains MarkerChain[]            # Selection of patrol chains to guide the constructed units
----@field PatrolChain MarkerChain               # Patrol chain to guide the construced units
----@field AttackChain MarkerChain               # Attack chain to guide the constructed units
----@field LandingChain MarkerChain              # Landing chain to guide the transports carrying the constructed units
----@field Area Area                             # An area, use depends on master platoon function
----@field Location Marker                       # A location, use depends on master platoon function
+---@field TransportReturn Marker    # Location for transports to return to
+---@field PatrolChains Marker[]     # Selection of patrol chains to guide the constructed units
+---@field PatrolChain Marker        # Patrol chain to guide the construced units
+---@field AttackChain Marker        # Attack chain to guide the constructed units
+---@field LandingChain Marker       # Landing chain to guide the transports carrying the constructed units
+---@field Area Area                 # An area, use depends on master platoon function
+---@field Location Marker           # A location, use depends on master platoon function
+---@field BaseName string           # Name of the `BaseManager` the platoon belongs to
+---@field NumBuilding integer       # Specific to `BaseManager` engineer platoons
 
 ---@class AddOpAIData
 ---@field MasterPlatoonFunction FileFunctionRef     # Behavior of instances upon completion
@@ -241,6 +249,7 @@ function FailSafeUpgradeOnStopBeingBuilt(unit)
 	end
 end
 
+---@alias BaseFunctionalityState "AirScouting" | "AntiAir" | "Artillery" | "BuildEngineers" | "CounterIntel" | "Engineers" | "ExpansionBases" | "Fabrication" | "GroundDefense" | "Intel" | "LandScouting" | "Nukes" | "Patrolling" | "Shields" | "TMLs" | "Torpedos" | "Walls"
 
 ---@class ExpansionBaseData
 ---@field BaseName string Name of the base manager to expand to
@@ -280,6 +289,7 @@ end
 ---@field EngineersBuilding integer
 ---@field ExpansionBaseData ExpansionBaseData[]
 ---@field FactoryBuildRateBuff string|nil Name of the buff to apply to factories
+---@field FunctionalityStates table<BaseFunctionalityState, boolean>
 ---@field Initialized boolean
 ---@field LevelNames LevelName[]
 ---@field MaximumConstructionEngineers integer
@@ -302,14 +312,10 @@ BaseManager = ClassSimple {
         self.Trash = TrashBag()
 
         self.Active = false
-        self.AIBrain = false
-        self.BaseName = false
         self.DefaultEngineerPatrolChain = false
         self.DefaultAirScoutPatrolChain = false
         self.DefaultLandScoutPatrolChain = false
         self.Initialized = false
-        self.Position = false
-        self.Radius = false
         self.ConstructionAssistBool = false
 
         self.FactoryBuildRateBuff = nil
@@ -330,7 +336,7 @@ BaseManager = ClassSimple {
         self.BuildTable = {}
         self.ConstructionEngineers = {}
         self.ExpansionBaseData = {}
-		
+
 		-- Commented out unused states, these were only found here throughout the FAF repo
 		-- We can re-enable them if corresponding functionalities are created, but right now there are none
         self.FunctionalityStates = {
@@ -571,7 +577,7 @@ BaseManager = ClassSimple {
                 })
             return true
         end
-
+        ---@cast name -AddUnitAIData
         if not self:CheckOpAIName(name) then return false end
 
         self.OpAITable[name] = BaseOpAI.CreateOpAI(self.AIBrain, self.BaseName, ptype, name, data)
@@ -1470,7 +1476,7 @@ BaseManager = ClassSimple {
 
     ---@param self BaseManager
     ---@param location Vector
-    ---@param buildCounter number
+    ---@param buildCounter table
     ---@return boolean
     CheckUnitBuildCounter = function(self, location, buildCounter)
         for xVal, xData in buildCounter do
@@ -1788,7 +1794,7 @@ BaseManager = ClassSimple {
         -- The Engineer AI Thread
         for i = 1, 3 do
             defaultBuilder = {
-                BuilderName = 'T' .. i .. 'BaseManaqer_EngineersWork_' .. self.BaseName,
+                BuilderName = 'T' .. i .. 'BaseManager_EngineersWork_' .. self.BaseName,
                 PlatoonTemplate = self:CreateEngineerPlatoonTemplate(i),
                 Priority = 1,
                 PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerEngineerPlatoonSplit' },
@@ -1930,68 +1936,28 @@ BaseManager = ClassSimple {
         }
         self.AIBrain:PBMAddPlatoon(defaultBuilder)
 
-        -- T1 Air Scouts
-        defaultBuilder = {
-            BuilderName = 'BaseManager_T1AirScout_' .. self.BaseName,
-            PlatoonTemplate = self:CreateAirScoutPlatoon(1),
-            Priority = 500,
-            PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerScoutingAI' },
-            BuildConditions = {
-                { BMBC, 'HighestFactoryLevelType', { 1, self.BaseName, 'Air' } },
-                { BMBC, 'AirScoutingEnabled', { self.BaseName, } },
-                { BMBC, 'BaseActive', { self.BaseName } },
-            },
-            PlatoonData = {
-                BaseName = self.BaseName,
-            },
-            PlatoonType = 'Air',
-            RequiresConstruction = true,
-            LocationType = self.BaseName,
-            InstanceCount = 1,
-        }
-        self.AIBrain:PBMAddPlatoon(defaultBuilder)
-
-        -- T2 Air Scouts
-        defaultBuilder = {
-            BuilderName = 'BaseManager_T2AirScout_' .. self.BaseName,
-            PlatoonTemplate = self:CreateAirScoutPlatoon(2),
-            Priority = 750,
-            PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerScoutingAI' },
-            BuildConditions = {
-                { BMBC, 'HighestFactoryLevelType', { 2, self.BaseName, 'Air' } },
-                { BMBC, 'AirScoutingEnabled', { self.BaseName, } },
-                { BMBC, 'BaseActive', { self.BaseName } },
-            },
-            PlatoonData = {
-                BaseName = self.BaseName,
-            },
-            PlatoonType = 'Air',
-            RequiresConstruction = true,
-            LocationType = self.BaseName,
-            InstanceCount = 1,
-        }
-        self.AIBrain:PBMAddPlatoon(defaultBuilder)
-
-        -- T3 Air Scouts
-        defaultBuilder = {
-            BuilderName = 'BaseManager_T3AirScout_' .. self.BaseName,
-            PlatoonTemplate = self:CreateAirScoutPlatoon(3),
-            Priority = 1000,
-            PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerScoutingAI' },
-            BuildConditions = {
-                { BMBC, 'HighestFactoryLevelType', { 3, self.BaseName, 'Air' } },
-                { BMBC, 'AirScoutingEnabled', { self.BaseName, } },
-                { BMBC, 'BaseActive', { self.BaseName } },
-            },
-            PlatoonData = {
-                BaseName = self.BaseName,
-            },
-            PlatoonType = 'Air',
-            RequiresConstruction = true,
-            LocationType = self.BaseName,
-            InstanceCount = 1,
-        }
-        self.AIBrain:PBMAddPlatoon(defaultBuilder)
+        -- T1-T3 Air Scouts
+        for i = 1, 3 do
+            defaultBuilder = {
+                BuilderName = 'BaseManager_T' .. i ..'AirScout_' .. self.BaseName,
+                PlatoonTemplate = self:CreateAirScoutPlatoon(i),
+                Priority = 250 + (i * 250), -- 500, 750, 1000 for T1-3
+                PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerScoutingAI' },
+                BuildConditions = {
+                    { BMBC, 'HighestFactoryLevelType', { i, self.BaseName, 'Air' } },
+                    { BMBC, 'AirScoutingEnabled', { self.BaseName, } },
+                    { BMBC, 'BaseActive', { self.BaseName } },
+                },
+                PlatoonData = {
+                    BaseName = self.BaseName,
+                },
+                PlatoonType = 'Air',
+                RequiresConstruction = true,
+                LocationType = self.BaseName,
+                InstanceCount = 1,
+            }
+            self.AIBrain:PBMAddPlatoon(defaultBuilder)
+        end
     end,
 
     ---@param self BaseManager
@@ -2037,7 +2003,7 @@ BaseManager = ClassSimple {
     end,
 
     ---@param self BaseManager
-    ---@return any
+    ---@return PlatoonTemplate
     CreateTMLPlatoonTemplate = function(self)
         local faction = self.AIBrain:GetFactionIndex()
         local template = {
@@ -2051,7 +2017,7 @@ BaseManager = ClassSimple {
     end,
 
     ---@param self BaseManager
-    ---@return any
+    ---@return PlatoonTemplate
     CreateNukePlatoonTemplate = function(self)
         local faction = self.AIBrain:GetFactionIndex()
         local template = {
@@ -2065,13 +2031,13 @@ BaseManager = ClassSimple {
     end,
 
     ---@param self BaseManager
-    ---@return any
+    ---@return PlatoonTemplate
     CreateLandScoutPlatoon = function(self)
         local faction = self.AIBrain:GetFactionIndex()
         local template = {
             'LandScoutTemplate',
             'NoPlan',
-            { 'uel0101', 1, 1, 'Scout', 'None' },
+            { 'uel0101', -1, 1, 'Scout', 'None' },
         }
         template = ScenarioUtils.FactionConvert(template, faction)
 
@@ -2080,13 +2046,13 @@ BaseManager = ClassSimple {
 
     ---@param self BaseManager
     ---@param techLevel number
-    ---@return any
+    ---@return PlatoonTemplate
     CreateAirScoutPlatoon = function(self, techLevel)
         local faction = self.AIBrain:GetFactionIndex()
         local template = {
             'AirScoutTemplate',
             'NoPlan',
-            { 'uea', 1, 1, 'Scout', 'None' },
+            { 'uea', -1, 1, 'Scout', 'None' },
         }
 
         if techLevel == 3 then
@@ -2101,7 +2067,7 @@ BaseManager = ClassSimple {
     end,
 
     ---@param self BaseManager
-    ---@return any
+    ---@return PlatoonTemplate
     CreateCommanderPlatoonTemplate = function(self)
         local faction = self.AIBrain:GetFactionIndex()
         local template = {
@@ -2115,7 +2081,7 @@ BaseManager = ClassSimple {
     end,
 
     ---@param self BaseManager
-    ---@return any
+    ---@return PlatoonTemplate
     CreateSupportCommanderPlatoonTemplate = function(self)
         local faction = self.AIBrain:GetFactionIndex()
         local template = {
@@ -2131,7 +2097,7 @@ BaseManager = ClassSimple {
     ---@param self BaseManager
     ---@param techLevel number
     ---@param platoonSize? number Defaults to 5
-    ---@return any
+    ---@return PlatoonTemplate
     CreateEngineerPlatoonTemplate = function(self, techLevel, platoonSize)
         local faction = self.AIBrain:GetFactionIndex()
         local size = platoonSize or 5

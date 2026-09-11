@@ -1,28 +1,20 @@
----@class UIBuildTemplateBuilding
----@field [1] string unit id
----@field [2] number build order
----@field [3] number position x
----@field [4] number position z
+local Prefs = import("/lua/user/prefs.lua")
+local UIUtil = import("/lua/ui/uiutil.lua")
 
----@class UIBuildTemplate
----@field [1] number        # width that is used when drag building the template
----@field [2] number        # height that is used when drag building the template
----@field [3] UIBuildTemplateBuilding
---@field [...] UIBuildTemplateBuilding
+-- This file is an implementation of factory queue templates, not a factory for templates.
 
 ---@class UIBuildTemplateData
----@field templateData table
+---@field templateData UIBuildTemplate
 ---@field name string
----@field icon string unit id
-
-
-local Prefs = import("/lua/user/prefs.lua")
+---@field icon UnitId
 
 ---@type UIBuildTemplateData[]
 local templates = Prefs.GetFromCurrentProfile('build_templates_factory') or {}
-local UIUtil = import("/lua/ui/uiutil.lua")
 
--- Utils
+--#region Utils
+
+--- Returns the next available default name (a number in parentheses) for factory queue templates.
+---@return string
 function GetInitialName()
     local nextNum = 0
     for _, template in templates do
@@ -39,6 +31,9 @@ function GetInitialName()
     return name
 end
 
+--- Gets the icon of the first unit in the build queue that has an icon.
+---@param buildQueue UIBuildQueueItem[]?
+---@return string
 function GetInitialIcon(buildQueue)
     for _, entry in buildQueue do
         if type(entry) == 'table' and UIUtil.UIFile('/icons/units/' .. entry.id .. '_icon.dds', true) then
@@ -48,7 +43,16 @@ function GetInitialIcon(buildQueue)
     return 'default' -- If we don't find a valid IconName; return string 'default'
 end
 
--- Main functions
+--#endregion
+
+--#region Template Module functions
+-- These functions must have the same name as the ones in build_templates.lua
+-- due to the implementation of construction.lua.
+
+--#region Main functions
+
+--- Creates a factory build queue template of the given queue and saves it to prefs.
+---@param buildQueue UIBuildQueueItem[]
 function CreateBuildTemplate(buildQueue)
     if buildQueue and not table.empty(buildQueue) then
         PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Tab_Click_02'}))
@@ -60,30 +64,55 @@ function CreateBuildTemplate(buildQueue)
     end
 end
 
+--- Gets factory build queue templates from prefs.
+---@return UIBuildTemplateData[]
 function GetTemplates()
     return Prefs.GetFromCurrentProfile('build_templates_factory')
 end
+--#endregion
+--#region Template options context menu
+-- These functions must have the same name as the ones in build_templates.lua
+-- due to the implementation of construction.lua.
 
--- Options menu
+--- Removes the factory build queue template with the given ID (an array index).
+---@param templateID integer
 function RemoveTemplate(templateID)
     table.remove(templates, templateID)
     Prefs.SetToCurrentProfile('build_templates_factory', templates)
 end
 
+--- Renames the factory build queue template with the given ID (an array index).
+---@param templateID integer
+---@param name string
 function RenameTemplate(templateID, name)
     templates[templateID].name = name
     Prefs.SetToCurrentProfile('build_templates_factory', templates)
 end
 
+--- Changes the icon for the factory build queue template with the given ID (an array index).
+---@param templateID integer
+---@param iconPath FileName
 function SetTemplateIcon(templateID, iconPath)
     templates[templateID].icon = iconPath
     Prefs.SetToCurrentProfile('build_templates_factory', templates)
 end
 
+--- Not implemented.
+--- 
+--- Shares to another army the factory build queue template with the given ID (an array index).
+---@deprecated
+---@param templateID integer
+---@param armyIndex integer
 function SendTemplate(templateID, armyIndex)
     WARN("Not implemented yet. Shhhh.")
 end
 
+--- Sets a hotkey for the factory build queue template with the given ID (an array index).
+--- 
+--- Returns false if the hotkey is already in use by another factory build queue template.
+---@param templateID integer
+---@param key Keycode
+---@return boolean success
 function SetTemplateKey(templateID, key)
     local used = false
     for i, template in templates do
@@ -102,7 +131,11 @@ function SetTemplateKey(templateID, key)
     end
 end
 
+--- Removes the hotkey for the factory build queue template with the given ID (an array index).
+---@param templateID integer
 function ClearTemplateKey(templateID)
     templates[templateID].key = nil
     Prefs.SetToCurrentProfile('build_templates_factory', templates)
 end
+--#endregion
+--#endregion

@@ -1,6 +1,7 @@
 local Control = import("/lua/maui/control.lua").Control
 
 ---@class Group : moho.group_methods, Control, InternalObject
+---@overload fun(parent: Control, debugname: string?): Group
 Group = ClassUI(moho.group_methods, Control) {
     ---@param self Group
     ---@param parent Control

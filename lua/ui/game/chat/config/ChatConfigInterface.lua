@@ -45,9 +45,11 @@ local ColorDefs = {
 }
 
 local CheckboxDefs = {
-    { Key = ChatConfigModel.KeySendType,       Text = "Default recipient: allies", Tooltip = 'chat_send_type' },
-    { Key = ChatConfigModel.KeyFeedBackground, Text = "Show feed background",      Tooltip = 'chat_feed_background' },
-    { Key = ChatConfigModel.KeyLinks,          Text = "Show camera links",         Tooltip = 'chat_filter' },
+    { Key = ChatConfigModel.KeySendType,            Text = "Default recipient: allies", Tooltip = 'chat_send_type' },
+    { Key = ChatConfigModel.KeyFeedBackground,      Text = "Show feed background",      Tooltip = 'chat_feed_background' },
+    { Key = ChatConfigModel.KeyLinks,               Text = "Show camera links",         Tooltip = nil },
+    { Key = ChatConfigModel.KeyMuteSharedUnits,     Text = "Mute unit sharing messages",     Tooltip = nil },
+    { Key = ChatConfigModel.KeyMuteSharedResources, Text = "Mute resource sharing messages", Tooltip = nil },
 }
 
 -------------------------------------------------------------------------------
@@ -185,7 +187,9 @@ local ChatConfigInterface = ClassUI(Window) {
             cb.OnCheck = function(_, checked)
                 ChatConfigController.SetOption(key, checked)
             end
-            Tooltip.AddCheckboxTooltip(cb, def.Tooltip)
+            if def.Tooltip then
+                Tooltip.AddCheckboxTooltip(cb, def.Tooltip)
+            end
             self.Checkboxes[i] = cb
         end
 

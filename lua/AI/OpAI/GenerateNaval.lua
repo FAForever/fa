@@ -238,13 +238,13 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
             BuildConditions = {
                 {
                     '/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                    {'default_brain','default_master'},
-                    {'default_brain','default_master'}
+                    {'default_master'},
+                    {'default_master'}
                 },
                 {
                     '/lua/ai/opai/GenerateNaval.lua', 'ChildShouldBuild',
-                    {'default_brain','default_master'},
-                    {'default_brain','default_master'},
+                    {'default_master'},
+                    {'default_master'},
                 },
             },
             PlatoonData = {
@@ -282,20 +282,20 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
         BuildConditions = {
             {
                 '/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                {'default_brain','default_master'},
-                {'default_brain','default_master'}
+                {'default_master'},
+                {'default_master'}
             },
             {
                 '/lua/ai/opai/GenerateNaval.lua', 'FleetIsBuilt',
-                {'default_brain','default_master'},
-                {'default_brain','default_master'},
+                {'default_master'},
+                {'default_master'},
             },
         },
         PlatoonBuildCallbacks = {
             {
                 '/lua/editor/amplatoonhelperfunctions.lua', 'AMUnlockPlatoon',
-                {'default_brain','default_platoon'},
-                {'default_brain','default_platoon'}
+                {'default_platoon'},
+                {'default_platoon'}
             },
         },
         PlatoonAddFunctions = {

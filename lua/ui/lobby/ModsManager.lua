@@ -294,8 +294,6 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
                 end
             )
             mods.sim.active = SetUtils.Subtract(mods.activated, mods.ui.active)
-            table.print(mods.sim.active, 'mods.sim.active')
-            table.print(mods.ui.active, 'mods.ui.active')
 
             callback(mods.sim.active, mods.ui.active)
         else

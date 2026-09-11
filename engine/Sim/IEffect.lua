@@ -131,6 +131,7 @@ end
 ---@param param IEffectCurveParameters
 ---@param height number
 ---@param size number
+---@return moho.IEffect
 function IEffect:SetEmitterCurveParam(param, height, size)
 end
 

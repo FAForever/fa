@@ -11,6 +11,8 @@ local UtilityCat = (((categories.RADAR + categories.COUNTERINTELLIGENCE) - categ
 ShieldCategory = categories.uel0307 + categories.ual0307 + categories.xsl0307
 NonShieldCategory = categories.ALLUNITS - ShieldCategory
 
+---@alias FormationCategoryNames LandCategoryNames | NavalCategoryNames | AirCategoryNames | SubCategoryNames
+
 ---@alias LandCategoryNames
 ---| "Shields"
 ---| "Bot1"

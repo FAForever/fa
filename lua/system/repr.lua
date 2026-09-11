@@ -37,10 +37,10 @@ local Inspector = {}
 local Inspector_mt = { __index = Inspector }
 
 ---@class DebugInspectOptions
----@field depth? number
----@field newline? string
----@field indent? string
----@field meta? boolean
+---@field depth? number # default `2`
+---@field newline? string # default `'\n'`
+---@field indent? string # default `'  '`
+---@field meta? boolean # default `false`
 
 -- upvalue scope for performance
 local tostring = tostring

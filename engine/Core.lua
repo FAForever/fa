@@ -10,8 +10,8 @@
 ---@class VectorBase
 ---@field [1] number    # x
 ---@field [2] number    # y
----@field x number
----@field y number
+---@field x number Read only value. Changing it has no effect on the vector. Set `[1]` instead.
+---@field y number Read only value. Changing it has no effect on the vector. Set `[2]` instead.
 
 ---@class Quaternion : VectorBase
 ---@operator mul(Quaternion): Quaternion
@@ -28,7 +28,7 @@
 ---@operator mul(number): Vector
 ---@operator unm: Vector
 ---@field [3] number    # z
----@field z number
+---@field z number Read only value. Changing it has no effect on the vector. Set `[3]` instead.
 
 ---@class Vector2 : VectorBase
 ---@operator add(Vector2): Vector2
@@ -49,6 +49,22 @@
 
 -- note that these object span both the sim and user states
 ---@alias GoalObject moho.manipulator_methods | EconomyEvent | Camera
+
+---@class FileInfo
+---@field IsFolder boolean
+---@field ReadOnly boolean
+---@field SizeBytes integer
+---@field TimeStamp string # unsigned 64 bit int in lowercase hexadecimal
+---@field WriteTime FileInfo.WriteTime
+
+---@class FileInfo.WriteTime
+---@field year integer
+---@field month integer
+---@field mday integer # month day
+---@field wday integer # week day
+---@field hour integer
+---@field minute integer
+---@field second integer
 
 ---@unknown
 function AITarget()
@@ -101,7 +117,7 @@ end
 
 --- returns a table of information for the given file, or `false` if the file doesn't exist
 ---@param filename FileName
----@return table | false
+---@return FileInfo | false
 function DiskGetFileInfo(filename)
 end
 
@@ -138,7 +154,7 @@ end
 
 ---@overload fun(category: EntityCategory, units: UserUnit[]): UserUnit[]
 ---@overload fun(category: EntityCategory, unitIds: UnitId[]): UnitId[]       
---- filters a list of (user) units or unit ids to only those that match the given category.
+--- filters a list of (user) units or unit blueprint ids to only those that match the given category.
 ---@param category EntityCategory
 ---@param units Unit[]
 ---@return Unit[]

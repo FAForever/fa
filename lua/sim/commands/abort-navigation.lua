@@ -42,7 +42,9 @@ function AbortNavigation(units, doPrint)
         local unit = units[k]
         if not IsDestroyed(unit) then
             local navigator = unit:GetNavigator()
-            navigator:AbortMove()
+            if navigator then
+                navigator:AbortMove()
+            end
             unit:RefocusAssisters()
         end
     end

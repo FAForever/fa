@@ -112,6 +112,7 @@ keyDescriptions = {
     ['select_naval'] = '<LOC key_desc_0048>Select all Naval units',
     ['cap_frames'] = '<LOC key_desc_0050>Capture Frames',
     ['pause_unit'] = '<LOC key_desc_0056>Pause',
+    ['shift_pause_unit'] = '<LOC key_desc_0056>Pause',
     ['pause_unit_all'] = '<LOC key_pause_unit_all>Pause all units in the selection',
     ['unpause_unit_all'] = '<LOC key_unpause_unit_all>Unpause all units in the selection',
     ['suicide'] = '<LOC key_desc_0057>Self-Destruct',
@@ -230,6 +231,7 @@ keyDescriptions = {
     ['cam_free'] = "<LOC key_desc_0104>Toggles camera free mode",
 
     ['quick_save'] = "<LOC key_desc_0130>Save the game to a special quick save file",
+    ['quick_load'] = "<LOC key_desc_quick_load>Load the game from the special quick save file",
     ['mouse_help'] = "<LOC key_desc_0132>Turn the mouse button help icon on/off",
 
     ['create_build_template'] = "<LOC key_desc_0181>Create a build template based on the current selection",
@@ -292,6 +294,7 @@ keyDescriptions = {
 
     -- GAZUI
     ['toggle_repeat_build'] = '<LOC key_desc_0185>Toggle factory repeat build',
+    ['shift_toggle_repeat_build'] = '<LOC key_desc_0185>Toggle factory repeat build',
     ['show_enemy_life'] = '<LOC key_desc_0186>Show enemy life bars',
     ['show_network_stats'] = '<LOC key_desc_0187>Show network stats window',
     ['toggle_shield'] = '<LOC key_desc_0189>Toggle unit shield',
@@ -555,8 +558,8 @@ keyDescriptions = {
     ['shift_filter_highest_engineer_and_assist'] = '<LOC key_desc_shift_filter_highest_engineer_and_assist>Filter engineers by tech level and majority faction',
     ['abort_navigation'] = '<LOC key_abort_navigation>Interrupt pathfinding of engineers',
     ['shift_abort_navigation'] = '<LOC key_abort_navigation>Interrupt pathfinding of engineers',
-    ['discharge_shields'] = '<LOC key_discharge_shields>Discharge shields',
-    ['shift_discharge_shields'] = '<LOC key_discharge_shields>Discharge shields',
+    ['discharge'] = '<LOC key_discharge_shields>Discharge shields',
+    ['shift_discharge'] = '<LOC key_discharge_shields>Discharge shields',
     ['spreadattack'] = '<LOC key_desc_distribute_orders>Distribute orders',
     ['shift_spreadattack'] = '<LOC key_desc_shift_distribute_orders>Distribute orders',
     ['spreadattack_context'] = '<LOC key_desc_distribute_orders>Distribute orders from the unit beneath the mouse cursor',
@@ -580,4 +583,5 @@ keyDescriptions = {
     ['create_build_template_16'] = '<LOC key_desc_create_build_template_02>Create a 16x16 chunk template',
     ['create_build_template_32'] = '<LOC key_desc_create_build_template_02>Create a 32x32 chunk template',
 
+    ['temporary_template_use_or_create'] = '<LOC key_desc_temporary_template_create_or_use>Save a temporary template from the current selection or use the saved temporary template.',
 }

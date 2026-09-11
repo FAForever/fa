@@ -992,7 +992,7 @@ options = {
 
             {
                 title = "<LOC options_show_player_names_title>Show Player Names",
-                key = 'options_show_player_names',
+                key = 'show_player_names',
                 type = 'toggle',
                 default = 'on',
                 set = function(key, value, startup)

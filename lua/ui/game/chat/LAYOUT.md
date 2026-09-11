@@ -1,6 +1,6 @@
 # Chat layout — component tree and scaling
 
-Anchors-and-dependencies map of the chat UI tree, used to reason about UI-scale behaviour. Read alongside [CLAUDE.md](CLAUDE.md) for the chat MVC contract and [`/lua/ui/CLAUDE.md`](../../CLAUDE.md) §§ 4 (Layout, UI scaling) and 5 (Skinning) for the project-wide rules.
+Anchors-and-dependencies map of the chat UI tree, used to reason about UI-scale behaviour. Read alongside [AGENTS.md](AGENTS.md) for the chat MVC contract and [`/lua/ui/AGENTS.md`](../../AGENTS.md) §§ 4 (Layout, UI scaling) and 5 (Skinning) for the project-wide rules.
 
 Notation throughout:
 

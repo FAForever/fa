@@ -289,7 +289,7 @@ factoryHotkeyLastClickWasLeft = false
 
 function factoryHotkey(units, count, selection, exFacUnits)
     CommandMode.StartCommandMode("build", {name = ''})
-
+    oldHandleEvent = worldview.HandleEvent
     -- Another 'hack' that is, uuhh - a hack. Override the event handle of the world view. If it doesn't
     -- return false then the event is captured and the engine ignores it (no orders are issued when clicking, etc)
     worldview.HandleEvent = function(self, event)

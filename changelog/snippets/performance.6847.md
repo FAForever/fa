@@ -1,1 +1,0 @@
-- Segment formations logic into different files and simplify category filters (#6847).

@@ -46,48 +46,56 @@ end
 -------------------------------------------------------------------------------
 -- Deprecated forwards
 
---- @deprecated use [ChatController.OnReceive](chat/ChatController.lua) instead
+--- use [ChatController.OnReceive](chat/ChatController.lua) instead
+---@deprecated
 function ReceiveChat(sender, msg)
     _deprecate('ReceiveChat', 'ChatController.OnReceive')
     ChatController.OnReceive(sender, msg)
 end
 
---- @deprecated use [ChatController.OnReceive](chat/ChatController.lua) instead
+--- use [ChatController.OnReceive](chat/ChatController.lua) instead
+---@deprecated
 function ReceiveChatFromSim(sender, msg)
     _deprecate('ReceiveChatFromSim', 'ChatController.OnReceive')
     ChatController.OnReceive(sender, msg)
 end
 
---- @deprecated use [ChatController.Init](chat/ChatController.lua) instead. The new `Init` takes no arguments — chat layout no longer needs a `mapGroup` reference because the tree mounts on `GetFrame(0)` directly.
+--- use [ChatController.Init](chat/ChatController.lua) instead. The new `Init` takes no arguments — chat layout no longer needs a `mapGroup` reference because the tree mounts on `GetFrame(0)` directly.
+---@deprecated
 function SetupChatLayout(_)
     _deprecate('SetupChatLayout', 'ChatController.Init')
     ChatController.Init()
 end
 
---- @deprecated no replacement; the new chat is hidden by default and follows `model.WindowVisible`, so the legacy "hide on NIS start" hook is no longer required
+--- no replacement; the new chat is hidden by default and follows `model.WindowVisible`, so the legacy "hide on NIS start" hook is no longer required
+---@deprecated
 function OnNISBegin()
     _deprecate('OnNISBegin', 'no replacement (no longer required)')
 end
 
---- @deprecated use [ChatInterface.OpenAndScrollLines](chat/ChatInterface.lua) with a negative delta
+--- use [ChatInterface.OpenAndScrollLines](chat/ChatInterface.lua) with a negative delta
+---@deprecated
 function ChatPageUp(mod)
     _deprecate('ChatPageUp', 'ChatInterface.OpenAndScrollLines(-mod)')
     ChatInterface.OpenAndScrollLines(-(mod or 10))
 end
 
---- @deprecated use [ChatInterface.OpenAndScrollLines](chat/ChatInterface.lua) with a positive delta
+--- use [ChatInterface.OpenAndScrollLines](chat/ChatInterface.lua) with a positive delta
+---@deprecated
 function ChatPageDown(mod)
     _deprecate('ChatPageDown', 'ChatInterface.OpenAndScrollLines(mod)')
     ChatInterface.OpenAndScrollLines(mod or 10)
 end
 
---- @deprecated use [ChatConfigInterface.Close](chat/config/ChatConfigInterface.lua) instead
+--- use [ChatConfigInterface.Close](chat/config/ChatConfigInterface.lua) instead
+---@deprecated
 function CloseChatConfig()
     _deprecate('CloseChatConfig', 'ChatConfigInterface.Close')
     ChatConfigInterface.Close()
 end
 
---- @deprecated use [ChatController.CloseWindow](chat/ChatController.lua) instead
+--- use [ChatController.CloseWindow](chat/ChatController.lua) instead
+---@deprecated
 function CloseChat()
     _deprecate('CloseChat', 'ChatController.CloseWindow')
     ChatController.CloseWindow()
@@ -99,7 +107,8 @@ function FindClients(id)
     return ChatController.FindClients(id)
 end
 
---- @deprecated subscribe to [ChatConfigModel.GetSingleton().Committed](chat/config/ChatConfigModel.lua) via `LazyVarDerive` instead. Best-effort shim — fires the callback once with the current options so legacy callers see a value, then wires a one-way derived observer so subsequent changes propagate. Mods should migrate to a real `LazyVarDerive` they can destroy on teardown.
+--- subscribe to [ChatConfigModel.GetSingleton().Committed](chat/config/ChatConfigModel.lua) via `LazyVarDerive` instead. Best-effort shim — fires the callback once with the current options so legacy callers see a value, then wires a one-way derived observer so subsequent changes propagate. Mods should migrate to a real `LazyVarDerive` they can destroy on teardown.
+---@deprecated
 function AddChatOptionSetCallback(callback, _)
     _deprecate('AddChatOptionSetCallback', 'LazyVarDerive(ChatConfigModel.GetSingleton().Committed, ...)')
     if type(callback) ~= 'function' then return end
@@ -114,7 +123,7 @@ function AddChatOptionSetCallback(callback, _)
     )
 end
 
---- @deprecated no caller-driven equivalent. The legacy `SetLayout` was the
+--- no caller-driven equivalent. The legacy `SetLayout` was the
 --- *layout* hook (HUD-arrangement preset: `bottom` / `left` / `right`),
 --- not the *skin* hook — it called `import(UIUtil.GetLayoutFilename('chat')).SetLayout()`
 --- to apply layout-specific positions. The new chat uses a single rect
@@ -122,11 +131,13 @@ end
 --- nothing to re-apply. Skin-driven theming is independent and is
 --- handled reactively via `UIUtil.SkinnableFile` (border, drag handles,
 --- scrollbar, buttons all follow the active skin without an explicit call).
+---@deprecated
 function SetLayout(_)
     _deprecate('SetLayout', 'no replacement (chat is single-layout; skin theming auto-updates via SkinnableFile)')
 end
 
---- @deprecated multiple `GetArmyData`-style helpers exist elsewhere; the new chat tree uses a private one in `ChatController`
+--- multiple `GetArmyData`-style helpers exist elsewhere; the new chat tree uses a private one in `ChatController`
+---@deprecated
 function GetArmyData(army)
     _deprecate('GetArmyData', 'GetArmiesTable().armiesTable[ArmyID]')
     local armies = GetArmiesTable()

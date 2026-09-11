@@ -131,16 +131,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/bomberescort_editorfunctions.lua', 'BomberEscortChildBomberCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/platooncountbuildconditions.lua', 'NumBuildersLessThanOSCounter',
-                                {'default_brain','default_builder_name', 2 },
-                                {'default_brain','default_builder_name','2'}
+                                {'default_builder_name', 2 },
+                                {'default_builder_name','2'}
                             },
                         },
                         PlatoonData = {
@@ -164,20 +164,20 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/bomberescort_editorfunctions.lua', 'BomberEscortChildBomberCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/platooncountbuildconditions.lua', 'NumBuildersLessThanOSCounter',
-                                {'default_brain','default_builder_name', 1 },
-                                {'default_brain','default_builder_name','1'}
+                                {'default_builder_name', 1 },
+                                {'default_builder_name','1'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1 , 0 },
-                                {'default_brain','1','0'}
+                                { 1 , 0 },
+                                {'1','0'}
                             },
                         },
                         PlatoonData = {
@@ -201,16 +201,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/bomberescort_editorfunctions.lua', 'BomberEscortChildEscortCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/platooncountbuildconditions.lua', 'NumBuildersLessThanOSCounter',
-                                {'default_brain','default_builder_name', 2 },
-                                {'default_brain','default_builder_name','2'}
+                                {'default_builder_name', 2 },
+                                {'default_builder_name','2'}
                             },
                         },
                         PlatoonData = {
@@ -234,16 +234,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/bomberescort_editorfunctions.lua', 'BomberEscortChildBomberCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/platooncountbuildconditions.lua', 'NumBuildersLessThanOSCounter',
-                                {'default_brain','default_builder_name', 1 },
-                                {'default_brain','default_builder_name','1'}
+                                {'default_builder_name', 1 },
+                                {'default_builder_name','1'}
                             },
                         },
                         PlatoonData = {
@@ -267,18 +267,18 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/bomberescort_editorfunctions.lua', 'BomberEscortMasterCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonBuildCallbacks = {
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMUnlockPlatoon',
-                                {'default_brain','default_platoon'},
-                                {'default_brain','default_platoon'}
+                                {'default_platoon'},
+                                {'default_platoon'}
                             },
                         },
                         PlatoonAddFunctions = {
@@ -306,16 +306,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/bomberescort_editorfunctions.lua', 'BomberEscortChildBomberCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/platooncountbuildconditions.lua', 'NumBuildersLessThanOSCounter',
-                                {'default_brain','default_builder_name', 2 },
-                                {'default_brain','default_builder_name','2'}
+                                {'default_builder_name', 2 },
+                                {'default_builder_name','2'}
                             },
                         },
                         PlatoonData = {
@@ -339,20 +339,20 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/bomberescort_editorfunctions.lua', 'BomberEscortChildBomberCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/platooncountbuildconditions.lua', 'NumBuildersLessThanOSCounter',
-                                {'default_brain','default_builder_name', 2 },
-                                {'default_brain','default_builder_name','2'}
+                                {'default_builder_name', 2 },
+                                {'default_builder_name','2'}
                             },
                             {'/lua/editor/otherarmyunitcountbuildconditions.lua', 'BrainGreaterThanNumCategory',
-                                {'default_brain','Player', 5 , categories.NAVAL * categories.MOBILE },
-                                {'default_brain','Player','5','categories.NAVAL * categories.MOBILE'}
+                                {'Player', 5 , categories.NAVAL * categories.MOBILE },
+                                {'Player','5','categories.NAVAL * categories.MOBILE'}
                             },
                         },
                         PlatoonData = {
@@ -376,16 +376,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/bomberescort_editorfunctions.lua', 'BomberEscortChildEscortCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/platooncountbuildconditions.lua', 'NumBuildersLessThanOSCounter',
-                                {'default_brain','default_builder_name', 2 },
-                                {'default_brain','default_builder_name','2'}
+                                {'default_builder_name', 2 },
+                                {'default_builder_name','2'}
                             },
                         },
                         PlatoonData = {

@@ -125,6 +125,7 @@ end
 ---@field __post_init? fun(self, ...)
 
 ---@class State
+---@field __base table
 
 ---@class fa-class-state : fa-class
 ---@field __State true

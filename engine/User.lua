@@ -124,6 +124,18 @@
 --- | 'NUMPAD_DECIMAL'
 --- | 'NUMPAD_DIVIDE'
 
+---@class UIBuildTemplateBuilding
+---@field [1] UnitId
+---@field [2] integer # build order
+---@field [3] integer # position x
+---@field [4] integer # position z
+
+---@class UIBuildTemplate
+---@field [1] integer        # width that is used when drag building the template
+---@field [2] integer        # height that is used when drag building the template
+---@field [3] UIBuildTemplateBuilding
+--@field [...] UIBuildTemplateBuilding
+
 --- Repeatedly the selection box of the unit to the hovered-over state to create a blinking effect
 ---@param entityId EntityId
 ---@param onTime number
@@ -138,8 +150,13 @@ end
 function AddCommandFeedbackBlip(meshInfo, duration)
 end
 
+---@class ConsoluteOutputReceiverHandle : userdata
+
+--- Creates a console output receiver that calls the given function on console output.
 ---
----@param func fun(text: string): any
+---@see RemoveConsoleOutputReciever Destroy the receiver and stop calling the function.
+---@param func fun(text: string)
+---@return ConsoluteOutputReceiverHandle
 function AddConsoleOutputReciever(func)
 end
 
@@ -523,10 +540,10 @@ function GetRolloverInfo()
 end
 
 --- Gets the state for the script bit
----@param unit UserUnit
+---@param units UserUnit[] # Returns false instead of erroring if wrong table format
 ---@param bit number
 ---@return boolean
-function GetScriptBit(unit, bit)
+function GetScriptBit(units, bit)
 end
 
 --- Returns a table of the currently selected units
@@ -540,20 +557,23 @@ end
 function GetSessionClients()
 end
 
----
+--- Gets the "+/- game speed" value.
+--- The actual sim rate can be calculated as `math.pow(2, x/3)`, where x is the game speed value.
 ---@return number
 function GetSimRate()
 end
 
----
----@return number
+--- Returns a hardcoded constant of how many sim ticks are supposed to occur per second.
+---@return 10
 function GetSimTicksPerSecond()
 end
+
+---@alias SpecialFileType 'SaveGame' | 'Replay' | 'CampaignSave'
 
 --- Gets information on a profile based file, `nil` if unable to find
 ---@param profileName string
 ---@param basename string
----@param type string
+---@param type SpecialFileType
 ---@return table
 function GetSpecialFileInfo(profileName, basename, type)
 end
@@ -561,19 +581,19 @@ end
 --- Given the base name of a special file, returns the complete path
 ---@param profilename string
 ---@param filename string
----@param type string
+---@param type SpecialFileType
 ---@return string
 function GetSpecialFilePath(profilename,  filename,  type)
 end
 
 --- Returns a table of strings which are the names of files in special locations (currently SaveFile, Replay)
----@param type string
+---@param type SpecialFileType
 ---@return { extension: string, directory: string, files: table<string, string[]> }
 function GetSpecialFiles(type)
 end
 
 ---
----@param type string
+---@param type SpecialFileType
 ---@return string
 function GetSpecialFolder(type)
 end
@@ -603,16 +623,16 @@ end
 
 --- Given a set of units, gets the union of orders and unit categories (for determining builds). You can use `GetUnitCommandFromCommandCap` to convert the toggles to unit commands
 ---@param unitSet UserUnit[]
----@return string[] orders
----@return CommandCap[] availableToggles
+---@return EngineCommandCap[] orders
+---@return EngineToggleCap[] availableToggles
 ---@return EntityCategory buildableCategories
 function GetUnitCommandData(unitSet)
 end
 
 --- Retrieves the orders, toggles and buildable categories of the given unit. You can use `GetUnitCommandFromCommandCap` to convert the toggles to unit commands
 ---@param unit UserUnit
----@return string[] orders
----@return CommandCap[] availableToggles
+---@return EngineCommandCap[] orders
+---@return EngineToggleCap[] availableToggles
 ---@return EntityCategory buildableCategories
 function GetUnitCommandDataOfUnit(unit)
 end
@@ -974,9 +994,10 @@ end
 function PrefetchSession(mapname, mods, hipri)
 end
 
----
----@param handler function
-function RemoveConsoleOutputReciever(handler)
+--- Destroys a console output receiver.
+---@see AddConsoleOutputReciever To create receivers.
+---@param handle ConsoluteOutputReceiverHandle
+function RemoveConsoleOutputReciever(handle)
 end
 
 --- Remove unit from the session extra select list
@@ -1350,7 +1371,7 @@ end
 function ValidateIPAddress(ipaddr)
 end
 
---- Validate a list of units
+--- Returns a copy of the units excluding those which are dead or destroyed.
 ---@param units UserUnit[]
 ---@return UserUnit[]
 function ValidateUnitsList(units)

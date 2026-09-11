@@ -1,0 +1,1 @@
+- Add a new temporary template hotkey that can save a selection of structures and then recall it as a build mode when used with an engineer selection, or as a cheat-only spawn mode when used with no selection (#7185).

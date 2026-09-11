@@ -236,10 +236,13 @@ UEL0301 = ClassUnit(CommandUnit) {
     ---@param self UEL0301
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementShieldGeneratorField = function(self, bp)
-        self:AddToggleCap('RULEUTC_ShieldToggle')
-        self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
-        self:SetMaintenanceConsumptionActive()
-        self:CreateShield(bp)
+        self:DestroyShield()
+        self:ForkThread(function()
+            WaitTicks(1)
+            self:CreateShield(bp)
+            self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
+            self:SetMaintenanceConsumptionActive()
+        end)
     end,
 
     ---@param self UEL0301
@@ -256,9 +259,6 @@ UEL0301 = ClassUnit(CommandUnit) {
         local bpEcon = self.Blueprint.Economy
         self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
         self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
-
-        local deathNuke = self:GetWeaponByLabel("DeathWeapon") --[[@as SCUDeathWeapon]]
-        deathNuke:AddDamageMod(bp.DeathWeaponDamageAdd)
     end,
 
     ---@param self UEL0301
@@ -267,10 +267,6 @@ UEL0301 = ClassUnit(CommandUnit) {
         local bpEcon = self.Blueprint.Economy
         self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
         self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
-
-        local deathNuke = self:GetWeaponByLabel("DeathWeapon") --[[@as SCUDeathWeapon]]
-        local baseBp = self.Blueprint.Enhancements["ResourceAllocation"]
-        deathNuke:AddDamageMod(-baseBp.DeathWeaponDamageAdd)
     end,
 
     ---@param self UEL0301

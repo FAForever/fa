@@ -593,15 +593,22 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             if tick > owner.tickIssuedShieldRepair and not owner:IsUnitState("Upgrading") then
                 owner.tickIssuedShieldRepair = tick
                 local guards = UnitGetGuards(owner)
-                if not TableEmpty(guards) then
+                local numGuards = TableGetn(guards)
+                if numGuards > 0 then
                     -- filter out guards with something queued after the shield assist order, as to not delete clear their queue
-                    for i, guard in guards do
+                    local i = 1
+                    while i <= numGuards do
+                        local guard = guards[i]
                         if TableGetn(UnitGetCommandQueue(guard)) >= 2 then
-                            guards[i] = nil
+                            guards[i] = guards[numGuards]
+                            guards[numGuards] = nil
+                            numGuards = numGuards - 1
+                        else
+                            i = i + 1
                         end
                     end
 
-                    if not TableEmpty(guards) then
+                    if numGuards > 0 then
                         -- For the filtered guards, clear their assist order, order repair, then re-add the assist order after
                         IssueClearCommands(guards)
                         IssueRepair(guards, owner)

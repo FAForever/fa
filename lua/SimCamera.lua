@@ -28,6 +28,7 @@ function OnCameraFinish(name)
 end
 
 ---@class SimCamera : SingleEvent
+---@overload fun(name: string): SimCamera
 SimCamera = Class(SingleEvent) {
     __init = function(self,name)
         self.CameraName = name
