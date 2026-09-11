@@ -1,0 +1,1 @@
+- (#7097) Reworked options window with improved layout, live search, and better overall usability.
