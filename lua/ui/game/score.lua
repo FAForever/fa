@@ -73,8 +73,8 @@ function updatePlayerName(line)
         line.division:SetText(playerRating)
     end
 
-    line.name:SetText(playerClan .. playerName)
     line.name:SetTruncationEnabled(true)
+    line.name:SetText(playerClan .. playerName)
     line.name:SetDropShadow(true)
     LayoutHelpers.AnchorToLeft(line.name, line.division)
 end
@@ -392,7 +392,7 @@ function SetupPlayerLines()
 
         -- hover to see full name (incase they are cut off)
         group.nameHover = Bitmap(group)
-        group.nameHover:SetAlpha(0)
+        group.nameHover:SetSolidColor('00000000')  -- fully transparent
         LayoutHelpers.AnchorToLeft(group.nameHover, group.division)
         LayoutHelpers.AtLeftIn(group.nameHover, group, 12)
         group.nameHover.Height:Set(group.name.Height)
