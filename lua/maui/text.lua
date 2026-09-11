@@ -33,6 +33,10 @@ Text = ClassUI(moho.text_methods, Control) {
         self._color.OnDirty = function(var)
             self:SetNewColor(var())
         end
+
+        self._truncationText = "..."
+        self._fullText = ""
+        self._truncationEnabled = false
     end,
 
     OnInit = function(self)
@@ -41,6 +45,84 @@ Text = ClassUI(moho.text_methods, Control) {
         self:SetClipToWidth(false)
     end,
 
+    --- Directly sets displayed text
+    ---@see Text.SetText # To set the raw text
+    ---@type fun(self: Text, str: string | number)
+    SetDisplayText = moho.text_methods.SetText,
+
+    --- Directly gets the current displayed text
+    ---@see Text.SetText # To get the raw text
+    ---@type fun(self: Text): string
+    GetDisplayText = moho.text_methods.GetText,
+
+    --- Sets the raw text; actual displayed text is affected by operations like truncation
+    ---@see Text.SetDisplayText # To directly set the displayed text
+    ---@param text string | number
+    SetText = function(self, text)
+        local t_text = type(text)
+        if t_text ~= "string" and t_text ~= "number" then
+            error('Expected string or number but got ' .. t_text, 2)
+        end
+        self._fullText = tostring(text)
+        if self._truncationEnabled then
+            self:_applyTruncation()
+        else
+            self:SetDisplayText(self._fullText)
+        end
+    end,
+
+    --- Get the raw text before operations like truncation
+    ---@see Text.GetDisplayText # To directly get the displayed text
+    ---@return string
+    GetText = function(self)
+        return self._fullText
+    end,
+
+    --- Sets custom truncation trailing characters like "..." or "-".
+    ---@param text string
+    SetTruncationText = function(self, text)
+        self._truncationText = tostring(text)
+    end,
+
+    ---@param enabled boolean
+    SetTruncationEnabled = function(self, enabled)
+
+        -- prevent recursive OnDirty wrappers
+        if self._truncationEnabled == enabled then
+            return
+        end
+
+        self._truncationEnabled = enabled
+        if enabled then
+            -- Preserve any existing OnDirty callback before adding _applyTruncation
+            if not self._originalWidthOnDirty then
+                self._originalWidthOnDirty = self.Width.OnDirty
+            end
+
+            self.Width.OnDirty = function(var)
+
+                if self._originalWidthOnDirty then
+                    self._originalWidthOnDirty(var)
+                end
+
+                self:_applyTruncation()
+            end
+
+            -- Apply truncation immediately so SetText() and SetTruncationEnabled() order doesn't matter
+            self:_applyTruncation()
+        else
+            -- Restore to the original OnDirty callback if it exists, otherwise set it to nil
+            if self._originalWidthOnDirty then
+                self.Width.OnDirty = self._originalWidthOnDirty
+                self._originalWidthOnDirty = nil
+            else
+                self.Width.OnDirty = nil
+            end
+        end
+
+    end,
+
+    ---@param clipToWidth boolean
     SetClipToWidth = function(self, clipToWidth)
         if clipToWidth then
             self.Width:Set(function() return self.Right() - self.Left() end)
@@ -48,6 +130,33 @@ Text = ClassUI(moho.text_methods, Control) {
             self.Width:Set(function() return math.floor(self.TextAdvance()) end)
         end
         self:SetNewClipToWidth(clipToWidth)
+    end,
+
+    --- Internal function to fit the truncation string inside the max width
+    _applyTruncation = function(self)
+        local maxWidth = self.Width()
+        if not maxWidth or maxWidth <= 0 then
+            self:SetDisplayText(self._fullText)
+            return
+        end
+
+        local truncationText = self._truncationText
+        local str = self._fullText
+        if str == nil then return end
+        -- restore full text if it now fits
+        if self:GetStringAdvance(str) <= maxWidth then
+            self:SetDisplayText(str)
+            return
+        end
+
+        --iterate until string + truncation text fit
+        local i = STR_Utf8Len(str)
+        while i > 0 and self:GetStringAdvance(str .. truncationText) > maxWidth do
+            str = STR_Utf8SubString(str, 1, i - 1)
+            i = i - 1
+        end
+
+        self:SetDisplayText(str .. truncationText)
     end,
 
     -- lazy var support
