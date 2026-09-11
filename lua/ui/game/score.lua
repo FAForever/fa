@@ -397,9 +397,10 @@ function SetupPlayerLines()
         group.nameHover.Height:Set(group.name.Height)
         LayoutHelpers.AtVerticalCenterIn(group.nameHover, group)
         Tooltip.AddAutoUpdatedControlTooltip(group.nameHover,
-        function() return group.name:GetText() or ""  end,
-        function() return "" end,
-        0.5)
+            function() return group.name:GetText() or "" end,
+            function() return "" end,
+            0.5
+        )
 
         group.Height:Set(group.faction.Height)
         group.Width:Set(controls.armyGroup.Width)
