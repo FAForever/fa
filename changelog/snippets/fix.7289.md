@@ -1,1 +1,1 @@
-- Your explanation here... [Don't forget to change the category in the filename] (#7289).
+- Add backwards compatibility for the naval formation changes in Nomads (#7289).
