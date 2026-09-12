@@ -371,7 +371,7 @@ UnitBlueprint{
             Icon = "sre",
             Name = "<LOC enhancements_0071>Enhanced Sensor System",
             NewOmniRadius = 80,
-            NewVisionRadius = 45,
+            NewVisionRadius = 44,
             MaintenanceConsumptionPerSecondEnergy = 100,
             ShowBones = { "SAM" },
             Slot = "LCH",
