@@ -474,6 +474,15 @@ UEL0301 = ClassUnit(CommandUnit) {
 
 TypeClass = UEL0301
 
+--#region debugging
+__moduleinfo.OnReload = function()
+    -- Buffs are stored globally and only created once so they need to be reset on reload
+    Buffs['UEFSCUPersonalShieldMaint'] = nil
+    Buffs['UEFSCUBubbleShieldMaint'] = nil
+    Buffs['UEFSCUSensorMaint'] = nil
+end
+--#endregion
+
 --#region Mod Compatibility
 local Shield = import("/lua/shield.lua").Shield
 --#endregion
