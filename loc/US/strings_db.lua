@@ -25,8 +25,8 @@ ual0301_RAS_help="Enhanced during construction with a Resource Allocation System
 ual0301_RAS_name=""
 
 --UEF
-uel0301_BubbleShield_desc="SACU (Shield Preset)"
-uel0301_BubbleShield_help="Enhanced during construction with the Bubble Shield Generator."
+uel0301_BubbleShield_desc="SACU (Shield Rambo Preset)"
+uel0301_BubbleShield_help="Enhanced during construction with the bubble shield generator, energy accelerator and heavy plasma refractor enhancements."
 uel0301_BubbleShield_name=""
 uel0301_Combat_desc="SACU (Combatant Preset)"
 uel0301_Combat_help="Enhanced during construction with the Energy Accelerator and Heavy Plasma Refractor."
