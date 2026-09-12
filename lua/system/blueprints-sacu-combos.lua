@@ -1,12 +1,5 @@
 --******************************************************************************************************
 --** Cybran SACU loadout combos
---**
---** Generates a hidden EnhancementPreset for every valid URL0301 slot combination
---** that is not already a named factory preset. IDs are stable: enhancement names
---** are sorted before the suffix is built, so clients cannot disagree on the string.
---**
---** Existing role presets (RAS, Engineer, Combat, ...) are left untouched and stay
---** on the Quantum Gateway construct grid.
 --******************************************************************************************************
 
 local TableInsert = table.insert
@@ -18,6 +11,17 @@ local ComboFactionBaseIds = {
 }
 
 local SlotOrder = { 'LCH', 'RCH', 'Back' }
+
+local ShortLabels = {
+    EMPCharge = 'EMP',
+    FocusConvertor = 'Amp',
+    NaniteMissileSystem = 'AA',
+    ResourceAllocation = 'RAS',
+    SelfRepairSystem = 'Nano',
+    StealthGenerator = 'Stealth',
+    CloakingGenerator = 'Cloak',
+    Switchback = 'Fab',
+}
 
 local function IsRemoveEnhancement(name)
     return string.sub(name, -6) == 'Remove'
@@ -131,9 +135,9 @@ end
 local function ComboUnitName(enhancements, bp)
     local labels = {}
     for _, name in enhancements do
-        TableInsert(labels, CleanLabel(name, bp.Enhancements[name]))
+        TableInsert(labels, ShortLabels[name] or CleanLabel(name, bp.Enhancements[name]))
     end
-    return 'SACU (' .. table.concat(labels, ' / ') .. ')'
+    return 'SACU (' .. table.concat(labels, '/') .. ')'
 end
 
 function InjectSacuLoadoutPresets(all_bps)
@@ -167,7 +171,7 @@ function InjectSacuLoadoutPresets(all_bps)
                         if not bp.EnhancementPresets[presetName] then
                             local pretty = ComboUnitName(enhList, bp)
                             bp.EnhancementPresets[presetName] = {
-                                Description = pretty,
+                                Description = bp.Description,
                                 BuildIconSortPriority = 90,
                                 Enhancements = enhList,
                                 HelpText = pretty,
