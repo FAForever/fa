@@ -227,7 +227,7 @@ UEL0301 = ClassUnit(CommandUnit) {
 
     ---@param self UEL0301
     ---@param bp UnitBlueprintEnhancement
-    ProcessEnhancementShield = function (self, bp)
+    ProcessEnhancementShield = function(self, bp)
         if not Buffs['UEFSCUPersonalShieldMaint'] then
             BuffBlueprint {
                 Name = 'UEFSCUPersonalShieldMaint',
@@ -251,7 +251,7 @@ UEL0301 = ClassUnit(CommandUnit) {
 
     ---@param self UEL0301
     ---@param bp UnitBlueprintEnhancement unused
-    ProcessEnhancementShieldRemove = function (self, bp)
+    ProcessEnhancementShieldRemove = function(self, bp)
         self:RemoveToggleCap('RULEUTC_ShieldToggle')
         self:DestroyShield()
 
