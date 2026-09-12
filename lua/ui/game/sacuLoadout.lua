@@ -97,14 +97,24 @@ local function FindBlueprintId(enhancements)
     end
 
     local want = ComboLogic.EnhancementSetKey(enhancements)
+    local found = nil
     for id, bp in __blueprints do
-        local assigned = bp.EnhancementPresetAssigned
-        if assigned and assigned.BaseBlueprintId == CybranSacuId and assigned.Enhancements then
-            if ComboLogic.EnhancementSetKey(assigned.Enhancements) == want then
-                return id
+        if type(id) == 'string' and bp and bp.EnhancementPresetAssigned then
+            local assigned = bp.EnhancementPresetAssigned
+            if assigned.BaseBlueprintId == CybranSacuId and assigned.Enhancements then
+                if ComboLogic.EnhancementSetKey(assigned.Enhancements) == want then
+                    local realId = bp.BlueprintId or id
+                    if type(realId) == 'string' and string.find(realId, 'url0301') then
+                        found = realId
+                        if string.find(realId, 'combo_') then
+                            return realId
+                        end
+                    end
+                end
             end
         end
     end
+    return found
 end
 
 function QueueSelected(count)
