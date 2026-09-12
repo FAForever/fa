@@ -29,9 +29,8 @@ Description = {
     ['uel0301-ed'] = "<LOC Unit_Description_0017> Engineering Drone acts as a secondary Engineer. Assists the SACU where applicable.",
     ['uel0301-psg'] = "<LOC Unit_Description_0018> Creates a protective shield around the SACU. Requires Energy to run.",
     ['uel0301-sgf'] = "<LOC Unit_Description_0019> Expands the radius of the SACU's personal shield. Requires Energy to run.",
-    ['uel0301-rj'] = "<LOC Unit_Description_0020> Radar Jammer creates false radar images. Countered by Omni sensors.",
+    ['uel0301-rj'] = "<LOC Unit_Description_0020> Equips the SACU with a radar jammer that creates false radar signatures (countered by omni sensors) and greatly expands the range of its standard sensor systems.\n\n+64 Omni Radius\n+18 Vision Radius\nJamming Blips = 10\nJamming Radius = 16",
     ['uel0301-isb'] = "<LOC Unit_Description_0021> Increases SACU's resource generation and volatility.\n\n+10 mass production per second\n+1000 energy production per second\n+1000 Death Nuke damage",
-    ['uel0301-sre'] = "<LOC Unit_Description_0022> Greatly expands the range of the standard on-board SACU sensor systems.",
     ['uel0301-acu'] = "<LOC Unit_Description_0023> Rapidly cools any weapon mounted onto the SACU. Increases rate of fire.",
     ['uel0301-heo'] = "<LOC Unit_Description_0024> Equips the standard SACU Heavy plasma cannon with area-of-effect damage.",
 
