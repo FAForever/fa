@@ -230,6 +230,7 @@ UnitBlueprint{
                 "SensorRangeEnhancer",
             },
             HelpText = "<LOC uel0301_IntelJammer_help>Support Armored Command Unit. Enhanced during construction with the bubble shield generator and intel support system enhancements.",
+            SelectionPriority = 1,
             SortCategory = "SORTOTHER",
             UnitName = "<LOC uel0301_IntelJammer_name>SACU (Sensor/Jamming Shield Preset)",
         },
