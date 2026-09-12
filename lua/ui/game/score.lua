@@ -703,6 +703,7 @@ function _OnBeat()
                         if GetFocusArmy() ~= index then
                             line.name:SetColor('ffa0a0a0')
                             line.score:SetColor('ffa0a0a0')
+                            line.division:SetColor('ffa0a0a0')
                         end
                         line.mass_in:SetColor('ffa0a0a0')
                         line.energy_in:SetColor('ffa0a0a0')
