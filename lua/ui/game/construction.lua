@@ -2001,14 +2001,7 @@ function CreateExtraControls(controlType)
         end
         SetupPauseButton()
     elseif controlType == 'enhancement' then
-    SetupPauseButton()
-    local loadout = import('/lua/ui/game/sacuLoadout.lua')
-    if loadout.IsCybranGatewaySelection(sortedOptions.selection) then
-        controls.extraBtn1:Enable()
-        controls.extraBtn1.OnClick = function()
-            loadout.QueueSelected(1)
-        end
-    end
+    	SetupPauseButton()
     else
         controls.extraBtn1:Disable()
         controls.extraBtn2:Disable()
