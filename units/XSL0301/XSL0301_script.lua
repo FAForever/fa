@@ -145,6 +145,9 @@ XSL0301 = ClassUnit(CommandUnit) {
         self:AddCommandCap('RULEUCC_Overcharge')
         self:GetWeaponByLabel('OverCharge').NeedsUpgrade = false
         self:GetWeaponByLabel('AutoOverCharge').NeedsUpgrade = false
+        if self.Brain.Human then
+            self:SetAutoOvercharge(true)
+        end
     end,
 
     ---@param self XSL0301
