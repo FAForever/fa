@@ -28,6 +28,13 @@ local GameMain = import("/lua/ui/game/gamemain.lua")
 local selectedUnit = nil
 local updateThread = nil
 local unitHP = {}
+local function UnitBuildIconId(id)
+    if id and string.sub(id, 1, 13) == 'url0301_combo' then
+        return 'url0301'
+    end
+    return id
+end
+
 controls = import("/lua/ui/controls.lua").Get()
 
 -- shared between sim and ui
@@ -379,7 +386,7 @@ function CreateQueueGrid(parent)
             for id, item in self.items do
                 if queue[id] then
                     item:Show()
-                    item.icon:SetTexture(UIUtil.UIFile('/icons/units/' .. queue[id].id .. '_icon.dds', true))
+                    item.icon:SetTexture(UIUtil.UIFile('/icons/units/' .. UnitBuildIconId(queue[id].id) .. '_icon.dds', true))
                     item.text:SetText(tostring(queue[id].count))
                 else
                     item:Hide()
@@ -660,8 +667,8 @@ function UpdateWindow(info)
         end
 
         if info.focus then
-            if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. info.focus.blueprintId .. '_icon.dds', true)) then
-                controls.actionIcon:SetTexture(UIUtil.UIFile('/icons/units/' .. info.focus.blueprintId .. '_icon.dds',
+            if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. UnitBuildIconId(info.focus.blueprintId) .. '_icon.dds', true)) then
+                controls.actionIcon:SetTexture(UIUtil.UIFile('/icons/units/' .. UnitBuildIconId(info.focus.blueprintId) .. '_icon.dds',
                     true))
             else
                 controls.actionIcon:SetTexture('/textures/ui/common/game/unit_view_icons/unidentified.dds')

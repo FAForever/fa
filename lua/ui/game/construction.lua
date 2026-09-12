@@ -46,6 +46,13 @@ local prevBuildables = false
 local prevSelection = false
 local prevBuildCategories = false
 
+local function UnitBuildIconId(id)
+    if id and string.sub(id, 1, 13) == 'url0301_combo' then
+        return 'url0301'
+    end
+    return id
+end
+
 -- Flag to indicate if every selected unit is a factory
 local allFactories = nil
 if options.gui_templates_factory ~= 0 then
@@ -579,8 +586,9 @@ function CommonLogic()
 
     controls.secondaryChoices.SetControlToType = function(control, type)
         local function SetIconTextures(control)
-            if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. control.Data.id .. '_icon.dds', true)) then
-                control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. control.Data.id .. '_icon.dds', true))
+            local iconId = UnitBuildIconId(control.Data.id)
+	    if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. iconId .. '_icon.dds', true)) then
+		control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. iconId .. '_icon.dds', true))
             else
                 control.Icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
             end
@@ -770,7 +778,7 @@ function CommonLogic()
 
     controls.choices.SetControlToType = function(control, type)
         local function SetIconTextures(control, optID)
-            local id = optID or control.Data.id
+            local id = UnitBuildIconId(optID or control.Data.id)
             if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds', true)) then
                 control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds', true))
             else
