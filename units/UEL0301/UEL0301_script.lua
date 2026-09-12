@@ -227,7 +227,6 @@ UEL0301 = ClassUnit(CommandUnit) {
     ---@param self UEL0301
     ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementShieldRemove = function (self, bp)
-        RemoveUnitEnhancement(self, 'Shield')
         self:DestroyShield()
         self:SetMaintenanceConsumptionInactive()
         self:RemoveToggleCap('RULEUTC_ShieldToggle')
