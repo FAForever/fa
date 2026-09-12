@@ -9,10 +9,20 @@ local DefaultWep = import("/lua/sim/defaultweapons.lua")
 local DefaultUnit = import("/lua/defaultunits.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
 local TWeapons = import("/lua/terranweapons.lua")
+local Buff = import("/lua/sim/buff.lua")
 
 local CommandUnit = DefaultUnit.CommandUnit
 local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
 local SCUDeathWeapon = DefaultWep.SCUDeathWeapon
+
+---@alias UEFSCUEnhancementBuffName
+---| "UEFSCUPersonalShieldMaint"
+---| "UEFSCUBubbleShieldMaint"
+---| "UEFSCUSensorMaint"
+
+---@alias UEFSCUEnhancementBuffType
+---| "SCUSHIELDMAINT"
+---| "SCUSENSORMAINT"
 
 ---@class UEL0301 : CommandUnit
 ---@field HasPodEnh boolean
@@ -218,35 +228,65 @@ UEL0301 = ClassUnit(CommandUnit) {
     ---@param self UEL0301
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementShield = function (self, bp)
+        if not Buffs['UEFSCUPersonalShieldMaint'] then
+            BuffBlueprint {
+                Name = 'UEFSCUPersonalShieldMaint',
+                DisplayName = 'UEFSCUPersonalShieldMaint',
+                BuffType = 'SCUSHIELDMAINT',
+                Stacks = 'IGNORE',
+                Duration = -1,
+                Affects = {
+                    EnergyMaintenanceOverride = {
+                        Add = bp.MaintenanceConsumptionPerSecondEnergy,
+                        Mult = 1,
+                    },
+                },
+            }
+        end
+        Buff.ApplyBuff(self, 'UEFSCUPersonalShieldMaint')
         self:AddToggleCap('RULEUTC_ShieldToggle')
-        self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
-        self:SetMaintenanceConsumptionActive()
+        -- Create shield after toggle cap so it can set the script bit
         self:CreateShield(bp)
     end,
 
     ---@param self UEL0301
     ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementShieldRemove = function (self, bp)
-        self:DestroyShield()
-        self:SetMaintenanceConsumptionInactive()
         self:RemoveToggleCap('RULEUTC_ShieldToggle')
+        self:DestroyShield()
+
+        Buff.RemoveBuff(self, 'UEFSCUPersonalShieldMaint')
     end,
 
     ---@param self UEL0301
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementShieldGeneratorField = function(self, bp)
+        if not Buffs['UEFSCUBubbleShieldMaint'] then
+            BuffBlueprint {
+                Name = 'UEFSCUBubbleShieldMaint',
+                DisplayName = 'UEFSCUBubbleShieldMaint',
+                BuffType = 'SCUSHIELDMAINT',
+                Stacks = 'IGNORE',
+                Duration = -1,
+                Affects = {
+                    EnergyMaintenanceOverride = {
+                        Add = bp.MaintenanceConsumptionPerSecondEnergy,
+                        Mult = 1,
+                    },
+                },
+            }
+        end
+        Buff.ApplyBuff(self, 'UEFSCUBubbleShieldMaint')
         self:AddToggleCap('RULEUTC_ShieldToggle')
-        self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
-        self:SetMaintenanceConsumptionActive()
         self:CreateShield(bp)
     end,
 
     ---@param self UEL0301
     ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementShieldGeneratorFieldRemove = function(self, bp)
-        self:DestroyShield()
-        self:SetMaintenanceConsumptionInactive()
         self:RemoveToggleCap('RULEUTC_ShieldToggle')
+        self:DestroyShield()
+        Buff.RemoveBuff(self, 'UEFSCUBubbleShieldMaint')
     end,
 
     ---@param self UEL0301
@@ -278,16 +318,29 @@ UEL0301 = ClassUnit(CommandUnit) {
         self:SetIntelRadius('Vision', bp.NewVisionRadius or 104)
         self:SetIntelRadius('Omni', bp.NewOmniRadius or 104)
 
-        self:SetIntelRadius('Jammer', bp.NewJammerRadius or 26)
-        self:EnableUnitIntel('Enhancement', 'Jammer')
-        self:AddToggleCap('RULEUTC_JammingToggle')
-        self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
-        self:SetMaintenanceConsumptionActive()
-
-        if self.IntelEffects then
-            self.IntelEffectsBag = {}
-            self:CreateTerrainTypeEffects(self.IntelEffects, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
+        if not Buffs['UEFSCUSensorMaint'] then
+            BuffBlueprint {
+                Name = 'UEFSCUSensorMaint',
+                DisplayName = 'UEFSCUSensorMaint',
+                BuffType = 'SCUSENSORMAINT',
+                Stacks = 'IGNORE',
+                Duration = -1,
+                Affects = {
+                    EnergyMaintenanceOverride = {
+                        Add = bp.MaintenanceConsumptionPerSecondEnergy,
+                        Mult = 1,
+                    },
+                },
+            }
         end
+
+        -- For normal units maintenance comes first, then intel becomes enabled
+        Buff.ApplyBuff(self, 'UEFSCUSensorMaint')
+        -- enable flag before intel
+        self.RadarJammerEnh = true
+        self:EnableUnitIntel('Enhancement', 'Jammer')
+        -- Add toggle after creating buff since it will set the script bit
+        self:AddToggleCap('RULEUTC_JammingToggle')
     end,
 
     ---@param self UEL0301
@@ -297,15 +350,12 @@ UEL0301 = ClassUnit(CommandUnit) {
         self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)
         self:SetIntelRadius('Omni', bpIntel.OmniRadius or 26)
 
-        self.RadarJammerEnh = false
-        self:SetIntelRadius('Jammer', 0)
         self:DisableUnitIntel('Enhancement', 'Jammer')
+        -- remove fx and range buff before disabling enhancement flag
         self:RemoveToggleCap('RULEUTC_JammingToggle')
-        self:SetMaintenanceConsumptionInactive()
+        self.RadarJammerEnh = false
 
-        if self.IntelEffectsBag then
-            EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
-        end
+        Buff.RemoveBuff(self, 'UEFSCUSensorMaint')
     end,
 
     ---@param self UEL0301
@@ -354,17 +404,58 @@ UEL0301 = ClassUnit(CommandUnit) {
         end
     end,
 
-        ---@param self UEL0301
+    -- Override the shield and jamming toggles so that maintenance energy can be handled with Buffs
+    ---@param self UEL0301
+    ---@param bit number
+    OnScriptBitSet = function(self, bit)
+        if bit == 0 then -- Shield toggle on
+            self:PlayUnitAmbientSound('ActiveLoop')
+            self:EnableShield()
+            if self:HasEnhancement('ShieldGeneratorField') then
+                Buff.ApplyBuff(self, 'UEFSCUBubbleShieldMaint')
+            elseif self:HasEnhancement('Shield') then
+                Buff.ApplyBuff(self, 'UEFSCUPersonalShieldMaint')
+            end
+        elseif bit == 2 then -- Jamming toggle off
+            self:StopUnitAmbientSound('ActiveLoop')
+            Buff.RemoveBuff(self, 'UEFSCUSensorMaint')
+            self:DisableUnitIntel('ToggleBit2', 'Jammer')
+        else
+            CommandUnit.OnScriptBitSet(self, bit)
+        end
+    end,
+
+    -- Override the shield and jamming toggles so that maintenance energy can be handled with Buffs
+    ---@param self UEL0301
+    ---@param bit number
+    OnScriptBitClear = function(self, bit)
+        if bit == 0 then -- Shield toggle off
+            self:StopUnitAmbientSound('ActiveLoop')
+            self:DisableShield()
+            if self:HasEnhancement('ShieldGeneratorField') then
+                Buff.RemoveBuff(self, 'UEFSCUBubbleShieldMaint')
+            elseif self:HasEnhancement('Shield') then
+                Buff.RemoveBuff(self, 'UEFSCUPersonalShieldMaint')
+            end
+        elseif bit == 2 then -- Jamming toggle on
+            self:PlayUnitAmbientSound('ActiveLoop')
+            Buff.ApplyBuff(self, 'UEFSCUSensorMaint')
+            self:EnableUnitIntel('ToggleBit2', 'Jammer')
+        else
+            CommandUnit.OnScriptBitClear(self, bit)
+        end
+    end,
+
+    ---@param self UEL0301
     ---@param intel IntelType
     OnIntelEnabled = function(self, intel)
         CommandUnit.OnIntelEnabled(self, intel)
-        if self.RadarJammerEnh and self:IsIntelEnabled('Jammer') then
+        -- check if we have jammer enh because jammer is enabled in OnStopBeingBuilt
+        if intel == 'Jammer' and self.RadarJammerEnh then
             if self.IntelEffects then
                 self.IntelEffectsBag = {}
-                self:CreateTerrainTypeEffects(self.IntelEffects, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
+                self:CreateTerrainTypeEffects(self.IntelEffects, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
             end
-            self:SetEnergyMaintenanceConsumptionOverride(self.Blueprint.Enhancements['RadarJammer'].MaintenanceConsumptionPerSecondEnergy or 0)
-            self:SetMaintenanceConsumptionActive()
         end
     end,
 
@@ -372,8 +463,8 @@ UEL0301 = ClassUnit(CommandUnit) {
     ---@param intel IntelType
     OnIntelDisabled = function(self, intel)
         CommandUnit.OnIntelDisabled(self, intel)
-        if self.RadarJammerEnh and not self:IsIntelEnabled('Jammer') then
-            self:SetMaintenanceConsumptionInactive()
+        -- check if we have jammer enh because jammer is disabled in OnStopBeingBuilt
+        if intel == 'Jammer' and self.RadarJammerEnh then
             if self.IntelEffectsBag then
                 EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
             end
