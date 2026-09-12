@@ -278,19 +278,7 @@ UEL0301 = ClassUnit(CommandUnit) {
     ProcessEnhancementSensorRangeEnhancer = function(self, bp)
         self:SetIntelRadius('Vision', bp.NewVisionRadius or 104)
         self:SetIntelRadius('Omni', bp.NewOmniRadius or 104)
-    end,
 
-    ---@param self UEL0301
-    ---@param bp UnitBlueprintEnhancement unused
-    ProcessEnhancementSensorRangeEnhancerRemove = function(self, bp)
-        local bpIntel = self.Blueprint.Intel
-        self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)
-        self:SetIntelRadius('Omni', bpIntel.OmniRadius or 26)
-    end,
-
-    ---@param self UEL0301
-    ---@param bp UnitBlueprintEnhancement
-    ProcessEnhancementRadarJammer = function(self, bp)
         self:SetIntelRadius('Jammer', bp.NewJammerRadius or 26)
         self:EnableUnitIntel('Enhancement', 'Jammer')
         self:AddToggleCap('RULEUTC_JammingToggle')
@@ -301,12 +289,15 @@ UEL0301 = ClassUnit(CommandUnit) {
             self.IntelEffectsBag = {}
             self:CreateTerrainTypeEffects(self.IntelEffects, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
         end
-
     end,
 
     ---@param self UEL0301
     ---@param bp UnitBlueprintEnhancement unused
-    ProcessEnhancementRadarJammerRemove = function(self, bp)
+    ProcessEnhancementSensorRangeEnhancerRemove = function(self, bp)
+        local bpIntel = self.Blueprint.Intel
+        self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)
+        self:SetIntelRadius('Omni', bpIntel.OmniRadius or 26)
+
         self.RadarJammerEnh = false
         self:SetIntelRadius('Jammer', 0)
         self:DisableUnitIntel('Enhancement', 'Jammer')
@@ -316,7 +307,6 @@ UEL0301 = ClassUnit(CommandUnit) {
         if self.IntelEffectsBag then
             EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
         end
-        
     end,
 
     ---@param self UEL0301

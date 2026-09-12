@@ -97,9 +97,11 @@ UEF Support Armored Command Unit
   - Energy cost: 30000 -> 28600
   - Build time: 3360 -> 3370
 - Radar Jammer:
-  - Build time: 2500 -> 1000
+  - Merged into Enhanced Sensor System upgrade
 - Enhanced Sensor System:
-  - Build time: 3000 -> 2520
+  - Mass cost: 600 -> 900
+  - Energy cost: 20000 -> 28000 
+  - Build time: 2520 -> 3520
 - Presets:
   - Shield preset: Added Energy Accelerator and Heavy Plasma Refractor upgrades
 
