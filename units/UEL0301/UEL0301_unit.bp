@@ -193,6 +193,8 @@ UnitBlueprint{
             Description = "<LOC uel0301_BubbleShield_desc>SACU (Shield preset)",
             BuildIconSortPriority = 30,
             Enhancements = {
+                "AdvancedCoolingUpgrade",
+                "HighExplosiveOrdnance",
                 "ShieldGeneratorField",
             },
             HelpText = "<LOC uel0301_BubbleShield_help>Support Armored Command Unit. Enhanced during construction with the bubble shield generator enhancement.",

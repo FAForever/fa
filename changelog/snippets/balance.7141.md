@@ -100,6 +100,8 @@ UEF Support Armored Command Unit
   - Build time: 2500 -> 1000
 - Enhanced Sensor System:
   - Build time: 3000 -> 2520
+- Presets:
+  - Shield preset: Added Energy Accelerator and Heavy Plasma Refractor upgrades
 
 {% unit URL0301 %}
 Cybran Support Armored Command Unit
