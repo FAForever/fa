@@ -22,9 +22,25 @@ name: Pull Request preparation
 
 on:
   pull_request:
-    types: [opened]
+    types:
+      - opened
+
+permissions:
+  pull-requests: write
 
 jobs:
+  greetings:
+    name: Greet first-time contributors
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post welcome comment
+        uses: actions/first-interaction@v3
+        with:
+          pr_message: |
+            Hello,
+            it seems this is your first contribution.
+            Please read our [contribution guidelines](CONTRIBUTING.md) to understand how to proceed.
+
   prepare_pr:
     name: Prepare pull request
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}

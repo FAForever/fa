@@ -124,6 +124,18 @@
 --- | 'NUMPAD_DECIMAL'
 --- | 'NUMPAD_DIVIDE'
 
+---@class UIBuildTemplateBuilding
+---@field [1] UnitId
+---@field [2] integer # build order
+---@field [3] integer # position x
+---@field [4] integer # position z
+
+---@class UIBuildTemplate
+---@field [1] integer        # width that is used when drag building the template
+---@field [2] integer        # height that is used when drag building the template
+---@field [3] UIBuildTemplateBuilding
+--@field [...] UIBuildTemplateBuilding
+
 --- Repeatedly the selection box of the unit to the hovered-over state to create a blinking effect
 ---@param entityId EntityId
 ---@param onTime number
@@ -611,16 +623,16 @@ end
 
 --- Given a set of units, gets the union of orders and unit categories (for determining builds). You can use `GetUnitCommandFromCommandCap` to convert the toggles to unit commands
 ---@param unitSet UserUnit[]
----@return string[] orders
----@return CommandCap[] availableToggles
+---@return EngineCommandCap[] orders
+---@return EngineToggleCap[] availableToggles
 ---@return EntityCategory buildableCategories
 function GetUnitCommandData(unitSet)
 end
 
 --- Retrieves the orders, toggles and buildable categories of the given unit. You can use `GetUnitCommandFromCommandCap` to convert the toggles to unit commands
 ---@param unit UserUnit
----@return string[] orders
----@return CommandCap[] availableToggles
+---@return EngineCommandCap[] orders
+---@return EngineToggleCap[] availableToggles
 ---@return EntityCategory buildableCategories
 function GetUnitCommandDataOfUnit(unit)
 end

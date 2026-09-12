@@ -1038,9 +1038,9 @@ end
 
 local NewDummies = {}
 
-local function GetFoot(bp, axe) return math.ceil(bp.Footprint and bp.Footprint[axe] or bp[axe] or 1) end
-local function GetSkirt(bp, axe) return math.max((bp.Physics and bp.Physics['Skirt'..axe] or 1), GetFoot(bp, axe)) end
-local function GetOffset(bp, axe) return (bp.Physics and bp.Physics['SkirtOffset'..axe] or 0) end
+local function GetFoot(bp, axis) return math.ceil(bp.Footprint and bp.Footprint[axis] or bp[axis] or 1) end
+local function GetSkirt(bp, axis) return math.max((bp.Physics and bp.Physics['Skirt'..axis] or 1), GetFoot(bp, axis)) end
+local function GetOffset(bp, axis) return (bp.Physics and bp.Physics['SkirtOffset'..axis] or 0) end
 
 local function ReduceFoot(val)
     local modded = math.mod(val, 2)
