@@ -4,7 +4,7 @@
 -- Summary: Construction management UI
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-
+local SacuLoadout = import('/lua/ui/game/sacuLoadout.lua')
 local UIUtil = import("/lua/ui/uiutil.lua")
 local DiskGetFileInfo = UIUtil.DiskGetFileInfo
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
@@ -2017,8 +2017,33 @@ function CreateExtraControls(controlType)
             controls.extraBtn1:Disable()
         end
         SetupPauseButton()
-    elseif controlType == 'enhancement' then
-    	SetupPauseButton()
+     elseif controlType == 'enhancement' then
+        local loadout = import('/lua/ui/game/sacuLoadout.lua')
+        if loadout.IsCybranGatewaySelection(sortedOptions.selection) then
+            Tooltip.AddCheckboxTooltip(controls.extraBtn1, 'construction_infinite')
+            controls.extraBtn1.OnClick = function(self, modifiers)
+                return Checkbox.OnClick(self, modifiers)
+            end
+            controls.extraBtn1.OnCheck = function(self, checked)
+                for _, v in sortedOptions.selection do
+                    v:ProcessInfo('SetRepeatQueue', tostring(checked))
+                end
+            end
+            local repeatOn = true
+            for _, v in sortedOptions.selection do
+                if not v:IsRepeatQueue() then
+                    repeatOn = false
+                    break
+                end
+            end
+            controls.extraBtn1:SetCheck(repeatOn, true)
+            controls.extraBtn1:Enable()
+            controls.extraBtn1.icon.OnTexture = UIUtil.UIFile('/game/construct-sm_btn/infinite_on.dds')
+            controls.extraBtn1.icon.OffTexture = UIUtil.UIFile('/game/construct-sm_btn/infinite_off.dds')
+            controls.extraBtn1.icon:Show()
+            controls.extraBtn1.icon:SetTexture(controls.extraBtn1.icon.OnTexture)
+        end
+        SetupPauseButton()
     else
         controls.extraBtn1:Disable()
         controls.extraBtn2:Disable()
