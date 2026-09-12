@@ -122,20 +122,37 @@ Text = ClassUI(moho.text_methods, Control) {
 
     end,
 
+    --- Adjusts text cropping behavior
     ---@param clipToWidth boolean
-    SetClipToWidth = function(self, clipToWidth)
+    ---@param truncationEnabled? boolean
+    ---@param customTruncationSymbol? string
+    SetClipToWidth = function(self, clipToWidth, truncationEnabled, customTruncationSymbol)
         if clipToWidth then
             self.Width:Set(function() return self.Right() - self.Left() end)
         else
+            self:SetTruncationEnabled(false)
             self.Width:Set(function() return math.floor(self.TextAdvance()) end)
         end
+
+        if truncationEnabled then
+            self:SetTruncationEnabled(truncationEnabled)
+        end
+
+        if customTruncationSymbol ~= nil then
+            self:SetTruncationText(customTruncationSymbol)
+        end
+
         self:SetNewClipToWidth(clipToWidth)
     end,
 
     --- Internal function to fit the truncation string inside the max width
     _applyTruncation = function(self)
-        local maxWidth = self.Width()
-        if not maxWidth or maxWidth <= 0 then
+
+        -- Avoid unnecessary truncation, and no width issues
+        if self._fullText == "" then return end
+
+        local initialized, maxWidth = pcall(function () return self.Width() end)
+        if not initialized or maxWidth <= 0 then
             self:SetDisplayText(self._fullText)
             return
         end

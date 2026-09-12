@@ -73,8 +73,7 @@ function updatePlayerName(line)
         line.division:SetText(playerRating)
     end
 
-    line.name:SetTruncationEnabled(true)
-    line.name:SetText(playerClan .. playerName)
+    line.name:SetText(playerClan .. playerName .. "1234567890101112131415")
     line.name:SetDropShadow(true)
     LayoutHelpers.AnchorToLeft(line.name, line.division)
 end
@@ -327,7 +326,7 @@ function SetupPlayerLines()
         group.score:SetColor('ffffffff')
 
         LayoutHelpers.AnchorToLeft(group.name, group.score, 5)
-        group.name:SetClipToWidth(true)
+        group.name:SetClipToWidth(true, true)
 
         if armyIndex ~= 0 then
             group.mass = Bitmap(group)
