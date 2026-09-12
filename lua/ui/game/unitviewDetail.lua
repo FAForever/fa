@@ -881,7 +881,11 @@ function Show(bp, builderUnit, bpID)
         View.ShieldStat.Value:SetText(bp.Defense.Shield.ShieldMaxHealth)
     end
 
-    local iconName = GameCommon.GetCachedUnitIconFileNames(bp)
+    local iconBp = bp
+    if bp.BlueprintId and string.sub(bp.BlueprintId, 1, 13) == 'url0301_combo' then
+        iconBp = __blueprints['url0301'] or bp
+    end
+    local iconName = GameCommon.GetCachedUnitIconFileNames(iconBp)
     View.UnitImg:SetTexture(iconName)
     LayoutHelpers.SetDimensions(View.UnitImg, 46, 46)
 

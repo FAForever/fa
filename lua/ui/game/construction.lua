@@ -1976,6 +1976,15 @@ function CreateExtraControls(controlType)
             controls.extraBtn1:Disable()
         end
 
+        controls.extraBtn1.icon.OnTexture = UIUtil.UIFile('/game/construct-sm_btn/infinite_on.dds')
+        controls.extraBtn1.icon.OffTexture = UIUtil.UIFile('/game/construct-sm_btn/infinite_off.dds')
+        controls.extraBtn1.icon:Show()
+        if controls.extraBtn1:IsDisabled() then
+            controls.extraBtn1.icon:SetTexture(controls.extraBtn1.icon.OffTexture)
+        else
+            controls.extraBtn1.icon:SetTexture(controls.extraBtn1.icon.OnTexture)
+        end
+
         SetupPauseButton()
     elseif controlType == 'selection' then
         Tooltip.AddCheckboxTooltip(controls.extraBtn1, 'save_template')
