@@ -226,7 +226,7 @@ UnitBlueprint{
             Description = "<LOC uel0301_IntelJammer_desc>SACU (Intel Jammer preset)",
             BuildIconSortPriority = 35,
             Enhancements = {
-                "RadarJammer",
+                "ShieldGeneratorField",
                 "SensorRangeEnhancer",
             },
             HelpText = "<LOC uel0301_IntelJammer_help>Support Armored Command Unit. Enhanced during construction with the radar jammer and enhanced sensor system enhancements.",

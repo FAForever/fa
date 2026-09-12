@@ -104,6 +104,7 @@ UEF Support Armored Command Unit
   - Build time: 2520 -> 3520
 - Presets:
   - Shield preset: Added Energy Accelerator and Heavy Plasma Refractor upgrades
+  - Intel preset: Replaced Jammer with Shield Generator Field. The jammer still exists though because it was merged into the Enhanced Sensor System upgrade.
 
 {% unit URL0301 %}
 Cybran Support Armored Command Unit
