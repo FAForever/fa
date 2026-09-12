@@ -120,15 +120,18 @@ local function ComboPresetName(enhancements)
     return 'combo_' .. table.concat(copy, '_')
 end
 
+local function CleanLabel(name, def)
+    local label = name
+    if def and def.Name then
+        label = string.gsub(def.Name, '^<LOC [^>]+>', '')
+    end
+    return label
+end
+
 local function ComboUnitName(enhancements, bp)
     local labels = {}
     for _, name in enhancements do
-        local def = bp.Enhancements[name]
-        local label = name
-        if def and def.Name then
-            label = def.Name
-        end
-        TableInsert(labels, label)
+        TableInsert(labels, CleanLabel(name, bp.Enhancements[name]))
     end
     return 'SACU (' .. table.concat(labels, ' / ') .. ')'
 end
@@ -162,14 +165,15 @@ function InjectSacuLoadoutPresets(all_bps)
                     else
                         local presetName = ComboPresetName(enhList)
                         if not bp.EnhancementPresets[presetName] then
+                            local pretty = ComboUnitName(enhList, bp)
                             bp.EnhancementPresets[presetName] = {
-                                Description = ComboUnitName(enhList, bp),
+                                Description = pretty,
                                 BuildIconSortPriority = 90,
                                 Enhancements = enhList,
-                                HelpText = ComboUnitName(enhList, bp),
+                                HelpText = pretty,
                                 SelectionPriority = 1,
                                 SortCategory = 'SORTOTHER',
-                                UnitName = ComboUnitName(enhList, bp),
+                                UnitName = pretty,
                                 HiddenInBuildMenu = true,
                             }
                             generated = generated + 1
