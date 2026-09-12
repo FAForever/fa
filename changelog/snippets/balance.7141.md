@@ -145,6 +145,9 @@ Cybran Support Armored Command Unit
   - Energy cost: 7400 -> 13000
   - Build time: 1800 -> 1620
   - Energy maintenance cost: 100 -> 70
+- Presets:
+  - Cloak preset: added EMP Burst upgrade
+  - Stealth preset: added Disintegrator Amplifier upgrade
 
 {% unit XSL0301 %}
 Seraphim Support Armored Command Unit
