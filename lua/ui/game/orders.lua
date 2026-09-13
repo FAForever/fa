@@ -1376,7 +1376,7 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
     -- to determine where they go by using preferred slots
     AddAbilityButtons(standardOrdersTable, availableOrders, units)
     local loadout = import('/lua/ui/game/sacuLoadout.lua')
-    if loadout.IsCybranGatewaySelection(units) then
+    if loadout.IsGatewaySelection(units) then
         table.insert(availableOrders, 'SacuLoadoutQueue')
         standardOrdersTable.SacuLoadoutQueue = {
             helpText = 'sacu_loadout_queue',

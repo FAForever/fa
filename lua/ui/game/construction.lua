@@ -424,8 +424,10 @@ function CreateTabs(type)
     elseif type == 'enhancement' then
         local selection = sortedOptions.selection
         local enhancements = selection[1]:GetBlueprint().Enhancements
-        if SacuLoadout.IsCybranGatewaySelection(selection) then
-            enhancements = SacuLoadout.GetSacuEnhancements()
+        local isGatewaySelection = SacuLoadout.IsGatewaySelection(selection)
+        local gatewaySacuId = isGatewaySelection and SacuLoadout.GetSelectionSacuId(selection)
+        if isGatewaySelection then
+            enhancements = SacuLoadout.GetSacuEnhancements(gatewaySacuId)
         end
         local enhCommon = import("/lua/enhancementcommon.lua")
         local enhancementPrefixes = {Back = 'b-', LCH = 'la-', RCH = 'ra-'}
@@ -466,8 +468,8 @@ function CreateTabs(type)
                         ---@field UnitID UnitId
 
                         enhTable.ID = enhName
-                        if SacuLoadout.IsCybranGatewaySelection(selection) then
-                            enhTable.UnitID = SacuLoadout.CybranSacuId
+                        if isGatewaySelection then
+                            enhTable.UnitID = gatewaySacuId
                         else
                             enhTable.UnitID = selection[1]:GetBlueprint().BlueprintId
                         end
@@ -1535,7 +1537,7 @@ function OnClickHandler(button, modifiers)
         end
 
     elseif item.type == 'enhancement' and button.Data.TooltipOnly == false then
-        if SacuLoadout.IsCybranGatewaySelection(sortedOptions.selection) then
+        if SacuLoadout.IsGatewaySelection(sortedOptions.selection) then
             SacuLoadout.OnSlotIconClick(item, modifiers)
             if activeTab then
                 OnNestedTabCheck(activeTab, true)
@@ -2013,7 +2015,7 @@ function CreateExtraControls(controlType)
         end
         SetupPauseButton()
     elseif controlType == 'enhancement' then
-        if SacuLoadout.IsCybranGatewaySelection(sortedOptions.selection) then
+        if SacuLoadout.IsGatewaySelection(sortedOptions.selection) then
             Tooltip.AddCheckboxTooltip(controls.extraBtn1, 'construction_infinite')
             controls.extraBtn1.OnClick = function(self, modifiers)
                 return Checkbox.OnClick(self, modifiers)
@@ -2274,8 +2276,8 @@ function FormatData(unitData, type)
                 Selected = false,
                 Disabled = false,
             }
-            if SacuLoadout.IsCybranGatewaySelection(sortedOptions.selection) then
-                iconData.Selected = SacuLoadout.IsEnhancementSelected(enhTable.ID)
+            if SacuLoadout.IsGatewaySelection(sortedOptions.selection) then
+                iconData.Selected = SacuLoadout.IsEnhancementSelected(enhTable.UnitID, enhTable.ID)
                 iconData.Disabled = false
             end
             if enhancementQueue then
@@ -2675,8 +2677,8 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             end
         end
 
-        local cybranGate = SacuLoadout.IsCybranGatewaySelection(selection)
-        if (table.getn(selection) == 1 and selection[1]:GetBlueprint().Enhancements) or cybranGate then
+        local isGatewaySelection = SacuLoadout.IsGatewaySelection(selection)
+        if (table.getn(selection) == 1 and selection[1]:GetBlueprint().Enhancements) or isGatewaySelection then
             controls.enhancementTab:Enable()
         else
             controls.enhancementTab:Disable()
@@ -2753,8 +2755,8 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         end
 
         -- Upgrade multiple SCU at once
-        local cybranGate = SacuLoadout.IsCybranGatewaySelection(selection)
-        if (table.getn(selection) == 1 and selection[1]:GetBlueprint().Enhancements) or cybranGate then
+        local isGatewaySelection = SacuLoadout.IsGatewaySelection(selection)
+        if (table.getn(selection) == 1 and selection[1]:GetBlueprint().Enhancements) or isGatewaySelection then
             controls.enhancementTab:Enable()
         else
             controls.enhancementTab:Disable()

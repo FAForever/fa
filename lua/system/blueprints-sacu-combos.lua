@@ -1,18 +1,30 @@
 --******************************************************************************************************
---** Cybran SACU loadout combos
+--** SACU loadout combos, for all four factions
 --******************************************************************************************************
 
 local TableInsert = table.insert
 local TableGetn = table.getn
 local StringLower = string.lower
 
+-- Base SACU blueprint id, one per faction. Kept in sync by hand with
+-- SacuLoadout.FactionSacuIds in lua/ui/game/sacuLoadout.lua (that file can't
+-- import this one - see the comment at the top of it - so the two tables can't
+-- share a single definition).
 local ComboFactionBaseIds = {
-    url0301 = true,
+    uel0301 = true, -- UEF
+    ual0301 = true, -- Aeon
+    url0301 = true, -- Cybran
+    xsl0301 = true, -- Seraphim
 }
 
 local SlotOrder = { 'LCH', 'RCH', 'Back' }
 
+-- Short display labels for combo names, so they still fit the unit info panel.
+-- Enhancement key names don't collide across factions, so this stays one flat
+-- table; anything not listed here falls back to its full in-game name (see
+-- CleanLabel below).
 local ShortLabels = {
+    -- Cybran
     EMPCharge = 'EMP',
     FocusConvertor = 'Amp',
     NaniteMissileSystem = 'AA',
@@ -21,6 +33,27 @@ local ShortLabels = {
     StealthGenerator = 'Stealth',
     CloakingGenerator = 'Cloak',
     Switchback = 'Fab',
+    -- UEF
+    AdvancedCoolingUpgrade = 'Energy',
+    HighExplosiveOrdnance = 'Plasma',
+    Pod = 'Drone',
+    RadarJammer = 'Jammer',
+    SensorRangeEnhancer = 'Sensor',
+    Shield = 'Shield',
+    ShieldGeneratorField = 'ShieldField',
+    -- Aeon
+    EngineeringFocusingModule = 'Fab',
+    Sacrifice = 'Sacrifice',
+    ShieldHeavy = 'HeavyShield',
+    StabilitySuppressant = 'Reacton',
+    SystemIntegrityCompensator = 'Nano',
+    Teleporter = 'Teleport',
+    -- Seraphim
+    DamageStabilization = 'Nano',
+    EngineeringThroughput = 'Fab',
+    EnhancedSensors = 'Sensor',
+    Missile = 'Missile',
+    Overcharge = 'OC',
 }
 
 local function IsRemoveEnhancement(name)
@@ -171,7 +204,11 @@ function InjectSacuLoadoutPresets(all_bps)
                         if not bp.EnhancementPresets[presetName] then
                             local pretty = ComboUnitName(enhList, bp)
                             bp.EnhancementPresets[presetName] = {
-                                Description = bp.Description,
+                                -- The hand-authored presets on this unit (RAS, Engineer, Combat, ...)
+                                -- set Description to the same short string as UnitName, not the base
+                                -- SCU's own Description ("Support Armored Command Unit") - that's what
+                                -- was showing up appended after the name in build tooltips/info panels.
+                                Description = pretty,
                                 BuildIconSortPriority = 90,
                                 Enhancements = enhList,
                                 HelpText = pretty,
@@ -188,7 +225,7 @@ function InjectSacuLoadoutPresets(all_bps)
         end
     end
 
-    SPEW(string.format('SACU loadout: generated %d hidden Cybran combos, reused %d named presets', generated, skippedNamed))
+    SPEW(string.format('SACU loadout: generated %d hidden combos, reused %d named presets', generated, skippedNamed))
 end
 
 function MarkHiddenSacuLoadoutPresets(all_bps)

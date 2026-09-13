@@ -223,7 +223,7 @@ Tooltips = {
     },
     sacu_loadout_queue = {
         title = "Queue SACU loadout",
-        description = "Queue a Cybran SACU with the upgrades selected on the enhancement tab. Shift-click queues 5.",
+        description = "Queue a SACU with the upgrades selected on the enhancement tab. Shift-click queues 5.",
     },
     toggle_area_assist = {
         title = "<LOC tooltipui0503>Area-Assist Toggle",

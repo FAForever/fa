@@ -450,10 +450,17 @@ function UpdateWindow(info)
         elseif bp.General.UnitName then
             name = LOC(bp.General.UnitName)
         end
-        if name ~= '' then
-            name = name .. ': '
+        -- Generated SACU loadout combos already carry their full description in
+        -- the name itself (e.g. "SACU (Cloak/EMP)") - skip the usual "Name: TechN
+        -- Description" suffix for them so nothing trails after the name.
+        if bp.CategoriesHash and bp.CategoriesHash.SACULOADOUTCOMBO then
+            controls.name:SetText(name)
+        else
+            if name ~= '' then
+                name = name .. ': '
+            end
+            controls.name:SetText(name .. description)
         end
-        controls.name:SetText(name .. description)
         local scale = controls.name.Width() / controls.name.TextAdvance()
         if scale < 1 then
             LayoutHelpers.AtTopIn(controls.name, controls.bg, 10 / scale)
