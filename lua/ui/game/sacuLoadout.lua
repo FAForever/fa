@@ -3,12 +3,46 @@
 --** Used by the Quantum Gateway enhancement tab. Clicks choose slots; Queue issues a factory build.
 --******************************************************************************************************
 
-local ComboLogic = import("/lua/system/blueprints-sacu-combos.lua")
+-- Note: deliberately NOT importing blueprints-sacu-combos.lua here. That file is
+-- loaded via doscript() from Blueprints.lua so its functions become real globals;
+-- import()-ing it as well would re-run the whole file into a second, throwaway
+-- module table just to reach EnhancementSetKey. The one function we need is
+-- reproduced locally below instead.
 
 local selectedBySlot = {}
 
 local SlotOrder = { 'LCH', 'RCH', 'Back' }
-local CybranSacuId = 'url0301'
+
+-- Exported so other UI files (construction.lua, unitview.lua, unitviewDetail.lua, ...)
+-- don't each hard-code the Cybran SACU blueprint id.
+CybranSacuId = 'url0301'
+local ComboIdPrefix = CybranSacuId .. '_combo'
+
+--- Sorted, pipe-joined key for an enhancement set. Must stay identical to the
+--- copy in blueprints-sacu-combos.lua, since both sides need to agree on the
+--- generated combo preset names.
+--- @param list string[]
+--- @return string
+local function EnhancementSetKey(list)
+    local copy = {}
+    for _, name in list do
+        table.insert(copy, name)
+    end
+    table.sort(copy)
+    return string.lower(table.concat(copy, '|'))
+end
+
+--- Generated combo units share the base SACU's icon (they have no icon of their
+--- own). Used by construction.lua, unitview.lua and unitviewDetail.lua so the
+--- build grid, queue grid and unit-view panel all fall back consistently.
+--- @param id string|nil
+--- @return string|nil
+function UnitBuildIconId(id)
+    if id and string.sub(id, 1, string.len(ComboIdPrefix)) == ComboIdPrefix then
+        return CybranSacuId
+    end
+    return id
+end
 
 function IsCybranGatewaySelection(selection)
     if not selection or table.empty(selection) then
@@ -96,15 +130,15 @@ local function FindBlueprintId(enhancements)
         return CybranSacuId
     end
 
-    local want = ComboLogic.EnhancementSetKey(enhancements)
+    local want = EnhancementSetKey(enhancements)
     local found = nil
     for id, bp in __blueprints do
         if type(id) == 'string' and bp and bp.EnhancementPresetAssigned then
             local assigned = bp.EnhancementPresetAssigned
             if assigned.BaseBlueprintId == CybranSacuId and assigned.Enhancements then
-                if ComboLogic.EnhancementSetKey(assigned.Enhancements) == want then
+                if EnhancementSetKey(assigned.Enhancements) == want then
                     local realId = bp.BlueprintId or id
-                    if type(realId) == 'string' and string.find(realId, 'url0301') then
+                    if type(realId) == 'string' and string.find(realId, CybranSacuId) then
                         found = realId
                         if string.find(realId, 'combo_') then
                             return realId

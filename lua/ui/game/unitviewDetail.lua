@@ -11,6 +11,7 @@ local WrapText = import("/lua/maui/text.lua").WrapText
 local armorDefinition = import("/lua/armordefinition.lua").armordefinition
 
 local controls = import("/lua/ui/controls.lua").Get()
+local SacuLoadout = import("/lua/ui/game/sacuLoadout.lua")
 
 local MathFloor = math.floor
 
@@ -882,8 +883,11 @@ function Show(bp, builderUnit, bpID)
     end
 
     local iconBp = bp
-    if bp.BlueprintId and string.sub(bp.BlueprintId, 1, 13) == 'url0301_combo' then
-        iconBp = __blueprints['url0301'] or bp
+    if bp.BlueprintId then
+        local iconId = SacuLoadout.UnitBuildIconId(bp.BlueprintId)
+        if iconId ~= bp.BlueprintId then
+            iconBp = __blueprints[iconId] or bp
+        end
     end
     local iconName = GameCommon.GetCachedUnitIconFileNames(iconBp)
     View.UnitImg:SetTexture(iconName)
