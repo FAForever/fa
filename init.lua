@@ -1,4 +1,4 @@
--- START OF COPY --
+--#region START OF COPY
 
 -- in an ideal world this file would be loaded (using dofile) by the other
 -- initialisation files to prevent code duplication. However, as it stands
@@ -36,39 +36,44 @@ if SetProcessPriority and GetProcessAffinityMask and SetProcessAffinityMask then
 
     -- priority values can be found at:
     -- - https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setpriorityclass
-    local success = SetProcessPriority(0x00000080)
+    local success = SetProcessPriority(0x00008000)
     if success then
-        LOG("Process - priority set to: 'high'")
+        LOG("Process - priority set to: 'above normal'")
     else
         LOG("Process - Failed to adjust process priority, this may impact your framerate")
     end
 
-    -- affinity values acts like a bit mask, we retrieve the mask and shift it if we think there are sufficient computing units
-    local success, processAffinityMask, systemAffinityMask = GetProcessAffinityMask();
-    if success then
-        -- system has 24 (logical) computing units or more, skip the first two computing units and all cores beyond the first 24. We need 
-        -- to do this because of floating point imprecision - we simply can't deduct a few digits to prevent using the first two cores
-        if systemAffinityMask >= 16777215 then
-            processAffinityMask = 16777212 -- 2 ^ 24 - 3 - 1
-
-        -- system has 6 (logical) computing units or more, skip first two computing units
-        elseif (systemAffinityMask >= 63) then
-            processAffinityMask = systemAffinityMask - 3 -- (2 ^ 6 - 1) - 3
-        end
-
-        -- update the afinity mask
-        if processAffinityMask != systemAffinityMask then
-            local success = SetProcessAffinityMask(processAffinityMask);
-            if success then
-                LOG("Process - affinity set to: " .. tostring(processAffinityMask))
+    local forceAffinity = ForceAffinity == "true"
+    if forceAffinity then
+        -- affinity values acts like a bit mask, we retrieve the mask and shift it if we think there are sufficient computing units
+        local success, processAffinityMask, systemAffinityMask = GetProcessAffinityMask();
+        if success then
+            -- system has 24 (logical) computing units or more, skip the first two computing units and all cores beyond the first 24. We need 
+            -- to do this because of floating point imprecision - we simply can't deduct a few digits to prevent using the first two cores
+            if systemAffinityMask >= 16777215 then
+                processAffinityMask = 16777212 -- 2 ^ 24 - 3 - 1
+    
+            -- system has 6 (logical) computing units or more, skip first two computing units
+            elseif (systemAffinityMask >= 63) then
+                processAffinityMask = systemAffinityMask - 3 -- (2 ^ 6 - 1) - 3
+            end
+    
+            -- update the afinity mask
+            if processAffinityMask != systemAffinityMask then
+                local success = SetProcessAffinityMask(processAffinityMask);
+                if success then
+                    LOG("Process - affinity set to: " .. tostring(processAffinityMask))
+                else
+                    LOG("Process - Failed to adjust the process affinity, this may impact your framerate")
+                end
             else
-                LOG("Process - Failed to adjust the process affinity, this may impact your framerate")
+                LOG("Process - Failed to update the process affinity, this may impact your framerate")
             end
         else
-            LOG("Process - Failed to update the process affinity, this may impact your framerate")
+            LOG("Process - Failed to retrieve the process affinity, this may impact your framerate")
         end
     else
-        LOG("Process - Failed to retrieve the process affinity, this may impact your framerate")
+        LOG("Process - Process affinity adjustment is disabled in client settings, this may impact your framerate")
     end
 else
     LOG("Process - Failed to find process priority and affinity related functions, this may impact your framerate")
@@ -584,7 +589,7 @@ local function LoadVaultContent(path)
     MountModContent(path .. '/mods')
 end
 
--- END OF COPY --
+--#endregion END OF COPY
 
 -- -- minimum viable shader version - should be bumped to the next release version when we change the shaders
 -- local minimumShaderVersion = 3745
