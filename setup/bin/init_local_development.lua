@@ -1,7 +1,7 @@
 
 -- change this to the location of the repository on your disk. Note that `\` is used
 -- for escaping characters and you can just use `/` in your path instead.
-local locationOfRepository = 'E:\FAF Testing\fa'
+local locationOfRepository = 'your-fa-repository-location'
 
 -- START OF COPY --
 
