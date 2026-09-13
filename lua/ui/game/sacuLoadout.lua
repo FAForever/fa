@@ -72,16 +72,27 @@ function UnitBuildIconId(id)
     return id
 end
 
---- True if every unit in the selection is a Quantum Gateway belonging to one of
---- the known factions (any faction, not just Cybran).
+--- True if every unit in the selection is a Quantum Gateway belonging to the
+--- SAME known faction. A mixed-faction selection is rejected outright (rather
+--- than accepted and half-honored) because QueueSelected only ever derives
+--- one preset id, from selection[1]'s faction, and issues it to the whole
+--- selection - a gateway of a different faction would silently reject that
+--- blueprint id and queue nothing, which is the "strange behavior" this
+--- guards against.
 function IsGatewaySelection(selection)
     if not selection or table.empty(selection) then
         return false
     end
+    local faction = nil
     for _, unit in selection do
-        if not unit:IsInCategory('GATE') or not GetUnitSacuFaction(unit) then
+        if not unit:IsInCategory('GATE') then
             return false
         end
+        local unitFaction = GetUnitSacuFaction(unit)
+        if not unitFaction or (faction and unitFaction ~= faction) then
+            return false
+        end
+        faction = unitFaction
     end
     return true
 end
