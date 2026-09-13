@@ -1375,7 +1375,23 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
     -- TODO? it would indeed be easier if the alt orders slot was in the blueprint, but for now try
     -- to determine where they go by using preferred slots
     AddAbilityButtons(standardOrdersTable, availableOrders, units)
-
+    local loadout = import('/lua/ui/game/sacuLoadout.lua')
+    if loadout.IsCybranGatewaySelection(units) then
+        table.insert(availableOrders, 'SacuLoadoutQueue')
+        standardOrdersTable.SacuLoadoutQueue = {
+            helpText = 'sacu_loadout_queue',
+            bitmapId = 'production',
+            preferredSlot = 8,
+            behavior = function(self, modifiers)
+                local count = 1
+                if modifiers.Shift then
+                    count = 5
+                end
+                loadout.QueueSelected(count)
+                self:SetCheck(false)
+            end,
+        }
+    end
     local assistingUnitList = {}
 
     --- Pods

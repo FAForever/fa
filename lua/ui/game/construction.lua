@@ -4,7 +4,7 @@
 -- Summary: Construction management UI
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-
+local SacuLoadout = import('/lua/ui/game/sacuLoadout.lua')
 local UIUtil = import("/lua/ui/uiutil.lua")
 local DiskGetFileInfo = UIUtil.DiskGetFileInfo
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
@@ -45,6 +45,13 @@ local watchingUnit
 local prevBuildables = false
 local prevSelection = false
 local prevBuildCategories = false
+
+local function UnitBuildIconId(id)
+    if id and string.sub(id, 1, 13) == 'url0301_combo' then
+        return 'url0301'
+    end
+    return id
+end
 
 -- Flag to indicate if every selected unit is a factory
 local allFactories = nil
@@ -419,7 +426,11 @@ function CreateTabs(type)
         defaultTabOrder = {t3 = 1, t2 = 2, t1 = 3, t4 = 4} -- T4 is last because only the Novax can build T4 but not T3
     elseif type == 'enhancement' then
         local selection = sortedOptions.selection
-        local enhancements = selection[1]:GetBlueprint().Enhancements
+        local loadout = import('/lua/ui/game/sacuLoadout.lua')
+	local enhancements = selection[1]:GetBlueprint().Enhancements
+	if loadout.IsCybranGatewaySelection(selection) then
+    		enhancements = loadout.GetSacuEnhancements()
+	end
         local enhCommon = import("/lua/enhancementcommon.lua")
         local enhancementPrefixes = {Back = 'b-', LCH = 'la-', RCH = 'ra-'}
         local newTabs = {}
@@ -459,7 +470,11 @@ function CreateTabs(type)
                         ---@field UnitID UnitId
 
                         enhTable.ID = enhName
-                        enhTable.UnitID = selection[1]:GetBlueprint().BlueprintId
+                        if loadout.IsCybranGatewaySelection(selection) then
+    				enhTable.UnitID = 'url0301'
+			else
+    				enhTable.UnitID = selection[1]:GetBlueprint().BlueprintId
+			end
                         table.insert(sortedOptions[slotName], enhTable)
                     end
                 end
@@ -571,8 +586,9 @@ function CommonLogic()
 
     controls.secondaryChoices.SetControlToType = function(control, type)
         local function SetIconTextures(control)
-            if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. control.Data.id .. '_icon.dds', true)) then
-                control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. control.Data.id .. '_icon.dds', true))
+            local iconId = UnitBuildIconId(control.Data.id)
+	    if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. iconId .. '_icon.dds', true)) then
+		control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. iconId .. '_icon.dds', true))
             else
                 control.Icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
             end
@@ -762,7 +778,7 @@ function CommonLogic()
 
     controls.choices.SetControlToType = function(control, type)
         local function SetIconTextures(control, optID)
-            local id = optID or control.Data.id
+            local id = UnitBuildIconId(optID or control.Data.id)
             if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds', true)) then
                 control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds', true))
             else
@@ -1523,6 +1539,14 @@ function OnClickHandler(button, modifiers)
         end
 
     elseif item.type == 'enhancement' and button.Data.TooltipOnly == false then
+    	local loadout = import('/lua/ui/game/sacuLoadout.lua')
+    	if loadout.IsCybranGatewaySelection(sortedOptions.selection) then
+        	loadout.OnSlotIconClick(item, modifiers)
+        	if activeTab then
+            		OnNestedTabCheck(activeTab, true)
+        	end
+        	return
+    	end
         local doOrder = true
         local clean = not modifiers.Shift
         local enhancementQueue = getEnhancementQueue()
@@ -1952,6 +1976,15 @@ function CreateExtraControls(controlType)
             controls.extraBtn1:Disable()
         end
 
+        controls.extraBtn1.icon.OnTexture = UIUtil.UIFile('/game/construct-sm_btn/infinite_on.dds')
+        controls.extraBtn1.icon.OffTexture = UIUtil.UIFile('/game/construct-sm_btn/infinite_off.dds')
+        controls.extraBtn1.icon:Show()
+        if controls.extraBtn1:IsDisabled() then
+            controls.extraBtn1.icon:SetTexture(controls.extraBtn1.icon.OffTexture)
+        else
+            controls.extraBtn1.icon:SetTexture(controls.extraBtn1.icon.OnTexture)
+        end
+
         SetupPauseButton()
     elseif controlType == 'selection' then
         Tooltip.AddCheckboxTooltip(controls.extraBtn1, 'save_template')
@@ -1984,7 +2017,32 @@ function CreateExtraControls(controlType)
             controls.extraBtn1:Disable()
         end
         SetupPauseButton()
-    elseif controlType == 'enhancement' then
+     elseif controlType == 'enhancement' then
+        local loadout = import('/lua/ui/game/sacuLoadout.lua')
+        if loadout.IsCybranGatewaySelection(sortedOptions.selection) then
+            Tooltip.AddCheckboxTooltip(controls.extraBtn1, 'construction_infinite')
+            controls.extraBtn1.OnClick = function(self, modifiers)
+                return Checkbox.OnClick(self, modifiers)
+            end
+            controls.extraBtn1.OnCheck = function(self, checked)
+                for _, v in sortedOptions.selection do
+                    v:ProcessInfo('SetRepeatQueue', tostring(checked))
+                end
+            end
+            local repeatOn = true
+            for _, v in sortedOptions.selection do
+                if not v:IsRepeatQueue() then
+                    repeatOn = false
+                    break
+                end
+            end
+            controls.extraBtn1:SetCheck(repeatOn, true)
+            controls.extraBtn1:Enable()
+            controls.extraBtn1.icon.OnTexture = UIUtil.UIFile('/game/construct-sm_btn/infinite_on.dds')
+            controls.extraBtn1.icon.OffTexture = UIUtil.UIFile('/game/construct-sm_btn/infinite_off.dds')
+            controls.extraBtn1.icon:Show()
+            controls.extraBtn1.icon:SetTexture(controls.extraBtn1.icon.OnTexture)
+        end
         SetupPauseButton()
     else
         controls.extraBtn1:Disable()
@@ -2222,6 +2280,11 @@ function FormatData(unitData, type)
                 Selected = false,
                 Disabled = false,
             }
+	    local loadout = import('/lua/ui/game/sacuLoadout.lua')
+	    if loadout.IsCybranGatewaySelection(sortedOptions.selection) then
+    		iconData.Selected = loadout.IsEnhancementSelected(enhTable.ID)
+    		iconData.Disabled = false
+	    end
             if enhancementQueue then
                 local slot = enhTable.Slot
                 if existingEnhancements[slot] == enhTable.ID then
@@ -2520,6 +2583,14 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         capturingKeys = false
         -- Sorting down units
         local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
+	local visibleBuildableUnits = {}
+	for _, unitId in buildableUnits do
+    		local unitBp = __blueprints[unitId]
+    		if not (unitBp and unitBp.CategoriesHash and unitBp.CategoriesHash.SACULOADOUTCOMBO) then
+        	table.insert(visibleBuildableUnits, unitId)
+    		end
+   	end
+	buildableUnits = visibleBuildableUnits
         if not isOldSelection then
             previousTabSet = nil
             previousTabSize = nil
@@ -2611,11 +2682,22 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             end
         end
 
-        if table.getn(selection) == 1 and selection[1]:GetBlueprint().Enhancements then
-            controls.enhancementTab:Enable()
-        else
-            controls.enhancementTab:Disable()
-        end
+	local cybranGate = false
+	if not table.empty(selection) then
+    	cybranGate = true
+    		for _, unit in selection do
+        		if not (unit:IsInCategory('GATE') and unit:IsInCategory('CYBRAN')) then
+            			cybranGate = false
+            			break
+        		end
+    		end
+	end
+
+	if (table.getn(selection) == 1 and selection[1]:GetBlueprint().Enhancements) or cybranGate then
+    		controls.enhancementTab:Enable()
+	else
+    		controls.enhancementTab:Disable()
+	end
 
         local templates = Templates.GetTemplates()
         if allMobile and templates and not table.empty(templates) then
@@ -2688,9 +2770,22 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         end
 
         -- Upgrade multiple SCU at once
-        if selection[1]:GetBlueprint().Enhancements and allSameUnit then
-            controls.enhancementTab:Enable()
-        end
+	local cybranGate = false
+	if not table.empty(selection) then
+    	cybranGate = true
+    		for _, unit in selection do
+        		if not (unit:IsInCategory('GATE') and unit:IsInCategory('CYBRAN')) then
+            			cybranGate = false
+            			break
+        		end
+    		end
+	end
+
+	if (table.getn(selection) == 1 and selection[1]:GetBlueprint().Enhancements) or cybranGate then
+    		controls.enhancementTab:Enable()
+	else
+    		controls.enhancementTab:Disable()
+	end
 
         -- Allow all races to build other races templates
         if options.gui_all_race_templates ~= 0 then

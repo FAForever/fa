@@ -480,8 +480,17 @@ function OnTabChangeLayout(type)
     else
         LayoutHelpers.AtTopIn(controls.choices, controls.minBG, 31)
         LayoutHelpers.AtLeftTopIn(controls.extraBtn1, controls.minBG, 10, 31)
-        controls.extraBtn1.icon:Hide()
-        controls.extraBtn1.icon:SetSolidColor('00000000')
+        local construction = import('/lua/ui/game/construction.lua')
+        local loadout = import('/lua/ui/game/sacuLoadout.lua')
+	if loadout.IsCybranGatewaySelection(GetSelectedUnits()) then
+    		controls.extraBtn1.icon.OnTexture = UIUtil.UIFile('/game/construct-sm_btn/infinite_on.dds')
+    		controls.extraBtn1.icon.OffTexture = UIUtil.UIFile('/game/construct-sm_btn/infinite_off.dds')
+    		controls.extraBtn1.icon:Show()
+    		controls.extraBtn1.icon:SetTexture(controls.extraBtn1.icon.OnTexture)
+	else
+    		controls.extraBtn1.icon:Hide()
+    		controls.extraBtn1.icon:SetSolidColor('00000000')
+	end
     end
 end
 
