@@ -451,7 +451,10 @@ local function EndSessionWithReason(reason, start)
     local gameTime = GetGameTimeSeconds()
     local realTime = GetSystemTimeSeconds() - start
     for _, listener in AutorunOnSessionEndListeners do
-        listener(reason, gameTime, realTime)
+        local ok, err = pcall(listener, reason, gameTime, realTime)
+        if not ok then
+            WARN("AutorunOnSessionEndListeners: listener error: " .. tostring(err))
+        end
     end
     SessionEndGame()
 end
@@ -510,7 +513,8 @@ end
 --- session without going through the lobby UI.
 ---@param mapName FileName
 function StartConfiguredSession(mapName)
-    local configLocation = GetCommandLineArg(configuredSessionCommandTrigger, 1)[1]
+    local configArg = GetCommandLineArg(configuredSessionCommandTrigger, 1)
+    local configLocation = configArg and configArg[1]
     if not configLocation then
         error("No config location specified, check your "..configuredSessionCommandTrigger.." argument")
     end
@@ -581,6 +585,9 @@ function StartConfiguredSession(mapName)
         local armyIndex = armyConfig.spawn
         if (not armyIndex) or (armyIndex <= 0) or (armyIndex > table.getn(armies)) then
             error("Invalid army spawn "..tostring(armyIndex))
+        end
+        if sessionInfo.teamInfo[armyIndex] then
+            error("Duplicate army spawn "..tostring(armyIndex))
         end
         local armyName = armies[armyIndex]
         sessionInfo.teamInfo[armyIndex] = {}
