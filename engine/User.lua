@@ -237,6 +237,7 @@ end
 
 --- Gets the current time in seconds, counting from 0 at application start.
 --- This is wall-clock time and is unaffected by gameplay.
+---@see GetSystemTimeSeconds Identical usage
 ---@return number
 function CurrentTime()
 end
