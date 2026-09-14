@@ -36,6 +36,8 @@ function __pow(a, b)
 end
 
 --- Prints to the moho logger with "info:" prefix. Unlike LOG, doesn't add the prefix for newlines.
+--- 
+---@see LOG
 ---@param out any
 ---@param ... any
 function _ALERT(out, ...)
@@ -57,6 +59,8 @@ function lazyimport(path)
 end
 
 --- Print a message to the moho logger, this shouldn't be used in production code
+--- 
+---@see _ALERT To not add a prefix for newlines.
 ---@param out any
 ---@param ... any
 function LOG(out, ...)
