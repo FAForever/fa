@@ -272,7 +272,9 @@ end
 function CAiBrain:GetBlueprintStat(statName, category)
 end
 
---- Return this brain's current enemy.
+--- Return this brain's current enemy
+--- 
+---@see AIBrain.SetCurrentEnemy # to set the enemy
 ---@return AIBrain? -- target army brain
 function CAiBrain:GetCurrentEnemy()
 end
@@ -545,7 +547,9 @@ end
 function CAiBrain:SetArmyStatsTrigger(statName, triggerName, compareType, value, category)
 end
 
---- Set the current enemy for this brain to attack.
+--- Set the current enemy for this brain to attack
+--- 
+---@see AIBrain.GetCurrentEnemy # to get the current enemy
 ---@param aiBrain AIBrain
 function CAiBrain:SetCurrentEnemy(aiBrain)
 end
