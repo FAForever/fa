@@ -511,7 +511,9 @@ end
 function GetNumRootFrames()
 end
 
---- Retrieves the value of a game option from the preference file. The value is retrieved from the 'option' table in the preference file.
+--- Retrieves the value of a game option from the preference file. 
+--- 
+--- The value is retrieved from the 'option' table for the current profile in the preference file.
 ---@param key string
 ---@return any
 function GetOptions(key)
