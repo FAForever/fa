@@ -6,14 +6,6 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
---- A basic area defined in the scenario.
----@class UIScenarioArea
----@field [1] number    # x0
----@field [2] number    # z0
----@field [3] number    # x1
----@field [4] number    # z1
----@field type 'RECTANGLE'
-
 --- A marker defined in the scenario.
 ---@class UIScenarioMarker
 ---@field color string
