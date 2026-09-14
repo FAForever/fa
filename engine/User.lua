@@ -559,7 +559,8 @@ function GetSessionClients()
 end
 
 --- Gets the "+/- game speed" value.
---- The actual sim rate can be calculated as `math.pow(2, x/3)`, where x is the game speed value.
+--- 
+--- The actual sim rate can be calculated using `math.pow(2, GetSimRate()/3)`
 ---@return number
 function GetSimRate()
 end
