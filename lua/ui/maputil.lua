@@ -26,6 +26,19 @@
 ---@class UIScenarioChain
 ---@field Markers string[]  # key of marker in the master chain
 
+---@class UIScenarioUnit
+---@field type UnitId
+---@field orders string # Can be empty
+---@field platoon string # Can be empty
+---@field Position Vector
+---@field Orientation Vector
+
+---@class UIScenarioUnitGroup
+---@field orders string # Can be empty
+---@field platoon string # Can be empty
+---@field Units { [string]: (UIScenarioUnitGroup | UIScenarioUnit) }
+---@field type 'GROUP'
+
 --- An army defined in the scenario.
 ---@class UIScenarioArmy
 ---@field personality string
@@ -35,6 +48,7 @@
 ---@field Economy { mass: number, energy: number }
 ---@field Alliances table
 ---@field PlatoonBuilders { Builders: table }
+---@field Units UIScenarioUnitGroup
 
 --- Scenario entities of a map that defines all areas, (resource) markers, marker chains and armies as defined in the average _save file.
 ---@class UIScenarioSaveFile
@@ -587,7 +601,7 @@ function GetStartPositionsFromScenario(scenarioInfo, scenarioSave)
 end
 
 ---Returns all units' (leaf nodes) positions under the specified group.
----@param tblNode? table
+---@param tblNode? UIScenarioUnitGroup
 ---@param positions? Vector[]
 ---@return Vector[]
 local function extractUnitPositions(tblNode, positions)
@@ -606,7 +620,7 @@ local function extractUnitPositions(tblNode, positions)
 end
 
 ---Extracts wreckage positions from all groups that contain `"wreck"` in their name.
----@param tblNode? table
+---@param tblNode? UIScenarioUnitGroup
 ---@param positions? Vector[]
 ---@return Vector[]
 local function extractPositionsFromWreckageGroups(tblNode, positions)
