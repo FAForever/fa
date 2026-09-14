@@ -239,9 +239,14 @@ end
 function CAiBrain:GetAttackVectors()
 end
 
---- Returns a list of factories, optionally filtered by distance from `positoin`.
----@param position? Vector
----@param radius? number
+--- Returns a list of all available factories
+---@return FactoryUnit[]
+function CAiBrain:GetAvailableFactories()
+end
+
+--- Returns a list of available factories, filtered by distance from `position`.
+---@param position Vector
+---@param radius number
 ---@return FactoryUnit[]
 function CAiBrain:GetAvailableFactories(position, radius)
 end
