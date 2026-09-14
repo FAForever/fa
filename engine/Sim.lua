@@ -15,6 +15,13 @@
 ---| 3 # Seraphim
 ---| 4 # (Nomads if enabled)
 
+---@alias FactionIdxOffset
+---| 1 # UEF
+---| 2 # Aeon
+---| 3 # Cybran
+---| 4 # Seraphim
+---| 5 # (Nomads if enabled)
+
 ---@alias ResourceDepositType "Mass" | "Hydrocarbon"
 ---@alias ResourceType "MASS" | "ENERGY"
 ---@alias DecalType
@@ -1135,6 +1142,8 @@ function SetArmyEconomy(army, mass, energy)
 end
 
 --- Sets faction for the given army
+---
+---@see AIBrain.GetFactionIndex # to get the faction index of an army represented by a brain
 ---@param army Army
 ---@param index Faction
 function SetArmyFactionIndex(army, index)

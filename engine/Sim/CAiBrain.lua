@@ -322,8 +322,9 @@ function CAiBrain:GetEconomyUsage(resource)
 end
 
 --- Returns the faction of the army represented by this brain.
--- 1 UEF, 2 Aeon, 3 Cybran, 4 Seraphim. 5 custom faction like Nomads
----@return integer
+---
+---@see SetArmyFactionIndex # to set an army's faction index
+---@return FactionIdxOffset
 function CAiBrain:GetFactionIndex()
 end
 
