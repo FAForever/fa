@@ -284,6 +284,7 @@ UnitBlueprint{
             ShortName = "<LOC sacu_short_xsl_damagestabilization>Nano",
             NewHealth = 14000,
             NewRegenRate = 250,
+            SelectionPriority = 1,
             ShowBones = { "Back_Upgrade" },
             Slot = "LCH",
             UpgradeEffectBones = {
@@ -344,6 +345,7 @@ UnitBlueprint{
             NewMaxRadius = 35,
             NewOmniRadius = 60,
             NewVisionRadius = 36,
+            SelectionPriority = 1,
             ShowBones = { "Back_Upgrade" },
             Slot = "Back",
             UpgradeEffectBones = { "Back_Upgrade" },
@@ -396,6 +398,7 @@ UnitBlueprint{
             Icon = "oc",
             Name = "<LOC enhancements_0139>Overcharge",
             ShortName = "<LOC sacu_short_xsl_overcharge>OC",
+            SelectionPriority = 1,
             Slot = "RCH",
             UpgradeEffectBones = {
                 "Right_Arm_Muzzle",
@@ -428,6 +431,7 @@ UnitBlueprint{
             OwnerShieldMesh = "/units/xsl0301/xsl0301_personalshield_mesh",
             PersonalShield = true,
             RegenAssistMult = 10,
+            SelectionPriority = 1,
             ShieldEnergyDrainRechargeTime = 5,
             ShieldMaxHealth = 20000,
             ShieldRechargeTime = 160,

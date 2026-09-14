@@ -124,6 +124,14 @@ local function StripLocTag(text)
     -- single local truncates to just the result so callers passing this straight
     -- into another call (e.g. TableInsert(labels, StripLocTag(...))) don't have
     -- that count spliced in as a surprise extra argument.
+    --
+    -- NOTE: an attempt to resolve this text with LOC() instead of stripping the
+    -- tag (so combo labels would actually translate) crashed blueprint loading -
+    -- LOC is apparently not yet available as a global this early in the load
+    -- order (PostModBlueprints runs before lua/system/Localization.lua's own
+    -- doscript, contrary to what reading that file in isolation suggested).
+    -- Reverted to stripping until a fix that doesn't call LOC() at blueprint-
+    -- load time is worked out - see ComboUnitName's comment.
     local stripped = string.gsub(text, '^<LOC [^>]+>', '')
     return stripped
 end
@@ -143,6 +151,14 @@ end
 --- Name, in the same <LOC key>text format) rather than a lookup table here,
 --- so a modder adding a new enhancement gets a short combo label for free by
 --- setting ShortName on their own blueprint - no table in this file to edit.
+---
+--- KNOWN ISSUE: this bakes an English-only label into the generated preset's
+--- Description/HelpText at blueprint-load time (see StripLocTag's comment -
+--- calling LOC() here crashes blueprint loading). Properly localizing this
+--- needs the composition to happen at UI display time instead (store the
+--- enhancement list on the generated blueprint, have unitview.lua/
+--- unitviewDetail.lua resolve+join each fragment via LOC() when rendering) -
+--- not fixed yet.
 local function ComboUnitName(enhancements, bp)
     local labels = {}
     for _, name in enhancements do
@@ -154,6 +170,28 @@ local function ComboUnitName(enhancements, bp)
         end
     end
     return 'SACU (' .. table.concat(labels, '/') .. ')'
+end
+
+--- 1 if any enhancement in the combo is combat-relevant, else nil (so the
+--- generated preset falls through to the base SCU's own SelectionPriority,
+--- same as every hand-authored non-combat preset - see
+--- Blueprints.lua's `preset.SelectionPriority or tempBp.General.SelectionPriority
+--- or 1`). Matches the hand-authored presets' own convention: Combat/
+--- BubbleShield/Rambo-style presets set SelectionPriority = 1, while
+--- Engineer/RAS/IntelJammer-style presets leave it unset. Read from each
+--- enhancement's own SelectionPriority field (set alongside Name/ShortName)
+--- rather than a lookup table here, for the same reason ShortName is - a
+--- modder's new enhancement opts a combo into combat priority by setting
+--- SelectionPriority = 1 on the enhancement itself, no table in this file to
+--- edit.
+local function ComboSelectionPriority(enhancements, bp)
+    for _, name in enhancements do
+        local def = bp.Enhancements[name]
+        if def and def.SelectionPriority == 1 then
+            return 1
+        end
+    end
+    return nil
 end
 
 function InjectSacuLoadoutPresets(all_bps)
@@ -202,7 +240,7 @@ function InjectSacuLoadoutPresets(all_bps)
                                 BuildIconSortPriority = 90,
                                 Enhancements = enhList,
                                 HelpText = pretty,
-                                SelectionPriority = 1,
+                                SelectionPriority = ComboSelectionPriority(enhList, bp),
                                 SortCategory = 'SORTOTHER',
                                 HiddenInBuildMenu = true,
                             }
