@@ -235,7 +235,7 @@ end
 function CAiBrain:GetArmyStat(statName, defaultValue)
 end
 
----@return table
+---@return PointVector[]
 function CAiBrain:GetAttackVectors()
 end
 
