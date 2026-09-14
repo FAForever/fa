@@ -606,6 +606,7 @@ function GetSystemTime()
 end
 
 --- Returns System time in seconds
+---@see CurrentTime Identical usage
 ---@return number
 function GetSystemTimeSeconds()
 end
