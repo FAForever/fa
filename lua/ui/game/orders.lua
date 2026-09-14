@@ -1380,8 +1380,8 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
         table.insert(availableOrders, 'SacuLoadoutQueue')
         standardOrdersTable.SacuLoadoutQueue = {
             helpText = 'sacu_loadout_queue',
-            bitmapId = 'production',
-            preferredSlot = 8,
+            bitmapId = 'sacu-loadout',
+            preferredSlot = 14,
             behavior = function(self, modifiers)
                 local count = 1
                 if modifiers.Shift then
