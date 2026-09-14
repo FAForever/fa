@@ -1145,9 +1145,9 @@ end
 function SetArmyOutOfGame(army)
 end
 
----Sets a file with army plans the AI will use to run.
+--- Sets a file with army plans the AI will use to run
 ---@param army Army
----@param plans FileName Path to the file with army plans.
+---@param plans FileName # Path to the file with army plans
 function SetArmyPlans(army, plans)
 end
 
