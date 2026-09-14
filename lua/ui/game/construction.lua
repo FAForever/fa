@@ -866,6 +866,9 @@ function CommonLogic()
             if control.Data.Disabled then
                 control:Enable()
                 control.Data.TooltipOnly = true
+                if control.Data.enhTable.DisableInGateway then
+                    control.tooltipID = LOC('<LOC sacu_gateway_disabled_tooltip>This cannot be built in from the gateway.')
+                end
                 if not control.Data.Selected then
                     control.Icon:SetSolidColor('aa000000')
                 end
@@ -1172,7 +1175,9 @@ function OnRolloverHandler(button, state)
         elseif item.type == 'queuestack' or item.type == 'unitstack' or item.type == 'attachedunit' then
             UnitViewDetail.Show(__blueprints[item.id], nil, item.id)
         elseif item.type == 'enhancement' then
-            UnitViewDetail.ShowEnhancement(item.enhTable, item.unitID, item.icon, GetEnhancementPrefix(item.unitID, item.icon), sortedOptions.selection[1])
+            -- True if this enhancement is disabled for gateway queuing.
+            local disabledInGateway = item.enhTable.DisableInGateway and SacuLoadout.IsGatewaySelection(sortedOptions.selection)
+            UnitViewDetail.ShowEnhancement(item.enhTable, item.unitID, item.icon, GetEnhancementPrefix(item.unitID, item.icon), sortedOptions.selection[1], disabledInGateway)
         elseif item.type == 'enhancementqueue' then
             UnitViewDetail.ShowEnhancement(item.enhancement, item.unitID, item.icon, GetEnhancementPrefix(item.unitID, item.icon), sortedOptions.selection[1])
         end
@@ -2278,7 +2283,8 @@ function FormatData(unitData, type)
             }
             if SacuLoadout.IsGatewaySelection(sortedOptions.selection) then
                 iconData.Selected = SacuLoadout.IsEnhancementSelected(enhTable.UnitID, enhTable.ID)
-                iconData.Disabled = false
+                -- Disables enhancements not allowed from the gateway.
+                iconData.Disabled = enhTable.DisableInGateway == true
             end
             if enhancementQueue then
                 local slot = enhTable.Slot

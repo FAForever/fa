@@ -87,7 +87,7 @@ function ShowView(showUpKeep, enhancement, showecon, showShield)
     end
 end
 
-function ShowEnhancement(bp, bpID, iconID, iconPrefix, userUnit)
+function ShowEnhancement(bp, bpID, iconID, iconPrefix, userUnit, disabledInGateway)
     if not CheckFormat() then
         View:Hide()
         return
@@ -136,11 +136,19 @@ function ShowEnhancement(bp, bpID, iconID, iconPrefix, userUnit)
     end
 
     if View.Description then
-        -- If enhancement of preset, then remove extension. (ual0301_Engineer -> ual0301)
-        if string.find(bpID, '_') then
-            bpID = string.sub(bpID, 1, string.find(bpID, "_[^_]*$")-1)
+        if disabledInGateway then
+            -- Shows the gateway-disabled message instead of the description.
+            CreateLines(View.Description, {{color = UIUtil.fontColor,
+                lines = WrapText(LOC('<LOC sacu_gateway_disabled_tooltip>This cannot be built in from the gateway.'), View.Description.Value[1].Width(), function(text)
+                    return View.Description.Value[1]:GetStringAdvance(text)
+                end)}})
+        else
+            -- If enhancement of preset, then remove extension. (ual0301_Engineer -> ual0301)
+            if string.find(bpID, '_') then
+                bpID = string.sub(bpID, 1, string.find(bpID, "_[^_]*$")-1)
+            end
+            WrapAndPlaceText(nil, nil, bpID.."-"..iconID, View.Description)
         end
-        WrapAndPlaceText(nil, nil, bpID.."-"..iconID, View.Description)
     end
 
     local showShield = false

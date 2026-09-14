@@ -488,6 +488,8 @@ UnitBlueprint{
             MaintenanceConsumptionPerSecondEnergy = 10000,
             Name = "<LOC enhancements_0035>Personal Teleporter",
             ShortName = "<LOC sacu_short_ual_teleporter>Teleport",
+            -- Greys this out in the gateway build queue.
+            DisableInGateway = true,
             ShowBones = { "Turbine" },
             Slot = "Back",
             UpgradeEffectBones = { "Turbine" },
