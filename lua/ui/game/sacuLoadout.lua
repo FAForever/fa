@@ -16,29 +16,6 @@ local selectedBySlot = {}
 
 local SlotOrder = { 'LCH', 'RCH', 'Back' }
 
--- Base SACU blueprint id for each faction, keyed by the faction category that the
--- Quantum Gateway (and the SACU it builds) both carry. Exported so other UI files
--- (construction.lua, unitview.lua, unitviewDetail.lua, ...) don't each hard-code
--- the ids themselves.
-FactionSacuIds = {
-    UEF = 'uel0301',
-    AEON = 'ual0301',
-    CYBRAN = 'url0301',
-    SERAPHIM = 'xsl0301',
-}
-local ComboIdSuffix = '_combo'
-
---- Which of FactionSacuIds' factions (if any) a unit belongs to.
---- @param unit Unit
---- @return string|nil faction category, e.g. 'CYBRAN'
-local function GetUnitSacuFaction(unit)
-    for faction in FactionSacuIds do
-        if unit:IsInCategory(faction) then
-            return faction
-        end
-    end
-end
-
 --- Sorted, pipe-joined key for an enhancement set. Must stay identical to the
 --- copy in blueprints-sacu-combos.lua, since both sides need to agree on the
 --- generated combo preset names.
@@ -56,58 +33,72 @@ end
 --- Generated combo units share their base SACU's icon (they have no icon of their
 --- own). Used by construction.lua, unitview.lua and unitviewDetail.lua so the
 --- build grid, queue grid and unit-view panel all fall back consistently, for
---- every faction's combos.
+--- every faction's combos - vanilla or added by a mod, since this checks the
+--- SACULOADOUTCOMBO category (set by MarkHiddenSacuLoadoutPresets in
+--- blueprints-sacu-combos.lua) and the preset's own recorded base id rather
+--- than a hardcoded faction/id table.
 --- @param id string|nil
 --- @return string|nil
 function UnitBuildIconId(id)
     if type(id) ~= 'string' then
         return id
     end
-    for _, sacuId in FactionSacuIds do
-        local prefix = sacuId .. ComboIdSuffix
-        if string.sub(id, 1, string.len(prefix)) == prefix then
-            return sacuId
-        end
+    local bp = __blueprints[id]
+    local assigned = bp and bp.EnhancementPresetAssigned
+    if bp and bp.CategoriesHash and bp.CategoriesHash['SACULOADOUTCOMBO'] and assigned then
+        return assigned.BaseBlueprintId or id
     end
     return id
 end
 
---- True if every unit in the selection is a Quantum Gateway belonging to the
---- SAME known faction. A mixed-faction selection is rejected outright (rather
---- than accepted and half-honored) because QueueSelected only ever derives
---- one preset id, from selection[1]'s faction, and issues it to the whole
---- selection - a gateway of a different faction would silently reject that
---- blueprint id and queue nothing, which is the "strange behavior" this
---- guards against.
-function IsGatewaySelection(selection)
-    if not selection or table.empty(selection) then
-        return false
-    end
-    local faction = nil
-    for _, unit in selection do
-        if not unit:IsInCategory('GATE') then
-            return false
-        end
-        local unitFaction = GetUnitSacuFaction(unit)
-        if not unitFaction or (faction and unitFaction ~= faction) then
-            return false
-        end
-        faction = unitFaction
-    end
-    return true
-end
-
---- The SACU blueprint id the current selection's gateway(s) build. Like the rest
---- of this picker, assumes a selection is a single faction's gateways - mixed
---- selections just use the first unit's faction.
+--- The base SACU blueprint id that `selection` can currently build, derived
+--- from the selection's real build capability (GetUnitCommandData) rather than
+--- a hardcoded GATE-category/faction table. This means it works for any unit
+--- that can build a SACU - a custom faction's gateway, a mod that grants the
+--- ability to a non-gateway unit, "All Faction Quantum Gate", or construction
+--- rules changed mid-match by another mod - not just units tagged GATE with
+--- one of the four vanilla faction categories.
+--- A selection that can build more than one distinct base SACU is treated as
+--- ambiguous and rejected (returns nil) rather than half-honored, for the same
+--- reason a mixed-faction selection used to be rejected: QueueSelected only
+--- ever issues one blueprint id to the whole selection.
 --- @param selection Unit[]
 --- @return string|nil
 function GetSelectionSacuId(selection)
     if not selection or table.empty(selection) then
         return nil
     end
-    local faction = GetUnitSacuFaction(selection[1])
-    return faction and FactionSacuIds[faction]
+
+    local _, _, buildableCategories = GetUnitCommandData(selection)
+    if not buildableCategories then
+        return nil
+    end
+
+    local buildableUnits = EntityCategoryGetUnitList(buildableCategories * categories.SUBCOMMANDER)
+    local baseSacuId = nil
+    for _, id in buildableUnits do
+        local bp = __blueprints[id]
+        -- The base SACU is the one entry with no EnhancementPresetAssigned -
+        -- every loadout preset (hand-authored or our generated combos) is a
+        -- clone of it and carries that field.
+        if bp and not bp.EnhancementPresetAssigned then
+            if baseSacuId and baseSacuId ~= id then
+                return nil
+            end
+            baseSacuId = id
+        end
+    end
+    return baseSacuId
+end
+
+--- True if `selection` can currently build exactly one shared base SACU.
+--- Used to decide whether to show the "Queue SACU loadout" order/button at
+--- all; QueueSelected below calls GetSelectionSacuId itself to know what to
+--- actually build.
+--- @param selection Unit[]
+--- @return boolean
+function IsGatewaySelection(selection)
+    return GetSelectionSacuId(selection) ~= nil
 end
 
 function GetSacuEnhancements(sacuId)

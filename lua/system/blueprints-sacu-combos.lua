@@ -6,55 +6,17 @@ local TableInsert = table.insert
 local TableGetn = table.getn
 local StringLower = string.lower
 
--- Base SACU blueprint id, one per faction. Kept in sync by hand with
--- SacuLoadout.FactionSacuIds in lua/ui/game/sacuLoadout.lua (that file can't
--- import this one - see the comment at the top of it - so the two tables can't
--- share a single definition).
-local ComboFactionBaseIds = {
-    uel0301 = true, -- UEF
-    ual0301 = true, -- Aeon
-    url0301 = true, -- Cybran
-    xsl0301 = true, -- Seraphim
-}
+-- Any unit blueprint carrying this category is treated as a loadout-eligible
+-- base SACU: InjectSacuLoadoutPresets below generates its enhancement combo
+-- presets, and MarkHiddenSacuLoadoutPresets tags those generated combos with
+-- SACULOADOUTCOMBO. The four vanilla SACUs (uel0301/ual0301/url0301/xsl0301)
+-- carry it via their own .bp files. A mod adding a new faction, or extending
+-- an existing unit, opts in the same way - by adding SACULOADOUTBASE to that
+-- unit's Categories (or AddCategories) - without hooking or editing this file
+-- or lua/ui/game/sacuLoadout.lua at all.
+local BaseCategory = 'SACULOADOUTBASE'
 
 local SlotOrder = { 'LCH', 'RCH', 'Back' }
-
--- Short display labels for combo names, so they still fit the unit info panel.
--- Enhancement key names don't collide across factions, so this stays one flat
--- table; anything not listed here falls back to its full in-game name (see
--- CleanLabel below).
-local ShortLabels = {
-    -- Cybran
-    EMPCharge = 'EMP',
-    FocusConvertor = 'Amp',
-    NaniteMissileSystem = 'AA',
-    ResourceAllocation = 'RAS',
-    SelfRepairSystem = 'Nano',
-    StealthGenerator = 'Stealth',
-    CloakingGenerator = 'Cloak',
-    Switchback = 'Fab',
-    -- UEF
-    AdvancedCoolingUpgrade = 'Energy',
-    HighExplosiveOrdnance = 'Plasma',
-    Pod = 'Drone',
-    RadarJammer = 'Jammer',
-    SensorRangeEnhancer = 'Sensor',
-    Shield = 'Shield',
-    ShieldGeneratorField = 'ShieldField',
-    -- Aeon
-    EngineeringFocusingModule = 'Fab',
-    Sacrifice = 'Sacrifice',
-    ShieldHeavy = 'HeavyShield',
-    StabilitySuppressant = 'Reacton',
-    SystemIntegrityCompensator = 'Nano',
-    Teleporter = 'Teleport',
-    -- Seraphim
-    DamageStabilization = 'Nano',
-    EngineeringThroughput = 'Fab',
-    EnhancedSensors = 'Sensor',
-    Missile = 'Missile',
-    Overcharge = 'OC',
-}
 
 local function IsRemoveEnhancement(name)
     return string.sub(name, -6) == 'Remove'
@@ -157,18 +119,39 @@ local function ComboPresetName(enhancements)
     return 'combo_' .. table.concat(copy, '_')
 end
 
-local function CleanLabel(name, def)
-    local label = name
-    if def and def.Name then
-        label = string.gsub(def.Name, '^<LOC [^>]+>', '')
-    end
-    return label
+local function StripLocTag(text)
+    -- string.gsub returns two values (result, replacement count); assigning to a
+    -- single local truncates to just the result so callers passing this straight
+    -- into another call (e.g. TableInsert(labels, StripLocTag(...))) don't have
+    -- that count spliced in as a surprise extra argument.
+    local stripped = string.gsub(text, '^<LOC [^>]+>', '')
+    return stripped
 end
 
+--- Falls back to the enhancement's full in-game Name (loc-tag stripped) when
+--- it has no ShortName of its own.
+local function CleanLabel(name, def)
+    if def and def.Name then
+        return StripLocTag(def.Name)
+    end
+    return name
+end
+
+--- Short display label for a combo name, so combos still fit the unit info
+--- panel - e.g. "Energy Accelerator" shows as "Energy". Read from the
+--- enhancement's own ShortName field on the blueprint (set alongside its
+--- Name, in the same <LOC key>text format) rather than a lookup table here,
+--- so a modder adding a new enhancement gets a short combo label for free by
+--- setting ShortName on their own blueprint - no table in this file to edit.
 local function ComboUnitName(enhancements, bp)
     local labels = {}
     for _, name in enhancements do
-        TableInsert(labels, ShortLabels[name] or CleanLabel(name, bp.Enhancements[name]))
+        local def = bp.Enhancements[name]
+        if def and def.ShortName then
+            TableInsert(labels, StripLocTag(def.ShortName))
+        else
+            TableInsert(labels, CleanLabel(name, def))
+        end
     end
     return 'SACU (' .. table.concat(labels, '/') .. ')'
 end
@@ -182,7 +165,7 @@ function InjectSacuLoadoutPresets(all_bps)
     local skippedNamed = 0
 
     for id, bp in all_bps.Unit do
-        if ComboFactionBaseIds[id] and bp.Enhancements and bp.EnhancementPresets then
+        if bp.CategoriesHash and bp.CategoriesHash[BaseCategory] and bp.Enhancements and bp.EnhancementPresets then
             local bySlot = GroupBySlot(bp.Enhancements)
             local slotChoices = {}
             for _, slot in SlotOrder do
@@ -204,17 +187,23 @@ function InjectSacuLoadoutPresets(all_bps)
                         if not bp.EnhancementPresets[presetName] then
                             local pretty = ComboUnitName(enhList, bp)
                             bp.EnhancementPresets[presetName] = {
-                                -- The hand-authored presets on this unit (RAS, Engineer, Combat, ...)
-                                -- set Description to the same short string as UnitName, not the base
-                                -- SCU's own Description ("Support Armored Command Unit") - that's what
-                                -- was showing up appended after the name in build tooltips/info panels.
+                                -- Description carries the full pretty name (e.g. "SACU
+                                -- (Cloak/EMP)"); UnitName is deliberately left unset, same
+                                -- as every hand-authored preset on this unit (RAS, Engineer,
+                                -- Combat, ...). HandleUnitWithBuildPresets in Blueprints.lua
+                                -- maps preset.Description/UnitName onto the generated clone's
+                                -- Description/General.UnitName - with UnitName unset it falls
+                                -- through to the base SCU's own (also unset) General.UnitName,
+                                -- so the unit-view panels' existing "name: TechN description"
+                                -- logic naturally falls back to just "TechN description" with
+                                -- no name/description duplication and no unit-specific UI code
+                                -- needed in unitview.lua/unitviewDetail.lua for this.
                                 Description = pretty,
                                 BuildIconSortPriority = 90,
                                 Enhancements = enhList,
                                 HelpText = pretty,
                                 SelectionPriority = 1,
                                 SortCategory = 'SORTOTHER',
-                                UnitName = pretty,
                                 HiddenInBuildMenu = true,
                             }
                             generated = generated + 1
@@ -237,7 +226,8 @@ function MarkHiddenSacuLoadoutPresets(all_bps)
         local assigned = bp.EnhancementPresetAssigned
         if assigned and assigned.Name and string.sub(assigned.Name, 1, 6) == 'combo_' then
             local baseId = assigned.BaseBlueprintId
-            if ComboFactionBaseIds[baseId] then
+            local baseBp = baseId and all_bps.Unit[baseId]
+            if baseBp and baseBp.CategoriesHash and baseBp.CategoriesHash[BaseCategory] then
                 bp.CategoriesHash = bp.CategoriesHash or {}
                 bp.CategoriesHash['SACULOADOUTCOMBO'] = true
                 bp.Categories = table.unhash(bp.CategoriesHash)

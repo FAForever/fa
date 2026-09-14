@@ -214,13 +214,6 @@ function LOCStr(str)
 end
 
 function GetShortDesc(bp)
-    -- Generated SACU loadout combos already carry their full description in the
-    -- name itself (e.g. "SACU (Cloak/EMP)") - skip the usual "Name: TechN
-    -- Description" suffix for them so nothing trails after the name.
-    if bp.CategoriesHash and bp.CategoriesHash.SACULOADOUTCOMBO then
-        return bp.General.UnitName and LOC(bp.General.UnitName) or ''
-    end
-
     local desc = ''
     if bp.General.UnitName then
         desc = LOC(bp.General.UnitName)
