@@ -27,8 +27,9 @@
 LaunchDir = ""      -- filled with whatever directory the exe is in
 __EngineStats = { } -- populated by the engine, each frame in the UI thread
 
---- Returns the bitwise XOR of a and b, coercing to integers. Returns `4294967296` (2^^32) if the
---- signs don't match.
+--- Returns a to the power of b.
+---
+---@see math.pow Identical function.
 ---@param a number
 ---@param b number
 ---@return integer
