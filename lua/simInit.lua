@@ -350,6 +350,35 @@ function BeginSession()
     for k, brain in ArmyBrains do
         brain:OnBeginSession()
     end
+
+    -- run an autorun-config-provided script, if any (see
+    -- SinglePlayerLaunch.lua's StartConfiguredSession)
+    if ScenarioInfo.autorunScript then
+        local scriptFile = import(ScenarioInfo.autorunScript)
+        if scriptFile.OnBeginSession then
+            scriptFile.OnBeginSession(ScenarioInfo)
+        end
+        if scriptFile.OnFirstGameTick then
+            ForkThread(function()
+                WaitTicks(1)
+                scriptFile.OnFirstGameTick(ScenarioInfo)
+            end)
+        end
+    end
+end
+
+--- Fetcher for the arbitrary per-army `data` from an autorun config
+---@param aiBrain AIBrain
+---@return unknown
+function AutorunGetAIBrainData(aiBrain)
+    local armyIndex = aiBrain:GetArmyIndex()
+    return ScenarioInfo.autorunBrainData and ScenarioInfo.autorunBrainData[armyIndex]
+end
+
+--- Fetcher for the arbitrary session-wide `data` from an autorun config
+---@return unknown
+function AutorunGetGlobalData()
+    return ScenarioInfo.autorunGlobalData
 end
 
 function GameOverListenerThread()

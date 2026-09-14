@@ -2,6 +2,7 @@
 local Prefs = import("/lua/user/prefs.lua")
 local MapUtils = import("/lua/ui/maputil.lua")
 local aiTypes = import("/lua/ui/lobby/aitypes.lua").aitypes
+local ModUtils = import("/lua/mods.lua")
 
 -- The engine doesn't log errors when the command line launch errors, so we fix that here. 
 local function error(string)
@@ -128,13 +129,17 @@ end
 
 
 --- Gets the scenario file from a map name if it isn't a scenario file already.
+--- Pass quiet=true to get nil instead of an error when it doesn't resolve.
 ---@param mapName FileName | string
----@return FileName
-function FixupMapName(mapName)
+---@param quiet? boolean
+---@return FileName?
+function FixupMapName(mapName, quiet)
     if (not string.find(mapName, "/")) and (not string.find(mapName, "\\")) then
         local files = DiskFindFiles('/maps', mapName .. '_scenario.lua')
         if files[1] then
             mapName = files[1]
+        elseif quiet then
+            return nil
         else
             error('Could not find scenario file for map name "' .. mapName .. '"')
         end
@@ -148,6 +153,9 @@ function FixupMapName(mapName)
         mapName = string.gsub(mapName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
         local info = DiskGetFileInfo(mapName)
         if not info then
+            if quiet then
+                return nil
+            end
             error('Map scenario file does not exist at location "' .. mapName .. '"')
         end
     end
@@ -359,10 +367,20 @@ local function SetupCommandLineSkirmish(scenario, isPerfTest)
     return sessionInfo
 end
 
+-- Command line flag for diverting into a fully lua configured game run.
+local configuredSessionCommandTrigger = '/autorun'
+
 --- Called by the engine using the `/map <mapPath>` launch arg
 ---@param mapName FileName
 ---@param isPerfTest any
 function StartCommandLineSession(mapName, isPerfTest)
+    -- Fully divert into a lua scripted session on `/autorun <config>`. All
+    -- other command line arguments are disregarded, `mapName` is just passed
+    -- so a warning can be given if it doesn't match a config provided value.
+    if HasCommandLineArg(configuredSessionCommandTrigger) then
+        return StartConfiguredSession(mapName)
+    end
+
     if not mapName then
         error("SetupCommandLineSession - mapName required")
     end
@@ -389,5 +407,222 @@ function StartCommandLineSession(mapName, isPerfTest)
     else
         sessionInfo = SetupCommandLineSkirmish(scenario, isPerfTest)
     end
+    LaunchSinglePlayerSession(sessionInfo)
+end
+
+---@param uiMods? string[]
+---@param simMods? string[]
+---@return table<string, boolean>
+local function BuildModList(uiMods, simMods)
+    local mods = {}
+    if uiMods ~= nil then
+        for _, uid in uiMods do
+            mods[uid] = true
+        end
+    else
+        local selectedUIMods = ModUtils.GetUiMods()
+        for _, mod in selectedUIMods do
+            mods[mod.uid] = true
+        end
+    end
+    if simMods ~= nil then
+        for _, uid in simMods do
+            mods[uid] = true
+        end
+    else
+        local selectedGameMods = ModUtils.GetGameMods()
+        for _, mod in selectedGameMods do
+            mods[mod.uid] = true
+        end
+    end
+    return mods
+end
+
+--- Functions to call, in registration order, whenever an autorun session ends
+--- because a configured game-time or real-time limit was reached.
+--- table.insert into this directly to add a listener
+AutorunOnSessionEndListeners = {}
+
+--- End the session for `reason` (one of "maxGameTime" / "maxRealTime"), after
+--- giving every AutorunOnSessionEndListeners entry a chance to observe it.
+---@param reason string
+---@param start number
+local function EndSessionWithReason(reason, start)
+    local gameTime = GetGameTimeSeconds()
+    local realTime = GetSystemTimeSeconds() - start
+    for _, listener in AutorunOnSessionEndListeners do
+        listener(reason, gameTime, realTime)
+    end
+    SessionEndGame()
+end
+
+--- Waits for the session to actually start, then applies an optional game
+--- speed and ends the session once a configured game-time and/or real-time
+--- limit is reached. No-op if none of the three are set.
+---@param targetSpeed? number
+---@param maxGameSeconds? number
+---@param maxRealSeconds? number
+local function ApplySimOptions(targetSpeed, maxGameSeconds, maxRealSeconds)
+    local N = 100
+    local start = GetSystemTimeSeconds()
+    while not WorldIsPlaying() do
+        coroutine.yield(N)
+    end
+    coroutine.yield(N)
+    if targetSpeed then
+        LOG("Setting game speed to: ", targetSpeed)
+        SetGameSpeed(targetSpeed)
+    end
+    if maxGameSeconds and maxRealSeconds then
+        -- Limit on both game time and real time
+        while (
+            ((GetSystemTimeSeconds() - start) < maxRealSeconds) and
+            (GetGameTimeSeconds() < maxGameSeconds)
+        ) do
+            coroutine.yield(N)
+        end
+        LOG("Maximum game or real time reached, exiting.")
+        EndSessionWithReason(
+            (GetGameTimeSeconds() >= maxGameSeconds) and "maxGameTime" or "maxRealTime",
+            start
+        )
+    elseif (not maxGameSeconds) and maxRealSeconds then
+        -- Only limit on real time
+        while (GetSystemTimeSeconds() - start) < maxRealSeconds do
+            coroutine.yield(N)
+        end
+        LOG("Maximum real time reached, exiting.")
+        EndSessionWithReason("maxRealTime", start)
+    elseif maxGameSeconds and (not maxRealSeconds) then
+        -- Only limit on game time
+        while GetGameTimeSeconds() < maxGameSeconds do
+            coroutine.yield(N)
+        end
+        LOG("Maximum game time reached, exiting.")
+        EndSessionWithReason("maxGameTime", start)
+    end
+    -- else: no time limits configured, nothing to do
+end
+
+--- Launch a full session configuration (map, scenario/session options, mods,
+--- armies, script, time limits) from the Lua file given by `/autorun <configPath>`.
+--- Lets a scripted/headless caller launch a fully specified single-player
+--- session without going through the lobby UI.
+---@param mapName FileName
+function StartConfiguredSession(mapName)
+    local configLocation = GetCommandLineArg(configuredSessionCommandTrigger, 1)[1]
+    if not configLocation then
+        error("No config location specified, check your "..configuredSessionCommandTrigger.." argument")
+    end
+    if string.sub(configLocation, 1, 1) ~= "/" then
+        configLocation = "/config/"..configLocation
+    end
+    _ALERT("Loading game configuration from:", configLocation)
+    local config = import(configLocation).config
+    if not config then
+        error("Config not found, please check the mounted "..configLocation.." file")
+    end
+
+    if config.mapName then
+        local configMapName = FixupMapName(config.mapName)
+        -- If the mapName appears to be valid on the command line then warn if
+        -- it gets overridden by a config value.
+        local cliMapName = FixupMapName(mapName, true)
+        if cliMapName and cliMapName ~= configMapName then
+            WARN("Command line provided map name (\""..mapName.."\") overridden by value from config (\""..configMapName.."\")")
+        end
+        mapName = configMapName
+    else
+        mapName = FixupMapName(mapName)
+    end
+    local scenario = MapUtils.LoadScenario(mapName)
+    if not scenario then
+        error("Unable to load map " .. mapName)
+    end
+    VerifyScenarioConfiguration(scenario)
+
+    -- Same GameOptions defaults as a `/map`-launched session (defaultOptions,
+    -- above), with values overridden where sepcified from the autorun config.
+    -- Additional options can exist in the config, which are also set here.
+    scenario.Options = table.copy(defaultOptions)
+    for k, v in (config.scenario or {}) do
+        scenario.Options[k] = v
+    end
+
+    if config.script then
+        scenario.autorunScript = config.script
+    end
+    -- Arbitrary session-wide data (not tied to any one army), fetch in-game
+    -- with AutorunGetGlobalData(). Per-army data (armyConfig.data, below) is
+    -- the equivalent for one AI brain.
+    scenario.autorunGlobalData = config.data
+    scenario.autorunBrainData = {}
+
+    local sessionInfo = {}
+    sessionInfo.scenarioInfo = scenario
+    sessionInfo.playerName = Prefs.GetFromCurrentProfile('Name') or 'Player'
+    local sessionConfig = config.session or {}
+    sessionInfo.createReplay = false
+    if sessionConfig.createReplay ~= nil then
+        sessionInfo.createReplay = sessionConfig.createReplay
+    end
+    sessionInfo.RandomSeed = sessionConfig.RandomSeed or Random()
+
+    local modsConfig = config.mods or {}
+    local mods = BuildModList(modsConfig.ui, modsConfig.sim)
+    sessionInfo.scenarioMods = ModUtils.GetGameMods(mods)
+    ModUtils.SetSelectedMods(mods)
+
+    sessionInfo.teamInfo = {}
+    local armies = scenario.Configurations.standard.teams[1].armies
+    local numColors = table.getn(import("/lua/gamecolors.lua").GameColors.PlayerColors)
+    local humanFound = false
+    for _, armyConfig in config.armies do
+        local armyIndex = armyConfig.spawn
+        if (not armyIndex) or (armyIndex <= 0) or (armyIndex > table.getn(armies)) then
+            error("Invalid army spawn "..tostring(armyIndex))
+        end
+        local armyName = armies[armyIndex]
+        sessionInfo.teamInfo[armyIndex] = {}
+        sessionInfo.teamInfo[armyIndex].ArmyName = armyName
+        sessionInfo.teamInfo[armyIndex].Faction = armyConfig.faction or GetRandomFaction()
+        sessionInfo.teamInfo[armyIndex].PlayerColor = armyConfig.colourIndex or math.mod(armyIndex, numColors)
+        sessionInfo.teamInfo[armyIndex].ArmyColor = armyConfig.colourIndex or math.mod(armyIndex, numColors)
+        if not armyConfig.aikey then
+            sessionInfo.teamInfo[armyIndex].Human = true
+            sessionInfo.playerName = armyConfig.name or sessionInfo.playerName
+            sessionInfo.teamInfo[armyIndex].PlayerName = sessionInfo.playerName
+            if humanFound then
+                error("Only a single human can play per game")
+            end
+            humanFound = true
+        else
+            sessionInfo.teamInfo[armyIndex].AIPersonality = armyConfig.aikey
+            sessionInfo.teamInfo[armyIndex].Human = false
+            sessionInfo.teamInfo[armyIndex].PlayerName = armyConfig.name
+                or GetRandomName(sessionInfo.teamInfo[armyIndex].Faction, sessionInfo.teamInfo[armyIndex].AIPersonality)
+        end
+        scenario.autorunBrainData[armyIndex] = armyConfig.data
+    end
+
+    local extras = MapUtils.GetExtraArmies(scenario)
+    if extras then
+        for _, armyName in extras do
+            local index = table.getn(sessionInfo.teamInfo) + 1
+            sessionInfo.teamInfo[index] = import("/lua/ui/lobby/lobbycomm.lua").GetDefaultPlayerOptions("civilian")
+            sessionInfo.teamInfo[index].PlayerName = 'civilian'
+            sessionInfo.teamInfo[index].Civilian = true
+            sessionInfo.teamInfo[index].ArmyName = armyName
+            sessionInfo.teamInfo[index].Human = false
+        end
+    end
+
+    local sim = config.sim or {}
+    if sim.targetSpeed or sim.maxGameSeconds or sim.maxRealSeconds then
+        ForkThread(function()
+            ApplySimOptions(sim.targetSpeed, sim.maxGameSeconds, sim.maxRealSeconds)
+        end)
+    end
+
     LaunchSinglePlayerSession(sessionInfo)
 end
