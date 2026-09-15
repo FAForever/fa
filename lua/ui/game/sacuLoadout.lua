@@ -61,11 +61,20 @@ end
 --- A selection that can build more than one distinct base SACU is treated as
 --- ambiguous and rejected (returns nil) rather than half-honored, for the same
 --- reason a mixed-faction selection used to be rejected: QueueSelected only
---- ever issues one blueprint id to the whole selection.
+--- ever issues one blueprint id to the whole selection. A selection with any
+--- non-factory unit in it is rejected outright for the same reason.
 --- @param selection Unit[]
 --- @return string|nil
 function GetSelectionSacuId(selection)
     if not selection or table.empty(selection) then
+        return nil
+    end
+
+    -- Reject a selection with anything other than factories outright, rather
+    -- than trusting GetUnitCommandData's buildableCategories result alone -
+    -- same "don't half-honor an ambiguous selection" reasoning as the
+    -- multi-base-SACU check below.
+    if not table.empty(EntityCategoryFilterOut(categories.FACTORY, selection)) then
         return nil
     end
 

@@ -34,15 +34,15 @@ end
 local function EnhancementChain(enhName, slotDefs)
     local chain = { enhName }
     local current = enhName
-    local guard = 0
-    while slotDefs[current] and slotDefs[current].Prerequisite and guard < 8 do
+    local depth = 0
+    while slotDefs[current] and slotDefs[current].Prerequisite and depth < 8 do
         local pre = slotDefs[current].Prerequisite
         if not slotDefs[pre] then
             break
         end
         TableInsert(chain, 1, pre)
         current = pre
-        guard = guard + 1
+        depth = depth + 1
     end
     return chain
 end

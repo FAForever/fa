@@ -1,8 +1,8 @@
 local UIUtil = import("/lua/ui/uiutil.lua")
+local DiskGetFileInfo = UIUtil.DiskGetFileInfo
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
-local GameCommon = import("/lua/ui/game/gamecommon.lua")
 local ItemList = import("/lua/maui/itemlist.lua").ItemList
 local Prefs = import("/lua/user/prefs.lua")
 local options = Prefs.GetFromCurrentProfile('options')
@@ -890,15 +890,12 @@ function Show(bp, builderUnit, bpID)
         View.ShieldStat.Value:SetText(bp.Defense.Shield.ShieldMaxHealth)
     end
 
-    local iconBp = bp
-    if bp.BlueprintId then
-        local iconId = SacuLoadout.UnitBuildIconId(bp.BlueprintId)
-        if iconId ~= bp.BlueprintId then
-            iconBp = __blueprints[iconId] or bp
-        end
+    local iconId = SacuLoadout.UnitBuildIconId(bp.BlueprintId)
+    if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. iconId .. '_icon.dds', true)) then
+        View.UnitImg:SetTexture(UIUtil.UIFile('/icons/units/' .. iconId .. '_icon.dds', true))
+    else
+        View.UnitImg:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
     end
-    local iconName = GameCommon.GetCachedUnitIconFileNames(iconBp)
-    View.UnitImg:SetTexture(iconName)
     LayoutHelpers.SetDimensions(View.UnitImg, 46, 46)
 
     ShowView(showUpKeep, false, showecon, showShield)
