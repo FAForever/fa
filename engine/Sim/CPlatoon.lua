@@ -165,6 +165,7 @@ end
 
 --- Returns number representing faction.
 -- 1 UEF, 2 Aeon, 3 Cybran, 4 Seraphim.
+---@see SetArmyFactionIndex
 ---@return integer
 function CPlatoon:GetFactionIndex()
 end
