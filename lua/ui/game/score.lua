@@ -73,7 +73,7 @@ function updatePlayerName(line)
         line.division:SetText(playerRating)
     end
 
-    line.name:SetText(playerClan .. playerName .. "1234567890101112131415")
+    line.name:SetText(playerClan .. playerName)
     line.name:SetDropShadow(true)
     LayoutHelpers.AnchorToLeft(line.name, line.division)
 end
@@ -778,6 +778,7 @@ function _OnBeat()
         if curFA < 1 then
             observerLine.name:SetColor('ffff7f00')
             observerLine.division:SetColor('ffff7f00')
+            observerLine.division:SetFont('Arial Bold', 12)
             observerLine.name:SetFont('Arial Bold', 12)
         elseif prevArmy < 1 then
             observerLine.name:SetColor('ffffffff')
