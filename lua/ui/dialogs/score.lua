@@ -250,6 +250,9 @@ function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
     StopAllSounds()
     ForkThread(function()
         while not(hotstats.scoreData.interval and hotstats.scoreData.current and hotstats.scoreData.history) do
+            if SessionIsPaused() then
+                SessionResume()
+            end
             WaitSeconds(0.5)
         end
         CreateDialog2(victory, showCampaign, operationVictoryTable, midGame)
