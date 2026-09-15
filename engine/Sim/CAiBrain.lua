@@ -506,16 +506,26 @@ end
 function CAiBrain:NumCurrentlyBuilding(entityCategoryOfBuildee, entityCategoryOfBuilder)
 end
 
----TODO.
+--- TODO.
 ---@param platoon Platoon
 ---@param squad PlatoonSquads
 ---@param alliance AllianceType
 ---@param compareType 'LeastDefended'|'Closest'|'Furthest'|'HighestValue'
 ---@param category EntityCategory
----@param unknown1? string
----@param unknown2? string
 ---@return Vector?
-function CAiBrain:PickBestAttackVector(platoon, squad, alliance, compareType, category, unknown1, unknown2)
+function CAiBrain:PickBestAttackVector(platoon, squad, alliance, compareType, category)
+end
+
+--- TODO.
+---@param platoon Platoon
+---@param squad PlatoonSquads
+---@param alliance AllianceType
+---@param compareType 'LeastDefended'|'Closest'|'Furthest'|'HighestValue'
+---@param category EntityCategory
+---@param file FileName
+---@param callbackName string # `fun(n1, n2, n3, n4): boolean`
+---@return Vector?
+function CAiBrain:PickBestAttackVector(platoon, squad, alliance, compareType, category, file, callbackName)
 end
 
 --- Returns true if platoon exists.
