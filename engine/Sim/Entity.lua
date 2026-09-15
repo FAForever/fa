@@ -233,7 +233,7 @@ function Entity:GetOrientation()
 end
 
 --- Returns the parent entity (e.g. the transport a unit is on), or nil if none
----@return self | nil
+---@return Entity?
 function Entity:GetParent()
 end
 
