@@ -95,7 +95,7 @@ Text = ClassUI(moho.text_methods, Control) {
         self._truncationEnabled = enabled
         if enabled then
             -- Preserve any existing OnDirty callback before adding _applyTruncation
-            if not self._originalWidthOnDirty then
+            if self.Width.OnDirty then
                 self._originalWidthOnDirty = self.Width.OnDirty
             end
 
