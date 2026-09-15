@@ -50,9 +50,9 @@ end
 
 ---@deprecated
 ---@param template PlatoonTemplate
----@param unknown2 string
+---@param desiredPlatoonName string
 ---@return boolean
-function CPlatoon:CanConsiderFormingPlatoon(template, unknown2)
+function CPlatoon:CanConsiderFormingPlatoon(template, desiredPlatoonName)
 end
 
 --- TODO.
