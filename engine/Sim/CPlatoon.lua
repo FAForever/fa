@@ -336,7 +336,7 @@ end
 function CPlatoon:Stop(squad)
 end
 
---- TODO.
+--- Runs Platoon's `OnDestroy` then runs `OnCreate` with the new plan.
 ---@param plan string
 ---@return string
 function CPlatoon:SwitchAIPlan(plan)
