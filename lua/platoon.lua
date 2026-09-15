@@ -82,7 +82,7 @@ Platoon = Class(moho.platoon_methods) {
     LastAttackDestination = {},
 
     ---@param self Platoon
-    ---@param plan table
+    ---@param plan string
     OnCreate = function(self, plan)
         self.Trash = TrashBag()
         if self[plan] then

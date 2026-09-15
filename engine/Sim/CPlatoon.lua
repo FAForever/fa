@@ -379,4 +379,7 @@ end
 function CPlatoon:UseTeleporter(gameObject, squad)
 end
 
+---@type fun(self: Platoon, plan: string)
+CPlatoon.OnCreate = nil
+
 return CPlatoon
