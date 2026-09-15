@@ -183,6 +183,10 @@ function CPlatoon:GetPersonality()
 end
 
 --- TODO.
+--- Returns nil if the platoon doesn't exist
+---@return number
+---@return number
+---@return number
 ---@return number
 function CPlatoon:GetPlatoonLifetimeStats()
 end
