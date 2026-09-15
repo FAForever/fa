@@ -1243,6 +1243,7 @@ end
 function SetTerrainTypeRect(rect, type)
 end
 
+--- Determined by the `/noinitialunits` command line arg
 ---@return boolean createInitial
 function ShouldCreateInitialArmyUnits()
 end
