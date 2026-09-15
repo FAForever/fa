@@ -23,6 +23,7 @@ function DistributeAssisters()
         local targets = EntityCategoryFilterOut(CategoriesAssisters, selection)
 
         if not TableEmpty(assisters) and not TableEmpty(targets) then
+            print(string.format("%d assisters assisting %d units", table.getn(assisters), table.getn(targets)))
             SimCallback({ Func = 'DistributeAssisters', Args = {} }, true)
             SelectUnits(targets)
         end
