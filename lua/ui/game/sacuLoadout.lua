@@ -202,17 +202,13 @@ local function FindBlueprintId(sacuId, enhancements)
     local want = EnhancementSetKey(enhancements)
     local found = nil
     for id, bp in __blueprints do
-        if type(id) == 'string' and bp and bp.EnhancementPresetAssigned then
+        if bp and bp.BaseBlueprintId == sacuId and bp.EnhancementPresetAssigned then
             local assigned = bp.EnhancementPresetAssigned
-            if assigned.BaseBlueprintId == sacuId and assigned.Enhancements then
-                if EnhancementSetKey(assigned.Enhancements) == want then
-                    local realId = bp.BlueprintId or id
-                    if type(realId) == 'string' and string.find(realId, sacuId) then
-                        found = realId
-                        if string.find(realId, 'combo_') then
-                            return realId
-                        end
-                    end
+            if assigned.Enhancements and EnhancementSetKey(assigned.Enhancements) == want then
+                local realId = bp.BlueprintId or id
+                found = realId
+                if type(realId) == 'string' and string.find(realId, 'combo_') then
+                    return realId
                 end
             end
         end

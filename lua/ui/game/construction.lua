@@ -424,8 +424,8 @@ function CreateTabs(type)
     elseif type == 'enhancement' then
         local selection = sortedOptions.selection
         local enhancements = selection[1]:GetBlueprint().Enhancements
-        local isGatewaySelection = SacuLoadout.IsGatewaySelection(selection)
-        local gatewaySacuId = isGatewaySelection and SacuLoadout.GetSelectionSacuId(selection)
+        local gatewaySacuId = SacuLoadout.GetSelectionSacuId(selection)
+        local isGatewaySelection = gatewaySacuId ~= nil
         if isGatewaySelection then
             enhancements = SacuLoadout.GetSacuEnhancements(gatewaySacuId)
         end
@@ -2272,6 +2272,10 @@ function FormatData(unitData, type)
             end
         end
 
+        -- Computed once here rather than per-enhancement inside AddEnhancement below -
+        -- sortedOptions.selection doesn't change across a single FormatData call.
+        local isGatewaySelection = SacuLoadout.IsGatewaySelection(sortedOptions.selection)
+
         local function AddEnhancement(enhTable)
             local iconData = {
                 type = 'enhancement',
@@ -2282,7 +2286,7 @@ function FormatData(unitData, type)
                 Selected = false,
                 Disabled = false,
             }
-            if SacuLoadout.IsGatewaySelection(sortedOptions.selection) then
+            if isGatewaySelection then
                 iconData.Selected = SacuLoadout.IsEnhancementSelected(enhTable.UnitID, enhTable.ID)
                 -- Disables enhancements not allowed from the gateway.
                 iconData.Disabled = enhTable.DisableInGateway == true
