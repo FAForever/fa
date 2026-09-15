@@ -1448,7 +1448,7 @@ end
 ---@param platoon Platoon
 ---@return boolean
 function InWaterCheck(platoon)
-    local t4Pos = platoon:GetPlatoonPosition()--[[@as Vector]]
+    local t4Pos = platoon:GetPlatoonPosition() ---@cast t4Pos -nil
     local inWater = GetTerrainHeight(t4Pos[1], t4Pos[3]) < GetSurfaceHeight(t4Pos[1], t4Pos[3])
 
     return inWater
