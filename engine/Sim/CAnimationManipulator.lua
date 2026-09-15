@@ -52,12 +52,12 @@ end
 function CAnimationManipulator:SetOverwriteMode(bool)
 end
 
----Set the relative rate at which this anim plays
----1.0 is normal speed. Rate can be negative to play backwards or 0 to pause.
+--- Set the relative rate at which this anim plays.
+---
+--- 1.0 is normal speed. Rate can be negative to play backwards or 0 to pause.
 ---@param rate number
 ---@return self
 function CAnimationManipulator:SetRate(rate)
 end
 
 return CAnimationManipulator
-
