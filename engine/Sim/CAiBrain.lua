@@ -102,9 +102,9 @@ end
 function CAiBrain:DecideWhatToBuild(builder, buildingType, buildingTemplate)
 end
 
----Destroys the platoon **without** destroying it's units.
+---Destroys the platoon **without** destroying its units.
 ---
----@see moho.platoon_methods.Destroy for destroying the platoon with it's units.
+---@see moho.platoon_methods.Destroy # for destroying the platoon with its units.
 ---@param platoon Platoon
 function CAiBrain:DisbandPlatoon(platoon)
 end
@@ -186,7 +186,7 @@ end
 -- return x, z
 
 --- Returns the army start position
---- 
+---
 ---@see SetArmyStart
 ---@return number Xcoordinate
 ---@return number Zcoordinate
@@ -224,14 +224,14 @@ end
 ---@field Name string
 ---@field Type "integer"
 ---@field Value integer
----@field Blueprints? table<BlueprintId, integer> `nil` when Value is 0
+---@field Blueprints? table<BlueprintId, integer> # `nil` when Value is 0
 
 --- Returns the statistic of the army, if it doesn't exist it creates it and returns the default value
----@see moho.aibrain_methods.GetBlueprintStat for army related statistics
----@see moho.aibrain_methods.SetArmyStat to update the stat
+---@see moho.aibrain_methods.GetBlueprintStat # for army related statistics
+---@see moho.aibrain_methods.SetArmyStat # to update the stat
 ---@param statName AIBrainBlueprintStatEconomy
 ---@param defaultValue number
----@return AIBrainArmyStat|AIBrainEconomyStat
+---@return AIBrainArmyStat | AIBrainEconomyStat
 function CAiBrain:GetArmyStat(statName, defaultValue)
 end
 
@@ -278,7 +278,7 @@ function CAiBrain:GetBlueprintStat(statName, category)
 end
 
 --- Return this brain's current enemy
---- 
+---
 ---@see AIBrain.SetCurrentEnemy # to set the enemy
 ---@return AIBrain? -- target army brain
 function CAiBrain:GetCurrentEnemy()
@@ -358,7 +358,7 @@ end
 --- This function does **not** take into account intel.
 ---@param category EntityCategory
 ---@param needToBeIdle boolean
----@param requireBuilt? boolean Appears to be not functional
+---@param requireBuilt? boolean # Appears to be not functional
 ---@return Unit[]
 function CAiBrain:GetListOfUnits(category, needToBeIdle, requireBuilt)
 end
@@ -373,23 +373,24 @@ end
 function CAiBrain:GetNoRushTicks()
 end
 
----Returns a number of active platoons with `name`
+--- Returns a number of active platoons with `name`
 ---@see moho.aibrain_methods.MakePlatoon
 ---@param name string
 ---@return integer
 function CAiBrain:GetNumPlatoonsTemplateNamed(name)
 end
 
----TODO: The name is most likely the AI Plan passed when making the platoon
+--- TODO: The name is most likely the AI Plan passed when making the platoon
+---
 ---@see moho.aibrain_methods.MakePlatoon
 ---@param name string
 ---@return integer
 function CAiBrain:GetNumPlatoonsWithAI(name)
 end
 
----Returns the number of units in `radius` from `position` that match the `category` and `alliance`.
+--- Returns the number of units in `radius` from `position` that match the `category` and `alliance`.
 ---
----Based on intel.
+--- Based on intel.
 ---@param category EntityCategory
 ---@param position Vector
 ---@param radius number
@@ -487,14 +488,14 @@ end
 function CAiBrain:IsOpponentAIRunning()
 end
 
----Creates a new platoon.
+--- Creates a new platoon.
 ---
----@see moho.aibrain_methods.GetNumPlatoonsTemplateNamed To get number of platoons with `name`.
----@see moho.aibrain_methods.GetPlatoonsList To get all plattons
----@see moho.aibrain_methods.GetPlatoonUniquelyNamed To get platoon by a unique name.
----@see moho.platoon_methods.UniquelyNamePlatoon To set platoon's unique name.
----@param name string Name of the platoon. Can be shared by more platoons.
----@param aiPlan string # to follow for this platoon or `''`, the function for the plan is in '/lua/platoon.lua'.
+---@see moho.aibrain_methods.GetNumPlatoonsTemplateNamed # To get number of platoons with `name`.
+---@see moho.aibrain_methods.GetPlatoonsList # To get all platoons
+---@see moho.aibrain_methods.GetPlatoonUniquelyNamed # To get platoon by a unique name.
+---@see moho.platoon_methods.UniquelyNamePlatoon # To set platoon's unique name.
+---@param name string # Name of the platoon. Can be shared by more platoons.
+---@param aiPlan string # plan to follow for this platoon or `''`, the function for the plan is in '/lua/platoon.lua'.
 ---@return Platoon
 function CAiBrain:MakePlatoon(name, aiPlan)
 end
@@ -563,7 +564,7 @@ function CAiBrain:SetArmyStatsTrigger(statName, triggerName, compareType, value,
 end
 
 --- Set the current enemy for this brain to attack
---- 
+---
 ---@see AIBrain.GetCurrentEnemy # to get the current enemy
 ---@param aiBrain AIBrain
 function CAiBrain:SetCurrentEnemy(aiBrain)
