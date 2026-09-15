@@ -471,7 +471,8 @@ function CreateTabs(type)
                         if isGatewaySelection then
                             enhTable.UnitID = gatewaySacuId
                         else
-                            enhTable.UnitID = selection[1]:GetBlueprint().BlueprintId
+                            local bp = selection[1]:GetBlueprint()
+                            enhTable.UnitID = bp.BaseBlueprintId or bp.BlueprintId
                         end
                         table.insert(sortedOptions[slotName], enhTable)
                     end
@@ -2587,7 +2588,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         local visibleBuildableUnits = {}
         for _, unitId in buildableUnits do
             local unitBp = __blueprints[unitId]
-            if not (unitBp and unitBp.CategoriesHash and unitBp.CategoriesHash.SACULOADOUTCOMBO) then
+            if not unitBp.CategoriesHash.SACULOADOUTCOMBO then
                 table.insert(visibleBuildableUnits, unitId)
             end
         end
