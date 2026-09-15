@@ -3,12 +3,6 @@
 --** Used by each faction's Quantum Gateway enhancement tab. Clicks choose slots; Queue issues a factory build.
 --******************************************************************************************************
 
--- Note: deliberately NOT importing blueprints-sacu-combos.lua here. That file is
--- loaded via doscript() from Blueprints.lua so its functions become real globals;
--- import()-ing it as well would re-run the whole file into a second, throwaway
--- module table just to reach EnhancementSetKey. The one function we need is
--- reproduced locally below instead.
-
 -- selectedBySlot[sacuId][slot] = enhancement chain. Keyed per-SACU (not just per-slot)
 -- so switching selection between, say, a UEF and an Aeon gateway can't leave a stale
 -- enhancement name from one faction selected against another's slot picker.
@@ -19,6 +13,9 @@ local SlotOrder = { 'LCH', 'RCH', 'Back' }
 --- Sorted, pipe-joined key for an enhancement set. Must stay identical to the
 --- copy in blueprints-sacu-combos.lua, since both sides need to agree on the
 --- generated combo preset names.
+-- Reproduced here instead of imported - that file is loaded via doscript()
+-- from Blueprints.lua, and import()-ing it too would re-run it into a
+-- second, throwaway module table just for this one function.
 --- @param list string[]
 --- @return string
 local function EnhancementSetKey(list)
@@ -37,8 +34,8 @@ end
 --- SACULOADOUTCOMBO category (set by MarkHiddenSacuLoadoutPresets in
 --- blueprints-sacu-combos.lua) and the preset's own recorded base id rather
 --- than a hardcoded faction/id table.
---- @param id string|nil
---- @return string|nil
+--- @param id? string
+--- @return string?
 function UnitBuildIconId(id)
     if type(id) ~= 'string' then
         return id
@@ -64,7 +61,7 @@ end
 --- ever issues one blueprint id to the whole selection. A selection with any
 --- non-factory unit in it is rejected outright for the same reason.
 --- @param selection Unit[]
---- @return string|nil
+--- @return string?
 function GetSelectionSacuId(selection)
     if not selection or table.empty(selection) then
         return nil
@@ -110,6 +107,9 @@ function IsGatewaySelection(selection)
     return GetSelectionSacuId(selection) ~= nil
 end
 
+--- Enhancement definitions on sacuId's blueprint, keyed by enhancement name.
+--- @param sacuId? UnitId
+--- @return table<string, UnitBlueprintEnhancement>?
 function GetSacuEnhancements(sacuId)
     local bp = sacuId and __blueprints[sacuId]
     if bp then
@@ -125,15 +125,15 @@ local function EnhancementChain(sacuId, name)
     local bp = __blueprints[sacuId]
     local chain = { name }
     local current = name
-    local guard = 0
-    while bp.Enhancements[current] and bp.Enhancements[current].Prerequisite and guard < 8 do
+    local depth = 0
+    while bp.Enhancements[current] and bp.Enhancements[current].Prerequisite and depth < 8 do
         local pre = bp.Enhancements[current].Prerequisite
         if not bp.Enhancements[pre] or IsRemoveEnhancement(pre) then
             break
         end
         table.insert(chain, 1, pre)
         current = pre
-        guard = guard + 1
+        depth = depth + 1
     end
     return chain
 end
@@ -220,33 +220,25 @@ local function FindBlueprintId(sacuId, enhancements)
     return found
 end
 
+--- Queues the currently-selected loadout at the gateway. Leaves presenting
+--- the result to the caller rather than printing here, so the UI can decide
+--- how to show success/failure (sound, message, etc).
+--- @param count? integer
+--- @return boolean success
+--- @return string idOrReason the queued blueprint id on success, else a failure reason
 function QueueSelected(count)
     count = count or 1
     local selection = GetSelectedUnits() or {}
     if not IsGatewaySelection(selection) then
-        print('Select a Quantum Gateway first')
-        return
+        return false, 'Select a Quantum Gateway first'
     end
 
     local sacuId = GetSelectionSacuId(selection)
     local id = sacuId and FindBlueprintId(sacuId, SelectedEnhancements(sacuId))
     if not id then
-        print('No blueprint for that loadout')
-        return
+        return false, 'No blueprint for that loadout'
     end
 
     IssueBlueprintCommand("UNITCOMMAND_BuildFactory", id, count)
-    print('Queued ' .. id)
-end
-
--- Old floating dialog kept for console testing.
-function Open()
-    QueueSelected(1)
-end
-
-function Toggle()
-    QueueSelected(1)
-end
-
-function Close()
+    return true, id
 end

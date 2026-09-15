@@ -1387,7 +1387,13 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
                 if modifiers.Shift then
                     count = 5
                 end
-                loadout.QueueSelected(count)
+                local success, info = loadout.QueueSelected(count)
+                if success then
+                    print('Queued ' .. info)
+                else
+                    print(info)
+                    PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Menu_Error_01'}))
+                end
                 self:SetCheck(false)
             end,
         }
