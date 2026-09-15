@@ -1647,12 +1647,13 @@ local keyActionsOrdersAdvanced = {
     ['distribute_assisters'] = {
         action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-assisters.lua").DistributeAssisters()',
         category = 'ordersAdvanced',
-        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#distribute-engineers'
+        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#distribute-assisters'
     },
     ['shift_distribute_assisters'] = {
         action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-assisters.lua").DistributeAssisters()',
         category = 'ordersAdvanced',
-        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#distribute-engineers'
+        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#distribute-assisters'
+    },
     ['abort_navigation'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").AbortNavigation()',
         category = 'ordersAdvanced',

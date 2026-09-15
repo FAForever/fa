@@ -534,8 +534,37 @@ Callbacks.SelectHighestEngineerAndAssist = function(data, selection)
 end
 
 Callbacks.DistributeAssisters = function(data, selection)
+    local TableSort = table.sort
+    local CategoriesAssisters = categories.BUILTBYTIER3FACTORY * (
+        categories.MOBILE * categories.SHIELD
+        + categories.SCOUT
+        + categories.STEALTHFIELD
+    )
+
+    selection = SecureUnits(selection)
+
     if selection then
-        local target = GetUnitById(data.TargetId) --[[@as Unit]]
+        local assisters = EntityCategoryFilterDown(CategoriesAssisters, selection)
+        local targets = EntityCategoryFilterDown(categories.ALLUNITS - CategoriesAssisters, selection)
+
+        if TableEmpty(assisters) or TableEmpty(targets) then
+            return
+        end
+
+        TableSort(assisters, function(left, right)
+            return left:GetEntityId() < right:GetEntityId()
+        end)
+        TableSort(targets, function(left, right)
+            return left:GetEntityId() < right:GetEntityId()
+        end)
+
+        local sourceAssister = assisters[1]
+        IssueClearCommands({ sourceAssister })
+        for _, target in targets do
+            IssueGuard({ sourceAssister }, target)
+        end
+
+        import("/lua/sim/commands/distribute-queue.lua").DistributeOrders(assisters, sourceAssister, true, false)
     end
 end
 
