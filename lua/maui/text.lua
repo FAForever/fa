@@ -118,6 +118,7 @@ Text = ClassUI(moho.text_methods, Control) {
             else
                 self.Width.OnDirty = nil
             end
+            self:SetDisplayText(self._fullText)
         end
 
     end,
