@@ -361,7 +361,8 @@ function GetCamera(name)
 end
 
 --- Gets the "arguments" (tokens split by spaces) that follow a commandline option,
---- disregarding if they start with `/` like other commandline options.  
+--- disregarding if they start with `/` like other commandline options.
+---
 --- Returns `false` if there are not `maxArgs` tokens after the `option`.
 ---@see GetCommandLineArgTable(option) for parsing key-values
 ---@param option string
@@ -391,12 +392,12 @@ end
 function GetFireState(units)
 end
 
---- Returns the root UI frame for a given adapter. You can use `GetFrame(0)` to retrieve the primary adapter. And you can use `GetFrame(1)` to retrieve the secondary adapter. 
+--- Returns the root UI frame for a given adapter. You can use `GetFrame(0)` to retrieve the primary adapter. And you can use `GetFrame(1)` to retrieve the secondary adapter.
 ---
 --- In the game options you can add a second adapter under the 'Video' tab.
---- 
----@see GetNumRootFrames to determine the number of root frames. 
---- 
+---
+---@see GetNumRootFrames to determine the number of root frames.
+---
 --- See also the following modules that manage these frames:
 --- - Primary adapter: lua\ui\game\worldview.lua
 --- - Secondary adapter: lua\ui\game\multihead.lua
@@ -487,10 +488,10 @@ function GetMovieVolume()
 end
 
 --- Returns the current number of root frames. There is usually only one root frame for each adapter (monitor). This is often referred to as a 'head' in other comments. The game supports up to two root frames.
---- 
+---
 --- In the game options you can add a second adapter under the 'Video' tab.
 ---
---- See also `GetFrame(0)` to retrieve the root frame of the primary adapter and `GetFrame(1)` to retrieve the root frame of the secondary adapter. 
+--- See also `GetFrame(0)` to retrieve the root frame of the primary adapter and `GetFrame(1)` to retrieve the root frame of the secondary adapter.
 --- See also the following modules that manage these frames:
 --- - Primary adapter: lua\ui\game\worldview.lua
 --- - Secondary adapter: lua\ui\game\multihead.lua
@@ -504,8 +505,8 @@ end
 function GetOptions(key)
 end
 
---- Retrieves a value in the memory-stored preference file. The value retrieved is a deep copy of what resides in the actual 
---- preference file. Therefore this function can be expensive to use directly - if you're not careful you may be allocating 
+--- Retrieves a value in the memory-stored preference file. The value retrieved is a deep copy of what resides in the actual
+--- preference file. Therefore this function can be expensive to use directly - if you're not careful you may be allocating
 --- kilobytes worth of data!
 ---
 --- You're encouraged to use `/lua/user/prefs.lua` to interact with the preference file.
@@ -571,7 +572,7 @@ end
 ---@param filename string
 ---@param type SpecialFileType
 ---@return string
-function GetSpecialFilePath(profilename,  filename,  type)
+function GetSpecialFilePath(profilename, filename, type)
 end
 
 --- Returns a table of strings which are the names of files in special locations (currently SaveFile, Replay)
@@ -601,7 +602,7 @@ end
 ---@param border number? defaults to 1
 ---@return number width
 ---@return number height
-function GetTextureDimensions(filename,  border)
+function GetTextureDimensions(filename, border)
 end
 
 --- Gets the alpha multiplier for 2D UI controls
@@ -625,7 +626,8 @@ end
 function GetUnitCommandDataOfUnit(unit)
 end
 
---- Given a `RULEUCC` type command, return the equivalent `UNITCOMMAND` command or "None" otherwise.  
+--- Given a `RULEUCC` type command, return the equivalent `UNITCOMMAND` command or "None" otherwise.
+---
 --- See `/lua/ui/game/commandgraphparams.lua#CommandGraphParams` or `UserUnitCommand`.
 --[[```
              RULEUCC_Move = Move
@@ -867,7 +869,7 @@ end
 IssueUnitCommandToUnit = function(unit, command, luaParams, clear)
 end
 
---- Issue a command to the current selection. 
+--- Issue a command to the current selection.
 ---@param command UserUnitCommand # Will crash the game if not a valid command.
 ---@param luaParams? table | string | number | boolean # Will crash the game if the table contains non-serializable types.
 ---@param clear boolean?
@@ -1029,7 +1031,7 @@ end
 function RestartSession()
 end
 
---- Writes the preferences to disk to make it persistent. This is an expensive operation. The 
+--- Writes the preferences to disk to make it persistent. This is an expensive operation. The
 --- game does this automatically when it exits, there should be no reason to call this manually.
 ---
 --- You're encouraged to use `/lua/user/prefs.lua` to interact with the preference file.
@@ -1257,7 +1259,6 @@ end
 function TeamColorMode(mode)
 end
 
-
 -- TODO: do these kinds of functions (that duplicate in `Unit.lua`) also accept single units
 -- like some of the other functions alude to?
 
@@ -1301,12 +1302,10 @@ end
 ---@param color Color
 ---@param thickness? number
 function UI_DrawCircle(pos, size, color, thickness)
-
   -- Introduced by an assembly function, see also:
   -- - https://github.com/FAForever/FA-Binary-Patches/pull/47
   -- - https://github.com/FAForever/FA-Binary-Patches/pull/111
   -- - https://github.com/FAForever/FA-Binary-Patches/pull/112
-
 end
 
 --- Draws a rectangle in world. Must be called from `WorldView:OnRenderWorld` or it won't draw anything.
@@ -1315,12 +1314,10 @@ end
 ---@param color Color
 ---@param thickness? number
 function UI_DrawRect(pos, size, color, thickness)
-
   -- Introduced by an assembly function, see also:
   -- - https://github.com/FAForever/FA-Binary-Patches/pull/47
   -- - https://github.com/FAForever/FA-Binary-Patches/pull/111
   -- - https://github.com/FAForever/FA-Binary-Patches/pull/112
-
 end
 
 --- Draws a line in world. Must be called from `WorldView:OnRenderWorld` or it won't draw anything.
@@ -1329,12 +1326,10 @@ end
 ---@param color Color
 ---@param thickness? number
 function UI_DrawLine(position1, position2, color, thickness)
-
   -- Introduced by an assembly function, see also:
   -- - https://github.com/FAForever/FA-Binary-Patches/pull/47
   -- - https://github.com/FAForever/FA-Binary-Patches/pull/111
   -- - https://github.com/FAForever/FA-Binary-Patches/pull/112
-
 end
 
 --- Draws a line in world. Must be called within `WorldView:OnRenderWorld`
