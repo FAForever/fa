@@ -1640,19 +1640,19 @@ local keyActionsOrdersAdvanced = {
         wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#filter-engineers'
     },
     ['shift_filter_highest_engineer_and_assist'] = {
-        action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-assisters.lua").SelectHighestEngineerAndAssist()',
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/filter-engineers.lua").SelectHighestEngineerAndAssist()',
         category = 'ordersAdvanced',
-        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#distribute-assisters'
+        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#filter-engineers'
     },
     ['distribute_assisters'] = {
         action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-assisters.lua").DistributeAssisters()',
         category = 'ordersAdvanced',
-        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#filter-engineers'
+        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#distribute-engineers'
     },
-    ['shift_filter_highest_engineer_and_assist'] = {
-        action = 'UI_Lua import("/lua/ui/game/hotkeys/filter-engineers.lua").DistributeAssisters()',
+    ['shift_distribute_assisters'] = {
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-assisters.lua").DistributeAssisters()',
         category = 'ordersAdvanced',
-        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#distribute-assisters'
+        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#distribute-engineers'
     },
     ['abort_navigation'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").AbortNavigation()',
