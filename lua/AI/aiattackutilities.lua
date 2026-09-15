@@ -1076,10 +1076,10 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
     return true
 end
 
---- set platoon.MovementLayer to the most restrictive movement layer
---- of a given platoon, and return a representative unit
----@param platoon Platoon       # platoon to find best target for
----@return Unit?                # The most restrictive layer of movement for a given platoon
+--- Sets `platoon.MovementLayer` to the most restrictive movement layer
+--- of the platoon, and returns a representative unit
+---@param platoon Platoon
+---@return Unit? # A unit with the most restrictive layer of movement for the platoon
 function GetMostRestrictiveLayer(platoon)
     if not platoon then
         return
