@@ -584,7 +584,8 @@ function CAiBrain:SetResourceSharing(bool)
 end
 
 --- TODO.
----@param category? EntityCategory
+---@see AIBrain.SetCurrentEnemy # To set the the target army
+---@param category? EntityCategory # Unit types to set up attack vectors for. Defaults to `STRUCTURE - MOBILE`
 function CAiBrain:SetUpAttackVectorsToArmy(category)
 end
 
