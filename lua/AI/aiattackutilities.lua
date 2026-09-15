@@ -1199,7 +1199,7 @@ end
 ---@param location Vector           # location to search around
 ---@param radius number             # radius around location to search in
 ---@param layer string              # layer to use to generate safe path... e.g. 'Air', 'Land', etc.
----@return table                    # Closest pathing node's name else false
+---@return table?                   # Closest pathing node's name
 function GetClosestPathNodeInRadiusByLayer(location, radius, layer)
 
     local bestDist = radius*radius
