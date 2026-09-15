@@ -1175,9 +1175,8 @@ end
 function SetOverlayFilter(overlay, categories, normalColor, selectColor, rolloverColor, inner1, inner2, outer1, outer2)
 end
 
----
+--- see `/lua/ui/game/RangeOverlayParams.lua`
 ---@param list RangeOverlay[]
----see `/lua/ui/game/RangeOverlayParams.lua`
 function SetOverlayFilters(list)
 end
 
