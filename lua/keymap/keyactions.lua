@@ -285,7 +285,7 @@ local keyActionsSelectionQuickSelect = {
     ['select_all_building_eng_onscreen'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectAllBuildingEngineers(true)',
         category = 'selection',
-    }, ['select_all_resource_consumers'] = {
+    },['select_all_resource_consumers'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectAllResourceConsumers()',
         category = 'selection',
     },
@@ -1653,7 +1653,6 @@ local keyActionsOrdersAdvanced = {
         action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-assisters.lua").DistributeAssisters()',
         category = 'ordersAdvanced',
         wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#distribute-engineers'
-    },
     ['abort_navigation'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").AbortNavigation()',
         category = 'ordersAdvanced',
@@ -1745,25 +1744,25 @@ local keyactionsOrdersContextBased = {
         wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cap-a-structure'
     },
 
-    ['upgrade_structure'] = {
+    ['upgrade_structure'] = { 
         action = 'UI_LUA import("/lua/ui/game/hotkeys/upgrade-structure.lua").UpgradeStructure()',
         category = 'ordersContextBased',
         wikiURL = '/Play/Game/Hotkeys/OrdersMouseContext#upgrade-a-structure'
     },
 
-    ['shift_upgrade_structure'] = {
+    ['shift_upgrade_structure'] = { 
         action = 'UI_LUA import("/lua/ui/game/hotkeys/upgrade-structure.lua").UpgradeStructure()',
         category = 'ordersContextBased',
         wikiURL = '/Play/Game/Hotkeys/OrdersMouseContext#upgrade-a-structure'
     },
 
-    ['upgrade_structure_pause'] = {
+    ['upgrade_structure_pause'] = { 
         action = 'UI_LUA import("/lua/ui/game/hotkeys/upgrade-structure.lua").UpgradeStructure(true)',
         category = 'ordersContextBased',
         wikiURL = '/Play/Game/Hotkeys/OrdersMouseContext#upgrade-a-structure'
     },
 
-    ['shift_upgrade_structure_pause'] = {
+    ['shift_upgrade_structure_pause'] = { 
         action = 'UI_LUA import("/lua/ui/game/hotkeys/upgrade-structure.lua").UpgradeStructure(true)',
         category = 'ordersContextBased',
         wikiURL = '/Play/Game/Hotkeys/OrdersMouseContext#upgrade-a-structure'

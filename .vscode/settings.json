@@ -1,4 +1,5 @@
 {
+  "editor.formatOnSave": false,
   "Lua.runtime.nonstandardSymbol": ["continue", "!="],
   "Lua.completion.showWord": "Disable",
   "Lua.runtime.special": {
@@ -19,6 +20,7 @@
     "*_save.lua"
   ],
   "[lua]": {
+    "editor.formatOnSave": false,
     "editor.wordBasedSuggestions": "off"
   },
   "files.associations": {
@@ -50,6 +52,7 @@
     "max_line_length": "unset"
   },
   "[markdown]": {
+    "editor.formatOnSave": false,
     "editor.tabSize": 2
   },
 
