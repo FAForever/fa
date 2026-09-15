@@ -79,12 +79,14 @@ _G.SessionResume = function()
     local timeDifference = GetSystemTimeSeconds() - OnPauseTimestamp
 
     -- conditions that allow an immediate resume of the session
-    if SessionIsReplay() or SessionIsGameOver() or
-        not SessionIsMultiplayer() or
+    local skipNotification = SessionIsGameOver() or not SessionIsMultiplayer()
+    if SessionIsReplay() or skipNotification or
         OnPauseClientIndex == localClientIndex or -- feature: the person who initiated the pause can resume at any time
         timeDifference > ResumeThreshold -- feature: any person can resume after the pause lasted past the threshold
     then
-        SessionSendChatMessage({ SendResumedBy = true })
+        if not skipNotification then
+            SessionSendChatMessage({ SendResumedBy = true })
+        end
         oldSessionResume()
         return 'Accepted'
     else
