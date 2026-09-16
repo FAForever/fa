@@ -32,7 +32,7 @@
 ---| "Personal"
 ---| "AntiArtillery"
 ---| "Unknown" # Any shield with not set type
----| "None" # Not an actual shiled type, but it's returned by unit when the unit doesn't have a shield
+---| "None" # Not an actual shield type, but it's returned by units that don't have a shield
 
 local Entity = import("/lua/sim/entity.lua").Entity
 local EffectTemplate = import("/lua/effecttemplates.lua")
@@ -173,7 +173,7 @@ end
 ---@field DamagedRegular table<string, integer|false>
 ---@field DamagedOverspill table<string, number>
 ---@field LiveImpactEntities integer
----@field ImpactEntitySpecs {["Owner"]: Unit}
+---@field ImpactEntitySpecs { Owner: Unit }
 Shield = ClassShield(moho.shield_methods, Entity) {
 
     RemainEnabledWhenAttached = false,
@@ -752,8 +752,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     end,
 
     --- Called when a shield collides with a projectile to check if the collision is valid
-    ---@param self Shield The shield we're checking the collision for
-    ---@param other Projectile The projectile we're checking the collision with
+    ---@param self Shield # The shield we're checking the collision for
+    ---@param other Projectile # The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
 
         if self.DisallowCollisions then
@@ -797,8 +797,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     end,
 
     --- Called when a shield collides with a collision beam to check if the collision is valid
-    ---@param self Shield The shield we're checking the collision for
-    ---@param firingWeapon Weapon The weapon the beam originates from that we're checking the collision with
+    ---@param self Shield # The shield we're checking the collision for
+    ---@param firingWeapon Weapon # The weapon the beam originates from that we're checking the collision with
     OnCollisionCheckWeapon = function(self, firingWeapon)
 
         if self.DisallowCollisions then
