@@ -536,12 +536,12 @@ function EngineersBuildPlatoon(platoon)
     local platoonUnits = platoon:GetPlatoonUnits()
     local data = platoon.PlatoonData
     local platoonName = data.PlatoonName
-    ---@type ConstructionUnit|nil
+    ---@type ConstructionUnit?
     local eng
     local engTable = {}
     local buildingPlatoon = false
     local buildingData
-    ---@type Unit|nil
+    ---@type Unit?
     local unitBeingBuilt
     local busy = false
     local buildingTemplate = StructureTemplates.BuildingTemplates[aiBrain:GetFactionIndex()]
@@ -553,8 +553,9 @@ function EngineersBuildPlatoon(platoon)
     -- Find all engineers in platoon
     for _, v in platoonUnits do
         if EntityCategoryContains(categories.CONSTRUCTION, v) then
+            ---@cast v ConstructionUnit
             if not eng then
-                eng = v--[[@as ConstructionUnit]]
+                eng = v
             else
                 table.insert(engTable, v)
             end
@@ -614,7 +615,11 @@ function EngineersBuildPlatoon(platoon)
                 end
             end
         end
-        if not eng:IsUnitState('Patrolling') and (eng:IsUnitState('Reclaiming') or eng:IsUnitState('Building') or eng:IsUnitState('Upgrading') or eng:IsUnitState('Repairing')) then
+        if not eng:IsUnitState('Patrolling') and (eng:IsUnitState('Reclaiming')
+            or eng:IsUnitState('Building')
+            or eng:IsUnitState('Upgrading')
+            or eng:IsUnitState('Repairing'))
+        then
             busy = true
         end
         if not busy and buildingPlatoon then
@@ -680,7 +685,6 @@ function EngineersBuildPlatoon(platoon)
                 aiBrain:DisbandPlatoon(platoon)
             end
         end
-        ---@cast eng -nil
         if not eng:IsUnitState('Patrolling') and data.PatrolChain then
             for _, v in ScenarioUtils.ChainToPositions(data.PatrolChain) do
                 platoon:Patrol(v)
@@ -826,17 +830,16 @@ function StartBaseEngineerThread(platoon)
             end
         end
     end
-    ---@type ConstructionUnit|nil
+    ---@type ConstructionUnit?
     local eng
     local engTable = {}
-    local cmd
-    local unitBeingBuilt
 
     -- Find all engineers in platoon
     for _, v in platoonUnits do
         if EntityCategoryContains(categories.CONSTRUCTION, v) then
+            ---@cast v ConstructionUnit
             if not eng then
-                eng = v--[[@as ConstructionUnit]]
+                eng = v
             else
                 table.insert(engTable, v)
             end
