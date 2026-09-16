@@ -631,7 +631,7 @@ VeterancyComponent = ClassSimple {
     ---@param self VeterancyComponent | Unit
     ---@param instigator Unit
     ---@param amount number
-    ---@param vector Vector unused
+    ---@param vector? Vector unused
     ---@param damageType DamageType unused
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         amount = MathMin(amount, self:GetMaxHealth())

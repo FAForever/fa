@@ -412,7 +412,7 @@ local Seen = { }
 
 --- Constructs a class or state, referring to the paragraphs of text at the top of this file
 ---@generic Base: table, T:table
----@param bases Base
+---@param bases? Base
 ---@param specs T
 ---@return T
 function ConstructClass(bases, specs)

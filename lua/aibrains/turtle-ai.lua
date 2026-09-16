@@ -21,15 +21,6 @@ local TableGetn = table.getn
 ---@field EngineerManager AIEngineerManager
 ---@field StructureManager AIStructureManager
 
----@class TriggerSpec
----@field Callback function
----@field ReconTypes ReconTypes
----@field Blip boolean
----@field Value boolean
----@field Category EntityCategory
----@field OnceOnly boolean
----@field TargetAIBrain AIBrain
-
 ---@class TurtleAIBrain: AIBrain, AIBrainEconomyComponent
 ---@field GridReclaim AIGridReclaim
 ---@field GridBrain AIGridBrain

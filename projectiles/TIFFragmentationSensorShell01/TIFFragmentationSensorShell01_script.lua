@@ -39,7 +39,7 @@ TIFFragmentationSensorShell01 = ClassProjectile(TArtilleryProjectile) {
 
         -- create vision
         ---@type VisionMarkerOpti
-        local marker = VisionMarkerOpti({ Owner = self })
+        local marker = VisionMarkerOpti()
         marker:UpdatePosition(px, pz)
         marker:UpdateDuration(5)
         marker:UpdateIntel(self.Army, 4, 'Vision', true)

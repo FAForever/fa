@@ -95,7 +95,7 @@ local ThreatInformation = import("/lua/shared/maputilities.lua").ThreatInformati
 local ThreatRendering = { }
 
 --- Changes the perspective of the threat values measured
----@param army number
+---@param army Army
 function iMapSwitchPerspective(army)
     iMapArmyPerspective = army
 end

@@ -12,14 +12,14 @@ SDFChronatronCannon01 = ClassProjectile(SChronatronCannon) {
 	FxImpactTrajectoryAligned = false,
 
 	---@param self SDFChronatronCannon01
-	---@param army number
+	---@param army Army
 	---@param EffectTable table
 	---@param EffectScale number
     CreateImpactEffects = function( self, army, EffectTable, EffectScale )
 		local launcher = self.Launcher
 		if launcher and launcher:HasEnhancement( 'BlastAttack' ) then
 			for k, v in ChronatronBlastAttackAOE do
-				emit = CreateEmitterAtEntity(self,army,v)
+				CreateEmitterAtEntity(self,army,v)
 			end
 		end
 		SChronatronCannon.CreateImpactEffects( self, army, EffectTable, EffectScale )

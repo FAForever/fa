@@ -49,8 +49,8 @@ function STRING(s)
 	return s
 end
 
----@param group Group
----@return table
+---@param group table
+---@return ScenarioGroup
 function GROUP(group)
 	group.type = 'GROUP'
 	return group
