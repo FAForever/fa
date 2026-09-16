@@ -561,7 +561,7 @@ function GetModNameVersion(mod)
 
     -- remove old mod version from mod name
     name = string.gsub(name, '[%[%<%{%(%s]+[vV]+%s*%d+[%.%d]*[%]%>%}%)%s]*', '')
-    name = StringCapitalize(name)
+    name = string.capitalize(name)
     name = name:gsub("-", "", 1)
 
     -- append new mod version to mod name
@@ -576,9 +576,9 @@ function GetModNameVersion(mod)
         local ver = mod.version
         -- correct mod version (e.g. 1.1.1 --> 1.11)
         if string.find(ver, "%d%.%d%.%d") then
-            ver = StringReverse(ver)
+            ver = string.reverse(ver)
             ver = ver:gsub("%.", "", 1)
-            ver = StringReverse(ver)
+            ver = string.reverse(ver)
         elseif not string.find(ver, "%.") then
             ver = ver .. '.0'
         end
@@ -599,9 +599,9 @@ function GetModAuthor(mod)
         if string.len(mod.author) < 20 then
             author = mod.author
         elseif string.find(mod.author, ",") then
-            author = StringSplit(mod.author, ',')[1]
+            author = string.split(mod.author, ',')[1]
         elseif string.find(mod.author, " ") then
-            author = StringSplit(mod.author, ' ')[1]
+            author = string.split(mod.author, ' ')[1]
         end
     end
     author = author:gsub("_", "", 1)
@@ -856,8 +856,8 @@ function LoadMods()
 end
 
 function StringReplace(str, remove, add)
-    local words = StringSplit(str, remove)
-    return StringJoin(words, add)
+    local words = string.split(str, remove)
+    return string.join(words, add)
 end
 
 -- refresh the mod list UI based on mods filtering and sorting
@@ -1167,7 +1167,7 @@ function CreateListElement(parent, mod, index)
         group.desc.Bottom:Set(function() return group.check.Bottom() - LayoutHelpers.ScaleNumber(8) end)
         group.desc.Height:Set(function() return group.desc.Bottom() - group.desc.Top() end)
 
-        local lines = StringSplit(mod.description, '\n')
+        local lines = string.split(mod.description, '\n')
         if (table.getsize(lines) > 3) then
             group.desc:SetText(lines[1] .. '\n' .. lines[2] .. '\n' .. lines[3])
         elseif string.len(mod.description) > modInfoDesciptionMax then

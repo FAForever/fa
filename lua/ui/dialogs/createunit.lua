@@ -1179,7 +1179,7 @@ function CreateDialog()
             armyLabel = LOC('<LOC score_0003>Observer')
         elseif armyData.civilian then
             icon:SetSolidColor('aaaaaaaa')
-            armyLabel = StringCapitalize(armyData.nickname)
+            armyLabel = string.capitalize(armyData.nickname)
             armyName = armyData.name == 'NEUTRAL_CIVILIAN' and LOC('<LOC lobui_0295>Neutral') or armyData.name
         else -- human or AI army
             armyLabel = CompressNickname(armyData.nickname, group.Width()-50)

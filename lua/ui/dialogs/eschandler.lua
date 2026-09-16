@@ -99,6 +99,3 @@ function HandleEsc(quit_game)
         SelectUnits(nil)
     end
 end
-
--- kept for mod backwards compatibility
-local Utils = import("/lua/system/utils.lua")
