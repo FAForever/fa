@@ -421,32 +421,31 @@ Prop = Class(moho.prop_methods) {
         end
     end,
 
-    ---@see use `prop.CachePosition` directly instead
-    ---@deprecated
+    ---@see Prop.CachePosition # read this field directly instead
+    ---@deprecated # Read field `Prop.CachePosition` instead
     ---@param self Prop
     ---@return Vector
     GetCachePosition = function(self)
         return self.CachePosition
     end,
 
-    ---@see no alternative, value is no longer in use
-    ---@deprecated
+    ---@deprecated # no alternative, value is no longer in use
     ---@param self Prop
     ---@param val boolean
     SetCanTakeDamage = function(self, val)
         self.CanTakeDamage = val
     end,
 
-    ---@see Prop.CanBeKilled field to read directly instead
-    ---@deprecated
+    ---@see Prop.CanBeKilled # set this field directly instead
+    ---@deprecated # Set field `Prop.CanBeKilled` instead
     ---@param self Prop
     ---@param val any
     SetCanBeKilled = function(self, val)
         self.CanBeKilled = val
     end,
 
-    ---@see Prop.CanBeKilled to compare with directly
-    ---@deprecated
+    ---@see Prop.CanBeKilled # read this field directly instead
+    ---@deprecated # Read field `Prop.CanBeKilled` instead
     ---@param self Prop
     ---@return boolean
     CheckCanBeKilled = function(self)
