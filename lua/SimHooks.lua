@@ -16,8 +16,8 @@ do
     ---@param tlz number Top left z coordinate.
     ---@param brx number Bottom right x coordinate.
     ---@param brz number Bottom right z coordinate.
-    ---@return Unit[]|nil
-    ---@overload fun(rectangle: Rectangle): Unit[]|nil
+    ---@return Unit[]?
+    ---@overload fun(rectangle: Rectangle): Unit[]?
     _G.GetUnitsInRect = function(rtlx, tlz, brx, brz)
 
         -- try and retrieve units
