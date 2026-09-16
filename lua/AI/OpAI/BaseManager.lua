@@ -244,9 +244,7 @@ end
 
 ---@alias Enhancement string --TODO
 
----@class LevelName
----@field Name string
----@field Priority number
+---@alias LevelName BuildGroup
 
 ---@class ConditionalBuildData
 ---@field DecrementAssisting function       # Decreases `NumAssisting` by one
