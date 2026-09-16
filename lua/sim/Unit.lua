@@ -183,7 +183,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field BuildRateOverride? number
 ---@field Captors? table<string, Unit>
 ---@field CaptureEffectsBag? TrashBag
----@field DamageEffectsBag? {[1]: TrashBag, [2]: TrashBag, [3]: TrashBag}
+---@field DamageEffectsBag? { [1]: TrashBag, [2]: TrashBag, [3]: TrashBag } # `[1]`: 50-75% hp, `[2]`: 25-50% hp, `[3]`: 0-25% hp
 ---@field ReclaimEffectsBag? TrashBag
 ---@field MovementEffectsBag? TrashBag
 ---@field UpgradeEffectsBag? TrashBag
@@ -195,7 +195,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field WorkItemBuildTime? number
 ---@field TeleportDrain? moho.EconomyEvent
 ---@field ToggleCaps? ToggleCap[]
----@field DeathWeaponEnabled? boolean If not set, it is treated as enabled
+---@field DeathWeaponEnabled? boolean # If not set, it is treated as enabled
 ---@field Sinking? boolean
 ---@field Detector? moho.CollisionManipulator
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent, FastDecayComponent) {
@@ -510,7 +510,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---| 7 # Special toggle
     ---| 8 # Cloak toggle
 
-    ---Toggle on
+    --- Called by engine when script bit is toggled *on* from Lua or UI
+    ---@see Unit.SetScriptBit # To set script bits in Lua
     ---@param self Unit
     ---@param bit UnitScriptBit
     OnScriptBitSet = function(self, bit)
@@ -557,7 +558,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
     end,
 
-    ---Toggle off
+    --- Called by engine when script bit is toggled *off* from Lua or UI
+    ---@see Unit.SetScriptBit # To set script bits in Lua
     ---@param self Unit
     ---@param bit UnitScriptBit
     OnScriptBitClear = function(self, bit)
@@ -2236,10 +2238,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         ChangeState(self, self.DeadState)
     end,
 
-    -- Generic function for showing a table of bones
+    --- Generic function for showing a table of bones
     ---@param self Unit
-    ---@param bones Bone[] List of bones
-    ---@param children boolean True/False to show child bones
+    ---@param bones Bone[] # List of bones
+    ---@param children boolean # Show child bones
     ShowBones = function(self, bones, children)
         for _, v in bones do
             if self:IsValidBone(v) then
