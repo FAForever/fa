@@ -5108,17 +5108,20 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self:UpdateStat(key, value)
     end,
 
-    --- Updates a statistic for the UI.
-    --- Relies on an assembly patch to be functional, without it this setup causes the game to crash.
+    --- Updates a statistic for the UI
+    ---
+    ---@see UserUnit.GetStat # to get the stat on the UI side
     ---@param self Unit
     ---@param key string
     ---@param value number
-    ---@see UserUnit.GetStat to get the stats in on the UI side
     UpdateStat = function(self, key, value)
-        -- With thanks to 4z0t the `SetStat` function no longer hard-crashes when the value doesn't exist. Instead, it returns 'true' 
-        -- when the stat doesn't exist. If it doesn't exist then we can use `GetStat` to initialize it. This makes no sense, therefore
-        -- we have this new function to hide the magic
-        local needsSetup = cUnit.SetStat(self, key, value)
+        -- With thanks to https://github.com/FAForever/FA-Binary-Patches/pull/21
+        -- the `SetStat` function returns `true` when the stat doesn't exist
+        -- instead of hard-crashing, and if it doesn't exist we can use `GetStat`
+        -- to initialize it. This makes no sense, therefore we have this function
+        -- to hide the magic.
+
+        local needsSetup = cUnit.SetStat(self, key, value) --[[@as true | nil ]]
         if needsSetup then
             cUnit.GetStat(self, key, value)
             cUnit.SetStat(self, key, value)
