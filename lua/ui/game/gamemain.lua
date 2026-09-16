@@ -837,8 +837,14 @@ function RemoveBeatFunction(fn, key)
     end
 end
 
--- Calls function callbacks that were added previously, whenever the sim beat occurs
 local last = 0
+
+--- Called by the engine whenever the sim beat occurs.
+--- 
+--- Sim beats occur whenever the sim has something to sync:
+--- - tick advance
+--- - sim callbacks issued
+--- - queued ticks after sim is paused
 function OnBeat()
     local rate = GetSimRate()
     local throttle = false

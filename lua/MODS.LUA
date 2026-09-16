@@ -463,7 +463,7 @@ local _mod_cache = nil
 ---@param selectedMods? uidSet set of mod UID's
 function SetSelectedMods(selectedMods)
     if selectedMods then
-        LOG("Mod list set to:")
+        LOG(string.format("Mod list set to %d mods:", table.getsize(selectedMods)))
         for uid in selectedMods do
             local info = _mod_cache[uid]
             LOG(string.format('\t%-5s "%-30s v%02s (%-37s by %s'

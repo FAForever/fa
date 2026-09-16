@@ -243,8 +243,6 @@ local function ResourceClickProcessing(self, event, uiGroup, resType)
                            Mass = Value.Mass, Energy = Value.Energy, }} )
             scoreData.resources.storage['stored'..resType] = scoreData.resources.storage['stored'..resType] + SentValue
             uiGroup[string.lower(resType)..'_in']:SetText(fmtnum(scoreData.resources.storage['stored'..resType]))
-            SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name, to = 'allies', Chat = true,
-                text = 'Sent '..resType..' '..fmtnum(SentValue)..' to '..ScoresCache[armyID].name })
         elseif event.Modifiers.Ctrl then
             if GetFocusArmy() == armyID then
                 SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name,
@@ -362,8 +360,6 @@ function SetupPlayerLines()
                     local SelUnits = GetSelectedUnits()
                     if (not SelUnits) or ((table.getn(SelUnits) == 1) and EntityCategoryContains(categories.COMMAND, SelUnits[1])) then return end
                     SimCallback( { Func = "GiveUnitsToPlayer", Args = { From = GetFocusArmy(), To = group.armyID }, }, true)
-                    SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name,
-                        to = 'allies', Chat = true, text = 'Sent units to '..ScoresCache[group.armyID].name })
                 elseif event.Modifiers.Ctrl then
                     SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name,
                         to = 'allies', Chat = true, text = ScoresCache[group.armyID].name..' give me Engineer' })
