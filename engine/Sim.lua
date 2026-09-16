@@ -1368,7 +1368,7 @@ function Warp(object, location, orientation)
 end
 
 ---@param entity Entity
----@param spec EntitySpec
+---@param spec EntitySpec | nil # `nil` must be explicit to make a 2-arg call
 function _c_CreateEntity(entity, spec)
 end
 
