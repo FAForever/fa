@@ -1480,20 +1480,15 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param oldHealth number
     ManageDamageEffects = function(self, newHealth, oldHealth)
 
-        if not self.DamageEffectsBag then
-            self.DamageEffectsBag = {
-                TrashBag(),
-                TrashBag(),
-                TrashBag(),
-            }
-
-            self.Trash:Add(self.DamageEffectsBag[1])
-            self.Trash:Add(self.DamageEffectsBag[2])
-            self.Trash:Add(self.DamageEffectsBag[3])
+        local damageEffectsBags = self.DamageEffectsBag
+        if not damageEffectsBags then
+            local bag1 = self.Trash:Add(TrashBag())
+            local bag2 = self.Trash:Add(TrashBag())
+            local bag3 = self.Trash:Add(TrashBag())
+            damageEffectsBags = { bag1, bag2, bag3 }
+            self.DamageEffectsBag = damageEffectsBags
         end
 
-        local damageEffectsBags = self.DamageEffectsBag
-        ---@cast damageEffectsBags -nil
         if newHealth < oldHealth then
             local amount = self.Blueprint.SizeDamageEffects
             if oldHealth == 0.75 then
@@ -4441,7 +4436,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end,
 
         ---@param self Unit
-        ---@param work any
+        ---@param work Enhancement
         OnWorkEnd = function(self, work)
             self:ClearWork()
             self:SetActiveConsumptionInactive()
