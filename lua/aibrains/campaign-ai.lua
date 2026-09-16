@@ -955,15 +955,15 @@ AIBrain = Class(StandardBrain) {
     ---@param location string
     ---@return FactoryUnit[]
     PBMGetAllFactories = function(self, location)
-        for _, loc in pairs(self.PBM.Locations) do
+        for _, loc in self.PBM.Locations do
             if loc.LocationType ~= location then continue end
 
             local facs = {}
-            for _, v in pairs(loc.PrimaryFactories) do
+            for _, v in loc.PrimaryFactories do
                 TableInsert(facs, v)
                 if v.Dead then continue end
 
-                for _, fac in pairs(v:GetGuards()) do
+                for _, fac in v:GetGuards() do
                     if EntityCategoryContains(factoryCategories, fac) then
                         TableInsert(facs, fac)
                     end
