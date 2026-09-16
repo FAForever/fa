@@ -1227,7 +1227,7 @@ BaseManager = ClassSimple {
     ---@param self BaseManager
     ---@param groupName string
     ---@param uncapturable? boolean
-    ---@param balance? number
+    ---@param balance? boolean
     SpawnGroup = function(self, groupName, uncapturable, balance)
         local unitGroup = ScenarioUtils.CreateArmyGroup(self.AIBrain.Name, groupName, nil, balance)
 
