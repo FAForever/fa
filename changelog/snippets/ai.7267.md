@@ -1,0 +1,3 @@
+- Created a new file with helper functions for formation commands that orient the formations correctly by angle on each node. (#7267)
+- Refactored platoon and ScenarioFramework to use the new formation commads. (#7267)
+- Attack platoons in campaign now orient formations correctly, so units move through path nodes faster. (#7267)
