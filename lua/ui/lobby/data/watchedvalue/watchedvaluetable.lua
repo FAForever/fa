@@ -24,13 +24,13 @@ LoggingEnabled = false
 LoggedChanges = {}
 
 --- A flat, fixed-keyset table eagerly populated with WatchedValues
----@class WatchedValueTable
----@field pairs fun(): table, any, nil
+---@class WatchedValueTable<K, V>
+---@field pairs fun(): fun(t: table<nonnil, WatchedValue<V>>, k: K): (K, V), table<nonnil, WatchedValue<V>>, nil
 WatchedValueTable = ClassSimple {
     __init = function(self, initialMapping)
         -- Where the values are really stored (__index and friends only apply if the keys are absent)
         -- We hide this away in the closure of the metatable.
-        local _store = {}
+        local _store = {} ---@type table<nonnil, WatchedValue>
         if LoggingEnabled then
             table.print(initialMapping, 'WatchedValueTable initialMapping')
         end
