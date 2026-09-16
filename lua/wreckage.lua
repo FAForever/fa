@@ -63,7 +63,7 @@ Wreckage = Class(Prop) {
     ---@return Wreckage
     Clone = function(self)
         local clone = CreateWreckage(
-            __blueprints[self.AssociatedBP]--[[@as UnitBlueprint]],
+            __blueprints[self.AssociatedBP] --[[@as UnitBlueprint]],
             self.CachePosition,
             self:GetOrientation(),
             self.MaxMassReclaim,
@@ -117,7 +117,7 @@ Wreckage = Class(Prop) {
 ---@param deathHitBox? table
 ---@return Wreckage
 function CreateWreckage(bp, position, orientation, mass, energy, timeMult, deathHitBox)
-    local prop = CreateProp(position, bp.Wreckage.Blueprint)--[[@as Wreckage]]
+    local prop = CreateProp(position, bp.Wreckage.Blueprint) --[[@as Wreckage]]
     prop:SetOrientation(orientation, true)
     prop:SetScale(bp.Display.UniformScale)
 

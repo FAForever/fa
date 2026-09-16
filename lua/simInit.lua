@@ -45,7 +45,7 @@ doscript '/lua/SimHooks.lua'
 doscript '/lua/SimSync.lua'
 
 ---@type table<string, Vector>
-local syncStartPositions -- This is held here because the Sync table iFBlobas cleared between SetupSession() and BeginSession()
+local syncStartPositions -- This is held here because the Sync table is cleared between SetupSession() and BeginSession()
 
 function ShuffleStartPositions(syncNewPositions)
     local markers = ScenarioInfo.Env.Scenario.MasterChain._MASTERCHAIN_.Markers

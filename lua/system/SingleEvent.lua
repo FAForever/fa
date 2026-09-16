@@ -6,12 +6,14 @@
 -- before it has been called, you must clear the old one before setting the new one.
 ---@class SingleEvent
 ---@field _EventSet boolean
----@field _EventFun? function
+---@field _EventFun? fun(arg: any)
 ---@field _EventArg? any
+---@overload fun(): SingleEvent
 SingleEvent = ClassSimple {
+    ---@generic T
     ---@param self SingleEvent
-    ---@param fun function
-    ---@param arg any
+    ---@param fun fun(arg: T)
+    ---@param arg T
     OnEvent = function(self, fun, arg)
         if fun and self._EventFun then
             error('SingleEvent: only one trigger can be set at a time')
