@@ -54,6 +54,7 @@
 ---@field type string
 ---@field color string
 ---@field prop string
+---@field resource boolean|nil
 
 ---@class ResourceMarker: Marker
 ---@field resource boolean

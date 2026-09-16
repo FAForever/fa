@@ -6,20 +6,6 @@
 
 ---@alias SaveFile "AirAttacks" | "AirScout" | "BasicLandAttack" | "BomberEscort" | "HeavyLandAttack" | "LandAssualt" | "LeftoverCleanup" | "LightAirAttack" | "NavalAttacks" | "NavalFleet"
 
--- types that originate from the map
-
----@class MarkerChain
----@field Markers Marker[]       # Name reference to a marker chain as defined in the map
----@class Area: string           # Name reference to a area as defined in the map
-
----@class Marker: string         # Name reference to a marker as defined in the map
----@field position Vector        # A { x, y, z } array-based table
----@field orientation Vector     # heading, pitch, roll
----@field type string
----@field color string
----@field prop string
----@field resource boolean|nil
-
 -- types commonly used in repository
 
 ---@class FunctionName: string
