@@ -3,6 +3,12 @@ local Utilities = import("/lua/utilities.lua")
 local pairs, ipairs = pairs, ipairs
 local iscallable = iscallable
 
+local airCheckCategories = categories.AIR * categories.MOBILE - categories.TRANSPORTATION - categories.EXPERIMENTAL - categories.SCOUT
+local landCheckCategories = categories.LAND * categories.MOBILE - categories.ENGINEER - categories.EXPERIMENTAL - categories.SCOUT
+local navalCheckCategories = categories.NAVAL * categories.MOBILE - categories.EXPERIMENTAL
+local anyCheckCategories = categories.MOBILE - categories.ENGINEER - categories.TRANSPORTATION - categories.EXPERIMENTAL - categories.SCOUT
+
+
 -------------------------------------------------------------------------------------------------------------------------
 --- This is the AttackManager class that is used for campaign/coop
 --- Vanilla Supreme Commander (referred to as *SC1* from now on) used this along with the PBM for its skirmish AI as well
@@ -58,6 +64,7 @@ local iscallable = iscallable
 ---@field DestroyCallbacks FileFunctionRef[]|nil Table of functions called when the platoon is destroyed
 ---@field LocationType string Location from PBM -- used if you want to get units from pool
 ---@field PlatoonType "Air" | "Gate" | "Land" | "Sea" | "Any" MUST BE SET IF UsePool IS `true`
+---@field PlatoonAddFunctions FileFunctionRef[]
 ---@field UsePool boolean Bool to use pool or not. Defaults to `false`
 
 
@@ -72,7 +79,6 @@ local iscallable = iscallable
 ---@field AttackManagerState AttackManagerState Either 'ACTIVE' or 'PAUSED', used to check if the AM is active for an AI
 ---@field AMFormThread thread|nil
 AttackManager = ClassSimple {
-    brain = nil,
     NeedSort = false,
     PlatoonCount = { DefaultGroupAir = 0, DefaultGroupLand = 0, DefaultGroupSea = 0, },
 
@@ -240,7 +246,7 @@ AttackManager = ClassSimple {
     CheckAttackConditions = function(self, pltnInfo)
         for _, v in pairs(pltnInfo.AttackConditions) do
             if iscallable(v[1]) then
-                if not v[1](self.brain, unpack(v[2])) then
+                if not v[1](self.brain, unpack(v[2]--[[@as table]])) then
                     return false
                 end
             else
@@ -274,6 +280,7 @@ AttackManager = ClassSimple {
 	---@param self AttackManager
     FormAttackPlatoon = function(self)
         local poolPlatoon = self.brain:GetPlatoonUniquelyNamed('ArmyPool')
+        ---@cast poolPlatoon -nil
 
 		-- Loop through all of the AM platoons
         for _, v in ipairs(self.Platoons) do
@@ -330,16 +337,16 @@ AttackManager = ClassSimple {
                 local checkCategory
                 -- Only T1-T3 aerial combat units
                 if v.PlatoonType == 'Air' then
-                    checkCategory = categories.AIR * categories.MOBILE - categories.TRANSPORTATION - categories.EXPERIMENTAL - categories.SCOUT
+                    checkCategory = airCheckCategories
                 -- Only T1-T3 surface combat units
                 elseif v.PlatoonType == 'Land' then
-                    checkCategory = categories.LAND * categories.MOBILE - categories.ENGINEER - categories.EXPERIMENTAL - categories.SCOUT
+                    checkCategory = landCheckCategories
                 -- Only T1-T3 naval combat units
                 elseif v.PlatoonType == 'Sea' then
-                    checkCategory = categories.NAVAL * categories.MOBILE - categories.EXPERIMENTAL
+                    checkCategory = navalCheckCategories
                 -- Only T1-T3 combined-arms combat units
                 elseif v.PlatoonType == 'Any' then
-                    checkCategory = categories.MOBILE - categories.ENGINEER - categories.TRANSPORTATION - categories.EXPERIMENTAL - categories.SCOUT
+                    checkCategory = anyCheckCategories
                 else
                     error('*AI WARNING: Invalid Platoon Type - ' .. v.PlatoonType, 2)
                 end
@@ -349,7 +356,7 @@ AttackManager = ClassSimple {
 
                 -- If the AM platoon has a base of origin, it will only grab ArmyPool units from near it
                 if v.LocationType then
-                    local location = false
+                    local location
                     for locNum, locData in self.brain.PBM.Locations do
                         if v.LocationType == locData.LocationType then
                             location = locData
