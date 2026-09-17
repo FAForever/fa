@@ -1373,6 +1373,6 @@ function _c_CreateEntity(entity, spec)
 end
 
 ---@param shield Shield
----@param spec UnitBlueprintDefenseShield
+---@param spec CShieldSpec | nil # `nil` must be explicit to make it a 2-arg call
 function _c_CreateShield(shield, spec)
 end

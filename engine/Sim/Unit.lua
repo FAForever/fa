@@ -772,4 +772,9 @@ Unit.OnRunOutOfFuel = nil
 ---@type fun(self: Unit)
 Unit.OnGotFuel = nil
 
+--- Called by the engine for `SHIELD` category units to determine if our 
+--- focused entity (a shield) is valid for repair tasks.
+---@type nil | fun(self: Unit): boolean
+Unit.ShieldIsOn = nil
+
 return Unit

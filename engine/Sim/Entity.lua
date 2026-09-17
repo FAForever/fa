@@ -438,4 +438,22 @@ end
 function Entity:SinkAway(dy)
 end
 
+--- Used by engine to regen HP when a shield's owner is repaired.
+---
+--- This behavior requires:
+--- - the owner to be `SHIELD` category
+--- - `Owner.ShieldIsOn() == true`
+--- - owner's focus entity is the shield
+--- 
+--- The exact amount regenerated is `RegenRate * RepairerBuildrate / RegenAssistMult`,
+--- ignoring resource consumption fraction (stalling).
+--- 
+--- Technically this can work for any focused entity, not just shield entities.
+---
+---@see Unit.ShieldIsOn
+---@see Unit.SetFocusEntity
+---@see UnitBlueprintDefenseShield.RegenAssistMult
+---@type number?
+Entity.RegenRate = nil
+
 return Entity
