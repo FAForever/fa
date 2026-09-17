@@ -16,6 +16,11 @@ local LazyVarCreate = import("/lua/lazyvar.lua").Create
 Text = ClassUI(moho.text_methods, Control) {
 
     __init = function(self, parent, debugname)
+
+        self._truncationText = "..."
+        self._fullText = ""
+        self._truncationEnabled = false
+
         InternalCreateText(self, parent)
         if debugname then
             self:SetName(debugname)
@@ -34,9 +39,6 @@ Text = ClassUI(moho.text_methods, Control) {
             self:SetNewColor(var())
         end
 
-        self._truncationText = "..."
-        self._fullText = ""
-        self._truncationEnabled = false
     end,
 
     OnInit = function(self)
@@ -135,7 +137,7 @@ Text = ClassUI(moho.text_methods, Control) {
             self.Width:Set(function() return math.floor(self.TextAdvance()) end)
         end
 
-        if truncationEnabled then
+        if truncationEnabled ~= nil then
             self:SetTruncationEnabled(truncationEnabled)
         end
 
