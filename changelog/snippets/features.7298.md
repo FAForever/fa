@@ -1,0 +1,1 @@
+- Add "Distribute Assisters" In a selection, takes all mobile shields, scouts, and stealth gens, distributes assist orders to the rest of the selection. changes current selection to only include the non assisters. Can be used by hotkey or right clicking the assist icon.(#7226).

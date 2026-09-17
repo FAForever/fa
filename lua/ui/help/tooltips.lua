@@ -38,7 +38,7 @@ Tooltips = {
     },
     assist = {
         title = "<LOC tooltipui0008>Assist",
-        description = "",
+        description = "Right-click to distribute assisters across selection.",
         keyID = "guard",
     },
     mode_hold = {
