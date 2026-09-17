@@ -1,0 +1,4 @@
+- Add truncation for the Text control (#7169):
+  - Accessible with `SetTruncationEnabled()`
+    - Use `SetTruncationText()` to assign custom trailing characters like "..." when text is cropped
+  - `SetText()` is split into `SetText()` and its implicitly called `SetDisplayText()`. This allows for text preprocessing operations such as truncation.
