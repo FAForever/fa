@@ -157,7 +157,7 @@ function CheckAvailableGates(aiBrain, locType)
         end
     end
     if pos then
-        local gates = GetOwnUnitsAroundPoint(aiBrain, categories.GATE, pos, rad)
+        local gates = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.GATE, pos, rad)
         if gates then
             for _, unit in gates do
                 if not unit:IsUnitState("TransportLoading") then

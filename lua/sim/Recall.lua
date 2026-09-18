@@ -230,7 +230,7 @@ local function RecallVotingThread(requestingArmy)
     requestingBrain.recallVotingThread = nil
 end
 
----@param army number
+---@param army Army
 ---@param vote boolean
 ---@param lastVote boolean
 ---@return boolean # if further user sync should happen
@@ -263,7 +263,7 @@ local function ArmyVoteRecall(army, vote, lastVote)
     return true
 end
 
----@param army number
+---@param army Army
 ---@param teammates number
 local function ArmyRequestRecall(army, teammates)
     local brain = GetArmyBrain(army)
@@ -459,7 +459,7 @@ function SyncRecallVote(vote)
 end
 
 ---@param teamSize number
----@param army number
+---@param army Army
 function SyncOpenRecallVote(teamSize, army)
     local sync = GetRecallSyncTable()
     local focus = GetFocusArmy()

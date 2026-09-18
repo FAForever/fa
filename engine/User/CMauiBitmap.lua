@@ -1,6 +1,8 @@
 ---@meta
 
 ---@class moho.bitmap_methods : moho.control_methods
+---@field BitmapWidth LazyVar<number>
+---@field BitmapHeight LazyVar<number>
 local CMauiBitmap = {}
 
 ---

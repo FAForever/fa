@@ -6,20 +6,6 @@
 
 ---@alias SaveFile "AirAttacks" | "AirScout" | "BasicLandAttack" | "BomberEscort" | "HeavyLandAttack" | "LandAssualt" | "LeftoverCleanup" | "LightAirAttack" | "NavalAttacks" | "NavalFleet"
 
--- types that originate from the map
-
----@class MarkerChain
----@field Markers Marker[]       # Name reference to a marker chain as defined in the map
----@class Area: string           # Name reference to a area as defined in the map
-
----@class Marker: string         # Name reference to a marker as defined in the map
----@field position Vector        # A { x, y, z } array-based table
----@field orientation Vector     # heading, pitch, roll
----@field type string
----@field color string
----@field prop string
----@field resource boolean|nil
-
 -- types commonly used in repository
 
 ---@class FunctionName: string
@@ -258,9 +244,7 @@ end
 
 ---@alias Enhancement string --TODO
 
----@class LevelName
----@field Name string
----@field Priority number
+---@alias LevelName BuildGroup
 
 ---@class ConditionalBuildData
 ---@field DecrementAssisting function       # Decreases `NumAssisting` by one
@@ -1241,7 +1225,7 @@ BaseManager = ClassSimple {
     ---@param self BaseManager
     ---@param groupName string
     ---@param uncapturable? boolean
-    ---@param balance? number
+    ---@param balance? boolean
     SpawnGroup = function(self, groupName, uncapturable, balance)
         local unitGroup = ScenarioUtils.CreateArmyGroup(self.AIBrain.Name, groupName, nil, balance)
 
