@@ -60,6 +60,7 @@ XSL0001 = ClassUnit(ACUUnit) {
         self:HideBone('Back_Upgrade', true)
         self:HideBone('Right_Upgrade', true)
         self:HideBone('Left_Upgrade', true)
+        self:HideBone('Left_Upgrade_Amplifier', true)
         self:AddBuildRestriction(categories.SERAPHIM *
             (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
     end,
