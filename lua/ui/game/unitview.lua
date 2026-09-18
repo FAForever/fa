@@ -24,10 +24,12 @@ local unitviewDetail = import("/lua/ui/game/unitviewdetail.lua")
 local Grid = import("/lua/maui/grid.lua").Grid
 local Construction = import("/lua/ui/game/construction.lua")
 local GameMain = import("/lua/ui/game/gamemain.lua")
+local SacuLoadout = import("/lua/ui/game/sacuLoadout.lua")
 
 local selectedUnit = nil
 local updateThread = nil
 local unitHP = {}
+
 controls = import("/lua/ui/controls.lua").Get()
 
 -- shared between sim and ui
@@ -379,7 +381,7 @@ function CreateQueueGrid(parent)
             for id, item in self.items do
                 if queue[id] then
                     item:Show()
-                    item.icon:SetTexture(UIUtil.UIFile('/icons/units/' .. queue[id].id .. '_icon.dds', true))
+                    item.icon:SetTexture(UIUtil.UIFile('/icons/units/' .. SacuLoadout.UnitBuildIconId(queue[id].id) .. '_icon.dds', true))
                     item.text:SetText(tostring(queue[id].count))
                 else
                     item:Hide()
@@ -660,8 +662,8 @@ function UpdateWindow(info)
         end
 
         if info.focus then
-            if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. info.focus.blueprintId .. '_icon.dds', true)) then
-                controls.actionIcon:SetTexture(UIUtil.UIFile('/icons/units/' .. info.focus.blueprintId .. '_icon.dds',
+            if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. SacuLoadout.UnitBuildIconId(info.focus.blueprintId) .. '_icon.dds', true)) then
+                controls.actionIcon:SetTexture(UIUtil.UIFile('/icons/units/' .. SacuLoadout.UnitBuildIconId(info.focus.blueprintId) .. '_icon.dds',
                     true))
             else
                 controls.actionIcon:SetTexture('/textures/ui/common/game/unit_view_icons/unidentified.dds')

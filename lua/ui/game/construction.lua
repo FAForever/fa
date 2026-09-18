@@ -4,7 +4,7 @@
 -- Summary: Construction management UI
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-
+local SacuLoadout = import('/lua/ui/game/sacuLoadout.lua')
 local UIUtil = import("/lua/ui/uiutil.lua")
 local DiskGetFileInfo = UIUtil.DiskGetFileInfo
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
@@ -45,6 +45,10 @@ local watchingUnit
 local prevBuildables = false
 local prevSelection = false
 local prevBuildCategories = false
+
+-- Note: the base icon fallback for generated SACU combo units lives in
+-- SacuLoadout.UnitBuildIconId() (shared with unitview.lua / unitviewDetail.lua)
+-- rather than being reimplemented here.
 
 -- Flag to indicate if every selected unit is a factory
 local allFactories = nil
@@ -420,6 +424,11 @@ function CreateTabs(type)
     elseif type == 'enhancement' then
         local selection = sortedOptions.selection
         local enhancements = selection[1]:GetBlueprint().Enhancements
+        local gatewaySacuId = SacuLoadout.GetSelectionSacuId(selection)
+        local isGatewaySelection = gatewaySacuId ~= nil
+        if isGatewaySelection then
+            enhancements = SacuLoadout.GetSacuEnhancements(gatewaySacuId)
+        end
         local enhCommon = import("/lua/enhancementcommon.lua")
         local enhancementPrefixes = {Back = 'b-', LCH = 'la-', RCH = 'ra-'}
         local newTabs = {}
@@ -459,7 +468,12 @@ function CreateTabs(type)
                         ---@field UnitID UnitId
 
                         enhTable.ID = enhName
-                        enhTable.UnitID = selection[1]:GetBlueprint().BlueprintId
+                        if isGatewaySelection then
+                            enhTable.UnitID = gatewaySacuId
+                        else
+                            local bp = selection[1]:GetBlueprint()
+                            enhTable.UnitID = bp.BaseBlueprintId or bp.BlueprintId
+                        end
                         table.insert(sortedOptions[slotName], enhTable)
                     end
                 end
@@ -571,8 +585,9 @@ function CommonLogic()
 
     controls.secondaryChoices.SetControlToType = function(control, type)
         local function SetIconTextures(control)
-            if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. control.Data.id .. '_icon.dds', true)) then
-                control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. control.Data.id .. '_icon.dds', true))
+            local iconId = SacuLoadout.UnitBuildIconId(control.Data.id)
+            if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. iconId .. '_icon.dds', true)) then
+                control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. iconId .. '_icon.dds', true))
             else
                 control.Icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
             end
@@ -762,7 +777,7 @@ function CommonLogic()
 
     controls.choices.SetControlToType = function(control, type)
         local function SetIconTextures(control, optID)
-            local id = optID or control.Data.id
+            local id = SacuLoadout.UnitBuildIconId(optID or control.Data.id)
             if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds', true)) then
                 control.Icon:SetTexture(UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds', true))
             else
@@ -852,6 +867,9 @@ function CommonLogic()
             if control.Data.Disabled then
                 control:Enable()
                 control.Data.TooltipOnly = true
+                if control.Data.enhTable.DisableInGateway then
+                    control.tooltipID = LOC('<LOC sacu_gateway_disabled_tooltip>This cannot be built in from the gateway.')
+                end
                 if not control.Data.Selected then
                     control.Icon:SetSolidColor('aa000000')
                 end
@@ -1158,7 +1176,9 @@ function OnRolloverHandler(button, state)
         elseif item.type == 'queuestack' or item.type == 'unitstack' or item.type == 'attachedunit' then
             UnitViewDetail.Show(__blueprints[item.id], nil, item.id)
         elseif item.type == 'enhancement' then
-            UnitViewDetail.ShowEnhancement(item.enhTable, item.unitID, item.icon, GetEnhancementPrefix(item.unitID, item.icon), sortedOptions.selection[1])
+            -- True if this enhancement is disabled for gateway queuing.
+            local disabledInGateway = item.enhTable.DisableInGateway and SacuLoadout.IsGatewaySelection(sortedOptions.selection)
+            UnitViewDetail.ShowEnhancement(item.enhTable, item.unitID, item.icon, GetEnhancementPrefix(item.unitID, item.icon), sortedOptions.selection[1], disabledInGateway)
         elseif item.type == 'enhancementqueue' then
             UnitViewDetail.ShowEnhancement(item.enhancement, item.unitID, item.icon, GetEnhancementPrefix(item.unitID, item.icon), sortedOptions.selection[1])
         end
@@ -1523,6 +1543,13 @@ function OnClickHandler(button, modifiers)
         end
 
     elseif item.type == 'enhancement' and button.Data.TooltipOnly == false then
+        if SacuLoadout.IsGatewaySelection(sortedOptions.selection) then
+            SacuLoadout.OnSlotIconClick(item, modifiers)
+            if activeTab then
+                OnNestedTabCheck(activeTab, true)
+            end
+            return
+        end
         local doOrder = true
         local clean = not modifiers.Shift
         local enhancementQueue = getEnhancementQueue()
@@ -1952,6 +1979,15 @@ function CreateExtraControls(controlType)
             controls.extraBtn1:Disable()
         end
 
+        controls.extraBtn1.icon.OnTexture = UIUtil.UIFile('/game/construct-sm_btn/infinite_on.dds')
+        controls.extraBtn1.icon.OffTexture = UIUtil.UIFile('/game/construct-sm_btn/infinite_off.dds')
+        controls.extraBtn1.icon:Show()
+        if controls.extraBtn1:IsDisabled() then
+            controls.extraBtn1.icon:SetTexture(controls.extraBtn1.icon.OffTexture)
+        else
+            controls.extraBtn1.icon:SetTexture(controls.extraBtn1.icon.OnTexture)
+        end
+
         SetupPauseButton()
     elseif controlType == 'selection' then
         Tooltip.AddCheckboxTooltip(controls.extraBtn1, 'save_template')
@@ -1985,6 +2021,30 @@ function CreateExtraControls(controlType)
         end
         SetupPauseButton()
     elseif controlType == 'enhancement' then
+        if SacuLoadout.IsGatewaySelection(sortedOptions.selection) then
+            Tooltip.AddCheckboxTooltip(controls.extraBtn1, 'construction_infinite')
+            controls.extraBtn1.OnClick = function(self, modifiers)
+                return Checkbox.OnClick(self, modifiers)
+            end
+            controls.extraBtn1.OnCheck = function(self, checked)
+                for _, v in sortedOptions.selection do
+                    v:ProcessInfo('SetRepeatQueue', tostring(checked))
+                end
+            end
+            local repeatOn = true
+            for _, v in sortedOptions.selection do
+                if not v:IsRepeatQueue() then
+                    repeatOn = false
+                    break
+                end
+            end
+            controls.extraBtn1:SetCheck(repeatOn, true)
+            controls.extraBtn1:Enable()
+            controls.extraBtn1.icon.OnTexture = UIUtil.UIFile('/game/construct-sm_btn/infinite_on.dds')
+            controls.extraBtn1.icon.OffTexture = UIUtil.UIFile('/game/construct-sm_btn/infinite_off.dds')
+            controls.extraBtn1.icon:Show()
+            controls.extraBtn1.icon:SetTexture(controls.extraBtn1.icon.OnTexture)
+        end
         SetupPauseButton()
     else
         controls.extraBtn1:Disable()
@@ -2212,6 +2272,10 @@ function FormatData(unitData, type)
             end
         end
 
+        -- Computed once here rather than per-enhancement inside AddEnhancement below -
+        -- sortedOptions.selection doesn't change across a single FormatData call.
+        local isGatewaySelection = SacuLoadout.IsGatewaySelection(sortedOptions.selection)
+
         local function AddEnhancement(enhTable)
             local iconData = {
                 type = 'enhancement',
@@ -2222,6 +2286,11 @@ function FormatData(unitData, type)
                 Selected = false,
                 Disabled = false,
             }
+            if isGatewaySelection then
+                iconData.Selected = SacuLoadout.IsEnhancementSelected(enhTable.UnitID, enhTable.ID)
+                -- Disables enhancements not allowed from the gateway.
+                iconData.Disabled = enhTable.DisableInGateway == true
+            end
             if enhancementQueue then
                 local slot = enhTable.Slot
                 if existingEnhancements[slot] == enhTable.ID then
@@ -2520,6 +2589,14 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         capturingKeys = false
         -- Sorting down units
         local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
+        local visibleBuildableUnits = {}
+        for _, unitId in buildableUnits do
+            local unitBp = __blueprints[unitId]
+            if not unitBp.CategoriesHash.SACULOADOUTCOMBO then
+                table.insert(visibleBuildableUnits, unitId)
+            end
+        end
+        buildableUnits = visibleBuildableUnits
         if not isOldSelection then
             previousTabSet = nil
             previousTabSize = nil
@@ -2611,7 +2688,8 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             end
         end
 
-        if table.getn(selection) == 1 and selection[1]:GetBlueprint().Enhancements then
+        local isGatewaySelection = SacuLoadout.IsGatewaySelection(selection)
+        if (table.getn(selection) == 1 and selection[1]:GetBlueprint().Enhancements) or isGatewaySelection then
             controls.enhancementTab:Enable()
         else
             controls.enhancementTab:Disable()
@@ -2688,8 +2766,11 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         end
 
         -- Upgrade multiple SCU at once
-        if selection[1]:GetBlueprint().Enhancements and allSameUnit then
+        local isGatewaySelection = SacuLoadout.IsGatewaySelection(selection)
+        if (table.getn(selection) == 1 and selection[1]:GetBlueprint().Enhancements) or isGatewaySelection then
             controls.enhancementTab:Enable()
+        else
+            controls.enhancementTab:Disable()
         end
 
         -- Allow all races to build other races templates

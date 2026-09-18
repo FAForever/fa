@@ -83,6 +83,7 @@ doscript("/lua/system/blueprints-projectiles.lua")
 doscript("/lua/system/blueprints-units.lua")
 doscript("/lua/system/blueprints-props.lua")
 doscript("/lua/system/blueprints-weapons.lua")
+doscript("/lua/system/blueprints-sacu-combos.lua")
 
 --- Special table merge function that allows setting a field to `nil`.
 ---@param t1 table
@@ -1117,6 +1118,7 @@ function PostModBlueprints(all_bps)
     -- Brute51: Modified code for ship wrecks and added code for SCU presets.
     -- removed the pairs() function call in the for loops for better efficiency and because it is not necessary.
     local preset_bps = {}
+    InjectSacuLoadoutPresets(all_bps)
 
     SpawnMenuDummyChanges(all_bps.Unit)
     
@@ -1149,6 +1151,7 @@ function PostModBlueprints(all_bps)
     end
 
     HandleUnitWithBuildPresets(preset_bps, all_bps)
+    MarkHiddenSacuLoadoutPresets(all_bps)
 
     -- find custom strategic icons defined by ui mods, this should be the very last thing 
     -- we do before releasing the blueprint values to the game as we want to catch all
