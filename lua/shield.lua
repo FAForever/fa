@@ -830,7 +830,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
         -- special behavior for projectiles that always collide with
         -- shields, like the seraphim storm when the Ythotha dies
-        if other.CollideFriendlyShield then
+        if other.Blueprint.Physics.CollideFriendlyShield then
             return true
         end
 
@@ -1547,7 +1547,7 @@ AntiArtilleryShield = ClassShield(Shield) {
             return false
         end
 
-        if other:GetBlueprint().Physics.CollideFriendlyShield and other.DamageData.ArtilleryShieldBlocks then
+        if other.Blueprint.Physics.CollideFriendlyShield and other.DamageData.ArtilleryShieldBlocks then
             return true
         end
 
