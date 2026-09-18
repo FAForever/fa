@@ -64,6 +64,7 @@ local SuspendCurrentThread = SuspendCurrentThread
 local ForkThread = ForkThread
 local ResumeThread = ResumeThread
 local ChangeState = ChangeState
+---@diagnostic disable-next-line: deprecated
 local ArmyGetHandicap = ArmyGetHandicap
 local WaitTicks = WaitTicks
 local CreateEmitterAtBone = CreateEmitterAtBone
@@ -118,7 +119,8 @@ local DEFAULT_OPTIONS = {
     MeshZ = '',
     ImpactMesh = '',
     ImpactEffects = '',
-    Size = 10,
+    Size = 10, -- also known as ShieldSize in bp
+    -- RegenAssistMulti = 1, -- Engine default is 1, but blueprints always use 60
     ShieldMaxHealth = 250,
     ShieldRechargeTime = 10,
     ShieldEnergyDrainRechargeTime = 10,
@@ -140,11 +142,16 @@ for k, bp in __blueprints do
         if not (bp.BlueprintId == "xac2101" or bp.BlueprintId == "xes0205") then
             local size = bp.Defense.Shield.ShieldSize
             if size > LargestShieldDiameter then
+                ---@cast size -nil
                 LargestShieldDiameter = size
             end
         end
     end
 end
+
+---@class ShieldSpec : UnitBlueprintDefenseShield, CShieldSpec
+---@field Size number # corresponds to ShieldSize in bp
+---@field Owner Unit
 
 ---@class Shield : moho.shield_methods, Entity
 ---@field Army Army
@@ -155,7 +162,12 @@ end
 ---@field MeshBp string
 ---@field MeshZBp string
 ---@field Enabled boolean
----@field ShieldType ShieldType
+---@field Recharged? boolean
+---@field DepletedByEnergy? boolean
+---@field DepletedByDamage? boolean
+---@field NoEnergyToSustain? boolean
+---@field RolledFromFactory? boolean
+---@field ShieldType ShieldType | 'Bubble'
 ---@field SpillOverDmgMod number
 ---@field ShieldRechargeTime number
 ---@field ShieldEnergyDrainRechargeTime number
@@ -169,33 +181,44 @@ end
 ---@field DisallowCollisions boolean
 ---@field AssistCostEnergyPerBuildRate? number
 ---@field AssistCostMassPerBuildRate? number
+---@field RegenThread thread | function
 ---@field StaticShield? boolean
 ---@field CommandShield? boolean
 ---@field DamagedTick table<string, integer>
 ---@field DamagedRegular table<string, integer|false>
 ---@field DamagedOverspill table<string, number>
 ---@field LiveImpactEntities integer
----@field ImpactEntitySpecs { Owner: Unit }
+---@field ImpactEntitySpecs EntitySpec
+---@field RegenThreadStartTick integer
+---@field RegenThreadSuspended boolean
+---@field RegenThreadState "On"
+---@field OverlappingShields? Shield[]
+---@field OverlappingShieldsCount? integer
+---@field ImpactEffects FileName[]
+---@field Trash TrashBag
+---@field MeshZ Entity # Shield mesh entity
+---@overload fun(spec: UnitBlueprintDefenseShield, owner: Unit): Shield
 Shield = ClassShield(moho.shield_methods, Entity) {
 
     RemainEnabledWhenAttached = false,
 
     ---@param self Shield
-    ---@param spec table
-    ---@param owner any
+    ---@param spec UnitBlueprintDefenseShield
+    ---@param owner Unit
     __init = function(self, spec, owner)
         -- This key deviates in name from the blueprints...
         spec.Size = spec.ShieldSize
 
         -- Apply default options
-        local spec = TableAssimilate(spec, DEFAULT_OPTIONS)
+        spec = TableAssimilate(spec, DEFAULT_OPTIONS)
         spec.Owner = owner
+        ---@cast spec ShieldSpec
 
         _c_CreateShield(self, spec)
     end,
 
     ---@param self Shield
-    ---@param spec unknown is this Entity?
+    ---@param spec ShieldSpec
     OnCreate = function(self, spec)
         -- cache information that is used frequently
         self.Army = EntityGetArmy(self)
@@ -284,8 +307,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         -- manage regeneration thread
         self.RegenThreadSuspended = true
         self.RegenThreadState = "On"
-        self.RegenThread = ForkThread(self.RegenThread, self)
-        TrashAdd(self.Trash, self.RegenThread)
+        self.RegenThread = ForkThread(self.RegenThread --[[@as fun(self: Shield)]], self)
+        TrashAdd(self.Trash, self.RegenThread --[[@as thread]])
 
         -- manage the loss of shield when energy is depleted
         self.Brain:AddEnergyDependingEntity(self)
@@ -305,6 +328,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         end
     end,
 
+    ---@param self Shield
     RegenThread = function(self)
 
         -- cache globals
@@ -405,8 +429,10 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     end,
 
     --- Retrieves allied shields that overlap with this shield, caches the results per tick
-    -- @param self A shield that we're computing the overlapping shields for
-    -- @param tick Optional parameter, represents the game tick. Used to determine if we need to refresh the cache
+    ---@param self Shield
+    ---@param tick integer # Optional parameter, represents the game tick. Used to determine if we need to refresh the cache
+    ---@return Shield[]
+    ---@return number # Number of overlapping shields
     GetOverlappingShields = function(self, tick)
 
         -- allow the game tick to be send to us, saves cycles
@@ -490,6 +516,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         return self.OverlappingShields, self.OverlappingShieldsCount
     end,
 
+    ---@param self Shield
+    ---@param value number
     UpdateShieldRatio = function(self, value)
         if value >= 0 then
             self.Owner:SetShieldRatio(value)
@@ -547,6 +575,11 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         return finalVal
     end,
 
+    ---@param self Shield
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector Vector
+    ---@param damageType DamageType
     OnDamage = function(self, instigator, amount, vector, damageType)
 
         -- only applies to trees
@@ -562,7 +595,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     ---@param self Shield
     ---@param instigator Unit
     ---@param amount number
-    ---@param vector Vector
+    ---@param vector? Vector
     ---@param dmgType DamageType
     ---@param doOverspill? boolean Defaults to `false`
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
@@ -674,7 +707,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             else
                 self.RegenThreadStartTick = tick + 10 * self.RegenStartTime
                 if self.RegenThreadSuspended then
-                    ResumeThread(self.RegenThread)
+                    ResumeThread(self.RegenThread --[[@as thread]])
                 end
             end
         end
@@ -710,6 +743,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         end
     end,
 
+    ---@param self Shield
+    ---@param vector Vector
     CreateImpactEffect = function(self, vector)
 
         if IsDestroyed(self) then
@@ -773,7 +808,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
     --- Called when a shield collides with a projectile to check if the collision is valid
     ---@param self Shield # The shield we're checking the collision for
-    ---@param other Projectile # The projectile we're checking the collision with
+    ---@param other Projectile | ShiledCollider # The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
 
         if self.DisallowCollisions then
@@ -782,6 +817,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
         -- special logic when it is a projectile to simulate air crashes
         if other.CrashingAirplaneShieldCollisionLogic then
+            ---@cast other ShiledCollider
             if other.ShieldImpacted then
                 return false
             else
@@ -799,7 +835,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         end
 
         if -- our projectiles do not collide with our shields
-        self.Army == other.Army
+            self.Army == other.Army
             -- neutral projectiles do not collide with any shields
             or other.Army == -1
         then
@@ -817,7 +853,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     end,
 
     --- Called when a shield collides with a collision beam to check if the collision is valid
-    ---@param self Shield # The shield we're checking the collision for
+    ---@param self Shield
     ---@param firingWeapon Weapon # The weapon the beam originates from that we're checking the collision with
     OnCollisionCheckWeapon = function(self, firingWeapon)
 
@@ -909,7 +945,10 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         end
     end,
 
-    -- Basically run a timer, but with visual bar movement
+    --- Basically run a timer, but with visual bar movement
+    ---@param self Shield
+    ---@param curProgress number
+    ---@param time number
     ChargingUp = function(self, curProgress, time)
 
         local max = 1
@@ -929,6 +968,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     end,
 
     OnState = State {
+        ---@param self Shield.OnState
         Main = function(self)
 
             -- always start consuming energy at this point
@@ -952,7 +992,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
                 -- unsuspend the regeneration thread
                 if self.RegenThreadSuspended then
-                    ResumeThread(self.RegenThread)
+                    ResumeThread(self.RegenThread --[[@as thread]])
                 end
 
                 -- introduce the shield bar
@@ -969,6 +1009,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             self.RolledFromFactory = true
         end,
 
+        ---@param self Shield.OnState
         IsOn = function(self)
             return true
         end,
@@ -976,7 +1017,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
     -- When manually turned off
     OffState = State {
-
+        ---@param self Shield.OffState
         Main = function(self)
 
             -- update internal state
@@ -993,12 +1034,14 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             self.Owner:PlayUnitSound('ShieldOff')
         end,
 
+        ---@param self Shield.OffState
         IsOn = function(self)
             return false
         end,
     },
 
     RechargeState = State {
+        ---@param self Shield.RechargeState
         Main = function(self)
 
             -- determine recharge time
@@ -1029,12 +1072,14 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             ChangeState(self, self.OnState)
         end,
 
+        ---@param self Shield.RechargeState
         IsOn = function(self)
             return false
         end,
     },
 
     DamageDrainedState = State {
+        ---@param self Shield.DamageDrainedState
         Main = function(self)
 
             -- update internal state
@@ -1053,12 +1098,14 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             ChangeState(self, self.RechargeState)
         end,
 
+        ---@param self Shield.DamageDrainedState
         IsOn = function(self)
             return false
         end,
     },
 
     EnergyDrainedState = State {
+        ---@param self Shield.EnergyDrainedState
         Main = function(self)
 
             -- update internal state
@@ -1078,15 +1125,18 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             -- ChangeState(self, self.RechargeState)
         end,
 
+        ---@param self Shield.EnergyDrainedState
         IsOn = function(self)
             return false
         end,
     },
 
     DeadState = State {
+        ---@param self Shield.DeadState
         Main = function(self)
         end,
 
+        ---@param self Shield.DeadState
         IsOn = function(self)
             return false
         end,
@@ -1096,7 +1146,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
     ---@deprecated
     DamageRechargeState = State {
-
+        ---@param self Shield.DamageRechargeState
         Main = function(self)
             -- back to the regular onstate
             ChangeState(self, self.RechargeState)
@@ -1104,37 +1154,44 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     },
 
     ---@deprecated
+    ---@param self Shield
     GetCachePosition = function(self)
         return self:GetPosition()
     end,
 
     ---@deprecated
+    ---@param self Shield
     SetRechargeTime = function(self, rechargeTime, energyRechargeTime)
         self.ShieldRechargeTime = rechargeTime
         self.ShieldEnergyDrainRechargeTime = energyRechargeTime
     end,
 
     ---@deprecated
+    ---@param self Shield
     SetVerticalOffset = function(self, offset)
         self.ShieldVerticalOffset = offset
     end,
 
     ---@deprecated
+    ---@param self Shield
     SetSize = function(self, size)
         self.Size = size
     end,
 
     ---@deprecated
+    ---@param self Shield
     SetShieldRegenRate = function(self, rate)
         self.RegenRate = rate
     end,
 
     ---@deprecated
+    ---@param self Shield
     SetShieldRegenStartTime = function(self, time)
         self.RegenStartTime = time
     end,
 
     ---@deprecated
+    ---@param self Shield
     SetType = function(self, type)
         self.ShieldType = type
     end,
@@ -1144,7 +1201,15 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
 --- A bubble shield attached to a single unit.
 ---@class PersonalBubble : Shield
+---@field SizeX number
+---@field SizeY number
+---@field SizeZ number
+---@field ShieldSize number?
+---@field ShieldType "Personal"
+---@overload fun(spec: UnitBlueprintDefenseShield, owner: Unit): PersonalBubble
 PersonalBubble = ClassShield(Shield) {
+    ---@param self PersonalBubble
+    ---@param spec ShieldSpec
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
 
@@ -1163,6 +1228,12 @@ PersonalBubble = ClassShield(Shield) {
         EntitySetCollisionShape(self, 'None')
     end,
 
+    ---@param self PersonalBubble
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector? Vector
+    ---@param dmgType DamageType
+    ---@param doOverspill? boolean Defaults to `false`
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
         -- We want all personal shields to pass overkill damage, including this one
         -- Was handled by self.PassOverkillDamage bp value, now defunct
@@ -1176,17 +1247,20 @@ PersonalBubble = ClassShield(Shield) {
         Shield.ApplyDamage(self, instigator, amount, vector, dmgType, doOverspill)
     end,
 
+    ---@param self PersonalBubble
     CreateShieldMesh = function(self)
         Shield.CreateShieldMesh(self)
         EntitySetCollisionShape(self, 'None')
     end,
 
+    ---@param self PersonalBubble
     RemoveShield = function(self)
         Shield.RemoveShield(self)
         EntitySetCollisionShape(self, 'None')
     end,
 
     OnState = State(Shield.OnState) {
+        ---@param self PersonalBubble.OnState
         Main = function(self)
             -- Set the collision profile of the unit to match the apparent shield sphere.
             -- Since the collision handler in Unit deals with personal shields, the damage will be
@@ -1197,6 +1271,7 @@ PersonalBubble = ClassShield(Shield) {
     },
 
     OffState = State(Shield.OffState) {
+        ---@param self PersonalBubble.OffState
         Main = function(self)
             -- When the shield is down for some reason, reset the unit's collision profile so it can
             -- again be hit.
@@ -1206,6 +1281,7 @@ PersonalBubble = ClassShield(Shield) {
     },
 
     RechargeState = State(Shield.RechargeState) {
+        ---@param self PersonalBubble.RechargeState
         Main = function(self)
             UnitRevertCollisionShape(self.Owner)
             Shield.RechargeState.Main(self)
@@ -1216,14 +1292,19 @@ PersonalBubble = ClassShield(Shield) {
 --- A personal bubble that can render a set of encompassed units invincible.
 -- Useful for shielded transports (to work around the area-damage bug).
 ---@class TransportShield : Shield
+---@field protectedUnits table<Unit, true?>
+---@overload fun(spec: UnitBlueprintDefenseShield, owner: Unit): TransportShield
 TransportShield = ClassShield(Shield) {
-
+    ---@param self TransportShield
+    ---@param spec ShieldSpec
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
         self.protectedUnits = {}
     end,
 
     -- toggle vulnerability of the transport and its content
+    ---@param self TransportShield
+    ---@param canTakeDamage boolean
     SetContentsVulnerable = function(self, canTakeDamage)
         for k, v in self.protectedUnits do
             k.CanTakeDamage = canTakeDamage
@@ -1231,17 +1312,22 @@ TransportShield = ClassShield(Shield) {
     end,
 
     -- we try and forget this unit
+    ---@param self TransportShield
+    ---@param unit Unit
     RemoveProtectedUnit = function(self, unit)
         self.protectedUnits[unit] = nil
         unit.CanTakeDamage = true
     end,
 
     -- we try and protect this unit
+    ---@param self TransportShield
+    ---@param unit Unit
     AddProtectedUnit = function(self, unit)
         self.protectedUnits[unit] = true
     end,
 
     OnState = State(Shield.OnState) {
+        ---@param self TransportShield.OnState
         Main = function(self)
             Shield.OnState.Main(self)
 
@@ -1250,6 +1336,8 @@ TransportShield = ClassShield(Shield) {
             self.Owner.CanTakeDamage = false
         end,
 
+        ---@param unit Unit
+        ---@param self TransportShield.OnState
         AddProtectedUnit = function(self, unit)
             self.protectedUnits[unit] = true
             unit.CanTakeDamage = false
@@ -1257,6 +1345,7 @@ TransportShield = ClassShield(Shield) {
     },
 
     OffState = State(Shield.OffState) {
+        ---@param self TransportShield.OffState
         Main = function(self)
             Shield.OffState.Main(self)
 
@@ -1267,6 +1356,7 @@ TransportShield = ClassShield(Shield) {
     },
 
     DamageDrainedState = State(Shield.DamageDrainedState) {
+        ---@param self TransportShield.DamageDrainedState
         Main = function(self)
             Shield.DamageDrainedState.Main(self)
 
@@ -1277,6 +1367,7 @@ TransportShield = ClassShield(Shield) {
     },
 
     EnergyDrainedState = State(Shield.EnergyDrainedState) {
+        ---@param self TransportShield.EnergyDrainedState
         Main = function(self)
             Shield.EnergyDrainedState.Main(self)
 
@@ -1290,14 +1381,33 @@ TransportShield = ClassShield(Shield) {
 --- A shield that sticks to the surface of the unit. Doesn't have its own collision physics, just
 -- grants extra health.
 ---@class PersonalShield : Shield
+---@field CollisionSizeX number # deprecated
+---@field CollisionSizeY number # deprecated
+---@field CollisionSizeZ number # deprecated
+---@field CollisionCenterX number # deprecated
+---@field CollisionCenterY number # deprecated
+---@field CollisionCenterZ number # deprecated
+---@field OwnerShieldMesh FileName | ''
+---@field ShieldType 'Personal'
+---@field ShieldEffectEntity Entity
+---@overload fun(spec: UnitBlueprintDefenseShield, owner: Unit): PersonalShield
 PersonalShield = ClassShield(Shield) {
 
     RemainEnabledWhenAttached = true,
 
+    ---@param self PersonalShield
+    ---@param spec ShieldSpec | LegacyShieldSpec
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
 
-        -- store information from spec
+        ---@class LegacyShieldSpec : ShieldSpec
+        ---@field CollisionSizeX number
+        ---@field CollisionSizeY number
+        ---@field CollisionSizeZ number
+        ---@field CollisionCenterX number
+        ---@field CollisionCenterY number
+        ---@field CollisionCenterZ number
+
         self.CollisionSizeX = spec.CollisionSizeX or 1
         self.CollisionSizeY = spec.CollisionSizeY or 1
         self.CollisionSizeZ = spec.CollisionSizeZ or 1
@@ -1313,6 +1423,12 @@ PersonalShield = ClassShield(Shield) {
         self.ShieldEffectEntity = Entity(self.ImpactEntitySpecs)
     end,
 
+    ---@param self PersonalShield
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector? Vector
+    ---@param dmgType DamageType
+    ---@param doOverspill? boolean Defaults to `false`
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
         -- We want all personal shields to pass overkill damage
         -- Was handled by self.PassOverkillDamage bp value, now defunct
@@ -1326,6 +1442,8 @@ PersonalShield = ClassShield(Shield) {
         Shield.ApplyDamage(self, instigator, amount, vector, dmgType, doOverspill)
     end,
 
+    ---@param self PersonalShield
+    ---@param vector Vector
     CreateImpactEffect = function(self, vector)
 
         if IsDestroyed(self) then
@@ -1369,6 +1487,7 @@ PersonalShield = ClassShield(Shield) {
         self.LiveImpactEntities = self.LiveImpactEntities - 1
     end,
 
+    ---@param self PersonalShield
     CreateShieldMesh = function(self)
         -- Personal shields (unit shields) don't handle collisions anymore.
         -- This is done in the Unit's OnDamage function instead.
@@ -1376,11 +1495,13 @@ PersonalShield = ClassShield(Shield) {
         EntitySetMesh(self.Owner, self.OwnerShieldMesh, true)
     end,
 
+    ---@param self PersonalShield
     RemoveShield = function(self)
         EntitySetCollisionShape(self, 'None')
         EntitySetMesh(self.Owner, self.Owner.Blueprint.Display.MeshBlueprint, true)
     end,
 
+    ---@param self PersonalShield
     OnDestroy = function(self)
         if not self.Owner.MyShield or self.Owner.MyShield.EntityId == self.EntityId then
             EntitySetMesh(self.Owner, self.Owner.Blueprint.Display.MeshBlueprint, true)
@@ -1391,12 +1512,18 @@ PersonalShield = ClassShield(Shield) {
 }
 
 ---@class AntiArtilleryShield : Shield
+---@field ShieldType 'AntiArtillery'
+---@overload fun(spec: UnitBlueprintDefenseShield, owner: Unit): AntiArtilleryShield
 AntiArtilleryShield = ClassShield(Shield) {
+    ---@param self AntiArtilleryShield
+    ---@param spec ShieldSpec
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
         self.ShieldType = 'AntiArtillery'
     end,
 
+    ---@param self AntiArtilleryShield
+    ---@param firingWeapon Weapon
     OnCollisionCheckWeapon = function(self, firingWeapon)
         local bp = firingWeapon:GetBlueprint()
         if bp.CollideFriendly == false then
@@ -1413,6 +1540,8 @@ AntiArtilleryShield = ClassShield(Shield) {
     end,
 
     -- Return true to process this collision, false to ignore it.
+    ---@param self AntiArtilleryShield
+    ---@param other Projectile
     OnCollisionCheck = function(self, other)
         if other.Army == -1 then
             return false
@@ -1432,7 +1561,11 @@ AntiArtilleryShield = ClassShield(Shield) {
 
 -- Pretty much the same as personal shield (no collisions), but has its own mesh and special effects.
 ---@class CzarShield : PersonalShield
+---@field ImpactMeshBp FileName
+---@field ImpactMeshBigBp FileName
+---@overload fun(spec: UnitBlueprintDefenseShield, owner: Unit): CzarShield
 CzarShield = ClassShield(PersonalShield) {
+    ---@param self CzarShield
     OnCreate = function(self, spec)
         PersonalShield.OnCreate(self, spec)
 
@@ -1441,6 +1574,8 @@ CzarShield = ClassShield(PersonalShield) {
     end,
 
 
+    ---@param self CzarShield
+    ---@param vector Vector
     CreateImpactEffect = function(self, vector)
 
         if IsDestroyed(self) then
@@ -1487,6 +1622,7 @@ CzarShield = ClassShield(PersonalShield) {
         self.LiveImpactEntities = self.LiveImpactEntities - 1
     end,
 
+    ---@param self CzarShield
     CreateShieldMesh = function(self)
         -- Personal shields (unit shields) don't handle collisions anymore.
         -- This is done in the Unit's OnDamage function instead.
@@ -1497,10 +1633,12 @@ CzarShield = ClassShield(PersonalShield) {
         self:SetDrawScale(self.Size)
     end,
 
+    ---@param self CzarShield
     OnDestroy = function(self)
         Shield.OnDestroy(self)
     end,
 
+    ---@param self CzarShield
     RemoveShield = function(self)
         Shield.RemoveShield(self)
         self:SetCollisionShape('None')

@@ -8,7 +8,9 @@ local Projectile = import("/lua/sim/projectile.lua").Projectile
 local VectorCached = Vector(0, 0, 0)
 
 -- Companion projectile enabling air units to hit shields
----@class ShiledCollider  : Projectile
+---@class ShiledCollider : Projectile
+---@field CrashingAirplaneShieldCollisionLogic true
+---@field ShieldImpacted? true
 ShieldCollider = ClassProjectile(Projectile) {
 
     ---@param self ShiledCollider
@@ -72,8 +74,8 @@ ShieldCollider = ClassProjectile(Projectile) {
 
     -- Destroy the sinking unit when it hits the ground.
     ---@param self ShiledCollider
-    ---@param targetType string
-    ---@param targetEntity Prop|Unit
+    ---@param targetType ImpactType
+    ---@param targetEntity Prop | Unit | Shield
     OnImpact = function(self, targetType, targetEntity)
         if self and not self:BeenDestroyed() and self.Plane and not self.Plane:BeenDestroyed() then
             if targetType == 'Terrain' or targetType == 'Water' then
