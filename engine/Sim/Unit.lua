@@ -769,29 +769,29 @@ function Unit:Kill(instigator, damageType, excessDamageRatio)
 end
 
 --- Called by the engine when the unit takes >= 2 times as much damage due to armor multi or handicap divisor.
----@type fun(self: Unit, type: DamageType)
+---@type fun(self: moho.unit_methods, type: DamageType)
 Unit.OnExtraDamageDealt = nil
 
 --- Called by the engine when a unit changes motion state,
 --- usually when it attaches/detaches from other entities such as transports.
----@type fun(self: Unit, new: MotionState, old: MotionState)
+---@type fun(self: moho.unit_methods, new: MotionState, old: MotionState)
 Unit.OnMotionStateChange = nil
 
 --- Called by the engine when the unit starts refueling at an air staging platform.
----@type fun(self: Unit)
+---@type fun(self: moho.unit_methods)
 Unit.OnStartRefueling = nil
 
 --- Called by the engine when the unit runs out of fuel.
----@type fun(self: Unit)
+---@type fun(self: moho.unit_methods)
 Unit.OnRunOutOfFuel = nil
 
 --- Called by the engine when the unit was out of fuel and recharges fuel (either by air staging or by landing).
----@type fun(self: Unit)
+---@type fun(self: moho.unit_methods)
 Unit.OnGotFuel = nil
 
 --- Called by the engine for `SHIELD` category units to determine if our 
 --- focused entity (a shield) is valid for repair tasks.
----@type nil | fun(self: Unit): boolean
+---@type nil | fun(self: moho.unit_methods): boolean
 Unit.ShieldIsOn = nil
 
 ---@alias UnitImpactType "Terrain" | "Water"
