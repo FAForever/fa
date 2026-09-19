@@ -1,7 +1,7 @@
 ---@meta
 
 ---@class EntitySpec
----@field Owner? Entity | integer # 0-indexed army index. Overrides `Army`.
+---@field Owner? moho.entity_methods | integer # 0-indexed army index. Overrides `Army`.
 ---@field Army? integer # 1-indexed army index
 
 ---@class moho.entity_methods : Destroyable
