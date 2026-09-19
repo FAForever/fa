@@ -290,6 +290,10 @@ end
 function Entity:IsValidBone(bone, allowNil)
 end
 
+--- Kills the entity and all attached entities, without any Lua callbacks.
+---
+---@see Unit.Kill # Kill with Lua callback and engine stats
+---@see Prop.Kill # Kill with Lua callback
 ---@overload fun()
 ---@param instigator Unit
 ---@param damageType DamageType

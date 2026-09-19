@@ -751,6 +751,17 @@ end
 function Unit:TransportHasSpaceFor(target)
 end
 
+--- Kills the unit, then does Lua callback and engine stat adjustments.
+---
+---@see Unit.CheckCanBeKilled
+---@see Unit.OnKilled
+---@overload fun()
+---@param instigator moho.entity_methods
+---@param damageType DamageType
+---@param excessDamageRatio number
+function Unit:Kill(instigator, damageType, excessDamageRatio)
+end
+
 --- Called by the engine when the unit takes >= 2 times as much damage due to armor multi or handicap divisor.
 ---@type fun(self: Unit, type: DamageType)
 Unit.OnExtraDamageDealt = nil
@@ -776,5 +787,8 @@ Unit.OnGotFuel = nil
 --- focused entity (a shield) is valid for repair tasks.
 ---@type nil | fun(self: Unit): boolean
 Unit.ShieldIsOn = nil
+
+---@type nil | fun(self: moho.unit_methods, instigator: moho.entity_methods, type: DamageType, overkillRatio: number)
+Unit.OnKilled = nil
 
 return Unit
