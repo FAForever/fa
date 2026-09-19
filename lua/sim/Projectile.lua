@@ -1059,7 +1059,7 @@ DummyProjectile = ClassDummyProjectile(ProjectileMethods) {
     ---@param inWater? boolean
     OnCreate = function(self, inWater)
         -- expected to be cached by all projectiles
-        self.Blueprint = EntityGetBlueprint(self)
+        self.Blueprint = EntityGetBlueprint(self) --[[@as ProjectileBlueprint]]
         self.Army = EntityGetArmy(self)
     end,
 
