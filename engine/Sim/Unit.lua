@@ -736,7 +736,13 @@ function Unit:ToggleScriptBit(bit)
 end
 
 --- detaches all units from this transport
----@param destroySomeUnits unknown
+--- 
+--- If `destroySomeUnits` is true, units have a 99% chance to be killed, except
+--- for `COMMAND` category units with `CheckCanBeKilled() == false`, which take
+--- 10000 "Damage" damage instead.
+--- 
+--- Units stored inside the transport are destroyed instead, calling `DestroyedOnTransport`
+---@param destroySomeUnits boolean
 function Unit:TransportDetachAllUnits(destroySomeUnits)
 end
 
@@ -787,6 +793,16 @@ Unit.OnGotFuel = nil
 --- focused entity (a shield) is valid for repair tasks.
 ---@type nil | fun(self: Unit): boolean
 Unit.ShieldIsOn = nil
+
+---@type nil | fun(self: moho.unit_methods): boolean
+Unit.CheckCanBeKilled = nil
+
+---@type nil | fun(self: moho.unit_methods): boolean
+Unit.CheckCanTakeDamage = nil
+
+--- Called when stored inside transport and destroyed.
+---@type nil | fun(self: moho.unit_methods)
+Unit.DestroyedOnTransport = nil
 
 ---@type nil | fun(self: moho.unit_methods, instigator: moho.entity_methods, type: DamageType, overkillRatio: number)
 Unit.OnKilled = nil
