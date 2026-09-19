@@ -54,22 +54,10 @@ function CreateDefaultBuildBeams(builder, unitBeingBuilt, buildEffectBones, buil
         beamEndBuilder = EntityCreateProjectile(unitBeingBuilt, '/effects/entities/UEFBuild/UEFBuild01_proj.bp', 0, 0, 0, nil, nil, nil)
         builder.UEFBuildProjectile = beamEndBuilder
         TrashBagAdd(builder.Trash, beamEndBuilder)
-        local _Destroy = builder.Trash.Destroy
-        builder.Trash.Destroy = function(self)
-            LOG(debug.traceback())
-            _Destroy(self)
-        end
-        LOG(beamEndBuilder)
-        LOG(__blueprints['/effects/entities/UEFBuild/UEFBuild01_proj.bp'].Lifetime)
     end
 
     -- reset the state of the projectile
-    local ok, msg = pcall(ProjectileSetVelocity, beamEndBuilder, 0)
-    if not ok then
-        WARN('CreatedAtTraceback: ', beamEndBuilder.CreatedAtTraceback)
-        WARN('DestroyedAtTraceback: ', beamEndBuilder.DestroyedAtTraceback)
-        error(msg)
-    end
+    ProjectileSetVelocity(beamEndBuilder, 0)
     TrashBagAdd(buildEffectsBag, CreateEmitterOnEntity(beamEndBuilder, army, '/effects/emitters/build_terran_glow_01_emit.bp'))
     TrashBagAdd(buildEffectsBag,  CreateEmitterOnEntity(beamEndBuilder, army, '/effects/emitters/sparks_08_emit.bp'))
 
