@@ -47,6 +47,11 @@
 ---| "Structure"
 ---| "TMD"
 
+---@class ArmorDefinition
+---@field [1] ArmorType
+---@field [integer] string # `"<DamageType> <multiplier>"`
+
+---@type ArmorDefinition[]
 armordefinition = {
 
     {   -- Armor Type Name
