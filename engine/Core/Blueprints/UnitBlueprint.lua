@@ -405,6 +405,8 @@
 ---@field SurfaceThreatLevel number
 
 ---@class UnitBlueprintDefenseShield
+--- The absorption type used to handle incoming damage types.
+---@field AbsorptionType? AbsorptionType
 --- If this shield only blocks weapons marked with `ArtilleryShieldBlocks`.
 --- Should not be defined with `PersonalBubble`, `PersonalShield`, or `TransportShield`.
 ---@field AntiArtilleryShield? boolean
