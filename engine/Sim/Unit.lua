@@ -794,6 +794,12 @@ Unit.OnGotFuel = nil
 ---@type nil | fun(self: Unit): boolean
 Unit.ShieldIsOn = nil
 
+---@alias UnitImpactType "Terrain" | "Water"
+
+--- Impact from ballistic motion state
+---@type nil | fun(self: moho.unit_methods, impactType: UnitImpactType)
+Unit.OnImpact = nil
+
 ---@type nil | fun(self: moho.unit_methods): boolean
 Unit.CheckCanBeKilled = nil
 
