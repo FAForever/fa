@@ -442,6 +442,14 @@ end
 function Entity:SinkAway(dy)
 end
 
+--- Called upon collision with a projectile. Return `false` to ignore it
+---@type fun(self: Entity, other: Projectile): boolean
+Entity.OnCollisionCheck = nil
+
+--- Called upon collision with a weapon's collision beam. Return `false` to ignore it
+---@type fun(self: Entity, firingWeapon: Weapon): boolean
+Entity.OnCollisionCheckWeapon = nil
+
 --- Used by engine to regen HP when a shield's owner is repaired.
 ---
 --- This behavior requires:

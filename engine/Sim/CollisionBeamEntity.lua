@@ -37,4 +37,7 @@ end
 function CCollisionBeamEntity:__init(spec)
 end
 
+---@type nil | fun(self: moho.CollisionBeamEntity, impactType: ImpactType, targetEntity: TargetObject?)
+CCollisionBeamEntity.OnImpact = nil
+
 return CCollisionBeamEntity

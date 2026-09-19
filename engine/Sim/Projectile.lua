@@ -237,4 +237,7 @@ end
 function Projectile:SetDamage(amount, radius)
 end
 
+---@type nil | fun(self: moho.projectile_methods, impactType: ImpactType, targetEntity: TargetObject?)
+Projectile.OnImpact = nil
+
 return Projectile
