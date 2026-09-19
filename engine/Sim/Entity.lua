@@ -450,6 +450,12 @@ Entity.OnCollisionCheck = nil
 ---@type fun(self: Entity, firingWeapon: Weapon): boolean
 Entity.OnCollisionCheckWeapon = nil
 
+---@see Damage
+---@see DamageArea
+---@see DamageRing
+---@type fun(self: Entity, instigator: Entity, amount: number, vector: Vector, damageType: DamageType): boolean
+Entity.OnDamage = nil
+
 --- Used by engine to regen HP when a shield's owner is repaired.
 ---
 --- This behavior requires:

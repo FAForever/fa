@@ -292,7 +292,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         end
     end,
 
-    --- Called by the engine when the projectile is killed, in other words: intercepted
+    --- Called by Lua when the projectile is killed (intercepted)
     ---@param self Projectile
     ---@param instigator Unit
     ---@param type string
