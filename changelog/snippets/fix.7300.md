@@ -1,1 +1,1 @@
-- Your explanation here... [Don't forget to change the category in the filename] (#7300).
+- Fix error with UEF build beam projectile being destroyed when setting its velocity (#7300).
