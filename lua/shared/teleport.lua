@@ -29,7 +29,10 @@
 -- Local performance upvalues
 local VDist3 = VDist3
 local MathPow = math.pow
-local MathSqrt = math.sqrt
+local MathMin = math.min
+local TableGetN = table.getn
+
+local IsKeyDown = IsKeyDown
 
 ---@param unit Unit | UserUnit
 ---@param location Vector
@@ -43,9 +46,10 @@ TeleportCostFunction = function(unit, location)
     local pos = unit:GetPosition()
 
     -- or, if queuing commands, use the position of the last teleport/move command
-    local queue = unit:GetCommandQueue() --[[@as (UICommandInfo[])]]
-    if table.getn(queue) > 0 then
-        for k = 1, table.getn(queue) do
+    local queue = unit:GetCommandQueue() --[[@as UICommandInfo[] | UnitCommand[] ]]
+    local queueN = TableGetN(queue)
+    if queueN > 0 then
+        for k = 1, queueN do
             local command = queue[k]
 
             -- this if statement can only be true in the UI code, so IsKeyDown works
@@ -58,16 +62,17 @@ TeleportCostFunction = function(unit, location)
     end
 
     local dist = VDist3(pos, location)
-    local teleDelay = bp.General.TeleportDelay or 0
-    local teleportFlatEnergyCost = bp.General.TeleportFlatEnergyCost or 75000
-    local teleportMaximumEnergyCost = bp.General.TeleportMaximumEnergyCost or 2500000
-    local teleportMaximumDuration = bp.General.TeleportMaximumDuration or 50
+    local bpGeneral = bp.General
+    local teleDelay = bpGeneral.TeleportDelay or 0
+    local teleportFlatEnergyCost = bpGeneral.TeleportFlatEnergyCost or 75000
+    local teleportMaximumEnergyCost = bpGeneral.TeleportMaximumEnergyCost or 2500000
+    local teleportMaximumDuration = bpGeneral.TeleportMaximumDuration or 50
     local bpEco = bp.Economy
     local energyCost, time
 
     if bpEco.UseVariableTeleportCosts then
-        energyCost = math.min(teleportFlatEnergyCost + (0.5 * math.pow(dist, 2.1)), teleportMaximumEnergyCost)
-        time = math.min(teleDelay + (0.00001 * math.pow(dist, 2.1)), teleportMaximumDuration)
+        energyCost = MathMin(teleportFlatEnergyCost + (0.5 * MathPow(dist, 2.1)), teleportMaximumEnergyCost)
+        time = MathMin(teleDelay + (0.00001 * MathPow(dist, 2.1)), teleportMaximumDuration)
 
         -- make sure the teleport destination effects appear on time
         teleDelay = time * 0.4
@@ -82,8 +87,8 @@ TeleportCostFunction = function(unit, location)
 
         if teleDelay then
             local energyCostMod = (time + teleDelay) / time
-            time = time + teleDelay
             energyCost = energyCost * energyCostMod
+            time = time + teleDelay
         end
     end
 
