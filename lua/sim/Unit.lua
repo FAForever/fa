@@ -2547,14 +2547,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         -- Turn off land bones if this unit has them.
         self:DoUnitCallbacks('OnStopBeingBuilt')
 
-        -- If we have a shield specified, create it.
-        -- Blueprint registration always creates a dummy Shield entry:
-        -- {
-        --     ShieldSize = 0
-        --     RegenAssistMult = 1
-        -- }
-        -- ... Which we must carefully ignore.
         local bpShield = blueprintDefense.Shield
+        --- Engine always creates a dummy entry `{ RegenAssistMult = 1, ShieldSize = 0 }`
+        ---@cast bpShield -nil
+        -- ignore the dummy entry
         if bpShield.ShieldSize ~= 0 then
             self:CreateShield(bpShield)
         end

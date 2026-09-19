@@ -377,6 +377,8 @@
 --- (It could be changed by a veterancy buff or enhancement)
 ---@field RegenRate number
 --- if the unit has a shield, the settings are held in a table here
+--- 
+--- Engine default is `{ RegenAssistMult = 1, ShieldSize = 0 }`
 ---@field Shield? UnitBlueprintDefenseShield
 --- if the various threat levels are not to be auto-generated at all for this unit
 ---@field SkipDynamicThreatCalculations? boolean
