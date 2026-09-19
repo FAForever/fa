@@ -198,6 +198,12 @@ else
 end
 ```
 
+## In-Depth Desync Debugging
+
+All desync-related data can be acquired from the engine by using the `/synclog <folder_path>` command line argument. For every game session (i.e. replay or skirmish), it creates a new folder that has logs for sim beat 0 (rule init sync, such as blueprint data) and the last `checksum_period + 20` (normally 70) sim beats. You can pause when the desync occurs to prevent deleting old sim beats, or in the game console, you can use `sim_KeepAllLogFiles` to retain all sim beats. When using sync logging, keep in mind the file sizes are large and it performs a lot of disk write operations, so it should only be used as necessary.
+
+By comparing logs from desynced game sessions, you can find exactly what action caused the desync, and then continue debugging in the Lua code. If working on binary code, the `/p` argument for the FADeepProbe debugger can help by logging Lua calls to a binary address.
+
 ## Starting a singleplayer session quickly
 
 You can start a singleplayer session quickly by adding the following command line arguments to your launch script or shortcut:
