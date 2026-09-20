@@ -793,7 +793,7 @@ end
 ---@param trigger ReactAITriggerEvent
 ---@param reaction ReactAIReactionType
 ---@param name string Unique name for the AI platoon
----@param data? table Optional data to overrite the default platoon builder values
+---@param data? table Optional data to overwrite the default platoon builder values
 ---@return ReactiveAI
 function BM:AddReactiveAI(trigger, reaction, name, data)
     self:InitializedCheck()
