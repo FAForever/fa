@@ -1245,12 +1245,15 @@ function BM:SetUnitUpgrades(upgradeTable, unitName, startActive)
 end
 
 --- Determines if a specific unit needs upgrades, returns name of upgrade if needed
+---
 --- Works with up to 3-level enhancement paths
---- TODO: Make a check that can deal with any number of prerequisites, like a 4-5-6 level enhancement path, example: ('Shield -> 'ShieldHeavy' -> 'ShieldVeryHeavy' ->'ShieldUltraHeavy' -> 'ShieldUltraBigHeavy')
 ---@param unit Unit
 ---@param unitType? string
 ---@return string|boolean
 function BM:UnitNeedsUpgrade(unit, unitType)
+    -- TODO: Make a check that can deal with any number of prerequisites,
+    -- like a 4-5-6 level enhancement path, example:
+    -- ('Shield -> 'ShieldHeavy' -> 'ShieldVeryHeavy' ->'ShieldUltraHeavy' -> 'ShieldUltraBigHeavy')
     if unit.Dead then
         return false
     end
