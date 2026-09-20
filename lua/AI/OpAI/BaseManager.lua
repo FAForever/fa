@@ -918,9 +918,7 @@ function BM:SetRadius(rad)
     self.Radius = rad
 end
 
----------------------------------------------------------------------------
--- Functions for tracking the number of engineers working in a base manager
----------------------------------------------------------------------------
+--#region - Functions for tracking the number of engineers working in a base manager
 
 --- Add to the engineer count, useful when gifting the base engineers.
 ---@param num? integer # Amount to add to the engineer count. Default to 1.
@@ -1128,9 +1126,9 @@ function BM:SetEngineerBuildRateBuff(buffName)
     self.EngineerBuildRateBuff = buffName
 end
 
----------------------------------------------------
--- Get/Set of default chains for base funcitonality
----------------------------------------------------
+
+--#endregion
+--#region - Get/Set of default chains for base funcitonality
 
 ---@return string?
 function BM:GetDefaultEngineerPatrolChain()
@@ -1208,9 +1206,9 @@ function BM:AddExpansionBase(baseName, engQuantity, baseData)
     end
 end
 
------------------------------------------------
--- Base Manager Unit Upgrade Level functions --
------------------------------------------------
+
+--#endregion
+--#region - Base Manager Unit Upgrade Level functions --
 
 --- Set what type of upgrades you want on what types of units. The list of upgrades can be changed later.
 ---
@@ -1733,9 +1731,9 @@ function BM:SetBuildAllStructures(val)
     end
 end
 
--------------------------------------
--- Default builders for base managers
--------------------------------------
+
+--#endregion
+--#region - Default builders for base managers
 
 ---@protected
 function BM:LoadDefaultBaseEngineers()
@@ -2139,3 +2137,5 @@ function FailSafeUpgradeOnStopBeingBuilt(unit)
 		end
 	end
 end
+
+--#endregion
