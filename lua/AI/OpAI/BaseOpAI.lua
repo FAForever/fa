@@ -763,15 +763,16 @@ function BaseOpAI:RemoveBuildCallback(funcName, builderName)
         end
     end
     if not builderName or builderName == self.MasterName then
-        for num, ac in self.MasterData.FormCallbacks do
+        for num, ac in self.MasterData.DestroyCallbacks do
             if ac[2] == funcName then
-                self.MasterData.FormCallbacks[num] = nil
+                self.MasterData.DestroyCallbacks[num] = nil
             end
         end
     end
     return true
 end
 
+---@see OpAI.RemoveBuildCallback # identical functionality
 ---@param funcName string
 ---@param builderName? string
 function BaseOpAI:RemoveDestroyCallback(funcName, builderName)
