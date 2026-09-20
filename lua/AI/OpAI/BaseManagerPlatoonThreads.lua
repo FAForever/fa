@@ -378,6 +378,9 @@ function ConstructionUnitDeath(unit)
     bManager:RemoveConstructionEngineer(unit)
 end
 
+---@class Unit
+---@field package Subtracted? true
+
 --- Death callback when units die to decrease counter
 ---@param unit Unit
 function BaseManagerSingleDestroyed(unit)
