@@ -28,7 +28,7 @@ local tableGetn = table.getn
 
 -- Used by the build conditions that dont need any args
 local emptyTable = {}
-local platoonTypes = {'Air', 'Land', 'Sea'}
+local platoonTypes = { 'Air', 'Land', 'Sea' }
 local targetCommanderLastPriorities = {
     categories.EXPERIMENTAL,
     categories.STRUCTURE * categories.DEFENSE,
@@ -44,7 +44,7 @@ local targetCommanderNeverPriorities = {
     categories.MOBILE - categories.COMMAND,
     categories.ALLUNITS - categories.COMMAND,
 }
-local defTargetPriorities = {'COMMAND', 'MOBILE', 'STRUCTURE DEFENSE', 'ALLUNITS'}
+local defTargetPriorities = { 'COMMAND', 'MOBILE', 'STRUCTURE DEFENSE', 'ALLUNITS' }
 
 ---Platoon template file with pre-generated platoon templates and builders
 ---@alias OpAIPlatoonTpFile
@@ -108,9 +108,9 @@ local defTargetPriorities = {'COMMAND', 'MOBILE', 'STRUCTURE DEFENSE', 'ALLUNITS
 ---| "T3Submarines"         # T3 Sera submarine
 ---| "TorpedoBoats"         # T2 UEF Torpedo boat
 ---| "BattleCruisers"
----| "T1"                   # T1 ships in NavalOpAI from generated templates 
----| "T2"                   # T2 ships in NavalOpAI from generated templates 
----| "T3"                   # T3 ships in NavalOpAI from generated templates 
+---| "T1"                   # T1 ships in NavalOpAI from generated templates
+---| "T2"                   # T2 ships in NavalOpAI from generated templates
+---| "T3"                   # T3 ships in NavalOpAI from generated templates
 ---| "All"
 
 ---@alias OpAILockType
@@ -166,6 +166,7 @@ function BaseOpAI:PreCreate()
     self.Trash = TrashBag()
     self.PreCreateFinished = true
 end
+
 ---@private
 ---@param force? boolean
 ---@return boolean
@@ -173,7 +174,7 @@ function BaseOpAI:FindMaster(force)
     if self.MasterData and not force then
         return true
     end
-    for k,v in self.AIBrain.AttackData.Platoons do
+    for k, v in self.AIBrain.AttackData.Platoons do
         if v.PlatoonName == self.MasterName then
             self.MasterData = v
             return true
@@ -181,6 +182,7 @@ function BaseOpAI:FindMaster(force)
     end
     return false
 end
+
 ---@private
 ---@param force? boolean
 ---@return boolean
@@ -191,14 +193,15 @@ function BaseOpAI:FindChildren(force)
     self.ChildrenHandles = {}
     local builderTable = ScenarioInfo.BuilderTable[self.AIBrain.CurrentPlan]
     for _, currType in platoonTypes do
-        for name,builder in builderTable[currType] do
+        for name, builder in builderTable[currType] do
             if self:ChildNameCheck(name) then
-                tableInsert(self.ChildrenHandles, { ChildName=name, ChildBuilder=builder })
+                tableInsert(self.ChildrenHandles, { ChildName = name, ChildBuilder = builder })
             end
         end
     end
     return true
 end
+
 ---@private
 ---@param typeTable OpAIChildType[]
 function BaseOpAI:AddChildType(typeTable)
@@ -210,6 +213,7 @@ function BaseOpAI:AddChildType(typeTable)
         end
     end
 end
+
 ---@private
 ---@param name string
 ---@return boolean
@@ -223,6 +227,7 @@ function BaseOpAI:ChildNameCheck(name)
     end
     return false
 end
+
 ---Sets the number of child platoons to build.
 ---
 ---Once the desired amount it reached, they are combined into a master platoon.
@@ -230,21 +235,23 @@ end
 ---@param childType? any
 function BaseOpAI:SetChildCount(number, childType)
     if not childType then
-        ScenarioInfo.OSPlatoonCounter[self.MasterName..'_D'..ScenarioInfo.Options.Difficulty] = number
+        ScenarioInfo.OSPlatoonCounter[self.MasterName .. '_D' .. ScenarioInfo.Options.Difficulty] = number
     else
-        ScenarioInfo.OSPlatoonCounter[self.MasterName..'_'..childType..'_D'..ScenarioInfo.Options.Difficulty] = number
+        ScenarioInfo.OSPlatoonCounter[self.MasterName .. '_' .. childType .. '_D' .. ScenarioInfo.Options.Difficulty] = number
     end
 end
+
 ---Sets the number of child platoons to build.
 ---
 ---Once the desired amount it reached, they are combined into a master platoon.
 ---@param diffTable {[1]: integer, [2]: integer, [3]: integer} count to set for Easy, Medium, Hard difficulty
 function BaseOpAI:SetChildCountDiffTable(diffTable)
     local platoonCounter = ScenarioInfo.OSPlatoonCounter
-    platoonCounter[self.MasterName..'_D1'] = diffTable[1]
-    platoonCounter[self.MasterName..'_D2'] = diffTable[2]
-    platoonCounter[self.MasterName..'_D3'] = diffTable[3]
+    platoonCounter[self.MasterName .. '_D1'] = diffTable[1]
+    platoonCounter[self.MasterName .. '_D2'] = diffTable[2]
+    platoonCounter[self.MasterName .. '_D3'] = diffTable[3]
 end
+
 ---Changes the children platoons' AI function
 ---@param functionInfo FileFunctionRef
 ---@param childType any Unused
@@ -252,22 +259,25 @@ function BaseOpAI:SetChildrenPlatoonAI(functionInfo, childType)
     if not self:FindChildren() then
         error('*AI DEBUG: No children for OpAI found')
     end
-    for k,v in self.ChildrenHandles do
+    for k, v in self.ChildrenHandles do
         v.ChildBuilder.PlatoonAIFunction = functionInfo
     end
 end
+
 ---Overrides the default platoon formation
 ---@param formationName UnitFormations
 function BaseOpAI:SetFormation(formationName)
     if not self:FindMaster() then return end
     self.MasterData.PlatoonData.OverrideFormation = formationName
 end
+
 ---@private
 ---@param funcName string
 ---@param bool boolean
 function BaseOpAI:SetFunctionStatus(funcName, bool)
-    ScenarioInfo.OSPlatoonCounter[self.MasterName..'_' .. funcName] = bool
+    ScenarioInfo.OSPlatoonCounter[self.MasterName .. '_' .. funcName] = bool
 end
+
 ---TODO: make a system out of this.  Derive functionality per override per OpAI type
 ---@private
 ---@param functionData any
@@ -276,18 +286,21 @@ function BaseOpAI:MasterPlatoonFunctionalityChange(functionData)
         self:SetFunctionStatus('Transports', true)
     end
 end
+
 ---Sets the the whole platoon or only units matching categories to target commanders after all other units.
 ---@param cat? EntityCategory Specifies a subset of the platoon to set target priorities for
 ---@return boolean
 function BaseOpAI:TargetCommanderLast(cat)
     return self:SetTargettingPriorities(targetCommanderLastPriorities, cat)
 end
+
 ---Sets the the whole platoon or only units matching categories to not target commanders.
 ---@param cat? EntityCategory Specifies a subset of the platoon to set target priorities for
 ---@return boolean
 function BaseOpAI:TargetCommanderNever(cat)
     return self:SetTargettingPriorities(targetCommanderNeverPriorities, cat)
 end
+
 ---Sets the target priorities for the whole platoon or only units matching categories
 ---@param priTable string[]|EntityCategory[]
 ---@param cat? EntityCategory specifying a subset of the platoon we wish to set target priorities for
@@ -316,7 +329,7 @@ function BaseOpAI:SetTargettingPriorities(priTable, cat)
         self.MasterData.PlatoonData.TargetPriorities = priorities
     end
 
-    tableInsert(self.MasterData.PlatoonAddFunctions, {BMPT, 'PlatoonSetTargetPriorities'})
+    tableInsert(self.MasterData.PlatoonAddFunctions, { BMPT, 'PlatoonSetTargetPriorities' })
 
     return true
 end
@@ -400,6 +413,7 @@ function BaseOpAI:ChildMonitorThread()
         WaitSeconds(7)
     end
 end
+
 ---@private
 ---@param name OpAIChildType
 ---@param data OpAINewChildMonitorData[]
@@ -419,6 +433,7 @@ function BaseOpAI:ChildMonitorCheck(name, data)
     end
     self:SetChildActive(name, true)
 end
+
 ---Overrides the the template size of `childrenType` to `quantity` and disables all other childs.
 ---
 ---Child platoon template **has to match all** `childrenType` to be set.
@@ -442,6 +457,7 @@ function BaseOpAI:SetChildQuantity(childrenType, quantity)
     self:KeepChildren(childrenType)
     self:OverrideTemplateSize(quantity)
 end
+
 ---@param childrenType OpAIChildType|OpAIChildType[]
 function BaseOpAI:RemoveChildren(childrenType)
     if not self:FindChildren() then return end
@@ -455,11 +471,11 @@ function BaseOpAI:RemoveChildren(childrenType)
 
     local childrenNames = self.ChildrenNames
     local childrenHandles = self.ChildrenHandles
-    for k,v in childrenNames do
+    for k, v in childrenNames do
         if v.ChildrenType then
             local found = false
             for cNum, cName in v.ChildrenType do
-                for num,name in removeTable do
+                for num, name in removeTable do
                     if (cName == name) then
                         found = true
                         break
@@ -472,7 +488,7 @@ function BaseOpAI:RemoveChildren(childrenType)
 
             -- Remove the builder
             if found then
-                for num,child in childrenHandles do
+                for num, child in childrenHandles do
                     if child.ChildBuilder.BuilderName == v.BuilderName then
                         childrenHandles[num] = nil
                     end
@@ -482,6 +498,7 @@ function BaseOpAI:RemoveChildren(childrenType)
         end
     end
 end
+
 ---@param childrenType OpAIChildType[]|OpAIChildType
 function BaseOpAI:KeepChildren(childrenType)
     if not self:FindChildren() then return end
@@ -538,7 +555,7 @@ function BaseOpAI:KeepChildren(childrenType)
             -- Remove the builder
             if not found then
                 self.AIBrain:PBMRemoveBuilder(v.BuilderName)
-                for num,child in childrenHandles do
+                for num, child in childrenHandles do
                     if child.ChildBuilder.BuilderName == v.BuilderName then
                         childrenHandles[num] = nil
                     end
@@ -548,13 +565,14 @@ function BaseOpAI:KeepChildren(childrenType)
         end
     end
 end
+
 ---@protected
 ---@param quantity integer|integer[]
 function BaseOpAI:OverrideTemplateSize(quantity)
     local quantityType = type(quantity)
     for _, v in self.ChildrenHandles do
         if quantityType == 'table' then
-            for sNum,sData in v.ChildBuilder.PlatoonTemplate do
+            for sNum, sData in v.ChildBuilder.PlatoonTemplate do
                 if sNum >= 3 then
                     sData[2] = 1
                     sData[3] = quantity[sNum - 2] or 1
@@ -562,7 +580,7 @@ function BaseOpAI:OverrideTemplateSize(quantity)
             end
         else
             local overrideNum = mathFloor(quantity / (tableGetn(v.ChildBuilder.PlatoonTemplate) - 2))
-            for sNum,sData in v.ChildBuilder.PlatoonTemplate do
+            for sNum, sData in v.ChildBuilder.PlatoonTemplate do
                 if sNum >= 3 then
                     sData[2] = 1
                     sData[3] = overrideNum
@@ -571,6 +589,7 @@ function BaseOpAI:OverrideTemplateSize(quantity)
         end
     end
 end
+
 ---Build conditions for PBM; Attack Conditions for AM Platoons
 ---@param fileName FileName
 ---@param funcName string
@@ -601,6 +620,7 @@ function BaseOpAI:AddBuildCondition(fileName, funcName, parameters, bName)
     end
     return true
 end
+
 ---@param funcName string
 ---@param bName? string
 ---@return boolean
@@ -633,6 +653,7 @@ function BaseOpAI:RemoveBuildCondition(funcName, bName)
     end
     return true
 end
+
 ---Add Functions for PBM Platoons; FormCallbacks for AM Platoons
 ---@protected
 ---@param fileName fun(self: Platoon) | FileName
@@ -656,6 +677,7 @@ function BaseOpAI:AddAddFunction(fileName, funcName, bName)
     end
     return true
 end
+
 ---Adds a function to run when the platoon is formed.
 ---@param filename fun(self: Platoon) | FileName
 ---@param funcName? string
@@ -664,6 +686,7 @@ function BaseOpAI:AddFormCallback(filename, funcName, builderName)
     builderName = builderName or self.MasterName
     self:AddAddFunction(filename, funcName, builderName)
 end
+
 ---Remove Functions for PBM Platoons; FormCallbacks for AM Platoons
 ---@protected
 ---@param funcName string
@@ -672,9 +695,9 @@ end
 function BaseOpAI:RemoveAddFunction(funcName, builderName)
     if not self:FindChildren() or not self:FindMaster() then return false end
 
-    for k,v in self.ChildrenHandles do
+    for k, v in self.ChildrenHandles do
         if not builderName or builderName == v.ChildBuilder.BuilderName then
-            for num,bc in v.ChildBuilder.PlatoonAddFunctions do
+            for num, bc in v.ChildBuilder.PlatoonAddFunctions do
                 if bc[2] == funcName then
                     v.ChildBuilder.PlatoonAddFunctions[num] = nil
                 end
@@ -682,7 +705,7 @@ function BaseOpAI:RemoveAddFunction(funcName, builderName)
         end
     end
     if not builderName or builderName == self.MasterName then
-        for num,ac in self.MasterData.FormCallbacks do
+        for num, ac in self.MasterData.FormCallbacks do
             if ac[2] == funcName then
                 self.MasterData.FormCallbacks[num] = nil
             end
@@ -690,11 +713,13 @@ function BaseOpAI:RemoveAddFunction(funcName, builderName)
     end
     return true
 end
+
 ---@param funcName string
 ---@param builderName? string
 function BaseOpAI:RemoveFormCallback(funcName, builderName)
     self:RemoveAddFunction(funcName, builderName)
 end
+
 ---Add Build Callback for PBM Platoons; Death Callback for AM Platoons
 ---@param fileName FileName
 ---@param funcName string
@@ -703,7 +728,7 @@ end
 function BaseOpAI:AddBuildCallback(fileName, funcName, builderName)
     if not self:FindChildren() or not self:FindMaster() then return false end
 
-    for k,v in self.ChildrenHandles do
+    for k, v in self.ChildrenHandles do
         if not builderName or builderName == v.ChildBuilder.BuilderName then
             tableInsert(v.ChildBuilder.PlatoonBuildCallbacks, { fileName, funcName })
         end
@@ -713,21 +738,23 @@ function BaseOpAI:AddBuildCallback(fileName, funcName, builderName)
     end
     return true
 end
+
 ---@param fileName FileName
 ---@param funcName string
 ---@param builderName? string
 function BaseOpAI:AddDestroyCallback(fileName, funcName, builderName)
     self:AddBuildCallback(fileName, funcName, builderName)
 end
+
 ---@param funcName string
 ---@param builderName? string
 ---@return boolean
 function BaseOpAI:RemoveBuildCallback(funcName, builderName)
     if not self:FindChildren() or not self:FindMaster() then return false end
 
-    for k,v in self.ChildrenHandles do
+    for k, v in self.ChildrenHandles do
         if not builderName or builderName == v.ChildBuilder.BuilderName then
-            for num,bc in v.ChildBuilder.PlatoonBuildCallbacks do
+            for num, bc in v.ChildBuilder.PlatoonBuildCallbacks do
                 if bc[2] == funcName then
                     v.ChildBuilder.PlatoonBuildCallbacks[num] = nil
                 end
@@ -735,7 +762,7 @@ function BaseOpAI:RemoveBuildCallback(funcName, builderName)
         end
     end
     if not builderName or builderName == self.MasterName then
-        for num,ac in self.MasterData.FormCallbacks do
+        for num, ac in self.MasterData.FormCallbacks do
             if ac[2] == funcName then
                 self.MasterData.FormCallbacks[num] = nil
             end
@@ -743,11 +770,13 @@ function BaseOpAI:RemoveBuildCallback(funcName, builderName)
     end
     return true
 end
+
 ---@param funcName string
 ---@param builderName? string
 function BaseOpAI:RemoveDestroyCallback(funcName, builderName)
     self:RemoveBuildCallback(funcName, builderName)
 end
+
 ---@param val boolean
 ---@return boolean
 function BaseOpAI:MasterUsePool(val)
@@ -756,17 +785,18 @@ function BaseOpAI:MasterUsePool(val)
     self.MasterData.UsePool = val
     return true
 end
+
 ---Changes the default (once all units die) rebuild condition for this AI platoon.
 ---@param lockType OpAILockType
 ---@param lockData? OpAILockData
 function BaseOpAI:SetLockingStyle(lockType, lockData)
-    if not(lockType == 'None' or lockType == 'DeathTimer' or lockType == 'BuildTimer' or lockType == 'DeathRatio' or lockType == 'RatioTimer') then
+    if not (lockType == 'None' or lockType == 'DeathTimer' or lockType == 'BuildTimer' or lockType == 'DeathRatio' or lockType == 'RatioTimer') then
         error('*AI ERROR: Error adding lock style: valid types are "DeathTimer", "BuildTimer", "DeathRatio", "RatioTimer", or "None"', 2)
     end
     self:RemoveBuildCondition('AMCheckPlatoonLock')
     if lockType == 'None' then return end
 
-    self:AddBuildCondition('/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock', {self.MasterName})
+    self:AddBuildCondition('/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock', { self.MasterName })
     self:RemoveDestroyCallback('AMUnlockPlatoon', self.MasterName)
     self:RemoveFormCallback('AMUnlockBuildTimer', self.MasterName)
     self:RemoveFormCallback('AMUnlockRatio', self.MasterName)
@@ -797,6 +827,7 @@ function BaseOpAI:SetLockingStyle(lockType, lockData)
         self.MasterData.PlatoonData.Ratio = lockData.Ratio
     end
 end
+
 ---@param childrenTypes OpAIChildType[]
 function BaseOpAI:SetChildrenActive(childrenTypes)
     if not self:FindChildren() then return end
@@ -805,6 +836,7 @@ function BaseOpAI:SetChildrenActive(childrenTypes)
         self:SetChildActive(v, true)
     end
 end
+
 ---@param cType OpAIChildType
 ---@param val boolean
 function BaseOpAI:SetChildActive(cType, val)
@@ -852,16 +884,17 @@ function BaseOpAI:SetChildActive(cType, val)
         if changeVal then
             if not self:AddBuildCondition(MIBC, 'True', emptyTable, v.BuilderName) or
                 not self:RemoveBuildCondition('False', v.BuilderName) then
-                error('*AI ERROR: Error Adding build condition',2)
+                error('*AI ERROR: Error Adding build condition', 2)
             end
         else
             if not self:AddBuildCondition(MIBC, 'False', emptyTable, v.BuilderName) or
                 not self:RemoveBuildCondition('True', v.BuilderName) then
-                error('*AI ERROR: Error Adding build condition',2)
+                error('*AI ERROR: Error Adding build condition', 2)
             end
         end
     end
 end
+
 ---Sets up all the variables and loads platoon builders.
 ---
 ---**This function is called automatically if the OpAI is added through BaseManager**
@@ -886,7 +919,7 @@ function BaseOpAI:Create(brain, location, builderType, name, builderData)
     local builderTypeName
     if type(self.BuilderType) == 'string' then
         self.GlobalVarName = name .. '_' .. self.BuilderType
-        builderTypeName = self.BuilderType--[[@as string]]
+        builderTypeName = self.BuilderType --[[@as string]]
     else
         self.GlobalVarName = name .. '_' .. self.BuilderType.Name
         builderTypeName = self.BuilderType.Name
@@ -926,30 +959,29 @@ function BaseOpAI:Create(brain, location, builderType, name, builderData)
 
         self.MasterName = 'OSB_Master_' .. builderTypeName .. '_' .. brain.Name .. '_' .. name
     else --If BuilderType is a table (was pregenerated)
-
         ScenarioUtils.LoadOSB(builderType, brain.Name, data)
-        saveFile = {Scenario = builderType--[[@as GeneratedScenario]]}
+        saveFile = { Scenario = builderType --[[@as GeneratedScenario]] }
 
         --self.MasterName = 'OSB_Master_' .. saveFile.Scenario.Name .. '_' .. brain.Name .. '_' .. name
-        self.MasterName = 'OSB_Master_' .. saveFile.Scenario.Name--[[@as string]] .. '_' .. brain.Name
+        self.MasterName = 'OSB_Master_' .. saveFile.Scenario.Name --[[@as string]] .. '_' .. brain.Name
     end
 
     builders = saveFile.Scenario.Armies['ARMY_1'].PlatoonBuilders.Builders
 
     if not builders then
-        error('*OpAI ERROR: No OpAI Global named: '..builderTypeName, 2)
+        error('*OpAI ERROR: No OpAI Global named: ' .. builderTypeName, 2)
     end
-    for k,v in builders do
+    for k, v in builders do
         if stringSub(k, 1, 10) == 'OSB_Child_' then
             local startCheck = 11
             if type(self.BuilderType) == "string" then
-                startCheck = startCheck + 1 + stringLen(builderTypeName--[[@as string]])
+                startCheck = startCheck + 1 + stringLen(builderTypeName --[[@as string]])
             else
                 startCheck = startCheck + 1 + stringLen(builderTypeName)
             end
-            local cType = stringSub(k,startCheck)
+            local cType = stringSub(k, startCheck)
 
-            tableInsert(self.ChildrenNames, { BuilderName = k..'_'..brain.Name..'_'..name, ChildrenType = v.ChildrenType })
+            tableInsert(self.ChildrenNames, { BuilderName = k .. '_' .. brain.Name .. '_' .. name, ChildrenType = v.ChildrenType })
             self:AddChildType(v.ChildrenType)
         end
     end
