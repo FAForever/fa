@@ -106,38 +106,38 @@ local BuildingCounterDefaultValues = {
 ---@alias FunctionName string
 
 ---@class FileFunctionRef
----@field [1] FileName     # Path to the file
+---@field [1] FileName # Path to the file
 ---@field [2] FunctionName # Function in the file to call
 
 ---@class BuildCondition: FileFunctionRef
----@field [3] table        # List of params to pass into the build condition function
+---@field [3] table # List of params to pass into the build condition function
 
 ---@class PlatoonData
 ---@field TransportReturn? MarkerName # Location for transports to return to
 ---@field PatrolChains? MarkerName[]  # Selection of patrol chains to guide the constructed units
----@field PatrolChain? MarkerName     # Patrol chain to guide the construced units
----@field AttackChain? MarkerName     # Attack chain to guide the constructed units
----@field LandingChain? MarkerName    # Landing chain to guide the transports carrying the constructed units
----@field Area? AreaName              # An area, use depends on master platoon function
----@field Location? MarkerName        # A location, use depends on master platoon function
----@field BaseName? string            # Name of the `BaseManager` the platoon belongs to
----@field NumBuilding? integer        # Specific to `BaseManager` engineer platoons
+---@field PatrolChain? MarkerName # Patrol chain to guide the construced units
+---@field AttackChain? MarkerName # Attack chain to guide the constructed units
+---@field LandingChain? MarkerName # Landing chain to guide the transports carrying the constructed units
+---@field Area? AreaName # An area, use depends on master platoon function
+---@field Location? MarkerName # A location, use depends on master platoon function
+---@field BaseName? string # Name of the `BaseManager` the platoon belongs to
+---@field NumBuilding? integer # Specific to `BaseManager` engineer platoons
 
 ---@class AddOpAIData
----@field MasterPlatoonFunction FileFunctionRef       # Behavior of instances upon completion
----@field PlatoonData? PlatoonData                    # Parameters of the master platoon function
----@field Priority? integer                           # Priority over other builders. Defaults to the template priority
+---@field MasterPlatoonFunction FileFunctionRef # Behavior of instances upon completion
+---@field PlatoonData? PlatoonData # Parameters of the master platoon function
+---@field Priority? integer # Priority over other builders. Defaults to the template priority
 
 ---@class AddUnitAIData
----@field Amount? integer                             # How many instances of this unit to build. Defaults to `1`.
----@field KeepAlive? boolean                          # Rebuild the unit after death, defaults to `false`
+---@field Amount? integer # How many instances of this unit to build. Defaults to `1`.
+---@field KeepAlive? boolean # Rebuild the unit after death, defaults to `false`
 ---@field BuildCondition? BuildCondition[]            # Build conditions that must be met before building can start, can be empty
 ---@field PlatoonAIFunction? FileFunctionRef|function # A { file, function } reference to the platoon AI function
 ---@field FormCallbacks? FileFunctionRef[]|function[] # A list of callbacks to be executed when the platoon is formed
----@field MaxAssist? integer                          # Number of engineers that can assist construction. Defaults to `1`.
----@field Retry? boolean                              # Retry construction of the unit, if it dies unfinished. Defaults to `false`.
----@field PlatoonData? PlatoonData                    # Parameters of the platoon AI function
----@field WaitSecondsAfterDeath? integer              # Time to wait after conditional build's death before starting a new one.
+---@field MaxAssist? integer # Number of engineers that can assist construction. Defaults to `1`.
+---@field Retry? boolean # Retry construction of the unit, if it dies unfinished. Defaults to `false`.
+---@field PlatoonData? PlatoonData # Parameters of the platoon AI function
+---@field WaitSecondsAfterDeath? integer # Time to wait after conditional build's death before starting a new one.
 
 -- types used by the BaseManager
 
@@ -210,7 +210,7 @@ local BuildingCounterDefaultValues = {
 ---@field name string|string[] Name of the unit group to build, or a table of unit names to build
 ---@field data AddUnitAIData
 
----Manager to maintain a base, build, and dispatch attacks. Used mainly in campaign missions.
+--- Manager to maintain a base, build, and dispatch attacks. Used mainly in campaign missions.
 ---
 --- To create a new base:
 --- 1. Initialize the base, calling one of the initialize functions.
@@ -588,17 +588,17 @@ function BM:Create()
     self.ConditionalBuildManager = ConditionalBuildManager()
 end
 
----Initialises the base manager. Sets up the base template from provided structure groups.
----@see BaseManager.StartNonZeroBase to start the base and spawn `levelTable` groups.
----@see BaseManager.StartDifficultyBase to start the base and spawn other non-maintained groups based on difficulty
----@see BaseManager.StartBase to start the base and spawn other non-maintained groups
----@see BaseManager.StartEmptyBase to start the base empty
+--- Initialises the base manager. Sets up the base template from provided structure groups.
+---@see BaseManager.StartNonZeroBase # to start the base and spawn `levelTable` groups.
+---@see BaseManager.StartDifficultyBase # to start the base and spawn other non-maintained groups based on difficulty
+---@see BaseManager.StartBase # to start the base and spawn other non-maintained groups
+---@see BaseManager.StartEmptyBase # to start the base empty
 ---@param brain CampaignAIBrain
----@param baseName string Unique name for the base
----@param position MarkerName|Vector The base will manage factories and engineers around this position
----@param radius integer Distance from the `position` to define the base area.
----@param levelTable table<GroupName, integer> Name of the structure groups and their priorities for the base to maintain.
----@param diffultySeparate? boolean If `true` the groups in  `levelTable` will be appended by `_D1` difficulty string.
+---@param baseName string # Unique name for the base
+---@param position MarkerName | Vector # The base will manage factories and engineers around this position
+---@param radius integer # Distance from the `position` to define the base area.
+---@param levelTable table<GroupName, integer> # Name of the structure groups and their priorities for the base to maintain.
+---@param diffultySeparate? boolean # If `true` the groups in  `levelTable` will be appended by `_D1` difficulty string.
 function BM:Initialize(brain, baseName, position, radius, levelTable, diffultySeparate)
     self.Active = true
     if self.Initialized then
@@ -658,7 +658,7 @@ function BM:Initialize(brain, baseName, position, radius, levelTable, diffultySe
     end
 end
 
----Throws an error if the manager isnt initialized yet.
+--- Throws an error if the manager isnt initialized yet.
 ---@protected
 function BM:InitializedCheck()
     if not self.Initialized then
@@ -667,22 +667,22 @@ function BM:InitializedCheck()
 end
 
 --- Enables or disables the base entirely, it may take a while before all base functionality is stopped
----@param status boolean        # Flag that indicates whether the base should be active
+---@param status boolean # Flag that indicates whether the base should be active
 function BM:BaseActive(status)
     self.Active = status
 end
 
----Initialises the base manager. Sets up the base template from provided structure groups
----using the _D1, _D2 and _D3 difficulty table for groups in `levelTable`.
----@see BaseManager.StartNonZeroBase to start the base and spawn `levelTable` groups.
----@see BaseManager.StartDifficultyBase to start the base and spawn other non-maintained groups based on difficulty
----@see BaseManager.StartBase to start the base and spawn other non-maintained groups
----@see BaseManager.StartEmptyBase to start the base empty
+--- Initialises the base manager. Sets up the base template from provided structure groups
+--- using the _D1, _D2 and _D3 difficulty table for groups in `levelTable`.
+---@see BaseManager.StartNonZeroBase # to start the base and spawn `levelTable` groups.
+---@see BaseManager.StartDifficultyBase # to start the base and spawn other non-maintained groups based on difficulty
+---@see BaseManager.StartBase # to start the base and spawn other non-maintained groups
+---@see BaseManager.StartEmptyBase # to start the base empty
 ---@param brain CampaignAIBrain
----@param baseName string Unique name for the base
----@param position MarkerName|Vector The base will manage factories and engineers around this position
----@param radius integer Distance from the `position` to define the base area.
----@param levelTable table<GroupName, integer> Name of the structure groups and their priorities for the base to maintain.
+---@param baseName string # Unique name for the base
+---@param position MarkerName|Vector # The base will manage factories and engineers around this position
+---@param radius integer # Distance from the `position` to define the base area.
+---@param levelTable table<GroupName, integer> # Name of the structure groups and their priorities for the base to maintain.
 function BM:InitializeDifficultyTables(brain, baseName, position, radius, levelTable)
     self:Initialize(brain, baseName, position, radius, levelTable, true)
 end
@@ -690,9 +690,9 @@ end
 -- Auto trashbags all threads on a base manager
 
 --- Allocates a thread running the function where the base manager is prepended as the first argument. The thread is inserted in the trashbag of the base manager
----@param fn function           # A function to run on the forked thread
----@param ... unknown           # Parameters of the function where the base manager is prepended as the first argument
----@return thread?              # An instance of the Thread class
+---@param fn function # A function to run on the forked thread
+---@param ... unknown # Parameters of the function where the base manager is prepended as the first argument
+---@return thread?    # An instance of the Thread class
 function BM:ForkThread(fn, ...)
     if fn then
         local thread = ForkThread(fn, self, unpack(arg))
@@ -704,13 +704,13 @@ function BM:ForkThread(fn, ...)
 end
 
 --- Instructs the base to attempt to build a specific unit group as defined in the map. These are usually experimentals
----@param sUnitName string                      # Name reference to a unit group as defined in the map
----@param bRetry boolean                        # Whether or not we should retry after failing to build
----@param nNumEngineers number                  # Number of engineers that can assist building
----@param tPlatoonAIFunction FileFunctionRef    # A { file, function } reference to the platoon AI function
----@param tPlatoonData PlatoonData              # Parameters of the platoon AI function
----@param fCondition BuildCondition[]           # Build conditions that must be met before building can start, can be empty
----@param bKeepAlive boolean                    # ??
+---@param sUnitName string # Name reference to a unit group as defined in the map
+---@param bRetry boolean # Whether or not we should retry after failing to build
+---@param nNumEngineers number # Number of engineers that can assist building
+---@param tPlatoonAIFunction FileFunctionRef # A { file, function } reference to the platoon AI function
+---@param tPlatoonData PlatoonData # Parameters of the platoon AI function
+---@param fCondition BuildCondition[] # Build conditions that must be met before building can start, can be empty
+---@param bKeepAlive boolean # ??
 ---@return nil
 function BM:ConditionalBuild(sUnitName, bRetry, nNumEngineers, tPlatoonAIFunction, tPlatoonData, fCondition, bKeepAlive)
     if type(fCondition) ~= 'function' then error('Parameter fCondition must be a function.') return end
@@ -732,18 +732,18 @@ end
 --- Instructs the base to attempt to build a specific unit group as defined in the map. These are usually experimentals.
 ---
 ---@see BaseManager.ConditionalBuild # - similar functionality
----@param unit string            # Name reference to a unit group as defined in the map
----@param data AddUnitAIData     # Parameters that describe the build conditions, the platoon function and the data of the platoon function
----@return boolean               # True when the AI was created
+---@param unit string # Name reference to a unit group as defined in the map
+---@param data AddUnitAIData # Parameters that describe the build conditions, the platoon function and the data of the platoon function
+---@return boolean # True when the AI was created
 function BM:AddUnitAI(unit, data)
     return self:AddOpAI(unit, data) --[[@as boolean]]
 end
 
 --- Attaches an OpAI instance to the base manager that uses the base to build platoons.
----@param ptype OpAIPlatoonTpFile | string       # Save file that is used to find child quantities
----@param name string                   # A name set by you to allow you to retrieve the returned AI instance
----@param data AddOpAIData?             # Parameters that describe the build conditions, the platoon function and the data of the platoon function
----@return OpAI                         # An instance of the OpAI class or false
+---@param ptype OpAIPlatoonTpFile | string # Save file that is used to find child quantities
+---@param name string # A name set by you to allow you to retrieve the returned AI instance
+---@param data AddOpAIData? # Parameters that describe the build conditions, the platoon function and the data of the platoon function
+---@return OpAI # An instance of the OpAI class or false
 ---@overload fun(self: BaseManager, ptype: string[], data: AddUnitAIData): boolean
 function BM:AddOpAI(ptype, name, data)
     if not self.AIBrain then
@@ -770,7 +770,7 @@ function BM:AddOpAI(ptype, name, data)
 end
 
 --- Retrieves a previously made OpAI instance
----@param name string       # A name previously set by you to attach an OpAI instance to the base manager
+---@param name string # A name previously set by you to attach an OpAI instance to the base manager
 ---@return OpAI|NavalOpAI|ReactiveAI # An instance of the OpAI class or false
 function BM:GetOpAI(name)
     return self.OpAITable[name]
@@ -780,20 +780,20 @@ end
 --- 
 --- Throws an error if the name is in use.
 ---@protected
----@param name string       # A name to check
+---@param name string # A name to check
 function BM:CheckOpAIName(name)
     if self.OpAITable[name] then
         error('*AI ERROR: Duplicate OpAI name: ' .. name .. ' - for base manager: ' .. self.BaseName)
     end
 end
 
----AI that is built with a predefined platoon template as response to the provided trigger type
+--- AI that is built with a predefined platoon template as response to the provided trigger type
 ---
----@see OpAI.SetChildActive to disable certain children
+---@see OpAI.SetChildActive # to disable certain children
 ---@param trigger ReactAITriggerEvent
 ---@param reaction ReactAIReactionType
----@param name string Unique name for the AI platoon
----@param data? table Optional data to overwrite the default platoon builder values
+---@param name string # Unique name for the AI platoon
+---@param data? table # Optional data to overwrite the default platoon builder values
 ---@return ReactiveAI
 function BM:AddReactiveAI(trigger, reaction, name, data)
     self:InitializedCheck()
@@ -807,7 +807,7 @@ function BM:AddReactiveAI(trigger, reaction, name, data)
     return opai
 end
 
--- Add generated naval AI.  Uses different OpAI type because it generates platoon data
+-- Add generated naval AI. Uses different OpAI type because it generates platoon data
 ---@param name string
 ---@param data NavalOpAIData
 ---@return NavalOpAI
@@ -825,10 +825,10 @@ function BM:AddNavalAI(name, data)
 end
 
 --- Adds a build group to the base manager that it needs to maintain
----@param groupName string      # Name reference to a unit group as defined in the map that represents the unit group to build
----@param priority number       # Priority that indicates how important this build group is in comparison to others
----@param spawn? boolean        # `true` to spawn the group right awaz, `false` to let the BaseManager build it.
----@param initial? boolean      # Initial group don't triggers sorting of the groups by priority. It is used only internally when the base manager is first initialized with multiple groups
+---@param groupName string # Name reference to a unit group as defined in the map that represents the unit group to build
+---@param priority number # Priority that indicates how important this build group is in comparison to others
+---@param spawn? boolean # `true` to spawn the group right awaz, `false` to let the BaseManager build it.
+---@param initial? boolean # Initial group don't triggers sorting of the groups by priority. It is used only internally when the base manager is first initialized with multiple groups
 function BM:AddBuildGroup(groupName, priority, spawn, initial)
     -- Make sure the group exists
     if self:HasGroup(groupName) then
@@ -860,17 +860,17 @@ function BM:AddBuildGroup(groupName, priority, spawn, initial)
 end
 
 --- Adds a build group based based on difficult to the base manager that it needs to maintain
----@param groupName string      # Name reference to a unit group as defined in the map that represents the unit group to build, appends the _D1, _D2 or _D3 to indicate difficulty
----@param priority number       # Priority that indicates how important this build group is in comparison to others
----@param spawn? boolean        # `true` to spawn the group right awaz, `false` to let the BaseManager build it.
----@param initial? boolean      # Initial group don't triggers sorting of the groups by priority. It is used only internally when the base manager is first initialized with multiple groups
+---@param groupName string # Name reference to a unit group as defined in the map that represents the unit group to build, appends the _D1, _D2 or _D3 to indicate difficulty
+---@param priority number # Priority that indicates how important this build group is in comparison to others
+---@param spawn? boolean # `true` to spawn the group right awaz, `false` to let the BaseManager build it.
+---@param initial? boolean # Initial group don't triggers sorting of the groups by priority. It is used only internally when the base manager is first initialized with multiple groups
 function BM:AddBuildGroupDifficulty(groupName, priority, spawn, initial)
     groupName = groupName .. '_D' .. ScenarioInfo.Options.Difficulty
     self:AddBuildGroup(groupName, priority, spawn, initial)
 end
 
 --- Removes a build group from the base manager
----@param groupName string      # Name reference to a unit group as defined in the map that represents the unit group to be removed
+---@param groupName string # Name reference to a unit group as defined in the map that represents the unit group to be removed
 function BM:ClearGroupTemplate(groupName)
     self.AIBrain.BaseTemplates[self.BaseName .. groupName] = { Template = {}, List = {}, UnitNames = {},
         BuildCounter = {} }
@@ -891,7 +891,7 @@ end
 --- Finds a build group from the base manager
 ---@protected
 ---@param groupName string # Name reference to a unit group as defined in the map that represents the unit group to be removed
----@return BmLevelName?       # The build group in linked to the unit group or false
+---@return BmLevelName? # The build group in linked to the unit group or nil
 function BM:FindGroup(groupName)
     for _, data in self.LevelNames do
         if data.Name == groupName then
@@ -901,7 +901,7 @@ function BM:FindGroup(groupName)
 end
 
 --- Retrieves the center of the base manager
----@return Vector               # A { x, y, z } array-based table
+---@return Vector # A { x, y, z } array-based table
 function BM:GetPosition()
     return self.Position
 end
@@ -923,37 +923,37 @@ end
 ---------------------------------------------------------------------------
 
 --- Add to the engineer count, useful when gifting the base engineers.
----@param num? integer      # Amount to add to the engineer count. Default to 1.
+---@param num? integer # Amount to add to the engineer count. Default to 1.
 function BM:AddCurrentEngineer(num)
     self.CurrentEngineerCount = self.CurrentEngineerCount + (num or 1)
 end
 
 --- Subtract from the engineer count
----@param num? integer      # Amount to subtract from the engineer count. Default to 1.
+---@param num? integer # Amount to subtract from the engineer count. Default to 1.
 function BM:SubtractCurrentEngineer(num)
     self.CurrentEngineerCount = self.CurrentEngineerCount - (num or 1)
 end
 
 --- Retrieve the engineer count
----@return integer              # Number of active engineers
+---@return integer # Number of active engineers
 function BM:GetCurrentEngineerCount()
     return self.CurrentEngineerCount
 end
 
 --- Retrieve the maximum number of engineers, the base manager won't build more engineers than this
----@return integer              # Maximum number of engineers for this base manager
+---@return integer # Maximum number of engineers for this base manager
 function BM:GetMaximumEngineers()
     return self.EngineerQuantity
 end
 
 --- Add an engineer to the engineer pool of the base manager
----@param unit Unit             # Engineer to add
+---@param unit Unit # Engineer to add
 function BM:AddConstructionEngineer(unit)
     table.insert(self.ConstructionEngineers, unit)
 end
 
 --- Remove an engineer from the engineer pool of the base manager
----@param unit Unit             # Engineer to remove
+---@param unit Unit # Engineer to remove
 function BM:RemoveConstructionEngineer(unit)
     for k, v in self.ConstructionEngineers do
         if v.EntityId == unit.EntityId then
@@ -963,13 +963,13 @@ function BM:RemoveConstructionEngineer(unit)
     end
 end
 
----Sets the number of engineers that can start new construction projects
+--- Sets the number of engineers that can start new construction projects
 ---@param num integer
 function BM:SetMaximumConstructionEngineers(num)
     self.MaximumConstructionEngineers = num
 end
 
----Returns the number of engineers that can start new construction projects
+--- Returns the number of engineers that can start new construction projects
 ---@return integer
 function BM:GetConstructionEngineerMaximum()
     return self.MaximumConstructionEngineers
@@ -990,7 +990,7 @@ function BM:ConstructionAlwaysAssist()
     return self.ConstructionAssistBool
 end
 
----Returns true when assisting construction is allowed in the base manager and the base has construction engineers
+--- Returns true when assisting construction is allowed in the base manager and the base has construction engineers
 ---@return boolean
 function BM:ConstructionNeedsAssister()
     if not self:ConstructionAlwaysAssist() or self:GetConstructionEngineerCount() == 0 then
@@ -999,7 +999,7 @@ function BM:ConstructionNeedsAssister()
     return true
 end
 
----Checks if the unit is registered as a constuction engineer for base building.
+--- Checks if the unit is registered as a constuction engineer for base building.
 ---@param unit Unit
 ---@return boolean
 function BM:IsConstructionUnit(unit)
@@ -1060,11 +1060,14 @@ function BM:NeedPermanentFactoryAssist()
     return false
 end
 
----Sets the maximum number of engineers operating in the base, this number includes commander if its spawned.
----@param count BaseEngineerDifficultyCount | BaseEngineerCount | integer If we have a table, we have various possible ways of counting engineers
+--- Sets the maximum number of engineers operating in the base, this number includes commander if its spawned.
+---@param count BaseEngineerDifficultyCount | BaseEngineerCount | integer # If we have a table, we have various possible ways of counting engineers
 --- {tNum1, tNum2, tNum3} - This is a difficulty defined total number of engs
+--- 
 --- {{tNum1, tNum2, tNum3,}, {aNum1, aNum2, aNum3}} - This is a difficulty defined total and permanent assisters
+--- 
 --- {tNum, aNum} - This is a single defined total with permanent assist
+--- 
 --- num - this is the number of total engineers
 function BM:SetEngineerCount(count)
     if type(count) == 'table' then
@@ -1114,13 +1117,13 @@ function BM:SetSupportACUCount(count)
 end
 
 --- Defines the factory build rate buff that is applied to all factories
----@param buffName string       # Name of a buff instance
+---@param buffName string # Name of a buff instance
 function BM:SetFactoryBuildRateBuff(buffName)
     self.FactoryBuildRateBuff = buffName
 end
 
 --- Defines the engineer build rate buff that is applied to all engineers
----@param buffName string       # Name of a buff instance
+---@param buffName string # Name of a buff instance
 function BM:SetEngineerBuildRateBuff(buffName)
     self.EngineerBuildRateBuff = buffName
 end
@@ -1165,8 +1168,8 @@ function BM:SetDefaultLandScoutPatrolChain(chainName)
 end
 
 --- Returns all factories working at a base manager
----@param category? EntityCategory Filter only this category factories
----@return FactoryUnit[] factories All factories working at this base manager, filtered by category if provided
+---@param category? EntityCategory # Filter only this category factories
+---@return FactoryUnit[] factories # All factories working at this base manager, filtered by category if provided
 function BM:GetAllBaseFactories(category)
     if not category then
         return self.AIBrain:PBMGetAllFactories(self.BaseName)
@@ -1190,7 +1193,7 @@ end
 --- baseData is a field that does nothing currently.  If we ever need more data (transports maybe) it would
 --- be housed there.
 ---@param baseName string
----@param engQuantity? number Defaults to `1`
+---@param engQuantity? number # Defaults to `1`
 ---@param baseData? any
 function BM:AddExpansionBase(baseName, engQuantity, baseData)
     table.insert(self.ExpansionBaseData, {
@@ -1209,14 +1212,14 @@ end
 -- Base Manager Unit Upgrade Level functions --
 -----------------------------------------------
 
----Set what type of upgrades you want on what types of units. The list of upgrades can be changed later.
+--- Set what type of upgrades you want on what types of units. The list of upgrades can be changed later.
 ---
----Specify only the final upgrades if the enhancements has any prerequisites.
+--- Specify only the final upgrades if the enhancements has any prerequisites.
 ---
----Applies to only ACU and SACU right now.
----@param upgradeTable Enhancement[] List of enhancements `{'ResourceEnhancement', 'T3Engineering'}`
+--- Applies to only ACU and SACU right now.
+---@param upgradeTable Enhancement[] # List of enhancements `{'ResourceEnhancement', 'T3Engineering'}`
 ---@param unitName "DefaultACU"|"DefaultSACU"
----@param startActive? boolean If true, it adds the enhancements to the existing units around the base right away.
+---@param startActive? boolean # If true, it adds the enhancements to the existing units around the base right away.
 function BM:SetUnitUpgrades(upgradeTable, unitName, startActive)
     if not unitName then
         error('*AI Debug: No unit name given for unit upgrades: Base named - ' .. self.BaseName, 2)
@@ -1313,14 +1316,14 @@ function BM:UnitNeedsUpgrade(unit, unitType)
     return false
 end
 
----@see BaseManager.SetUnitUpgrades for details
+---@see BaseManager.SetUnitUpgrades # for details
 ---@param upgradeTable Enhancement[]
 ---@param startActive? boolean
 function BM:SetACUUpgrades(upgradeTable, startActive)
     self:SetUnitUpgrades(upgradeTable, 'DefaultACU', startActive)
 end
 
----@see BaseManager.SetUnitUpgrades for details
+---@see BaseManager.SetUnitUpgrades # for details
 ---@param upgradeTable Enhancement[]
 ---@param startActive? boolean
 function BM:SetSACUUpgrades(upgradeTable, startActive)
@@ -1349,13 +1352,13 @@ function BM:UpgradeCheckThread()
     end
 end
 
----Sort build groups by priority
+--- Sort build groups by priority
 ---@protected
 function BM:SortGroupNames()
     table.sort(self.LevelNames, sortDownByPriority)
 end
 
----Changes the priority of the group previously added to the manager.
+--- Changes the priority of the group previously added to the manager.
 ---@param groupName string
 ---@param priority number
 function BM:SetGroupPriority(groupName, priority)
@@ -1368,9 +1371,9 @@ function BM:SetGroupPriority(groupName, priority)
     self:SortGroupNames()
 end
 
----Spawns a group, gives nuke and anti-nukes ammo and applies buffs.
+--- Spawns a group, gives nuke and anti-nukes ammo and applies buffs.
 ---
----The base will not try to rebuild anything from this group.
+--- The base will not try to rebuild anything from this group.
 ---@param groupName string
 ---@param uncapturable? boolean
 ---@param balance? boolean
@@ -1400,16 +1403,16 @@ function BM:SpawnGroup(groupName, uncapturable, balance)
     end
 end
 
----Spawn a unit group as wreckages.
+--- Spawn a unit group as wreckages.
 ---
----The base will not try to rebuild anything from this group.
+--- The base will not try to rebuild anything from this group.
 ---@param groupName string
 function BM:SpawnGroupAsWreckage(groupName)
     ScenarioUtils.CreateArmyGroup(self.AIBrain.Name, groupName, true)
 end
 
----Starts the base. Sets Engineer Count, spawns in all groups that have priority greater than zero
----@param engineerNumber? BaseEngineerDifficultyCount | BaseEngineerCount | integer Defaults to 0
+--- Starts the base. Sets Engineer Count, spawns in all groups that have priority greater than zero
+---@param engineerNumber? BaseEngineerDifficultyCount | BaseEngineerCount | integer # Defaults to 0
 ---@param uncapturable? boolean
 function BM:StartNonZeroBase(engineerNumber, uncapturable)
     if not engineerNumber and not ScenarioInfo.VarTable[self.BaseName .. '_EngineerNumber'] then
@@ -1429,11 +1432,11 @@ function BM:StartNonZeroBase(engineerNumber, uncapturable)
     end
 end
 
----Starts the base. Sets engineer count, spawns in all groups in `groupNames` based on difficulty.
+--- Starts the base. Sets engineer count, spawns in all groups in `groupNames` based on difficulty.
 ---
----The manager will not maintain any structures from these groups.
+--- The manager will not maintain any structures from these groups.
 ---@param groupNames GroupName[]
----@param engineerNumber? BaseEngineerDifficultyCount | BaseEngineerCount | integer Defaults to 0
+---@param engineerNumber? BaseEngineerDifficultyCount | BaseEngineerCount | integer # Defaults to 0
 ---@param uncapturable? boolean
 function BM:StartDifficultyBase(groupNames, engineerNumber, uncapturable)
     local newNames = {}
@@ -1443,11 +1446,11 @@ function BM:StartDifficultyBase(groupNames, engineerNumber, uncapturable)
     self:StartBase(newNames, engineerNumber, uncapturable)
 end
 
----Starts the base. Sets engineer count, spawns in all groups in `groupNames`.
+--- Starts the base. Sets engineer count, spawns in all groups in `groupNames`.
 ---
----The manager will not maintain any structures from these groups.
+--- The manager will not maintain any structures from these groups.
 ---@param groupNames GroupName[]
----@param engineerNumber? BaseEngineerDifficultyCount | BaseEngineerCount | integer Defaults to 0
+---@param engineerNumber? BaseEngineerDifficultyCount | BaseEngineerCount | integer # Defaults to 0
 ---@param uncapturable? boolean
 function BM:StartBase(groupNames, engineerNumber, uncapturable)
     if not engineerNumber and not ScenarioInfo.VarTable[self.BaseName .. '_EngineerNumber'] then
@@ -1466,10 +1469,10 @@ function BM:StartBase(groupNames, engineerNumber, uncapturable)
     end
 end
 
----Starts the base. Sets engineer count and spawns in no groups.
+--- Starts the base. Sets engineer count and spawns in no groups.
 ---
----Use this if you want engineers to build the base.
----@param engineerNumber? BaseEngineerDifficultyCount | BaseEngineerCount | integer Defaults to 1
+--- Use this if you want engineers to build the base.
+---@param engineerNumber? BaseEngineerDifficultyCount | BaseEngineerCount | integer # Defaults to 1
 function BM:StartEmptyBase(engineerNumber)
     if not engineerNumber and not ScenarioInfo.VarTable[self.BaseName .. '_EngineerNumber'] then
         self:SetEngineerCount(1)
@@ -1668,7 +1671,7 @@ end
 ---| "LandScouting"
 ---| "AirScouting"
 
----Toggle functionality of base parts through functions
+--- Toggle functionality of base parts through functions
 ---@param actType BaseManagerFunctionality
 ---@param val boolean
 function BM:SetActive(actType, val)
@@ -1706,7 +1709,7 @@ end
 ---| 'EnergyProduction'
 ---| 'Storage'
 
----Toggle what structures can the base build. All are enabled by default.
+--- Toggle what structures can the base build. All are enabled by default.
 ---@param buildType BaseManagerBuildFunctionality
 ---@param val boolean
 function BM:SetBuild(buildType, val)
@@ -1720,7 +1723,7 @@ function BM:SetBuild(buildType, val)
     fn(self, val)
 end
 
----Toggle building of all structures in the base
+--- Toggle building of all structures in the base
 ---@param val boolean
 function BM:SetBuildAllStructures(val)
     for k, v in self.BuildFunctions do
@@ -2030,7 +2033,7 @@ function BM:CreateSupportCommanderPlatoonTemplate()
 end
 ---@protected
 ---@param techLevel number
----@param platoonSize? number Defaults to 5
+---@param platoonSize? number # Defaults to 5
 ---@return PlatoonTemplate
 function BM:CreateEngineerPlatoonTemplate(techLevel, platoonSize)
     local faction = self.AIBrain:GetFactionIndex()
@@ -2098,7 +2101,7 @@ end
 
 --- Failsafe function that will upgrade factories, radar, etc. to next level
 ---@param unit Unit
----@param upgradeID UnitId Blueprint
+---@param upgradeID UnitId # Blueprint
 function FailSafeUpgradeBaseManagerStructure(unit, upgradeID)
 	-- Add callback when the structure starts building something
 	if not unit.AddedUpgradeCallback then
