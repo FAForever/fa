@@ -1477,6 +1477,7 @@ function BaseManagerTMLPlatoon(platoon)
 
     if not aiBrain.BaseManagers[platoon.PlatoonData.BaseName] then
         aiBrain:DisbandPlatoon(platoon)
+        return
     end
 
     for _, launcher in TMLs do
@@ -1531,6 +1532,7 @@ function BaseManagerNukePlatoon(platoon)
 
     if not aiBrain.BaseManagers[platoon.PlatoonData.BaseName] then
         aiBrain:DisbandPlatoon(platoon)
+        return
     end
 
     for _, silo in SMLs do
