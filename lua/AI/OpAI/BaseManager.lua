@@ -730,7 +730,8 @@ function BM:ConditionalBuild(sUnitName, bRetry, nNumEngineers, tPlatoonAIFunctio
 end
 
 --- Instructs the base to attempt to build a specific unit group as defined in the map. These are usually experimentals.
----@see Functionally the same as ConditionalBuild
+---
+---@see BaseManager.ConditionalBuild # - similar functionality
 ---@param unit string            # Name reference to a unit group as defined in the map
 ---@param data AddUnitAIData     # Parameters that describe the build conditions, the platoon function and the data of the platoon function
 ---@return boolean               # True when the AI was created
