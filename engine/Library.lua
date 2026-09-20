@@ -163,6 +163,19 @@ end
 function table.setn(table, n)
 end
 
+---@version <5.1, JIT
+---
+---Executes the given f over the numerical indices of table. For each index, f is called with the index and respective value as arguments. Indices are visited in sequential order, from 1 to n, where n is the size of the table. If f returns a non-nil value, then the loop is broken and this value is returned as the result of foreachi.
+---
+---[View documents](command:extension.lua.doc?["en-us/51/manual.html/pdf-table.foreachi"])
+---
+---@generic T
+---@param list any
+---@param callback fun(key: string, value: any):T|nil
+---@return T|nil
+---@deprecated
+function table.foreachi(list, callback) end
+
 serialize = {}
 
 ---@param str string
