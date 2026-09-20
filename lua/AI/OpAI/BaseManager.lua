@@ -733,7 +733,7 @@ end
 ---@see Functionally the same as ConditionalBuild
 ---@param unit string            # Name reference to a unit group as defined in the map
 ---@param data AddUnitAIData     # Parameters that describe the build conditions, the platoon function and the data of the platoon function
----@return boolean               # Truw when the AI was created
+---@return boolean               # True when the AI was created
 function BM:AddUnitAI(unit, data)
     return self:AddOpAI(unit, data) --[[@as boolean]]
 end
