@@ -54,7 +54,7 @@ function NeedAnyStructure(aiBrain, baseName)
             for i = 2, tableGetn(entry) do
                 ---@type Vector
                 local pos = entry[i]
-                if aiBrain:CanBuildStructureAt(category, {pos[1], 0, pos[2]}) and bManager:CheckUnitBuildCounter(pos, buildCounter) then
+                if aiBrain:CanBuildStructureAt(category, { pos[1], 0, pos[2] }) and bManager:CheckUnitBuildCounter(pos, buildCounter) then
                     return true
                 end
             end
@@ -101,8 +101,8 @@ end
 ---@param baseName string
 ---@return boolean
 function BaseManagerNeedsEngineers(aiBrain, baseName)
-	local bManager = aiBrain.BaseManagers[baseName]
-	return bManager and bManager.EngineerQuantity > bManager.CurrentEngineerCount
+    local bManager = aiBrain.BaseManagers[baseName]
+    return bManager and bManager.EngineerQuantity > bManager.CurrentEngineerCount
 end
 
 ---Returns `true` when any of the expansions has less engineers than set in the expansion data.
@@ -190,7 +190,7 @@ function CDRInPoolNeedAnyStructure(aiBrain, baseName)
             for i = 2, tableGetn(entry) do
                 ---@type Vector
                 local pos = entry[i]
-                if aiBrain:CanBuildStructureAt(category, {pos[1], 0, pos[2]}) then
+                if aiBrain:CanBuildStructureAt(category, { pos[1], 0, pos[2] }) then
                     return true
                 end
             end
@@ -241,7 +241,7 @@ function SubCDRInPoolNeedAnyStructure(aiBrain, baseName)
             for i = 2, tableGetn(entry) do
                 ---@type Vector
                 local pos = entry[i]
-                if aiBrain:CanBuildStructureAt(category, {pos[1], 0, pos[2]}) then
+                if aiBrain:CanBuildStructureAt(category, { pos[1], 0, pos[2] }) then
                     return true
                 end
             end
@@ -308,7 +308,7 @@ function HighestFactoryLevel(aiBrain, level, baseName)
     return true
 end
 
---- Returns true when the highest tier factory matches `level` 
+--- Returns true when the highest tier factory matches `level`
 --- Example: level = 2, type = "Land". Platoon wont be built if the base has T3 land factory.
 ---@param aiBrain CampaignAIBrain
 ---@param level number
@@ -351,9 +351,9 @@ function FactoryCountAndNeed(aiBrain, techLevel, engQuantity, pType, baseName)
     local bManager = aiBrain.BaseManagers[baseName]
     if not bManager then return false end
 
-    local facCat = ParseEntityCategory('FACTORY * TECH'..techLevel)
+    local facCat = ParseEntityCategory('FACTORY * TECH' .. techLevel)
     local facList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, facCat, bManager.Position, bManager.Radius)
-    local typeCount = {Air = 0, Land = 0, Sea = 0, }
+    local typeCount = { Air = 0, Land = 0, Sea = 0, }
     for k, v in facList do
         if EntityCategoryContains(categories.AIR, v) then
             typeCount['Air'] = typeCount['Air'] + 1
@@ -389,7 +389,7 @@ end
 function UnfinishedBuildingsCheck(aiBrain, baseName)
     local bManager = aiBrain.BaseManagers[baseName]
 
-	-- Return if the BaseManager doesn't exist, or the list is empty, or all buildings are finished
+    -- Return if the BaseManager doesn't exist, or the list is empty, or all buildings are finished
     if not bManager or tableEmpty(bManager.UnfinishedBuildings) then
         return false
     end
@@ -420,8 +420,8 @@ end
 ---@param baseName string
 ---@return boolean
 function BaseActive(aiBrain, baseName)
-	local bManager = aiBrain.BaseManagers[baseName]
-	return bManager and bManager.Active
+    local bManager = aiBrain.BaseManagers[baseName]
+    return bManager and bManager.Active
 end
 
 --- Deprecated, it was supposed to be a condition for an unfinished reclaim function/thread
@@ -429,7 +429,7 @@ end
 ---@param baseName string
 ---@return boolean
 function BaseReclaimEnabled(aiBrain, baseName)
-	local bManager = aiBrain.BaseManagers[baseName]
+    local bManager = aiBrain.BaseManagers[baseName]
     return bManager and bManager.FunctionalityStates.EngineerReclaiming
 end
 
@@ -437,7 +437,7 @@ end
 ---@param baseName string
 ---@return boolean
 function BasePatrollingEnabled(aiBrain, baseName)
-	local bManager = aiBrain.BaseManagers[baseName]
+    local bManager = aiBrain.BaseManagers[baseName]
     return bManager and bManager.FunctionalityStates.Patrolling
 end
 
@@ -445,47 +445,47 @@ end
 ---@param baseName string
 ---@return boolean
 function BaseBuildingEngineers(aiBrain, baseName)
-	local bManager = aiBrain.BaseManagers[baseName]
-	return bManager and bManager.FunctionalityStates.BuildEngineers
+    local bManager = aiBrain.BaseManagers[baseName]
+    return bManager and bManager.FunctionalityStates.BuildEngineers
 end
 
 ---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function BaseEngineersEnabled(aiBrain, baseName)
-	local bManager = aiBrain.BaseManagers[baseName]
-	return bManager and bManager.FunctionalityStates.Engineers
+    local bManager = aiBrain.BaseManagers[baseName]
+    return bManager and bManager.FunctionalityStates.Engineers
 end
 
 ---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function LandScoutingEnabled(aiBrain, baseName)
-	local bManager = aiBrain.BaseManagers[baseName]
-	return bManager and bManager.FunctionalityStates.LandScouting
+    local bManager = aiBrain.BaseManagers[baseName]
+    return bManager and bManager.FunctionalityStates.LandScouting
 end
 
 ---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function AirScoutingEnabled(aiBrain, baseName)
-	local bManager = aiBrain.BaseManagers[baseName]
-	return bManager and bManager.FunctionalityStates.AirScouting
+    local bManager = aiBrain.BaseManagers[baseName]
+    return bManager and bManager.FunctionalityStates.AirScouting
 end
 
 ---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function ExpansionBasesEnabled(aiBrain, baseName)
-	local bManager = aiBrain.BaseManagers[baseName]
-	return bManager and bManager.FunctionalityStates.ExpansionBases
+    local bManager = aiBrain.BaseManagers[baseName]
+    return bManager and bManager.FunctionalityStates.ExpansionBases
 end
 
 ---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function TMLsEnabled(aiBrain, baseName)
-	local bManager = aiBrain.BaseManagers[baseName]
+    local bManager = aiBrain.BaseManagers[baseName]
     return bManager and bManager.FunctionalityStates.TMLs
 end
 

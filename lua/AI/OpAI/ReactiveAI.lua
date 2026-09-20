@@ -40,12 +40,12 @@ local unpack = unpack
 -- | 'Pinpoint'
 
 TrackingCategories = {
-    ExperimentalAir = { categories.EXPERIMENTAL * categories.AIR},
+    ExperimentalAir = { categories.EXPERIMENTAL * categories.AIR },
     ExperimentalLand = { categories.uel0401, (categories.EXPERIMENTAL * categories.LAND * categories.MOBILE) },
-    ExperimentalNaval = { categories.EXPERIMENTAL * categories.NAVAL},
-    Nuke = { categories.NUKE},
-    HLRA = { categories.ueb2401, (categories.STRATEGIC * categories.TECH3) + (categories.EXPERIMENTAL * categories.STRUCTURE)},
-    MassedAir = { categories.AIR * categories.MOBILE * ( categories.TECH2 + categories.TECH3 )},
+    ExperimentalNaval = { categories.EXPERIMENTAL * categories.NAVAL },
+    Nuke = { categories.NUKE },
+    HLRA = { categories.ueb2401, (categories.STRATEGIC * categories.TECH3) + (categories.EXPERIMENTAL * categories.STRUCTURE) },
+    MassedAir = { categories.AIR * categories.MOBILE * (categories.TECH2 + categories.TECH3) },
 }
 
 ---AI that is built with a predefined platoon template as response to the provided trigger type
@@ -61,80 +61,80 @@ local ReactOpAI = {
         AirRetaliation = {
             ExperimentalAir = {
                 OpAI = 'AirAttacks',
-                Children = {'AirSuperiority', 'CombatFighters', 'Interceptors'},
+                Children = { 'AirSuperiority', 'CombatFighters', 'Interceptors' },
                 Priority = 1200,
                 ChildCount = 4,
-                PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI'},
+                PlatoonAIFunction = { '/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI' },
                 PlatoonData = {
                     CategoryList = TrackingCategories.ExperimentalAir,
                 },
                 TriggeringBuildConditions = {
-                    {OAUCBC, 'FocusBrainBeingBuiltOrActiveCategoryCompare', {1, TrackingCategories.ExperimentalAir, '>='}},
+                    { OAUCBC, 'FocusBrainBeingBuiltOrActiveCategoryCompare', { 1, TrackingCategories.ExperimentalAir, '>=' } },
                 },
             },
             ExperimentalLand = {
                 OpAI = 'AirAttacks',
-                Children = {'HeavyGunships', 'Gunships', 'Bombers', 'CombatFighters'},
+                Children = { 'HeavyGunships', 'Gunships', 'Bombers', 'CombatFighters' },
                 Priority = 1200,
                 ChildCount = 3,
-                PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI'},
+                PlatoonAIFunction = { '/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI' },
                 PlatoonData = {
                     CategoryList = TrackingCategories.ExperimentalLand,
                 },
                 TriggeringBuildConditions = {
-                    {OAUCBC, 'FocusBrainBeingBuiltOrActiveCategoryCompare', {1, TrackingCategories.ExperimentalLand, '>='}},
+                    { OAUCBC, 'FocusBrainBeingBuiltOrActiveCategoryCompare', { 1, TrackingCategories.ExperimentalLand, '>=' } },
                 },
             },
             ExperimentalNaval = {
                 OpAI = 'AirAttacks',
-                Children = {'TorpedoBombers', 'HeavyTorpedoBombers'},
+                Children = { 'TorpedoBombers', 'HeavyTorpedoBombers' },
                 Priority = 1200,
                 ChildCount = 3,
-                PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI'},
+                PlatoonAIFunction = { '/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI' },
                 PlatoonData = {
                     CategoryList = TrackingCategories.ExperimentalNaval,
                 },
                 TriggeringBuildConditions = {
-                    {OAUCBC, 'FocusBrainBeingBuiltOrActiveCategoryCompare', {1, TrackingCategories.ExperimentalNaval, '>='}},
+                    { OAUCBC, 'FocusBrainBeingBuiltOrActiveCategoryCompare', { 1, TrackingCategories.ExperimentalNaval, '>=' } },
                 },
             },
             Nuke = {
                 OpAI = 'AirAttacks',
-                Children = {'StratBombers', 'HeavyGunships', 'Gunships', 'Bombers'},
+                Children = { 'StratBombers', 'HeavyGunships', 'Gunships', 'Bombers' },
                 ChildCount = 1,
                 Priority = 1200,
-                PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI'},
+                PlatoonAIFunction = { '/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI' },
                 PlatoonData = {
                     CategoryList = TrackingCategories.Nuke,
                 },
                 TriggeringBuildConditions = {
-                    {OAUCBC, 'FocusBrainBeingBuiltOrActiveCategoryCompare', {1, TrackingCategories.Nuke, '>='}},
+                    { OAUCBC, 'FocusBrainBeingBuiltOrActiveCategoryCompare', { 1, TrackingCategories.Nuke, '>=' } },
                 },
             },
             HLRA = {
                 OpAI = 'AirAttacks',
-                Children = {'StratBombers', 'HeavyGunships', 'Gunships', 'Bombers'},
+                Children = { 'StratBombers', 'HeavyGunships', 'Gunships', 'Bombers' },
                 ChildCount = 1,
                 Priority = 1200,
-                PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI'},
+                PlatoonAIFunction = { '/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI' },
                 PlatoonData = {
                     CategoryList = TrackingCategories.HLRA,
                 },
                 TriggeringBuildConditions = {
-                    {OAUCBC, 'FocusBrainBeingBuiltOrActiveCategoryCompare', {1, TrackingCategories.HLRA, '>='}},
+                    { OAUCBC, 'FocusBrainBeingBuiltOrActiveCategoryCompare', { 1, TrackingCategories.HLRA, '>=' } },
                 },
             },
             MassedAir = {
                 OpAI = 'AirAttacks',
-                Children = {'AirSuperiority', 'CombatFighters', 'Interceptors'},
+                Children = { 'AirSuperiority', 'CombatFighters', 'Interceptors' },
                 ChildCount = 4,
                 Priority = 1200,
-                PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI'},
+                PlatoonAIFunction = { '/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI' },
                 PlatoonData = {
                     CategoryList = TrackingCategories.MassedAir,
                 },
                 TriggeringBuildConditions = {
-                    {OAUCBC, 'FocusBrainBeingBuiltOrActiveCategoryCompare', {40, TrackingCategories.MassedAir, '>='}},
+                    { OAUCBC, 'FocusBrainBeingBuiltOrActiveCategoryCompare', { 40, TrackingCategories.MassedAir, '>=' } },
                 },
             },
         },
@@ -160,7 +160,7 @@ function ReactOpAI:Create(brain, location, trigger, reaction, name, data)
         Priority = builderType.Priority,
     }
     if data then
-        for k,v in data do
+        for k, v in data do
             builderData[k] = v
         end
     end
@@ -181,6 +181,7 @@ function ReactOpAI:Create(brain, location, trigger, reaction, name, data)
         self:AddBuildCondition(unpack(v))
     end
 end
+
 ---@protected
 ---@param trigger ReactAITriggerEvent
 ---@param reaction ReactAIReactionType
@@ -196,7 +197,7 @@ function ReactOpAI:GetBuilderType(trigger, reaction)
     return retData
 end
 
-ReactiveAI = Class(OpAI--[[@as fa-class]])(ReactOpAI)
+ReactiveAI = Class(OpAI --[[@as fa-class]])(ReactOpAI)
 
 ---@param brain CampaignAIBrain
 ---@param location string Name of the base

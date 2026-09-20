@@ -45,7 +45,7 @@ function NavalAI:Create(brain, location, name, data)
     OpAI.Create(self, brain, location, navalTable, name .. '_' .. location .. '_NavalAI', data)
 end
 
-NavalOpAI = Class(OpAI--[[@as fa-class]])(NavalAI)
+NavalOpAI = Class(OpAI --[[@as fa-class]])(NavalAI)
 
 ---@param brain CampaignAIBrain
 ---@param location string

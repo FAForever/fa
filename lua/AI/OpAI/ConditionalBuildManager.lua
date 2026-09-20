@@ -1,4 +1,3 @@
-
 ---Helper class that manages construction projects of mobile units by engineers in the BaseManager.
 ---
 ---Used for building units that can't be produced from factories and must be built by engineers.
@@ -8,7 +7,7 @@
 ---@class ConditionalBuildManager
 ---@field Index integer                  # Index of the conditional build entry from the base manager that is being built
 ---@field IsBuilding boolean             # Is currently producing unit?
----True when the engineer is starting a new build, 
+---True when the engineer is starting a new build,
 ---prevents other engineers from starting their own builds
 ---@field IsInitiated boolean
 ---@field MainBuilder? Unit              # Engineer that was issued to build the required unit.
@@ -25,6 +24,7 @@ function CBM:__init()
     self.MaxAssisting = 1
     self.Index = 0
 end
+
 ---Store the engineer that was issued to start the construction and update the values so other
 ---engineers won't try to start their own.
 ---@param builder Unit
@@ -38,6 +38,7 @@ function CBM:OnUnitConstructionRequested(builder, data)
     self.IsBuilding = false
     self.WaitSecondsAfterDeath = data.WaitSecondsAfterDeath
 end
+
 ---Stores the unit and sets variables so other engineers can see what's going on
 ---@param unitBeingbuilt Unit
 function CBM:OnUnitConstructionStarted(unitBeingbuilt)
@@ -45,12 +46,15 @@ function CBM:OnUnitConstructionStarted(unitBeingbuilt)
     self.IsBuilding = true
     self.Unit = unitBeingbuilt
 end
+
 function CBM:IncrementAssisting()
     self.NumAssisting = self.NumAssisting + 1
 end
+
 function CBM:DecrementAssisting()
     self.NumAssisting = self.NumAssisting - 1
 end
+
 ---Resets the stored values so it can be reused for another build project
 function CBM:Reset()
     self.IsInitiated = false
@@ -62,6 +66,7 @@ function CBM:Reset()
     self.Index = 0
     self.WaitSecondsAfterDeath = nil
 end
+
 ---@return boolean?
 function CBM:NeedsMoreBuilders()
     return self.IsBuilding and self.Unit and not self.Unit.Dead and (self.NumAssisting < self.MaxAssisting)

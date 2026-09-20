@@ -53,7 +53,7 @@ CDRTargetPriorities = {
 ---@see PlatoonCDRData For required platoon data.
 ---@param platoon Platoon
 function CDROverchargeBehavior(platoon)
-    local cdr = platoon:GetPlatoonUnits()[1]--[[@as OpAIACUUnit]]
+    local cdr = platoon:GetPlatoonUnits()[1] --[[@as OpAIACUUnit]]
     if platoon.CDRData then
         cdr.CDRData = platoon.CDRData
     end
@@ -76,7 +76,7 @@ function CDROverChargeThread(cdr)
     ---@cast weapBPs -nil
     ---@type WeaponBlueprint
     local weapon
-    for _,v in weapBPs do
+    for _, v in weapBPs do
         if v.Label == 'OverCharge' then
             weapon = v
             break
@@ -135,7 +135,7 @@ function CDROverChargeThread(cdr)
                             if aiBrain:GetEconomyStored('ENERGY') >= weapon.EnergyRequired and not target.Dead then
                                 overCharging = true
                                 IssueToUnitClearCommands(cdr)
-                                IssueOverCharge({cdr}, target)
+                                IssueOverCharge({ cdr }, target)
                             elseif not target.Dead then
                                 local tarPos = target:GetPosition()
                                 IssueToUnitClearCommands(cdr)
@@ -191,7 +191,7 @@ function CDRRepairBuildingUnit(cdr, plat)
 
     if targetUnit and not targetUnit:BeenDestroyed() and targetUnit:GetFractionComplete() < 1 then
         IssueToUnitClearCommands(cdr)
-        IssueRepair({cdr}, targetUnit)
+        IssueRepair({ cdr }, targetUnit)
 
         repeat
             WaitSeconds(1)

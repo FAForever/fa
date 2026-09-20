@@ -106,28 +106,28 @@ local tableFind = table.find
 local TIERS = {
     --Tier 1 naval units
     { --              UEF        AEON       CYBRAN     SERA
-        CORE =      {'ues0103', 'uas0103', 'urs0103', 'xss0103'},
-        SUBS =      {'ues0203', 'uas0203', 'urs0203', 'xss0203'},
-        LIGHT =     { nil     , 'uas0102',  nil     ,  nil     },
+        CORE = { 'ues0103', 'uas0103', 'urs0103', 'xss0103' },
+        SUBS = { 'ues0203', 'uas0203', 'urs0203', 'xss0203' },
+        LIGHT = { nil, 'uas0102', nil, nil },
     },
 
     --Tier 2 naval units
     {
-        CORE =      {'ues0201', 'uas0201', 'urs0201', 'xss0201'},
-        SUBS =      {'xes0102', 'xas0204', 'xrs0204', 'xss0203'},   --note seraphim have no T2 sub hunter
-        CRUISERS =  {'ues0202', 'uas0202', 'urs0202', 'xss0202'},
-        UTILITY =   {'xes0205',  nil     , 'xrs0205',  nil     },
+        CORE = { 'ues0201', 'uas0201', 'urs0201', 'xss0201' },
+        SUBS = { 'xes0102', 'xas0204', 'xrs0204', 'xss0203' },    --note seraphim have no T2 sub hunter
+        CRUISERS = { 'ues0202', 'uas0202', 'urs0202', 'xss0202' },
+        UTILITY = { 'xes0205', nil, 'xrs0205', nil },
     },
 
     --Tier 3 naval units
     {
-        CORE =      {'ues0302', 'uas0302', 'urs0302', 'xss0302'},
-        SUBS =      {'xes0102', 'xas0204', 'xrs0204', 'xss0304'},
-        CRUISERS =  {'ues0202', 'uas0202', 'urs0202', 'xss0202'},
-        CARRIERS =  { nil     , 'uas0303', 'urs0303', 'xss0303'},
-        FATTIES =   {'xes0307', 'xas0306',  nil     ,  nil     },
-        UTILITY =   {'xes0205',  nil     , 'xrs0205',  nil     },
-        NUKESUBS =  {'ues0304', 'uas0304', 'urs0304',  nil     },
+        CORE = { 'ues0302', 'uas0302', 'urs0302', 'xss0302' },
+        SUBS = { 'xes0102', 'xas0204', 'xrs0204', 'xss0304' },
+        CRUISERS = { 'ues0202', 'uas0202', 'urs0202', 'xss0202' },
+        CARRIERS = { nil, 'uas0303', 'urs0303', 'xss0303' },
+        FATTIES = { 'xes0307', 'xas0306', nil, nil },
+        UTILITY = { 'xes0205', nil, 'xrs0205', nil },
+        NUKESUBS = { 'ues0304', 'uas0304', 'urs0304', nil },
     },
 }
 
@@ -180,7 +180,7 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
     local Scenario = {
         Name = name,
         Platoons = {
-            OST_BLANK_TEMPLATE = {'OST_BLANK_TEMPLATE', ''},
+            OST_BLANK_TEMPLATE = { 'OST_BLANK_TEMPLATE', '' },
         },
         Armies = {
             ARMY_1 = {
@@ -195,7 +195,7 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
     local levels = levelsPerTier * 3
 
     --Frigate increment per level
-    local frigInc = (maxFrigates-minFrigates)/(levels-1)
+    local frigInc = (maxFrigates - minFrigates) / (levels - 1)
 
     --Accumulators
     local frigAcc = minFrigates
@@ -207,14 +207,14 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
     --Build the stuff
     for level = 1, levels do
         --Types of naval units in the platoon
-        local tier = mathFloor((level-1)/levelsPerTier) + 1
-        local waveLevel = mathMod(level-1, levelsPerTier) + 1
+        local tier = mathFloor((level - 1) / levelsPerTier) + 1
+        local waveLevel = mathMod(level - 1, levelsPerTier) + 1
         local tpName = 'OST_' .. name .. '_' .. tier .. '-' .. waveLevel .. '_Template'
 
         ---@type OpAIChildType[]
-        local children = {'T' .. tier} --, 'L' .. tostring(level)}
+        local children = { 'T' .. tier } --, 'L' .. tostring(level)}
 
-        local template = {tpName, ''}
+        local template = { tpName, '' }
         Scenario.Platoons[tpName] = template
 
         --------------------------------
@@ -238,15 +238,15 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
         local numBattleships = mathFloor(battAcc)
 
         if numFrigates > 0 then
-            tableInsert(template, {TIER1.CORE[faction], 1, numFrigates, 'Attack', 'None'})
+            tableInsert(template, { TIER1.CORE[faction], 1, numFrigates, 'Attack', 'None' })
             tableInsert(children, 'Frigate')
         end
         if isEnabledType('Destroyer', enabledTypes) and numDestroyers > 0 then
-            tableInsert(template, {TIER2.CORE[faction], 1, numDestroyers, 'Attack', 'None'})
+            tableInsert(template, { TIER2.CORE[faction], 1, numDestroyers, 'Attack', 'None' })
             tableInsert(children, 'Destroyer')
         end
         if isEnabledType('Battleship', enabledTypes) and numBattleships > 0 then
-            tableInsert(template, {TIER3.CORE[faction], 1, numBattleships, 'Attack', 'None'})
+            tableInsert(template, { TIER3.CORE[faction], 1, numBattleships, 'Attack', 'None' })
             tableInsert(children, 'Battleship')
         end
 
@@ -264,14 +264,14 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
             if numSubmarines > 0 then
                 local placed = false
                 if tier == 3 and not data.DisableTypes['T3Submarine'] then
-                    tableInsert(template, {TIER3.SUBS[faction], 1, numSubmarines, 'Guard', 'None'})
+                    tableInsert(template, { TIER3.SUBS[faction], 1, numSubmarines, 'Guard', 'None' })
                     tableInsert(children, 'T3Submarine')
                     placed = true
                 elseif tier >= 2 and not placed and not data.DisableTypes['T2Submarine'] then
-                    tableInsert(template, {TIER2.SUBS[faction], 1, numSubmarines, 'Guard', 'None'})
+                    tableInsert(template, { TIER2.SUBS[faction], 1, numSubmarines, 'Guard', 'None' })
                     tableInsert(children, 'T2Submarine')
                 elseif not placed and not data.DisableTypes['Submarine'] then
-                    tableInsert(template, {TIER1.SUBS[faction], 1, numSubmarines, 'Guard', 'None'})
+                    tableInsert(template, { TIER1.SUBS[faction], 1, numSubmarines, 'Guard', 'None' })
                     tableInsert(children, 'Submarine')
                 end
             end
@@ -287,7 +287,7 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
             end
 
             if numCruisers > 0 then
-                tableInsert(template, {TIERS[tier].CRUISERS[faction], 1, numCruisers, 'Guard', 'None'})
+                tableInsert(template, { TIERS[tier].CRUISERS[faction], 1, numCruisers, 'Guard', 'None' })
                 tableInsert(children, 'Cruiser')
             end
         end
@@ -300,7 +300,7 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
             end
 
             if numLight > 0 then
-                tableInsert(template, {TIER1.LIGHT[faction], 1, numLight, 'Guard', 'None'})
+                tableInsert(template, { TIER1.LIGHT[faction], 1, numLight, 'Guard', 'None' })
                 tableInsert(children, 'LightBoat')
             end
         end
@@ -315,7 +315,7 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
             end
 
             if numUtility > 0 then
-                tableInsert(template, {TIER3.UTILITY[faction], 1, numUtility, 'Guard', 'None'})
+                tableInsert(template, { TIER3.UTILITY[faction], 1, numUtility, 'Guard', 'None' })
                 tableInsert(children, 'Utility')
             end
         end
@@ -328,7 +328,7 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
             end
 
             if numFatties > 0 then
-                tableInsert(template, {TIER3.FATTIES[faction], 1, numFatties, 'Guard', 'None'})
+                tableInsert(template, { TIER3.FATTIES[faction], 1, numFatties, 'Guard', 'None' })
                 tableInsert(children, 'Fatty')
             end
         end
@@ -341,7 +341,7 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
             end
 
             if numCarriers > 0 then
-                tableInsert(template, {TIER3.CARRIERS[faction], 1, numCarriers, 'Guard', 'None'})
+                tableInsert(template, { TIER3.CARRIERS[faction], 1, numCarriers, 'Guard', 'None' })
                 tableInsert(children, 'Carrier')
             end
         end
@@ -354,14 +354,14 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
             end
 
             if numNukeSubs > 0 then
-                tableInsert(template, {TIER3.NUKESUBS[faction], 1, numNukeSubs, 'Guard', 'None'})
+                tableInsert(template, { TIER3.NUKESUBS[faction], 1, numNukeSubs, 'Guard', 'None' })
                 tableInsert(children, 'NukeSubmarine')
             end
         end
 
         -- Create the child platoon builder
         builders['OSB_Child_' .. name .. '_' .. tier .. '-' .. waveLevel] = {
-            PlatoonAIFunction = {SPAI, 'DefaultOSBasePatrol', {'default_platoon'}, {'default_platoon'}},
+            PlatoonAIFunction = { SPAI, 'DefaultOSBasePatrol', { 'default_platoon' }, { 'default_platoon' } },
             PlatoonTemplate = tpName,
             Priority = BasePriority + tier,
             InstanceCount = 1,
@@ -372,20 +372,22 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
             BuildConditions = {
                 {
                     '/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                    {'default_master'},
-                    {'default_master'}
+                    { 'default_master' },
+                    { 'default_master' }
                 },
                 {
                     '/lua/ai/opai/GenerateNaval.lua', 'ChildShouldBuild',
-                    {'default_master'},
-                    {'default_master'},
+                    { 'default_master' },
+                    { 'default_master' },
                 },
             },
             PlatoonData = {
                 {
-                    type = 5, name = 'AMPlatoons', value = {
-                        {type = 2, name = 'String_0',  value = masterPlatoonName},
-                        {type = 2, name = 'APPEND_FleetChildren',  value = masterPlatoonName},
+                    type = 5,
+                    name = 'AMPlatoons',
+                    value = {
+                        { type = 2, name = 'String_0',             value = masterPlatoonName },
+                        { type = 2, name = 'APPEND_FleetChildren', value = masterPlatoonName },
                     }
                 },
             },
@@ -408,36 +410,36 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
         BuildTimeOut = -1,
         PlatoonType = 'Sea',
         RequiresConstruction = false,
-        PlatoonAIFunction = {SPAI, 'DefaultOSBasePatrol', {'default_platoon'}, {'default_platoon'}},
+        PlatoonAIFunction = { SPAI, 'DefaultOSBasePatrol', { 'default_platoon' }, { 'default_platoon' } },
         BuildConditions = {
             {
                 '/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                {'default_master'},
-                {'default_master'}
+                { 'default_master' },
+                { 'default_master' }
             },
             {
                 '/lua/ai/opai/generatenaval.lua', 'FleetIsBuilt',
-                {'default_master'},
-                {'default_master'},
+                { 'default_master' },
+                { 'default_master' },
             },
         },
         PlatoonBuildCallbacks = {
             {
                 '/lua/editor/amplatoonhelperfunctions.lua', 'AMUnlockPlatoon',
-                {'default_platoon'},
-                {'default_platoon'}
+                { 'default_platoon' },
+                { 'default_platoon' }
             },
         },
         PlatoonAddFunctions = {
             {
                 '/lua/editor/amplatoonhelperfunctions.lua', 'AMLockPlatoon',
-                {'default_platoon'},
-                {'default_platoon'}
+                { 'default_platoon' },
+                { 'default_platoon' }
             },
         },
         PlatoonData = {
-            {type = 3, name = 'AMMasterPlatoon',  value = true},
-            {type = 3, name = 'UsePool', value = false},
+            { type = 3, name = 'AMMasterPlatoon', value = true },
+            { type = 3, name = 'UsePool',         value = false },
         },
     }
 
@@ -448,7 +450,7 @@ end
 ---@param master string
 ---@return boolean
 function FleetIsBuilt(aiBrain, master)
-    local fleetCounter = ScenarioFramework.AMPlatoonCounter(aiBrain, master..'_FleetChildren')
+    local fleetCounter = ScenarioFramework.AMPlatoonCounter(aiBrain, master .. '_FleetChildren')
 
     return fleetCounter >= 1
 end
@@ -457,7 +459,7 @@ end
 ---@param master string
 ---@return boolean
 function ChildShouldBuild(aiBrain, master)
-    local fleetCounter = ScenarioFramework.AMPlatoonCounter(aiBrain, master..'_FleetChildren')
+    local fleetCounter = ScenarioFramework.AMPlatoonCounter(aiBrain, master .. '_FleetChildren')
 
     return fleetCounter < 1
 end
