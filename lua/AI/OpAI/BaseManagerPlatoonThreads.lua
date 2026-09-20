@@ -329,7 +329,7 @@ function DoConditionalBuild(singleEngineerPlatoon)
     -- Get unit plans from the scenario
     local unitToBuild, unitName
     if type(selectedBuild.name) == 'table' then
-		unitName = table.random(selectedBuild.name)
+		unitName = table.random(selectedBuild.name --[[@as string[] ]])
         unitToBuild = ScenarioUtils.FindUnit(unitName, Scenario.Armies[aiBrain.Name].Units)
         if not unitToBuild then error('Unit with name "' .. unitName .. '" could not be found for conditional building.') return end
     else
