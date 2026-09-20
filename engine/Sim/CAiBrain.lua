@@ -406,9 +406,15 @@ end
 
 --- Returns platoon by unique name.
 ---
----@see moho.platoon_methods.UniquelyNamePlatoon To set the name.
+---@see moho.platoon_methods.UniquelyNamePlatoon # To set the name.
 ---@param name string
 ---@return Platoon?
+function CAiBrain:GetPlatoonUniquelyNamed(name)
+end
+
+--- `ArmyPool` is created by engine and contains all units for the army
+---@param name 'ArmyPool'
+---@return Platoon
 function CAiBrain:GetPlatoonUniquelyNamed(name)
 end
 

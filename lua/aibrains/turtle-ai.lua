@@ -334,10 +334,8 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
 
         -- TURNING OFF AI POOL PLATOON, I MAY JUST REMOVE THAT PLATOON FUNCTIONALITY LATER
         local poolPlatoon = self:GetPlatoonUniquelyNamed('ArmyPool')
-        if poolPlatoon then
-            poolPlatoon.ArmyPool = true
-            poolPlatoon:TurnOffPoolAI()
-        end
+        poolPlatoon.ArmyPool = true
+        poolPlatoon:TurnOffPoolAI()
 
         -- Stores handles to all builders for quick iteration and updates to all
         self.BuilderHandles = {}

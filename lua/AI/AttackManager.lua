@@ -280,7 +280,6 @@ AttackManager = ClassSimple {
 	---@param self AttackManager
     FormAttackPlatoon = function(self)
         local poolPlatoon = self.brain:GetPlatoonUniquelyNamed('ArmyPool')
-        ---@cast poolPlatoon -nil
 
 		-- Loop through all of the AM platoons
         for _, v in ipairs(self.Platoons) do
