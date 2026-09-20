@@ -45,7 +45,7 @@ CDRTargetPriorities = {
     categories.TECH1 * categories.MOBILE, categories.ALLUNITS
 }
 
----Sets up threads for ACU fighting
+--- Sets up threads for ACU fighting
 --- - actively OC-ing and attacking nearby units.
 --- - returning to base if got too far during fight
 --- - return to base if on low HP
@@ -182,7 +182,7 @@ function CDROverChargeThread(cdr)
     end
 end
 
----Finishes the constructioin of the unit the ACU was previously building
+--- Finishes the constructioin of the unit the ACU was previously building
 ---@param cdr OpAIACUUnit
 ---@param plat Platoon
 function CDRRepairBuildingUnit(cdr, plat)
@@ -209,7 +209,7 @@ function CDRRepairBuildingUnit(cdr, plat)
     end
 end
 
----Moves the commander back to the base position if it get's too far while fighting.
+--- Moves the commander back to the base position if it get's too far while fighting.
 ---@param cdr OpAIACUUnit
 function CDRLeashThread(cdr)
     local data = cdr.CDRData

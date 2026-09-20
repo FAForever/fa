@@ -48,7 +48,7 @@ TrackingCategories = {
     MassedAir = { categories.AIR * categories.MOBILE * (categories.TECH2 + categories.TECH3) },
 }
 
----AI that is built with a predefined platoon template as response to the provided trigger type
+--- AI that is built with a predefined platoon template as response to the provided trigger type
 ---
 ---@see ReactAITriggerEvent for list of available events
 ---@see ReactAIReactionType for the types of reactive AIs

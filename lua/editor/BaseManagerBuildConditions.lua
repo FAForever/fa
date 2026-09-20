@@ -18,7 +18,7 @@ local EntityCategoryContains, ParseEntityCategory = EntityCategoryContains, Pars
 local t2factories = categories.FACTORY * categories.TECH2
 local t3factories = categories.FACTORY * categories.TECH3
 
----Checks the base template of the base manager to see if any structure is not built.
+--- Checks the base template of the base manager to see if any structure is not built.
 ---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
@@ -63,7 +63,7 @@ function NeedAnyStructure(aiBrain, baseName)
     return false
 end
 
----Compares number of `category` units belonging to `aiBrain` that are in within the base radius to `varName`
+--- Compares number of `category` units belonging to `aiBrain` that are in within the base radius to `varName`
 ---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@param category EntityCategory
@@ -96,7 +96,7 @@ function NumUnitsLessNearBase(aiBrain, baseName, category, varName)
     return false
 end
 
----Returns `true` when number of active engineers in the base is less than set maximum.
+--- Returns `true` when number of active engineers in the base is less than set maximum.
 ---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
@@ -105,7 +105,7 @@ function BaseManagerNeedsEngineers(aiBrain, baseName)
     return bManager and bManager.EngineerQuantity > bManager.CurrentEngineerCount
 end
 
----Returns `true` when any of the expansions has less engineers than set in the expansion data.
+--- Returns `true` when any of the expansions has less engineers than set in the expansion data.
 ---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
@@ -126,7 +126,7 @@ function ExpansionBasesNeedEngineers(aiBrain, baseName)
     return false
 end
 
----Check if specific expansion base needs engineers
+--- Check if specific expansion base needs engineers
 ---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@param eBaseName string
@@ -148,7 +148,7 @@ function NumEngiesInExpansionBase(aiBrain, baseName, eBaseName)
     return false
 end
 
----Currently unsed, as ACU is treated as engineer in the base manager.
+--- Currently unsed, as ACU is treated as engineer in the base manager.
 ---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
@@ -199,7 +199,7 @@ function CDRInPoolNeedAnyStructure(aiBrain, baseName)
     return false
 end
 
----Currently unsed, as sACU is treated as engineer in the base manager.
+--- Currently unsed, as sACU is treated as engineer in the base manager.
 ---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
@@ -250,7 +250,7 @@ function SubCDRInPoolNeedAnyStructure(aiBrain, baseName)
     return false
 end
 
----Returns `true` if the base construction units are building any of the passed `catTable` units.
+--- Returns `true` if the base construction units are building any of the passed `catTable` units.
 ---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@param catTable string[] List of category strings to test, e.g. `{'MOBILE LAND', 'ALLUNITS' }`
@@ -284,9 +284,9 @@ function CategoriesBeingBuilt(aiBrain, baseName, catTable)
     return false
 end
 
----Checks if the base has any T3 / T2 factories based on `level`.
+--- Checks if the base has any T3 / T2 factories based on `level`.
 ---
----Always returns true for when `level` is `1`
+--- Always returns true for when `level` is `1`
 ---@param aiBrain CampaignAIBrain
 ---@param level number Factory tech level
 ---@param baseName string

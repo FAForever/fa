@@ -46,7 +46,7 @@ local targetCommanderNeverPriorities = {
 }
 local defTargetPriorities = { 'COMMAND', 'MOBILE', 'STRUCTURE DEFENSE', 'ALLUNITS' }
 
----Platoon template file with pre-generated platoon templates and builders
+--- Platoon template file with pre-generated platoon templates and builders
 ---@alias OpAIPlatoonTpFile
 ---| "AirAttacks"
 ---| "AirScout"
@@ -148,9 +148,9 @@ local defTargetPriorities = { 'COMMAND', 'MOBILE', 'STRUCTURE DEFENSE', 'ALLUNIT
 ---@field BuilderType OpAIPlatoonTpFile | GeneratedScenario Save file that is used to find child quantities
 ---@field MasterData AMBuilder
 ---@field ChildrenHandles OpAIChildHandle[]
----Periodically runs functions in `OpAI.ChildMonitorData` to toggle children
+--- Periodically runs functions in `OpAI.ChildMonitorData` to toggle children
 ---
----Childrens are enabled by default, unless one of the functions return `false`
+--- Childrens are enabled by default, unless one of the functions return `false`
 ---@field ChildMonitorHandle? thread
 ---@field ChildMonitorData? table<OpAIChildType, OpAINewChildMonitorData[]>
 ---@field ChildrenNames OpAIChildrenName[]
@@ -158,7 +158,7 @@ local defTargetPriorities = { 'COMMAND', 'MOBILE', 'STRUCTURE DEFENSE', 'ALLUNIT
 ---@field private PreCreateFinished boolean
 ---@overload fun(): OpAI
 local BaseOpAI = {}
----Set up variables local to this OpAI instance
+--- Set up variables local to this OpAI instance
 ---@private
 function BaseOpAI:PreCreate()
     if self.PreCreateFinished then return end
@@ -228,9 +228,9 @@ function BaseOpAI:ChildNameCheck(name)
     return false
 end
 
----Sets the number of child platoons to build.
+--- Sets the number of child platoons to build.
 ---
----Once the desired amount it reached, they are combined into a master platoon.
+--- Once the desired amount it reached, they are combined into a master platoon.
 ---@param number integer
 ---@param childType? any
 function BaseOpAI:SetChildCount(number, childType)
@@ -241,9 +241,9 @@ function BaseOpAI:SetChildCount(number, childType)
     end
 end
 
----Sets the number of child platoons to build.
+--- Sets the number of child platoons to build.
 ---
----Once the desired amount it reached, they are combined into a master platoon.
+--- Once the desired amount it reached, they are combined into a master platoon.
 ---@param diffTable {[1]: integer, [2]: integer, [3]: integer} count to set for Easy, Medium, Hard difficulty
 function BaseOpAI:SetChildCountDiffTable(diffTable)
     local platoonCounter = ScenarioInfo.OSPlatoonCounter
@@ -252,7 +252,7 @@ function BaseOpAI:SetChildCountDiffTable(diffTable)
     platoonCounter[self.MasterName .. '_D3'] = diffTable[3]
 end
 
----Changes the children platoons' AI function
+--- Changes the children platoons' AI function
 ---@param functionInfo FileFunctionRef
 ---@param childType any Unused
 function BaseOpAI:SetChildrenPlatoonAI(functionInfo, childType)
@@ -264,7 +264,7 @@ function BaseOpAI:SetChildrenPlatoonAI(functionInfo, childType)
     end
 end
 
----Overrides the default platoon formation
+--- Overrides the default platoon formation
 ---@param formationName UnitFormations
 function BaseOpAI:SetFormation(formationName)
     if not self:FindMaster() then return end
@@ -278,7 +278,7 @@ function BaseOpAI:SetFunctionStatus(funcName, bool)
     ScenarioInfo.OSPlatoonCounter[self.MasterName .. '_' .. funcName] = bool
 end
 
----TODO: make a system out of this.  Derive functionality per override per OpAI type
+--- TODO: make a system out of this.  Derive functionality per override per OpAI type
 ---@private
 ---@param functionData any
 function BaseOpAI:MasterPlatoonFunctionalityChange(functionData)
@@ -287,21 +287,21 @@ function BaseOpAI:MasterPlatoonFunctionalityChange(functionData)
     end
 end
 
----Sets the the whole platoon or only units matching categories to target commanders after all other units.
+--- Sets the the whole platoon or only units matching categories to target commanders after all other units.
 ---@param cat? EntityCategory Specifies a subset of the platoon to set target priorities for
 ---@return boolean
 function BaseOpAI:TargetCommanderLast(cat)
     return self:SetTargettingPriorities(targetCommanderLastPriorities, cat)
 end
 
----Sets the the whole platoon or only units matching categories to not target commanders.
+--- Sets the the whole platoon or only units matching categories to not target commanders.
 ---@param cat? EntityCategory Specifies a subset of the platoon to set target priorities for
 ---@return boolean
 function BaseOpAI:TargetCommanderNever(cat)
     return self:SetTargettingPriorities(targetCommanderNeverPriorities, cat)
 end
 
----Sets the target priorities for the whole platoon or only units matching categories
+--- Sets the target priorities for the whole platoon or only units matching categories
 ---@param priTable string[]|EntityCategory[]
 ---@param cat? EntityCategory specifying a subset of the platoon we wish to set target priorities for
 ---@return boolean
@@ -339,24 +339,25 @@ end
 ---@field [2] (ChildMonitorFnData|fun(): boolean)[]
 
 ---@param childrenData OpAINewChildMonitorData[]
----```
----childData = {
+--- ```
+--- childrenData = {
 ---    { 'LightTanks', 'LightBots' },
 ---    {
 ---        Function or function table,
 ---        Function or function table,
 ---        Function or function table,
 ---    },
----}
+--- }
+--- ```
 function BaseOpAI:AddChildrenMonitor(childrenData)
     for _, v in childrenData do
         self:AddChildMonitor(v)
     end
 end
 
----Adds a function that will be run periodically to toggle the child.
+--- Adds a function that will be run periodically to toggle the child.
 ---
----The child stays enabled, unless the function returns `false`.
+--- The child stays enabled, unless the function returns `false`.
 ---@param childData OpAINewChildMonitorData[]
 function BaseOpAI:AddChildMonitor(childData)
     -- add children and functions to the child table in self
@@ -398,9 +399,9 @@ function BaseOpAI:AddChildMonitor(childData)
     end
 end
 
----Runs periodically to toggle children enabled.
+--- Runs periodically to toggle children enabled.
 ---
----Children are enabled unless one of the conditions return `false`.
+--- Children are enabled unless one of the conditions return `false`.
 ---@private
 function BaseOpAI:ChildMonitorThread()
     local monitorData = self.ChildMonitorData
@@ -434,11 +435,11 @@ function BaseOpAI:ChildMonitorCheck(name, data)
     self:SetChildActive(name, true)
 end
 
----Overrides the the template size of `childrenType` to `quantity` and disables all other childs.
+--- Overrides the the template size of `childrenType` to `quantity` and disables all other childs.
 ---
----Child platoon template **has to match all** `childrenType` to be set.
+--- Child platoon template **has to match all** `childrenType` to be set.
 ---
----Possible combinations are:
+--- Possible combinations are:
 --- - `'HeavyTanks', 6` - Sets the tanks count to 6
 --- - `{'HeavyTanks', 'LightTanks', 'LightArtillery'}, 9` - Sets each to 3
 --- - `{'HeavyTanks', 'LightArtillery'}, {10, 2}` - Sets tanks count to 10, art to 2
@@ -590,7 +591,7 @@ function BaseOpAI:OverrideTemplateSize(quantity)
     end
 end
 
----Build conditions for PBM; Attack Conditions for AM Platoons
+--- Build conditions for PBM; Attack Conditions for AM Platoons
 ---@param fileName FileName
 ---@param funcName string
 ---@param parameters table Array with parameters that will be passed to the build condition function
@@ -654,7 +655,7 @@ function BaseOpAI:RemoveBuildCondition(funcName, bName)
     return true
 end
 
----Add Functions for PBM Platoons; FormCallbacks for AM Platoons
+--- Add Functions for PBM Platoons; FormCallbacks for AM Platoons
 ---@protected
 ---@param fileName fun(self: Platoon) | FileName
 ---@param funcName? string
@@ -678,7 +679,7 @@ function BaseOpAI:AddAddFunction(fileName, funcName, bName)
     return true
 end
 
----Adds a function to run when the platoon is formed.
+--- Adds a function to run when the platoon is formed.
 ---@param filename fun(self: Platoon) | FileName
 ---@param funcName? string
 ---@param builderName? string
@@ -687,7 +688,7 @@ function BaseOpAI:AddFormCallback(filename, funcName, builderName)
     self:AddAddFunction(filename, funcName, builderName)
 end
 
----Remove Functions for PBM Platoons; FormCallbacks for AM Platoons
+--- Remove Functions for PBM Platoons; FormCallbacks for AM Platoons
 ---@protected
 ---@param funcName string
 ---@param builderName? string
@@ -720,7 +721,7 @@ function BaseOpAI:RemoveFormCallback(funcName, builderName)
     self:RemoveAddFunction(funcName, builderName)
 end
 
----Add Build Callback for PBM Platoons; Death Callback for AM Platoons
+--- Add Build Callback for PBM Platoons; Death Callback for AM Platoons
 ---@param fileName FileName
 ---@param funcName string
 ---@param builderName? string
@@ -786,7 +787,7 @@ function BaseOpAI:MasterUsePool(val)
     return true
 end
 
----Changes the default (once all units die) rebuild condition for this AI platoon.
+--- Changes the default (once all units die) rebuild condition for this AI platoon.
 ---@param lockType OpAILockType
 ---@param lockData? OpAILockData
 function BaseOpAI:SetLockingStyle(lockType, lockData)
@@ -895,9 +896,9 @@ function BaseOpAI:SetChildActive(cType, val)
     end
 end
 
----Sets up all the variables and loads platoon builders.
+--- Sets up all the variables and loads platoon builders.
 ---
----**This function is called automatically if the OpAI is added through BaseManager**
+--- **This function is called automatically if the OpAI is added through BaseManager**
 ---@see BaseManager.AddOpAI
 ---@param brain CampaignAIBrain
 ---@param location string Name of the base

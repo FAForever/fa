@@ -51,7 +51,7 @@ local categoriesSTRUCTURE = categories.STRUCTURE
 ---@field AssistRange integer|nil Range in which the engineer can find things to assist. Defaults to base manager's `Radius`
 ---@field BeingBuiltCategories string[]|nil
 
----Possible data the engineer platoon can have
+--- Possible data the engineer platoon can have
 ---@class BMEngineerPlatoonData
 ---@field BaseName string Name of the base manager
 ---@field Assist BMAssistPlatoonData|nil
@@ -210,7 +210,7 @@ function ConditionalBuildDied(conditionalUnit)
     })
 end
 
----Unlocks conditional build `name` after `seconds` for rebuilding after death.
+--- Unlocks conditional build `name` after `seconds` for rebuilding after death.
 ---@param name string
 ---@param seconds integer
 local function unlockConditionalBuildThread(name, seconds)
@@ -938,7 +938,7 @@ end
 
 --#region Patrol and Assist
 
----Sets the platoon on a patrol route created from base factories positions.
+--- Sets the platoon on a patrol route created from base factories positions.
 ---@param platoon Platoon
 function BaseManagerPatrolLocationFactoriesAI(platoon)
     local aiBrain = platoon:GetBrain() --[[@as CampaignAIBrain]]
@@ -971,7 +971,7 @@ function BaseManagerPatrolLocationFactoriesAI(platoon)
     end
 end
 
----Patrols the engineer using the default BaseManager patrol chain or around the base factories.
+--- Patrols the engineer using the default BaseManager patrol chain or around the base factories.
 ---@param platoon Platoon
 function BaseManagerEngineerPatrol(platoon)
     local aiBrain = platoon:GetBrain() --[[@as CampaignAIBrain]]

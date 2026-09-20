@@ -1,14 +1,14 @@
----Helper class that manages construction projects of mobile units by engineers in the BaseManager.
+--- Helper class that manages construction projects of mobile units by engineers in the BaseManager.
 ---
----Used for building units that can't be produced from factories and must be built by engineers.
+--- Used for building units that can't be produced from factories and must be built by engineers.
 --- - experimentals
 --- - sonars
 --- - any other mobile unit that the engineers can build.
 ---@class ConditionalBuildManager
 ---@field Index integer                  # Index of the conditional build entry from the base manager that is being built
 ---@field IsBuilding boolean             # Is currently producing unit?
----True when the engineer is starting a new build,
----prevents other engineers from starting their own builds
+--- True when the engineer is starting a new build,
+--- prevents other engineers from starting their own builds
 ---@field IsInitiated boolean
 ---@field MainBuilder? Unit              # Engineer that was issued to build the required unit.
 ---@field MaxAssisting integer           # Max engineers that can assist the construction
@@ -25,8 +25,8 @@ function CBM:__init()
     self.Index = 0
 end
 
----Store the engineer that was issued to start the construction and update the values so other
----engineers won't try to start their own.
+--- Store the engineer that was issued to start the construction and update the values so other
+--- engineers won't try to start their own.
 ---@param builder Unit
 ---@param data AddUnitAIData
 function CBM:OnUnitConstructionRequested(builder, data)
@@ -39,7 +39,7 @@ function CBM:OnUnitConstructionRequested(builder, data)
     self.WaitSecondsAfterDeath = data.WaitSecondsAfterDeath
 end
 
----Stores the unit and sets variables so other engineers can see what's going on
+--- Stores the unit and sets variables so other engineers can see what's going on
 ---@param unitBeingbuilt Unit
 function CBM:OnUnitConstructionStarted(unitBeingbuilt)
     self.IsInitiated = false
@@ -55,7 +55,7 @@ function CBM:DecrementAssisting()
     self.NumAssisting = self.NumAssisting - 1
 end
 
----Resets the stored values so it can be reused for another build project
+--- Resets the stored values so it can be reused for another build project
 function CBM:Reset()
     self.IsInitiated = false
     self.IsBuilding = false

@@ -17,7 +17,7 @@ local mathMod = math.mod
 local tableInsert = table.insert
 local tableFind = table.find
 
----Generated data with platoon templates and builders for OpAI
+--- Generated data with platoon templates and builders for OpAI
 ---@class GeneratedScenario: Scenario
 ---@field Name string
 
@@ -57,47 +57,47 @@ local tableFind = table.find
 ---| 'CORE_TO_NUKESUBS'          # How many core ships must be places before we convert to this type. Defaults to `3`.
 
 ---@class NavalOpAIGeneratorData
----The starting number of virtual frigate units allocated to the very first platoon template (Tier 1, Wave 1)
+--- The starting number of virtual frigate units allocated to the very first platoon template (Tier 1, Wave 1)
 ---
----Sets the baseline strength and size for the weakest naval wave. Higher values result in larger starting fleets
+--- Sets the baseline strength and size for the weakest naval wave. Higher values result in larger starting fleets
 ---
----If not provided, it will be calculated from the number of naval factories in the base
+--- If not provided, it will be calculated from the number of naval factories in the base
 ---@field MaxFrigates? integer
----The target number of virtual frigate units allocated to the final platoon template (Tier 3, final wave)
+--- The target number of virtual frigate units allocated to the final platoon template (Tier 3, final wave)
 ---
----Controls the maximum overall scaling and final size of the endgame naval force
+--- Controls the maximum overall scaling and final size of the endgame naval force
 ---
----If not provided, it will be calculated from the number of naval factories in the base
+--- If not provided, it will be calculated from the number of naval factories in the base
 ---@field MinFrigates? integer
----Used to calculate `MaxFrigates` based on number of naval factories in the base.
+--- Used to calculate `MaxFrigates` based on number of naval factories in the base.
 ---
----Used only if `MaxFrigates` is not specified.
+--- Used only if `MaxFrigates` is not specified.
 ---
----Defaults to `1`
+--- Defaults to `1`
 ---@field MaxMultiplier? integer
----Used to calculate `MinFrigates` based on number of naval factories in the base.
+--- Used to calculate `MinFrigates` based on number of naval factories in the base.
 ---
----Used only if `MinFrigates` is not specified.
+--- Used only if `MinFrigates` is not specified.
 ---
----Defaults to `MaxMultiplier`
+--- Defaults to `MaxMultiplier`
 ---@field MinMultiplier? integer
----The number of distinct platoon build waves generated within each of the 3 tech tiers (T1, T2, and T3)
+--- The number of distinct platoon build waves generated within each of the 3 tech tiers (T1, T2, and T3)
 ---
----Determines total progression steps Nx3.
----It controls the growth smooth steps: higher values create more granular progression with smaller unit increments
----between waves,while lower values cause steeper jumps in fleet composition
+--- Determines total progression steps Nx3.
+--- It controls the growth smooth steps: higher values create more granular progression with smaller unit increments
+--- between waves,while lower values cause steeper jumps in fleet composition
 ---
----Defaults to `1`
+--- Defaults to `1`
 ---@field NumLevels? integer
----If specified, only these types will be used to generate the template
+--- If specified, only these types will be used to generate the template
 ---
----`Frigates` can't be disabled.
+--- `Frigates` can't be disabled.
 ---@field EnabledTypes? NavalOpAIChildType[]
----Disables certain childs from being added during during template generation.
+--- Disables certain childs from being added during during template generation.
 ---
----Core ships can't be disabled.
+--- Core ships can't be disabled.
 ---@field DisableTypes? table<NavalOpAIChildType, true>
----Overrides default conversions for generating the platoon.
+--- Overrides default conversions for generating the platoon.
 ---
 ---@see NavalOpAIGenConversion
 ---@field Overrides? table<NavalOpAIGenConversion, number>
@@ -133,9 +133,9 @@ local TIERS = {
 
 local BasePriority = 700
 
----How many ships must exist before we convert them to one of the next-tier core ship
+--- How many ships must exist before we convert them to one of the next-tier core ship
 ---
----How many core ships (frigates, destroyers, battleships) must be in a platoon before we include one of these unit types.
+--- How many core ships (frigates, destroyers, battleships) must be in a platoon before we include one of these unit types.
 local Conversions = {
     FRIGATES_PER_DESTROYER = 5,
     DESTROYERS_PER_BATTLESHIP = 5,
@@ -148,7 +148,7 @@ local Conversions = {
     CORE_TO_NUKESUBS = 3,
 }
 
----Returns true if `enabledTypes` is not specified or when it contains `unitType`
+--- Returns true if `enabledTypes` is not specified or when it contains `unitType`
 ---@param unitType NavalOpAIChildType
 ---@param enabledTypes? NavalOpAIChildType[]
 ---@return boolean
