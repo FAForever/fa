@@ -226,14 +226,14 @@ local BuildingCounterDefaultValues = {
 ---@field ConstructionEngineers Unit[]
 ---@field CurrentEngineerCount integer Number of currently active engineers
 ---@field ConstructionAssistBool boolean
----@field EngineerBuildRateBuff string|nil  Name of the buff to apply to engineers
+---@field EngineerBuildRateBuff string?  Name of the buff to apply to engineers
 ---@field EngineerQuantity integer Max number of engineers the base is allowed to use
 ---@field EngineersBuilding integer
----@field DefaultEngineerPatrolChain string|nil Patrol chains used by base engineers
----@field DefaultAirScoutPatrolChain string|nil Patrol chains for air scouting, if not set, random route is generated for each scouting platoon.
----@field DefaultLandScoutPatrolChain string|nil Patrol chains for land scouting, if not set, random route is generated for each scouting platoon.
+---@field DefaultEngineerPatrolChain string? Patrol chains used by base engineers
+---@field DefaultAirScoutPatrolChain string? Patrol chains for air scouting, if not set, random route is generated for each scouting platoon.
+---@field DefaultLandScoutPatrolChain string? Patrol chains for land scouting, if not set, random route is generated for each scouting platoon.
 ---@field ExpansionBaseData ExpansionBaseData[]
----@field FactoryBuildRateBuff string|nil Name of the buff to apply to factories
+---@field FactoryBuildRateBuff string? Name of the buff to apply to factories
 ---@field FunctionalityStates BMFunctionalityState
 ---@field Initialized boolean
 ---@field BuildTable table<string, boolean>
@@ -1132,7 +1132,7 @@ end
 -- Get/Set of default chains for base funcitonality
 ---------------------------------------------------
 
----@return string|nil
+---@return string?
 function BM:GetDefaultEngineerPatrolChain()
     return self.DefaultEngineerPatrolChain
 end
@@ -1144,7 +1144,7 @@ function BM:SetDefaultEngineerPatrolChain(chainName)
     return true
 end
 
----@return string|nil
+---@return string?
 function BM:GetDefaultAirScoutPatrolChain()
     return self.DefaultAirScoutPatrolChain
 end
@@ -1155,7 +1155,7 @@ function BM:SetDefaultAirScoutPatrolChain(chainName)
     return true
 end
 
----@return string|nil
+---@return string?
 function BM:GetDefaultLandScoutPatrolChain()
     return self.DefaultLandScoutPatrolChain
 end
