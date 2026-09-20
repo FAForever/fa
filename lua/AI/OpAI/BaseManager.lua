@@ -687,8 +687,6 @@ function BM:InitializeDifficultyTables(brain, baseName, position, radius, levelT
     self:Initialize(brain, baseName, position, radius, levelTable, true)
 end
 
--- Auto trashbags all threads on a base manager
-
 --- Allocates a thread running the function where the base manager is prepended as the first argument. The thread is inserted in the trashbag of the base manager
 ---@param fn function # A function to run on the forked thread
 ---@param ... unknown # Parameters of the function where the base manager is prepended as the first argument
