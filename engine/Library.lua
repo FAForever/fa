@@ -130,6 +130,16 @@ end
 function table.empty2(table)
 end
 
+--- Returns the number of linear elements in the table.
+---
+---[View documents](command:extension.lua.doc?["en-us/51/manual.html/pdf-table.getn"])
+---
+---@generic T
+---@param list T[]
+---@return integer
+---@nodiscard
+function table.getn(list) end
+
 --- Returns the size of a list
 ---@param list table
 ---@return integer
