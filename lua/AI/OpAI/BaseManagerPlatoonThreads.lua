@@ -857,7 +857,7 @@ function TransportUnitsToLocation(platoon, finalLocation)
     if not AIUtils.GetTransports(platoon) then
         return false
     end
-    AIUtils.UseTransports(units, platoon:GetSquadUnits('Scout'), finalLocation)
+    AIUtils.UseTransports(units, platoon:GetSquadUnits('Scout') --[[@as AirTransport[] ]], finalLocation)
 
     return true
 end
