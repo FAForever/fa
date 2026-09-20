@@ -46,13 +46,13 @@ local mobileNavalCategories = categories.MOBILE * categories.NAVAL
 --for sorian AI
 local SUtils = import("/lua/ai/sorianutilities.lua")
 
----@alias PlatoonSquads 'Attack' | 'Artillery' | 'Guard' | 'Scout' | 'Support' | 'Unassigned'
+---@alias PlatoonSquads PlatoonSquadType
 
 ---@class PlatoonSquadTemplate
 ---@field [1] UnitId
 ---@field [2] integer Min, negative number will set it to `Min` * NumAvailableFactories, each time the platoon is set to build
 ---@field [3] integer Max
----@field [4] PlatoonSquads
+---@field [4] PlatoonSquadType
 ---@field [5] UnitFormations
 
 ---Platoon Template can have any number of squad templates, starting from index 3.

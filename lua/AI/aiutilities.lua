@@ -1455,7 +1455,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param platoon Platoon
----@param squad PlatoonSquads
+---@param squad PlatoonSquadType
 ---@param maxRange number
 ---@param atkPri table
 ---@param enemyBrain? AIBrain

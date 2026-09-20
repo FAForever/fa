@@ -1100,7 +1100,7 @@ function CreatePlatoons(strArmy, tblNode, tblResult, platoonList, currPlatoon, t
                     end
                     ---@type PlatoonSquadTemplate
                     local squadTp = currTemplate[i]
-                    ---@type BlueprintId, integer, integer, PlatoonSquads, UnitFormations
+                    ---@type BlueprintId, integer, integer, PlatoonSquadType, UnitFormations
                     local bpId, min, max, squad, formation = unpack(squadTp)
                     if tblData.type == bpId and platoon.squadCounter[i] < max then
                         platoon.squadCounter[i] = platoon.squadCounter[i] + 1
