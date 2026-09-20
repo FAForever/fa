@@ -212,11 +212,11 @@ local BuildingCounterDefaultValues = {
 
 ---Manager to maintain a base, build, and dispatch attacks. Used mainly in campaign missions.
 ---
----To create a new base
---- - Initialize the base, calling one of the initialize functions.
---- - Start the base. The base can spawn structures or start empty and build everyting.
---- - Optionally set engineers counts
---- - Add OpAI platoons with attacks
+--- To create a new base:
+--- 1. Initialize the base, calling one of the initialize functions.
+--- 2. Start the base. The base can spawn structures or start empty and build everyting.
+--- 3. Optionally set engineers counts
+--- 4. Add OpAI platoons with attacks
 ---@class BaseManager
 ---@field Active boolean
 ---@field AIBrain CampaignAIBrain
