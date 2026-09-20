@@ -200,9 +200,9 @@ local BuildingCounterDefaultValues = {
 ---@field Walls boolean
 
 ---@class ExpansionBaseData
----@field BaseName string Name of the base manager to expand to
----@field Engineers integer Number of engineers to sent to the expansion. Engineers are set, only when there's not enough.
----@field IncomingEngineers integer Number of engineers on the way to the expansion
+---@field BaseName string # Name of the base manager to expand to
+---@field Engineers integer # Number of engineers to sent to the expansion. Engineers are set, only when there's not enough.
+---@field IncomingEngineers integer # Number of engineers on the way to the expansion
 
 ---@alias Enhancement string --TODO
 
@@ -224,24 +224,24 @@ local BuildingCounterDefaultValues = {
 ---@field ConditionalBuildManager ConditionalBuildManager
 ---@field ConditionalBuildTable ConditionalBuildEntry[]
 ---@field ConstructionEngineers Unit[]
----@field CurrentEngineerCount integer Number of currently active engineers
+---@field CurrentEngineerCount integer # Number of currently active engineers
 ---@field ConstructionAssistBool boolean
----@field EngineerBuildRateBuff string?  Name of the buff to apply to engineers
----@field EngineerQuantity integer Max number of engineers the base is allowed to use
+---@field EngineerBuildRateBuff string? # Name of the buff to apply to engineers
+---@field EngineerQuantity integer # Max number of engineers the base is allowed to use
 ---@field EngineersBuilding integer
----@field DefaultEngineerPatrolChain string? Patrol chains used by base engineers
----@field DefaultAirScoutPatrolChain string? Patrol chains for air scouting, if not set, random route is generated for each scouting platoon.
----@field DefaultLandScoutPatrolChain string? Patrol chains for land scouting, if not set, random route is generated for each scouting platoon.
+---@field DefaultEngineerPatrolChain string? # Patrol chains used by base engineers
+---@field DefaultAirScoutPatrolChain string? # Patrol chains for air scouting, if not set, random route is generated for each scouting platoon.
+---@field DefaultLandScoutPatrolChain string? # Patrol chains for land scouting, if not set, random route is generated for each scouting platoon.
 ---@field ExpansionBaseData ExpansionBaseData[]
----@field FactoryBuildRateBuff string? Name of the buff to apply to factories
+---@field FactoryBuildRateBuff string? # Name of the buff to apply to factories
 ---@field FunctionalityStates BMFunctionalityState
 ---@field Initialized boolean
 ---@field BuildTable table<string, boolean>
 ---@field LevelNames BmLevelName[]
----@field MaximumConstructionEngineers integer Number of engineers that can start construction projects. Defaults to `Difficulty` or `3`
----@field NumPermanentAssisting integer Number of engineer that is currently permanently assisting factories
+---@field MaximumConstructionEngineers integer # Number of engineers that can start construction projects. Defaults to `Difficulty` or `3`
+---@field NumPermanentAssisting integer # Number of engineer that is currently permanently assisting factories
 ---@field OpAITable table<string, OpAI|NavalOpAI|ReactiveAI>
----@field PermanentAssistCount integer Number of engineers that should permanently assist factories
+---@field PermanentAssistCount integer # Number of engineers that should permanently assist factories
 ---@field PermanentAssisters table<Unit, boolean>
 ---@field Position Vector
 ---@field Radius number
