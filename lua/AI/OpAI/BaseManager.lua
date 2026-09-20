@@ -711,7 +711,10 @@ end
 ---@param bKeepAlive boolean # ??
 ---@return nil
 function BM:ConditionalBuild(sUnitName, bRetry, nNumEngineers, tPlatoonAIFunction, tPlatoonData, fCondition, bKeepAlive)
-    if type(fCondition) ~= 'function' then error('Parameter fCondition must be a function.') return end
+    if type(fCondition) ~= 'function' then
+        error('Parameter fCondition must be a function.')
+        return
+    end
 
     table.insert(self.ConditionalBuildTable, {
         name = sUnitName,
@@ -775,7 +778,7 @@ function BM:GetOpAI(name)
 end
 
 --- Checks whether the intended OpAI name is unique.
---- 
+---
 --- Throws an error if the name is in use.
 ---@protected
 ---@param name string # A name to check
@@ -870,8 +873,12 @@ end
 --- Removes a build group from the base manager
 ---@param groupName string # Name reference to a unit group as defined in the map that represents the unit group to be removed
 function BM:ClearGroupTemplate(groupName)
-    self.AIBrain.BaseTemplates[self.BaseName .. groupName] = { Template = {}, List = {}, UnitNames = {},
-        BuildCounter = {} }
+    self.AIBrain.BaseTemplates[self.BaseName .. groupName] = {
+        Template = {},
+        List = {},
+        UnitNames = {},
+        BuildCounter = {}
+    }
 end
 
 --- Checks if a build group exists in the base manager
@@ -1059,11 +1066,11 @@ end
 --- Sets the maximum number of engineers operating in the base, this number includes commander if its spawned.
 ---@param count BaseEngineerDifficultyCount | BaseEngineerCount | integer # If we have a table, we have various possible ways of counting engineers
 --- {tNum1, tNum2, tNum3} - This is a difficulty defined total number of engs
---- 
+---
 --- {{tNum1, tNum2, tNum3,}, {aNum1, aNum2, aNum3}} - This is a difficulty defined total and permanent assisters
---- 
+---
 --- {tNum, aNum} - This is a single defined total with permanent assist
---- 
+---
 --- num - this is the number of total engineers
 function BM:SetEngineerCount(count)
     if type(count) == 'table' then
@@ -1076,14 +1083,14 @@ function BM:SetEngineerCount(count)
             self:SetTotalEngineerCount(count[ScenarioInfo.Options.Difficulty])
             -- Table with 2 entries means first is total engs, 2nd is num permanent assisting
         elseif table.getn(count) == 2 then
-            self:SetTotalEngineerCount(count[1]--[[@as integer]])
-            self:SetPermanentAssistCount(count[2]--[[@as integer]])
+            self:SetTotalEngineerCount(count[1] --[[@as integer]])
+            self:SetPermanentAssistCount(count[2] --[[@as integer]])
             -- Unknown number of entries
         else
             error('*Base Manager Error: Unknown number of entries passed to SetEngineerCount')
         end
     else
-        self:SetTotalEngineerCount(count--[[@as integer]])
+        self:SetTotalEngineerCount(count --[[@as integer]])
     end
 end
 
@@ -1124,7 +1131,6 @@ function BM:SetEngineerBuildRateBuff(buffName)
     self.EngineerBuildRateBuff = buffName
 end
 
-
 --#endregion
 --#region - Get/Set of default chains for base funcitonality
 
@@ -1144,6 +1150,7 @@ end
 function BM:GetDefaultAirScoutPatrolChain()
     return self.DefaultAirScoutPatrolChain
 end
+
 ---@param chainName string
 ---@return boolean
 function BM:SetDefaultAirScoutPatrolChain(chainName)
@@ -1185,7 +1192,7 @@ end
 --- Add in the ability for an expansion base to move out and help another base manager at another location
 --- Functionality should mean that you simply specifiy the name of the base and it will then send out an
 --- engineer to build it.  You can also specify the number of engineers you would like to support with
---- 
+---
 --- baseData is a field that does nothing currently.  If we ever need more data (transports maybe) it would
 --- be housed there.
 ---@param baseName string
@@ -1203,7 +1210,6 @@ function BM:AddExpansionBase(baseName, engQuantity, baseData)
         -- Setup base here
     end
 end
-
 
 --#endregion
 --#region - Base Manager Unit Upgrade Level functions --
@@ -1274,7 +1280,7 @@ function BM:UnitNeedsUpgrade(unit, unitType)
     if not allEnhancements then
         return false
     end
-        
+
     for _, upgradeName in upgradeTable do
         -- Find the upgrade in the unit's bp
         local bpUpgrade = allEnhancements[upgradeName]
@@ -1282,7 +1288,7 @@ function BM:UnitNeedsUpgrade(unit, unitType)
             if not unit:HasEnhancement(upgradeName) then
                 -- Check if we already have an enhancement on the slot our desired enhancement wants to occupy
                 if SimUnitEnhancements and SimUnitEnhancements[unit.EntityId] and SimUnitEnhancements[unit.EntityId][bpUpgrade.Slot] then
-                    -- Account for 3-level enhancements, like the Cybran ACU's recent *Stealth -> Self-Repair -> Cloak* enhancement path, if we want 'Cloak', check for 'Stealth' 
+                    -- Account for 3-level enhancements, like the Cybran ACU's recent *Stealth -> Self-Repair -> Cloak* enhancement path, if we want 'Cloak', check for 'Stealth'
                     -- Check for the prerequisite's prerequisite, and return it
                     if bpUpgrade.Prerequisite and allEnhancements[bpUpgrade.Prerequisite].Prerequisite and (SimUnitEnhancements[unit.EntityId][bpUpgrade.Slot] == allEnhancements[bpUpgrade.Prerequisite].Prerequisite) then
                         return bpUpgrade.Prerequisite
@@ -1577,10 +1583,10 @@ end
 ---@param unitData table
 ---@param namesTable table
 function BM:StoreStructureName(unitName, unitData, namesTable)
-    if not namesTable[ unitData.Position[1] ] then
-        namesTable[ unitData.Position[1] ] = {}
+    if not namesTable[unitData.Position[1]] then
+        namesTable[unitData.Position[1]] = {}
     end
-    namesTable[ unitData.Position[1] ][ unitData.Position[3] ] = unitName
+    namesTable[unitData.Position[1]][unitData.Position[3]] = unitName
 end
 
 ---@protected
@@ -1590,17 +1596,17 @@ end
 ---@param unitPos Vector
 ---@param unitName string
 function BM:StoreBuildCounter(buildCounter, buildingType, buildingId, unitPos, unitName)
-    if not buildCounter[ unitPos[1] ] then
-        buildCounter[ unitPos[1] ] = {}
+    if not buildCounter[unitPos[1]] then
+        buildCounter[unitPos[1]] = {}
     end
-    buildCounter[ unitPos[1] ][ unitPos[2] ] = {
+    buildCounter[unitPos[1]][unitPos[2]] = {
         BuildingID = buildingId,
         BuildingType = buildingType,
         Position = unitPos,
         UnitName = unitName,
     }
     if self.BuildingCounterData.Default then
-        buildCounter[ unitPos[1] ][ unitPos[2] ].Counter = self:BuildingCounterDifficultyDefault(buildingType)
+        buildCounter[unitPos[1]][unitPos[2]].Counter = self:BuildingCounterDifficultyDefault(buildingType)
     end
 end
 
@@ -1729,7 +1735,6 @@ function BM:SetBuildAllStructures(val)
     end
 end
 
-
 --#endregion
 --#region - Default builders for base managers
 
@@ -1745,7 +1750,7 @@ function BM:LoadDefaultBaseEngineers()
             PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerEngineerPlatoonSplit' },
             BuildConditions = {
                 { BMBC, 'BaseManagerNeedsEngineers', { self.BaseName } },
-                { BMBC, 'BaseActive', { self.BaseName } },
+                { BMBC, 'BaseActive',                { self.BaseName } },
             },
             PlatoonData = {
                 BaseName = self.BaseName,
@@ -1774,11 +1779,11 @@ function BM:LoadDefaultBaseEngineers()
                         BaseName = self.BaseName,
                     },
                     BuildConditions = {
-                        { BMBC, 'BaseEngineersEnabled', { self.BaseName } },
+                        { BMBC, 'BaseEngineersEnabled',  { self.BaseName } },
                         { BMBC, 'BaseBuildingEngineers', { self.BaseName } },
-                        { BMBC, 'HighestFactoryLevel', { i, self.BaseName } },
-                        { BMBC, 'FactoryCountAndNeed', { i, j, pType, self.BaseName } },
-                        { BMBC, 'BaseActive', { self.BaseName } },
+                        { BMBC, 'HighestFactoryLevel',   { i, self.BaseName } },
+                        { BMBC, 'FactoryCountAndNeed',   { i, j, pType, self.BaseName } },
+                        { BMBC, 'BaseActive',            { self.BaseName } },
                     },
                     PlatoonBuildCallbacks = { { BMBC, 'BaseManagerEngineersStarted' }, },
                     InstanceCount = 3,
@@ -1789,6 +1794,7 @@ function BM:LoadDefaultBaseEngineers()
         end
     end
 end
+
 ---@protected
 function BM:LoadDefaultBaseCDRs()
     -- CDR Build
@@ -1813,6 +1819,7 @@ function BM:LoadDefaultBaseCDRs()
     }
     self.AIBrain:PBMAddPlatoon(defaultBuilder)
 end
+
 ---@protected
 function BM:LoadDefaultBaseSupportCDRs()
     -- sCDR Build
@@ -1849,13 +1856,14 @@ function BM:LoadDefaultBaseSupportCDRs()
             { BMBC, 'BaseEngineersEnabled', { self.BaseName } },
             { BMBC, 'NumUnitsLessNearBase',
                 { self.BaseName, ParseEntityCategory('SUBCOMMANDER'), self.BaseName .. '_sACUNumber' } },
-            { BMBC, 'BaseActive', { self.BaseName } },
+            { BMBC, 'BaseActive',           { self.BaseName } },
         },
         InstanceCount = 2,
         BuildTimeOut = 10, -- Timeout really fast because they dont need to really finish
     }
     self.AIBrain:PBMAddPlatoon(defaultBuilder)
 end
+
 ---@protected
 function BM:LoadDefaultScoutingPlatoons()
     -- Land Scouts
@@ -1866,7 +1874,7 @@ function BM:LoadDefaultScoutingPlatoons()
         PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerScoutingAI' },
         BuildConditions = {
             { BMBC, 'LandScoutingEnabled', { self.BaseName, } },
-            { BMBC, 'BaseActive', { self.BaseName } },
+            { BMBC, 'BaseActive',          { self.BaseName } },
         },
         PlatoonData = {
             BaseName = self.BaseName,
@@ -1881,14 +1889,14 @@ function BM:LoadDefaultScoutingPlatoons()
     -- T1-T3 Air Scouts
     for i = 1, 3 do
         defaultBuilder = {
-            BuilderName = 'BaseManager_T' .. i ..'AirScout_' .. self.BaseName,
+            BuilderName = 'BaseManager_T' .. i .. 'AirScout_' .. self.BaseName,
             PlatoonTemplate = self:CreateAirScoutPlatoon(i),
             Priority = 250 + (i * 250), -- 500, 750, 1000 for T1-3
             PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerScoutingAI' },
             BuildConditions = {
                 { BMBC, 'HighestFactoryLevelType', { i, self.BaseName, 'Air' } },
-                { BMBC, 'AirScoutingEnabled', { self.BaseName, } },
-                { BMBC, 'BaseActive', { self.BaseName } },
+                { BMBC, 'AirScoutingEnabled',      { self.BaseName, } },
+                { BMBC, 'BaseActive',              { self.BaseName } },
             },
             PlatoonData = {
                 BaseName = self.BaseName,
@@ -1901,6 +1909,7 @@ function BM:LoadDefaultScoutingPlatoons()
         self.AIBrain:PBMAddPlatoon(defaultBuilder)
     end
 end
+
 ---@protected
 function BM:LoadDefaultBaseTMLs()
     local defaultBuilder = {
@@ -1912,7 +1921,7 @@ function BM:LoadDefaultBaseTMLs()
         LocationType = self.BaseName,
         PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerTMLPlatoon' },
         BuildConditions = {
-            { BMBC, 'BaseActive', { self.BaseName } },
+            { BMBC, 'BaseActive',  { self.BaseName } },
             { BMBC, 'TMLsEnabled', { self.BaseName } },
         },
         PlatoonData = {
@@ -1921,6 +1930,7 @@ function BM:LoadDefaultBaseTMLs()
     }
     self.AIBrain:PBMAddPlatoon(defaultBuilder)
 end
+
 ---@protected
 function BM:LoadDefaultBaseNukes()
     local defaultBuilder = {
@@ -1932,7 +1942,7 @@ function BM:LoadDefaultBaseNukes()
         LocationType = self.BaseName,
         PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerNukePlatoon' },
         BuildConditions = {
-            { BMBC, 'BaseActive', { self.BaseName } },
+            { BMBC, 'BaseActive',   { self.BaseName } },
             { BMBC, 'NukesEnabled', { self.BaseName } },
         },
         PlatoonData = {
@@ -1941,6 +1951,7 @@ function BM:LoadDefaultBaseNukes()
     }
     self.AIBrain:PBMAddPlatoon(defaultBuilder)
 end
+
 ---@protected
 ---@return PlatoonTemplate
 function BM:CreateTMLPlatoonTemplate()
@@ -1954,6 +1965,7 @@ function BM:CreateTMLPlatoonTemplate()
 
     return template
 end
+
 ---@protected
 ---@return PlatoonTemplate
 function BM:CreateNukePlatoonTemplate()
@@ -1967,6 +1979,7 @@ function BM:CreateNukePlatoonTemplate()
 
     return template
 end
+
 ---@protected
 ---@return PlatoonTemplate
 function BM:CreateLandScoutPlatoon()
@@ -1980,6 +1993,7 @@ function BM:CreateLandScoutPlatoon()
 
     return template
 end
+
 ---@protected
 ---@param techLevel number
 ---@return PlatoonTemplate
@@ -2001,6 +2015,7 @@ function BM:CreateAirScoutPlatoon(techLevel)
 
     return template
 end
+
 ---@protected
 ---@return PlatoonTemplate
 function BM:CreateCommanderPlatoonTemplate()
@@ -2014,6 +2029,7 @@ function BM:CreateCommanderPlatoonTemplate()
 
     return template
 end
+
 ---@protected
 ---@return PlatoonTemplate
 function BM:CreateSupportCommanderPlatoonTemplate()
@@ -2027,6 +2043,7 @@ function BM:CreateSupportCommanderPlatoonTemplate()
 
     return template
 end
+
 ---@protected
 ---@param techLevel number
 ---@param platoonSize? number # Defaults to 5
@@ -2069,7 +2086,7 @@ function CreateBaseManager(brain, baseName, position, radius, levelTable)
     bManager:Create()
 
     if brain and baseName and position and radius then
-        bManager:Initialize(brain--[[@as CampaignAIBrain]], baseName, position, radius, levelTable)
+        bManager:Initialize(brain --[[@as CampaignAIBrain]], baseName, position, radius, levelTable)
     end
 
     return bManager
@@ -2080,60 +2097,60 @@ end
 ---@param unit Unit
 ---@param unitBeingBuilt Unit
 function FailSafeStructureOnStartBuild(unit, unitBeingBuilt)
-	-- If we are in the upgrading state, then it's the upgrade we want under normal circumstances.
-	-- We don't use different upgrades paths for coop, only that of the original SCFA (no Support Factory upgrade paths whatsoever)
-	-- If you decide to mess around with AI armies in cheat mode, and order a newly added upgrade path instead anyway, then any mishaps happening afterwards is on you!
-	if unit:IsUnitState('Upgrading') then
-		unitBeingBuilt.UnitName = unit.UnitName
-		unitBeingBuilt.BaseName = unit.BaseName
+    -- If we are in the upgrading state, then it's the upgrade we want under normal circumstances.
+    -- We don't use different upgrades paths for coop, only that of the original SCFA (no Support Factory upgrade paths whatsoever)
+    -- If you decide to mess around with AI armies in cheat mode, and order a newly added upgrade path instead anyway, then any mishaps happening afterwards is on you!
+    if unit:IsUnitState('Upgrading') then
+        unitBeingBuilt.UnitName = unit.UnitName
+        unitBeingBuilt.BaseName = unit.BaseName
 
-		-- Add callback when the upgrade is finished
-		if not unitBeingBuilt.AddedFinishedCallback then
-			unitBeingBuilt:AddUnitCallback(FailSafeUpgradeOnStopBeingBuilt, 'OnStopBeingBuilt')
-			unitBeingBuilt.AddedFinishedCallback = true
-		end
-	end
+        -- Add callback when the upgrade is finished
+        if not unitBeingBuilt.AddedFinishedCallback then
+            unitBeingBuilt:AddUnitCallback(FailSafeUpgradeOnStopBeingBuilt, 'OnStopBeingBuilt')
+            unitBeingBuilt.AddedFinishedCallback = true
+        end
+    end
 end
 
 --- Failsafe function that will upgrade factories, radar, etc. to next level
 ---@param unit Unit
 ---@param upgradeID UnitId # Blueprint
 function FailSafeUpgradeBaseManagerStructure(unit, upgradeID)
-	-- Add callback when the structure starts building something
-	if not unit.AddedUpgradeCallback then
-		unit:AddOnStartBuildCallback(FailSafeStructureOnStartBuild)
-		unit.AddedUpgradeCallback = true
-	end
+    -- Add callback when the structure starts building something
+    if not unit.AddedUpgradeCallback then
+        unit:AddOnStartBuildCallback(FailSafeStructureOnStartBuild)
+        unit.AddedUpgradeCallback = true
+    end
 
-    IssueUpgrade({unit}, upgradeID)
-	unit.SetToUpgrade = true
+    IssueUpgrade({ unit }, upgradeID)
+    unit.SetToUpgrade = true
 end
 
 --- Failsafe callback function when a structure upgrade is finished building
 --- Updates the ScenarioInfo.UnitNames table with the new unit, and upgrades further if needed
 ---@param unit Unit
 function FailSafeUpgradeOnStopBeingBuilt(unit)
-	local aiBrain = unit.Brain --[[@as CampaignAIBrain]]
-	local bManager = aiBrain.BaseManagers[unit.BaseName]
+    local aiBrain = unit.Brain --[[@as CampaignAIBrain]]
+    local bManager = aiBrain.BaseManagers[unit.BaseName]
 
-	if bManager then
-		local armyIndex = aiBrain:GetArmyIndex()
-		ScenarioInfo.UnitNames[armyIndex][unit.UnitName] = unit
+    if bManager then
+        local armyIndex = aiBrain:GetArmyIndex()
+        ScenarioInfo.UnitNames[armyIndex][unit.UnitName] = unit
 
-		local factionIndex = aiBrain:GetFactionIndex()
-		local upgradeID = aiBrain:FindUpgradeBP(unit.UnitId, UpgradeTemplates.StructureUpgradeTemplates[factionIndex])
+        local factionIndex = aiBrain:GetFactionIndex()
+        local upgradeID = aiBrain:FindUpgradeBP(unit.UnitId, UpgradeTemplates.StructureUpgradeTemplates[factionIndex])
 
-		-- Check if our structure can even upgrade to begin with
-		if upgradeID then
-			-- Check if the BM is supposed to upgrade this structure further
-			for index, structure in pairs(bManager.UpgradeTable) do
-				-- If the names match, and the IDs don't, we need to upgrade
-				if unit.UnitName == structure.UnitName and unit.UnitId ~= structure.FinalUnit and not unit.SetToUpgrade then
-					FailSafeUpgradeBaseManagerStructure(unit, upgradeID)
-				end
-			end
-		end
-	end
+        -- Check if our structure can even upgrade to begin with
+        if upgradeID then
+            -- Check if the BM is supposed to upgrade this structure further
+            for index, structure in pairs(bManager.UpgradeTable) do
+                -- If the names match, and the IDs don't, we need to upgrade
+                if unit.UnitName == structure.UnitName and unit.UnitId ~= structure.FinalUnit and not unit.SetToUpgrade then
+                    FailSafeUpgradeBaseManagerStructure(unit, upgradeID)
+                end
+            end
+        end
+    end
 end
 
 --#endregion
