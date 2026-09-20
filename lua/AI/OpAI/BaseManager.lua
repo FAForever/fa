@@ -203,6 +203,7 @@ local BuildingCounterDefaultValues = {
 ---@field BaseName string # Name of the base manager to expand to
 ---@field Engineers integer # Number of engineers to sent to the expansion. Engineers are set, only when there's not enough.
 ---@field IncomingEngineers integer # Number of engineers on the way to the expansion
+---@field TransportPlatoon? boolean # Is never set
 
 ---@alias Enhancement string --TODO
 
