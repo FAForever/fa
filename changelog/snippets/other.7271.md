@@ -1,1 +1,1 @@
-- Refactor and annotations for the BaseManager class and other files and functions used by the campaign platoons. (#7271)
+- Refactor and annotate the BaseManager class and other files and functions used by the campaign platoons. (#7271)
