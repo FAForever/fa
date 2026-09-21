@@ -106,28 +106,28 @@ local tableFind = table.find
 local TIERS = {
     --Tier 1 naval units
     { --              UEF        AEON       CYBRAN     SERA
-        CORE = { 'ues0103', 'uas0103', 'urs0103', 'xss0103' },
-        SUBS = { 'ues0203', 'uas0203', 'urs0203', 'xss0203' },
-        LIGHT = { nil, 'uas0102', nil, nil },
+        CORE  = { 'ues0103', 'uas0103', 'urs0103', 'xss0103' },
+        SUBS  = { 'ues0203', 'uas0203', 'urs0203', 'xss0203' },
+        LIGHT = {  nil     , 'uas0102',  nil     ,  nil      },
     },
 
     --Tier 2 naval units
     {
-        CORE = { 'ues0201', 'uas0201', 'urs0201', 'xss0201' },
-        SUBS = { 'xes0102', 'xas0204', 'xrs0204', 'xss0203' },    --note seraphim have no T2 sub hunter
+        CORE     = { 'ues0201', 'uas0201', 'urs0201', 'xss0201' },
+        SUBS     = { 'xes0102', 'xas0204', 'xrs0204', 'xss0203' }, --note seraphim have no T2 sub hunter
         CRUISERS = { 'ues0202', 'uas0202', 'urs0202', 'xss0202' },
-        UTILITY = { 'xes0205', nil, 'xrs0205', nil },
+        UTILITY  = { 'xes0205',  nil     , 'xrs0205',  nil      },
     },
 
     --Tier 3 naval units
     {
-        CORE = { 'ues0302', 'uas0302', 'urs0302', 'xss0302' },
-        SUBS = { 'xes0102', 'xas0204', 'xrs0204', 'xss0304' },
+        CORE     = { 'ues0302', 'uas0302', 'urs0302', 'xss0302' },
+        SUBS     = { 'xes0102', 'xas0204', 'xrs0204', 'xss0304' },
         CRUISERS = { 'ues0202', 'uas0202', 'urs0202', 'xss0202' },
-        CARRIERS = { nil, 'uas0303', 'urs0303', 'xss0303' },
-        FATTIES = { 'xes0307', 'xas0306', nil, nil },
-        UTILITY = { 'xes0205', nil, 'xrs0205', nil },
-        NUKESUBS = { 'ues0304', 'uas0304', 'urs0304', nil },
+        CARRIERS = {  nil     , 'uas0303', 'urs0303', 'xss0303' },
+        FATTIES  = { 'xes0307', 'xas0306',  nil     ,  nil      },
+        UTILITY  = { 'xes0205',  nil     , 'xrs0205',  nil      },
+        NUKESUBS = { 'ues0304', 'uas0304', 'urs0304',  nil      },
     },
 }
 
