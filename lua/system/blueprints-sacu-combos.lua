@@ -112,17 +112,21 @@ local function ComboPresetName(enhancements)
     return 'combo_' .. table.concat(copy, '_')
 end
 
-local function StripLocTag(text)
-    -- Strips a leading <LOC key> tag from text.
-    local stripped = string.gsub(text, '^<LOC [^>]+>', '')
-    return stripped
+-- Turns a `<LOC key>text` tag into a `{i key}` directive so it localizes when
+-- shown; text with no tag is returned as-is.
+local function LocDirective(text)
+    local key = string.match(text, '^<LOC ([^>]+)>')
+    if key then
+        return '{i ' .. key .. '}'
+    end
+    return text
 end
 
---- Falls back to the enhancement's full in-game Name (loc-tag stripped) when
---- it has no ShortName of its own.
+--- Falls back to the enhancement's full in-game Name when it has no
+--- ShortName of its own.
 local function CleanLabel(name, def)
     if def and def.Name then
-        return StripLocTag(def.Name)
+        return LocDirective(def.Name)
     end
     return name
 end
@@ -134,7 +138,7 @@ local function ComboUnitName(enhancements, bp)
     for _, name in enhancements do
         local def = bp.Enhancements[name]
         if def and def.ShortName then
-            TableInsert(labels, StripLocTag(def.ShortName))
+            TableInsert(labels, LocDirective(def.ShortName))
         else
             TableInsert(labels, CleanLabel(name, def))
         end

@@ -2585,6 +2585,11 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         ClearCurrentFactoryForQueueDisplay()
     end
 
+    local allSameUnit = true
+    local bpID = false
+    local allMobile = true
+    local isGatewaySelection = false
+
     if not table.empty(selection) then
         capturingKeys = false
         -- Sorting down units
@@ -2671,9 +2676,9 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         sortedOptions.selection = selection
         controls.selectionTab:Enable()
 
-        local allSameUnit = true
-        local bpID = false
-        local allMobile = true
+        allSameUnit = true
+        bpID = false
+        allMobile = true
         for i, v in selection do
             if allMobile and not v:IsInCategory('MOBILE') then
                 allMobile = false
@@ -2688,7 +2693,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             end
         end
 
-        local isGatewaySelection = SacuLoadout.IsGatewaySelection(selection)
+        isGatewaySelection = SacuLoadout.IsGatewaySelection(selection)
         if (table.getn(selection) == 1 and selection[1]:GetBlueprint().Enhancements) or isGatewaySelection then
             controls.enhancementTab:Enable()
         else
@@ -2747,32 +2752,6 @@ function OnSelection(buildableCategories, selection, isOldSelection)
     end
 
     if not table.empty(selection) then
-        -- Repeated from original to access the local variables
-        local allSameUnit = true
-        local bpID = false
-        local allMobile = true
-        for i, v in selection do
-            if allMobile and not v:IsInCategory('MOBILE') then
-                allMobile = false
-            end
-            if allSameUnit and bpID and bpID ~= v:GetBlueprint().BlueprintId then
-                allSameUnit = false
-            else
-                bpID = v:GetBlueprint().BlueprintId
-            end
-            if not allMobile and not allSameUnit then
-                break
-            end
-        end
-
-        -- Upgrade multiple SCU at once
-        local isGatewaySelection = SacuLoadout.IsGatewaySelection(selection)
-        if (table.getn(selection) == 1 and selection[1]:GetBlueprint().Enhancements) or isGatewaySelection then
-            controls.enhancementTab:Enable()
-        else
-            controls.enhancementTab:Disable()
-        end
-
         -- Allow all races to build other races templates
         if options.gui_all_race_templates ~= 0 then
             local templates = Templates.GetTemplates()
