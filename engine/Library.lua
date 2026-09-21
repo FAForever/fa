@@ -130,16 +130,6 @@ end
 function table.empty2(table)
 end
 
---- Returns the number of linear elements in the table.
----
----[View documents](command:extension.lua.doc?["en-us/51/manual.html/pdf-table.getn"])
----
----@generic T
----@param list T[]
----@return integer
----@nodiscard
-function table.getn(list) end
-
 --- Returns the size of a list
 ---@param list table
 ---@return integer
@@ -162,12 +152,6 @@ end
 ---@param n number # floored to int
 function table.setn(table, n)
 end
-
----@generic T
----@param list any
----@param callback fun(key: string, value: any):T|nil
----@return T|nil
-function table.foreachi(list, callback) end
 
 serialize = {}
 
