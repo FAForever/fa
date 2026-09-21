@@ -143,10 +143,8 @@ function ShowEnhancement(bp, bpID, iconID, iconPrefix, userUnit, disabledInGatew
                     return View.Description.Value[1]:GetStringAdvance(text)
                 end)}})
         else
-            -- If enhancement of preset, then remove extension. (ual0301_Engineer -> ual0301)
-            if string.find(bpID, '_') then
-                bpID = string.sub(bpID, 1, string.find(bpID, "_[^_]*$")-1)
-            end
+            local unitBp = __blueprints[bpID]
+            bpID = unitBp and unitBp.BaseBlueprintId or bpID
             WrapAndPlaceText(nil, nil, bpID.."-"..iconID, View.Description)
         end
     end

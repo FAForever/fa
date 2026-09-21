@@ -3,19 +3,13 @@
 --** Used by each faction's Quantum Gateway enhancement tab. Clicks choose slots; Queue issues a factory build.
 --******************************************************************************************************
 
--- selectedBySlot[sacuId][slot] = enhancement chain. Keyed per-SACU (not just per-slot)
--- so switching selection between, say, a UEF and an Aeon gateway can't leave a stale
--- enhancement name from one faction selected against another's slot picker.
+-- selectedBySlot[sacuId][slot] = enhancement chain for in-progress slot picks.
 local selectedBySlot = {}
 
 local SlotOrder = { 'LCH', 'RCH', 'Back' }
 
---- Sorted, pipe-joined key for an enhancement set. Must stay identical to the
---- copy in blueprints-sacu-combos.lua, since both sides need to agree on the
---- generated combo preset names.
--- Reproduced here instead of imported - that file is loaded via doscript()
--- from Blueprints.lua, and import()-ing it too would re-run it into a
--- second, throwaway module table just for this one function.
+--- Sorted, pipe-joined key for an enhancement set. Must match the copy in
+--- blueprints-sacu-combos.lua.
 --- @param list string[]
 --- @return string
 local function EnhancementSetKey(list)
@@ -27,13 +21,7 @@ local function EnhancementSetKey(list)
     return string.lower(table.concat(copy, '|'))
 end
 
---- Generated combo units share their base SACU's icon (they have no icon of their
---- own). Used by construction.lua, unitview.lua and unitviewDetail.lua so the
---- build grid, queue grid and unit-view panel all fall back consistently, for
---- every faction's combos - vanilla or added by a mod, since this checks the
---- SACULOADOUTCOMBO category (set by MarkHiddenSacuLoadoutPresets in
---- blueprints-sacu-combos.lua) and the preset's own recorded base id rather
---- than a hardcoded faction/id table.
+--- Base SACU icon id for a generated combo unit; anything else unchanged.
 --- @param id? string
 --- @return string?
 function UnitBuildIconId(id)
@@ -48,18 +36,8 @@ function UnitBuildIconId(id)
     return id
 end
 
---- The base SACU blueprint id that `selection` can currently build, derived
---- from the selection's real build capability (GetUnitCommandData) rather than
---- a hardcoded GATE-category/faction table. This means it works for any unit
---- that can build a SACU - a custom faction's gateway, a mod that grants the
---- ability to a non-gateway unit, "All Faction Quantum Gate", or construction
---- rules changed mid-match by another mod - not just units tagged GATE with
---- one of the four vanilla faction categories.
---- A selection that can build more than one distinct base SACU is treated as
---- ambiguous and rejected (returns nil) rather than half-honored, for the same
---- reason a mixed-faction selection used to be rejected: QueueSelected only
---- ever issues one blueprint id to the whole selection. A selection with any
---- non-factory unit in it is rejected outright for the same reason.
+--- The base SACU blueprint id that `selection` can currently build, or nil if
+--- ambiguous or not a factory selection.
 --- @param selection Unit[]
 --- @return string?
 function GetSelectionSacuId(selection)
@@ -67,10 +45,7 @@ function GetSelectionSacuId(selection)
         return nil
     end
 
-    -- Reject a selection with anything other than factories outright, rather
-    -- than trusting GetUnitCommandData's buildableCategories result alone -
-    -- same "don't half-honor an ambiguous selection" reasoning as the
-    -- multi-base-SACU check below.
+    -- Only factories can have a valid SACU loadout selection.
     if not table.empty(EntityCategoryFilterOut(categories.FACTORY, selection)) then
         return nil
     end
@@ -80,15 +55,13 @@ function GetSelectionSacuId(selection)
         return nil
     end
 
-    local buildableUnits = EntityCategoryGetUnitList(buildableCategories * categories.SUBCOMMANDER)
+    local candidates = EntityCategoryGetUnitList(buildableCategories * categories.SACULOADOUTBASE)
     local baseSacuId = nil
-    for _, id in buildableUnits do
+    for _, id in candidates do
         local bp = __blueprints[id]
-        -- The base SACU is the one entry with no EnhancementPresetAssigned -
-        -- every loadout preset (hand-authored or our generated combos) is a
-        -- clone of it and carries that field.
+        -- The base SACU has no EnhancementPresetAssigned.
         if bp and not bp.EnhancementPresetAssigned then
-            if baseSacuId and baseSacuId ~= id then
+            if baseSacuId then
                 return nil
             end
             baseSacuId = id
@@ -97,10 +70,7 @@ function GetSelectionSacuId(selection)
     return baseSacuId
 end
 
---- True if `selection` can currently build exactly one shared base SACU.
---- Used to decide whether to show the "Queue SACU loadout" order/button at
---- all; QueueSelected below calls GetSelectionSacuId itself to know what to
---- actually build.
+--- True if `selection` can build exactly one shared base SACU.
 --- @param selection Unit[]
 --- @return boolean
 function IsGatewaySelection(selection)
@@ -194,43 +164,39 @@ function OnSlotIconClick(item, modifiers)
     print('SACU ' .. slot .. ': ' .. name)
 end
 
-local function FindBlueprintId(sacuId, enhancements)
+--- Blueprint id of the preset matching this combo, or nil if none.
+local function ComboBlueprintId(sacuId, enhancements)
     if table.empty(enhancements) then
         return sacuId
     end
 
+    local bp = __blueprints[sacuId]
+    if not bp or not bp.EnhancementPresets then
+        return nil
+    end
+
     local want = EnhancementSetKey(enhancements)
-    local found = nil
-    for id, bp in __blueprints do
-        if bp and bp.BaseBlueprintId == sacuId and bp.EnhancementPresetAssigned then
-            local assigned = bp.EnhancementPresetAssigned
-            if assigned.Enhancements and EnhancementSetKey(assigned.Enhancements) == want then
-                local realId = bp.BlueprintId or id
-                found = realId
-                if type(realId) == 'string' and string.find(realId, 'combo_') then
-                    return realId
-                end
-            end
+    for presetName, preset in bp.EnhancementPresets do
+        if preset.Enhancements and EnhancementSetKey(preset.Enhancements) == want then
+            return string.lower(sacuId .. '_' .. presetName)
         end
     end
-    return found
+    return nil
 end
 
---- Queues the currently-selected loadout at the gateway. Leaves presenting
---- the result to the caller rather than printing here, so the UI can decide
---- how to show success/failure (sound, message, etc).
+--- Queues the currently-selected loadout at the gateway.
 --- @param count? integer
 --- @return boolean success
 --- @return string idOrReason the queued blueprint id on success, else a failure reason
 function QueueSelected(count)
     count = count or 1
     local selection = GetSelectedUnits() or {}
-    if not IsGatewaySelection(selection) then
-        return false, 'Select a Quantum Gateway first'
+    local sacuId = GetSelectionSacuId(selection)
+    if not sacuId then
+        return false, 'Selection cannot build any units with loadouts'
     end
 
-    local sacuId = GetSelectionSacuId(selection)
-    local id = sacuId and FindBlueprintId(sacuId, SelectedEnhancements(sacuId))
+    local id = ComboBlueprintId(sacuId, SelectedEnhancements(sacuId))
     if not id then
         return false, 'No blueprint for that loadout'
     end
