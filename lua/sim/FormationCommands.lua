@@ -20,7 +20,7 @@ local Vector = Vector
 local baseZeroAngle = Vector(0, 0, 1)
 
 ---Converts a table with position to vector if its not a vector already
----@param pos table<{[1]: number, [2]: number, [3]: number}>|Vector
+---@param pos { [1]: number, [2]: number, [3]: number }|Vector
 local function positionToVector(pos)
     if pos.x then
         return pos
