@@ -246,7 +246,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@param self EasyAIBrain
     ---@param platoon AIPlatoon
     ---@param units Unit[]
-    ---@param squad PlatoonSquads
+    ---@param squad PlatoonSquadType
     ---@param formation UnitFormations
     AssignUnitsToPlatoon = function(self, platoon, units, squad, formation)
         StandardBrain.AssignUnitsToPlatoon(self, platoon, units, squad, formation)

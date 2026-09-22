@@ -366,9 +366,7 @@ AIBrain = Class(StandardBrain) {
 
             -- TURNING OFF AI POOL PLATOON, I MAY JUST REMOVE THAT PLATOON FUNCTIONALITY LATER
             local poolPlatoon = self:GetPlatoonUniquelyNamed('ArmyPool')
-            if poolPlatoon then
-                poolPlatoon:TurnOffPoolAI()
-            end
+            poolPlatoon:TurnOffPoolAI()
             self.HasPlatoonList = false
             self:PBMSetEnabled(true)
 			

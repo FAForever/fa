@@ -437,7 +437,7 @@ CreateUnitNearTypeTrigger = TriggerFile.CreateUnitNearTypeTrigger
 --- Orders a platoon to move along a route
 ---@param platoon Platoon
 ---@param route (MarkerName | Vector)[]
----@param squad? PlatoonSquads
+---@param squad? PlatoonSquadType
 function PlatoonMoveRoute(platoon, route, squad)
     for _, node in route do
         if type(node) == 'string' then
@@ -454,7 +454,7 @@ end
 --- Orders platoon to patrol a route
 ---@param platoon Platoon
 ---@param route (MarkerName | Vector)[]
----@param squad? PlatoonSquads
+---@param squad? PlatoonSquadType
 function PlatoonPatrolRoute(platoon, route, squad)
     for _, node in route do
         if type(node) == 'string' then
@@ -471,7 +471,7 @@ end
 --- Orders a platoon to attack-move along a route
 ---@param platoon Platoon
 ---@param route (MarkerName | Vector)[]
----@param squad? PlatoonSquads
+---@param squad? PlatoonSquadType
 function PlatoonAttackRoute(platoon, route, squad)
     for _, node in route do
         if type(node) == 'string' then
@@ -488,7 +488,7 @@ end
 --- Orders a platoon to move along a chain
 ---@param platoon Platoon
 ---@param chain ChainName
----@param squad? PlatoonSquads
+---@param squad? PlatoonSquadType
 function PlatoonMoveChain(platoon, chain, squad)
     PlatoonMoveRoute(platoon, ScenarioUtils.ChainToPositions(chain), squad)
 end
@@ -496,7 +496,7 @@ end
 --- Orders a platoon to patrol along a chain
 ---@param platoon Platoon
 ---@param chain ChainName
----@param squad? PlatoonSquads
+---@param squad? PlatoonSquadType
 function PlatoonPatrolChain(platoon, chain, squad)
     PlatoonPatrolRoute(platoon, ScenarioUtils.ChainToPositions(chain), squad)
 end
@@ -504,7 +504,7 @@ end
 --- Orders a platoon to attack-move through a chain
 ---@param platoon Platoon
 ---@param chain ChainName
----@param squad? PlatoonSquads
+---@param squad? PlatoonSquadType
 function PlatoonAttackChain(platoon, chain, squad)
     PlatoonAttackRoute(platoon, ScenarioUtils.ChainToPositions(chain), squad)
 end

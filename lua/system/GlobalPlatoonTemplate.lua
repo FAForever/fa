@@ -8,7 +8,7 @@
 ---@field [1] EntityCategory | string
 ---@field [2] number Minimal number of units
 ---@field [3] number Maximum number of units
----@field [4] PlatoonSquads Squad the units belong to
+---@field [4] PlatoonSquadType Squad the units belong to
 ---@field [5] UnitFormations Formation to apply
 
 ---@class PlatoonTemplatePlanSpec
