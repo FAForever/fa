@@ -4219,7 +4219,7 @@ Platoon = Class(moho.platoon_methods) {
     ---@param self Platoon
     ---@param path Vector[] A table of positions, preferably of type Vector. Converted otherwise.
     ---@param formation? UnitFormations self.PlatoonData.UseFormation The formation to apply, such as GrowthFormation, AttackFormation or NoFormation.
-    ---@return PlatoonCommand[]
+    ---@return SimCommand[]
     IssueMoveAlongRoute = function(self, path, formation)
         formation = formation or self.PlatoonData.UseFormation or 'NoFormation'
 
