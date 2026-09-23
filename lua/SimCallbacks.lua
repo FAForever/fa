@@ -534,7 +534,6 @@ Callbacks.SelectHighestEngineerAndAssist = function(data, selection)
 end
 
 Callbacks.DistributeAssisters = function(_, selection)
-    local TableSort = table.sort
     local GetAssistersAndTargets = import("/lua/shared/commands/distribute-assisters.lua").GetAssistersAndTargets
 
     selection = SecureUnits(selection)
@@ -545,13 +544,6 @@ Callbacks.DistributeAssisters = function(_, selection)
         if not assisters[1] or not targets[1] then
             return
         end
-
-        TableSort(assisters, function(left, right)
-            return left:GetEntityId() < right:GetEntityId()
-        end)
-        TableSort(targets, function(left, right)
-            return left:GetEntityId() < right:GetEntityId()
-        end)
 
         local sourceAssister = assisters[1]
         IssueClearCommands({ sourceAssister })
