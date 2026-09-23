@@ -2,27 +2,18 @@
 local SelectUnits = SelectUnits
 local SimCallback = SimCallback
 local GetSelectedUnits = GetSelectedUnits
-local EntityCategoryFilterDown = EntityCategoryFilterDown
-local EntityCategoryFilterOut = EntityCategoryFilterOut
-
-local TableEmpty = table.empty
 
 -- cached for performance
-local CategoriesAssisters = categories.BUILTBYTIER3FACTORY * (
-    categories.MOBILE * categories.SHIELD
-    + categories.SCOUT
-    + categories.STEALTHFIELD
-)
+local GetAssistersAndTargets = import("/lua/shared/commands/distribute-assisters.lua").GetAssistersAndTargets
 
 --- Distributes guard orders for selected assisters across the remaining selected units.
 function DistributeAssisters()
     local selection = GetSelectedUnits()
 
     if selection then
-        local assisters = EntityCategoryFilterDown(CategoriesAssisters, selection)
-        local targets = EntityCategoryFilterOut(CategoriesAssisters, selection)
+        local assisters, targets = GetAssistersAndTargets(selection)
 
-        if not TableEmpty(assisters) and not TableEmpty(targets) then
+        if assisters[1] and targets[1] then
             print(string.format("%d assisters assisting %d units", table.getn(assisters), table.getn(targets)))
             SimCallback({ Func = 'DistributeAssisters', Args = {} }, true)
             SelectUnits(targets)

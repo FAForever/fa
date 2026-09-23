@@ -535,19 +535,14 @@ end
 
 Callbacks.DistributeAssisters = function(data, selection)
     local TableSort = table.sort
-    local CategoriesAssisters = categories.BUILTBYTIER3FACTORY * (
-        categories.MOBILE * categories.SHIELD
-        + categories.SCOUT
-        + categories.STEALTHFIELD
-    )
+    local GetAssistersAndTargets = import("/lua/shared/commands/distribute-assisters.lua").GetAssistersAndTargets
 
     selection = SecureUnits(selection)
 
-    if selection then
-        local assisters = EntityCategoryFilterDown(CategoriesAssisters, selection)
-        local targets = EntityCategoryFilterDown(categories.ALLUNITS - CategoriesAssisters, selection)
+    if selection[1] then
+        local assisters, targets = GetAssistersAndTargets(selection)
 
-        if TableEmpty(assisters) or TableEmpty(targets) then
+        if not assisters[1] or not targets[1] then
             return
         end
 
