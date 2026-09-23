@@ -228,6 +228,7 @@ function Update()
             CreateDialog(clients)
         end
         parent:Update(clients)
+        SimCallback({Func = 'RollRandom', Args = EmptyTable}, false)
     else
         if parent then DestroyDialog() end
     end

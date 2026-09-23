@@ -1448,6 +1448,10 @@ Callbacks.AIPlatoonSimpleStructureBehavior = function(data, units)
     import("/lua/aibrains/platoons/platoon-simple-structure.lua").DebugAssignToUnits(data, units)
 end
 
+Callbacks.RollRandom = function(data, units)
+    Random()
+end
+
 --#endregion
 
 -------------------------------------------------------------------------------
