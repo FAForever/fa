@@ -189,6 +189,8 @@ local function CreateDialog(clients)
     end
 end
 
+local nextCallback = 0
+
 function Update()
     local needDialog = false
     local clients = GetSessionClients()
@@ -228,7 +230,11 @@ function Update()
             CreateDialog(clients)
         end
         parent:Update(clients)
-        SimCallback({Func = 'RollRandom', Args = EmptyTable}, false)
+        local t = GetSystemTimeSeconds()
+        if t > nextCallback then
+            SimCallback({Func = 'RollRandom', Args = EmptyTable}, false)
+            nextCallback = t + 0.1
+        end
     else
         if parent then DestroyDialog() end
     end
