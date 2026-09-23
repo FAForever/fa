@@ -103,27 +103,27 @@ end
 ---@param x number
 ---@param y number
 ---@param z number
----@return moho.IEffect
+---@return self
 function IEffect:OffsetEmitter(x, y, z)
 end
 
 --- Resize the emitter curve to the number of ticks passed in. This is so if we change the lifetime of the emitter we can rescale some of the curves to match if needed. Arguably this should happen automatically to all curves but the original design was screwed up
 ---@param param IEffectCurveParameters
 ---@param timeInTicks number
----@return moho.IEffect
+---@return self
 function IEffect:ResizeEmitterCurve(param, timeInTicks)
 end
 
 --- Scales the emitter
 ---@param scale number
----@return moho.IEffect
+---@return self
 function IEffect:ScaleEmitter(scale)
 end
 
 --- Defines a beam parameter, allowing you to tweak beams on an individual basis
 ---@param name IEffectBeamParameters
 ---@param value number
----@return moho.IEffect
+---@return self
 function IEffect:SetBeamParam(name, value)
 end
 
@@ -131,14 +131,14 @@ end
 ---@param param IEffectCurveParameters
 ---@param height number
 ---@param size number
----@return moho.IEffect
+---@return self
 function IEffect:SetEmitterCurveParam(param, height, size)
 end
 
 --- Defines a emitter parameter, allowing you to tweak effects on an individual basis. Note that if a parameter is also a curve, the curve takes precedence and this function will have no effect
 ---@param param IEffectParameters
 ---@param value number
----@return moho.IEffect
+---@return self
 function IEffect:SetEmitterParam(param, value)
 end
 

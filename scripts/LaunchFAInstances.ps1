@@ -3,6 +3,7 @@
     [string]$map = "/maps/scmp_009/SCMP_009_scenario.lua",  # Default map: Seton's Clutch
     [int]$port = 15000,  # Default port for hosting the game
     [int]$teams = 2,  # Default to two teams, 0 for FFA
+    [string]$exe = "ForgedAlliance.exe", # exe filepath string, can be relative or exact
     [switch]$toLobby # launches into custom lobby
 )
 
@@ -66,7 +67,12 @@ function Launch-GameInstance {
         [string]$arguments
     )
 
-    # Add window position and size arguments
+    # Add exe argument used by debugger
+    if ($gameExecutable -eq $debuggerExecutable) {
+        $arguments = "$exe $arguments"
+    }
+
+    # Add window position and size arguments    
     $arguments += " /position $xPos $yPos /size $windowWidth $windowHeight"
     
     try {

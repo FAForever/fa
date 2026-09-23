@@ -40,14 +40,14 @@ function GreaterThanEconStorageMax(aiBrain, mStorage, eStorage)
     local energyStorageRatio = GetEconomyStoredRatio(aiBrain, 'ENERGY')
 
     if massStorageRatio ~= 0 then
-        massMaxStored = GetEconomyStored('MASS') / massStorageRatio
+        massMaxStored = GetEconomyStored(aiBrain, 'MASS') / massStorageRatio
     else
-        massMaxStored = GetEconomyStored('MASS')
+        massMaxStored = GetEconomyStored(aiBrain, 'MASS')
     end
     if energyStorageRatio ~= 0 then
-        energyMaxStored = GetEconomyStored('ENERGY') / energyStorageRatio
+        energyMaxStored = GetEconomyStored(aiBrain, 'ENERGY') / energyStorageRatio
     else
-        energyMaxStored = GetEconomyStored('ENERGY')
+        energyMaxStored = GetEconomyStored(aiBrain, 'ENERGY')
     end
 
     if (massMaxStored >= mStorage and energyMaxStored >= eStorage) then
@@ -126,14 +126,14 @@ function LessEconStorageMax(aiBrain, mStorage, eStorage)
     local energyStorageRatio = GetEconomyStoredRatio(aiBrain, 'ENERGY')
 
     if massStorageRatio ~= 0 then
-        massMaxStored = GetEconomyStored('MASS') / massStorageRatio
+        massMaxStored = GetEconomyStored(aiBrain, 'MASS') / massStorageRatio
     else
-        massMaxStored = GetEconomyStored('MASS')
+        massMaxStored = GetEconomyStored(aiBrain, 'MASS')
     end
     if energyStorageRatio ~= 0 then
-        energyMaxStored = GetEconomyStored('ENERGY') / energyStorageRatio
+        energyMaxStored = GetEconomyStored(aiBrain, 'ENERGY') / energyStorageRatio
     else
-        energyMaxStored = GetEconomyStored('ENERGY')
+        energyMaxStored = GetEconomyStored(aiBrain, 'ENERGY')
     end
 
     if (massMaxStored < mStorage and energyMaxStored < eStorage) then
@@ -441,7 +441,7 @@ end
 ---@param aiBrain AIBrain
 ---@param numReq number
 ---@param category EntityCategory
----@param idleReq boolean
+---@param idleReq? boolean
 ---@return boolean
 function HaveGreaterThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
     local numUnits

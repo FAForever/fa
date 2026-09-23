@@ -43,7 +43,7 @@ VeteranDefault = {
 --- if DifferentialUpgradeCostCalculation is set to true, the base upgrade cost will be subtracted
 ---@param builder Unit
 ---@param targetData UnitBlueprintEconomy
----@param upgradeBaseData UnitBlueprintEconomy
+---@param upgradeBaseData? UnitBlueprintEconomy
 ---@return number time
 ---@return number energy
 ---@return number mass
@@ -96,7 +96,7 @@ local ToString = import("/lua/sim/categoryutils.lua").ToString
 -- Gets army index for specified army name
 -- e.g. GetArmyIndex('ARMY_1') -> 1
 ---@param army Army
----@return number
+---@return integer
 function GetArmyIndex(army)
     local armyType = type(army)
     if armyType == 'number' then
@@ -117,7 +117,7 @@ end
 --- e.g. AddRestriction(categories.TECH2, 1) -> restricts all T2 units for army 1
 --- e.g. AddRestriction(categories.TECH2) -> restricts all T2 units for all armies
 ---@param cats EntityCategory
----@param army Army
+---@param army? Army
 function AddRestriction(cats, army)
     if type(cats) ~= 'userdata' then
         WARN('Game.AddRestriction() called with invalid categories "' .. ToString(cats) .. '" '
@@ -164,7 +164,7 @@ end
 --- e.g. IsRestricted('xab1401', 1) -> checks if Aeon Paragon is restricted for army with index 1
 --- Note that global restrictions take precedence over restrictions set on specific armies
 ---@param unitId UnitId
----@param army number
+---@param army integer
 ---@return boolean
 function IsRestricted(unitId, army)
     if bps.Ignored then
@@ -262,7 +262,7 @@ end
 --- e.g. restrictions = {categories.TECH1} ->
 ---@param toggle boolean
 ---@param cats EntityCategory
----@param army number
+---@param army? number
 function ResolveRestrictions(toggle, cats, army)
     -- Initialize blueprints info only once
     if table.empty(bps.ids) or table.empty(bps.upgradeable) then

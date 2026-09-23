@@ -6,7 +6,7 @@
 --------------------------------------------------------------------------------------------------
 
 --- LeftoverCleanupBC = BuildCondition   doc = "Please work function docs."
----@param aiBrain AIBrain default_brain
+---@param aiBrain CampaignAIBrain
 ---@param locationType string default_location_type
 ---@return boolean
 function LeftoverCleanupBC(aiBrain, locationType)

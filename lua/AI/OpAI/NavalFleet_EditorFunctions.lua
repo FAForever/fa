@@ -7,7 +7,7 @@
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 
 --- NavalFleetChildCountDifficulty = BuildCondition   doc = "Please work function docs."
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param master string
 ---@return boolean
 function NavalFleetChildCountDifficulty(aiBrain, master)
@@ -31,7 +31,7 @@ function NavalFleetChildCountDifficulty(aiBrain, master)
 end
 
 --- NavalSubChildCountDifficulty = BuildCondition   doc = "Please work function docs."
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param master string
 ---@return boolean
 function NavalSubChildCountDifficulty(aiBrain, master)
@@ -57,7 +57,7 @@ function NavalSubChildCountDifficulty(aiBrain, master)
 end
 
 --- NavalFleetMasterCountDifficulty = BuildCondition   doc = "Please work function docs."
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param master string
 ---@return boolean
 function NavalFleetMasterCountDifficulty(aiBrain, master)

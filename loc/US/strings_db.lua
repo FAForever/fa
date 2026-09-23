@@ -4474,6 +4474,8 @@ key_desc_0408="Select all Bombers (Torpedo)"
 
 key_desc_quick_load="Load the game from the special quick save file"
 
+key_desc_temporary_template_create_or_use="Save a temporary template from the current selection or use the saved temporary template."
+
 keymap_category_0000="UI"
 keymap_category_0004="Selection"
 keymap_category_0025="Camera"

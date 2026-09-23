@@ -182,7 +182,34 @@ Callbacks.UpdateMarker = SimPing.UpdateMarker
 
 Callbacks.FactionSelection = ScenarioFramework.OnFactionSelect
 
-Callbacks.ToggleSelfDestruct = import("/lua/selfdestruct.lua").ToggleSelfDestruct
+---@param data ToggleSelfDestructData
+---@param units Unit[]
+Callbacks.ToggleSelfDestruct = function(data, units)
+    -- prevent malformed input
+    if (not units) or (table.getn(units) == 0) then
+        return
+    end
+
+    -- prevent abuse
+    if (not data) or (not data.owner) or (not OkayToMessWithArmy(data.owner)) then
+        return
+    end
+
+    -- moderation rule: if you self destruct with one or more ACUs in the selection when playing full 
+    -- share, then you only self destruct the ACUs. This does not make it impossible to abuse, but it 
+    -- does introduce a simple guardrail. 
+    if ScenarioInfo.Options.Share == "FullShare" then
+        local commandUnits = EntityCategoryFilterDown(categories.COMMAND, SecureUnits(units))
+        if table.getn(commandUnits) > 0 then
+            import("/lua/selfdestruct.lua").ToggleSelfDestruct(data, commandUnits)
+            return
+        end
+    end
+
+    -- otherwise just pass it through as usual
+    import("/lua/selfdestruct.lua").ToggleSelfDestruct(data, units)
+end
+
 
 Callbacks.MarkerOnScreen = import("/lua/simcameramarkers.lua").MarkerOnScreen
 
@@ -1025,7 +1052,8 @@ Callbacks.CheatSpawnUnit = function(data)
             local unit = CreateUnitHPR(data.bpId, data.army, pos[1], pos[2], pos[3], 0, data.yaw, 0)
             local unitbp = __blueprints[data.bpId]
             if data.CreateTarmac and unit.CreateTarmac and unitbp.Display and unitbp.Display.Tarmacs then
-                unit:CreateTarmac(true, true, true, false, false)
+                ---@cast unit StructureUnit
+                unit:CreateTarmac(true, true, true)
             end
             if data.UnitIconCameraMode then
                 local size = math.max(

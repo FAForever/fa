@@ -1,4 +1,6 @@
 ---@declare-global
+
+---@diagnostic disable: lowercase-global
 -- ==========================================================================================
 -- * File       : lua/system/utils.lua
 -- * Authors    : Gas Powered Games, FAF Community, HUSSAR

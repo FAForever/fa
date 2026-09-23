@@ -7,8 +7,8 @@
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 
 --- BomberEscortChildBomberCountDifficulty = BuildCondition   doc = "Please work function docs."
----@param aiBrain AIBrain default_brain
----@param master string default_master
+---@param aiBrain CampaignAIBrain
+---@param master string
 ---@return boolean
 function BomberEscortChildBomberCountDifficulty(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master..'_BomberChildren')
@@ -28,8 +28,8 @@ function BomberEscortChildBomberCountDifficulty(aiBrain, master)
 end
 
 --- BomberEscortChildEscortCountDifficulty = BuildCondition   doc = "Please work function docs."
----@param aiBrain AIBrain default_brain
----@param master string default_master
+---@param aiBrain CampaignAIBrain
+---@param master string
 ---@return boolean
 function BomberEscortChildEscortCountDifficulty(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master..'_EscortChildren')
@@ -49,8 +49,8 @@ function BomberEscortChildEscortCountDifficulty(aiBrain, master)
 end
 
 --- BomberEscortMasterCountDifficulty = BuildCondition   doc = "Please work function docs."
----@param aiBrain AIBrain default_brain
----@param master string default_master
+---@param aiBrain CampaignAIBrain
+---@param master string
 ---@return boolean
 function BomberEscortMasterCountDifficulty(aiBrain, master)
     local escortCounter = ScenarioFramework.AMPlatoonCounter(aiBrain, master..'_EscortChildren')
@@ -82,18 +82,17 @@ end
 ---@param platoon Platoon
 function BomberEscortAI(platoon)
     local aiBrain = platoon:GetBrain()
-    local target = false
-    --local cmd = false
+    local target
     while aiBrain:PlatoonExists(platoon) do
-        target = false
-        if table.getn(platoon:GetSquadUnits('artillery')) > 0 then
-            target = platoon:FindClosestUnit('artillery', 'Enemy', true, categories.ALLUNITS-categories.WALL)
+        target = nil
+        if table.getn(platoon:GetSquadUnits('Artillery')) > 0 then
+            target = platoon:FindClosestUnit('Artillery', 'Enemy', true, categories.ALLUNITS-categories.WALL)
         else
-            target = platoon:FindClosestUnit('attack', 'Enemy', true, categories.ALLUNITS)
+            target = platoon:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS)
         end
-        if target and not target:IsDead() then
+        if target and not target.Dead then
             platoon:Stop()
-            cmd = platoon:AggressiveMoveToLocation( target:GetPosition() )
+            platoon:AggressiveMoveToLocation( target:GetPosition() )
         else
             platoon:AggressiveMoveToLocation( (aiBrain:GetHighestThreatPosition(2, true)) )
         end
