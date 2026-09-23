@@ -78,7 +78,7 @@ end
 ---| `IssueFormPatrol` # Formation patrol. Does NOT return `SimCommand`
 ---| `IssueFormAttack` # Formation attack
 
---- Issues formation order to the units, using `angles` to oreient units at each node.
+--- Issues formation order to the units, using `angles` to orient units at each node.
 ---@param units Unit[]
 ---@param fn UnitsFormationCommand One of the `IssueFormationCommand` functions
 ---@param positions Vector[]

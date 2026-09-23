@@ -4197,7 +4197,7 @@ Platoon = Class(moho.platoon_methods) {
         local commands = {}
 
         -- we have no formation, further computations are not required. We use this
-        -- shortcut because calling IssueFormPatrol() with no formation causes them
+        -- shortcut because calling IssueFormAggressiveMove() with no formation causes them
         -- to not move at all.
         if formation == 'NoFormation' then
             local units = self:GetPlatoonUnits()
@@ -4232,7 +4232,7 @@ Platoon = Class(moho.platoon_methods) {
         local commands = {}
 
         -- we have no formation, further computations are not required. We use this
-        -- shortcut because calling IssueFormPatrol() with no formation causes them
+        -- shortcut because calling IssueFormMove() with no formation causes them
         -- to not move at all.
         if formation == 'NoFormation' then
             local units = self:GetPlatoonUnits()

@@ -467,7 +467,7 @@ function GroupFormPatrolChain(units, chain, formation)
     end
 end
 
---- Orders a group to attack-move a along a chain
+--- Orders a group to attack-move along a chain
 ---@param units Unit[]
 ---@param chain ChainName
 function GroupAttackChain(units, chain)
@@ -476,7 +476,7 @@ function GroupAttackChain(units, chain)
     end
 end
 
---- Orders a group to attack-move a along a route
+--- Orders a group to attack-move along a route
 ---@param units Unit[]
 ---@param route (MarkerName | Vector)[]
 function GroupAttackRoute(units, route)
@@ -497,7 +497,7 @@ function GroupMoveChain(units, chain)
     end
 end
 
---- Orders a group to move a along a route
+--- Orders a group to move along a route
 ---@param units Unit[]
 ---@param route (MarkerName | Vector)[]
 function GroupMoveRoute(units, route)
