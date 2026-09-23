@@ -4212,7 +4212,7 @@ Platoon = Class(moho.platoon_methods) {
         local angles = FormationCommands.GetAnglesForRoute(path, self:GetPlatoonPosition())
         local units = self:GetPlatoonUnits()
 
-        FormationCommands.UnitsFormationOrder(units, IssueFormAggressiveMove, path, angles, formation)
+        return FormationCommands.UnitsFormationOrder(units, IssueFormAggressiveMove, path, angles, formation)
     end,
 
     --- Moves the platoon along the path, orientating at each node to match the line from the previous node to the current node.
