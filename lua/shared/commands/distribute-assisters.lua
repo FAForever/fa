@@ -47,11 +47,16 @@ AssisterCategory = (
 
 --- Separates a selection into eligible assisters and assist targets.
 ---@param selection Unit[] | UserUnit[]
+---@param assisterCategory? EntityCategory
+---@param targetCategory? EntityCategory
 ---@return Unit[] | UserUnit[] assisters
 ---@return Unit[] | UserUnit[] targets
-function GetAssistersAndTargets(selection)
-    local assisters = EntityCategoryFilterDown(AssisterCategory, selection)
-    local targets = EntityCategoryFilterDown(categories.ALLUNITS - AssisterCategory, selection)
+function GetAssistersAndTargets(selection, assisterCategory, targetCategory)
+    assisterCategory = assisterCategory or AssisterCategory
+    targetCategory = targetCategory or (categories.ALLUNITS - assisterCategory)
+
+    local assisters = EntityCategoryFilterDown(assisterCategory, selection)
+    local targets = EntityCategoryFilterDown(targetCategory - assisterCategory, selection)
 
     return assisters, targets
 end

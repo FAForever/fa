@@ -533,26 +533,22 @@ Callbacks.SelectHighestEngineerAndAssist = function(data, selection)
     end
 end
 
-Callbacks.DistributeAssisters = function(_, selection)
-    local GetAssistersAndTargets = import("/lua/shared/commands/distribute-assisters.lua").GetAssistersAndTargets
+---@param data DistributeAssistersData
+Callbacks.DistributeAssisters = function(data)
+    local assisters = SecureUnits(data.AssisterIds)
+    local targets = SecureUnits(data.TargetIds)
 
-    selection = SecureUnits(selection)
-
-    if selection[1] then
-        local assisters, targets = GetAssistersAndTargets(selection)
-
-        if not assisters[1] or not targets[1] then
-            return
-        end
-
-        local sourceAssister = assisters[1]
-        IssueClearCommands({ sourceAssister })
-        for _, target in targets do
-            IssueGuard({ sourceAssister }, target)
-        end
-
-        import("/lua/sim/commands/distribute-queue.lua").DistributeOrders(assisters, sourceAssister, true, false)
+    if not assisters[1] or not targets[1] then
+        return
     end
+
+    local sourceAssister = assisters[1]
+    IssueClearCommands({ sourceAssister })
+    for _, target in targets do
+        IssueGuard({ sourceAssister }, target)
+    end
+
+    import("/lua/sim/commands/distribute-queue.lua").DistributeOrders(assisters, sourceAssister, true, false)
 end
 
 do
