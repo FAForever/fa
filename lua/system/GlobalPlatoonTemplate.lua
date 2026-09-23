@@ -8,7 +8,7 @@
 ---@field [1] EntityCategory | string
 ---@field [2] number Minimal number of units
 ---@field [3] number Maximum number of units
----@field [4] PlatoonSquads Squad the units belong to
+---@field [4] PlatoonSquadType Squad the units belong to
 ---@field [5] UnitFormations Formation to apply
 
 ---@class PlatoonTemplatePlanSpec
@@ -17,10 +17,10 @@
 ---@field GlobalSquads PlatoonTemplateSquad[]
 
 ---@class PlatoonTemplateFactionalSquad
----@field UEF PlatoonTemplateSquad?
----@field Cybran PlatoonTemplateSquad?
----@field Seraphim PlatoonTemplateSquad?
----@field Aeon PlatoonTemplateSquad?
+---@field UEF? PlatoonTemplateSquad[]
+---@field Cybran? PlatoonTemplateSquad[]
+---@field Seraphim? PlatoonTemplateSquad[]
+---@field Aeon? PlatoonTemplateSquad[]
 
 ---@class PlatoonTemplateFactionalSpec
 ---@field Name string Unique identifier for the platoon template, used as a string reference
@@ -38,7 +38,7 @@ PlatoonTemplates = {}
 
 --- Register a platoon template, or override an existing platoon template
 ---@param spec PlatoonTemplateSpec
----@return string
+---@return string?
 PlatoonTemplate = function(spec)
 
     -- it should be a table

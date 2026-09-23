@@ -9,8 +9,8 @@
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 
 --- AirAttackChildCountDifficulty = BuildCondition   doc = "Please work function docs."
----@param aiBrain AIBrain default_brain
----@param master string default_master
+---@param aiBrain CampaignAIBrain
+---@param master string
 ---@param number number
 ---@return boolean
 function AirAttackChildCountDifficulty(aiBrain, master, number)
@@ -33,8 +33,8 @@ function AirAttackChildCountDifficulty(aiBrain, master, number)
 end
 
 --- AirAttackMasterCountDifficulty = BuildCondition   doc = "Please work function docs."
----@param aiBrain AIBrain default_brain
----@param master string default_master
+---@param aiBrain CampaignAIBrain
+---@param master string
 ---@param number number
 ---@return boolean
 function AirAttackMasterCountDifficulty(aiBrain, master, number)
