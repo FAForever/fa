@@ -533,7 +533,7 @@ Callbacks.SelectHighestEngineerAndAssist = function(data, selection)
     end
 end
 
-Callbacks.DistributeAssisters = function(data, selection)
+Callbacks.DistributeAssisters = function(_, selection)
     local TableSort = table.sort
     local GetAssistersAndTargets = import("/lua/shared/commands/distribute-assisters.lua").GetAssistersAndTargets
 
