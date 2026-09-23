@@ -581,7 +581,7 @@ Tooltips = {
     -- **********************
     -- ** Options Strings
     -- **********************
-
+    
     options_invert_middle_mouse_button = {
         title = "<LOC INVERT_MOUSE_PAN>Invert pan direction with middle mouse button",
         description = "<LOC INVERT_MOUSE_PAN_DESCRIPTION>When enabled, dragging with the middle mouse button moves the camera in the opposite direction.",
@@ -1074,8 +1074,8 @@ Tooltips = {
         description = "<LOC OPTIONS_0294>When on, a unit can only be part of one control group. A unit will be transferred from any previously assigned control groups to the new control group.",
     },
     options_add_to_factory_control_group = {
-        title = "<LOC OPTIONS_0295>Transitive Control Groups of Factories",
-        description = "<LOC OPTIONS_0296>When on, a unit inherits the control group of the factory it is produced by."
+        title= "<LOC OPTIONS_0295>Transitive Control Groups of Factories",
+        description= "<LOC OPTIONS_0296>When on, a unit inherits the control group of the factory it is produced by."
     },
     options_selection_sets_double_tap_behavior = {
         title = "<LOC OPTIONS_0297>Successive Control Group Select Behavior",
@@ -1229,12 +1229,12 @@ Tooltips = {
         description = "<LOC lobui_0524>When clicked, all the main game options will be reset to ranked settings",
     },
     lob_rerun_benchmark = {
-        title = '<LOC lobui_0752>Rerun CPU Benchmark',
-        description = '<LOC lobui_0753>Recalculates your CPU rating.'
+        title='<LOC lobui_0752>Rerun CPU Benchmark',
+        description='<LOC lobui_0753>Recalculates your CPU rating.'
     },
     lob_close_empty_slots = {
-        title = '<LOC lobui_0774>Close/Open Empty Slots',
-        description = '<LOC lobui_0775>Closes all empty open slots. If all empty slots are already closed, then it opens them. Right-click for close - spawn mex. Hold Ctrl to reset.'
+        title='<LOC lobui_0774>Close/Open Empty Slots',
+        description='<LOC lobui_0775>Closes all empty open slots. If all empty slots are already closed, then it opens them. Right-click for close - spawn mex. Hold Ctrl to reset.'
     },
     map_type = {
         title = "<LOC MAPSEL_0032>Map Type",
@@ -1917,7 +1917,7 @@ Tooltips = {
         title = "<LOC tooltipui0153>GPGNet",
         description = "<LOC tooltipui0154>Log into GPGNet",
     },
-    mpselect_lan = {
+         mpselect_lan = {
         title = "<LOC OPTIONS_0123>LAN",
         description = "<LOC OPTIONS_0124>Host, Join or Observe a LAN Game",
     },
