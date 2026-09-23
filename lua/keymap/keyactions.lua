@@ -1649,7 +1649,7 @@ local keyActionsOrdersAdvanced = {
         category = 'ordersAdvanced',
         wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#distribute-assisters'
     },
-    ['filter_distribute_support_units_and_assist'] = {
+    ['shift_filter_support_units_and_assist'] = {
         action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-assisters.lua").DistributeAssisters()',
         category = 'ordersAdvanced',
         wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#distribute-assisters'
