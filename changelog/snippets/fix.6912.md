@@ -1,0 +1,1 @@
+- (#6912) Re-apply the fix for factories not immediately starting to build queued units after the factory finishes upgrading, or when a currently building land or navy unit is cancelled. It was suspected of causing desyncs, but that does not seem to be the case.
