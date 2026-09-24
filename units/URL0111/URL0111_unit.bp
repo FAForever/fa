@@ -69,11 +69,18 @@ UnitBlueprint{
                     ScrollTreads = true,
                     TreadMarks = {
                         {
-                            TreadMarks = "tank_treads06_albedo",
-                            TreadMarksInterval = 0.09,
-                            TreadMarksSizeX = 0.9,
-                            TreadMarksSizeZ = 2,
-                            TreadOffset = { 0, 0, -0.7 },
+                            TreadMarks = "tank_treads03_albedo",
+                            TreadMarksInterval = 0.1,
+                            TreadMarksSizeX = 0.3,
+                            TreadMarksSizeZ = 2.5,
+                            TreadOffset = { 0.3, 0, -0.8 },
+                        },
+                        {
+                            TreadMarks = "tank_treads03_albedo",
+                            TreadMarksInterval = 0.1,
+                            TreadMarksSizeX = 0.3,
+                            TreadMarksSizeZ = 2.5,
+                            TreadOffset = { -0.3, 0, -0.8 },
                         },
                     },
                 },
