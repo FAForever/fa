@@ -42,12 +42,14 @@ local DeathWeaponEMP = ClassWeapon(Weapon) {
     ---@param self DeathWeaponEMP
     Fire = function(self)
         local blueprint = self.Blueprint
-        local unit = self.unit
+        local unit = self.unit --[[@as MobileUnit]]
         local position = unit:GetPosition()
 
         -- do the damage
-        DamageArea(unit, position, blueprint.DamageRadius, blueprint.Damage, blueprint.DamageType or 'Normal',
-            blueprint.DamageFriendly or false)
+        local dmgT = self:GetDamageTable()
+        local dmgRadius = dmgT.DamageRadius
+        DamageArea(unit, position, dmgRadius, dmgT.DamageAmount, dmgT.DamageType or 'Normal',
+            dmgT.DamageFriendly or false)
 
         -- create explosion effect
         local army = unit.Army
@@ -59,14 +61,14 @@ local DeathWeaponEMP = ClassWeapon(Weapon) {
         -- create a decal
         if not unit.transportDrop then
             local rotation = 6.28 * Random()
-            DamageArea(unit, position, 6, 1, 'TreeForce', true)
-            DamageArea(unit, position, 6, 1, 'TreeForce', true)
-            CreateDecal(position, rotation, 'scorch_010_albedo', '', 'Albedo', 11, 11, 250, 120, army)
+            DamageArea(unit, position, dmgRadius, 1, 'TreeForce', true)
+            DamageArea(unit, position, dmgRadius, 1, 'TreeForce', true)
+            CreateDecal(position, rotation, 'scorch_010_albedo', '', 'Albedo', dmgRadius*1.7, dmgRadius*1.7, 250, 120, army)
         end
 
         -- create light flash
-        CreateLightParticle(unit, -1, army, 7, 12, 'glow_03', 'ramp_red_06')
-        CreateLightParticle(unit, -1, army, 7, 22, 'glow_03', 'ramp_antimatter_02')
+        CreateLightParticle(unit, -1, army, dmgRadius * 1.17, 12, 'glow_03', 'ramp_red_06')
+        CreateLightParticle(unit, -1, army, dmgRadius * 1.17, 22, 'glow_03', 'ramp_antimatter_02')
 
         -- create flying and burning debris
         local vx, _, vz = unit:GetVelocity()
