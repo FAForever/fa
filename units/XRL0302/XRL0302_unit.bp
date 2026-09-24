@@ -40,6 +40,8 @@ UnitBlueprint{
         "SHOWATTACKRETICLE",
         "TECH2",
         "VISIBLETORECON",
+        "OVERLAYINDIRECTFIRE",
+        "OVERLAYDIRECTFIRE",
     },
     Defense = {
         ArmorType = "Normal",
