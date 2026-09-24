@@ -37,6 +37,7 @@ local DeathWeaponEMP = ClassWeapon(Weapon) {
     OnCreate = function(self)
         Weapon.OnCreate(self)
         self:SetWeaponEnabled(false)
+        self:ChangeMaxRadius(self:GetDamageTable().DamageRadius)
     end,
 
     AddDamageRadiusMod = function(self, dmgRadMod)
