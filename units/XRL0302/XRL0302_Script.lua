@@ -39,6 +39,12 @@ local DeathWeaponEMP = ClassWeapon(Weapon) {
         self:SetWeaponEnabled(false)
     end,
 
+    AddDamageRadiusMod = function(self, dmgRadMod)
+        Weapon.AddDamageRadiusMod(self, dmgRadMod)
+        -- use max radius to show damage radius, since it isn't used for target checking
+        self:ChangeMaxRadius(self:GetDamageTable().DamageRadius)
+    end,
+
     ---@param self DeathWeaponEMP
     Fire = function(self)
         local blueprint = self.Blueprint
