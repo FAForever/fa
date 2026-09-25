@@ -161,11 +161,11 @@ UnitBlueprint{
         {
             AboveWaterTargetsOnly = true,
             CollideFriendly = false,
-            Damage = 1,
+            Damage = 0,
             DamageFriendly = false,
-            DamageRadius = 6.5,
+            DamageRadius = 0,
             DamageType = "FireBeetleExplosion",
-            DisplayName = "Suicide",
+            DisplayName = "Detonation Trigger",
             FireTargetLayerCapsTable = {
                 Land = "Land|Water|Seabed",
                 Water = "Land|Water|Seabed",
@@ -192,7 +192,7 @@ UnitBlueprint{
             DamageFriendly = false,
             DamageRadius = 6.5,
             DamageType = "EMP",
-            DisplayName = "EMP",
+            DisplayName = "EMP Blast",
             FireOnDeath = true,
             FireTargetLayerCapsTable = {
                 Air = "Air|Land|Seabed|Water",
