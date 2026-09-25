@@ -42,6 +42,14 @@
 ---@field x1 number
 ---@field y1 number
 
+---@class PointVector
+---@field px number
+---@field py number
+---@field pz number
+---@field vx number
+---@field vy number
+---@field vz number
+
 ---@alias Color string `EnumColor` or hexcode like `'RrGgBb'`, or `'AaRrGgBb'` with transparency
 ---@alias Bone string | number
 ---@alias Army string | integer
@@ -329,15 +337,14 @@ function ParseEntityCategory(cat)
 end
 
 --- Creates a point vector
----@alternative Not used, better off allocating a separate position and vector
+---@deprecated Not used, better off allocating a separate position and vector
 ---@param px number
 ---@param py number
 ---@param pz number
 ---@param vx number
 ---@param vy number
 ---@param vz number
----@return Vector position
----@return Vector velocity
+---@return PointVector
 function PointVector(px, py, pz, vx, vy, vz)
 end
 
@@ -401,7 +408,7 @@ function RegisterUnitBlueprint(spec)
 end
 
 --- Resumes the thread after suspending it, does nothing if the thread wasn't suspended
----@see # Counterpart of SuspendCurrentThread
+---@see SuspendCurrentThread # Counterpart of SuspendCurrentThread
 ---@param thread thread
 function ResumeThread(thread)
 end
