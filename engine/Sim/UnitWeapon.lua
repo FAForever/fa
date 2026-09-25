@@ -64,17 +64,23 @@ return false
 function UnitWeapon:CanFire()
 end
 
----
+--- Sets the engine weapon attribute, but it doesn't seem to be used anywhere.
+---@deprecated # Non-functional, use Lua function instead.
+---@see Weapon.AddDamageMod # Use instead
 ---@param damage number
 function UnitWeapon:ChangeDamage(damage)
 end
 
----
+--- Sets the engine weapon attribute, but it doesn't seem to be used anywhere.
+---@deprecated # Non-functional, use Lua function instead.
+---@see Weapon.AddDamageRadiusMod # Use instead
 ---@param radius number
 function UnitWeapon:ChangeDamageRadius(radius)
 end
 
----
+--- Sets the engine weapon attribute, but it doesn't seem to be used anywhere.
+---@deprecated # Non-functional, use Lua function instead.
+---@see Weapon.ChangeDamageType # Use instead
 ---@param typeName DamageType
 function UnitWeapon:ChangeDamageType(typeName)
 end
