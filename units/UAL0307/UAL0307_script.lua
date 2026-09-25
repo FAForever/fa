@@ -6,6 +6,7 @@
 
 local AShieldHoverLandUnit = import("/lua/aeonunits.lua").AShieldHoverLandUnit
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
+local SlowHover = import("/lua/defaultunits.lua").SlowHoverLandUnit
 local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
 
 ---@class UAL0307 : AShieldHoverLandUnit
@@ -69,7 +70,12 @@ UAL0307 = ClassUnit(AShieldHoverLandUnit, ShieldEffectsComponent) {
     end,
 
     OnLayerChange = function(self, new, old)
-        AShieldHoverLandUnit.OnLayerChange(self, new, old)
+        local physics = (self.Blueprint or self:GetBlueprint()).Physics
+        if physics.WaterSpeedMultiplier then
+            SlowHover.OnLayerChange(self, new, old)
+        else
+            AShieldHoverLandUnit.OnLayerChange(self, new, old)
+        end
 
         if not IsDestroyed(self.TargetPointer) then
             if self.PointerEnabled == false then
