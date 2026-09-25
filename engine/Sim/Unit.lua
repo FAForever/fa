@@ -184,7 +184,7 @@ function Unit:GetCurrentLayer()
 end
 
 --- Returns the current move location of the unit
----@return Vector
+---@return Vector | false
 function Unit:GetCurrentMoveLocation()
 end
 
