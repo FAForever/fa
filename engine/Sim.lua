@@ -43,6 +43,13 @@
 ---@type AIBrain[]
 ArmyBrains = {}
 
+--- Global automatically set by the engine in the thread of a `SimLua` console command
+---
+---@see DebugGetSelection # For multiple selected units, in any sim thread
+---@see SelectedUnit # Proper interface to get this value
+---@type Unit?
+__selected_unit = {}
+
 --- restricts the army from building the unit category
 ---@param army Army
 ---@param category EntityCategory
@@ -1088,8 +1095,13 @@ end
 function RemoveEconomyEvent(unit, event)
 end
 
---- Returns the currently selected unit. For use at the lua console, so you can call Lua methods on a unit
----@return Unit
+--- Returns the currently selected unit.
+--- 
+--- Only returns a unit when called from the `SimLua` console command's thread.
+--- 
+---@see DebugGetSelection # For multiple selected units, in any sim thread.
+---@see __selected_unit The unit this function returns
+---@return Unit?
 function SelectedUnit()
 end
 
@@ -1240,6 +1252,7 @@ end
 function SetTerrainTypeRect(rect, type)
 end
 
+--- Determined by the `/noinitialunits` command line arg
 ---@return boolean createInitial
 function ShouldCreateInitialArmyUnits()
 end

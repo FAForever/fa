@@ -41,6 +41,8 @@ VeteranDefault = {
 ---
 --- In order to keep backwards compatibility, there is a new option in the blueprint economy section.
 --- if DifferentialUpgradeCostCalculation is set to true, the base upgrade cost will be subtracted
+--- 
+--- Called by the engine to determine construction ETAs when showing the command graph
 ---@param builder Unit
 ---@param targetData UnitBlueprintEconomy
 ---@param upgradeBaseData? UnitBlueprintEconomy

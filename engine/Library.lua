@@ -27,8 +27,10 @@
 LaunchDir = ""      -- filled with whatever directory the exe is in
 __EngineStats = { } -- populated by the engine, each frame in the UI thread
 
---- Returns the bitwise XOR of a and b, coercing to integers. Returns `4294967296` (2^^32) if the
---- signs don't match.
+--- Returns a to the power of b.
+---
+--- Note: this is not the ^ operator, which is XOR, this is a separate function.
+---@see math.pow Identical function.
 ---@param a number
 ---@param b number
 ---@return integer
@@ -36,6 +38,8 @@ function __pow(a, b)
 end
 
 --- Prints to the moho logger with "info:" prefix. Unlike LOG, doesn't add the prefix for newlines.
+--- 
+---@see LOG
 ---@param out any
 ---@param ... any
 function _ALERT(out, ...)
@@ -57,6 +61,8 @@ function lazyimport(path)
 end
 
 --- Print a message to the moho logger, this shouldn't be used in production code
+--- 
+---@see _ALERT To not add a prefix for newlines.
 ---@param out any
 ---@param ... any
 function LOG(out, ...)
