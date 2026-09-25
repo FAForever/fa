@@ -6,6 +6,7 @@ ProjectileBlueprint{
         CollideEntity = false,
         CollideSurface = false,
         DestroyOnWater = false,
+        DetonateBelowHeight = -9999,
         DirectionX = 0,
         DirectionXRange = 0,
         DirectionY = 0,
