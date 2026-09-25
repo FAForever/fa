@@ -53,10 +53,12 @@ local DeathWeaponEMP = ClassWeapon(Weapon) {
         local position = unit:GetPosition()
 
         -- do the damage
-        local dmgT = self:GetDamageTable()
-        local dmgRadius = dmgT.DamageRadius
-        DamageArea(unit, position, dmgRadius, dmgT.DamageAmount, dmgT.DamageType or 'Normal',
-            dmgT.DamageFriendly or false)
+        local damageTable = self:GetDamageTable()
+        local damageRadius = damageTable.DamageRadius
+        DamageArea(unit, position, damageRadius, damageTable.DamageAmount
+            , damageTable.DamageType or 'Normal'
+            , damageTable.DamageFriendly or false
+        )
 
         -- create explosion effect
         local army = unit.Army
@@ -68,14 +70,16 @@ local DeathWeaponEMP = ClassWeapon(Weapon) {
         -- create a decal
         if not unit.transportDrop then
             local rotation = 6.28 * Random()
-            DamageArea(unit, position, dmgRadius, 1, 'TreeForce', true)
-            DamageArea(unit, position, dmgRadius, 1, 'TreeForce', true)
-            CreateDecal(position, rotation, 'scorch_010_albedo', '', 'Albedo', dmgRadius*1.7, dmgRadius*1.7, 250, 120, army)
+            DamageArea(unit, position, damageRadius, 1, 'TreeForce', true)
+            DamageArea(unit, position, damageRadius, 1, 'TreeForce', true)
+            local decalRadius = damageRadius * 1.7 -- 11/6.5
+            CreateDecal(position, rotation, 'scorch_010_albedo', '', 'Albedo', decalRadius, decalRadius, 250, 120, army)
         end
 
         -- create light flash
-        CreateLightParticle(unit, -1, army, dmgRadius * 1.17, 12, 'glow_03', 'ramp_red_06')
-        CreateLightParticle(unit, -1, army, dmgRadius * 1.17, 22, 'glow_03', 'ramp_antimatter_02')
+        local lightParticleSize = damageRadius * 1.17 -- * 7/6
+        CreateLightParticle(unit, -1, army, lightParticleSize, 12, 'glow_03', 'ramp_red_06')
+        CreateLightParticle(unit, -1, army, lightParticleSize, 22, 'glow_03', 'ramp_antimatter_02')
 
         -- create flying and burning debris
         local vx, _, vz = unit:GetVelocity()
