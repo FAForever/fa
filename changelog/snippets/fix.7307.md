@@ -1,1 +1,4 @@
-- Your explanation here... [Don't forget to change the category in the filename] (#7307).
+- Fix issues with the fire beetle (#7307):
+  - Fix damage effect not being affected by changes to the weapon's damage table, such as damage and damage radius modifiers.
+    - Visuals are now scaled with damage radius modifiers.
+  - Fix the explosion range's indirect-fire (yellow) range ring not showing. The direct-fire (red) range ring is the detonation range when attacking something.
