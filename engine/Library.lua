@@ -29,6 +29,7 @@ __EngineStats = { } -- populated by the engine, each frame in the UI thread
 
 --- Returns a to the power of b.
 ---
+--- Note: this is not the ^ operator, which is XOR, this is a separate function.
 ---@see math.pow Identical function.
 ---@param a number
 ---@param b number
