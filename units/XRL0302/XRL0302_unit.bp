@@ -182,6 +182,7 @@ UnitBlueprint{
             TargetRestrictDisallow = "UNTARGETABLE",
             Turreted = false,
             WeaponCategory = "Kamikaze",
+            RangeCategory = "UWRC_DirectFire",
         },
         {
             AboveWaterTargetsOnly = true,
