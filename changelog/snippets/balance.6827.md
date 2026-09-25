@@ -1,0 +1,1 @@
+- (#6827) Fix shield assist not stalling when you stall resources, causing the shield to be repaired for free.
