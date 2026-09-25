@@ -151,6 +151,7 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
                 end
             else
                 lastTarget = nil
+                navigator:SetSpeedThroughGoal(false)
             end
             self:SetCustomName(navigator:GetStatus())
 
