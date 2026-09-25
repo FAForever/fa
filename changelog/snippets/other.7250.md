@@ -1,0 +1,1 @@
+- All custom `String_` functions are moved to the default `string` library. Same pattern as the extended `table`. (#7250)
