@@ -153,11 +153,6 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
     ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
-        local wep = self.WeaponInstances['DeathWeapon']
-        wep:AddDamageMod(99999)
-        wep:AddDamageRadiusMod(20)
-        wep.damageTableCache.DamageType = "Deathnuke"
-        wep.damageTableCacheValid = false
     end,
 
     ---@param self XRL0302
