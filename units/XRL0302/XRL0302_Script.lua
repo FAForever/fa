@@ -122,6 +122,7 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
         local weapon = self:GetWeaponByLabel('Suicide')
         if not navigator then return end
 
+        local lastTarget
         while not IsDestroyed(self) do
 
             -- adjust behavior of the weapon so it only fires when we're trying to attack something
@@ -143,10 +144,13 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
             local command = self:GetCommandQueue()[1]
             if command and command.commandType == 10 then
                 local target = command.target --[[@as Unit]]
-                if target then
+                if target ~= lastTarget then
+                    lastTarget = target
                     navigator:SetDestUnit(target)
                     navigator:SetSpeedThroughGoal(true)
                 end
+            else
+                lastTarget = nil
             end
             self:SetCustomName(navigator:GetStatus())
 
