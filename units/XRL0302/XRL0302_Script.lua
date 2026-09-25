@@ -72,7 +72,7 @@ local DeathWeaponEMP = ClassWeapon(Weapon) {
             local rotation = 6.28 * Random()
             DamageArea(unit, position, damageRadius, 1, 'TreeForce', true)
             DamageArea(unit, position, damageRadius, 1, 'TreeForce', true)
-            local decalRadius = damageRadius * 1.7 -- 11/6.5
+            local decalRadius = damageRadius * 1.83 -- 11/6
             CreateDecal(position, rotation, 'scorch_010_albedo', '', 'Albedo', decalRadius, decalRadius, 250, 120, army)
         end
 
