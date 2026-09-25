@@ -2,3 +2,4 @@
   - Fix damage effect not being affected by changes to the weapon's damage table, such as damage and damage radius modifiers.
     - Visuals are now scaled with damage radius modifiers.
   - Fix the explosion range's indirect-fire (yellow) range ring not showing. The direct-fire (red) range ring is the detonation range when attacking something.
+  - Update weapon names and information in UI to make it more clear what they do.
