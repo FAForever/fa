@@ -1,12 +1,12 @@
 -- |-------------------------------|---------|--------|---------|
 -- | Name                          | Mean ms | 3x Dev | Hashes? |
 -- |-------------------------------|---------|--------|---------|
--- | "For table.getn upvalued"     |   8.02  | 0.22   |    N    |
--- | "For table.getn"              |   8.06  | 0.36   |    N    |
--- | "While cache table.getn"      |   8.43  | 0.26   |    N    |
+-- | "For table.getn upvalued"     |   9.03  | 0.26   |    N    |
+-- | "For table.getn"              |   9.02  | 0.27   |    N    |
+-- | "While cache table.getn"      |   9.46  | 0.32   |    N    |
 -- | "For ipairs upvalued"         | 146.    | 4.0    |    N    |
 -- | "For ipairs"                  | 146.    | 2.3    |    N    |
--- | "While table.getn"            | 162.    | 7.1    |    N    |
+-- | "While table.getn"            | 163.    | 2.5    |    N    |
 -- |-------------------------------|---------|--------|---------|
 -- | "For each with next upvalued" | 231.    | 4.6    |    Y    |
 -- | "For each"                    | 232.    | 5.1    |    Y    |
@@ -50,6 +50,7 @@ function ForGetn(loop)
 
     for _ = 1, loop do
         for k = 1, table.getn(data) do
+            local v = data[k]
         end
     end
 
@@ -63,6 +64,7 @@ function ForGetnUpval(loop)
     local TableGetN = table.getn
     for _ = 1, loop do
         for k = 1, TableGetN(data) do
+            local v = data[k]
         end
     end
 
@@ -192,6 +194,7 @@ function WhileGetn(loop)
         local k = 1
         while k < table.getn(data) do
             k = k + 1
+            local v = data[k]
         end
     end
 
@@ -208,6 +211,7 @@ function WhileGetnCached(loop)
         local n = table.getn(data)
         while k < n do
             k = k + 1
+            local v = data[k]
         end
     end
 
