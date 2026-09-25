@@ -17,9 +17,9 @@
 -- |-------------------------------|---------|--------|---------|
 --
 -- Conclusions: 
--- - Use `for i = 1, TableGetN({})` for arrays 
+-- - Use `for i = 1, TableGetN(t) do local v = t[i]` for arrays (26x faster)
 --   - Don't use `table.insert` when traversing arrays
--- - Use `for k, v in {}` for tables
+-- - Use `for k, v in t` for tables
 
 ModuleName = "Table Loops"
 BenchmarkData = {
