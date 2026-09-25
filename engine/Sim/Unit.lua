@@ -549,7 +549,7 @@ function Unit:SetCreator(unit)
 end
 
 --- sets a custom name for the unit, displayed in green text
----@param name string
+---@param name string | number
 function Unit:SetCustomName(name)
 end
 
