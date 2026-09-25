@@ -120,6 +120,7 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
     TrackTargetThread = function(self)
         local navigator = self:GetNavigator()
         local weapon = self:GetWeaponByLabel('Suicide')
+        if not navigator then return end
 
         while not IsDestroyed(self) do
 
