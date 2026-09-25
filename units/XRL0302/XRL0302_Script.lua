@@ -147,6 +147,7 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
                     navigator:SetSpeedThroughGoal(true)
                 end
             end
+            self:SetCustomName(navigator:GetStatus())
 
             WaitTicks(6)
         end
