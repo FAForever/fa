@@ -451,7 +451,7 @@ categories = {
 ---| "TACTICAL"
 ---| "TACTICALMISSILEPLATFORM"
 ---| "TANK"
----| "TARGETCHASER"
+---| "TARGETCHASER" # Unit does not mantain any formation when on attack task
 ---| "TECH1"
 ---| "TECH2"
 ---| "TECH3"

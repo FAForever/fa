@@ -127,12 +127,12 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
 
             -- adjust behavior of the weapon so it only fires when we're trying to attack something
             if weapon then
-                if (
-                    -- we're trying to attack
-                    self:IsUnitState('Attacking') or
-                        -- engineer trying to take us
-                        self:IsUnitState('BeingCaptured') or self:IsUnitState('BeingReclaimed')
-                    )
+                if -- we're trying to attack
+                    self:IsUnitState('Attacking')
+                    or self:IsUnitState('Patrolling')
+                    -- engineer trying to take us
+                    or self:IsUnitState('BeingCaptured')
+                    or self:IsUnitState('BeingReclaimed')
                 then
                     weapon:SetEnabled(true)
                 else
@@ -144,9 +144,8 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
             local command = self:GetCommandQueue()[1]
             if command and command.commandType == 10 then
                 local target = command.target --[[@as Unit]]
-                if target ~= lastTarget then
+                if target and target ~= lastTarget then
                     lastTarget = target
-                    navigator:SetDestUnit(target)
                     navigator:SetSpeedThroughGoal(true)
                 end
             else
