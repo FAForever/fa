@@ -42,6 +42,7 @@ UnitBlueprint{
         "VISIBLETORECON",
         "OVERLAYINDIRECTFIRE",
         "OVERLAYDIRECTFIRE",
+        "TARGETCHASER",
     },
     Defense = {
         ArmorType = "Normal",

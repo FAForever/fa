@@ -184,7 +184,7 @@ function Unit:GetCurrentLayer()
 end
 
 --- Returns the current move location of the unit
----@return Vector
+---@return Vector | false
 function Unit:GetCurrentMoveLocation()
 end
 
@@ -549,7 +549,7 @@ function Unit:SetCreator(unit)
 end
 
 --- sets a custom name for the unit, displayed in green text
----@param name string
+---@param name string | number
 function Unit:SetCustomName(name)
 end
 
