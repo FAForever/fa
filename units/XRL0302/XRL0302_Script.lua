@@ -146,7 +146,6 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
                 local target = command.target --[[@as Unit]]
                 if target and target ~= lastTarget then
                     lastTarget = target
-                    navigator:SetDestUnit(target)
                     navigator:SetSpeedThroughGoal(true)
                 end
             else
