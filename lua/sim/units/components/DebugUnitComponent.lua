@@ -22,6 +22,17 @@
 
 local DebugComponent = import("/lua/shared/components/debugcomponent.lua").DebugComponent
 
+---@type UnitState[]
+UnitStates = { 'Immobile', 'Moving', 'Attacking', 'Guarding', 'Building', 'Upgrading',
+    'WaitingForTransport', 'TransportLoading', 'TransportUnloading', 'MovingDown', 'MovingUp',
+    'Patrolling', 'Busy', 'Attached', 'BeingReclaimed', 'Repairing', 'Diving', 'Surfacing',
+    'Teleporting', 'Ferrying', 'WaitForFerry', 'AssistMoving', 'PathFinding', 'ProblemGettingToGoal',
+    'NeedToTerminateTask', 'Capturing', 'BeingCaptured', 'Reclaiming', 'AssistingCommander',
+    'Refueling', 'GuardBusy', 'ForceSpeedThrough', 'UnSelectable', 'DoNotTarget', 'LandingOnPlatform',
+    'CannotFindPlaceToLand', 'BeingUpgraded', 'Enhancing', 'BeingBuilt', 'NoReclaim', 'NoCost',
+    'BlockCommandQueue', 'MakingAttackRun', 'HoldingPattern', 'SiloBuildingAmmo',
+}
+
 ---@class DebugUnitComponent : DebugComponent
 DebugUnitComponent = Class(DebugComponent) {
 
@@ -117,5 +128,20 @@ DebugUnitComponent = Class(DebugComponent) {
 
         local blueprint = self.Blueprint
         DrawCircle(self:GetPosition(), math.max(blueprint.SizeX, blueprint.SizeY, blueprint.SizeZ), color)
+    end,
+
+    DebugActiveStates = function(self)
+        if not self.EnabledLogging then
+            return
+        end
+
+        local activeStates = {}
+        for _, state in UnitStates do
+            if self:IsUnitState(state) then
+                table.insert(activeStates, state)
+            end
+        end
+
+        self:DebugLog('Active states: ' .. table.concat(activeStates, ', '))
     end,
 }
