@@ -48,6 +48,7 @@ local TrashBag = TrashBag
 ---@field BeamExhaustEffectsBag TrashBag
 ---@field TransportBeamEffectsBag? TrashBag
 ---@field OnBeingBuiltEffectsBag? TrashBag
+---@field transportDrop? true # unit is in air after detaching from transport
 MobileUnit = ClassUnit(Unit, TreadComponent) {
 
     ---@param self MobileUnit

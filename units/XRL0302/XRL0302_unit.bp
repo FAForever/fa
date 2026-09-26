@@ -40,6 +40,8 @@ UnitBlueprint{
         "SHOWATTACKRETICLE",
         "TECH2",
         "VISIBLETORECON",
+        "OVERLAYINDIRECTFIRE",
+        "OVERLAYDIRECTFIRE",
     },
     Defense = {
         ArmorType = "Normal",
@@ -159,11 +161,11 @@ UnitBlueprint{
         {
             AboveWaterTargetsOnly = true,
             CollideFriendly = false,
-            Damage = 1,
+            Damage = 0,
             DamageFriendly = false,
-            DamageRadius = 6.5,
+            DamageRadius = 0,
             DamageType = "FireBeetleExplosion",
-            DisplayName = "Suicide",
+            DisplayName = "Detonation Trigger",
             FireTargetLayerCapsTable = {
                 Land = "Land|Water|Seabed",
                 Water = "Land|Water|Seabed",
@@ -180,6 +182,7 @@ UnitBlueprint{
             TargetRestrictDisallow = "UNTARGETABLE",
             Turreted = false,
             WeaponCategory = "Kamikaze",
+            RangeCategory = "UWRC_DirectFire",
         },
         {
             AboveWaterTargetsOnly = true,
@@ -189,7 +192,7 @@ UnitBlueprint{
             DamageFriendly = false,
             DamageRadius = 6.5,
             DamageType = "EMP",
-            DisplayName = "EMP",
+            DisplayName = "EMP Blast",
             FireOnDeath = true,
             FireTargetLayerCapsTable = {
                 Air = "Air|Land|Seabed|Water",
@@ -200,7 +203,7 @@ UnitBlueprint{
             IgnoreIfDisabled = true,
             Label = "DeathWeapon",
             ManualFire = false,
-            MaxRadius = 5,
+            MaxRadius = 6.5,
             MuzzleVelocity = 0,
             ProjectileId = "/projectiles/CIFEMP01/CIFEMP01_proj.bp",
             ProjectileLifetimeUsesMultiplier = 1.15,
@@ -210,34 +213,12 @@ UnitBlueprint{
                     RackBone = 0,
                 },
             },
-            RangeCategory = "UWRC_DirectFire",
+            RangeCategory = "UWRC_IndirectFire",
             RateOfFire = 10/20, --10/integer interval in ticks
             SalvoSize = 1,
             SlavedToBody = true,
             TargetRestrictDisallow = "UNTARGETABLE, AIR",
             WeaponCategory = "Direct Fire",
-        },
-        {
-            Damage = 0,
-            DisplayName = "Detonation Trigger",
-            FireTargetLayerCapsTable = {
-                Air = "Land|Water|Seabed",
-                Land = "Land|Water|Seabed",
-            },
-            Label = "ExplosionRadiusRingDummyWeapon",
-            MaxRadius = 6.5,
-            MuzzleSalvoDelay = 1,
-            MuzzleSalvoSize = 0,
-            ProjectileId = "/projectiles/CDFRocketMeson01/CDFRocketMeson01_proj.bp",
-            RackBones = {
-                {
-                    MuzzleBones = { 0 },
-                    RackBone = 0,
-                },
-            },
-            RackRecoilDistance = 0,
-            RangeCategory = "UWRC_IndirectFire",
-            TargetRestrictDisallow = "UNTARGETABLE AIR",
         },
     },
     Wreckage = {
