@@ -195,9 +195,9 @@ Callbacks.ToggleSelfDestruct = function(data, units)
         return
     end
 
-    -- moderation rule: if you self destruct with one or more ACUs in the selection when playing full 
-    -- share, then you only self destruct the ACUs. This does not make it impossible to abuse, but it 
-    -- does introduce a simple guardrail. 
+    -- moderation rule: if you self destruct with one or more ACUs in the selection when playing full
+    -- share, then you only self destruct the ACUs. This does not make it impossible to abuse, but it
+    -- does introduce a simple guardrail.
     if ScenarioInfo.Options.Share == "FullShare" then
         local commandUnits = EntityCategoryFilterDown(categories.COMMAND, SecureUnits(units))
         if table.getn(commandUnits) > 0 then
@@ -532,6 +532,24 @@ Callbacks.SelectHighestEngineerAndAssist = function(data, selection)
         IssueClearCommands(noACU)
         IssueGuard(noACU, target)
     end
+end
+
+---@param data DistributeAssistersData
+Callbacks.DistributeAssisters = function(data)
+    local assisters = SecureUnits(data.AssisterIds)
+    local targets = SecureUnits(data.TargetIds)
+
+    if not assisters[1] or not targets[1] then
+        return
+    end
+
+    local sourceAssister = assisters[1]
+    IssueClearCommands({ sourceAssister })
+    for _, target in targets do
+        IssueGuard({ sourceAssister }, target)
+    end
+
+    import("/lua/sim/commands/distribute-queue.lua").DistributeOrders(assisters, sourceAssister, true, false)
 end
 
 do
