@@ -10,9 +10,10 @@
   "Lua.telemetry.enable": false,
   "Lua.workspace.checkThirdParty": false,
   "Lua.runtime.path": ["/?"],
-  "Lua.runtime.plugin": ".vscode/fa-plugin.lua",
+  "Lua.runtime.plugin": "./lua-ls-addon/plugin.lua",
   "Lua.workspace.ignoreDir": [
     ".vscode/",
+    "lua-ls-addon/",
     "loc/",
     "*.bp",
     "lua/ui/lobby/changelog/generated/",
@@ -31,17 +32,9 @@
   "Lua.completion.autoRequire": false,
   "Lua.diagnostics.globals": [
     "ScenarioInfo",
+    "Scenario",
     "__moduleinfo",
-    "sortedpairs",
-    "sort_by",
-    "sort_down_by",
-    "safecall",
-    "printField",
     "__diskwatch",
-    "repr",
-    "repru",
-    "reprs",
-    "reprsl",
     "__language",
     "__installedlanguages",
     "__blueprints"
@@ -492,5 +485,9 @@
     "ZockyZock",
     "zthuee",
     "Zulip"
+  ],
+  "Lua.diagnostics.disable": [
+    "inject-field",
+    "unsupport-symbol"
   ]
 }
