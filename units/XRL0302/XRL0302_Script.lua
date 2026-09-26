@@ -142,15 +142,16 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
 
             -- adjust behavior of tracking a target so that we speed through the target instead of bump into it
             local command = self:GetCommandQueue()[1]
+            local target
             if command and command.commandType == 10 then
-                local target = command.target --[[@as Unit]]
-                if target and target ~= lastTarget then
-                    lastTarget = target
-                    navigator:SetSpeedThroughGoal(true)
-                end
-            else
+                target = command.target
+            end
+            if not target then
                 lastTarget = nil
                 navigator:SetSpeedThroughGoal(false)
+            elseif target ~= lastTarget then
+                lastTarget = target
+                navigator:SetSpeedThroughGoal(true)
             end
 
             WaitTicks(6)
