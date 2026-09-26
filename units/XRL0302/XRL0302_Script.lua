@@ -127,12 +127,11 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
 
             -- adjust behavior of the weapon so it only fires when we're trying to attack something
             if weapon then
-                if (
-                    -- we're trying to attack
-                    self:IsUnitState('Attacking') or
-                        -- engineer trying to take us
-                        self:IsUnitState('BeingCaptured') or self:IsUnitState('BeingReclaimed')
-                    )
+                if -- we're trying to attack
+                    self:IsUnitState('Attacking')
+                    -- engineer trying to take us
+                    or self:IsUnitState('BeingCaptured')
+                    or self:IsUnitState('BeingReclaimed')
                 then
                     weapon:SetEnabled(true)
                 else
