@@ -1060,6 +1060,23 @@ options = {
             },
 
             {
+                title = "<LOC OPTIONS_ECON_OVERLAY_SCALE_TITLE>Scale Economy Overlay",
+                key = 'econ_overlay_scale',
+                type = 'toggle',
+                default = 1.0,
+                custom = {
+                    states = {
+                        { text = "80%", key = 0.8, },
+                        { text = "100%", key = 1.0, },
+                        { text = "125%", key = 1.25, },
+                        { text = "150%", key = 1.5, },
+                        { text = "175%", key = 1.75, },
+                        { text = "200%", key = 2.0, },
+                    },
+                },
+            },
+
+            {
                 title = "<LOC OPTIONS_RECLAIMBATCHING>Reclaim batching",
                 key = 'reclaim_overview_batching',
                 type = 'toggle',

@@ -1,0 +1,1 @@
+- Add an option to scale the economy overlay (#7287).
