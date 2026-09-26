@@ -129,6 +129,7 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
             if weapon then
                 if -- we're trying to attack
                     self:IsUnitState('Attacking')
+                    or self:IsUnitState('Patrolling')
                     -- engineer trying to take us
                     or self:IsUnitState('BeingCaptured')
                     or self:IsUnitState('BeingReclaimed')
