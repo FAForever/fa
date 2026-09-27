@@ -41,15 +41,15 @@ function StartPerfTest()
     -- Long wait to give stuff time to load up before running the perf test.
     WaitSeconds(25)
 
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Intro_Shot'), 0.0)
+    Cinematics.CameraMoveToMarker('Intro_Shot', 0.0)
     BeginLoggingStats('perftest.log')
     WaitSeconds(2)
 
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_2'), 10.0)
+    Cinematics.CameraMoveToMarker('Perf_Cam_2', 10.0)
 
     WaitSeconds(10.0)
 
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_000'), 5.0)
+    Cinematics.CameraMoveToMarker('Perf_Cam_000', 5.0)
     PerfTest1()
     SetArmyGroupState(P_GA_L4_P2, 'HoldFire')
     PerfTest2()
@@ -63,7 +63,7 @@ end
 
 -- Small Battle Start - Should be a light load test
 function PerfTest1()
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_3'), 0.0)
+    Cinematics.CameraMoveToMarker('Perf_Cam_3', 0.0)
 
     SetArmyGroupState(U_MB_Base, 'Aggressive')
     SetArmyGroupState(P_GA_L1_P1, 'Aggressive') -- Assault
@@ -73,14 +73,14 @@ function PerfTest1()
     ScenarioUtils.AssignOrders('SBN_Patrol', P_GA_L2_P1)
     WaitSeconds(1)
 
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_4'), 10.0)
+    Cinematics.CameraMoveToMarker('Perf_Cam_4', 10.0)
     PerfTest1_HAI()
     WaitSeconds(60)
 end
 
 -- Naval Battle Start - Should be a medium load test
 function PerfTest2()
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_5'), 0)
+    Cinematics.CameraMoveToMarker('Perf_Cam_5', 0)
 
     -- Player Cybran Moves
     SetStateAndMove(P_NG_L1_P1, 'Agressive', -20, -55)
@@ -117,23 +117,23 @@ end
 
 -- Big Battle Start - Heaviest Load Battle
 function PerfTest3()
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_7'), 0)
+    Cinematics.CameraMoveToMarker('Perf_Cam_7', 0)
     ForkThread(SpawnMainBattle)
 end
 
 function PerfTest4()
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_11'), 0)
+    Cinematics.CameraMoveToMarker('Perf_Cam_11', 0)
     PerfTest4_Mavor()
     WaitSeconds(30.0)
 
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_12'), 0)
+    Cinematics.CameraMoveToMarker('Perf_Cam_12', 0)
     PerfTest4_Nukes()
     WaitSeconds(16.0)
 
     Cinematics.CameraReset()
     WaitSeconds(22.0)
 
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_13'), 0)
+    Cinematics.CameraMoveToMarker('Perf_Cam_13', 0)
     WaitSeconds(40.0)
 
     EndLoggingStats()
@@ -322,7 +322,7 @@ end
 function AtlantisRising()
     WaitSeconds(18.0)
 
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_6'), 8)
+    Cinematics.CameraMoveToMarker('Perf_Cam_6', 8)
 
     SetArmyGroupState(U_NG_L4_P2, 'Aggressive')
     SetArmyGroupState(P_NG_L4_P4, 'Aggressive')
@@ -408,7 +408,7 @@ function Major_Ground_Assault_Start()
     SetArmyGroupState(P_MGA_L7_P1, 'Aggressive')
     SetArmyGroupState(U_MGA_L6_P1, 'Aggressive')
 
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_8'), 10)
+    Cinematics.CameraMoveToMarker('Perf_Cam_8', 10)
     WaitSeconds(20.0)
 
     SetArmyGroupState(P_MGA_L6_P1, 'Aggressive')
@@ -431,12 +431,12 @@ function Major_Ground_Assault_Start()
     IssuePatrol(U_MGA_Fighters2, A_Base_Colossus[1]:GetPosition())
     WaitSeconds(15.0)
 
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_9'), 0)
+    Cinematics.CameraMoveToMarker('Perf_Cam_9', 0)
 
     PerfTest3_Nukes()
     WaitSeconds(8.0)
 
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_10'), 0)
+    Cinematics.CameraMoveToMarker('Perf_Cam_10', 0)
     WaitSeconds(20.0)
 end
 

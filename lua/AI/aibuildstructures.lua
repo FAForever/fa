@@ -305,7 +305,7 @@ function DoHackyLogic(buildingType, builder)
                 if unitInstance then
                     TriggerFile.CreateUnitStopBeingBuiltTrigger(function(unitBeingBuilt)
                         local newPlatoon = aiBrain:MakePlatoon('', '')
-                        aiBrain:AssignUnitsToPlatoon(newPlatoon, {unitBeingBuilt}, 'Attack', 'None')
+                        aiBrain:AssignUnitToPlatoon(newPlatoon, unitBeingBuilt, 'Attack', 'None')
                         newPlatoon:StopAI()
                         newPlatoon:ForkAIThread(newPlatoon.TacticalAI)
                     end, unitInstance)

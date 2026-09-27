@@ -27,7 +27,7 @@ AIPlatoon = Class(moho.platoon_methods) {
     PlatoonName = 'PlatoonBase',
     StateName = 'Unknown',
 
-    ---@see `AIBrain:MakePlatoon`
+    ---@see AIBrain.MakePlatoon
     ---@param self AIPlatoon
     ---@param plan string
     OnCreate = function(self, plan)
@@ -402,7 +402,8 @@ AIPlatoon = Class(moho.platoon_methods) {
     end,
 
     --- Called as a unit (with carrier capabilities) of this platoon has a change in storage
-    ---@see `OnAddToStorage` and `OnRemoveFromStorage` for the unit in question
+    ---@see AIPlatoon.OnAddToStorage
+    ---@see AIPlatoon.OnRemoveFromStorage
     ---@param self AIPlatoon
     ---@param carrier Unit
     ---@param loading boolean

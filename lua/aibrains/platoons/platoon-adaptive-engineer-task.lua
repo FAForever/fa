@@ -82,7 +82,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                 self:LogDebug(string.format('PreAllocatedTask detected, task is '..tostring(data.Task)))
                 if data.Task == 'Reclaim' then
                     local plat = aiBrain:MakePlatoon('', '')
-                    aiBrain:AssignUnitsToPlatoon(plat, {unit}, 'support', 'None')
+                    aiBrain:AssignUnitToPlatoon(plat, unit, 'support', 'None')
                     import("/lua/aibrains/platoons/platoon-adaptive-reclaim.lua").AssignToUnitsMachine({ }, self, self:GetPlatoonUnits())
                     return
                 elseif data.Task == 'ReclaimStructure' then

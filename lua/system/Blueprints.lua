@@ -934,6 +934,7 @@ function PreModBlueprints(all_bps)
                 local insertPos = bpWeapon.AddIndex
                 MergeWeaponByLabel(bp, mergeLabel, insertPos, bpWeapon)
             end
+            bp.ModWeapon = nil
         end
 
         BlueprintLoaderUpdateProgress()
@@ -1002,14 +1003,18 @@ function MergeWeaponByLabel(baseBp, label, insertPos, newBp)
     end
 
     local firstDummyIndex
+    local merged = false
     for i, w in weaponTable do
         if w.Label == label then
             weaponTable[i] = BlueprintMerged(w, newBp)
-            return
+            merged = true
         end
         if w.DummyWeapon then
             firstDummyIndex = i
         end
+    end
+    if merged then
+        return
     end
 
     local finalInsertIndex = firstDummyIndex or TableGetn(weaponTable) + 1
@@ -1038,9 +1043,9 @@ end
 
 local NewDummies = {}
 
-local function GetFoot(bp, axe) return math.ceil(bp.Footprint and bp.Footprint[axe] or bp[axe] or 1) end
-local function GetSkirt(bp, axe) return math.max((bp.Physics and bp.Physics['Skirt'..axe] or 1), GetFoot(bp, axe)) end
-local function GetOffset(bp, axe) return (bp.Physics and bp.Physics['SkirtOffset'..axe] or 0) end
+local function GetFoot(bp, axis) return math.ceil(bp.Footprint and bp.Footprint[axis] or bp[axis] or 1) end
+local function GetSkirt(bp, axis) return math.max((bp.Physics and bp.Physics['Skirt'..axis] or 1), GetFoot(bp, axis)) end
+local function GetOffset(bp, axis) return (bp.Physics and bp.Physics['SkirtOffset'..axis] or 0) end
 
 local function ReduceFoot(val)
     local modded = math.mod(val, 2)

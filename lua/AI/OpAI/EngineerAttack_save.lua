@@ -249,8 +249,8 @@ Scenario = {
                             },
                             {
                                 '/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                { 1 },
-                                {'1'}
+                                { 1, 2, 4 },
+                                {'1', '2', '4'}
                             },
                         },
                         PlatoonData =

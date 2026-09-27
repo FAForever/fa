@@ -147,6 +147,7 @@ UnitBlueprint{
         SelectionCenterOffsetZ = -2,
         SelectionSizeX = 4,
         SelectionSizeZ = 4,
+        UISelection = Sound { Bank = 'Interface', Cue = 'Aeon_Select_Factory', LodCutoff = 'UnitMove_LodCutoff' },
     },
     Footprint = {
         MaxSlope = 0.25,

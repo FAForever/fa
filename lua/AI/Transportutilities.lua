@@ -27,7 +27,6 @@ local VDist2 = VDist2
 local VDist3 = VDist3
 local WaitTicks = coroutine.yield
 
-local AssignUnitsToPlatoon = moho.aibrain_methods.AssignUnitsToPlatoon
 local GetFuelRatio = moho.unit_methods.GetFuelRatio
 local GetFractionComplete = moho.entity_methods.GetFractionComplete
 local GetListOfUnits = moho.aibrain_methods.GetListOfUnits
@@ -94,7 +93,7 @@ function AssignTransportToPool( unit, aiBrain )
 		-- if not in need of repair or fuel -- 
 		if not ProcessAirUnits( unit, aiBrain ) then
             if aiBrain.TransportPool then
-                AssignUnitsToPlatoon( aiBrain, aiBrain.TransportPool, {unit}, 'Support','')
+                aiBrain:AssignUnitToPlatoon( aiBrain.TransportPool, unit, 'Support','')
             else
                 return
             end
@@ -327,7 +326,7 @@ function GetTransports( platoon, aiBrain)
 
                         -- this puts specials into the transport pool -- occurs to me that they
                         -- may get stuck in here if it turns out we cant use transports
-                        AssignUnitsToPlatoon( aiBrain, transportpool, {trans}, 'Support','none')
+                        aiBrain:AssignUnitToPlatoon( aiBrain.TransportPool, trans, 'Support','none')
                     
                         -- limit collection of armypool transports to 15
                         if transportcount == 15 then
@@ -666,7 +665,7 @@ function GetTransports( platoon, aiBrain)
                     LOG("*AI DEBUG "..aiBrain.Nickname.." "..platoon.BuilderName.." "..transportplatoon.BuilderName.." adds transport "..transport.EntityId)
                 end
                 
-				AssignUnitsToPlatoon( aiBrain, transportplatoon, {transport}, 'Support', 'BlockFormation')
+				aiBrain:AssignUnitToPlatoon( transportplatoon, transport, 'Support', 'BlockFormation')
 				IssueToUnitClearCommands(transport)
 				IssueToUnitMove(transport, location )
 
@@ -831,7 +830,7 @@ function ReturnTransportsToPool( aiBrain, units, move )
                 returnpool = aiBrain:MakePlatoon('TransportRTB'..tostring(v.EntityId), 'none')
                 returnpool.BuilderName = 'TransportRTB'..tostring(v.EntityId)
                 returnpool.PlanName = returnpool.BuilderName
-                AssignUnitsToPlatoon( aiBrain, returnpool, {v}, 'Unassigned', '')
+                aiBrain:AssignUnitToPlatoon( returnpool, v, 'Unassigned', '')
                 if TransportDialog then
                     LOG("*AI DEBUG "..aiBrain.Nickname.." "..returnpool.BuilderName.." Transport "..v.EntityId.." assigned" )
                 end
@@ -877,7 +876,7 @@ function ReturnTransportsToPool( aiBrain, units, move )
                             if TransportDialog then
                                 LOG("*AI DEBUG "..aiBrain.Nickname.." "..v.PlatoonHandle.BuilderName.." transport "..v.EntityId.." now in the Transport Pool  InUse is "..repr(v.InUse))
                             end
-                            AssignUnitsToPlatoon( aiBrain, aiBrain.TransportPool, {v}, 'Support', '' )
+                            aiBrain:AssignUnitToPlatoon( aiBrain.TransportPool, v, 'Support', '' )
                             v.PlatoonHandle = aiBrain.TransportPool
                             v.InUse = false
                             v.Assigning = false                            
@@ -886,7 +885,7 @@ function ReturnTransportsToPool( aiBrain, units, move )
                         if TransportDialog then
                             LOG("*AI DEBUG "..aiBrain.Nickname.." "..v.PlatoonHandle.BuilderName.." assigned unit "..v.EntityId.." "..v:GetBlueprint().Description.." to the Army Pool" )
                         end
-						AssignUnitsToPlatoon( aiBrain, aiBrain.ArmyPool, {v}, 'Unassigned', '' )
+						aiBrain:AssignUnitToPlatoon( aiBrain.ArmyPool, v, 'Unassigned', '' )
 						v.PlatoonHandle = aiBrain.ArmyPool
        					v.InUse = false
                         v.Assigning = false
@@ -910,7 +909,7 @@ function ReturnUnloadedUnitToPool( aiBrain, unit )
 		IssueToUnitClearCommands(unit)
 		local ident = Random(1,999999)
 		local returnpool = aiBrain:MakePlatoon('ReturnToPool'..tostring(ident), 'none')
-		AssignUnitsToPlatoon( aiBrain, returnpool, {unit}, 'Unassigned', 'None' )
+		aiBrain:AssignUnitToPlatoon( returnpool, unit, 'Unassigned', 'None' )
 		returnpool.PlanName = 'ReturnToBaseAI'
 		returnpool.BuilderName = 'FailedUnload'
 		while attached and not unit.Dead do
@@ -1466,7 +1465,7 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
 			end
 			local ident = Random(1,999999)
 			local returnpool = aiBrain:MakePlatoon('RTB - Excess in SortingOnTransport'..tostring(ident), 'none')
-			AssignUnitsToPlatoon( aiBrain, returnpool, currLeftovers, 'Unassigned', 'None' )
+			aiBrain:AssignUnitsToPlatoon( aiBrain, returnpool, currLeftovers, 'Unassigned', 'None' )
 			returnpool.PlanName = 'ReturnToBaseAI'
 			returnpool.BuilderName = 'SortUnitsOnTransportsLeftovers'..tostring(ident)
 			returnpool:SetAIPlan('ReturnToBaseAI',aiBrain)
@@ -1594,7 +1593,7 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
 						end
 					end
 					IssueToUnitClearCommands(v)
-					AssignUnitsToPlatoon( aiBrain, returnpool, {v}, 'Attack', 'None' )
+					aiBrain:AssignUnitToPlatoon( returnpool, v, 'Attack', 'None' )
 				end
 			end
 		end
@@ -2165,7 +2164,7 @@ function TransportReturnToBase(unit, aiBrain)
 
 	local returnpool = aiBrain:MakePlatoon('AirRefit'..tostring(ident), 'none')
 	if not unit.Dead then
-		AssignUnitsToPlatoon( aiBrain, returnpool, {unit}, 'Unassigned', '')
+		aiBrain:AssignUnitToPlatoon( returnpool, unit, 'Unassigned', '')
 		unit.PlatoonHandle = returnpool
 	end
 	while (not unit.Dead) do

@@ -7,7 +7,6 @@
 ---@alias Task table
 ---@alias CSimSoundManager any
 ---@alias EconomyEvent moho.EconomyEvent
----@alias ArmyPlans any
 
 ---@alias Faction
 ---| 0 # UEF
@@ -15,6 +14,13 @@
 ---| 2 # Cybran
 ---| 3 # Seraphim
 ---| 4 # (Nomads if enabled)
+
+---@alias FactionIdxOffset
+---| 1 # UEF
+---| 2 # Aeon
+---| 3 # Cybran
+---| 4 # Seraphim
+---| 5 # (Nomads if enabled)
 
 ---@alias ResourceDepositType "Mass" | "Hydrocarbon"
 ---@alias ResourceType "MASS" | "ENERGY"
@@ -31,11 +37,18 @@
 
 ---@alias Object Blip | CollisionBeam | moho.entity_methods | moho.prop_methods | moho.projectile_methods | moho.unit_methods
 ---@alias BoneObject moho.entity_methods | moho.prop_methods | moho.projectile_methods | moho.unit_methods
----@alias ReclaimObject moho.prop_methods | moho.unit_methods
+---@alias ReclaimObject Prop | Unit
 ---@alias TargetObject moho.prop_methods | moho.unit_methods | moho.projectile_methods
 
 ---@type AIBrain[]
 ArmyBrains = {}
+
+--- Global automatically set by the engine in the thread of a `SimLua` console command
+---
+---@see DebugGetSelection # For multiple selected units, in any sim thread
+---@see SelectedUnit # Proper interface to get this value
+---@type Unit?
+__selected_unit = {}
 
 --- restricts the army from building the unit category
 ---@param army Army
@@ -1082,8 +1095,13 @@ end
 function RemoveEconomyEvent(unit, event)
 end
 
---- Returns the currently selected unit. For use at the lua console, so you can call Lua methods on a unit
----@return Unit
+--- Returns the currently selected unit.
+--- 
+--- Only returns a unit when called from the `SimLua` console command's thread.
+--- 
+---@see DebugGetSelection # For multiple selected units, in any sim thread.
+---@see __selected_unit The unit this function returns
+---@return Unit?
 function SelectedUnit()
 end
 
@@ -1136,6 +1154,8 @@ function SetArmyEconomy(army, mass, energy)
 end
 
 --- Sets faction for the given army
+---
+---@see AIBrain.GetFactionIndex # to get the faction index of an army represented by a brain
 ---@param army Army
 ---@param index Faction
 function SetArmyFactionIndex(army, index)
@@ -1146,10 +1166,9 @@ end
 function SetArmyOutOfGame(army)
 end
 
---- Unfinished function related to AI, is not used
----@deprecated
+--- Sets a file with army plans the AI will use to run
 ---@param army Army
----@param plans ArmyPlans
+---@param plans FileName # Path to the file with army plans
 function SetArmyPlans(army, plans)
 end
 
@@ -1160,6 +1179,8 @@ function SetArmyShowScore(army, show)
 end
 
 --- Sets the army starting position for the initial unit.
+--- 
+---@see AIBrain.GetArmyStartPos
 ---@param army Army
 ---@param x number
 ---@param z number
@@ -1231,6 +1252,7 @@ end
 function SetTerrainTypeRect(rect, type)
 end
 
+--- Determined by the `/noinitialunits` command line arg
 ---@return boolean createInitial
 function ShouldCreateInitialArmyUnits()
 end

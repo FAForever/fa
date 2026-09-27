@@ -1432,7 +1432,7 @@ function DisableAI(self)
     SorianUtils.AISendChat('enemies', self.Nickname, 'ilost')
     -- remove PlatoonHandle from all AI units before we kill / transfer the army
     local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-    if not table.empty(units) then
+    if not TableEmpty(units) then
         for _, unit in units do
             if not unit.Dead then
                 local handle = unit.PlatoonHandle
@@ -1440,7 +1440,7 @@ function DisableAI(self)
                     handle:Stop()
                     handle:PlatoonDisbandNoAssign()
                 end
-                IssueStop({ unit })
+                IssueToUnitStop(unit)
                 IssueToUnitClearCommands(unit)
             end
         end

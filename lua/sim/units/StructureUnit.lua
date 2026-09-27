@@ -146,7 +146,7 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
             if self.TarmacBag then
                 self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)
             else
-                self:CreateTarmac(true, true, true, false, false)
+                self:CreateTarmac(true, true, true)
             end
         end
     end,
@@ -314,7 +314,7 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
 
         -- tarmac is made once seraphim animation is complete
         if self.Blueprint.General.FactionName == "Seraphim" then
-            self:CreateTarmac(true, true, true, false, false)
+            self:CreateTarmac(true, true, true)
         end
 
         self:PlayActiveAnimation()

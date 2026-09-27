@@ -570,6 +570,16 @@ local function ScriptButtonOrderBehavior(self, modifiers, subState)
     end
 end
 
+--Allow the right button on shieldtoggle to disharge the shields
+local function ShieldToggleOrderBehavior(self, modifiers, subState)
+    if modifiers and modifiers.Right then
+        SimCallback({ Func = "DischargeShields", Args = {} }, true)
+        return
+    end
+
+    ScriptButtonOrderBehavior(self, modifiers, subState)
+end
+
 local function ScriptButtonInitFunction(control, unitList, subCheck)
     local result = nil
     local mixed = false
@@ -1133,7 +1143,7 @@ local defaultOrdersTable = {
     ExFac = {                       helpText = "external_factory",  bitmapId = 'exfac',                 preferredSlot = 10,  behavior = ExternalFactoryBehavior},
 
     -- Unit toggle rules
-    RULEUTC_ShieldToggle = {        helpText = "toggle_shield",     bitmapId = 'shield',                preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 0},
+    RULEUTC_ShieldToggle = {        helpText = "toggle_shield",     bitmapId = 'shield',                preferredSlot = 8,  behavior = ShieldToggleOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 0},
     RULEUTC_WeaponToggle = {        helpText = "toggle_weapon",     bitmapId = 'toggle-weapon',         preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 1},
     RULEUTC_JammingToggle = {       helpText = "toggle_jamming",    bitmapId = 'jamming',               preferredSlot = 9,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 2},
     RULEUTC_IntelToggle = {         helpText = "toggle_intel",      bitmapId = 'intel',                 preferredSlot = 9,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 3},

@@ -13,8 +13,9 @@ local TableInsert = table.insert
 
 ---@class Prop : moho.prop_methods
 ---@field Trash TrashBag
----@field EntityId number
+---@field EntityId string
 ---@field Blueprint PropBlueprint
+---@field IsProp true
 ---@field CachePosition Vector
 ---@field MaxMassReclaim number
 ---@field MaxEnergyReclaim number
@@ -22,6 +23,8 @@ local TableInsert = table.insert
 ---@field ReclaimLeft number
 ---@field SyncData? table
 ---@field Extents? table
+---@field EventCallbacks? table<PropCallbackTypes, fun(prop: Prop, params: any)[]>
+---@field CanBeKilled boolean
 Prop = Class(moho.prop_methods) {
 
     IsProp = true,
@@ -230,7 +233,7 @@ Prop = Class(moho.prop_methods) {
     ---@param sizex number The width of the box.
     ---@param sizey number The height of the box.
     ---@param sizez number The length of the box.
-    ---@param radius number The radius of the sphere.
+    ---@param radius? number The radius of the sphere.
     SetPropCollision = function(self, shape, centerx, centery, centerz, sizex, sizey, sizez, radius)
         if radius and shape == 'Sphere' then
             self:SetCollisionShape(shape, centerx, centery, centerz, radius)
@@ -418,32 +421,31 @@ Prop = Class(moho.prop_methods) {
         end
     end,
 
-    ---@see use `prop.CachePosition` directly instead
-    ---@deprecated
+    ---@see Prop.CachePosition # read this field directly instead
+    ---@deprecated # Read field `Prop.CachePosition` instead
     ---@param self Prop
     ---@return Vector
     GetCachePosition = function(self)
         return self.CachePosition
     end,
 
-    ---@see no alternative, value is no longer in use
-    ---@deprecated
+    ---@deprecated # no alternative, value is no longer in use
     ---@param self Prop
     ---@param val boolean
     SetCanTakeDamage = function(self, val)
         self.CanTakeDamage = val
     end,
 
-    ---@see use `prop.CanBeKilled` directly instead
-    ---@deprecated
+    ---@see Prop.CanBeKilled # set this field directly instead
+    ---@deprecated # Set field `Prop.CanBeKilled` instead
     ---@param self Prop
     ---@param val any
     SetCanBeKilled = function(self, val)
         self.CanBeKilled = val
     end,
 
-    ---@see compare with `prop.CanBeKilled` directly instead
-    ---@deprecated
+    ---@see Prop.CanBeKilled # read this field directly instead
+    ---@deprecated # Read field `Prop.CanBeKilled` instead
     ---@param self Prop
     ---@return boolean
     CheckCanBeKilled = function(self)

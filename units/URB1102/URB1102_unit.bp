@@ -36,6 +36,7 @@ UnitBlueprint{
         RegenRate = 5,
     },
     Display = {
+        Abilities = { "<LOC ability_amphibious>Amphibious" },
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
