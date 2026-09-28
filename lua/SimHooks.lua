@@ -104,6 +104,17 @@ IssueToUnitClearCommands = function(unit)
     return IssueClearCommands(UnitsCache)
 end
 
+--- Orders a unit to guard a target. See `IssueGuard` when you want to apply the order to a group of units.
+---
+--- This use of this function is **not** compatible with the Steam version of the game.
+---@param unit moho.unit_methods
+---@param target Unit | Vector
+---@return SimCommand
+IssueToUnitGuard = function(unit, target)
+    UnitsCache[1] = unit
+    return IssueGuard(UnitsCache, target)
+end
+
 --- Issues a unit to stop what it was doing, this happens immediately. See `IssueStop` when you want to apply the order to a group of units.
 ---
 --- This use of this function is **not** compatible with the Steam version of the game.

@@ -543,9 +543,9 @@ Callbacks.DistributeAssisters = function(data)
     end
 
     local sourceAssister = assisters[1]
-    IssueClearCommands({ sourceAssister })
+    IssueToUnitClearCommands(sourceAssister)
     for _, target in targets do
-        IssueGuard({ sourceAssister }, target)
+        IssueToUnitGuard(sourceAssister, target)
     end
 
     import("/lua/sim/commands/distribute-queue.lua").DistributeOrders(assisters, sourceAssister, true, false)
