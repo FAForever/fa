@@ -50,7 +50,6 @@ UnitBlueprint{
         "RECLAIMABLE",
         "SCOUT",
         "SELECTABLE",
-        "SONAR",
         "TECH3",
         "UEF",
         "VISIBLETORECON",
