@@ -531,8 +531,8 @@ AIPlatoon = Class(moho.platoon_methods) {
                     unit:SetCustomName('EngineerDisbanded')
                 end
                 if not unit.Dead then
-                    IssueStop({ unit })
-                    IssueClearCommands({ unit })
+                    IssueToUnitStop(unit)
+                    IssueToUnitClearCommands(unit)
                 end
             end
         end

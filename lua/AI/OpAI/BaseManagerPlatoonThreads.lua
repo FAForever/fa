@@ -29,13 +29,14 @@ local EntityCategoryContains, ParseEntityCategory = EntityCategoryContains, Pars
 local WaitTicks, WaitSeconds = WaitTicks, WaitSeconds
 local IssueToUnitMove = IssueToUnitMove
 local IssueToUnitClearCommands = IssueToUnitClearCommands
+local IssueToUnitGuard = IssueToUnitGuard
 local IssueToUnitStop = IssueToUnitStop
+local IssueToUnitNuke = IssueToUnitNuke
+local IssueToUnitRepair = IssueToUnitRepair
+local IssueToUnitScript = IssueToUnitScript
+local IssueToUnitTactical = IssueToUnitTactical
+local IssueToUnitUpgrade = IssueToUnitUpgrade
 local IssueGuard = IssueGuard
-local IssueNuke = IssueNuke
-local IssueRepair = IssueRepair
-local IssueScript = IssueScript
-local IssueTactical = IssueTactical
-local IssueUpgrade = IssueUpgrade
 
 local categoriesENGINEER = categories.ENGINEER
 local categoriesFACTORY = categories.FACTORY
@@ -297,7 +298,7 @@ function AssistConditionalBuild(singleEngineerPlatoon)
 
     -- Give orders to repair the unit
     IssueToUnitClearCommands(engineer)
-    IssueRepair({ engineer }, cbManager.Unit)
+    IssueToUnitRepair(engineer, cbManager.Unit)
 
     -- Super loop
     while aiBrain:PlatoonExists(singleEngineerPlatoon) do
@@ -423,7 +424,7 @@ function UpgradeBaseManagerStructure(unit, upgradeID)
         unit.AddedUpgradeCallback = true
     end
 
-    IssueUpgrade({ unit }, upgradeID)
+    IssueToUnitUpgrade(unit, upgradeID)
     unit.SetToUpgrade = true
 end
 
@@ -706,7 +707,7 @@ function BaseManagerEngineerThread(platoon)
                 Engineer = v
             else
                 IssueToUnitClearCommands(v)
-                IssueGuard({ v }, Engineer)
+                IssueToUnitGuard(v, Engineer)
             end
         end
     end
@@ -809,7 +810,7 @@ function BuildUnfinishedStructures(platoon)
                 if not beingBuiltList[unitName] then
                     unfinishedBuildings = true
                     IssueToUnitClearCommands(eng)
-                    IssueRepair({ eng }, building)
+                    IssueToUnitRepair(eng, building)
                     repeat
                         WaitSeconds(3)
                         if not aiBrain:PlatoonExists(platoon) then
@@ -1038,7 +1039,7 @@ function PermanentFactoryAssist(platoon)
         if ((not assistFac or assistFac.Dead) and lowFac) or (high and low and lowFac and high > low + 1 and highFac == unit:GetGuardedUnit()) then
             assistFac = lowFac
             platoon:Stop()
-            IssueGuard({ unit }, lowFac)
+            IssueToUnitGuard(unit, lowFac)
 
             -- Add to the list of units that are permanently assisting in this base manager
             bManager.PermanentAssisters[unit] = true
@@ -1455,11 +1456,11 @@ function BaseManagerTMLAI(platoon)
             end
             if not target.Dead then
                 if EntityCategoryContains(categoriesSTRUCTURE, target) or simpleTargetting then
-                    IssueTactical({ unit }, target)
+                    IssueToUnitTactical(unit, target)
                 else
                     local targPos = SUtils.LeadTarget(platoon, target)
                     if targPos then
-                        IssueTactical({ unit }, targPos)
+                        IssueToUnitTactical(unit, targPos)
                     end
                 end
             end
@@ -1514,7 +1515,7 @@ function BaseManagerNukeAI(platoon)
 
             local nukePos = AIBehaviors.GetHighestThreatClusterLocation(aiBrain, unit)
             if nukePos then
-                IssueNuke({ unit }, nukePos)
+                IssueToUnitNuke(unit, nukePos)
                 WaitSeconds(15)
                 IssueToUnitClearCommands(unit)
             end
@@ -1665,7 +1666,7 @@ function UnitUpgradeThread(unit)
             }
             IssueToUnitStop(unit)
             IssueToUnitClearCommands(unit)
-            IssueScript({ unit }, order)
+            IssueToUnitScript(unit, order)
 
             repeat
                 WaitSeconds(3)

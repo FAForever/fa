@@ -983,7 +983,7 @@ end
 ---@param unit Unit
 ---@param destroyUnit? boolean
 function FakeTeleportUnit(unit, destroyUnit)
-    IssueStop({unit})
+    IssueToUnitStop(unit)
     IssueToUnitClearCommands(unit)
     unit.CanBeKilled = false
 
@@ -1105,9 +1105,9 @@ function UpgradeUnit(unit)
         WARN("ScenarioFramework: UpgradeUnit: no upgrade found for unit: " .. unit.UnitId)
         return
     end
-    IssueStop({unit})
+    IssueToUnitStop(unit)
     IssueToUnitClearCommands(unit)
-    IssueUpgrade({unit}, upgradeBP)
+    IssueToUnitUpgrade(unit, upgradeBP)
 end
 
 --- Triggers a help text prompt to appear in the UI.

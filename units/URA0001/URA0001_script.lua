@@ -41,11 +41,11 @@ URA0001 = ClassUnit(CAirUnit) {
     end,
 
     OnStartCapture = function(self, target)
-        IssueStop({self}) -- You can't capture!
+        IssueToUnitStop(self) -- You can't capture!
     end,
 
     OnStartReclaim = function(self, target)
-        IssueStop({self}) -- You can't reclaim!
+        IssueToUnitStop(self) -- You can't reclaim!
     end,
 
     -- We never want to waste effort sinking these
@@ -121,7 +121,7 @@ URA0001 = ClassUnit(CAirUnit) {
             end
 
             IssueToUnitClearCommands(self)
-            IssueGuard({self}, focus)
+            IssueToUnitGuard(self, focus)
         end,
     },
 }

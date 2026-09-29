@@ -45,6 +45,8 @@ local mobileAirCategories = categories.MOBILE * categories.AIR
 local mobileLandCategories = categories.MOBILE * categories.LAND
 local mobileNavalCategories = categories.MOBILE * categories.NAVAL
 
+local emptyTable = {}
+
 --for sorian AI
 local SUtils = import("/lua/ai/sorianutilities.lua")
 
@@ -450,7 +452,7 @@ Platoon = Class(moho.platoon_methods) {
                         Enhancement = v
                     }
                     --LOG('*AI DEBUG: '..aiBrain.Nickname..' EnhanceAI Added Enhancement: '..v)
-                    IssueScript({unit}, order)
+                    IssueToUnitScript(unit, order)
                     lastEnhancement = v
                 end
             end
@@ -542,7 +544,7 @@ Platoon = Class(moho.platoon_methods) {
             end
             if not target.Dead then
                 --LOG('*AI DEBUG: Firing Tactical Missile at enemy swine!')
-                IssueTactical({unit}, target)
+                IssueToUnitTactical(unit, target)
             end
             WaitSeconds(3)
         end
@@ -575,7 +577,7 @@ Platoon = Class(moho.platoon_methods) {
 
                 nukePos = import("/lua/ai/aibehaviors.lua").GetHighestThreatClusterLocation(aiBrain, unit)
                 if nukePos then
-                   IssueNuke({unit}, nukePos)
+                   IssueToUnitNuke(unit, nukePos)
                    WaitSeconds(12)
                    IssueToUnitClearCommands(unit)
                 end
@@ -2003,7 +2005,7 @@ Platoon = Class(moho.platoon_methods) {
             eng.AssistSet = true
             eng.UnitBeingAssist = assistee.UnitBeingBuilt or assistee.UnitBeingAssist or assistee
             --LOG('* EconUnfinishedBody: Assisting now: ['..eng.UnitBeingBuilt:GetBlueprint().BlueprintId..'] ('..eng.UnitBeingBuilt:GetBlueprint().Description..')')
-            IssueGuard({eng}, assistee)
+            IssueToUnitGuard(eng, assistee)
         else
             self.AssistPlatoon = nil
             eng.UnitBeingAssist = nil
@@ -2119,7 +2121,7 @@ Platoon = Class(moho.platoon_methods) {
             eng.AssistSet = true
             eng.UnitBeingAssist = assistee.UnitBeingBuilt or assistee.UnitBeingAssist or assistee
             --LOG('* EconAssistBody: Assisting now: ['..eng.UnitBeingAssist:GetBlueprint().BlueprintId..'] ('..eng.UnitBeingAssist:GetBlueprint().Description..')')
-            IssueGuard({eng}, eng.UnitBeingAssist)
+            IssueToUnitGuard(eng, eng.UnitBeingAssist)
         else
             self.AssistPlatoon = nil
             eng.UnitBeingAssist = nil
@@ -2263,7 +2265,7 @@ Platoon = Class(moho.platoon_methods) {
                 if not eng then
                     eng = v
                 else
-                    IssueGuard({v}, eng)
+                    IssueToUnitGuard(v, eng)
                 end
             end
         end
@@ -2641,7 +2643,7 @@ Platoon = Class(moho.platoon_methods) {
             end
             if upgradeID then
                 upgradeIssued = true
-                IssueUpgrade({v}, upgradeID)
+                IssueToUnitUpgrade(v, upgradeID)
                 --LOG('-- Upgrading unit '..v.UnitId..' ('..v.Blueprint.FactionCategory..') with '..upgradeID)
             end
         end
@@ -3039,7 +3041,7 @@ Platoon = Class(moho.platoon_methods) {
         for _,v in platoonUnits do
             if not v.Dead then
                 if v.Layer ~= 'Sub' and v:TestCommandCaps('RULEUCC_Dive') then
-                    IssueDive({v})
+                    IssueToUnitDive(v)
                 end
             end
         end
@@ -4083,7 +4085,7 @@ Platoon = Class(moho.platoon_methods) {
         if assistee then
             self:Stop()
             eng.AssistSet = true
-            IssueGuard({eng}, assistee)
+            IssueToUnitGuard(eng, assistee)
         else
             self:PlatoonDisband()
         end
@@ -4119,7 +4121,7 @@ Platoon = Class(moho.platoon_methods) {
             end
 
             if v:TestCommandCaps('RULEUCC_Dive') and v.UnitId != 'uas0401' then
-                IssueDive({v})
+                IssueToUnitDive(v)
             end
         end
         WaitSeconds(5)
@@ -4366,7 +4368,7 @@ Platoon = Class(moho.platoon_methods) {
                     local time = 0
                     IssueToUnitClearCommands(eng)
                     while time < 30 do
-                        IssueAggressiveMove({eng}, moveLocation)
+                        IssueToUnitAggressiveMove(eng, moveLocation)
                         time = time + 1
                         WaitTicks(50)
                         local engPos = eng:GetPosition()
@@ -4375,7 +4377,7 @@ Platoon = Class(moho.platoon_methods) {
                             local actionTaken = AIUtils.EngAvoidLocalDanger(aiBrain, eng)
                             if actionTaken then
                                 -- Statemachine switch to evaluating next action to take
-                                IssueAggressiveMove({eng}, moveLocation)
+                                IssueToUnitAggressiveMove(eng, moveLocation)
                             end
                         end
                         if reclaimGridInstance.Cells[reclaimTargetX][reclaimTargetZ].TotalMass < 10  or aiBrain:GetEconomyStoredRatio('MASS') > 0.95 then
@@ -4496,7 +4498,7 @@ Platoon = Class(moho.platoon_methods) {
             end
         end
         if borderWarning and buildLocation and whatToBuild then
-            IssueBuildMobile({eng}, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, {})
+            IssueToUnitBuildMobile(eng, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, emptyTable)
             borderWarning = false
         elseif buildLocation and whatToBuild then
             aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
@@ -4512,7 +4514,7 @@ Platoon = Class(moho.platoon_methods) {
                     borderWarning = true
                 end
                 if borderWarning and v.position and whatToBuild then
-                    IssueBuildMobile({eng}, v.position, whatToBuild, {})
+                    IssueToUnitBuildMobile(eng, v.position, whatToBuild, emptyTable)
                     borderWarning = false
                 elseif buildLocation and whatToBuild then
                     aiBrain:BuildStructure(eng, whatToBuild, {v.position[1], v.position[3], 0}, false)
@@ -4540,7 +4542,7 @@ Platoon = Class(moho.platoon_methods) {
                     borderWarning = true
                 end
                 if borderWarning and v.position and whatToBuild then
-                    IssueBuildMobile({eng}, v.position, whatToBuild, {})
+                    IssueToUnitBuildMobile(eng, v.position, whatToBuild, emptyTable)
                     borderWarning = false
                 elseif buildLocation and whatToBuild then
                     aiBrain:BuildStructure(eng, whatToBuild, {v.position[1], v.position[3], 0}, false)
@@ -4562,7 +4564,7 @@ Platoon = Class(moho.platoon_methods) {
         if hydroPresent then
             buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplDefault['BaseTemplates'][factionIndex], 'T1EnergyProduction', eng, true, categories.STRUCTURE * categories.FACTORY, 12, true)
             if borderWarning and buildLocation and whatToBuild then
-                IssueBuildMobile({eng}, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, {})
+                IssueToUnitBuildMobile(eng, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, emptyTable)
                 borderWarning = false
             elseif buildLocation and whatToBuild then
                 aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
@@ -4573,7 +4575,7 @@ Platoon = Class(moho.platoon_methods) {
             for i=1, 2 do
                 buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplDefault['BaseTemplates'][factionIndex], 'T1EnergyProduction', eng, true, categories.STRUCTURE * categories.FACTORY, 12, true)
                 if borderWarning and buildLocation and whatToBuild then
-                    IssueBuildMobile({eng}, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, {})
+                    IssueToUnitBuildMobile(eng, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, emptyTable)
                     borderWarning = false
                 elseif buildLocation and whatToBuild then
                     aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
@@ -4593,7 +4595,7 @@ Platoon = Class(moho.platoon_methods) {
                         borderWarning = true
                     end
                     if borderWarning and v.position and whatToBuild then
-                        IssueBuildMobile({eng}, v.position, whatToBuild, {})
+                        IssueToUnitBuildMobile(eng, v.position, whatToBuild, emptyTable)
                         borderWarning = false
                     elseif buildLocation and whatToBuild then
                         aiBrain:BuildStructure(eng, whatToBuild, {v.position[1], v.position[3], 0}, false)
@@ -4609,7 +4611,7 @@ Platoon = Class(moho.platoon_methods) {
                         borderWarning = true
                     end
                     if borderWarning and buildMassPoints[i].position and whatToBuild then
-                        IssueBuildMobile({eng}, buildMassPoints[i].position, whatToBuild, {})
+                        IssueToUnitBuildMobile(eng, buildMassPoints[i].position, whatToBuild, emptyTable)
                         borderWarning = false
                     elseif buildMassPoints[i].Position and whatToBuild then
                         aiBrain:BuildStructure(eng, whatToBuild, {buildMassPoints[i].position[1], buildMassPoints[i].position[3], 0}, false)
@@ -4622,7 +4624,7 @@ Platoon = Class(moho.platoon_methods) {
                 buildMassPoints = aiBrain:RebuildTable(buildMassPoints)
                 buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplDefault['BaseTemplates'][factionIndex], 'T1EnergyProduction', eng, true, categories.STRUCTURE * categories.FACTORY, 12, true)
                 if borderWarning and buildLocation and whatToBuild then
-                    IssueBuildMobile({eng}, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, {})
+                    IssueToUnitBuildMobile(eng, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, emptyTable)
                     borderWarning = false
                 elseif buildLocation and whatToBuild then
                     aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
@@ -4636,7 +4638,7 @@ Platoon = Class(moho.platoon_methods) {
                             borderWarning = true
                         end
                         if borderWarning and v.position and whatToBuild then
-                            IssueBuildMobile({eng}, v.position, whatToBuild, {})
+                            IssueToUnitBuildMobile(eng, v.position, whatToBuild, emptyTable)
                             borderWarning = false
                         elseif v.position and whatToBuild then
                             aiBrain:BuildStructure(eng, whatToBuild, {v.position[1], v.position[3], 0}, false)
@@ -4666,7 +4668,7 @@ Platoon = Class(moho.platoon_methods) {
                             borderWarning = true
                         end
                         if borderWarning and v.position and whatToBuild then
-                            IssueBuildMobile({eng}, v.position, whatToBuild, {})
+                            IssueToUnitBuildMobile(eng, v.position, whatToBuild, emptyTable)
                             borderWarning = false
                         elseif v.position and whatToBuild then
                             aiBrain:BuildStructure(eng, whatToBuild, {v.position[1], v.position[3], 0}, false)
@@ -4697,7 +4699,7 @@ Platoon = Class(moho.platoon_methods) {
                     borderWarning = true
                 end
                 if borderWarning and v.position and whatToBuild then
-                    IssueBuildMobile({eng}, v.position, whatToBuild, {})
+                    IssueToUnitBuildMobile(eng, v.position, whatToBuild, emptyTable)
                     borderWarning = false
                 elseif v.position and whatToBuild then
                     aiBrain:BuildStructure(eng, whatToBuild, {v.position[1], v.position[3], 0}, false)
@@ -4730,7 +4732,7 @@ Platoon = Class(moho.platoon_methods) {
                 buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplDefault['BaseTemplates'][factionIndex], 'T1EnergyProduction', eng, true, categories.STRUCTURE * categories.FACTORY, 12, true)
                 if buildLocation and whatToBuild then
                     if borderWarning and buildLocation and whatToBuild then
-                        IssueBuildMobile({eng}, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, {})
+                        IssueToUnitBuildMobile(eng, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, emptyTable)
                         borderWarning = false
                     elseif buildLocation and whatToBuild then
                         aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
@@ -4741,7 +4743,7 @@ Platoon = Class(moho.platoon_methods) {
                     -- This is a backup to avoid a power stall should the GetBuildLocation fail with adjacency
                     buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplDefault['BaseTemplates'][factionIndex], 'T1EnergyProduction', eng, false, categories.STRUCTURE * categories.FACTORY, 12, true)
                     if borderWarning and buildLocation and whatToBuild then
-                        IssueBuildMobile({eng}, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, {})
+                        IssueToUnitBuildMobile(eng, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, emptyTable)
                         borderWarning = false
                     elseif buildLocation and whatToBuild then
                         aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
@@ -4755,7 +4757,7 @@ Platoon = Class(moho.platoon_methods) {
         if not hydroPresent and closeMarkers > 3 then
             buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplDefault['BaseTemplates'][factionIndex], 'T1LandFactory', eng, true, categories.MASSEXTRACTION, 15, true)
             if borderWarning and buildLocation and whatToBuild then
-                IssueBuildMobile({eng}, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, {})
+                IssueToUnitBuildMobile(eng, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, emptyTable)
                 borderWarning = false
             elseif buildLocation and whatToBuild then
                 aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
@@ -4817,7 +4819,7 @@ Platoon = Class(moho.platoon_methods) {
             if assistee  then
                 IssueToUnitClearCommands(eng)
                 eng.UnitBeingAssist = assistee.UnitBeingBuilt or assistee.UnitBeingAssist or assistee
-                IssueGuard({eng}, eng.UnitBeingAssist)
+                IssueToUnitGuard(eng, eng.UnitBeingAssist)
                 coroutine.yield(30)
                 while eng and not eng.Dead and not eng:IsIdleState() do
                     if not eng.UnitBeingAssist or eng.UnitBeingAssist.Dead or eng.UnitBeingAssist:BeenDestroyed() then
@@ -4837,7 +4839,7 @@ Platoon = Class(moho.platoon_methods) {
                     if (playableArea[3] > 512 or playableArea[4] > 512) or personality == 'rushair' then
                         buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplDefault['BaseTemplates'][factionIndex], 'T1AirFactory', eng, true, categories.HYDROCARBON, 15, true)
                         if borderWarning and buildLocation and whatToBuild then
-                            IssueBuildMobile({eng}, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, {})
+                            IssueToUnitBuildMobile(eng, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, emptyTable)
                             borderWarning = false
                         elseif buildLocation and whatToBuild then
                             aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
@@ -4847,7 +4849,7 @@ Platoon = Class(moho.platoon_methods) {
                     else
                         buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplDefault['BaseTemplates'][factionIndex], 'T1LandFactory', eng, true, categories.HYDROCARBON, 15, true)
                         if borderWarning and buildLocation and whatToBuild then
-                            IssueBuildMobile({eng}, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, {})
+                            IssueToUnitBuildMobile(eng, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, emptyTable)
                             borderWarning = false
                         elseif buildLocation and whatToBuild then
                             aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
@@ -4857,7 +4859,7 @@ Platoon = Class(moho.platoon_methods) {
                         if playableArea[3] > 256 or playableArea[4] > 256 and aiBrain:GetEngineerManagerUnitsBeingBuilt(categories.FACTORY * categories.AIR) < 1 and aiBrain:GetCurrentUnits(categories.FACTORY * categories.AIR) < 1 then
                             buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplDefault['BaseTemplates'][factionIndex], 'T1AirFactory', eng, true, categories.HYDROCARBON, 25, true)
                             if borderWarning and buildLocation and whatToBuild then
-                                IssueBuildMobile({eng}, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, {})
+                                IssueToUnitBuildMobile(eng, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, emptyTable)
                                 borderWarning = false
                             elseif buildLocation and whatToBuild then
                                 aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
