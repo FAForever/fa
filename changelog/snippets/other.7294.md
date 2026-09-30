@@ -1,0 +1,1 @@
+- Add a `/autorun <config>` command line option to launch a fully scripted single-player session (map, options, mods, armies, and an optional Lua script) from a config file, for automated/scripted testing (#7294).
