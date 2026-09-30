@@ -68,9 +68,11 @@
 ---@field StayUnderwater boolean
 --- if the projectile is initially affected by gravity (-4.9 ogrids/second/second)
 ---@field UseGravity boolean
---- projectile will detonate when going above this height above ground
+--- projectile will detonate (impact "Air") when going above this height above ground
 ---@field DetonateAboveHeight number
---- projectile will detonate when dipping under this height above ground
+--- projectile will detonate (impact "Air") when dipping under this height above ground
+---
+--- Defaults to 0 which triggers if underground
 ---@field DetonateBelowHeight number
 --- Max turn rate for the projectile, in degrees per second. Applies only
 --- to tracking and velocity-aligned projectiles.
