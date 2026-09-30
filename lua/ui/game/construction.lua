@@ -1449,7 +1449,9 @@ function OnClickHandler(button, modifiers)
                     if not table.empty(exFacs) then
                         local exFacUnits = EntityCategoryFilterOut(categories.EXTERNALFACTORY, selection)
                         for _, exFac in exFacs do
-                            table.insert(exFacUnits, exFac:GetCreator())
+                            if exFac:GetFractionComplete() == 1 then
+                                table.insert(exFacUnits, exFac:GetCreator())
+                            end
                         end
                         -- in case we've somehow selected both the platform and the factory, only put the fac in once
                         exFacUnits = table.unique(exFacUnits)
@@ -1908,7 +1910,9 @@ function CreateExtraControls(controlType)
             SetPaused(sortedOptions.selection, checked)
             -- If we have exFacs platforms or exFac units selected, we'll pause their counterparts as well
             for _, exFac in EntityCategoryFilterDown(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, sortedOptions.selection) do
-                exFac:GetCreator():ProcessInfo('SetPaused', tostring(checked))
+                if exFac:FractionComplete() == 1 then
+                    exFac:GetCreator():ProcessInfo('SetPaused', tostring(checked))
+                end
             end
         end
         if pauseEnabled then
@@ -1928,7 +1932,9 @@ function CreateExtraControls(controlType)
             for _, v in sortedOptions.selection do
                 v:ProcessInfo('SetRepeatQueue', tostring(checked))
                 if EntityCategoryContains(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, v) then
-                    v:GetCreator():ProcessInfo('SetRepeatQueue', tostring(checked))
+                    if v:GetFractionComplete() == 1 then
+                        v:GetCreator():ProcessInfo('SetRepeatQueue', tostring(checked))
+                    end
                 end
             end
         end
@@ -2506,7 +2512,9 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         -- Queue display is easy: if we've got one unit selected, and it's an exFac platform,
         -- show the queue of its attached external factory
         -- this automatically supports removing/modifying the queue, neat!
-        if EntityCategoryContains(categories.EXTERNALFACTORY, selection[1]) then
+        if EntityCategoryContains(categories.EXTERNALFACTORY, selection[1])
+            and selection[1]:GetFractionComplete() == 1
+        then
             currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1]:GetCreator())
         else
             currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1])

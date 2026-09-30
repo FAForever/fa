@@ -38,12 +38,16 @@ local oldHandleEvent = worldview.HandleEvent
 ---@param selection UserUnit[]
 ---@return UserUnit[] | nil
 function TranslateExFacUnits(selection)
-    local exFacs = EntityCategoryFilterDown(categories.EXTERNALFACTORY, selection) -- get all selected units with a factory attachment
+    -- get all selected units with a factory attachment
+    local exFacs = EntityCategoryFilterDown(categories.EXTERNALFACTORY, selection)
     if not table.empty(exFacs) then
         ---@type UserUnit[]
         local nonExFacs = EntityCategoryFilterOut(categories.EXTERNALFACTORY, selection) -- get all selected Units without a factory attachment
         for _, exFac in exFacs do
-            table.insert(nonExFacs, exFac:GetCreator()) -- for each unit with a factory attachment add the attachment to the list of factories
+            if exFac:GetFractionComplete() == 1 then
+                -- for each unit with a factory attachment add the attachment to the list of factories
+                table.insert(nonExFacs, exFac:GetCreator())
+            end
         end
 
         -- in case we've somehow selected both the platform and the factory, only put the fac in once
