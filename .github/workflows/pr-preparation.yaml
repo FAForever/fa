@@ -36,6 +36,8 @@ jobs:
       - name: Post welcome comment
         uses: actions/first-interaction@v3
         with:
+          issue_message: |
+            This action should not trigger on issues being opened, but the issue message is required regardless.
           pr_message: |
             Hello,
             it seems this is your first contribution.
