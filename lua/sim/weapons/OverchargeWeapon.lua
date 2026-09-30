@@ -93,6 +93,19 @@ OverchargeWeapon = ClassWeapon(DefaultProjectileWeapon) {
         self.unit:SetOverchargePaused(false)
     end,
 
+    --- The overcharge aim controller only takes over the arm while overcharge is enabled
+    ---@param self OverchargeWeapon
+    ---@param aimControl moho.AimManipulator
+    OnAimControlRebuilt = function(self, aimControl)
+        if self.enabled then
+            aimControl:SetEnabled(true)
+            aimControl:SetPrecedence(20)
+        else
+            aimControl:SetEnabled(false)
+            aimControl:SetPrecedence(0)
+        end
+    end,
+
     ---@param self OverchargeWeapon
     OnGotTarget = function(self)
         if self:CanOvercharge() then
