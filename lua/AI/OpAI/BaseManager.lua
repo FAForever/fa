@@ -2123,7 +2123,7 @@ function FailSafeUpgradeBaseManagerStructure(unit, upgradeID)
         unit.AddedUpgradeCallback = true
     end
 
-    IssueUpgrade({ unit }, upgradeID)
+    IssueToUnitUpgrade(unit, upgradeID)
     unit.SetToUpgrade = true
 end
 

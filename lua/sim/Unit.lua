@@ -2841,15 +2841,15 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
             local cmd
             if guarded:IsUnitState('Reclaiming') then
-                cmd = IssueReclaim
+                cmd = IssueToUnitReclaim
             elseif guarded:IsUnitState('Building') then
-                cmd = IssueRepair
+                cmd = IssueToUnitRepair
             end
 
             if cmd then
                 IssueToUnitClearCommands(self)
-                cmd({self}, focus)
-                IssueGuard({self}, guarded)
+                cmd(self, focus)
+                IssueToUnitGuard(self, guarded)
             end
         end
     end,
@@ -2886,7 +2886,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         if order ~= 'Repair' and Game.IsRestricted(id, self.Army) then
             WARN('Unit.OnStartBuild() Army ' ..self.Army.. ' cannot build restricted unit: ' .. (bp.Description or id))
             self:OnFailedToBuild() -- Don't use: self:OnStopBuild()
-            IssueClearFactoryCommands({self})
+            IssueToUnitClearFactoryCommands(self)
             IssueToUnitClearCommands(self)
             return false -- Report failure of OnStartBuild
         end

@@ -1775,7 +1775,7 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
 	local watchcount = 0
     transport.Loading = true
 
-	IssueStop( {transport} )
+	IssueToUnitStop(transport)
     
     if TransportDialog then
         LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." transport "..transport.EntityId.." moving to "..repr(units[1]:GetPosition()).." for pickup - distance "..VDist3( transport:GetPosition(), units[1]:GetPosition()))
@@ -1791,7 +1791,7 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
 			unitsdead = false
 			loading = true
 			-- here is where we issue the Load command to the transport --
-			local ok, msg = pcall(IssueTransportLoad, {u}, transport )
+			local ok, msg = pcall(IssueToUnitTransportLoad, u, transport)
 			if not ok then
 				LOG("Unable to IssueTransportLoad to: " .. repr(u.Blueprint.BlueprintId))
 			end
@@ -1867,7 +1867,7 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
 				if (not u.Dead) and not IsUnitState( u, 'Attached') then
 					-- if the unit is not attached and the transport has space for it or it's a UEF Gunship (TransportHasSpaceFor command is unreliable)
 					if (not transport.Dead) and transport:TransportHasSpaceFor(u) then
-						IssueStop({u})
+						IssueToUnitStop(u)
 						if reissue > 1 then
 							if TransportDialog then
                                 LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport"..transport.EntityId.." Warping unit "..u.EntityId.." to transport ")
@@ -1898,7 +1898,7 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
 					LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." Reloading "..counter.." units - reload "..reloads)
 				end
 				IssueStop( newunits )
-				IssueStop( {transport} )
+				IssueToUnitStop(transport)
 				local goload = safecall("Unable to IssueTransportLoad", IssueTransportLoad, newunits, transport )
 				if goload and TransportDialog then
 					LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." reloads is "..reloads.." goload is "..repr(goload).." for "..transport:GetBlueprint().Description)
@@ -1919,11 +1919,11 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
     end
 
     if transport.InUse then
-        IssueStop( {transport} )
+        IssueToUnitStop(transport)
         if (not transport.Dead) then
             if not unitsdead then
                 -- have the transport guard his loading spot until everyone else has loaded up
-                IssueGuard( {transport}, GetPosition(transport) )
+                IssueToUnitGuard(transport, GetPosition(transport) )
                 if TransportDialog then
                     LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." begins to loiter after load")
                 end
@@ -2061,7 +2061,7 @@ function WatchUnitUnload( transport, unitlist, destination, aiBrain, UnitPlatoon
         LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." unloadwatch begins at "..repr(destination) )
     end
 	
-	IssueTransportUnload( {transport}, destination)
+	IssueToUnitTransportUnload(transport, destination)
     WaitTicks(4)
 	local watchcount = 0.3
 
@@ -2103,9 +2103,9 @@ function WatchUnitUnload( transport, unitlist, destination, aiBrain, UnitPlatoon
 					break			
 				elseif watchcount >= 8 then
 					LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." transport "..transport.EntityId.." watched unload for "..watchcount.." seconds")
-					IssueTransportUnload( {transport}, GetPosition(transport))
+					IssueToUnitTransportUnload(transport, GetPosition(transport))
 				elseif watchcount > 4 then
-					IssueTransportUnload( {transport}, GetPosition(transport))
+					IssueToUnitTransportUnload(transport, GetPosition(transport))
 				end
 			end
 		end
@@ -2196,18 +2196,18 @@ function TransportReturnToBase(unit, aiBrain)
 						LOG("*AI DEBUG "..aiBrain.Nickname.." Air Unit "..unit.Sync.id.." returning to base ")
 					end
 					returnPos = aiBrain.BuilderManagers[bestBaseName].Position
-					IssueStop ( {unit} )
-					IssueClearCommands( {unit} )
+					IssueToUnitStop(unit)
+					IssueToUnitClearCommands(unit)
 					local safePath, reason = NavUtils.PathToWithThreatThreshold('Air', platPos, returnPos, aiBrain, NavUtils.ThreatFunctions.AntiAir, 50, aiBrain.IMAPConfig.Rings)
 					if safePath then
 						-- use path
 						for _,p in safePath do
-							IssueMove( {unit}, p )
+							IssueToUnitMove(unit, p)
 						end
-						IssueMove( {unit}, returnPos)
+						IssueToUnitMove(unit, returnPos)
 					else
 						-- go direct -- possibly bad
-						IssueMove( {unit}, returnPos )
+						IssueToUnitMove(unit, returnPos)
 					end
 				end
 			end
