@@ -36,6 +36,7 @@ jobs:
       - name: Post welcome comment
         uses: actions/first-interaction@v1.3.0
         with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
           pr-message: |
             Hello,
             it seems this is your first contribution.
