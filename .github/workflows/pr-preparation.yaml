@@ -34,11 +34,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Post welcome comment
-        uses: actions/first-interaction@v3
+        uses: actions/first-interaction@v1.3.0
         with:
-          issue_message: |
-            This action should not trigger on issues being opened, but the issue message is required regardless.
-          pr_message: |
+          pr-message: |
             Hello,
             it seems this is your first contribution.
             Please read our [contribution guidelines](CONTRIBUTING.md) to understand how to proceed.
