@@ -2,6 +2,8 @@
 
 -- LuaPlus returns nil when indexing nil instead of raising an error, so `if t.a.b then` is safe
 -- when `t` or `t.a` is nil. A lot of code relies on this instead of writing explicit nil checks.
+-- This benchmark measures the cost of indexing nil, and compares implicit nil checks in access
+-- chains against explicit ones.
 
 -- Loop parameter: 10000. ns/access includes about 3.3 ns of loop overhead (the missing root guards).
 --
