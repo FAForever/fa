@@ -6,6 +6,10 @@
 -- the cost of those chains against explicit `and` guards, for chains that are present, missing
 -- at the root and missing in the middle.
 
+-- A single access is too cheap to measure against the loop baseline, so each outer iteration runs
+-- an inner loop of 50 iterations with the access unrolled 10 times: 500 accesses per outer
+-- iteration. The inner loop overhead is the same for every benchmark in this file.
+
 ModuleName = "Nil Indexing"
 BenchmarkData = {
     IndexTable = "Index table",
@@ -25,7 +29,18 @@ function IndexTable(loop)
     local start = timer()
 
     for _ = 1, loop do
-        v = t.a
+        for _ = 1, 50 do
+            v = t.a
+            v = t.a
+            v = t.a
+            v = t.a
+            v = t.a
+            v = t.a
+            v = t.a
+            v = t.a
+            v = t.a
+            v = t.a
+        end
     end
 
     local final = timer()
@@ -39,7 +54,18 @@ function IndexNil(loop)
     local start = timer()
 
     for _ = 1, loop do
-        v = t.a
+        for _ = 1, 50 do
+            v = t.a
+            v = t.a
+            v = t.a
+            v = t.a
+            v = t.a
+            v = t.a
+            v = t.a
+            v = t.a
+            v = t.a
+            v = t.a
+        end
     end
 
     local final = timer()
@@ -53,7 +79,18 @@ function ChainPresent(loop)
     local start = timer()
 
     for _ = 1, loop do
-        v = t.a.b.c
+        for _ = 1, 50 do
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+        end
     end
 
     local final = timer()
@@ -67,7 +104,18 @@ function ChainMissingRoot(loop)
     local start = timer()
 
     for _ = 1, loop do
-        v = t.a.b.c
+        for _ = 1, 50 do
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+        end
     end
 
     local final = timer()
@@ -81,7 +129,18 @@ function ChainMissingMiddle(loop)
     local start = timer()
 
     for _ = 1, loop do
-        v = t.a.b.c
+        for _ = 1, 50 do
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+            v = t.a.b.c
+        end
     end
 
     local final = timer()
@@ -95,7 +154,18 @@ function GuardedPresent(loop)
     local start = timer()
 
     for _ = 1, loop do
-        v = t and t.a and t.a.b and t.a.b.c
+        for _ = 1, 50 do
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+        end
     end
 
     local final = timer()
@@ -109,7 +179,18 @@ function GuardedMissingRoot(loop)
     local start = timer()
 
     for _ = 1, loop do
-        v = t and t.a and t.a.b and t.a.b.c
+        for _ = 1, 50 do
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+        end
     end
 
     local final = timer()
@@ -123,7 +204,18 @@ function GuardedMissingMiddle(loop)
     local start = timer()
 
     for _ = 1, loop do
-        v = t and t.a and t.a.b and t.a.b.c
+        for _ = 1, 50 do
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+            v = t and t.a and t.a.b and t.a.b.c
+        end
     end
 
     local final = timer()
