@@ -1,7 +1,9 @@
 ---@diagnostic disable: need-check-nil
 
--- Loop parameter 10000, 5 000 000 accesses per run, outliers removed. ns/access includes the
--- inner loop overhead, about 3.3 ns (the cost of the "missing root" guards, which only test t).
+-- LuaPlus returns nil when indexing nil instead of raising an error, so `if t.a.b then` is safe
+-- when `t` or `t.a` is nil. A lot of code relies on this instead of writing explicit nil checks.
+
+-- Loop parameter: 10000. ns/access includes about 3.3 ns of loop overhead (the missing root guards).
 --
 -- |---------------------------------------|---------------------------------|---------|---------|--------|-----------|
 -- | Name                                  | Expression                      | Samples | Mean ms | Dev ms | ns/access |
@@ -26,38 +28,25 @@
 -- | "Local guarded chain, missing root"   | if b then v = b.c               |      59 |   16.60 |   0.00 |      3.32 |
 -- |---------------------------------------|---------------------------------|---------|---------|--------|-----------|
 --
--- The profiler's "paired" and "ratio" modes don't apply here: the empty baseline loop of 10000
--- iterations measures as 0, so they report 0 and infinity.
+-- Analysis:
+-- - Indexing nil is 2.1x slower than indexing a table.
+-- - Guarding every link with `and` re-reads `t.a` and `t.a.b` at each step. It is 2.2x slower than
+--   the unguarded chain when the chain is present and 1.2x slower when it breaks in the middle. It
+--   is only faster when `t` is nil, by 6.1x.
+-- - Guarding only `t` is 1.1x slower than the unguarded chain when `t` exists and 6.3x faster when
+--   `t` is nil. It breaks even when `t` is nil in about 8% of calls.
+-- - Nested `if`s with a local per link are 1.2x slower than guarding only `t` when the chain is
+--   present, and 1.05x faster than the unguarded chain when it breaks in the middle. The gain does
+--   not justify the harder to read code.
 --
--- Conclusions:
--- - Indexing nil works, but costs more than indexing a table: about 4.7 ns against 0.5 ns once the
---   loop overhead is subtracted. Each nil index in a chain adds a few ns over a table index.
--- - A full `and` guard re-reads every prefix of the chain. When the chain is present it costs over
---   twice the unguarded chain (27.7 vs 12.5 ns), and it is still slower when the chain breaks in
---   the middle (18.0 vs 15.4 ns). It only wins when the root is nil (3.4 vs 20.5 ns).
--- - A root-only guard costs about 1.5 ns over the unguarded chain when the root exists (14.0 vs
---   12.5 ns, 16.8 vs 15.4 ns) and saves about 17 ns when the root is nil (3.3 vs 20.5 ns). It
---   breaks even when the root is nil about 8% of the time.
--- - Nested `if`s with a local per link read each link once and exit early, but the extra tests and
---   jumps cost more than they save when the chain is present (17.2 vs 14.0 ns root guarded, 12.5 ns
---   unguarded). They are the fastest variant when the chain breaks in the middle (14.6 vs 15.4 ns
---   unguarded), and match the other guards when the root is nil (3.3 ns). The gain is too small to
---   justify the loss in legibility. (The 0.00 deviation for the missing root case is likely timer
---   resolution: the samples were identical after outlier removal.)
--- - Recommendation: never write full `and` guards for nil safety. Rely on implicit nil-safe chains
---   (`if t.a.b then`) when the root is almost always present. Guard only the root (`t and t.a.b`)
---   when it is nil in more than a few percent of calls. Where a prefix is used more than once, read
---   it into a local (see table-sub.lua).
+-- Conclusion:
+-- - Don't guard every link with `and` for nil safety.
+-- - Write `if t.a.b then` when `t` is almost always present.
+-- - Write `if t and t.a.b then` when `t` is nil in more than about 8% of calls.
+-- - When the same `t.a` is read more than once, read it into a local (see table-sub.lua).
 
--- LuaPlus returns nil when indexing nil instead of raising an error. A lot of code relies on this
--- to write implicit nil checks in access chains, such as `if t.a.b then`. This benchmark compares
--- the cost of those chains against explicit `and` guards on every link and on the root only, and
--- against nested `if`s with a local per link, for chains that are present, missing at the root and
--- missing in the middle.
-
--- A single access is too cheap to measure against the loop baseline, so each outer iteration runs
--- an inner loop of 50 iterations with the access unrolled 10 times: 500 accesses per outer
--- iteration. The inner loop overhead is the same for every benchmark in this file.
+-- The access is repeated 10 times per inner iteration so the loop instructions are a smaller part
+-- of each measurement.
 
 ModuleName = "Nil Indexing"
 BenchmarkData = {
