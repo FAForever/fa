@@ -45,7 +45,6 @@
 -- - Don't guard every link with `and` for nil safety.
 -- - Write `if t.a.b then` when `t` is almost always present.
 -- - Write `if t and t.a.b then` when `t` is nil in more than about 8% of calls.
--- - When the same `t.a` is read more than once, read it into a local (see table-sub.lua).
 
 -- The access is repeated 10 times per inner iteration so the loop instructions are a smaller part
 -- of each measurement.
