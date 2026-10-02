@@ -1101,6 +1101,10 @@ Tooltips = {
         title = '<LOC OPTIONS_0305>Show Player Cursor Locations for Observers',
         description = '<LOC OPTIONS_0306>Shows the cursor locations of alive players and other observers as you observe a game.\r\nDoes not apply for replays, including live ones.',
     },
+    options_econ_overlay_scale = {
+        title = '<LOC OPTIONS_ECON_OVERLAY_SCALE_TITLE>Scale Economy Overlay',
+        description = '<LOC OPTIONS_ECON_OVERLAY_SCALE_DESCRIPTION>Adjusts the size of the economy overlay.\nRequires a game restart if overlay was enabled this session.',
+    },
     -- **********************
     -- ** Lobby Strings
     -- **********************
