@@ -1,0 +1,1 @@
+- Expand AIx options to allow 0.1-0.4 AIx modifiers
