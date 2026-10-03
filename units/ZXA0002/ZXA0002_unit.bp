@@ -5,12 +5,13 @@ UnitBlueprint {
         'FACTORY',
         'CONSTRUCTION',
         'SELECTABLE',
-        'UNTARGETTABLE',
+        'UNTARGETABLE',
         'RALLYPOINT',
         'SORTCONSTRUCTION',
         'DRAGBUILD',
         'SHOWQUEUE',
-        'EXTERNALFACTORYUNIT'
+        'EXTERNALFACTORYUNIT',
+        'UNSPAWNABLE',
     },
     Defense = {
         Health = 100000,
