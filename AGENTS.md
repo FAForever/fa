@@ -147,6 +147,7 @@ Use the typed class constructors from [lua/system/class.lua](lua/system/class.lu
 
 ```lua
 local ACUUnit = import("/lua/defaultunits.lua").ACUUnit
+local ACUDeathWeapon = import("/lua/sim/defaultweapons.lua").ACUDeathWeapon
 
 ---@class UEL0001 : ACUUnit
 ---@field HasLeftPod boolean
