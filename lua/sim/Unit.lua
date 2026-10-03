@@ -3468,12 +3468,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         if new == 'Land' then
             self:PlayUnitSound('TransitionLand')
-            self:PlayUnitAmbientSound('AmbientMoveLand')
         elseif new == 'Water' or new == 'Seabed' then
             self:PlayUnitSound('TransitionWater')
-            self:PlayUnitAmbientSound('AmbientMoveWater')
-        elseif new == 'Sub' then
-            self:PlayUnitAmbientSound('AmbientMoveSub')
         end
 
         local movementEffects = self.Blueprint.Display.MovementEffects
