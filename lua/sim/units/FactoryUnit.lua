@@ -202,7 +202,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
     ---@param self FactoryUnit
     OnFailedToBuild = function(self)
         local unitBeingBuilt = self.UnitBeingBuilt
-        if unitBeingBuilt.Dead or IsDestroyed(unitBeingBuilt) then
+        if unitBeingBuilt and not unitBeingBuilt.Dead then
             -- Instantly clear the build area so the next build can start, since unit `Destroy` doesn't do so.
             unitBeingBuilt:SetCollisionShape("None")
         end
