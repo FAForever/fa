@@ -259,7 +259,7 @@ Benchmarks live in [lua/benchmarks/](lua/benchmarks/). Each file sets `ModuleNam
 There is no way to run the game in CI. Tests are small, offline, and require the FAF Lua interpreter ([FAForever/lua-lang](https://github.com/FAForever/lua-lang), CI uses the `faforever/lua:v5.0-3` Docker image). Standard Lua 5.1+ will not parse this code.
 
 ```bash
-bash ./tests/run-syntax-test.sh      # luac -p over every .lua and .bp file
+bash ./tests/run-syntax-test.sh      # luac -p over .lua and .bp files
 bash ./tests/run-utility-tests.sh    # tests/utility/*.spec.lua (luft framework)
 bash ./tests/run-blueprint-tests.sh  # sanity checks on units/*/*.bp
 ```
@@ -270,7 +270,7 @@ Run with Docker if the interpreter isn't installed locally:
 docker run --rm -v "$PWD:/fa" -w /fa faforever/lua:v5.0-3 sh -c "apk add bash findutils >/dev/null && bash ./tests/run-syntax-test.sh"
 ```
 
-The syntax test skips files that use `{&h&a}` syntax (`lua/lazyvar.lua`, `lua/system/class.lua`, `lua/sim/NavGenerator.lua`, `lua/system/categories.lua`). Add to that list if you introduce the syntax elsewhere.
+The syntax test skips the `testmaps/` and `engine/` folders, and files that use `{&h &a}` syntax (`lua/lazyvar.lua`, `lua/system/class.lua`, `lua/sim/NavGenerator.lua`, `lua/system/categories.lua`). Add to that list in `tests/run-syntax-test.sh` if you introduce the syntax elsewhere.
 
 Real verification means running the game: copy `setup/bin/init_local_development.lua` into the FAF client's `bin` folder (usually `C:\ProgramData\FAForever\bin`), set `locationOfRepository` in it, and launch `ForgedAlliance.exe /init "init_local_development.lua" /EnableDiskWatch /showlog /nomovie`. Check the moho log for Lua errors. See [docs/development/setup.md](docs/development/setup.md). When you can't run the game, say so and state what the user should check in-game.
 
