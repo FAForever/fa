@@ -128,7 +128,7 @@ Details: [docs/development-start-here/lua-contexts.md](docs/development-start-he
 | `lua/system/` | Runtime infrastructure: `class.lua` (class system), `import.lua`, `Blueprints.lua` + `blueprints-*.lua` (blueprint post-processing), `trashbag.lua`, `categories.lua`, `utils.lua`. |
 | `lua/AI/`, `lua/aibrains/`, `lua/sim/*Manager.lua` | AI: builders, platoons, base templates, the AI brain variants. |
 | `lua/shared/` | Code usable from more than one context. |
-| `units/<ID>/` | One folder per unit: `<ID>_unit.bp` (blueprint), `<ID>_script.lua` (unit class), meshes, textures, icons. |
+| `units/<ID>/` | One folder per unit: `<ID>_unit.bp` (blueprint), `<ID>_script.lua` (unit class), and any meshes, textures and icons FAF adds or changes (see below). |
 | `projectiles/`, `effects/`, `env/`, `meshes/`, `textures/` | Assets and their blueprints/scripts. Only assets FAF adds or changes are here (see below). |
 | `schook/` | Empty placeholders (`-- shadow base game schook file`) that blank out the base game's own schook hooks. The `hook` table in the init files makes the engine append `/schook/<path>` to `/<path>`. Don't add code here; edit the file under `lua/` directly. Mods use the same hooking mechanism with their `hook/` folder. |
 | `loc/<LANG>/` | Localization string tables. Use `<LOC key>fallback` strings in user-facing text. |
