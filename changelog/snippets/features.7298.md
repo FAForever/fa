@@ -1,0 +1,1 @@
+- Add a "Distribute Assisters" command that assists all selected mobile shields, scouts, and stealth generators onto other units in the selection, and then selects those other units. Can be used by hotkey or right clicking the assist order button (#7226).

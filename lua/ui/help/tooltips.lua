@@ -38,7 +38,7 @@ Tooltips = {
     },
     assist = {
         title = "<LOC tooltipui0008>Assist",
-        description = "",
+        description = "Right-click to distribute assist orders of mobile shields, scouts and stealth generators across selection.",
         keyID = "guard",
     },
     mode_hold = {
