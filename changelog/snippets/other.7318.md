@@ -1,1 +1,1 @@
-- Your explanation here... [Don't forget to change the category in the filename] (#7318).
+- Add `AGENTS.md` and `CLAUDE.md` guides for coding agents (#7318).
