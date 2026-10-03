@@ -130,7 +130,7 @@ Details: [docs/development-start-here/lua-contexts.md](docs/development-start-he
 | `lua/shared/` | Code usable from more than one context. |
 | `units/<ID>/` | One folder per unit: `<ID>_unit.bp` (blueprint), `<ID>_script.lua` (unit class), meshes, textures, icons. |
 | `projectiles/`, `effects/`, `env/`, `meshes/`, `textures/` | Assets and their blueprints/scripts. Only assets FAF adds or changes are here (see below). |
-| `schook/` | Hook files mounted on top of the base game's `/lua` via the `hook` table in the init files. Code here is appended to the original file of the same path. |
+| `schook/` | Empty placeholders (`-- shadow base game schook file`) that blank out the base game's own schook hooks. The `hook` table in the init files makes the engine append `/schook/<path>` to `/<path>`. Don't add code here; edit the file under `lua/` directly. Mods use the same hooking mechanism with their `hook/` folder. |
 | `loc/<LANG>/` | Localization string tables. Use `<LOC key>fallback` strings in user-facing text. |
 | `engine/` | Annotation-only stubs of engine-provided globals and `moho.*` classes. Never loaded by the game. Keep them accurate when you learn engine behavior. |
 | `lua-ls-addon/` | LuaLS plugin that teaches the language server this Lua dialect. Wired in via `.vscode/settings.json`. |
