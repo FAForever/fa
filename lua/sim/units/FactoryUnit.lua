@@ -473,7 +473,9 @@ FactoryUnit = ClassUnit(StructureUnit) {
     },
 
     UpgradingState = State(StructureUnit.UpgradingState) {
-        --- Adapted from StructureUnit to unblock the build area when the factory upgrade finishes.
+        --- Copied from `StructureUnit.UpgradingState.OnStopBuild` and modified
+        --- to unblock the build area when the factory upgrade finishes.
+        ---@see StructureUnit.UpgradingState.OnStopBuild
         ---@param self FactoryUnit
         ---@param unitBuilding Unit
         ---@param order string
