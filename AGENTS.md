@@ -18,7 +18,7 @@ The engine runs a GPG-modified **LuaPlus 5.0** (not 5.1+). Things that trip up t
 - `^` is bitwise XOR. Use `math.pow` for exponentiation. `|`, `&`, `<<`, `>>` are bitwise operators.
 - `!=` is accepted as `~=`. `#` starts a comment (like `--`). Avoid both in new code.
 - `continue` exists and works inside loops. It is fine to use.
-- `{&h &a}` pre-allocates a table (`2^h` hash slots, `a` array slots), e.g. `{&1 &8}`. See [Performance](#performance).
+- `{&h &a}` pre-allocates a table for `h` hash entries (rounded up to a power of two) and `a` array entries, e.g. `{&1 &8}`. See [Performance](#performance).
 - There is no `#t` length operator (`#` is a comment). Use `table.getn` / `table.getsize`. Varargs use the implicit `arg` table (`arg.n`), not `select('#', ...)`.
 - **Indexing `nil` returns `nil` instead of raising an error.** Standard Lua errors here, so this is easy to miss. `local v = t.a.b` is `nil` when `t` or `t.a` is `nil`, and much of the repo relies on this for implicit nil checks in access chains (`if t[1].a then` is safe when `t[1]` is missing). Don't "fix" such chains with extra `and` guards, and don't assume they are bugs. What still errors:
   - Calling `nil` (`t.a.b()` when `b` is missing).
