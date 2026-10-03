@@ -251,7 +251,7 @@ Benchmarks live in [lua/benchmarks/](lua/benchmarks/). Each file sets `ModuleNam
 ## Code style
 
 - Annotate everything new (see [annotation.md](annotation.md)): `---` description on every function and class, `@param`/`@return` with types, `---@field` for every class field. The FA Lua VS Code extension / LuaLS depends on these.
-- Comments: declarative, succinct, no trailing period on single-sentence comments, no em-dashes.
+- Comments: declarative, succinct, no period at the end of a comment (periods between sentences are fine), no em-dashes.
 - 4-space indentation. Follow the [Lua Style Guide](http://lua-users.org/wiki/LuaStyleGuide).
 - Match surrounding code. Much of the tree is legacy GPG code with its own style; don't reformat code you aren't changing.
 
