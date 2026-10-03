@@ -857,6 +857,8 @@
 ---@field ZephyrDamageMod number
 --- New Max Radius of the unit
 ---@field NewMaxRadius number
+--- Muzzle bone the gun fires from once the enhancement shows a different barrel
+---@field NewMuzzleBone? Bone
 --- New Rate of Fire of the unit. This is How fast the Gun shoots
 ---@field NewRateOfFire number
 --- New Damage Radius of the unit

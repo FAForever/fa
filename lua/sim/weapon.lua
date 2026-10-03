@@ -71,6 +71,7 @@ local WeaponMethods = moho.weapon_methods
 
 ---@class Weapon : moho.weapon_methods, InternalObject, DebugWeaponComponent
 ---@field AimControl? moho.AimManipulator
+---@field AimControlEnabled? boolean # last value passed to `AimManipulatorSetEnabled`, restored when the aim controller is rebuilt
 ---@field AimLeft? moho.AimManipulator
 ---@field AimRight? moho.AimManipulator
 ---@field Army Army
@@ -304,6 +305,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     ---@param self Weapon
     ---@param enabled boolean
     AimManipulatorSetEnabled = function(self, enabled)
+        self.AimControlEnabled = enabled
         local aimControl = self.AimControl
         if aimControl then
             aimControl:SetEnabled(enabled)
@@ -313,6 +315,88 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     ---@param self Weapon
     GetAimManipulator = function(self)
         return self.AimControl
+    end,
+
+    --- Moves the muzzle of the weapon to another bone, for example onto the longer barrel that an
+    --- enhancement shows. The rack muzzles that used the muzzle of the blueprint follow it, so that
+    --- projectiles and muzzle effects start at the new bone. The aim controller is rebuilt as well:
+    --- the engine computes the firing solution from the muzzle bone the aim controller was created
+    --- with, and without the rebuild the projectiles would fly parallel to the old barrel.
+    ---
+    --- Only this weapon instance changes; the blueprint is shared and stays as it is. Pass `nil` to
+    --- return to the muzzle of the blueprint.
+    ---@param self Weapon
+    ---@param bone? Bone
+    ChangeMuzzleBone = function(self, bone)
+        local blueprint = self:GetBlueprint()
+        local blueprintMuzzle = blueprint.TurretBoneMuzzle
+
+        if bone and not self.unit:ValidateBone(bone) then
+            WARN(string.format('Weapon "%s" can not change its muzzle to bone "%s", it does not exist in the unit mesh'
+                , tostring(blueprint.Label)
+                , tostring(bone)
+            ))
+            return
+        end
+
+        local bp = blueprint
+        if bone and bone ~= blueprintMuzzle then
+            bp = table.copy(blueprint)
+            bp.TurretBoneMuzzle = bone
+            local racks = {}
+            for i, rack in blueprint.RackBones do
+                local muzzles = {}
+                for k, muzzle in rack.MuzzleBones do
+                    if muzzle == blueprintMuzzle then
+                        muzzles[k] = bone
+                    else
+                        muzzles[k] = muzzle
+                    end
+                end
+                racks[i] = table.copy(rack)
+                racks[i].MuzzleBones = muzzles
+            end
+            bp.RackBones = racks
+        end
+
+        if bp == self.Blueprint then
+            return
+        end
+        self.Blueprint = bp
+
+        local aimControl = self.AimControl
+        if not aimControl then
+            return
+        end
+
+        -- a turret with dual manipulators or a second yaw bone keeps controllers that are not tracked here
+        if bp.TurretDualManipulators or bp.TurretBoneDualYaw then
+            WARN(string.format('Weapon "%s" can not rebuild the aim controller of a dual turret, it keeps aiming with the old muzzle'
+                , tostring(bp.Label)
+            ))
+            return
+        end
+
+        local heading, pitch = aimControl:GetHeadingPitch()
+        aimControl:Destroy()
+        self.AimControl = nil
+        self:SetupTurret(bp)
+
+        aimControl = self.AimControl
+        if aimControl then
+            aimControl:SetHeadingPitch(heading, pitch)
+            self:OnAimControlRebuilt(aimControl)
+        end
+    end,
+
+    --- Called after `ChangeMuzzleBone` replaced the aim controller, to carry over state that was set
+    --- on the previous one after the weapon was created.
+    ---@param self Weapon
+    ---@param aimControl moho.AimManipulator
+    OnAimControlRebuilt = function(self, aimControl)
+        if self.AimControlEnabled == false then
+            aimControl:SetEnabled(false)
+        end
     end,
 
     ---@param self Weapon
