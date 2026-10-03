@@ -1,0 +1,1 @@
+- Fix error when an army is defeated related to missing AI platoon functions (#7256).
