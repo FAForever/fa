@@ -617,10 +617,6 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         return
     end
 
-    if import("/lua/ui/game/selection.lua").IsHidden() then
-        return
-    end
-
     -- populate observable and send out a notification
     cachedSelection.oldSelection = oldSelection
     cachedSelection.newSelection = newSelection
