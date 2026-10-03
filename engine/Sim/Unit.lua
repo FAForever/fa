@@ -51,6 +51,7 @@ local Unit = {}
 ---| "MakingAttackRun"
 ---| "HoldingPattern"
 ---| "SiloBuildingAmmo"
+---| "Sacrificing"
 
 ---@class UnitCommand
 ---@field _c_object userdata
@@ -183,7 +184,7 @@ function Unit:GetCurrentLayer()
 end
 
 --- Returns the current move location of the unit
----@return Vector
+---@return Vector | false
 function Unit:GetCurrentMoveLocation()
 end
 
@@ -221,8 +222,10 @@ end
 function Unit:GetHealth()
 end
 
---- Returns the navigator object of this unit
----@return Navigator
+--- Returns the navigator object of this unit. 
+--- 
+--- Returns `nil` for immobile units.
+---@return Navigator?
 function Unit:GetNavigator()
 end
 
@@ -235,6 +238,7 @@ end
 
 --- Returns number of factory/engineer build orders that fit in the specified category
 ---@param category EntityCategory
+---@return integer
 function Unit:GetNumBuildOrders(category)
 end
 
@@ -270,10 +274,13 @@ end
 function Unit:GetShieldRatio()
 end
 
+---@class UnitStat
+---@field Value number
+
 --- Returns the unit's specific statistics
 ---@param statName string
 ---@param defaultVal? number
----@return number
+---@return UnitStat
 function Unit:GetStat(statName, defaultVal)
 end
 
@@ -284,7 +291,7 @@ function Unit:GetTacticalSiloAmmoCount()
 end
 
 --- Returns our target unit if we have one
----@return Entity | Unit | nil
+---@return Entity | Unit | Prop | nil
 function Unit:GetTargetEntity()
 end
 
@@ -297,6 +304,7 @@ end
 function Unit:GetUnitId()
 end
 
+--- Returns unit velocity in ogrids/tick
 ---@return number x
 ---@return number y
 ---@return number z
@@ -320,8 +328,12 @@ end
 function Unit:GetWorkProgress()
 end
 
---- Adds nuclear missiles to the unit.
---- This is the method to call for both SML's and SMD's.
+--- With [FA-Binary-Patches#15](https://github.com/FAForever/FA-Binary-Patches/pull/15),
+--- `InBlocks` makes `amount` set the number of "blocks" for the in-progress tactical or nuclear missile.
+--- A projectile is built out of `10 * (buildTime / buildRate)` blocks.
+--- Use `Unit:GiveNukeSiloBlocks()` to use this feature.
+
+--- Adds nuclear missiles to the unit
 ---@see GiveTacticalSiloAmmo() # for tactical missiles
 ---@param amount number
 ---@param inBlocks? boolean
@@ -537,7 +549,7 @@ function Unit:SetCreator(unit)
 end
 
 --- sets a custom name for the unit, displayed in green text
----@param name string
+---@param name string | number
 function Unit:SetCustomName(name)
 end
 
@@ -728,5 +740,26 @@ end
 ---@return boolean
 function Unit:TransportHasSpaceFor(target)
 end
+
+--- Called by the engine when the unit takes >= 2 times as much damage due to armor multi or handicap divisor.
+---@type fun(self: Unit, type: DamageType)
+Unit.OnExtraDamageDealt = nil
+
+--- Called by the engine when a unit changes motion state,
+--- usually when it attaches/detaches from other entities such as transports.
+---@type fun(self: Unit, new: MotionState, old: MotionState)
+Unit.OnMotionStateChange = nil
+
+--- Called by the engine when the unit starts refueling at an air staging platform.
+---@type fun(self: Unit)
+Unit.OnStartRefueling = nil
+
+--- Called by the engine when the unit runs out of fuel.
+---@type fun(self: Unit)
+Unit.OnRunOutOfFuel = nil
+
+--- Called by the engine when the unit was out of fuel and recharges fuel (either by air staging or by landing).
+---@type fun(self: Unit)
+Unit.OnGotFuel = nil
 
 return Unit

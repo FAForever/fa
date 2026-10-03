@@ -22,6 +22,10 @@
 # SOFTWARE.
 # -----------------------------------------------------------------------------
 
+
+# This script loops through all files in the provided folder and adds
+# functional links to pull request references.
+
 # Function to display usage information
 usage() {
     echo "Usage: $0 <folder_name> <org_name> <repository_name> <base_url>"
@@ -45,13 +49,11 @@ if [ ! -d "$FOLDER_NAME" ]; then
     exit 1
 fi
 
-# Loop through all files in the folder and execute a command
+# Loop through all files in the folder and add links to pull request numbers
 for FILE in "$FOLDER_NAME"/*; 
 do
     if [[ -f "$FILE" && "$FILE" == *.md ]]; then
-        # Replace this with your actual command
-        echo "Executing command on file: $FILE"
-        # Example command
+        echo "Adding links to file: $FILE"
         TMP_FILE=$(mktemp)
         sed -E 's/#([0-9]{4,5})/[#\1](https:\/\/'"$BASE_HOSTNAME"'\/'"$ORG_NAME"'\/'"$REPO_NAME"'\/pull\/\1)/g' "$FILE" > "$TMP_FILE"
         mv "$TMP_FILE" "$FILE"

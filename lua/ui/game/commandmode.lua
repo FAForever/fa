@@ -193,7 +193,7 @@ function StartCommandMode(newCommandMode, data)
 end
 
 --- Called when the command mode ends and deconstructs all the data.
----@param isCancel boolean # set when we're at the end of (a sequence of) order(s), is usually always true. False when the mode is ended with right click, except for "ping" mode.
+---@param isCancel? boolean # set when we're at the end of (a sequence of) order(s), is usually always true. False when the mode is ended with right click, except for "ping" mode.
 function EndCommandMode(isCancel)
     if ignoreSelection then
         return
@@ -249,11 +249,19 @@ function RestoreCommandMode(ignorePreviousCommands)
     end
 end
 
+---@class CommandModeTable
+---@field [1] CommandMode
+---@field [2] CommandModeData
+
 -- allocate the table once for performance
+---@type CommandModeTable
 local commandModeTable = {}
 
 --- Retrieves the current command mode information.
----@return { [1]: CommandModeDataOrder, [2]: CommandModeData }
+--- 
+--- Called by the engine for worldview right click action, left click action, and
+--- engine worldview HandleEvent.
+---@return CommandModeTable
 function GetCommandMode()
     commandModeTable[1] = commandMode
     commandModeTable[2] = modeData
@@ -406,7 +414,7 @@ local function OnGuardUpgrade(guardees, unit)
 
     if upgradeRadarTech2 and
         EntityCategoryContains(categories.STRUCTURE * categories.RADAR * categories.TECH2, unit) and
-        unitBlueprint.Economy.ConsumptionPerSecondEnergy > unit:GetEconData().energyConsumed -- check for any adjacency
+        unitBlueprint.Economy.MaintenanceConsumptionPerSecondEnergy > unit:GetEconData().energyConsumed -- check for any adjacency
     then
         ForkThread(UpgradeUnit, unit)
         return

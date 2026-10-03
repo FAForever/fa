@@ -123,7 +123,7 @@
 ---@field hasBriefing boolean       # flag whether the _strings.lua file has briefing data in it
 
 --- The scenario information with additional fields, as defined once in a session
----@class UISessionSenarioInfo : UIScenarioInfoFile
+---@class UISessionScenarioInfo : UIScenarioInfoFile
 --- These are the actual `<key, value>` pairs that the lobby defines, not the option-factory type
 --- objects the lobby uses
 ---@field Options? GameOptions
@@ -145,7 +145,7 @@ end
 ---@param pathToScenarioInfo any
 ---@return string
 local function GetPathToFolder(pathToScenarioInfo)
-    local splits = StringSplit(pathToScenarioInfo, "/")
+    local splits = string.split(pathToScenarioInfo, "/")
     -- Remove the length of the last token (filename), and the slash character before it.
     return string.sub(pathToScenarioInfo, 1, string.len(pathToScenarioInfo) - string.len(splits[table.getn(splits)]) - 1)
 end
@@ -584,6 +584,60 @@ function GetStartPositionsFromScenario(scenarioInfo, scenarioSave)
     end
 
     return output
+end
+
+---Returns all units' (leaf nodes) positions under the specified group.
+---@param tblNode? table
+---@param positions? Vector[]
+---@return Vector[]
+local function extractUnitPositions(tblNode, positions)
+    positions = positions or {}
+    if not tblNode then return positions end
+
+    for strName, tblData in pairs(tblNode.Units) do
+        if tblData.type == 'GROUP' then
+            positions = extractUnitPositions(tblData, positions)
+        else
+            table.insert(positions, tblData.Position)
+        end
+    end
+
+    return positions
+end
+
+---Extracts wreckage positions from all groups that contain `"wreck"` in their name.
+---@param tblNode? table
+---@param positions? Vector[]
+---@return Vector[]
+local function extractPositionsFromWreckageGroups(tblNode, positions)
+    positions = positions or {}
+    if not tblNode then return positions end
+
+    for strName, tblData in pairs(tblNode.Units) do
+        if tblData.type == 'GROUP' then
+            if string.find(string.lower(strName), "wreck") then
+                positions = extractUnitPositions(tblData, positions)
+            else
+                positions = extractPositionsFromWreckageGroups(tblData, positions)
+            end
+        end
+    end
+
+    return positions
+end
+
+---Returns all unit wreckage positions. Extracted from army groups that contain `"wreck"` in their name.
+---@param scenario UIScenarioSaveFile
+---@return Vector[]
+function GetWreckagePositions(scenario)
+    ---@type Vector[]
+    local positions = {}
+
+    for _, army in pairs(scenario.Armies) do
+        positions = extractPositionsFromWreckageGroups(army.Units, positions)
+    end
+
+    return positions
 end
 
 --#endregion

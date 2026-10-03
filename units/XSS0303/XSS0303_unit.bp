@@ -137,6 +137,7 @@ UnitBlueprint{
         SelectionCenterOffsetZ = 9.1,
         SelectionSizeX = 2.8,
         SelectionSizeZ = 3.2,
+        UISelection = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Factory', LodCutoff = 'UnitMove_LodCutoff' },
     },
     Footprint = {
         SizeX = 5,
@@ -263,6 +264,7 @@ UnitBlueprint{
             CannotAttackGround = true,
             CollideFriendly = false,
             Damage = 60,
+            DamageRadius = 1,
             DamageType = "Normal",
             DisplayName = "Losaare AA Autocannon",
             FireTargetLayerCapsTable = { Water = "Air" },
@@ -323,6 +325,7 @@ UnitBlueprint{
             CannotAttackGround = true,
             CollideFriendly = false,
             Damage = 60,
+            DamageRadius = 1,
             DamageType = "Normal",
             DisplayName = "Losaare AA Autocannon",
             FireTargetLayerCapsTable = { Water = "Air" },

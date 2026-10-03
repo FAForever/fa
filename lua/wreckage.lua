@@ -11,6 +11,7 @@ local Prop = import("/lua/sim/prop.lua").Prop
 local CreateProp = CreateProp
 
 ---@class Wreckage : Prop
+---@field AssociatedBP BlueprintId BlueprintID of the unit
 Wreckage = Class(Prop) {
 
     IsWreckage = true,
@@ -62,7 +63,7 @@ Wreckage = Class(Prop) {
     ---@return Wreckage
     Clone = function(self)
         local clone = CreateWreckage(
-            __blueprints[self.AssociatedBP],
+            __blueprints[self.AssociatedBP] --[[@as UnitBlueprint]],
             self.CachePosition,
             self:GetOrientation(),
             self.MaxMassReclaim,
@@ -98,7 +99,7 @@ Wreckage = Class(Prop) {
         if not rebuilders[1] then return end
         local pos = self:GetPosition()
         for _, u in rebuilders do
-            IssueBuildMobile({u}, pos, bpid, {})
+            IssueToUnitBuildMobile(u, pos, bpid, {})
         end
         if assisters[1] then
             IssueGuard(assisters, pos)
@@ -112,11 +113,11 @@ Wreckage = Class(Prop) {
 ---@param orientation Quaternion
 ---@param mass number
 ---@param energy number
----@param time number
+---@param timeMult number
 ---@param deathHitBox? table
 ---@return Wreckage
-function CreateWreckage(bp, position, orientation, mass, energy, time, deathHitBox)
-    local prop = CreateProp(position, bp.Wreckage.Blueprint)
+function CreateWreckage(bp, position, orientation, mass, energy, timeMult, deathHitBox)
+    local prop = CreateProp(position, bp.Wreckage.Blueprint) --[[@as Wreckage]]
     prop:SetOrientation(orientation, true)
     prop:SetScale(bp.Display.UniformScale)
 
@@ -150,7 +151,7 @@ function CreateWreckage(bp, position, orientation, mass, energy, time, deathHitB
 
     -- set collision box and reclaim values, the latter depends on the health of the wreck
     prop:SetPropCollision('Box', cx, cy, cz, sx, sy, sz)
-    prop:SetMaxReclaimValues(time, mass, energy)
+    prop:SetMaxReclaimValues(timeMult, mass, energy)
 
     --FIXME: SetVizToNeurals('Intel') is correct here, so you can't see enemy wreckage appearing
     -- under the fog. However the engine has a bug with prop intel that makes the wreckage

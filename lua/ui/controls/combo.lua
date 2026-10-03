@@ -400,7 +400,7 @@ Combo = ClassUI(Group) {
     -- get the index selected (1 based!) and the item
     ---@param self Combo
     ---@return number
-    ---@return number|nil
+    ---@return string | number | nil
     GetItem = function(self)
         local sel = self._list:GetSelection()
         if sel >= 0 then

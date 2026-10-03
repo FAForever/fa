@@ -9,7 +9,7 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 140,
+                    LODCutoff = 130,
                     ShaderName = "TMeshAlpha",
                     NormalsName = "sw_bush01_normalsTS.dds",
                 },

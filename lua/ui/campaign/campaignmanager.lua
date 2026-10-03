@@ -49,6 +49,7 @@ diffKeyToDiffInt = {
 }
 
 -- this is sync'd from the sim, so it should be authoritative
+---@type boolean
 campaignMode = false
 
 --- # Campaign table format:

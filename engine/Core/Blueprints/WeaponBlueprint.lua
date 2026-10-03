@@ -21,6 +21,7 @@
 
 ---@class WeaponBlueprint: Blueprint
 --- During blueprint loading, which Label to look for when merging into a weapon blueprint.
+--- If the original weapon has multiple weapons with that label, they are all merged into.
 ---@field MergeLabel? string
 --- During blueprint loading, if `MergeLabel` is not found, which index the weapon should be added at.  
 --- For example, index 1 controls the unit's weapon AI. Defaults to adding to the end of the `Weapon` table.
@@ -36,8 +37,14 @@
 ---@field AimsStraightOnDisable boolean
 --- always recheck for better target regardless of whether you already have one or not
 ---@field AlwaysRecheckTarget boolean
+--- animation played by the weapon's Rack Salvo Charge Sequence
+---@field AnimationCharge? FileName
+--- How fast the charge animation runs
+---@field AnimationChargeRate? number
 --- animation played by the weapon's Rack Salvo Reload Sequence
 ---@field AnimationReload? FileName
+--- How fast the reload animation runs
+---@field AnimationReloadRate? number
 --- if an anti-artillery shield will block this projectile
 ---@field ArtilleryShieldBlocks? boolean
 --- information about the audio files used by the weapon
@@ -77,7 +84,8 @@
 ---@field CollideFriendly boolean
 --- beams fire without stopping - overrides `RateOfFire`
 ---@field ContinuousBeam boolean
---- this projectile needs to be built and stored before the weapon can fire
+--- This projectile needs to be built and stored before the weapon can fire.
+--- Makes the engine check if the weapon has silo ammo before being allowed to fire.
 ---@field CountedProjectile? boolean
 --- damage value of the projectile fired from the weapon
 ---@field Damage number
@@ -212,7 +220,8 @@
 --- sets `AlwaysRecheckTarget = false` and prevents automatic target resetting
 --- so that bombers don't retarget halfway through a bombing run
 ---@field NeedToComputeBombDrop? boolean
---- if the unit is set as "busy" while the weapon charges
+--- Controls whether the unit is set as "busy" while the weapon charges/reloads/fires. Set to `true` to allow
+--- other weapons to fire/unit actions to occur while this weapon is working.
 ---@field NotExclusive? boolean
 ---@field NoPause any unused
 --- The damage that the inner ring of the nuke does in each segment. The outer damage will also end
@@ -237,11 +246,11 @@
 --- The total time in seconds it takes the outer damage ring to apply its damage from the epicenter
 --- of the nuke to its outer ring radius. If `0` or `1`, this behaves as a damage area.
 ---@field NukeOuterRingTotalTime? number
---- nuke weapon flag
+--- Flag that makes weapons valid for nuke orders and makes them use nuke silo ammo.
 ---@field NukeWeapon? boolean
 ---@field Overcharge? WeaponBlueprintOvercharge
 --- overcharge weapon flag
----@field OverchargeWeapon? boolean
+---@field OverChargeWeapon? boolean
 --- flag that specifies if the weapon prefers to target what the primary weapon is currently
 --- targeting
 ---@field PrefersPrimaryWeaponTarget? boolean
@@ -279,7 +288,9 @@
 ---@field RateOfFire number
 --- if this weapon will find new target on miss events
 ---@field ReTargetOnMiss? boolean
---- if `true`, will set the orange work progress bar to display the reload progress of this weapon
+--- if `true`, will set the orange work progress bar to display the reload progress of this weapon.
+--- Should not be used for units with silo weapons, as the work progress of the reload will transfer
+--- as silo build progress after unit transfer.
 ---@field RenderFireClock? boolean
 --- used by the XSL0402 (Othuy "lighting storm") to define the time to re-aquire a new target before going
 --- through the next lighting strike process
@@ -372,6 +383,8 @@
 --- as a moble artillery unit or when a unit is required to be stationary during an unpack / repack
 --- sequence.
 ---@field WeaponUnpackLocksMotion? boolean
+--- Deprecated. Use `WeaponUnpackLocksMotion` instead.
+---@field WeaponUnpackLockMotion? boolean
 --- time the unit will take to unpack the weapon
 ---@field WeaponUnpackTimeout? number
 --- if the weapon must unpack before it's ready to fire

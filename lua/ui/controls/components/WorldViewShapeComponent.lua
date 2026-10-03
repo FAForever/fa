@@ -57,7 +57,7 @@ WorldViewShapeComponent = ClassSimple {
     RemoveShape = function(self, id)
         self.Shapes[id] = nil
 
-        if table.empty(self.Shapes) then
+        if table.empty(self.Shapes) and not IsDestroyed(self) then
             self:SetCustomRender(false)
         end
     end,

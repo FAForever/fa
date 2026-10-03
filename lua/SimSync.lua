@@ -1,9 +1,18 @@
 ---@declare-global
 
+---@class SyncEventData
+---@field ACUDestroyed? Sync.Event.ACUDestroyed[]
+
 -- The global sync table is copied to the user layer every time the main and sim threads are
 -- synchronized on the sim beat (which is like a tick but happens even when the game is paused)
 ---@class SyncTable: table
 ---@field EnhanceRestrict table<Enhancement, true>
+---@field Ping SyncPingData[]
+---@field Score GameScoreData # Filtered based on game state.
+---@field FocusArmyChanged? { new: integer, old: integer }
+---@field Cheaters? { [integer]: integer, CheatsEnabled: boolean } # Created by the engine. Array part is cheating command source indices.
+---@field Events? SyncEventData # used by UI mods such as supreme score board
+---@field Reclaim table<EntityId, {mass: number, position: Vector}|false>
 Sync = { }
 
 local SyncDefaults = {
@@ -19,6 +28,7 @@ end
 
 ---@class UnitSyncData
 ---@field WepPriority? UnitSyncWepPriority
+---@field Buffs? BuffName[] # Buffs affecting this unit
 
 -- UnitData that has been synced. We keep a separate copy of this so when we change
 -- focus army we can resync the data.
@@ -31,6 +41,7 @@ UnitData = {}
 ---@type EnhancementSyncTable
 SimUnitEnhancements = {}
 
+--- Called by the engine every sim beat
 function ResetSyncTable()
     local sync = Sync
     for k, v in sync do
@@ -107,6 +118,11 @@ function SyncUnitEnhancements()
     Sync.UserUnitEnhancements = sync
 end
 
+--- Called by the engine when using the console command `DebugMoveCamera`
+---@param x0 number
+---@param y0 number
+---@param x1 number
+---@param y1 number
 function DebugMoveCamera(x0,y0,x1,y1)
     local Camera = import("/lua/simcamera.lua").SimCamera
     local cam = Camera("WorldCamera")
@@ -138,6 +154,9 @@ function OnPostLoad()
     Sync.IsSavedGame = true
 end
 
+--- Called by the engine when the focus army changes
+---@param new integer
+---@param old integer
 function NoteFocusArmyChanged(new, old)
     import("/lua/simping.lua").OnArmyChange()
     import("/lua/sim/recall.lua").OnArmyChange()
@@ -165,7 +184,7 @@ function FloatingEntityText(entityId, text)
 end
 
 function StartCountdown(entityId, duration)
-    cdDuration = duration or 5
+    local cdDuration = duration or 5
     if not entityId then
         WARN('Trying to start countdown text with no entityId.')
         return false

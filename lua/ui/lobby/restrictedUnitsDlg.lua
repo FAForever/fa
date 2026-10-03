@@ -32,7 +32,7 @@ function CreateDialog(parent, initialRestrictions, OnOk, OnCancel, isHost)
     dialog.Width:Set(300)
     dialog.Height:Set(450)
     
-    dialog.border = CreateBorder(dialog)
+    dialog.border = UIUtil.CreateSCXMenuPanelBorder(dialog)
     dialog.brackets = UIUtil.CreateDialogBrackets(dialog, 118, 106, 118, 104)
     
     local title = UIUtil.CreateText(dialog, "<LOC restricted_units_dlg_0000>Unit Manager", 20, UIUtil.titleFont)
@@ -234,55 +234,4 @@ function CreateDialog(parent, initialRestrictions, OnOk, OnCancel, isHost)
 
     UIUtil.MakeInputModal(dialog, function() okBtn.OnClick(okBtn) end, function() cancelBtn.OnClick(cancelBtn) end)
     UIUtil.CreateWorldCover(dialog)    
-end
-
-function CreateBorder(parent)
-    local tbl = {}
-    tbl.tl = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_ul.dds'))
-    tbl.tm = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_horz_um.dds'))
-    tbl.tr = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_ur.dds'))
-    tbl.l = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_vert_l.dds'))
-    tbl.r = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_vert_r.dds'))
-    tbl.bl = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_ll.dds'))
-    tbl.bm = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_lm.dds'))
-    tbl.br = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_lr.dds'))
-    
-    tbl.tl.Bottom:Set(parent.Top)
-    tbl.tl.Right:Set(parent.Left)
-    
-    tbl.tr.Bottom:Set(parent.Top)
-    tbl.tr.Left:Set(parent.Right)
-    
-    tbl.tm.Bottom:Set(parent.Top)
-    tbl.tm.Right:Set(parent.Right)
-    tbl.tm.Left:Set(parent.Left)
-    
-    tbl.l.Bottom:Set(parent.Bottom)
-    tbl.l.Top:Set(parent.Top)
-    tbl.l.Right:Set(parent.Left)
-    
-    tbl.r.Bottom:Set(parent.Bottom)
-    tbl.r.Top:Set(parent.Top)
-    tbl.r.Left:Set(parent.Right)
-    
-    tbl.bl.Top:Set(parent.Bottom)
-    tbl.bl.Right:Set(parent.Left)
-    
-    tbl.br.Top:Set(parent.Bottom)
-    tbl.br.Left:Set(parent.Right)
-    
-    tbl.bm.Top:Set(parent.Bottom)
-    tbl.bm.Right:Set(parent.Right)
-    tbl.bm.Left:Set(parent.Left)
-    
-    tbl.tl.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.tm.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.tr.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.l.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.r.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.bl.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.bm.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.br.Depth:Set(function() return parent.Depth() - 1 end)
-    
-    return tbl
 end

@@ -40,9 +40,9 @@ XES0205 = ClassUnit(TShieldSeaUnit, ShieldEffectsComponent) {
     OnShieldEnabled = function(self)
         TShieldSeaUnit.OnShieldEnabled(self)
         ShieldEffectsComponent.OnShieldEnabled(self)
-        if self.ShieldEffectsBag then 
+        if self.ShieldEffectsBag then
             for _, v in self.ShieldEffectsBag do
-                v:OffsetEmitter(0, -0.15, 0.35)
+                v:OffsetEmitter(0, -0.12, 0.155)
             end
         end
     end,

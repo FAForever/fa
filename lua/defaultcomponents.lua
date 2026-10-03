@@ -1,6 +1,8 @@
 local Buff = import("/lua/sim/buff.lua")
 local Entity = import("/lua/sim/entity.lua").Entity
 
+local IsDestroyed = IsDestroyed
+
 ---@class ShieldEffectsComponent : Unit
 ---@field Trash TrashBag
 ---@field ShieldEffectsBag TrashBag
@@ -251,6 +253,7 @@ IntelComponent = ClassSimple {
 
             --- display progress
             for k = 1, ticks do
+                if self.Dead or IsDestroyed(self) then return end
 
                 -- prevent changing work progress when we are doing work (such as an enhancement)
                 if not self.WorkItem then
@@ -417,14 +420,27 @@ TreadComponent = ClassSimple {
 
     ---@param self Unit | TreadComponent
     CreateMovementEffects = function(self)
+        -- early exit: do not create treads if we do not have the blueprint
         local treads = self.TreadBlueprint
         if not treads then
+            return
+        end
+
+        -- early exit: do not create treads if we're in the air or on water
+        local layer = self.Layer
+        if layer == "Air" or layer == "Water" then
+            return
+        end
+
+        -- early exit: do not create treads if we are attached to something (like a transport)
+        if self:IsUnitState("Attached") then
             return
         end
 
         if treads.ScrollTreads then
             self:AddThreadScroller(1.0, treads.ScrollMultiplier or 0.2)
         end
+
         local treadMarks = treads.TreadMarks
         local treadType = self.TerrainType.Treads
         if treadMarks and treadType and treadType ~= 'None' then
@@ -615,7 +631,7 @@ VeterancyComponent = ClassSimple {
     ---@param self VeterancyComponent | Unit
     ---@param instigator Unit
     ---@param amount number
-    ---@param vector Vector unused
+    ---@param vector? Vector unused
     ---@param damageType DamageType unused
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         amount = MathMin(amount, self:GetMaxHealth())

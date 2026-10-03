@@ -15,8 +15,8 @@ function AIChat(group, text, sender)
             return
         end
         ChatTo:Set(group)
-        msg = { to = ChatTo(), Chat = true }
-        msg.text = text
+        local msg = { to = ChatTo(), Chat = true }
+        msg.text = LOC(text) or text
         msg.aisender = sender
         local armynumber = GetArmyData(sender)
         if ChatTo() == 'allies' then
@@ -66,11 +66,11 @@ function AISendChatMessage(towho, msg)
         if towho then
             for k,v in towho do
                 if v == focus then
-                    import("/lua/ui/game/chat.lua").ReceiveChat(msg.aisender, msg)
+                    import("/lua/ui/game/chat/ChatController.lua").OnReceive(msg.aisender, msg)
                 end
             end
         else
-            import("/lua/ui/game/chat.lua").ReceiveChat(msg.aisender, msg)
+            import("/lua/ui/game/chat/ChatController.lua").OnReceive(msg.aisender, msg)
         end
     elseif msg.Taunt then
         import("/lua/ui/game/taunt.lua").RecieveAITaunt(msg.aisender, msg)
@@ -93,5 +93,3 @@ function GetArmyData(army)
     return result
 end
 
---- Kept for backwards compatibility
-local Chat = import("/lua/ui/game/chat.lua")

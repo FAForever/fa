@@ -55,7 +55,7 @@ end
 
 --- Transforms the camera to be able to view the entire region
 ---@param region Rectangle
----@param seconds? number
+---@param seconds? number # Do not set to 0; that causes the camera to zoom onto the center of the map instead of the cursor
 function CameraImpl:MoveToRegion(region, seconds)
 end
 
@@ -73,7 +73,7 @@ function CameraImpl:Reset()
 end
 
 --- Applies the provided settings to the camera
----@see `CameraImpl:SaveSettings` to retrieve the settings
+---@see Camera.SaveSettings to retrieve the settings
 ---@param settings UserCameraSettings
 function CameraImpl:RestoreSettings(settings)
 end
@@ -83,7 +83,7 @@ function CameraImpl:RevertRotation()
 end
 
 --- Returns the current camera settings
----@see `CameraImpl:RestoreSettings` to apply the settings
+---@see Camera.RestoreSettings to apply the settings
 ---@return UserCameraSettings
 function CameraImpl:SaveSettings()
 end
@@ -94,7 +94,8 @@ function CameraImpl:SetAccMode(accTypeName)
 end
 
 --- Sets zoom scale to allow zooming past or before the point where map fills control
-function CameraImpl:SetMaxZoomMult()
+---@param max number
+function CameraImpl:SetMaxZoomMult(max)
 end
 
 --- 

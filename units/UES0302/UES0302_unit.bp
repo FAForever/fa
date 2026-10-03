@@ -3,6 +3,7 @@ UnitBlueprint{
     AI = {
         AttackAngle = 60,
         GuardReturnRadius = 15,
+        GuardScanRadius = 165,
         TargetBones = {
             "UES0302",
             "Front_Turret01",

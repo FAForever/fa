@@ -988,13 +988,13 @@ BuilderGroup {
         BuilderType = 'Any',
     },
     Builder {
-        BuilderName = 'T2 Shield UEF Seraphim',
+        BuilderName = 'T2 Shield UEF Aeon Seraphim',
         PlatoonTemplate = 'T2Shield',
         Priority = 5,
         InstanceCount = 2,
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
-            { MIBC, 'FactionIndex', {1, 4}},
+            { MIBC, 'FactionIndex', {1, 2, 4}},
             { EBC, 'GreaterThanMassStorageCurrent', { 150 }},
             { EBC, 'GreaterThanEconIncomeOverTime',  { 7, 350}},
             { EBC, 'GreaterThanEconEfficiencyCombined', { 0.85, 1.2 }},

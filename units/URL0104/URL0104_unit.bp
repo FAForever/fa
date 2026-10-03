@@ -205,7 +205,7 @@ UnitBlueprint{
             BallisticArc = "RULEUBA_None",
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 16,
+            Damage = 14,
             DamageType = "Normal",
             DisplayName = "Nanodart Launcher",
             FireTargetLayerCapsTable = { Land = "Air" },

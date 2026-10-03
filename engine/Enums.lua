@@ -53,7 +53,7 @@
 ---| "RULEUMT_Amphibious"
 ---| "RULEUMT_Hover"
 ---| "RULEUMT_AmphibiousFloating"
----| "RULEUMT_Special"
+---| "RULEUMT_Special" # Identical to None
 
 ---@alias UnitBuildRestriction
 ---| "RULEUBR_None"
@@ -86,6 +86,12 @@
 ---| "Water"
 ---| "Air"
 ---| "Orbital"
+
+---@alias MotionState
+---| "None"         # Unit is moving normally
+---| "Attached"     # Unit attached to entity (ex: transport, factory)
+---| "Ballistic"    # Unit detached from entity and now falling
+---| "Crashed"      # Unit that was falling crashed to the ground
 
 ---@alias HorizontalMovementState
 ---| 'TopSpeed'
@@ -132,8 +138,8 @@
 ---| "Invalid"
 ---| "Terrain"
 ---| "Water"
----| "Air"
----| "Underwater"
+---| "Air" # Caused by end of lifetime
+---| "Underwater" # Caused by end of lifetime
 ---| "Projectile"
 ---| "ProjectileUnderwater"
 ---| "Prop"

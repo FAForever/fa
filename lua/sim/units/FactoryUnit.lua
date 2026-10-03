@@ -141,7 +141,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
         end
 
         -- Factory can stop building but still have an unbuilt unit if a mobile build order is issued and the order is cancelled
-        if unitBeingBuilt:GetFractionComplete() < 1 then
+        if not IsDestroyed(unitBeingBuilt) and unitBeingBuilt:GetFractionComplete() < 1 then
             unitBeingBuilt:Destroy()
         end
 
@@ -201,8 +201,11 @@ FactoryUnit = ClassUnit(StructureUnit) {
 
     ---@param self FactoryUnit
     OnFailedToBuild = function(self)
-        -- Instantly clear the build area so the next build can start, since unit `Destroy` doesn't do so.
-        self.UnitBeingBuilt:SetCollisionShape('None')
+        local unitBeingBuilt = self.UnitBeingBuilt
+        if unitBeingBuilt and not unitBeingBuilt.Dead then
+            -- Instantly clear the build area so the next build can start, since unit `Destroy` doesn't do so.
+            unitBeingBuilt:SetCollisionShape("None")
+        end
         StructureUnitOnFailedToBuild(self)
         self.FactoryBuildFailed = true
         self:StopBuildFx()
@@ -470,7 +473,9 @@ FactoryUnit = ClassUnit(StructureUnit) {
     },
 
     UpgradingState = State(StructureUnit.UpgradingState) {
-        --- Adapted from StructureUnit to unblock the build area when the factory upgrade finishes.
+        --- Copied from `StructureUnit.UpgradingState.OnStopBuild` and modified
+        --- to unblock the build area when the factory upgrade finishes.
+        ---@see StructureUnit.UpgradingState.OnStopBuild
         ---@param self FactoryUnit
         ---@param unitBuilding Unit
         ---@param order string

@@ -1,0 +1,97 @@
+# Copyright (c) 2024 FAForever
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+name: Pull Request preparation
+
+on:
+  pull_request:
+    types:
+      - opened
+
+permissions:
+  pull-requests: write
+
+jobs:
+  greetings:
+    name: Greet first-time contributors
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post welcome comment
+        uses: actions/first-interaction@v1.3.0
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-message: |
+            Hello,
+            it seems this is your first contribution.
+            Please read our [contribution guidelines](CONTRIBUTING.md) to understand how to proceed.
+
+  prepare_pr:
+    name: Prepare pull request
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
+
+      - name: Add snippet
+        working-directory: changelog/snippets
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          LABELS: "${{ toJson(github.event.pull_request.labels.*.name) }}"
+        run: |
+          # Configure git
+          git config user.email "github@faforever.com"
+          git config user.name "FAForever Machine User"
+
+          category="category"
+          template="sections/template-snippet.md"
+
+          if echo "$LABELS" | grep -q 'area: graphics'; then
+            category="graphics"
+          elif echo "$LABELS" | grep -q 'area: AI'; then
+            category="ai"
+          elif echo "$LABELS" | grep -q 'area: balance idea'; then
+            category="balance"
+            template="sections/template-snippet-balance.md"
+          elif echo "$LABELS" | grep -q -E 'area: documentation|area: tooling'; then
+            category="other"
+          elif echo "$LABELS" | grep -q 'type: bug'; then
+            category="fix"
+          fi
+
+          file="${category}.${PR_NUMBER}.md"
+          cp "$template" "$file"
+          sed -i "s/PR_NUMBER/${PR_NUMBER}/g" "$file"
+
+          git add .
+          git commit -m "Add snippet template"
+          git push
+
+      - name: Convert PR to draft
+        run: gh pr ready --undo ${{ github.event.pull_request.number }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}

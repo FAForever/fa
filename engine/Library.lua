@@ -19,7 +19,7 @@
 ---@field maxstack number
 
 ----------
--- Moho discrepancies
+--#region Moho discrepancies
 ----------
 
 -- variables set from the engine
@@ -27,14 +27,19 @@
 LaunchDir = ""      -- filled with whatever directory the exe is in
 __EngineStats = { } -- populated by the engine, each frame in the UI thread
 
---- Returns the bitwise XOR of a and b, coercing to integers. Returns `4294967296` (2^^32) if the
---- signs don't match.
+--- Returns a to the power of b.
+---
+--- Note: this is not the ^ operator, which is XOR, this is a separate function.
+---@see math.pow Identical function.
 ---@param a number
 ---@param b number
 ---@return integer
 function __pow(a, b)
 end
 
+--- Prints to the moho logger with "info:" prefix. Unlike LOG, doesn't add the prefix for newlines.
+--- 
+---@see LOG
 ---@param out any
 ---@param ... any
 function _ALERT(out, ...)
@@ -56,12 +61,18 @@ function lazyimport(path)
 end
 
 --- Print a message to the moho logger, this shouldn't be used in production code
+--- 
+---@see _ALERT To not add a prefix for newlines.
 ---@param out any
 ---@param ... any
 function LOG(out, ...)
 end
 
-function LuaDumpBinary()
+--- Compiles a source file into a binary lua file that can be loaded using dofile but cannot be hooked.
+---@param sourcePath FileName
+---@param outputPath FileName
+---@return boolean success
+function LuaDumpBinary(sourcePath, outputPath)
 end
 
 ---@return any[]
@@ -74,6 +85,7 @@ function debug.allocatedsize(obj)
 end
 
 --- Returns a cached table of all table allocations tracked between calls of `debug.trackallocations(true)` and `debug.trackallocations(false)`.
+--- Since it is cached, make sure to clear it or mark seen objects after you finish tracking.
 ---@return table<any, string>
 function debug.allocinfo()
 end
@@ -118,14 +130,23 @@ end
 function debug.trackallocations(doTrack)
 end
 
--- these are available in the initfile, but are removed from the game
-io = nil
-os = nil
-
 --- Returns if the table is empty
 ---@param table table
 ---@return boolean
 function table.empty2(table)
+end
+
+---@generic T
+---@param list any
+---@param callback fun(key: integer, value: any):T|nil
+---@return T|nil
+function table.foreachi(list, callback) end
+
+---@generic T
+---@param list T[]
+---@return integer
+---@nodiscard
+function table.getn(list)
 end
 
 --- Returns the size of a list
@@ -140,6 +161,15 @@ table.getsize = nil
 ---@param table table
 ---@return integer
 function table.getsize2(table)
+end
+
+--- Sets the size index `n` in the table or in its internal table.  
+--- `n` is used in the table library functions and can also be retrieved using `table.getn`.
+---
+--- [View Online Documentation](https://www.lua.org/pil/19.1.html)
+---@param table table
+---@param n number # floored to int
+function table.setn(table, n)
 end
 
 serialize = {}
@@ -164,17 +194,34 @@ end
 function string.lualex(str)
 end
 
+--#region these are available in the init file, but are removed from the game
+
+--- Only available in the init file.
+io = nil
+--- Only available in the init file.
+os = nil
+
+---
+---Dynamically links the host program with the C library `libname`.
+---
+---Only available in the init file.
+---
+---[View documents](command:extension.lua.doc?["en-us/51/manual.html/pdf-package.loadlib"])
+---
+---@param libname string
+---@param funcname string
+---@return any
+function loadlib(libname, funcname)
+end
+
+--#endregion
+
 ----------
---- Version discrepancies
+--#region Version discrepancies
 ----------
 
 _LOADED = {} -- used by `requires`
 _VERSION = "Lua 5.0.1" -- override the version from the extension
-
----@param libname string
----@param funcname string
-function loadlib(libname, funcname)
-end
 
 -- renamed in 5.1
 math.mod = math.fmod
@@ -208,3 +255,4 @@ string.pack           = nil
 string.packsize       = nil
 string.reverse        = nil
 string.unpack         = nil
+--#endregion
