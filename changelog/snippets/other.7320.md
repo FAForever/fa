@@ -1,1 +1,1 @@
-- Your explanation here... [Don't forget to change the category in the filename] (#7320).
+- Fix documentation of the table pre-allocation syntax (#7320).
