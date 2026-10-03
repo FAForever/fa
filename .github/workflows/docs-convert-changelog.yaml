@@ -18,26 +18,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-name: Convert Markdown changelog to Lua
+name: Convert all Markdown changelogs to Lua
 
 on:
-  workflow_dispatch:
-    inputs:
-      reference:
-        required: true
-        type: choice
-        description: The reference (branch or tag) to use to compile the changelog snippets from
-        options:
-          - develop
-          - deploy/fafbeta
-          - deploy/fafdevelop
-
   workflow_call:
     inputs:
-      reference:
-        required: true
+      branch:
         type: string
-        description: The reference (branch or tag) to use to compile the changelog snippets from
+        required: true
+        description: The branch to check out
+      additional-changelog:
+        type: string # fafdevelop or fafbeta
+        description: Add changelog entry for current fafdevelop or fafbeta changes
 
 jobs:
   convert_changelog:
@@ -49,14 +41,49 @@ jobs:
           echo "SCRIPTS=.github/workflows/scripts/python" >> $GITHUB_ENV
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
+          ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
+          ref: ${{ inputs.branch }}
           sparse-checkout: |
-            ${{ env.SCRIPTS }}
-            changelog
+            changelog/snippets
+            docs/_posts
+            lua/ui/lobby
+            .github/workflows
+
+      - name: Download develop changelog
+        if: inputs.additional-changelog == 'fafdevelop'
+        # No artifact exists when there are no snippets to process
+        continue-on-error: true
+        uses: actions/download-artifact@v7
+        with:
+          name: changelog-fafdevelop
+
+      - name: Add develop changelog
+        if: inputs.additional-changelog == 'fafdevelop'
+        run: |
+          FILE="${{ github.workspace }}/docs/_posts/fafdevelop.md"
+          cat changelog/snippets/sections/template-header-fafdevelop.md >> "$FILE"
+          # the changelog file might not exist
+          if [ -f changelog-fafdevelop.md ]; then cat changelog-fafdevelop.md >> "$FILE"; fi
+
+      - name: Download beta changelog
+        if: inputs.additional-changelog == 'fafbeta'
+        # No artifact exists when there are no snippets to process
+        continue-on-error: true
+        uses: actions/download-artifact@v7
+        with:
+          name: changelog-fafbeta
+
+      - name: Add beta changelog
+        if: inputs.additional-changelog == 'fafbeta'
+        run: |
+          FILE="${{ github.workspace }}/docs/_posts/fafbeta.md"
+          cat changelog/snippets/sections/template-header-fafbeta.md >> "$FILE"
+          if [ -f changelog-fafbeta.md ]; then cat changelog-fafbeta.md >> "$FILE"; fi
 
       - name: Setup python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.8'
 
@@ -67,24 +94,26 @@ jobs:
 
       - name: Convert changelog to Lua
         run: |
-          out_dir=lua_changelog
-          mkdir $out_dir
-          for file in changelog/*.md; do
-            out_file=$(basename ${file%.md}.lua)
-            python3 $SCRIPTS/changelog_markdown2lua.py "${file}" "${out_dir}/${out_file}"
-          done
+          rm -f lua/ui/lobby/changelog/generated/*
+          out_dir=lua/ui/lobby/changelog/generated
+          python3 $SCRIPTS/changelog_markdown2lua.py "docs/_posts" "${out_dir}"
+
+      - name: Create changelog overview in Lua
+        run: |
+          out_dir=lua/ui/lobby/changelog/generated
+          python3 $SCRIPTS/changelog_overview.py "docs/_posts" "${out_dir}/overview.lua"
 
       - name: Add the Lua changelog as an artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: lua_changelog
           path: |
-            lua_changelog
+            lua/ui/lobby/changelog/generated
 
   validate_lua_changelog:
     name: Validate Lua changelog
     runs-on: ubuntu-latest
-    container: faforever/lua:v5.0-1
+    container: faforever/lua:v5.0-3
     needs: convert_changelog
     steps:
       - name: Install tooling
@@ -92,13 +121,13 @@ jobs:
           apk add bash git findutils
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           sparse-checkout: |
             tests/run-syntax-test.sh
 
       - name: Download the Lua changelog artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: lua_changelog
 

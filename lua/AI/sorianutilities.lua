@@ -615,8 +615,8 @@ function FinishAIChat(data)
                         v.ProcessBuild = nil
                     end
                     v.BuilderManagerData.EngineerManager:RemoveUnit(v)
-                    IssueStop({v})
-                    IssueClearCommands({v})
+                    IssueToUnitStop(v)
+                    IssueToUnitClearCommands(v)
                     AISendPing(v:GetPosition(), 'move', data.Army)
                     AISendChat(data.ToArmy, aiBrain.Nickname, 'giveengineer')
                     ChangeUnitArmy(v,data.ToArmy)
@@ -712,7 +712,7 @@ end
 ---     - Launch Time: ~3 seconds
 ---@param platoon Platoon
 ---@param target Unit
----@return boolean
+---@return Vector?
 function LeadTarget(platoon, target)
     -- Get launcher and target position
     local LauncherPos = platoon:GetPlatoonPosition()
@@ -812,14 +812,14 @@ function LeadTarget(platoon, target)
     MissileImpactY = MissileImpactY + (Random(0, TMLRandom) - TMLRandom / 2) / 5
     -- Cancel firing if target is outside map boundries
     if MissileImpactX < 0 or MissileImpactY < 0 or MissileImpactX > ScenarioInfo.size[1] or MissileImpactY > ScenarioInfo.size[2] then
-        return false
+        return
     end
     -- Also cancel if target would be out of weaponrange or inside minimum range.
     local maxRadius = 256
     local minRadius = 15
     local dist3 = VDist2(LauncherPos[1], LauncherPos[3], MissileImpactX, MissileImpactY)
     if dist3 < minRadius or dist3 > maxRadius then
-        return false
+        return
     end
     -- return extrapolated target position / missile impact coordinates
     return {MissileImpactX, Target2SecPos[2], MissileImpactY}
@@ -1058,7 +1058,7 @@ function LaunchNukesTimed(aiBrain, nukesToFire, target)
     local lastFT = nukes[1].flightTime
     for k,v in nukes do
         WaitSeconds(lastFT - v.flightTime)
-        IssueNuke({v.unit}, target)
+        IssueToUnitNuke(v.unit, target)
         lastFT = v.flightTime
     end
 end

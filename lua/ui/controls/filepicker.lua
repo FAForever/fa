@@ -142,10 +142,11 @@ function IsFilenameInvalid(filename)
 end
 
 ---@class FilePicker : Group
+---@overload fun(parent: Control, fileType: SpecialFileType, onlyShowMine: any, selectAction: any, debugName: any): FilePicker
 FilePicker = ClassUI(Group) {
     ---@param self FilePicker
     ---@param parent Control
-    ---@param fileType filetype
+    ---@param fileType SpecialFileType
     ---@param onlyShowMine any
     ---@param selectAction any
     ---@param debugName any

@@ -12,7 +12,7 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 230,
+                    LODCutoff = 360,
                     ShaderName = "NormalMappedTerrain",
                     AlbedoName = "CrysCrystal01_albedo.dds",
                 },

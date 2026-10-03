@@ -1,1 +1,0 @@
-- (#6963) Fix non-area DoT damage dealing damage ticks before waiting the delay between damage ticks.

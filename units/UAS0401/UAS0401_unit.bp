@@ -178,10 +178,10 @@ UnitBlueprint{
         UniformScale = 0.1,
     },
     Economy = {
-        BuildCostEnergy = 380000,
-        BuildCostMass = 24000,
+        BuildCostEnergy = 400000,
+        BuildCostMass = 25000,
         BuildRate = 225,
-        BuildTime = 38400,
+        BuildTime = 40000,
         BuildableCategory = {
             "BUILTBYTIER3FACTORY AEON MOBILE CONSTRUCTION",
             "BUILTBYTIER2FACTORY AEON MOBILE CONSTRUCTION",
@@ -194,6 +194,7 @@ UnitBlueprint{
         SelectionCenterOffsetZ = 4,
         SelectionSizeX = 3,
         SelectionSizeZ = 3,
+        UISelection = Sound { Bank = 'Interface', Cue = 'Aeon_Select_Factory', LodCutoff = 'UnitMove_LodCutoff' },
     },
     General = {
         CommandCaps = {

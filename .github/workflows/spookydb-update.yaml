@@ -34,18 +34,18 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-      # https://github.com/actions/checkout/tree/v4/
+      # https://github.com/actions/checkout/tree/v6/
       - name: Checkout spooky db code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
             repository: FAForever/spooky-db
             path: gh-pages
             ref: gh-pages  
             ssh-key: ${{ secrets.SPOOKYDB_DEPLOYMENT_KEY }}
     
-      # https://github.com/actions/download-artifact/tree/v4/
+      # https://github.com/actions/download-artifact/tree/v7/
       - name: Download recent unit information
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
             name: spookydb-dist
             path: dist
@@ -74,7 +74,7 @@ jobs:
         working-directory: gh-pages
         run: |
             # Check for any differences between the working directory and the latest commit
-            if git diff --quiet; then
+            if [ -z "$(git status --porcelain)" ]; then
                 echo "No changes to deploy"
                 exit 0
             fi

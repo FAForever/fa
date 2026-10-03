@@ -32,7 +32,7 @@ Open up two explorers. Navigate to where you cloned the repository in one. Navig
 
 - `C:\ProgramData\FAForever\bin`
 
-Copy the `init_local_development.lua` file your fork to the the bin folder. The game uses an initialisation file to understand where it should (not) search for game files. The initialisation file you just copied is an adjusted initialisation file that tells the game to also look at your local repository. We still need to tell it where that is. Open up the file that you copied. At the top you'll find:
+Copy the `init_local_development.lua` file from your fork to the bin folder. The game uses an initialisation file to understand where it should (not) search for game files. The initialisation file you just copied is an adjusted initialisation file that tells the game to also look at your local repository. We still need to tell it where that is. Open up the file that you copied. At the top you'll find:
 
 ```lua
 -- change this to the location of the repository on your disk. Note that `\` is used
@@ -64,7 +64,7 @@ For Linux users you can use the following bash script file instead:
 
 # Change this to the location of your run proton run script
 RunProton="$HOME/Applications/FAF/downlords-faf-client-1.6.0/run"
-$RunProton $HOME/.faforever/bin/ForgedAlliance.exe /init init_dev.lua /showlog /log "dev.log" /EnableDiskWatch /nomovie
+$RunProton $HOME/.faforever/bin/ForgedAlliance.exe /init init_local_development.lua /showlog /log "dev.log" /EnableDiskWatch /nomovie
 
 # /init               Define what initialisation file to use
 # /EnableDiskWatch    Allows the game to reload files when it sees they're changed on disk

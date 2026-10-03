@@ -1,1 +1,0 @@
-- (#6975) Fix mass fabricators and extractors applying an additional adjacency bonus when spawned adjacent to a mass consumer through cheats or the unit transfer mechanic.

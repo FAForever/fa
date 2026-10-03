@@ -22,7 +22,7 @@ NukeAOE = ClassSimple {
     end,
 
     ---@param self NukeAOE
-    ---@param instigator Unit
+    ---@param instigator Unit | Projectile | nil
     ---@param pos Vector
     ---@param army AIBrain
     ---@param damageType DamageType
@@ -35,7 +35,7 @@ NukeAOE = ClassSimple {
     end,
 
     ---@param self NukeAOE
-    ---@param instigator Unit
+    ---@param instigator Unit | Projectile | nil
     ---@param pos Vector
     SlowNuke = function(self, instigator, pos)
         local ringWidth = (self.Radius / self.Ticks)

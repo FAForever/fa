@@ -24,7 +24,7 @@ XEA0002 = ClassUnit(TAirUnit) {
     OnDestroy = function(self)
         if not self.IsDying and self.Parent then
             self.Parent.Satellite = nil
-            IssueBuildFactory({ self.Parent }, 'XEA0002', 1)
+            IssueToUnitBuildFactory(self.Parent, 'XEA0002', 1)
         end
         TAirUnit.OnDestroy(self)
     end,
@@ -47,7 +47,7 @@ XEA0002 = ClassUnit(TAirUnit) {
 
         if self.Parent then
             self.Parent.Satellite = nil
-            IssueBuildFactory({ self.Parent }, 'XEA0002', 1)
+            IssueToUnitBuildFactory(self.Parent, 'XEA0002', 1)
         end
 
         TAirUnit.OnKilled(self, instigator, type, overkillRatio)

@@ -26,6 +26,8 @@ doscript '/lua/system/GlobalBuilderTemplate.lua'
 doscript '/lua/system/GlobalBuilderGroup.lua'
 doscript '/lua/system/GlobalBaseTemplate.lua'
 
+doscript '/lua/system/categories.lua'
+
 GameOverListeners = {}
 WaitTicks = coroutine.yield
 
@@ -44,7 +46,8 @@ doscript '/lua/SimHooks.lua'
 -- Set up the sync table and some globals for use by scenario functions
 doscript '/lua/SimSync.lua'
 
-local syncStartPositions = false -- This is held here because the Sync table iFBlobas cleared between SetupSession() and BeginSession()
+---@type table<string, Vector>
+local syncStartPositions -- This is held here because the Sync table is cleared between SetupSession() and BeginSession()
 
 function ShuffleStartPositions(syncNewPositions)
     local markers = ScenarioInfo.Env.Scenario.MasterChain._MASTERCHAIN_.Markers
@@ -112,11 +115,20 @@ function SetupSession()
     -- ScenarioInfo is a table filled in by the engine with fields from the _scenario.lua
     -- file we're using for this game. We use it to store additional global information
     -- needed by our scenario.
+
+    --- Army index to table of platoon names to platoon handles. The name comes from the save.lua file.
+    ---@type table<integer, table<string, Platoon>>
     ScenarioInfo.PlatoonHandles = {}
+    --- Army index to table of unit group names to unit group tables. The name comes from the save.lua file.
+    ---@type table<integer, table<string, Unit[]>>
     ScenarioInfo.UnitGroups = {}
+    --- Army index to table of unit names to unit handles. The name comes from the save.lua file.
+    ---@type table<integer, table<string, Unit>>
     ScenarioInfo.UnitNames = {}
 
     ScenarioInfo.VarTable = {}
+
+    ---@type table<string, integer|boolean>
     ScenarioInfo.OSPlatoonCounter = {}
     ScenarioInfo.BuilderTable = { Air = {}, Land = {}, Sea = {}, Gate = {} }
     ScenarioInfo.BuilderTable.AddedPlans = {}
@@ -205,6 +217,7 @@ function SetupSession()
     doscript('/lua/dataInit.lua')
     doscript(ScenarioInfo.save, ScenarioInfo.Env)
 
+    ---@type Scenario
     Scenario = ScenarioInfo.Env.Scenario
 
     local spawn = ScenarioInfo.Options.TeamSpawn
@@ -221,6 +234,8 @@ function SetupSession()
     doscript(ScenarioInfo.script, ScenarioInfo.Env)
 
     ResetSyncTable()
+    
+    SetupPathfinding()
 end
 
 -- OnCreateArmyBrain() is called by then engine as the brains are created, and we
@@ -457,12 +472,16 @@ end
 
 --- Setup for union army, where all teams can control the units of its allies
 function BeginSessionUnionArmy(teams)
+    SPEW("Initialing session with union army control...")
+
     local humanIndex = 0
     for i, brain in ArmyBrains do
         if brain.BrainType ~= 'Human' then continue end
         for i2, _ in ArmyBrains do
             if not IsAlly(i, i2) then continue end
             SetCommandSource(i2 - 1, humanIndex, true)
+
+            SPEW("Army " .. tostring(i2) .. " control shared with army " .. tostring(i) .. " (source index " .. tostring(humanIndex) .. ")")
         end
         humanIndex = humanIndex + 1
     end
@@ -471,6 +490,8 @@ end
 
 --- Setup for common army, where all teams are batched together into one army
 function BeginSessionCommonArmy(teams)
+    SPEW("Initialing session with common army control...")
+
     local humanIndex = 0
     local IsHuman = {}
     for _, brain in ArmyBrains do
@@ -566,6 +587,20 @@ function OnPostLoad()
     import("/lua/simsync.lua").OnPostLoad()
     if GetFocusArmy() ~= -1 then
         Sync.SetAlliedVictory = ArmyBrains[GetFocusArmy()].RequestingAlliedVictory or false
+    end
+    
+    SetupPathfinding()
+end
+
+-- This changes default navigator's behaviour to make pathfinding more predictable and less frustrating. 
+-- Default value in the engine is 50. When distance between current units positions and 
+-- their final destination point >50, they use some weird pathfinding logic based on hidden waypoints and 
+-- start moving in columns. We disable such behaviour by setting this value to 9999, so navigator
+-- will be using personal positioning instead of waypoints for any move order (doesn't affect "formation move").
+-- useful console commands for debugging: "dbg navwaypoints", "dbg navpath", "dbg navsteering"
+function SetupPathfinding()
+    if rawget(_G, "SetNavigatorPersonalPosMaxDistance") then
+        SetNavigatorPersonalPosMaxDistance(9999)
     end
 end
 

@@ -346,7 +346,6 @@ UnitBlueprint{
             CannotAttackGround = true,
             CollideFriendly = false,
             Damage = 250,
-            DamageRadius = 1,
             DamageType = "Normal",
             DisplayName = "Flayer SAM Launcher",
             FireTargetLayerCapsTable = { Water = "Air" },

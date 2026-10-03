@@ -265,7 +265,6 @@ BuffEffects = {
         end
     end,
 
-    --- Quite confident that this one is broken
     ---@param buffDefinition BlueprintBuff
     ---@param buffValues BlueprintBuffAffect
     ---@param unit Unit
@@ -279,14 +278,12 @@ BuffEffects = {
         local healthadj = val - health
 
         if healthadj < 0 then
-            -- fixme: DoTakeDamage shouldn't be called directly
-            local data = {
-                Instigator = instigator,
-                Amount = -1 * healthadj,
-                Type = buffDefinition.DamageType or 'Spell',
-                Vector = VDiff(instigator:GetPosition(), unit:GetPosition()),
-            }
-            unit:DoTakeDamage(data)
+            unit:OnDamage(
+                instigator,
+                -1 * healthadj,
+                VDiff(instigator:GetPosition(), unit:GetPosition()),
+                buffDefinition.DamageType or 'Spell'
+            )
         else
             unit:AdjustHealth(instigator, healthadj)
         end
@@ -304,13 +301,24 @@ BuffEffects = {
         local unitbphealth = unit:GetBlueprint().Defense.MaxHealth or 1
         local val = BuffCalculate(unit, buffName, 'MaxHealth', unitbphealth)
 
+        val = math.round(val)
+
         local oldmax = unit:GetMaxHealth()
-        local difference = oldmax - unit:GetHealth()
+        local health = unit:GetHealth()
+        local difference = oldmax - health
 
         unit:SetMaxHealth(val)
 
-        if not buffValues.DoNotFill and not unit.IsBeingTransferred then
-            unit:SetHealth(unit, unit:GetMaxHealth() - difference)
+        if not unit.IsBeingTransferred then
+            if not buffValues.DoNotFill then
+                unit:SetHealth(unit, unit:GetMaxHealth() - difference)
+            elseif val < health then
+                -- Set health because it stays above max health until the next AdjustHealth call
+                -- this causes AdjustHealth to be fully absorbed 
+                -- this causes air units to get stuck repairing in air staging
+                -- it also makes DoNotFill buffs seemingly fill HP if the buff was removed and re-applied
+                unit:SetHealth(unit, val)
+            end
         end
     end,
 
@@ -360,8 +368,8 @@ BuffEffects = {
             local wepbp = wep:GetBlueprint()
             local weprad = wepbp.DamageRadius
             local val = BuffCalculate(unit, buffName, 'DamageRadius', weprad)
-
-            wep:SetDamageRadius(val)
+            wep.DamageRadiusMod = val
+            wep.damageTableCache = false
         end
     end,
 
@@ -626,13 +634,13 @@ function RemoveBuff(unit, buffName, removeAllCounts, instigator)
         def:OnBuffRemove(unit, instigator)
     end
 
-    -- FIXME: This doesn't work because the magic sync table doesn't detect
-    -- the change. Need to give all child tables magic meta tables too.
     if def.Icon then
         -- If the user layer was displaying an icon, remove it from the sync table
-        local newTable = unit.Sync.Buffs
-        table.removeByValue(newTable, buffName)
-        unit.Sync.Buffs = table.copy(newTable)
+        local oldTable = unit.Sync.Buffs
+        if oldTable then
+            table.removeByValue(oldTable, buffName)
+            unit.Sync.Buffs = oldTable
+        end
     end
 
     BuffAffectUnit(unit, buffName, unit, true)
@@ -811,6 +819,16 @@ function ApplyBuff(unit, buffName, instigator)
 
     if def.OnApplyBuff then
         def:OnApplyBuff(unit, instigator)
+    end
+
+    if def.Icon then
+        local currentBuffs = unit.Sync.Buffs
+        if currentBuffs then
+            table.insert(currentBuffs, buffName)
+            unit.Sync.Buffs = currentBuffs
+        else
+            unit.Sync.Buffs = { buffName }
+        end
     end
 
     BuffAffectUnit(unit, buffName, instigator, false)
