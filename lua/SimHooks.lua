@@ -86,7 +86,7 @@ function IssueToUnitAggressiveMove(unit, target)
 end
 
 --- Orders a unit to attack a target
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueAttack for units group variant
@@ -100,7 +100,7 @@ end
 
 --- Orders a factory to build a unit.
 --- Takes 1 tick to apply.
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueBuildFactory for units group variant
@@ -116,7 +116,7 @@ end
 
 --- Orders a to build a unit, the nearest unit is given the order
 --- Takes some time to apply (at least 3 ticks).
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueBuildMobile for units group variant
@@ -131,7 +131,7 @@ function IssueToUnitBuildMobile(unit, position, blueprintID, table)
 end
 
 --- Orders a unit to capture a target, usually engineers
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueCapture for units group variant
@@ -157,7 +157,7 @@ end
 
 --- Clears out all commands issued on the factory without affecting
 --- the build queue, allows you to change the rally point
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueClearFactoryCommands for units group variant
@@ -169,7 +169,7 @@ function IssueToUnitClearFactoryCommands(factory)
 end
 
 --- Orders a unit to destroy itself, doesn't leave a wreckage
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueToUnitKillSelf for an alternative that does leave a wreckage
@@ -182,7 +182,7 @@ function IssueToUnitDestroySelf(unit)
 end
 
 --- Orders a unit to dive
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueDive for units group variant
@@ -194,7 +194,7 @@ function IssueToUnitDive(unit)
 end
 
 --- Orders a factory to assist another factory
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueFactoryAssist for units group variant
@@ -207,7 +207,7 @@ function IssueToUnitFactoryAssist(unit, target)
 end
 
 --- Orders a factory to set rally point
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueFactoryRallyPoint for units group variant
@@ -220,7 +220,7 @@ function IssueToUnitFactoryRallyPoint(unit, position)
 end
 
 --- Orders unit to setup a ferry
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueFerry for units group variant
@@ -233,7 +233,7 @@ function IssueToUnitFerry(unit, position)
 end
 
 --- Orders a unit to guard a target
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueGuard for units group variant
@@ -246,7 +246,7 @@ function IssueToUnitGuard(unit, target)
 end
 
 --- Orders a unit to kill themselves
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueToUnitDestroySelf # an alternative that does not leave a wreckage
@@ -259,7 +259,7 @@ function IssueToUnitKillSelf(unit)
 end
 
 --- Orders a unit to move to a position.
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueMove for units group variant
@@ -272,7 +272,7 @@ function IssueToUnitMove(unit, position)
 end
 
 --- Orders a unit to move off a factory build site.
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueMoveOffFactory for units group variant
@@ -285,7 +285,7 @@ function IssueToUnitMoveOffFactory(unit, position)
 end
 
 --- Orders a unit to launch a strategic missile at a position
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueToUnitTactical # for tactical missiles
@@ -299,7 +299,7 @@ function IssueToUnitNuke(unit, position)
 end
 
 --- Orders a unit to use Overcharge at a target
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueOverCharge for units group variant
@@ -312,7 +312,7 @@ function IssueToUnitOverCharge(unit, target)
 end
 
 --- Orders a unit to patrol to a position
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssuePatrol for units group variant
@@ -326,7 +326,7 @@ end
 
 --- Orders a unit to pause building, upgrading, and other tasks.
 --- This pause order is put into the order queue, so it may not apply immediately.
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see Unit.SetPaused to pause a unit in the middle of a task.
@@ -338,7 +338,7 @@ function IssueToUnitPause(unit)
 end
 
 --- Orders a unit to reclaim a target
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueReclaim for units group variant
@@ -351,7 +351,7 @@ function IssueToUnitReclaim(unit, target)
 end
 
 --- Orders a unit to repair a target
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueRepair for units group variant
@@ -364,7 +364,7 @@ function IssueToUnitRepair(unit, target)
 end
 
 --- Orders a unit to sacrifice, yielding part of their build cost to a target
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueSacrifice for units group variant
@@ -378,7 +378,7 @@ end
 
 --- Orders a unit to run a script sequence, as an example:
 --- `{ TaskName = "EnhanceTask", Enhancement = "AdvancedEngineering" }`
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueScript for units group variant
@@ -391,7 +391,7 @@ function IssueToUnitScript(unit, order)
 end
 
 --- Orders a unit (SML or SMD) to build a nuke
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueSiloBuildNuke for units group variant
@@ -403,7 +403,7 @@ function IssueToUnitSiloBuildNuke(unit)
 end
 
 --- Orders a unit to build a tactical missile
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueSiloBuildTactical for units group variant
@@ -415,7 +415,7 @@ function IssueToUnitSiloBuildTactical(unit)
 end
 
 --- Orders a unit to stop, this happens immediately
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueStop for units group variant
@@ -426,7 +426,7 @@ function IssueToUnitStop(unit)
 end
 
 --- Orders a unit to launch a tactical missile
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueToUnitNuke # for nuclear missiles
@@ -440,7 +440,7 @@ function IssueToUnitTactical(unit, target)
 end
 
 --- Orders a unit to teleport to a position
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueTeleport for units group variant
@@ -463,7 +463,7 @@ function IssueToUnitTeleportToBeacon(unit, beacon)
 end
 
 --- Orders a unit to attach itself to a transport
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueTransportLoad for units group variant
@@ -476,7 +476,7 @@ function IssueToUnitTransportLoad(unit, transport)
 end
 
 --- Orders a transport to unload their cargo at a position
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueTransportUnload for units group variant
@@ -489,7 +489,7 @@ function IssueToUnitTransportUnload(unit, position)
 end
 
 --- Orders a transport or carrier to unload specific units by `categories`
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueTransportUnloadSpecific for units group variant
@@ -502,19 +502,8 @@ function IssueToUnitTransportUnloadSpecific(unit, category, position)
     return IssueTransportUnloadSpecific(UnitsCache, category, position)
 end
 
---- Orders a unit to guard a target. See `IssueGuard` when you want to apply the order to a group of units.
----
---- This use of this function is **not** compatible with the Steam version of the game.
----@param unit moho.unit_methods
----@param target Unit | Vector
----@return SimCommand
-IssueToUnitGuard = function(unit, target)
-    UnitsCache[1] = unit
-    return IssueGuard(UnitsCache, target)
-end
-
 --- Orders a unit to upgrade
----
+--- 
 --- This function is **not** compatible with the Steam version of the game.
 ---
 ---@see IssueUpgrade for units group variant
