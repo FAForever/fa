@@ -1,1 +1,1 @@
-- Your explanation here... [Don't forget to change the category in the filename] (#7319).
+- Add a benchmark for indexing `nil` that compares different implicit nil check usages of the behavior (#7319).
