@@ -1,6 +1,6 @@
 # Forged Alliance Forever — Game Code
 
-This repository is the Lua game code (plus blueprints, effects, textures, localization) for [FAF](https://www.faforever.com/), the community continuation of *Supreme Commander: Forged Alliance*. The C++ engine is closed-source; this repo is everything the engine loads through its Lua VM. There is no build step: files are packaged into `.nx2`/`.scd` archives at deploy time, or loaded straight from disk during local development.
+This repository is the Lua game code (plus blueprints, effects, textures, localization) for [FAF](https://www.faforever.com/), the community continuation of *Supreme Commander: Forged Alliance*. The C++ engine is closed-source. This repo replaces the base game's Lua, and adds or overrides assets on top of the base game's (see [Gotchas](#gotchas)). There is no build step: files are packaged into `.nx2`/`.scd` archives at deploy time, or loaded straight from disk during local development.
 
 Folder-specific guides extend this one. Read them when working in those folders:
 
