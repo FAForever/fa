@@ -143,7 +143,7 @@ Details: [docs/development-start-here/lua-contexts.md](docs/development-start-he
 
 ## Classes
 
-Use the typed class constructors from [lua/system/class.lua](lua/system/class.lua), not plain `Class`, when one applies: `ClassUnit`, `ClassWeapon`, `ClassProjectile`, `ClassShield`, `ClassUI`, `ClassDummyUnit`, `ClassSimple`. States use `State { ... }` and `ChangeState(self, self.SomeState)`.
+Use the typed class constructors from [lua/system/class.lua](lua/system/class.lua), not plain `Class`, when one applies: `ClassUnit`, `ClassWeapon`, `ClassProjectile`, `ClassShield`, `ClassUI`, `ClassDummyUnit`, `ClassDummyProjectile`, `ClassTrashBag`, `ClassSimple`. States use `State { ... }` and `ChangeState(self, self.SomeState)`.
 
 ```lua
 local ACUUnit = import("/lua/defaultunits.lua").ACUUnit
