@@ -265,14 +265,7 @@ bash ./tests/run-utility-tests.sh    # tests/utility/*.spec.lua (luft framework)
 bash ./tests/run-blueprint-tests.sh  # sanity checks on units/*/*.bp
 ```
 
-Run with Docker if the interpreter isn't installed locally (PowerShell; from Git Bash, prefix `MSYS_NO_PATHCONV=1` so `/fa` isn't rewritten into a Windows path):
-
-```powershell
-docker run --rm -v "${PWD}:/fa" -w /fa faforever/lua:v5.0-3 sh -c "apk add bash findutils >/dev/null && tr -d '\r' < tests/run-syntax-test.sh | bash"
-```
-
-- `tr -d '\r'` is needed on Windows checkouts: Git converts the scripts to CRLF line endings, which bash in the container can't run.
-- CI checks out only the files that ship with the game (sparse checkout in [.github/workflows/tests.yaml](.github/workflows/tests.yaml)). A local run also scans `lua-ls-addon/`, `tests/`, `setup/`, `wiki/`, `.github/` and `.claude/`. Those contain standard Lua (e.g. the `#` length operator), so syntax errors reported there are expected and don't fail CI.
+To run the CI workflow itself locally, use Act with Docker as described in [docs/development.md](docs/development.md#automation-via-github-actions).
 
 The syntax test skips the `testmaps/` and `engine/` folders, and files that use `{&h &a}` syntax (`lua/lazyvar.lua`, `lua/system/class.lua`, `lua/sim/NavGenerator.lua`, `lua/system/categories.lua`). Add to that list in `tests/run-syntax-test.sh` if you introduce the syntax elsewhere.
 
