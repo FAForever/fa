@@ -99,7 +99,7 @@ Wreckage = Class(Prop) {
         if not rebuilders[1] then return end
         local pos = self:GetPosition()
         for _, u in rebuilders do
-            IssueBuildMobile({u}, pos, bpid, {})
+            IssueToUnitBuildMobile(u, pos, bpid, {})
         end
         if assisters[1] then
             IssueGuard(assisters, pos)

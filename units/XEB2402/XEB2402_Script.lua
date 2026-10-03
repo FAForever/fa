@@ -105,7 +105,7 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
     -- Override OnStartBuild to cancel any and all commands if we already have a Satellite
     OnStartBuild = function(self, unitBeingBuilt, order)
         if self.Satellite or self.waitingForLaunch then
-            IssueStop({self})
+            IssueToUnitStop(self)
             IssueToUnitClearCommands(self) -- This clears the State launch procedure for some reason, leading to the following hack
 
             -- This is ugly but necessary. It will keep resetting the launch procedure if the player spams to build a Satellite before initial launch
@@ -125,7 +125,7 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
         self:PlayUnitSound('ConstructStop')
 
         if not unitBeingBuilt:IsBeingBuilt() and not self.Satellite and not self.waitingForLaunch then
-            IssueStop({self})
+            IssueToUnitStop(self)
             self.newSatellite = unitBeingBuilt
             ChangeState(self, self.OpenState)
         else
