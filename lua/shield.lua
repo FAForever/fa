@@ -170,7 +170,6 @@ local IsArmyResourceEfficiencyUpdated = {}
 ---@field RegenRate number # Determines HP/second regen. Also used by the engine for regen assist.
 ---@field RegenStartTime number
 ---@field RegenAssistMult number # cached from shield spec
----@field RegenAssistersPerArmy table<Army, Unit[]>
 ---@field RegenAssisters table<EntityId, Unit>
 ---@field RegenAssistThreadSuspended boolean
 ---@field PassOverkillDamage boolean
@@ -417,7 +416,6 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
         -- cache table operations
         local regenAssistMult = self.RegenAssistMult
-        local regenAssistersPerArmy = self.RegenAssistersPerArmy
         local owner = self.Owner
 
         -- variables needed across ticks
