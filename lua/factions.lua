@@ -1,43 +1,55 @@
--- Call these in your scripts where you need them
+--#region Call these in your scripts where you need them
 
+--- Returns a list of faction data, which is mostly used for faction-specific UI but is also used to determine the initial unit to spawn.
+--- Call this in your scripts.
+---@param AllowedMods? uidSet # A table of currently enabled mods, keyed by mod ID, or `true` to get all mods. Ignores mods if not used.
+---@return FactionData[]
 function GetFactions(AllowedMods)
     -- AllowedMods  -> a table of currently enabled mods, keyed by mod ID. Ignore if not used
     -- returns a list of factions. All 4 of the original factions are included plus all enabled custom factions.
     return GetCustomFactions(OrgFactions(), AllowedMods)
 end
 
+--- Gets a name for AI players. Unused, even in Nomads code.
+---@return table
 function GetNewFactionAINames()
     -- Gets a name for AI players
     local ainames = {}
-    for f,_ in NewFactionAiData do
+    for f, _ in NewFactionAiData do
         ainames[f] = NewFactionAiData[f].ainames or { 'nameless', }
     end
     return ainames
 end
 
+--- Gets an AI plan for computer players. Unused, even in Nomads code.
+---@param offset integer # key with which the table should begin, counting up from this value + 1
+---@return table
 function GetNewFactionAIPlans(offset)
     -- Gets an AI plan for computer players. Offset is the key with which the table should begin, counting up from
     -- that value + 1.
     if table.empty(NewFactionAiData) then
-        local x = import("/lua/factions.lua").Factions  -- to make sure NewFactionAiData contains something
+        local x = import("/lua/factions.lua").Factions -- to make sure NewFactionAiData contains something
     end
     if not offset then
-        offset = 5  -- 5 for the 5 races
+        offset = 5 -- 5 for the 5 races
     end
     local aiplans = {}
     offset = math.max(0, offset)
-    for f,_ in NewFactionAiData do
+    for f, _ in NewFactionAiData do
         offset = offset + 1
-        aiplans[ offset ] = NewFactionAiData[f].AIPlansList or { '/lua/AI/aiarchetype-managerloader.lua', }
+        aiplans[offset] = NewFactionAiData[f].AIPlansList or { '/lua/AI/aiarchetype-managerloader.lua', }
     end
     return aiplans
 end
 
--- ----------------------------------------------------------------------------------------------------------------
--- Don't touch these!
+--#endregion
+
+--#region Don't touch these!
 
 NewFactionAiData = {}
 
+---@param FactionsTable FactionData[]
+---@param AllowedMods uidSet
 function GetCustomFactions(FactionsTable, AllowedMods)
     if not FactionsTable or type(FactionsTable) ~= 'table' then
         FactionsTable = {}
@@ -48,7 +60,7 @@ function GetCustomFactions(FactionsTable, AllowedMods)
 
         local FactionFile = import(file)
         if rawget(FactionFile, 'Factions') then
-            WARN('File '..repr(file)..' contains a "Factions" variable. Please change it to "FactionList", the old variable is not used.')
+            WARN('File ' .. repr(file) .. ' contains a "Factions" variable. Please change it to "FactionList", the old variable is not used.')
         end
         if not rawget(FactionFile, 'FactionList') then
             continue
@@ -68,6 +80,8 @@ function GetCustomFactions(FactionsTable, AllowedMods)
     return FactionsTable
 end
 
+---@param AllowedMods uidSet
+---@return uidSet
 function GetSelectedMods(AllowedMods)
     -- We need an array with it's keys being mod uids and the values being true. but this function can be called
     -- while loading the game which means /lua/mods.lua.GetSelectedMods() doesn't work. In that case we look in
@@ -81,9 +95,9 @@ function GetSelectedMods(AllowedMods)
             mods[mod.uid] = true
         end
     end
-    if AllowedMods then  -- AllowedMods -> table of mods keyed by mod id
+    if AllowedMods then -- AllowedMods -> table of mods keyed by mod id
         local newmods = {}
-        for id,_ in mods do
+        for id, _ in mods do
             if AllowedMods[id] then
                 newmods[id] = true
             end
@@ -93,6 +107,9 @@ function GetSelectedMods(AllowedMods)
     return mods
 end
 
+---@param tbl table
+---@param keys string[]
+---@return boolean
 function TableHasKeys(tbl, keys)
     for _, k in keys do
         if not tbl[k] then
@@ -102,234 +119,287 @@ function TableHasKeys(tbl, keys)
     return true
 end
 
+---@class FactionData
+---@field Key FactionKey
+---@field Category FactionCategory
+---@field FactionInUnitBp FactionName
+---@field IsCustomFaction false
+---@field DisplayName UnlocalizedString # "<LOC _UEF>UEF"
+---@field SoundPrefix string # 'UEF'
+---@field InitialUnit UnitId # 'uel0001'
+---@field CampaignFileDesignator FactionDesignator
+---@field TransmissionLogColor Color
+---@field Icon FileName # ex: "/widgets/faction-icons-alpha_bmp/uef_ico.dds"
+---@field VeteranIcon FileName # ex: "/game/veteran-logo_bmp/uef-veteran_bmp.dds"
+---@field SmallIcon FileName # ex: "/faction_icon-sm/uef_ico.dds"
+---@field LargeIcon FileName # ex: "/faction_icon-lg/uef_ico.dds"
+---@field TooltipID string # 'lob_uef'
+---@field DefaultSkin Skin
+---@field loadingMovie FileName # ex: '/movies/UEF_load.sfd'
+---@field loadingColor Color
+---@field loadingTexture FileName # ex: '/UEF_load.dds'
+---@field IdleEngTextures IdleEngTextures
+---@field IdleFactoryTextures IdleFactoryTextures
+---@field GAZ_UI_Info GAZ_UI_Info
+---@field AI table # Unused, even in Nomads
+
+---@alias FactionKey 'uef' | 'aeon' | 'cybran' | 'seraphim'
+---@alias FactionName 'UEF' | 'Aeon' | 'Cybran' | 'Seraphim'
+---@alias FactionDesignator 'E' | 'A' | 'R' | 'S'
+
+---@class IdleEngTextures
+---@field T1 FileName # ex: '/icons/units/uel0105_icon.dds'
+---@field T2 FileName # ex: '/icons/units/uel0208_icon.dds'
+---@field T2F FileName # T2 field engineer. ex: '/icons/units/xel0209_icon.dds'
+---@field T3 FileName # ex: '/icons/units/uel0309_icon.dds'
+---@field SCU FileName # ex: '/icons/units/uel0301_icon.dds'
+
+--- Icons for factories of a given layer and tech level.
+---@alias IdleFactoryTextures table<LayerCategory, IdleFactoryTexturesLayer>
+--- FileName is a unit icon for the respective tech level factory for a given layer.
+---@alias IdleFactoryTexturesLayer table<1|2|3, FileName>
+
+---@class GAZ_UI_Info
+---@field BuildingIdPrefixes BuildingIdPrefixes
+
+---@alias BuildingIdPrefixes BuildingIdPrefixesUEF | BuildingIdPrefixesAeon | BuildingIdPrefixesCybran | BuildingIdPrefixesSeraphim
+---@alias BuildingIdPrefixesUEF 'ueb' | 'xeb' | 'deb' | 'zeb'
+---@alias BuildingIdPrefixesAeon 'uab' | 'xab'| 'dab'| 'zab'
+---@alias BuildingIdPrefixesCybran 'urb' | 'xrb'| 'drb'| 'zrb'
+---@alias BuildingIdPrefixesSeraphim 'xsb' | 'usb'| 'dsb'| 'zsb'
+
+---@return FactionData[]
 function OrgFactions()
     return {
-    {
-        Key = 'uef',
-        Category = 'UEF',
-        FactionInUnitBp = 'UEF',
-        IsCustomFaction = false,
-        DisplayName = "<LOC _UEF>UEF",
-        SoundPrefix = 'UEF',
-        InitialUnit = 'uel0001',
-        CampaignFileDesignator = 'E',
-        TransmissionLogColor = 'ff00c1ff',
-        Icon = "/widgets/faction-icons-alpha_bmp/uef_ico.dds",
-        VeteranIcon = "/game/veteran-logo_bmp/uef-veteran_bmp.dds",
-        SmallIcon = "/faction_icon-sm/uef_ico.dds",
-        LargeIcon = "/faction_icon-lg/uef_ico.dds",
-        TooltipID = 'lob_uef',
-        DefaultSkin = 'uef',
-        loadingMovie = '/movies/UEF_load.sfd',
-        loadingColor = 'FFbadbdb',
-        loadingTexture = '/UEF_load.dds',
-        IdleEngTextures = {
-            T1 = '/icons/units/uel0105_icon.dds',
-            T2 = '/icons/units/uel0208_icon.dds',
-            T2F = '/icons/units/xel0209_icon.dds',
-            T3 = '/icons/units/uel0309_icon.dds',
-            SCU = '/icons/units/uel0301_icon.dds',
-        },
-        IdleFactoryTextures = {
-            LAND = {
-                '/icons/units/ueb0101_icon.dds',
-                '/icons/units/ueb0201_icon.dds',
-                '/icons/units/ueb0301_icon.dds',
+        {
+            Key = 'uef',
+            Category = 'UEF',
+            FactionInUnitBp = 'UEF',
+            IsCustomFaction = false,
+            DisplayName = "<LOC _UEF>UEF",
+            SoundPrefix = 'UEF',
+            InitialUnit = 'uel0001',
+            CampaignFileDesignator = 'E',
+            TransmissionLogColor = 'ff00c1ff',
+            Icon = "/widgets/faction-icons-alpha_bmp/uef_ico.dds",
+            VeteranIcon = "/game/veteran-logo_bmp/uef-veteran_bmp.dds",
+            SmallIcon = "/faction_icon-sm/uef_ico.dds",
+            LargeIcon = "/faction_icon-lg/uef_ico.dds",
+            TooltipID = 'lob_uef',
+            DefaultSkin = 'uef',
+            loadingMovie = '/movies/UEF_load.sfd',
+            loadingColor = 'FFbadbdb',
+            loadingTexture = '/UEF_load.dds',
+            IdleEngTextures = {
+                T1 = '/icons/units/uel0105_icon.dds',
+                T2 = '/icons/units/uel0208_icon.dds',
+                T2F = '/icons/units/xel0209_icon.dds',
+                T3 = '/icons/units/uel0309_icon.dds',
+                SCU = '/icons/units/uel0301_icon.dds',
             },
-            AIR = {
-                '/icons/units/ueb0102_icon.dds',
-                '/icons/units/ueb0202_icon.dds',
-                '/icons/units/ueb0302_icon.dds',
+            IdleFactoryTextures = {
+                LAND = {
+                    '/icons/units/ueb0101_icon.dds',
+                    '/icons/units/ueb0201_icon.dds',
+                    '/icons/units/ueb0301_icon.dds',
+                },
+                AIR = {
+                    '/icons/units/ueb0102_icon.dds',
+                    '/icons/units/ueb0202_icon.dds',
+                    '/icons/units/ueb0302_icon.dds',
+                },
+                NAVAL = {
+                    '/icons/units/ueb0103_icon.dds',
+                    '/icons/units/ueb0203_icon.dds',
+                    '/icons/units/ueb0303_icon.dds',
+                },
             },
-            NAVAL = {
-                '/icons/units/ueb0103_icon.dds',
-                '/icons/units/ueb0203_icon.dds',
-                '/icons/units/ueb0303_icon.dds',
-            },
-        },
 
-        GAZ_UI_Info = {
-            BuildingIdPrefixes = {
-                'ueb',
-                'xeb',
-                'deb',
-                'zeb',
+            GAZ_UI_Info = {
+                BuildingIdPrefixes = {
+                    'ueb',
+                    'xeb',
+                    'deb',
+                    'zeb',
+                },
             },
         },
-    },
-    {
-        Key = 'aeon',
-        Category = 'AEON',
-        FactionInUnitBp = 'Aeon',
-        IsCustomFaction = false,
-        DisplayName = "<LOC _Aeon>Aeon",
-        SoundPrefix = 'Aeon',
-        InitialUnit = 'ual0001',
-        CampaignFileDesignator = 'A',
-        TransmissionLogColor = 'ffff0000',
-        Icon = "/widgets/faction-icons-alpha_bmp/aeon_ico.dds",
-        VeteranIcon = "/game/veteran-logo_bmp/aeon-veteran_bmp.dds",
-        SmallIcon = "/faction_icon-sm/aeon_ico.dds",
-        LargeIcon = "/faction_icon-lg/aeon_ico.dds",
-        TooltipID = 'lob_aeon',
-        DefaultSkin = 'aeon',
-        loadingMovie = '/movies/aeon_load.sfd',
-        loadingColor = 'FFc7e98a',
-        loadingTexture = '/aeon_load.dds',
-        IdleEngTextures = {
-            T1 = '/icons/units/ual0105_icon.dds',
-            T2 = '/icons/units/ual0208_icon.dds',
-            T2F = '/icons/units/xel0209_icon.dds',
-            T3 = '/icons/units/ual0309_icon.dds',
-            SCU = '/icons/units/ual0301_icon.dds',
-        },
-        IdleFactoryTextures = {
-            LAND = {
-                '/icons/units/uab0101_icon.dds',
-                '/icons/units/uab0201_icon.dds',
-                '/icons/units/uab0301_icon.dds',
+        {
+            Key = 'aeon',
+            Category = 'AEON',
+            FactionInUnitBp = 'Aeon',
+            IsCustomFaction = false,
+            DisplayName = "<LOC _Aeon>Aeon",
+            SoundPrefix = 'Aeon',
+            InitialUnit = 'ual0001',
+            CampaignFileDesignator = 'A',
+            TransmissionLogColor = 'ffff0000',
+            Icon = "/widgets/faction-icons-alpha_bmp/aeon_ico.dds",
+            VeteranIcon = "/game/veteran-logo_bmp/aeon-veteran_bmp.dds",
+            SmallIcon = "/faction_icon-sm/aeon_ico.dds",
+            LargeIcon = "/faction_icon-lg/aeon_ico.dds",
+            TooltipID = 'lob_aeon',
+            DefaultSkin = 'aeon',
+            loadingMovie = '/movies/aeon_load.sfd',
+            loadingColor = 'FFc7e98a',
+            loadingTexture = '/aeon_load.dds',
+            IdleEngTextures = {
+                T1 = '/icons/units/ual0105_icon.dds',
+                T2 = '/icons/units/ual0208_icon.dds',
+                T2F = '/icons/units/xel0209_icon.dds',
+                T3 = '/icons/units/ual0309_icon.dds',
+                SCU = '/icons/units/ual0301_icon.dds',
             },
-            AIR = {
-                '/icons/units/uab0102_icon.dds',
-                '/icons/units/uab0202_icon.dds',
-                '/icons/units/uab0302_icon.dds',
+            IdleFactoryTextures = {
+                LAND = {
+                    '/icons/units/uab0101_icon.dds',
+                    '/icons/units/uab0201_icon.dds',
+                    '/icons/units/uab0301_icon.dds',
+                },
+                AIR = {
+                    '/icons/units/uab0102_icon.dds',
+                    '/icons/units/uab0202_icon.dds',
+                    '/icons/units/uab0302_icon.dds',
+                },
+                NAVAL = {
+                    '/icons/units/uab0103_icon.dds',
+                    '/icons/units/uab0203_icon.dds',
+                    '/icons/units/uab0303_icon.dds',
+                },
             },
-            NAVAL = {
-                '/icons/units/uab0103_icon.dds',
-                '/icons/units/uab0203_icon.dds',
-                '/icons/units/uab0303_icon.dds',
-            },
-        },
 
-        GAZ_UI_Info = {
-            BuildingIdPrefixes = {
-                'uab',
-                'xab',
-                'dab',
-                'zab',
+            GAZ_UI_Info = {
+                BuildingIdPrefixes = {
+                    'uab',
+                    'xab',
+                    'dab',
+                    'zab',
+                },
             },
         },
-    },
-    {
-        Key = 'cybran',
-        Category = 'CYBRAN',
-        FactionInUnitBp = 'Cybran',
-        IsCustomFaction = false,
-        DisplayName = "<LOC _Cybran>Cybran",
-        SoundPrefix = 'Cybran',
-        InitialUnit = 'url0001',
-        CampaignFileDesignator = 'R',
-        TransmissionLogColor = 'ff89d300',
-        Icon = "/widgets/faction-icons-alpha_bmp/cybran_ico.dds",
-        VeteranIcon = "/game/veteran-logo_bmp/cybran-veteran_bmp.dds",
-        SmallIcon = "/faction_icon-sm/cybran_ico.dds",
-        LargeIcon = "/faction_icon-lg/cybran_ico.dds",
-        TooltipID = 'lob_cybran',
-        DefaultSkin = 'cybran',
-        loadingMovie = '/movies/cybran_load.sfd',
-        loadingColor = 'FFe24f2d',
-        loadingTexture = '/cybran_load.dds',
-        IdleEngTextures = {
-            T1 = '/icons/units/url0105_icon.dds',
-            T2 = '/icons/units/url0208_icon.dds',
-            T2F = '/icons/units/xel0209_icon.dds',
-            T3 = '/icons/units/url0309_icon.dds',
-            SCU = '/icons/units/url0301_icon.dds',
-        },
-        IdleFactoryTextures = {
-            LAND = {
-                '/icons/units/urb0101_icon.dds',
-                '/icons/units/urb0201_icon.dds',
-                '/icons/units/urb0301_icon.dds',
+        {
+            Key = 'cybran',
+            Category = 'CYBRAN',
+            FactionInUnitBp = 'Cybran',
+            IsCustomFaction = false,
+            DisplayName = "<LOC _Cybran>Cybran",
+            SoundPrefix = 'Cybran',
+            InitialUnit = 'url0001',
+            CampaignFileDesignator = 'R',
+            TransmissionLogColor = 'ff89d300',
+            Icon = "/widgets/faction-icons-alpha_bmp/cybran_ico.dds",
+            VeteranIcon = "/game/veteran-logo_bmp/cybran-veteran_bmp.dds",
+            SmallIcon = "/faction_icon-sm/cybran_ico.dds",
+            LargeIcon = "/faction_icon-lg/cybran_ico.dds",
+            TooltipID = 'lob_cybran',
+            DefaultSkin = 'cybran',
+            loadingMovie = '/movies/cybran_load.sfd',
+            loadingColor = 'FFe24f2d',
+            loadingTexture = '/cybran_load.dds',
+            IdleEngTextures = {
+                T1 = '/icons/units/url0105_icon.dds',
+                T2 = '/icons/units/url0208_icon.dds',
+                T2F = '/icons/units/xel0209_icon.dds',
+                T3 = '/icons/units/url0309_icon.dds',
+                SCU = '/icons/units/url0301_icon.dds',
             },
-            AIR = {
-                '/icons/units/urb0102_icon.dds',
-                '/icons/units/urb0202_icon.dds',
-                '/icons/units/urb0302_icon.dds',
+            IdleFactoryTextures = {
+                LAND = {
+                    '/icons/units/urb0101_icon.dds',
+                    '/icons/units/urb0201_icon.dds',
+                    '/icons/units/urb0301_icon.dds',
+                },
+                AIR = {
+                    '/icons/units/urb0102_icon.dds',
+                    '/icons/units/urb0202_icon.dds',
+                    '/icons/units/urb0302_icon.dds',
+                },
+                NAVAL = {
+                    '/icons/units/urb0103_icon.dds',
+                    '/icons/units/urb0203_icon.dds',
+                    '/icons/units/urb0303_icon.dds',
+                },
             },
-            NAVAL = {
-                '/icons/units/urb0103_icon.dds',
-                '/icons/units/urb0203_icon.dds',
-                '/icons/units/urb0303_icon.dds',
-            },
-        },
 
-        GAZ_UI_Info = {
-            BuildingIdPrefixes = {
-                'urb',
-                'xrb',
-                'drb',
-                'zrb',
+            GAZ_UI_Info = {
+                BuildingIdPrefixes = {
+                    'urb',
+                    'xrb',
+                    'drb',
+                    'zrb',
+                },
             },
         },
-    },
-    {
-        Key = 'seraphim',
-        Category = 'SERAPHIM',
-        FactionInUnitBp = 'Seraphim',
-        IsCustomFaction = false,
-        DisplayName = "<LOC _Seraphim>Seraphim",
-        SoundPrefix = 'Seraphim',
-        InitialUnit = 'xsl0001',
-        CampaignFileDesignator = 'S',
-        TransmissionLogColor = 'ff00FF00',
-        Icon = "/widgets/faction-icons-alpha_bmp/seraphim_ico.dds",
-        VeteranIcon = "/game/veteran-logo_bmp/seraphim-veteran_bmp.dds",
-        SmallIcon = "/faction_icon-sm/seraphim_ico.dds",
-        LargeIcon = "/faction_icon-lg/seraphim_ico.dds",
-        TooltipID = 'lob_seraphim',
-        DefaultSkin = 'seraphim',
-        loadingMovie = '/movies/seraphim_load.sfd',
-        loadingColor = 'FFffd700',
-        loadingTexture = '/seraphim_load.dds',
-        IdleEngTextures = {
-            T1 = '/icons/units/xsl0105_icon.dds',
-            T2 = '/icons/units/xsl0208_icon.dds',
-            T2F = '/icons/units/xel0209_icon.dds',
-            T3 = '/icons/units/xsl0309_icon.dds',
-            SCU = '/icons/units/xsl0301_icon.dds',
-        },
-        IdleFactoryTextures = {
-            LAND = {
-                '/icons/units/xsb0101_icon.dds',
-                '/icons/units/xsb0201_icon.dds',
-                '/icons/units/xsb0301_icon.dds',
+        {
+            Key = 'seraphim',
+            Category = 'SERAPHIM',
+            FactionInUnitBp = 'Seraphim',
+            IsCustomFaction = false,
+            DisplayName = "<LOC _Seraphim>Seraphim",
+            SoundPrefix = 'Seraphim',
+            InitialUnit = 'xsl0001',
+            CampaignFileDesignator = 'S',
+            TransmissionLogColor = 'ff00FF00',
+            Icon = "/widgets/faction-icons-alpha_bmp/seraphim_ico.dds",
+            VeteranIcon = "/game/veteran-logo_bmp/seraphim-veteran_bmp.dds",
+            SmallIcon = "/faction_icon-sm/seraphim_ico.dds",
+            LargeIcon = "/faction_icon-lg/seraphim_ico.dds",
+            TooltipID = 'lob_seraphim',
+            DefaultSkin = 'seraphim',
+            loadingMovie = '/movies/seraphim_load.sfd',
+            loadingColor = 'FFffd700',
+            loadingTexture = '/seraphim_load.dds',
+            IdleEngTextures = {
+                T1 = '/icons/units/xsl0105_icon.dds',
+                T2 = '/icons/units/xsl0208_icon.dds',
+                T2F = '/icons/units/xel0209_icon.dds',
+                T3 = '/icons/units/xsl0309_icon.dds',
+                SCU = '/icons/units/xsl0301_icon.dds',
             },
-            AIR = {
-                '/icons/units/xsb0102_icon.dds',
-                '/icons/units/xsb0202_icon.dds',
-                '/icons/units/xsb0302_icon.dds',
+            IdleFactoryTextures = {
+                LAND = {
+                    '/icons/units/xsb0101_icon.dds',
+                    '/icons/units/xsb0201_icon.dds',
+                    '/icons/units/xsb0301_icon.dds',
+                },
+                AIR = {
+                    '/icons/units/xsb0102_icon.dds',
+                    '/icons/units/xsb0202_icon.dds',
+                    '/icons/units/xsb0302_icon.dds',
+                },
+                NAVAL = {
+                    '/icons/units/xsb0103_icon.dds',
+                    '/icons/units/xsb0203_icon.dds',
+                    '/icons/units/xsb0303_icon.dds',
+                },
             },
-            NAVAL = {
-                '/icons/units/xsb0103_icon.dds',
-                '/icons/units/xsb0203_icon.dds',
-                '/icons/units/xsb0303_icon.dds',
-            },
-        },
 
-        GAZ_UI_Info = {
-            BuildingIdPrefixes = {
-                'xsb',
-                'usb',
-                'dsb',
-                'zsb',
+            GAZ_UI_Info = {
+                BuildingIdPrefixes = {
+                    'xsb',
+                    'usb',
+                    'dsb',
+                    'zsb',
+                },
             },
         },
-    },
-}
+    }
 end
 
--- ----------------------------------------------------------------------------------------------------------------
--- Original faction variables
+--#region Original faction variables
 
 Factions = GetFactions()
 
--- Map faction key to index, as this lookup is done frequently
+--- Maps faction key to faction index, as this lookup is done frequently
+---@type table<FactionKey, integer>
 FactionIndexMap = {}
 
--- File designator to faction key
+--- Maps faction campaign file designator to faction key
+---@type table<FactionDesignator, FactionKey>
 FactionDesToKey = {}
 
+--- Maps unit bp FactionName to faction index
+---@type table<FactionName, integer>
 FactionInUnitBpToKey = {}
 
 for index, value in Factions do
@@ -337,3 +407,6 @@ for index, value in Factions do
     FactionDesToKey[value.CampaignFileDesignator] = value.Key
     FactionInUnitBpToKey[value.FactionInUnitBp] = index
 end
+--#endregion
+
+--#endregion

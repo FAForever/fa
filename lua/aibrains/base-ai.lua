@@ -28,15 +28,6 @@ local TableGetn = table.getn
 
 local StandardBrain = import("/lua/aibrain.lua").AIBrain
 
----@class TriggerSpec
----@field Callback function
----@field ReconTypes ReconTypes
----@field Blip boolean
----@field Value boolean
----@field Category EntityCategory
----@field OnceOnly boolean
----@field TargetAIBrain AIBrain
-
 ---@class BaseAIBrain: AIBrain
 ---@field Army number
 ---@field AIPlansList string[][]

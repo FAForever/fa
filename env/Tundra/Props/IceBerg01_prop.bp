@@ -12,7 +12,7 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 430,
+                    LODCutoff = 1350,
                     ShaderName = "NormalMappedTerrain",
                     AlbedoName = "IceBerg01_albedo.dds",
                 },

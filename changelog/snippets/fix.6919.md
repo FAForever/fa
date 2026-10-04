@@ -1,1 +1,0 @@
-- (#6919) Fix ACUs being unkillable if their player disconnects in the middle of a recall.

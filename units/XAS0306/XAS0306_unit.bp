@@ -3,6 +3,7 @@ UnitBlueprint{
     AI = {
         AttackAngle = 60,
         GuardReturnRadius = 15,
+        GuardScanRadius = 180,
         TargetBones = {
             "Turret_Front",
             "Turret_Back",
@@ -144,9 +145,9 @@ UnitBlueprint{
         MaxSpeed = 3,
         MaxSpeedReverse = 3,
         MaxSteerForce = 5,
-        MeshExtentsX = 3.25,
+        MeshExtentsX = 2.5,
         MeshExtentsY = 5,
-        MeshExtentsZ = 15,
+        MeshExtentsZ = 7.5,
         MotionType = "RULEUMT_Water",
         TurnRadius = 25,
         TurnRate = 30,

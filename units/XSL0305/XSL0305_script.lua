@@ -128,6 +128,7 @@ XSL0305 = ClassUnit(SLandUnit) {
         end
 
         local weapon = self:GetWeaponByLabel("MainGun")
+        ---@cast weapon -nil
         local bp = self:GetWeaponByLabel(label):GetBlueprint()
 
         -- a lot of the firing sequence relies on the stored blueprint - we'll store the current

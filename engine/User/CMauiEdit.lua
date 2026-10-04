@@ -1,5 +1,65 @@
 ---@meta
 
+--- Modifier-key state attached to an input event. Each field is `true`
+--- only when the matching modifier was held at the moment the event
+--- fired; absent entries are nil rather than `false`, so test with
+--- `event.Modifiers.Shift` (truthy / nil) rather than equality.
+---@class KeyModifiers
+---@field Shift?  boolean
+---@field Ctrl?   boolean
+---@field Alt?    boolean
+---@field Left?   boolean   # left mouse button held (mouse events)
+---@field Right?  boolean   # right mouse button held (mouse events)
+---@field Middle? boolean   # middle mouse button held (mouse events)
+
+---@alias KeyEventType 
+---| KeyEventType.Mouse
+---| KeyEventType.Keyboard
+
+--- Key events from the mouse
+---@alias KeyEventType.Mouse
+---| "ButtonPress"
+---| "ButtonRelease"
+---| "ButtonDClick"
+---| "MouseEnter"
+---| "MouseMotion"
+---| "MouseExit"
+---| "WheelRotation"
+
+--- Key events from the keyboard when a Control has "keyboard focus" or is an "input capture"
+---@see Control.AcquireKeyboardFocus # Keyboard focus
+---@see Control.AbandonKeyboardFocus # Keyboard focus
+---@see Control.OnKeyboardFocusChange # Keyboard focus
+---@see Control.OnLoseKeyboardFocus # Keyboard focus
+---@see AddInputCapture # Input Capture
+---@see AnyInputCapture # Input Capture
+---@see GetInputCapture # Input Capture
+---@see RemoveInputCapture # Input Capture
+---@alias KeyEventType.Keyboard
+---| "KeyDown"
+---| "Char"
+---| "KeyUp"
+
+--- Generic input-event payload delivered to MAUI control hooks. Each
+--- control hook (`HandleEvent`, the keyboard / mouse callbacks on `Edit`,
+--- `Button`, `Checkbox`, etc.) receives a single `KeyEvent` table; not
+--- every field is meaningful for every event Type, so MouseX/Y are -1
+--- on key events and WheelDelta/Rotation are 0 outside wheel events.
+---
+--- For `Edit.OnNonTextKeyPressed` the function gets `(self, keycode, event)`
+--- — `keycode` is the raw VK_* code (compare against `UIUtil.VK_*`) and
+--- `event.Modifiers` is the modifier state at the time of the press.
+---@class KeyEvent
+---@field Type           KeyEventType   # "Char" / "KeyDown" / "ButtonPress" / "MouseEnter" / "MouseExit" / "WheelRotation" / ...
+---@field Control        Control        # the control receiving the event
+---@field KeyCode        number         # engine-translated keycode (post-IME, etc.)
+---@field RawKeyCode     number         # OS-level VK_* keycode (compare against `UIUtil.VK_*`)
+---@field Modifiers      KeyModifiers   # which modifiers / mouse buttons were held when the event fired
+---@field MouseX         number         # cursor X in screen coords (-1 on non-mouse events)
+---@field MouseY         number         # cursor Y in screen coords (-1 on non-mouse events)
+---@field WheelDelta     number         # mouse-wheel delta (0 outside wheel events)
+---@field WheelRotation  number         # mouse-wheel rotation in 1/120 ticks (0 outside wheel events)
+
 ---@class moho.edit_methods : moho.control_methods
 local CMauiEdit = {}
 
@@ -156,25 +216,6 @@ end
 function CMauiEdit:ShowCaret(show)
 end
 
----@class EventModifiers
----@field Alt? true
----@field Ctrl? true
----@field Left? true
----@field Right? true
----@field Shift? true
----@field Middle? true
-
----@class KeyEvent
----@field Control Control
----@field KeyCode number
----@field Modifiers EventModifiers
----@field MouseX number
----@field MouseY number
----@field RawKeyCode number
----@field Type string
----@field WheelDelta number
----@field WheelRotation number
-
 --- Called when the text has changed in the text box. Passes in the newly changed text
 --- and the previous text.
 ---@type fun(self: Edit, newText: string, oldText: string)
@@ -198,5 +239,9 @@ CMauiEdit.OnCharPressed = nil
 --- Called when the `escape` key is pressed. Return `true` to prevent the text box from clearing.
 ---@type fun(self: Edit, text: string): boolean
 CMauiEdit.OnEscPressed = nil
+
+--- Engine does not call HandleEvent for Edit controls.
+---@type nil
+CMauiEdit.HandleEvent = nil
 
 return CMauiEdit

@@ -28,7 +28,7 @@ local CreateBitmapStd = UIUtil.CreateBitmapStd
 
 ---@type Group
 local parent = false
-local shareResources = true
+local shareResources = SessionGetScenarioInfo().Options.TeamShareOverflow == "enabled"
 local alliedVictory = true
 
 local dialogue = false
@@ -528,19 +528,32 @@ function BuildPlayerLines()
 
         local allyTitle = allyGroup.title
 
-        local srCheck = UIUtil.CreateCheckboxStd(allyTitle, '/game/toggle_btn/toggle')
-        srCheck:SetCheck(shareResources, true)
-        LayoutHelpers.AtRightIn(srCheck, allyTitle)
-        srCheck.Top:Set(function() return allyGroup.Top() + 4 end)
-        Tooltip.AddCheckboxTooltip(srCheck, 'dip_share_resources')
-        allyTitle.srCheck = srCheck
 
-        local icon = CreateBitmapStd(srCheck, "/game/toggle_btn/icon-shared-resources")
-        icon:DisableHitTest()
-        LayoutHelpers.AtCenterIn(icon, srCheck)
-        srCheck.label = icon
 
         if sessionOptions.TeamLock == "unlocked" then
+            local srCheck = UIUtil.CreateCheckboxStd(allyTitle, '/game/toggle_btn/toggle')
+            srCheck:SetCheck(shareResources, true)
+            LayoutHelpers.AtRightIn(srCheck, allyTitle)
+            srCheck.Top:Set(function() return allyGroup.Top() + 4 end)
+            Tooltip.AddCheckboxTooltip(srCheck, 'dip_share_resources')
+            allyTitle.srCheck = srCheck
+
+            local icon = CreateBitmapStd(srCheck, "/game/toggle_btn/icon-shared-resources")
+            icon:DisableHitTest()
+            LayoutHelpers.AtCenterIn(icon, srCheck)
+            srCheck.icon = icon
+
+            srCheck.OnCheck = function(self, checked)
+                shareResources = checked
+                SimCallback({
+                    Func = "SetResourceSharing",
+                    Args = {
+                        Army = GetFocusArmy(),
+                        Value = checked,
+                    },
+                })
+            end
+
             local avCheck = UIUtil.CreateCheckboxStd(allyTitle, "/game/toggle_btn/toggle")
             avCheck:SetCheck(alliedVictory, true)
             LayoutHelpers.LeftOf(avCheck, srCheck)
@@ -565,17 +578,6 @@ function BuildPlayerLines()
         end
 
         belowEntry = allyGroup._bottom
-
-        srCheck.OnCheck = function(self, checked)
-            shareResources = checked
-            SimCallback({
-                Func = "SetResourceSharing",
-                Args = {
-                    Army = GetFocusArmy(),
-                    Value = checked,
-                },
-            })
-        end
     end
 
     if enemyCount > 0 then

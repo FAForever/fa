@@ -1,5 +1,12 @@
 UnitBlueprint{
     Description = "<LOC uab0102_desc>Air Factory",
+	AI = {
+        TargetBones = {
+            "Attachpoint",
+            "Right_Slider2",
+            "Front_Slider",
+        },
+    },
     Audio = {
         Construct      = Sound { Bank = 'UAB',        Cue = 'UAB0102_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
         ConstructLoop  = Sound { Bank = 'UAB',        Cue = 'UAB0102_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
@@ -133,6 +140,14 @@ UnitBlueprint{
     LifeBarOffset = 1.55,
     LifeBarSize = 4.5,
     Physics = {
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = true,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
         MaxGroundVariation = 1.1,
@@ -171,9 +186,9 @@ UnitBlueprint{
     SelectionSizeX = 2.85,
     SelectionSizeZ = 2.75,
     SelectionThickness = 0.35,
-    SizeX = 3,
+    SizeX = 3.5,
     SizeY = 0.7,
-    SizeZ = 3,
+    SizeZ = 3.5,
     StrategicIconName = "icon_factory1_air",
     StrategicIconSortPriority = 220,
     Wreckage = {

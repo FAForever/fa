@@ -4,6 +4,7 @@ local TableGetn = table.getn
 
 local MathMax = math.max
 local MathFloor = math.floor
+local MATH_IRound = MATH_IRound
 
 local StringFind = string.find
 
@@ -233,18 +234,21 @@ local function PostProcessUnit(unit)
                     unit.AI.GuardScanRadius = 0
                 end
 
-                -- cap it, some units have extreme values based on their attack radius
-                if isTech1 and unit.AI.GuardScanRadius > 40 then
+                -- Cap it, since some units would have extreme values due to their large attack radii
+                if isTech1 and not isNaval and unit.AI.GuardScanRadius > 40 then
                     unit.AI.GuardScanRadius = 40
-                elseif isTech2 and unit.AI.GuardScanRadius > 80 then
+
+                elseif (isTech1 and isNaval or isTech2 and not isNaval) and unit.AI.GuardScanRadius > 80 then
                     unit.AI.GuardScanRadius = 80
-                elseif isTech3 and unit.AI.GuardScanRadius > 120 then
+
+                elseif (isTech2 and isNaval or isTech3 and not isNaval) and unit.AI.GuardScanRadius > 120 then
                     unit.AI.GuardScanRadius = 120
-                elseif isExperimental and unit.AI.GuardScanRadius > 160 then
+
+                elseif (isTech3 and isNaval or isExperimental) and unit.AI.GuardScanRadius > 160 then
                     unit.AI.GuardScanRadius = 160
                 end
 
-                -- sanitize it
+                -- Sanitize it
                 unit.AI.GuardScanRadius = math.floor(unit.AI.GuardScanRadius)
             end
         end
@@ -252,12 +256,22 @@ local function PostProcessUnit(unit)
 
     -- Build range overlay
     -- only for engineers, excluding insignificant units such as Cybran build drones or air staging that has its own radius set
-    if isEngineer and not (unit.CategoriesHash['INSIGNIFICANTUNIT'] or unit.CategoriesHash['AIRSTAGINGPLATFORM']) then
+    if (isEngineer or unit.BlueprintId == 'xrl0403') and not (unit.CategoriesHash['INSIGNIFICANTUNIT'] or unit.CategoriesHash['AIRSTAGINGPLATFORM']) then
         -- guarantee that the table exists
         if not unit.AI then unit.AI = {} end
 
-        -- Engine allows building +2 range outside the max distance (or even more for large buildings)
-        local overlayRadius = (unit.Economy.MaxBuildDistance or 5) + 2
+        -- Engine adds builder footprint max size and target skirt max size when allowing building
+        -- so add the builder footprint and a minimal 1 skirt size to the overlay radius.
+        local footprintSize
+        local footprint = unit.Footprint
+        if footprint and footprint.SizeX and footprint.SizeZ then
+            footprintSize = MathMax(MathFloor(footprint.SizeX), MathFloor(footprint.SizeZ))
+        else
+            footprintSize = MATH_IRound(MathMax(unit.SizeX or 0, unit.SizeZ or 0))
+            -- Cap at 6 because that is the largest amphibious unit footprint (see footprints.lua)
+            if footprintSize > 6 then footprintSize = 6 end
+        end
+        local overlayRadius = (unit.Economy.MaxBuildDistance or 5) + footprintSize + 1
 
         -- Display auto-assist range for engineer stations instead of max build distance if it is smaller and exists
         if unit.CategoriesHash['ENGINEERSTATION'] then
@@ -719,6 +733,7 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
         efBlueprint.SelectionMeshScaleY = unit.ExternalFactory.SelectionMeshScaleY or 3
         efBlueprint.SelectionMeshScaleZ = unit.ExternalFactory.SelectionMeshScaleZ or 1
         efBlueprint.Display.UniformScale = unit.ExternalFactory.UniformScale or 1.6
+        efBlueprint.Audio = { UISelection = unit.ExternalFactory.UISelection or unit.Audio.UISelection }
 
         -- add our select button override
         if not efBlueprint.General.OrderOverrides then

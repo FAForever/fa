@@ -15,7 +15,7 @@
 ---@field Tech1 number
 ---@field Tech2 number
 ---@field Tech3 number
----@field SCU number
+---@field SCU? number
 
 ---@class BaseBuilderTemplateMassToFactoryValues
 ---@field T1Value number
@@ -24,7 +24,7 @@
 
 ---@class BaseBuilderTemplateSettings
 ---@field FactoryCount BaseBuilderTemplateFactoryCount
----@field EngineersCount BaseBuilderTemplateEngineerCount
+---@field EngineerCount BaseBuilderTemplateEngineerCount
 ---@field MassToFactoryValues BaseBuilderTemplateMassToFactoryValues
 
 ---@class BaseBuilderTemplateSpec
@@ -32,8 +32,8 @@
 ---@field Builders table<BuilderGroupNames>
 ---@field NonCheatBuilders table<BuilderGroupNames>
 ---@field BaseSettings BaseBuilderTemplateSettings
----@field ExpansionFunction fun(aiBrain: AIBrain, location: Position, markerType: string)
----@field FirstBaseFunction fun(aiBrain: AIBrain)?
+---@field ExpansionFunction fun(aiBrain: AIBrain, location: Vector, markerType: string): integer
+---@field FirstBaseFunction? fun(aiBrain: AIBrain): integer, string?
 
 -- Global list of all BaseBuilderTemplates found in the system.
 ---@type table<string, BaseBuilderTemplateSpec>
@@ -41,7 +41,7 @@ BaseBuilderTemplates = {}
 
 --- Register a base builder template, or override an existing base builder template
 ---@param spec BaseBuilderTemplateSpec
----@return string
+---@return string?
 BaseBuilderTemplate = function(spec)
 
     -- it should be a table

@@ -7,12 +7,12 @@
 ---@field targetId? EntityId
 ---@field blueprintId? UnitId
 ---@field commandType number
+---@field commandId integer
 
 ---@alias SubmergeStatus
 ---| -1  # submerged
 ---|  0  # unknown
 ---|  1  # not submerged
-
 
 ---@alias FireState
 ---| 0 # Return fire
@@ -124,6 +124,18 @@
 --- | 'NUMPAD_DECIMAL'
 --- | 'NUMPAD_DIVIDE'
 
+---@class UIBuildTemplateBuilding
+---@field [1] UnitId
+---@field [2] integer # build order
+---@field [3] integer # position x
+---@field [4] integer # position z
+
+---@class UIBuildTemplate
+---@field [1] integer        # width that is used when drag building the template
+---@field [2] integer        # height that is used when drag building the template
+---@field [3] UIBuildTemplateBuilding
+--@field [...] UIBuildTemplateBuilding
+
 --- Repeatedly the selection box of the unit to the hovered-over state to create a blinking effect
 ---@param entityId EntityId
 ---@param onTime number
@@ -138,8 +150,13 @@ end
 function AddCommandFeedbackBlip(meshInfo, duration)
 end
 
+---@class ConsoluteOutputReceiverHandle : userdata
+
+--- Creates a console output receiver that calls the given function on console output.
 ---
----@param func fun(text: string): any
+---@see RemoveConsoleOutputReciever Destroy the receiver and stop calling the function.
+---@param func fun(text: string)
+---@return ConsoluteOutputReceiverHandle
 function AddConsoleOutputReciever(func)
 end
 
@@ -220,6 +237,7 @@ end
 
 --- Gets the current time in seconds, counting from 0 at application start.
 --- This is wall-clock time and is unaffected by gameplay.
+---@see GetSystemTimeSeconds Identical usage
 ---@return number
 function CurrentTime()
 end
@@ -356,7 +374,8 @@ function GetCamera(name)
 end
 
 --- Gets the "arguments" (tokens split by spaces) that follow a commandline option,
---- disregarding if they start with `/` like other commandline options.  
+--- disregarding if they start with `/` like other commandline options.
+---
 --- Returns `false` if there are not `maxArgs` tokens after the `option`.
 ---@see GetCommandLineArgTable(option) for parsing key-values
 ---@param option string
@@ -386,12 +405,12 @@ end
 function GetFireState(units)
 end
 
---- Returns the root UI frame for a given adapter. You can use `GetFrame(0)` to retrieve the primary adapter. And you can use `GetFrame(1)` to retrieve the secondary adapter. 
+--- Returns the root UI frame for a given adapter. You can use `GetFrame(0)` to retrieve the primary adapter. And you can use `GetFrame(1)` to retrieve the secondary adapter.
 ---
 --- In the game options you can add a second adapter under the 'Video' tab.
---- 
---- See also `GetNumRootFrames()` to determine the number of root frames. 
---- 
+---
+---@see GetNumRootFrames to determine the number of root frames.
+---
 --- See also the following modules that manage these frames:
 --- - Primary adapter: lua\ui\game\worldview.lua
 --- - Secondary adapter: lua\ui\game\multihead.lua
@@ -482,10 +501,10 @@ function GetMovieVolume()
 end
 
 --- Returns the current number of root frames. There is usually only one root frame for each adapter (monitor). This is often referred to as a 'head' in other comments. The game supports up to two root frames.
---- 
+---
 --- In the game options you can add a second adapter under the 'Video' tab.
 ---
---- See also `GetFrame(0)` to retrieve the root frame of the primary adapter and `GetFrame(1)` to retrieve the root frame of the secondary adapter. 
+--- See also `GetFrame(0)` to retrieve the root frame of the primary adapter and `GetFrame(1)` to retrieve the root frame of the secondary adapter.
 --- See also the following modules that manage these frames:
 --- - Primary adapter: lua\ui\game\worldview.lua
 --- - Secondary adapter: lua\ui\game\multihead.lua
@@ -493,14 +512,16 @@ end
 function GetNumRootFrames()
 end
 
---- Retrieves the value of a game option from the preference file. The value is retrieved from the 'option' table in the preference file.
+--- Retrieves the value of a game option from the preference file. 
+--- 
+--- The value is retrieved from the 'option' table for the current profile in the preference file.
 ---@param key string
 ---@return any
 function GetOptions(key)
 end
 
---- Retrieves a value in the memory-stored preference file. The value retrieved is a deep copy of what resides in the actual 
---- preference file. Therefore this function can be expensive to use directly - if you're not careful you may be allocating 
+--- Retrieves a value in the memory-stored preference file. The value retrieved is a deep copy of what resides in the actual
+--- preference file. Therefore this function can be expensive to use directly - if you're not careful you may be allocating
 --- kilobytes worth of data!
 ---
 --- You're encouraged to use `/lua/user/prefs.lua` to interact with the preference file.
@@ -523,10 +544,10 @@ function GetRolloverInfo()
 end
 
 --- Gets the state for the script bit
----@param unit UserUnit
+---@param units UserUnit[] # Returns false instead of erroring if wrong table format
 ---@param bit number
 ---@return boolean
-function GetScriptBit(unit, bit)
+function GetScriptBit(units, bit)
 end
 
 --- Returns a table of the currently selected units
@@ -540,20 +561,24 @@ end
 function GetSessionClients()
 end
 
----
+--- Gets the "+/- game speed" value.
+--- 
+--- The actual sim rate can be calculated using `math.pow(2, GetSimRate()/3)`
 ---@return number
 function GetSimRate()
 end
 
----
----@return number
+--- Returns a hardcoded constant of how many sim ticks are supposed to occur per second.
+---@return 10
 function GetSimTicksPerSecond()
 end
+
+---@alias SpecialFileType 'SaveGame' | 'Replay' | 'CampaignSave'
 
 --- Gets information on a profile based file, `nil` if unable to find
 ---@param profileName string
 ---@param basename string
----@param type string
+---@param type SpecialFileType
 ---@return table
 function GetSpecialFileInfo(profileName, basename, type)
 end
@@ -561,19 +586,19 @@ end
 --- Given the base name of a special file, returns the complete path
 ---@param profilename string
 ---@param filename string
----@param type string
+---@param type SpecialFileType
 ---@return string
-function GetSpecialFilePath(profilename,  filename,  type)
+function GetSpecialFilePath(profilename, filename, type)
 end
 
 --- Returns a table of strings which are the names of files in special locations (currently SaveFile, Replay)
----@param type string
+---@param type SpecialFileType
 ---@return { extension: string, directory: string, files: table<string, string[]> }
 function GetSpecialFiles(type)
 end
 
 ---
----@param type string
+---@param type SpecialFileType
 ---@return string
 function GetSpecialFolder(type)
 end
@@ -584,6 +609,7 @@ function GetSystemTime()
 end
 
 --- Returns System time in seconds
+---@see CurrentTime Identical usage
 ---@return number
 function GetSystemTimeSeconds()
 end
@@ -593,7 +619,7 @@ end
 ---@param border number? defaults to 1
 ---@return number width
 ---@return number height
-function GetTextureDimensions(filename,  border)
+function GetTextureDimensions(filename, border)
 end
 
 --- Gets the alpha multiplier for 2D UI controls
@@ -603,21 +629,22 @@ end
 
 --- Given a set of units, gets the union of orders and unit categories (for determining builds). You can use `GetUnitCommandFromCommandCap` to convert the toggles to unit commands
 ---@param unitSet UserUnit[]
----@return string[] orders
----@return CommandCap[] availableToggles
+---@return EngineCommandCap[] orders
+---@return EngineToggleCap[] availableToggles
 ---@return EntityCategory buildableCategories
 function GetUnitCommandData(unitSet)
 end
 
 --- Retrieves the orders, toggles and buildable categories of the given unit. You can use `GetUnitCommandFromCommandCap` to convert the toggles to unit commands
 ---@param unit UserUnit
----@return string[] orders
----@return CommandCap[] availableToggles
+---@return EngineCommandCap[] orders
+---@return EngineToggleCap[] availableToggles
 ---@return EntityCategory buildableCategories
 function GetUnitCommandDataOfUnit(unit)
 end
 
---- Given a `RULEUCC` type command, return the equivalent `UNITCOMMAND` command or "None" otherwise.  
+--- Given a `RULEUCC` type command, return the equivalent `UNITCOMMAND` command or "None" otherwise.
+---
 --- See `/lua/ui/game/commandgraphparams.lua#CommandGraphParams` or `UserUnitCommand`.
 --[[```
              RULEUCC_Move = Move
@@ -820,7 +847,7 @@ end
 
 ---@param playerId? string  # if not provided, will return whether the local player is an observer
 ---@return boolean
-function IsObserver()
+function IsObserver(playerId)
 end
 
 --- Issue a factory build or upgrade command to your selection
@@ -859,7 +886,7 @@ end
 IssueUnitCommandToUnit = function(unit, command, luaParams, clear)
 end
 
---- Issue a command to the current selection. 
+--- Issue a command to the current selection.
 ---@param command UserUnitCommand # Will crash the game if not a valid command.
 ---@param luaParams? table | string | number | boolean # Will crash the game if the table contains non-serializable types.
 ---@param clear boolean?
@@ -974,9 +1001,10 @@ end
 function PrefetchSession(mapname, mods, hipri)
 end
 
----
----@param handler function
-function RemoveConsoleOutputReciever(handler)
+--- Destroys a console output receiver.
+---@see AddConsoleOutputReciever To create receivers.
+---@param handle ConsoluteOutputReceiverHandle
+function RemoveConsoleOutputReciever(handle)
 end
 
 --- Remove unit from the session extra select list
@@ -1020,7 +1048,7 @@ end
 function RestartSession()
 end
 
---- Writes the preferences to disk to make it persistent. This is an expensive operation. The 
+--- Writes the preferences to disk to make it persistent. This is an expensive operation. The
 --- game does this automatically when it exits, there should be no reason to call this manually.
 ---
 --- You're encouraged to use `/lua/user/prefs.lua` to interact with the preference file.
@@ -1166,9 +1194,8 @@ end
 function SetOverlayFilter(overlay, categories, normalColor, selectColor, rolloverColor, inner1, inner2, outer1, outer2)
 end
 
----
+--- see `/lua/ui/game/RangeOverlayParams.lua`
 ---@param list RangeOverlay[]
----@see `/lua/ui/game/RangeOverlayParams.lua`
 function SetOverlayFilters(list)
 end
 
@@ -1249,7 +1276,6 @@ end
 function TeamColorMode(mode)
 end
 
-
 -- TODO: do these kinds of functions (that duplicate in `Unit.lua`) also accept single units
 -- like some of the other functions alude to?
 
@@ -1293,12 +1319,10 @@ end
 ---@param color Color
 ---@param thickness? number
 function UI_DrawCircle(pos, size, color, thickness)
-
   -- Introduced by an assembly function, see also:
   -- - https://github.com/FAForever/FA-Binary-Patches/pull/47
   -- - https://github.com/FAForever/FA-Binary-Patches/pull/111
   -- - https://github.com/FAForever/FA-Binary-Patches/pull/112
-
 end
 
 --- Draws a rectangle in world. Must be called from `WorldView:OnRenderWorld` or it won't draw anything.
@@ -1307,12 +1331,10 @@ end
 ---@param color Color
 ---@param thickness? number
 function UI_DrawRect(pos, size, color, thickness)
-
   -- Introduced by an assembly function, see also:
   -- - https://github.com/FAForever/FA-Binary-Patches/pull/47
   -- - https://github.com/FAForever/FA-Binary-Patches/pull/111
   -- - https://github.com/FAForever/FA-Binary-Patches/pull/112
-
 end
 
 --- Draws a line in world. Must be called from `WorldView:OnRenderWorld` or it won't draw anything.
@@ -1321,12 +1343,10 @@ end
 ---@param color Color
 ---@param thickness? number
 function UI_DrawLine(position1, position2, color, thickness)
-
   -- Introduced by an assembly function, see also:
   -- - https://github.com/FAForever/FA-Binary-Patches/pull/47
   -- - https://github.com/FAForever/FA-Binary-Patches/pull/111
   -- - https://github.com/FAForever/FA-Binary-Patches/pull/112
-
 end
 
 --- Draws a line in world. Must be called within `WorldView:OnRenderWorld`
@@ -1350,7 +1370,7 @@ end
 function ValidateIPAddress(ipaddr)
 end
 
---- Validate a list of units
+--- Returns a copy of the units excluding those which are dead or destroyed.
 ---@param units UserUnit[]
 ---@return UserUnit[]
 function ValidateUnitsList(units)

@@ -1,1 +1,0 @@
-- (#6911) Remove debug statements when building kernel drones

@@ -1,0 +1,382 @@
+--******************************************************************************************************
+--** Copyright (c) 2024 FAForever
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
+
+local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Prefs = import("/lua/user/prefs.lua")
+local UIUtil = import("/lua/ui/uiutil.lua")
+
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Group = import("/lua/maui/group.lua").Group
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+
+local ChangelogOverview = import("/lua/ui/lobby/changelog/generated/overview.lua")
+
+local SeenChangelog = "LobbyChangelog"
+
+---@class UIChangelogOverview
+---@field Changelogs UIChangelogMetadata[]
+
+---@class UIChangelogMetadata
+---@field Version number
+---@field Name string
+---@field Date string
+---@field URL string
+---@field Path FileName
+
+---@class UIChangelogData
+---@field Version number
+---@field Title string
+---@field Description string[]
+
+--- Toggles the debug interface that shows the various groups that are used to divide the dialog
+local debugInterface = false
+
+---@type TrashBag
+local ModuleTrash = TrashBag()
+
+---@class UIChangelogDialog : Group
+---@field Debug Group
+---@field CommonUI Group
+---@field Border Border
+---@field Background Bitmap
+---@field DialogBackground Bitmap
+---@field Header Group
+---@field HeaderDebug Bitmap
+---@field HeaderTitle Text
+---@field HeaderEscapeButton Button
+---@field HeaderSubtitle Text
+---@field Footer Group
+---@field FooterDebug Bitmap
+---@field FooterWebsiteButton Button
+---@field FooterDiscordButton Button
+---@field Content Group
+---@field ContentDebug Bitmap
+---@field ContentNotes Group
+---@field ContentNotesDebug Bitmap
+---@field ContentPatches Group
+---@field ContentPatchesDebug Bitmap
+---@field ContentDivider Bitmap
+---@field ContentPatchesList ItemList
+---@field ContentNotesList ItemList
+local ChangelogDialog = ClassUI(Group) {
+
+    ---@param self UIChangelogDialog
+    ---@param parent Control
+    __init = function(self, parent)
+        Group.__init(self, parent)
+
+        -- occupy center of screen
+
+        LayoutHelpers.SetDimensions(self, 1000, 700)
+        LayoutHelpers.AtCenterIn(self, parent)
+
+        -- allow us to use escape to quickly get out
+
+        EscapeHandler.PushEscapeHandler(
+            function()
+                self:Close()
+            end
+        )
+
+        -- make sure we're on top of everything else
+
+        self.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
+
+        -- debugging
+
+        self.Debug = Group(self)
+        LayoutHelpers.FillParent(self.Debug, self)
+
+        -- setup
+
+        self.CommonUI = Group(self)
+        LayoutHelpers.FillParent(self.CommonUI, self)
+
+        self.Border = UIUtil.SurroundWithBorder(self.CommonUI, '/scx_menu/lan-game-lobby/frame/')
+
+        self.Background = Bitmap(self.CommonUI)
+        self.Background:SetSolidColor("99111111")
+        LayoutHelpers.FillParent(self.Background, GetFrame(0))
+
+        self.DialogBackground = Bitmap(self.CommonUI)
+        self.DialogBackground:SetSolidColor("99111111")
+        LayoutHelpers.FillParent(self.DialogBackground, self.CommonUI)
+
+        -- header
+
+        self.Header = Group(self.CommonUI)
+        self.Header.Left:Set(self.CommonUI.Left)
+        self.Header.Top:Set(self.CommonUI.Top)
+        self.Header.Right:Set(self.CommonUI.Right)
+        self.Header.Bottom:Set(function() return self.CommonUI.Top() + LayoutHelpers.ScaleNumber(50) end)
+
+        self.HeaderDebug = Bitmap(self.Debug)
+        self.HeaderDebug:SetSolidColor("ffff0000")
+        LayoutHelpers.FillParent(self.HeaderDebug, self.Header)
+
+        self.HeaderTitle = UIUtil.CreateText(self.CommonUI,
+            LOC("Changelog of Supreme Commander: Forged Alliance Forever"), 17, 'Arial Gras', true)
+        LayoutHelpers.AtVerticalCenterIn(self.HeaderTitle, self.Header)
+        self.HeaderTitle.Left:Set(function() return self.Header.Left() + LayoutHelpers.ScaleNumber(10) end)
+
+        self.HeaderEscapeButton = UIUtil.CreateButtonStd(self.CommonUI, '/game/menu-btns/close', "", 12)
+        LayoutHelpers.AtVerticalCenterIn(self.HeaderEscapeButton, self.Header)
+        LayoutHelpers.DepthOverParent(self.HeaderEscapeButton, self.CommonUI, 5)
+        self.HeaderEscapeButton.Right:Set(function() return self.Header.Right() - LayoutHelpers.ScaleNumber(10) end)
+        self.HeaderEscapeButton.OnClick = function()
+            self:Close()
+        end
+
+        self.HeaderSubtitle = UIUtil.CreateText(self.CommonUI, LOC("Game version 3700"), 17, 'Arial Gras', true)
+        LayoutHelpers.AtVerticalCenterIn(self.HeaderSubtitle, self.Header)
+        self.HeaderSubtitle.Right:Set(function() return self.HeaderEscapeButton.Left() - LayoutHelpers.ScaleNumber(20) end)
+
+        -- footer
+
+        self.Footer = Group(self.CommonUI)
+        self.Footer.Left:Set(self.CommonUI.Left)
+        self.Footer.Top:Set(function() return self.CommonUI.Bottom() - LayoutHelpers.ScaleNumber(50) end)
+        self.Footer.Right:Set(self.CommonUI.Right)
+        self.Footer.Bottom:Set(self.CommonUI.Bottom)
+
+        self.FooterDebug = Bitmap(self.Debug)
+        self.FooterDebug:SetSolidColor("ff00ff00")
+        LayoutHelpers.FillParent(self.FooterDebug, self.Footer)
+
+        self.FooterWebsiteButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "<LOC uilobby_0004>View Online")
+        LayoutHelpers.AtVerticalCenterIn(self.FooterWebsiteButton, self.Footer)
+        LayoutHelpers.DepthOverParent(self.FooterWebsiteButton, self.Footer, 5)
+        self.FooterWebsiteButton.Left:Set(function() return self.Footer.Left() - LayoutHelpers.ScaleNumber(10) end)
+        self.FooterWebsiteButton.OnClick = function()
+            OpenURL('http://github.com/FAForever/fa/releases')
+        end
+
+        self.FooterDiscordButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "<LOC uilobby_0006>Report a bug")
+        LayoutHelpers.AtVerticalCenterIn(self.FooterDiscordButton, self.Footer)
+        LayoutHelpers.DepthOverParent(self.FooterDiscordButton, self.Footer, 5)
+        self.FooterDiscordButton.Left:Set(function() return self.Footer.Right() - LayoutHelpers.ScaleNumber(170) end)
+        self.FooterDiscordButton.OnClick = function()
+            OpenURL('http://discord.gg/pK94Dk9hNz')
+        end
+
+        -- content
+
+        self.Content = Group(self)
+        self.Content.Left:Set(self.CommonUI.Left)
+        self.Content.Right:Set(self.CommonUI.Right)
+        self.Content.Top:Set(self.Header.Bottom)
+        self.Content.Bottom:Set(self.Footer.Top)
+
+        self.ContentDebug = Bitmap(self.Debug)
+        self.ContentDebug:SetSolidColor("ff0000ff")
+        LayoutHelpers.FillParent(self.ContentDebug, self.Content)
+
+        self.ContentNotes = Group(self.Content)
+        LayoutHelpers.FillParent(self.ContentNotes, self.Content)
+        self.ContentNotes.Right:Set(function() return self.Content.Right() - LayoutHelpers.ScaleNumber(200) end)
+
+        self.ContentNotesDebug = Bitmap(self.Debug)
+        self.ContentNotesDebug:SetSolidColor("9900ff00")
+        LayoutHelpers.FillParent(self.ContentNotesDebug, self.ContentNotes)
+
+        self.ContentPatches = Group(self.Content)
+        LayoutHelpers.FillParent(self.ContentPatches, self.Content)
+        self.ContentPatches.Left:Set(function() return self.ContentNotes.Right() end)
+
+        self.ContentPatchesDebug = Bitmap(self.Debug)
+        self.ContentPatchesDebug:SetSolidColor("99ff0000")
+        LayoutHelpers.FillParent(self.ContentPatchesDebug, self.ContentPatches)
+
+        self.ContentDivider = Bitmap(self.CommonUI)
+        self.ContentDivider:SetSolidColor("99ffffff")
+        self.ContentDivider.Left:Set(function() return self.ContentNotes.Right() + 1 end)
+        self.ContentDivider.Top:Set(function() return self.Content.Top() + LayoutHelpers.ScaleNumber(10) end)
+        self.ContentDivider.Right:Set(self.ContentNotes.Right)
+        self.ContentDivider.Bottom:Set(function() return self.Content.Bottom() - LayoutHelpers.ScaleNumber(10) end)
+
+        -- patches
+
+        self.ContentPatchesList = ItemList(self.ContentPatches)
+        LayoutHelpers.FillParentFixedBorder(self.ContentPatchesList, self.ContentPatches, 12)
+        self.ContentPatchesList.Right:Set(function() return self.ContentPatches.Right() - LayoutHelpers.ScaleNumber(24) end)
+
+        self.ContentPatchesList:SetFont(UIUtil.bodyFont, 12)
+        self.ContentPatchesList:SetColors("ffffffff", "00000000")
+        self.ContentPatchesList:ShowMouseoverItem(true)
+
+        UIUtil.CreateLobbyVertScrollbar(self.ContentPatchesList)
+        self.ContentPatchesList.OnClick = function(element, row, event)
+            self:PopulateWithPatch(row)
+        end
+
+        -- patchnotes
+
+        self.ContentNotesList = ItemList(self.ContentNotes)
+        LayoutHelpers.FillParentFixedBorder(self.ContentNotesList, self.ContentNotes, 12)
+        self.ContentNotesList.Right:Set(function() return self.ContentNotes.Right() - LayoutHelpers.ScaleNumber(24) end)
+
+        self.ContentNotesList:SetFont(UIUtil.bodyFont, 12)
+        self.ContentNotesList:SetColors("ffffffff", "00000000")
+        self.ContentNotesList:ShowMouseoverItem(true)
+
+        UIUtil.CreateLobbyVertScrollbar(self.ContentNotesList)
+        self.ContentNotesList.OnClick = function(element, row, event) end
+
+        -- Populate
+
+        self:PopulatePatchList()
+        self:PopulateWithPatch(0)
+
+        if not debugInterface then
+            self.Debug:Hide()
+        end
+
+    end,
+
+    --- Populates the dialog with the given patch
+    ---@param self UIChangelogDialog
+    ---@param index number
+    PopulateWithPatch = function(self, index)
+        ---@type UIChangelogMetadata
+        local changelog = ChangelogOverview.Overview.Changelogs[index + 1]
+
+        ---@type UIChangelogData
+        local patch = import(changelog.Path).Changelog
+
+        if patch then
+
+            if changelog.URL then
+                self.FooterWebsiteButton:Enable()
+                self.FooterWebsiteButton.OnClick = function()
+                    OpenURL(changelog.URL)
+                end
+            else
+                self.FooterWebsiteButton:Disable()
+            end
+
+            self.ContentPatchesList:SetSelection(index)
+            self.HeaderSubtitle:SetText(patch.Title or "Unknown title")
+            self.ContentNotesList:DeleteAllItems()
+
+            local altDescription = LOC("<LOC ChangelogDescriptionIdentifier>")
+            for k, line in patch[altDescription] or patch.Description do
+                self.ContentNotesList:AddItem(line)
+            end
+        else
+            self.FooterWebsiteButton:Disable()
+        end
+    end,
+
+    --- Populates the list of patches
+    ---@param self UIChangelogDialog
+    PopulatePatchList = function(self)
+        self.ContentPatchesList:DeleteAllItems()
+        for _, changelog in pairs(ChangelogOverview.Overview.Changelogs) do
+            self.ContentPatchesList:AddItem(changelog.Name)
+        end
+    end,
+
+    --- Destroys the dialog
+    ---@param self UIChangelogDialog
+    Close = function(self)
+
+        local version, gametype, commit = import("/lua/version.lua").GetVersionData()
+
+        -- prevent the dialog from popping up again
+        Prefs.SetToCurrentProfile(SeenChangelog, tonumber(version))
+
+        EscapeHandler.PopEscapeHandler()
+
+        -- go into oblivion
+        CloseChangelogDialog()
+    end,
+}
+
+---@type UIChangelogDialog | false
+ChangelogInstance = false
+
+--- Closes the dialog. Function is idempotent.
+CloseChangelogDialog = function()
+    ModuleTrash:Destroy()
+    ChangelogInstance = false
+end
+
+--- Opens the changelog dialog. Function is idempotent.
+---@param parent Control
+---@return UIChangelogDialog
+CreateChangelogDialog = function(parent)
+    CloseChangelogDialog()
+
+    ---@type UIChangelogDialog
+    ChangelogInstance = ChangelogDialog(parent)
+    ModuleTrash:Add(ChangelogInstance)
+    return ChangelogInstance
+end
+
+--- Returns iff the changelog is open.
+---@return boolean
+IsOpen = function()
+    if not ChangelogInstance then
+        return false
+    end
+
+    if IsDestroyed(ChangelogInstance) then
+        return false
+    end
+
+    return true
+end
+
+--- Returns true iff we should open the changelog.
+---@return boolean
+function ShouldOpenChangelog()
+    local version, gametype, commit = import("/lua/version.lua").GetVersionData()
+
+    local LastChangelogVersion = Prefs.GetFromCurrentProfile(SeenChangelog) or 0
+    return LastChangelogVersion < tonumber(version)
+end
+
+-------------------------------------------------------------------------------
+--#region Debugging
+
+--- Called by the module manager when this module becomes dirty
+function __moduleinfo.OnDirty()
+    -- keep track of whether the changelog was open
+    local openAgain = IsOpen()
+
+    -- clear all trash related to the dialog, including the dialog itself
+    CloseChangelogDialog()
+
+    -- if the dialog was open, wait a second and then automatically re-open it
+    if openAgain then
+        ForkThread(
+            function()
+                WaitSeconds(1.0)
+                local module = import(__moduleinfo.name)
+                module.CreateChangelogDialog(GetFrame(0))
+            end
+        )
+    end
+end
+
+--#endregion

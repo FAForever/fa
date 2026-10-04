@@ -55,16 +55,16 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
     end,
 
     ---@param self SBOOhwalliBombEffectController01
-    ---@param army number
+    ---@param army Army
     CreateInitialBuildup = function( self, army )
 		WaitTicks(11)
         for k, v in SOhwalliBombHit01 do
-            emit = CreateEmitterAtEntity(self,army,v)
+            CreateEmitterAtEntity(self,army,v)
         end
     end,
 
     ---@param self SBOOhwalliBombEffectController01
-    ---@param army number
+    ---@param army Army
     CreateRifts = function(self, army )
         -- Create projectiles in a dispersal pattern, that create x/z direction that 
         -- the effects emitters use a path.
@@ -79,7 +79,7 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
 
         ------Create pre-buildup effects------
         for k, v in EffectTemplate.SOhwalliBombHit02 do
-            emit = CreateEmitterAtEntity(self,army,v)
+            CreateEmitterAtEntity(self,army,v)
         end  
 
         for i = 0, (num_projectiles -1) do
@@ -93,7 +93,7 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
     end,
 
     ---@param self SBOOhwalliBombEffectController01
-    ---@param army number
+    ---@param army Army
     MainBlast = function( self, army )
 		WaitTicks(26)
 
@@ -105,7 +105,7 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
 
 		-- Create explosion effects
         for k, v in EffectTemplate.SOhwalliDetonate01 do
-            emit = CreateEmitterAtEntity(self,army,v)
+            CreateEmitterAtEntity(self,army,v)
         end
 
         self:CreatePlumes()

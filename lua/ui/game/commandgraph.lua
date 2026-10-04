@@ -19,6 +19,8 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local trashBtn = nil
 local dragging = false
 
+--- Called by the engine when the command graph is shown by pressing the shift key.
+---@param show boolean
 function OnCommandGraphShow(show)
 
     import("/lua/ui/game/reclaim.lua").OnCommandGraphShow(show)
@@ -59,6 +61,7 @@ function OnCommandGraphShow(show)
 --    end
 end
 
+--- Called by the engine when the user begins dragging a command graph node in the world view.
 function OnCommandDragBegin()
 --    local worldView = import("/lua/ui/game/worldview.lua").view
 --    worldView:OnCommandDragBegin()
@@ -66,6 +69,7 @@ function OnCommandDragBegin()
 --    dragging = true
 end
 
+--- Called by the engine when the user stops dragging a command graph node in the world view.
 function OnCommandDragEnd(event,cmdId)
 --    local worldView = import("/lua/ui/game/worldview.lua").view
 --    worldView:OnCommandDragEnd()

@@ -17,4 +17,9 @@ end
 function CMauiFrame:SetTargetHead(head)
 end
 
+--- Will crash the game
+---@deprecated
+function CMauiFrame.ClearChildren()
+end
+
 return CMauiFrame

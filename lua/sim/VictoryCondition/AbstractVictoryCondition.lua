@@ -22,6 +22,7 @@
 
 local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 local SyncGameResult = import("/lua/simsyncutils.lua").SyncGameResult
+local SimUtils = import("/lua/simutils.lua")
 
 -- upvalue for performance
 local TableGetn = table.getn
@@ -43,7 +44,9 @@ AbstractVictoryCondition = Class(DebugComponent) {
     --- An attempt to end the game. The monitoring thread continues to catch draws. It will take this many seconds to declare victory and start the end game procedure.
     DelayBeforeVictory = 5,
 
-    --- Once the game is guaranteed to end, it will take this many seconds to end the game.
+    --- Once the game is guaranteed to end, it will take this many seconds to end the game. This needs
+    --- to be three or more seconds for campaign/coop to end gracefully. It takes three seconds for 
+    --- an operation (campaign/coop) to end via `ScenarioFramework.EndOperation`.
     DelayBeforeGameEnds = 3,
 
     ---@param self AbstractVictoryCondition
@@ -271,7 +274,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
         end
     end,
 
-    --- Ends the game. The monitoring thread is stopped. The game ends three seconds later to give all players a window of opportunity to share the game results with the server. 
+    --- Ends the game. The monitoring thread is stopped. The game ends after DelayBeforeGameEnds seconds to give all players a window of opportunity to share the game results with the server. 
     ---@param self AbstractVictoryCondition
     EndGame = function(self)
         -- stop checking the game state
@@ -280,13 +283,15 @@ AbstractVictoryCondition = Class(DebugComponent) {
             self.ProcessGameStateThreadInstance = nil
         end
 
+        SimUtils.GameIsEnding = true
+
         self.Trash:Add(ForkThread(self.EndGameThread, self))
     end,
 
     --- Ends the game.
     ---@param self AbstractVictoryCondition
     EndGameThread = function(self)
-        WaitSeconds(3)
+        WaitSeconds(self.DelayBeforeGameEnds)
 
         for _, v in GameOverListeners do
             pcall(v)
