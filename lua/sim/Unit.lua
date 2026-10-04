@@ -1298,7 +1298,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                             or not shieldAssistMass
                             -- units not focused on a shield that is up cannot be shield assisted
                             or not focusShield:IsUp()
-                            or not focus:GetFocusUnit() == nil
+                            or focus:GetFocusUnit() ~= nil
                         then
                             SetDefaultRepairCosts()
                         else
