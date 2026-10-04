@@ -327,7 +327,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
             -- check if we need to suspend ourself
             if -- we're at zero health or lower
-            health <= 0
+                health <= 0
                 -- we're full health
                 or health == maxHealth
                 -- we're not enabled
