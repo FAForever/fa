@@ -427,6 +427,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         local repairPerBuildrate = regenRate / regenAssistMult / 10
         -- Owner damaged state affects repairs of next tick
         local ownerIsDamaged = EntityGetHealth(owner) < EntityGetMaxHealth(owner)
+        local lastHealth = EntityGetHealth(self)
 
         while not IsDestroyed(self) do
             -- update regen info if it changed
@@ -467,8 +468,10 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             end
 
             local excessBuildpower = 0
+            local builderBp = 0
+            local resourcesConsumed
             for _, builder in self.RegenAssisters do
-                local resourcesConsumed = builder:GetResourceConsumed()
+                resourcesConsumed = builder:GetResourceConsumed()
                     -- *Immediately* detects paused builders. 
                     -- Resource consumption == 0 for pausing is delayed by 1 tick, which would cause an HP loss on pause.
                 if  builder.ActiveConsumption
@@ -479,6 +482,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                     -- Engine splits buildpower 50/50 when owner was damaged last tick
                     excessBuildpower = excessBuildpower + (ownerIsDamaged and builderExcessBp * 0.5 or builderExcessBp)
                 end
+                builderBp = builderBp + builder:GetBuildRate()
             end
 
             -- Note: If a shield has enough buildpower this tick to restore it to full HP, 
@@ -486,8 +490,15 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             -- causing the thread to break. It's a massive amount of buildpower so I won't fix it.
 
             local healthToRemove = repairPerBuildrate * excessBuildpower
-            EntityAdjustHealth(self, self.Owner, -healthToRemove)
-            self:UpdateShieldRatio((health - healthToRemove) / maxHealth)
+            local eh = repairPerBuildrate * builderBp * resourcesConsumed
+            if ownerIsDamaged then
+                eh = eh * 0.5
+            end
+            local dh = health - lastHealth
+            LOG(string.format('T %d - expected: %f, actual: %f (%%%-03.1f)', GetGameTick(), eh, dh, dh/eh*100))
+            lastHealth = health
+            -- EntityAdjustHealth(self, self.Owner, -healthToRemove)
+            -- self:UpdateShieldRatio((health - healthToRemove) / maxHealth)
 
             -- update for next tick
             ownerIsDamaged = EntityGetHealth(owner) < EntityGetMaxHealth(owner)

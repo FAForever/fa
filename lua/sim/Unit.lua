@@ -883,6 +883,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         local unitShield = unit.MyShield
         if unitShield and unitShield:IsUp() then
+            self:DebugLog(GetGameTick(), 'OnBeingRepaired for the shield ', unit.UnitId)
             unitShield:OnBeingRepaired(self)
         end
 
@@ -896,7 +897,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         unit.Repairers[self.EntityId] = nil
 
         local unitShield = unit.MyShield
-        if unitShield and unitShield:IsUp() then
+        if unitShield then
+            self:DebugLog(GetGameTick(), 'OnStopBeingRepaired for the shield ', unit.UnitId)
             unitShield:OnStopBeingRepaired(self)
         end
 
