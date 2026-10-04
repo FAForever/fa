@@ -1228,6 +1228,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             local myShield = self.MyShield
             if myShield.AssistCostEnergyPerBuildRate and myShield.AssistCostMassPerBuildRate then
                 for _, unit in self.Repairers do
+                    if unit.Dead then continue end
                     unit:UpdateConsumptionValues()
                 end
             end
