@@ -403,6 +403,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         -- Temporarily disable the unit's weapons when it is transferred to prevent bypassing the fire rate
         self:AddOnGivenCallback(self.OnGivenDisableWeapons)
+
+        -- cache category check
+        self.IsCategoryShield = self.Blueprint.CategoriesHash["SHIELD"]
     end,
 
     -------------------------------------------------------------------------------------------
@@ -2554,7 +2557,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         if bpShield.ShieldSize ~= 0 then
             self:CreateShield(bpShield)
         end
-        self.IsCategoryShield = self.Blueprint.CategoriesHash["SHIELD"]
 
         -- Create spherical collisions if defined
         if bp.SizeSphere then
