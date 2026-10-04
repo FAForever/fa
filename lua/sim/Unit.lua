@@ -1226,6 +1226,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     UpdateShieldAssistersConsumption = function(self)
         if self.Blueprint.CategoriesHash["SHIELD"] then
             local myShield = self.MyShield
+            ---@diagnostic disable-next-line: need-check-nil
             if myShield.AssistCostEnergyPerBuildRate and myShield.AssistCostMassPerBuildRate then
                 for _, unit in self.Repairers do
                     if unit.Dead then continue end
