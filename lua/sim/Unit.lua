@@ -198,6 +198,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field DeathWeaponEnabled? boolean # If not set, it is treated as enabled
 ---@field Sinking? boolean
 ---@field Detector? moho.CollisionManipulator
+---@field IsShieldCategory? boolean
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent, FastDecayComponent) {
 
     IsUnit = true,
@@ -1224,7 +1225,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     ---@param self Unit
     UpdateShieldAssistersConsumption = function(self)
-        if self.Blueprint.CategoriesHash["SHIELD"] then
+        if self.IsShieldCategory then
             local myShield = self.MyShield
             ---@diagnostic disable-next-line: need-check-nil
             if myShield.AssistCostEnergyPerBuildRate and myShield.AssistCostMassPerBuildRate then
@@ -1286,8 +1287,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                         mass = mass * repairRatio
                     end
 
-                    if not focus.Blueprint.CategoriesHash["SHIELD"] then
-                        -- units without SHIELD category cannot be shield assisted
+                    -- units without SHIELD category cannot be shield assisted
+                    if not focus.IsShieldCategory then
                         SetDefaultRepairCosts()
                     else
                         local focusShield = focus.MyShield
@@ -2549,6 +2550,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         if bpShield.ShieldSize ~= 0 then
             self:CreateShield(bpShield)
         end
+        self.IsShieldCategory = self.Blueprint.CategoriesHash["SHIELD"]
 
         -- Create spherical collisions if defined
         if bp.SizeSphere then
