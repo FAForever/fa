@@ -1330,8 +1330,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                 else
                     -- building a unit
                     time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
-                    energy = energy * repairRatio
-                    mass = mass * repairRatio
                 end
             end
 
