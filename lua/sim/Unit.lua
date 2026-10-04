@@ -143,6 +143,7 @@ SyncMeta = {
 
 local cUnit = moho.unit_methods
 local cUnitGetBuildRate = cUnit.GetBuildRate
+local UnitSetMaxHealth = _G.moho.unit_methods.SetMaxHealth
 
 ---@class UnitBuffsTable
 ---@field Affects table<BuffAffectName, table<BuffName, BlueprintBuffAffectState>>
@@ -4608,6 +4609,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     SetRegen = function(self, value)
         self:SetRegenRate(value)
         self:UpdateStat("HitpointsRegeneration", value)
+    end,
+
+    ---@param self Unit
+    ---@param maxhealth number
+    SetMaxHealth = function(self, maxhealth)
+        UnitSetMaxHealth(self, maxhealth)
+        self:UpdateShieldAssistersConsumption()
     end,
 
     -------------------------------------------------------------------------------------------
