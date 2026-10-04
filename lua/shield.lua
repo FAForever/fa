@@ -171,6 +171,7 @@ local IsArmyResourceEfficiencyUpdated = {}
 ---@field RegenStartTime number
 ---@field RegenAssistMult number # cached from shield spec
 ---@field RegenAssisters table<EntityId, Unit>
+---@field NumAssisters integer
 ---@field RegenAssistThreadSuspended boolean
 ---@field PassOverkillDamage boolean
 ---@field ImpactMeshBp string
