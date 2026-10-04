@@ -339,13 +339,10 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 self:UpdateShieldRatio(health / maxHealth)
 
                 -- Manage shield assisters: shield is full HP and cannot be assisted anymore
-                local repairers
-                local shouldUpdateRepairers = self.AssistCostEnergyPerBuildRate and self.AssistCostMassPerBuildRate
                 if health == maxHealth
-                    and shouldUpdateRepairers
+                    and self.AssistCostEnergyPerBuildRate and self.AssistCostMassPerBuildRate
                 then
-                    repairers = self.Owner.Repairers
-                    for _, unit in repairers do
+                    for _, unit in self.Owner.Repairers do
                         if unit.Dead then continue end
                         unit:UpdateConsumptionValues()
                     end
@@ -358,8 +355,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 fromSuspension = true
 
                 -- Manage shield assisters: shield was damaged from full HP and can now be assisted
-                if shouldUpdateRepairers then
-                    for _, unit in repairers do
+                if self.AssistCostEnergyPerBuildRate and self.AssistCostMassPerBuildRate then
+                    for _, unit in self.Owner.Repairers do
                         if unit.Dead then continue end
                         unit:UpdateConsumptionValues()
                     end
