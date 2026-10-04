@@ -1299,8 +1299,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                             -- units default to repair cost for shield assist costs
                             or not shieldAssistEnergy
                             or not shieldAssistMass
-                            -- units not focused on a shield that is up cannot be shield assisted
-                            or not focusShield:IsUp()
+                            -- units not focused on a shield that they say is on cannot be shield assisted
+                            or not focus:ShieldIsOn()
                             or focus:GetFocusUnit() ~= nil
                         then
                             SetDefaultRepairCosts()
