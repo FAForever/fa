@@ -841,7 +841,7 @@
 ---@field Enhancements Enhancement[]
 ---@field BaseBlueprintId UnitId
 
----@class UnitBlueprintEnhancement
+---@class UnitBlueprintEnhancement : UnitBlueprintDefenseShield
 --- Cost of the enhancement in energy
 ---@field BuildCostEnergy number
 --- Cost of the enhancement in mass
