@@ -213,7 +213,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Othe Tactical Bomb",
             DoTPulses = 1,
-            DoTSkipFirstTick = true,
+            DoTSkipFirstPulse = true,
             DoTTime = 2.6,
             FireTargetLayerCapsTable = {
                 Air = "Land|Water|Seabed",

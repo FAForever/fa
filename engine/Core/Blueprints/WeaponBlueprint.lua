@@ -112,7 +112,7 @@
 ---@field DoTPulses number
 --- if true, the impact deals only `InitialDamage` and no DoT pulse is consumed at impact:
 --- all `DoTPulses` are dealt over `DoTTime`. Projectile weapons only, ignored by beams.
----@field DoTSkipFirstTick? boolean
+---@field DoTSkipFirstPulse? boolean
 --- duration that the Damage over Time will last in seconds
 ---@field DoTTime number
 --- If `FixBombTrajectory` is set, then bombs dropped with this weapon will be aimed at the position

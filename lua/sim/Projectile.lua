@@ -633,7 +633,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         local damage = DamageData.DamageAmount
         if damage > 0 then
             local initialDamage = DamageData.InitialDamageAmount or 0
-            local impactDamage = DamageData.DoTSkipFirstTick and initialDamage or damage + initialDamage
+            local impactDamage = DamageData.DoTSkipFirstPulse and initialDamage or damage + initialDamage
 
             -- deal damage in a radius
             local radius = DamageData.DamageRadius
@@ -670,8 +670,8 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                 -- check for and deal damage over time
                 local DoTTime = DamageData.DoTTime
                 if DoTTime > 0 then
-                    -- one pulse is consumed by the impact hit, unless DoTSkipFirstTick defers all pulses
-                    local DoTPulses = DamageData.DoTSkipFirstTick and DamageData.DoTPulses or DamageData.DoTPulses - 1
+                    -- one pulse is consumed by the impact hit, unless DoTSkipFirstPulse defers all pulses
+                    local DoTPulses = DamageData.DoTSkipFirstPulse and DamageData.DoTPulses or DamageData.DoTPulses - 1
                     if DoTPulses >= 1 then
                         ForkThread(
                             AreaDoTThread,
@@ -715,8 +715,8 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                 -- check for and apply damage over time
                 local DoTTime = DamageData.DoTTime
                 if DoTTime > 0 then
-                    -- one pulse is consumed by the impact hit, unless DoTSkipFirstTick defers all pulses
-                    local DoTPulses = DamageData.DoTSkipFirstTick and DamageData.DoTPulses or DamageData.DoTPulses - 1
+                    -- one pulse is consumed by the impact hit, unless DoTSkipFirstPulse defers all pulses
+                    local DoTPulses = DamageData.DoTSkipFirstPulse and DamageData.DoTPulses or DamageData.DoTPulses - 1
                     if DoTPulses >= 1 then
                         ForkThread(
                             UnitDoTThread,
