@@ -1,0 +1,1 @@
+- Automatically pause the game on the first desync (ignoring desyncs on the first beat), so that desynced players can leave without affecting the match further (#7299).
