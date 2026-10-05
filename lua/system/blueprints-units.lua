@@ -628,6 +628,54 @@ local function PostProcessUnit(unit)
             unit.Display.AnimationDeath = nil
         end
     end
+
+    --#region Adjust shield assist effectiveness
+    -- Engine only implements assist for SHIELD category units
+    if unit.CategoriesHash["SHIELD"] then
+        local shieldBp = unit.Defense.Shield
+        ---@cast shieldBp -nil
+        local regenPerBuildRate = shieldBp.RegenPerBuildRate
+        local regenRate = shieldBp.ShieldRegenRate
+        if not regenPerBuildRate then
+            local enhancements = unit.Enhancements
+            if enhancements then
+                for _, enh in enhancements do
+                    local enhRegen = enh.RegenPerBuildRate
+                    if enhRegen then
+                        regenPerBuildRate = enhRegen
+                        break
+                    end
+                end
+            end
+        end
+        if regenPerBuildRate then
+            -- RegenAssistMult is used by the engine to determine how much buildpower is needed to
+            -- provide 1x the shield's regen rate as HP restored.
+            -- Exception: RegenRate is read from the Shield's lua table during run time, so
+            -- the actual HP restored/second may vary from blueprint spec.
+
+            -- HP Restored/second = RegenRate * Buildpower / RegenAssistMult
+            --   We want to be able to assign it simply using HP Restored/s per buildpower.
+            -- HPR = RR * BP / RAM
+            -- HPR * RAM = RR * BP
+            -- RAM = RR * BP / HPR
+            -- RAM = RR * 1 / (HPR/BP)
+            -- RAM = RR / (HPR/BP)
+
+            shieldBp.RegenAssistMult = regenRate / regenPerBuildRate
+        end
+
+    end
+    --#endregion
+
+    if isAir then
+        local airBp = unit.Air
+        if airBp and airBp.EnableVisionWhileFalling == nil
+            and unit.CategoriesHash["SCOUT"]
+        then
+            airBp.EnableVisionWhileFalling = true
+        end
+    end
 end
 
 --- Feature: re-apply the ability to land on water

@@ -263,6 +263,9 @@
 ---@field TurnSpeed? number
 --- if the unit uses wings for forward flight
 ---@field Winged? boolean
+--- if the unit gives vision after it dies and before it impacts the ground or water
+--- Defaults to true for `SCOUT` category air units
+---@field EnableVisionWhileFalling? boolean
 
 
 ---@class UnitBlueprintAdjacency
@@ -463,6 +466,19 @@
 --- If this shield is one that unequivocally protects all attached units.
 --- Should not be defined with `AntiArtilleryShield`, `PersonalBubble`, or `PersonalShield`.
 ---@field TransportShield? boolean
+--- How much HP/s is restored per unit of buildpower assisting the shield. 
+--- Overrides `RegenAssistMult` during blueprint loading.
+---@field RegenPerBuildRate? number
+--- The energy cost per second per unit of buildpower assisting the shield.
+--- Must be present alongside `AssistCostMassPerBuildRate` to have an effect.
+--- If both shield and unit HP are damaged, the costs/effects are split equally between HP repair cost
+--- and shield assist cost.
+---@field AssistCostEnergyPerBuildRate? number
+--- The mass cost per second per unit of buildpower assisting the shield.
+--- Must be present alongside `AssistCostEnergyPerBuildRate` to have an effect.
+--- If both shield and unit HP are damaged, the costs/effects are split equally between HP repair cost
+--- and shield assist cost.
+---@field AssistCostMassPerBuildRate? number
 
 ---@class UnitBlueprintBlinkingLightsData
 ---@field BLBone Bone
@@ -828,7 +844,7 @@
 ---@field Enhancements Enhancement[]
 ---@field BaseBlueprintId UnitId
 
----@class UnitBlueprintEnhancement
+---@class UnitBlueprintEnhancement : UnitBlueprintDefenseShield
 --- Cost of the enhancement in energy
 ---@field BuildCostEnergy number
 --- Cost of the enhancement in mass
@@ -1083,11 +1099,11 @@
 ---@field SpoofRadius { Max: number, Min: number }
 --- used by XSL0101 (Selen) to define how it needs to sit still while its cloak is enabled for it to work
 ---@field StealthWaitTime? number
---- how far the unit can see above water and land. Defaults to 10.
+--- how far the unit can see above water and land. Defaults to 10
 ---@field VisionRadius number
 --- used by XSA0101 (Seraphim T1 air scout) to set its vision radius when it crashes
 ---@field VisionRadiusOnDeath? number
---- how far the unit can see underwater
+--- how far the unit can see underwater. Defaults to 10
 ---@field WaterVisionRadius number
 
 ---@class UnitBlueprintInterface
@@ -1161,7 +1177,9 @@
 --- Used by some build animations to scale their effects
 ---@field MeshExtentsZ number
 ---@field MinSpeedPercent number
---- method of locomotion. Defaults to "RULEUMT_None" if MaxSpeed = 0.
+--- method of locomotion.
+---
+--- Set by engine to `RULEUMT_None` if MaxSpeed = 0.
 ---@field MotionType UnitMotionType
 --- The occupy rectangles of the unit that will override the footprint. Every 4 numbers in the
 --- array define a occupation rectangle for the override (offsetX, offsetZ, sizeX, sizeZ).
