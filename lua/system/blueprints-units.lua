@@ -667,6 +667,15 @@ local function PostProcessUnit(unit)
 
     end
     --#endregion
+
+    if isAir then
+        local airBp = unit.Air
+        if airBp and airBp.EnableVisionWhileFalling == nil
+            and unit.CategoriesHash["SCOUT"]
+        then
+            airBp.EnableVisionWhileFalling = true
+        end
+    end
 end
 
 --- Feature: re-apply the ability to land on water
