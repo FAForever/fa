@@ -47,6 +47,9 @@ UnitBlueprint{
             ShieldRegenStartTime = 3,
             ShieldSize = 28,
             ShieldVerticalOffset = -4,
+            RegenPerBuildRate = 1.87,
+            AssistCostEnergyPerBuildRate = 5.80,
+            AssistCostMassPerBuildRate = 0.430,
         },
     },
     Display = {
