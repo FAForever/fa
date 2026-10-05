@@ -1,1 +1,1 @@
-- Disable intel of most air units while they are falling to the ground after being killed. Scouts keep their vision while falling but have their other intel disabled. (#7190)
+- Disable intel of most air units while they are falling to the ground after being killed. Scouts keep their vision while falling but have their other intel disabled (#7190).
