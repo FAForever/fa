@@ -1,2 +1,2 @@
 - Refactor the Ahwassa strategic bomb to use the damage over time mechanics instead of a hand-rolled damage thread, with no change in damage values, radii or timing (#7323).
-- Add a new `DoTSkipFirstTick` weapon blueprint flag for projectile weapons: the impact deals only `InitialDamage` and all `DoTPulses` are dealt over `DoTTime` (#7323).
+- Add a new `DoTSkipFirstPulse` weapon blueprint flag for projectile weapons: the impact deals only `InitialDamage` and all `DoTPulses` are dealt over `DoTTime` (#7323).
