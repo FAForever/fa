@@ -196,7 +196,8 @@ end
 --- Gets the unit's focus unit, which is usually the unit it is building/repairing/reclaiming/capturing.
 --- The focus may be set to an Entity (usually a Shield) or a Projectile, in which case this
 --- will return nil.
----@see SetFocusEntity
+---
+---@see Unit.SetFocusEntity
 ---@return Unit?
 function Unit:GetFocusUnit()
 end
@@ -576,7 +577,8 @@ end
 --- Sets the focus entity of the unit. 
 --- Usually set by the engine when an engineer starts building/repairing/reclaiming/capturing units.
 --- Shield units set their shield entity as the focus to make it repairable.
----@see GetFocusUnit
+---
+---@see Unit.GetFocusUnit
 ---@param focus FocusObject
 function Unit:SetFocusEntity(focus)
 end
