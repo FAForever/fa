@@ -287,6 +287,7 @@ LazyVarMetaTable = {
 
 LazyVarMetaTable.__index = LazyVarMetaTable
 
+--- Called by the engine and lua to create lazyvars.
 ---@generic T
 ---@param initial? T defaults to `0`
 ---@return LazyVar<T>

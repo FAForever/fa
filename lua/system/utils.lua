@@ -1,4 +1,6 @@
 ---@declare-global
+
+---@diagnostic disable: lowercase-global
 -- ==========================================================================================
 -- * File       : lua/system/utils.lua
 -- * Authors    : Gas Powered Games, FAF Community, HUSSAR
@@ -78,7 +80,7 @@ if not rawget(table, 'getsize') then
 
     --- Returns actual size of a table, including string keys
     ---@param t table
-    ---@return number
+    ---@return integer
     function table.getsize(t)
         if type(t) ~= 'table' then return 0 end
         local size = 0
@@ -104,16 +106,41 @@ function table.copy(t)
     return r
 end
 
---- table.find(t,val) returns the key for val if it is in t table.
---- Otherwise, return nil
-function table.find(t,val)
-    if not t then return end -- prevents looping over nil table
+---Returns the key of the first occurrence of `what` in this table, or `nil` if there are none.
+---@generic K, V
+---@param t table<K, V>?
+---@param what V
+---@return K? key
+function table.find(t, what)
+    if not t then return end
     for k,v in t do
-        if v == val then
-            return k
-        end
+        if v == what then return k end
     end
-    -- return nil by falling off the end
+end
+
+---Returns the key of the first element in the table that causes `fn` to return `true`, or `nil` if there are none.
+---@generic K, V
+---@param t table<K, V>
+---@param fn fun(value: V): boolean?
+---@return K? key
+function table.findCustom(t, fn)
+    if not t then return end
+    for k, v in t do
+        if fn(v) then return k end
+    end
+end
+
+---Returns `true` if the table contains the given `value`.
+---@generic K, V
+---@param t table<K, V>
+---@param value V
+---@return boolean
+function table.has(t, value)
+    if not t then return false end
+    for k, v in t do
+        if v == value then return true end
+    end
+    return false
 end
 
 --- table.subset(t1,t2) returns true iff every key/value pair in t1 is also in t2
@@ -282,7 +309,10 @@ end
 
 --- table.sorted(t, [comp]) is the same as table.sort(t, comp) except it returns
 --- a sorted copy of t, leaving the original unchanged.
---- [comp] is an optional comparison function, defaulting to less-than.
+---@generic T
+---@param t T[]
+---@param comp? fun(v: T): boolean An optional comparison function, defaulting to less-than.
+---@return T[] copy Sorted copy of the original table
 function table.sorted(t, comp)
     local r = table.copy(t)
     TableSort(r, comp)
@@ -474,9 +504,12 @@ function table.hashkeys(t, value)
     return table.keys(r)
 end
 
---- table.map(fn,t) returns a table with the same keys as t but with
---- fn function applied to each value.
-function table.map(fn, t)
+--- table.map(fn,t) returns a table with the same keys as t but with `fn` applied to each value.
+---@generic T
+---@param t T[]
+---@param fn fun(v: T): any
+---@return table
+function table.map(t, fn)
     if not t then return {} end -- prevents looping over nil table
     local r = {}
     for k,v in t do
@@ -616,6 +649,15 @@ function table.random(array)
     return array[Random(1, TableGetn(array))]
 end
 
+---Removes all elements from the table
+---@param t table
+function table.clear(t)
+    if not t then return end
+    for k, _ in t do
+        t[k] = nil
+    end
+end
+
 
 -- Lua 5.0 implementation of the Lua 5.1 function string.match
 -- Returns a regex match
@@ -631,47 +673,48 @@ end)
 -- gfind was renamed to gmatch in Lua 5.1. added gmatch for additional compatibility
 rawset(string, 'gmatch', string.gfind)
 
---- Returns items as a single string, separated by the delimiter
-function StringJoin(items, delimiter)
-    local str = "";
-    for k,v in items do
-        str = str .. v .. delimiter
-    end
-    return str
-end
+--- Concatenates a list of strings into one, separated by `sep`. Alias of `table.concat`.
+---@type fun(list: string[], sep?: string): string
+string.join = table.concat
 
 --- "explode" a string into a series of tokens, using a separator character `sep`
 ---@param str string
----@param sep string
+---@param sep? string Defaults to `:`
 ---@return string[]
-function StringSplit(str, sep)
-    local sep, fields = sep or ":", {}
+function string.split(str, sep)
+    sep = sep or ":"
+    local fields = {}
     local pattern = string.format("([^%s]+)", sep)
+    ---@diagnostic disable-next-line: discard-returns
     str:gsub(pattern, function(c) fields[table.getn(fields)+1] = c end)
     return fields
 end
 
---- Returns true if the string starts with the specified value
-function StringStartsWith(stringToMatch, valueToSeek)
-    return stringToMatch:sub(1, valueToSeek:len()) == valueToSeek
-end
-
 --- Extracts a string between two specified strings
---- e.g. StringExtract('/path/name_end.lua', '/', '_end', true) --> name
-function StringExtract(str, str1, str2, fromEnd)
-    local pattern = str1 .. '(.*)' .. str2
+---
+--- e.g. `string.extractBetween('/path/name_end.lua', '/', '_end', true)` --> name
+---@param str string
+---@param from string
+---@param to string
+---@param fromEnd? boolean Defaults to `false`
+---@return string?
+function string.extractBetween(str, from, to, fromEnd)
+    local pattern = from .. '(.*)' .. to
     if fromEnd then pattern = '.*' .. pattern end
     local _, _, m = str:find(pattern)
     return m
 end
 
 --- Adds comma as thousands separator in specified value
---- e.g. StringComma(10000) --> 10,000
-function StringComma(value)
-    local str = value or 0
+--- e.g. string.commaFormat(10000) --> 10,000
+---@param value number
+---@return string
+function string.commaFormat(value)
+    local str = value or 0 ---@type number | string
     while true do
       local k
       str, k = string.gsub(str, "^(-?%d+)(%d%d%d)", '%1,%2')
+      ---@cast str string
       if k == 0 then
         break
       end
@@ -680,43 +723,73 @@ function StringComma(value)
 end
 
 --- Prepends a string with specified symbol or one space
-function StringPrepend(str, symbol)
+---@param str string
+---@param symbol string? # Defaults to `" "`
+---@return string
+function string.prepend(str, symbol)
     if not symbol then symbol = ' ' end
     return symbol .. str
 end
 
 --- Splits a string with camel case to a string with separate words
---- e.g. StringSplitCamel('SupportCommanderUnit') -> 'Support Commander Unit'
-function StringSplitCamel(str)
+--- e.g. string.splitCamelCase('SupportCommanderUnit') -> 'Support Commander Unit'
+---@param str string
+---@return string
+function string.splitCamelCase(str)
     local first = str:sub(1, 1)
-    local split = first .. str:sub(2):gsub("[A-Z]", StringPrepend)
+    local split = first .. str:sub(2):gsub("[A-Z]", string.prepend)
     return (split:gsub("^.", string.upper))
 end
 
---- Reverses order of letters for specified string
---- e.g. StringReverse('abc123') --> 321cba
-function StringReverse(str)
-    local tbl =  {}
-    str:gsub(".", function(c) table.insert(tbl,c) end)
-    tbl = table.reverse(tbl)
-    return table.concat(tbl)
+
+if not rawget(string, 'reverse') then
+    -- The Moho engine's Lua runtime is Lua 5.0, which predates `string.reverse` (a Lua 5.1
+    -- addition) -- see engine/Library.lua where it is explicitly annotated as absent. This
+    -- polyfill should be defined in the engine for performance if that ever changes.
+
+    --- Reverses order of letters for specified string
+    --- e.g. string.reverse('abc123') --> 321cba
+    ---@param str string
+    ---@return string
+    function string.reverse(str)
+        local tbl = {}
+        str:gsub(".", function(c) table.insert(tbl,c) end)
+        tbl = table.reverse(tbl)
+        return table.concat(tbl)
+    end
 end
 
 --- Capitalizes each word in specified string
---- e.g. StringCapitalize('hello supreme commander') --> Hello Supreme Commander
-function StringCapitalize(str)
+--- e.g. string.capitalize('hello supreme commander') --> Hello Supreme Commander
+---@param str string
+---@return string
+function string.capitalize(str)
     return string.gsub(" "..str, "%W%l", string.upper):sub(2)
 end
 
---- Check if a given string starts with specified string
-function StringStarts(str, startString)
-   return StringStartsWith(str, startString)
+---Check if a given string starts with specified string
+---@param str string
+---@param startString string
+---@return boolean
+function string.startsWith(str, startString)
+   return str:sub(1, startString:len()) == startString
 end
 
---- Check if a given string ends with specified string
-function StringEnds(str, endString)
+---Check if a given string ends with specified string
+---@param str string
+---@param endString string
+---@return boolean
+function string.endsWith(str, endString)
    return endString == '' or str:sub(-endString:len()) == endString
 end
+
+local name = type('')
+local mmt = {
+    __newindex = function(_, key, _)
+        error(("Attempt to set attribute '%s' on %s"):format(tostring(key), name), 2)
+    end,
+}
+setmetatable(getmetatable(''), mmt)
 
 --- Sorts two variables based on their numeric value or alpha order (strings)
 function Sort(itemA, itemB)
@@ -740,7 +813,10 @@ function Sort(itemA, itemB)
     end
 end
 
--- Rounds a number to specified double precision
+---Rounds a number to specified double precision
+---@param num number
+---@param idp? number
+---@return number
 function math.round(num,idp)
     if not idp then
         return math.floor(num+.5)
@@ -751,6 +827,10 @@ function math.round(num,idp)
 end
 
 --- Clamps numeric value to specified Min and Max range
+---@param v number
+---@param min number
+---@param max number
+---@return number
 function math.clamp(v, min, max)
     if v <= min then return min end
     if v >= max then return max end
@@ -775,7 +855,7 @@ function GetCommandLineArgTable(option)
     local result = {}
     if args then
         for _, arg in args do
-            local pair = StringSplit(arg, ":")
+            local pair = string.split(arg, ":")
             local name, value = pair[1], pair[2]
             result[name] = value
         end
@@ -1105,3 +1185,31 @@ function vector_metatable.__mul(a, b)
         a1 * b2 - a2 * b1
     )
 end
+
+-- ==========================================================================================
+-- * Deprecated aliases - kept for backwards compatibility with code that hasn't been
+-- * updated to use the string library equivalents yet.
+-- ==========================================================================================
+
+---@deprecated Use `string.join` instead.
+StringJoin = string.join
+---@deprecated Use `string.split` instead.
+StringSplit = string.split
+---@deprecated Use `string.extractBetween` instead.
+StringExtract = string.extractBetween
+---@deprecated Use `string.commaFormat` instead.
+StringComma = string.commaFormat
+---@deprecated Use `string.prepend` instead.
+StringPrepend = string.prepend
+---@deprecated Use `string.splitCamelCase` instead.
+StringSplitCamel = string.splitCamelCase
+---@deprecated Use `string.reverse` instead.
+StringReverse = string.reverse
+---@deprecated Use `string.capitalize` instead.
+StringCapitalize = string.capitalize
+---@deprecated Use `string.startsWith` instead.
+StringStarts = string.startsWith
+---@deprecated Use `string.startsWith` instead.
+StringStartsWith = string.startsWith
+---@deprecated Use `string.endsWith` instead.
+StringEnds = string.endsWith

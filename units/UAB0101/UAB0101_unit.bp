@@ -147,6 +147,7 @@ UnitBlueprint{
     LifeBarOffset = 1.9,
     LifeBarSize = 4.5,
     Physics = {
+        BuildOnLayerCaps = { LAYER_Land = true },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
         MaxGroundVariation = 1.1,

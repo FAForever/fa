@@ -5,6 +5,14 @@
 --*
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
+
+-- This file implements the main lobby screen
+-- To see the options/map selection screen, see mapselect.lua
+-- For mods, modsmanager.lua
+-- For unit restrictions, unitsmanager.lua
+-- For "patchnotes" screen, changelog.lua
+-- For load game screen, saveload.lua CreateLoadDialog
+
 local GameVersion = import("/lua/version.lua").GetVersion
 local UIUtil = import("/lua/ui/uiutil.lua")
 local MenuCommon = import("/lua/ui/menus/menucommon.lua")
@@ -30,8 +38,6 @@ local FactionData = import("/lua/factions.lua")
 local TextArea = import("/lua/ui/controls/textarea.lua").TextArea
 local Presets = import("/lua/ui/lobby/presets.lua")
 
-local utils = import("/lua/system/utils.lua")
-
 local Trueskill = import("/lua/ui/lobby/trueskill.lua")
 local Player = Trueskill.Player
 local Rating = Trueskill.Rating
@@ -49,6 +55,8 @@ local AIStrings = {}
 local AITooltips = {}
 
 
+
+local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 
 function GetAITypes()
     AIKeys = {}
@@ -74,10 +82,32 @@ if HasCommandLineArg("/syncreplay") and HasCommandLineArg("/gpgnet") then
     IsSyncReplayServer = true
 end
 
-local globalOpts = import("/lua/ui/lobby/lobbyoptions.lua").globalOpts
-local teamOpts = import("/lua/ui/lobby/lobbyoptions.lua").teamOptions
-local AIOpts = import("/lua/ui/lobby/lobbyoptions.lua").AIOpts
+local lobbyOptions = import("/lua/ui/lobby/lobbyoptions.lua")
+local globalOpts = lobbyOptions.globalOpts
+local teamOpts = lobbyOptions.teamOptions
+local AIOpts = lobbyOptions.AIOpts
 local gameColors = import("/lua/gamecolors.lua").GameColors
+
+-- Table mapping option keys to mods that use them
+--
+-- Format: `{ [optionKey] = { modUID = modName, modUID = modName, ... } }`
+---@type table<string, table<string, string>>
+local ModOptionMapping = {}
+
+-- Set of option keys from the original/default lobbyOptions.lua
+-- Used to distinguish default options from mod-added options
+---@type table<string, true>
+local DefaultOptionKeys = {}
+
+-- Initialize DefaultOptionKeys with the original lobbyOptions.lua options
+local function initOptionKeys(...)
+    for _, optionTable in ipairs(arg) do
+        for _, option in optionTable do
+            DefaultOptionKeys[option.key] = true
+        end
+    end
+end
+initOptionKeys(globalOpts, teamOpts, AIOpts)
 
 local numOpenSlots = LobbyComm.maxPlayerSlots
 
@@ -86,14 +116,21 @@ function ImportModAIOptions()
     local simMods = import("/lua/mods.lua").AllMods()
     local OptionData
     local alreadyStored
-    for Index, ModData in simMods do
+    for _, ModData in simMods do
         if exists(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua') then
             OptionData = import(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua').AIOpts
-            for s, t in OptionData do
+            for _, t in OptionData do
                 -- check, if we have this option already stored
                 alreadyStored = false
-                for k, v in AIOpts do
+                for _, v in AIOpts do
                     if v.key == t.key then
+                        if DebugComponent.EnabledLogging then
+                            LOG(string.format(
+                                'Found duplicate mod option "%s" in mod "%s"'
+                                , t.key
+                                , ModData.name
+                            ))
+                        end
                         alreadyStored = true
                         break
                     end
@@ -101,6 +138,11 @@ function ImportModAIOptions()
                 if not alreadyStored then
                     table.insert(AIOpts, t)
                 end
+
+                -- Initialize the option's mod set
+                ModOptionMapping[t.key] = ModOptionMapping[t.key] or {}
+                -- Track that this option is used by this mod
+                ModOptionMapping[t.key][ModData.uid] = ModData.name
             end
         end
     end
@@ -110,12 +152,35 @@ ImportModAIOptions()
 -- Maps faction identifiers to their names.
 local FACTION_NAMES = {[1] = "uef", [2] = "aeon", [3] = "cybran", [4] = "seraphim", [5] = "random" }
 
+--- Helper function: Returns true if the given option key exists in the default lobbyOptions.lua
+---@param optionKey string
+---@return boolean
+local function IsDefaultOption(optionKey)
+    return DefaultOptionKeys[optionKey] ~= nil
+end
+
+--- Helper function: Returns true if the given option is used by any of the given mods
+---@param optionKey string
+---@param enabledModUIDs table<string, nonnil> # `table<modUID, unused>`
+---@return boolean
+local function IsOptionUsedByGivenMods(optionKey, enabledModUIDs)
+    local modUIDsUsingOpt = ModOptionMapping[optionKey]
+    if not modUIDsUsingOpt then return false end
+    for modUID, _ in modUIDsUsingOpt do
+        if enabledModUIDs[modUID] then
+            return true
+        end
+    end
+    return false
+end
+
 local rehostPlayerOptions = {} -- Player options loaded from preset, used for rehosting
 
 local formattedOptions = {}
 local nonDefaultFormattedOptions = {}
 local LrgMap = false
 
+---@type UILobbyHostUtils
 local HostUtils
 local mapPreviewSlotSwapFrom = 0
 local mapPreviewSlotSwap = false
@@ -211,17 +276,17 @@ local commands = {
 
 local Strings = LobbyComm.Strings
 
----@type LobbyComm
-local lobbyComm = false
+---@type UILobbyCommunication
+local lobbyComm
 local localPlayerName = ""
 local gameName = ""
-local hostID = false
+local hostID
 local singlePlayer = false
 ---@type Group
-local GUI = false
-local localPlayerID = false
+local GUI
+local localPlayerID
 ---@type GameData | WatchedGameData
-local gameInfo = false
+local gameInfo
 local lastKickMessage = UTF.UnescapeString(Prefs.GetFromCurrentProfile('lastKickMessage') or "")
 
 local defaultMode =(HasCommandLineArg("/windowed") and "windowed") or Prefs.GetFromCurrentProfile('options').primary_adapter
@@ -625,13 +690,13 @@ end
 
 
 function Reset()
-    lobbyComm = false
+    lobbyComm = nil
     localPlayerName = ""
     gameName = ""
-    hostID = false
+    hostID = nil
     singlePlayer = false
-    GUI = false
-    localPlayerID = false
+    GUI = nil
+    localPlayerID = nil
     availableMods = {}
     selectedUIMods = Mods.GetSelectedUIMods()
     selectedSimMods = Mods.GetSelectedSimMods()
@@ -1571,7 +1636,7 @@ local function AssignRandomStartSpots()
         return
     end
 
-    function teamsAddSpot(teams, team, spot)
+    local function teamsAddSpot(teams, team, spot)
         if not teams[team] then
             teams[team] = {}
         end
@@ -1579,7 +1644,7 @@ local function AssignRandomStartSpots()
     end
 
     -- rearrange players according to the provided setup
-    function rearrangePlayers(data)
+    local function rearrangePlayers(data)
         gameInfo.GameOptions['Quality'] = data.quality
 
         -- Copy a reference to each of the PlayerData objects indexed by their original slots.
@@ -1593,7 +1658,7 @@ local function AssignRandomStartSpots()
             local rating_cmp = function(a,b) return a.rating > b.rating end
             local slot_cmp = function(a,b) return a.slot < b.slot end
 
-            function getMasterOrder(sortedSlots)
+            local function getMasterOrder(sortedSlots)
                 local masterOrder = {}
 
                 local slot2nr = {}
@@ -1608,7 +1673,7 @@ local function AssignRandomStartSpots()
                 return masterOrder
             end
 
-            function teamsSameSize(slots)
+            local function teamsSameSize(slots)
                 local size
 
                 for t, sorted in slots do
@@ -1621,7 +1686,7 @@ local function AssignRandomStartSpots()
                 return true
             end
 
-            function reorderSlots(sortedSlots, masterOrder)
+            local function reorderSlots(sortedSlots, masterOrder)
                 local newSlots = {}
                 for i, j in masterOrder do
                     table.insert(newSlots, sortedSlots.byNr[j].slot)
@@ -1749,6 +1814,7 @@ local function AssignRandomStartSpots()
         end
     end
 
+    local s, q
     if teamSpawn == 'random' or teamSpawn == 'random_reveal' then
         s = autobalance_random(ratingTable, teams)
         q = autobalance_quality(s)
@@ -1767,7 +1833,6 @@ local function AssignRandomStartSpots()
     }
 
     local cmp = function(a, b) return a.quality > b.quality end
-    local s, q
     for fname, f in functions do
         s = f(ratingTable, teams)
         if s then
@@ -1794,7 +1859,7 @@ local function AssignRandomStartSpots()
         setups = table.shuffle(setups)
     end
 
-    best = table.remove(setups, 1)
+    local best = table.remove(setups, 1)
     rearrangePlayers(best)
 end
 
@@ -2268,14 +2333,52 @@ local function TryLaunch(skipNoObserversCheck)
 
         HostUtils.SendArmySettingsToServer()
 
+        --#region Filter GameOptions to remove options from disabled mods
+
+        local enabledModUIDs = Mods.GetSelectedMods()
+
+        -- Remove options from disabled mods
+        -- Only remove options that are not in the default lobbyOptions.lua
+        local keysToRemove = {}
+        for optionKey, _ in gameInfo.GameOptions do
+            -- Skip if this is a default option (always keep default options)
+            if not IsDefaultOption(optionKey) and ModOptionMapping[optionKey] then
+                -- Check if this option is used by an enabled mod
+                local isUsed = IsOptionUsedByGivenMods(optionKey, enabledModUIDs)
+
+                -- If NOT used, mark for removal
+                if not isUsed then
+                    table.insert(keysToRemove, optionKey)
+                    if DebugComponent.EnabledSpewing then
+                        SPEW(string.format('Option "%s" marked for removal because none of these mods are enabled: "%s"'
+                            , optionKey
+                            , table.concat(table.values(ModOptionMapping[optionKey]))
+                        ))
+                    end
+                end
+            end
+        end
+        if DebugComponent.EnabledLogging then
+            LOG(string.format("%d options marked for removal", table.getsize(keysToRemove)))
+        end
+
+        -- Remove the marked keys from GameOptions
+        for _, key in keysToRemove do
+            gameInfo.GameOptions[key] = nil
+        end
+        --#endregion
+
         -- Tell everyone else to launch and then launch ourselves.
         -- TODO: Sending gamedata here isn't necessary unless lobbyComm is fucking stupid and allows
         -- out-of-order message delivery.
         -- Downlord: I use this in clients now to store the rehost preset. So if you're going to remove this, please
         -- check if rehosting still works for non-host players.
+        ---@see UIlobbyMessageHandlers.Launch
         lobbyComm:BroadcastData({ Type = 'Launch', GameInfo = gameInfo })
 
         -- set the mods
+        -- We don't broadcast them because its a huge table of type ModInfo[]
+        -- Clients will set their mods independently in the `Launch` message handler
         gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
 
         SetWindowedLobby(false)
@@ -2284,8 +2387,6 @@ local function TryLaunch(skipNoObserversCheck)
 
         -- launch the game
         lobbyComm:LaunchGame(gameInfo)
-
-        
     end
 
     LaunchGame()
@@ -2392,7 +2493,7 @@ local function UpdateGame()
                         info.Name = mod.name
                         info.Author = mod.author
                         info.Location = mod.location
-                        info.Identifier = string.lower(utils.StringSplit(mod.location, '/')[2])
+                        info.Identifier = string.lower(string.split(mod.location, '/')[2])
                         info.UID = uid
                         table.insert(iconReplacements, info)
                     -- tell us (and then spam the author, not the dev) if it failed
@@ -5085,7 +5186,7 @@ local FromSubjectOrHost = function(data)
     return false
 end
 
---
+---@class UIlobbyMessageHandlers
 local MessageHandlers = {
     -- Update player options. Either the host reconfiguring, or users tweaking their own settings.
     PlayerOptions = {
@@ -6822,6 +6923,7 @@ function InitHostUtils()
         return
     end
 
+    ---@class UILobbyHostUtils
     HostUtils = {
         --- Cause a player's ready box to become unchecked.
         --

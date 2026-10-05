@@ -37,17 +37,28 @@ local DeathWeaponEMP = ClassWeapon(Weapon) {
     OnCreate = function(self)
         Weapon.OnCreate(self)
         self:SetWeaponEnabled(false)
+        self:ChangeMaxRadius(self:GetDamageTable().DamageRadius)
+    end,
+
+    AddDamageRadiusMod = function(self, dmgRadMod)
+        Weapon.AddDamageRadiusMod(self, dmgRadMod)
+        -- use max radius to show damage radius, since it isn't used for target checking
+        self:ChangeMaxRadius(self:GetDamageTable().DamageRadius)
     end,
 
     ---@param self DeathWeaponEMP
     Fire = function(self)
         local blueprint = self.Blueprint
-        local unit = self.unit
+        local unit = self.unit --[[@as MobileUnit]]
         local position = unit:GetPosition()
 
         -- do the damage
-        DamageArea(unit, position, blueprint.DamageRadius, blueprint.Damage, blueprint.DamageType or 'Normal',
-            blueprint.DamageFriendly or false)
+        local damageTable = self:GetDamageTable()
+        local damageRadius = damageTable.DamageRadius
+        DamageArea(unit, position, damageRadius, damageTable.DamageAmount
+            , damageTable.DamageType or 'Normal'
+            , damageTable.DamageFriendly or false
+        )
 
         -- create explosion effect
         local army = unit.Army
@@ -59,14 +70,16 @@ local DeathWeaponEMP = ClassWeapon(Weapon) {
         -- create a decal
         if not unit.transportDrop then
             local rotation = 6.28 * Random()
-            DamageArea(unit, position, 6, 1, 'TreeForce', true)
-            DamageArea(unit, position, 6, 1, 'TreeForce', true)
-            CreateDecal(position, rotation, 'scorch_010_albedo', '', 'Albedo', 11, 11, 250, 120, army)
+            DamageArea(unit, position, damageRadius, 1, 'TreeForce', true)
+            DamageArea(unit, position, damageRadius, 1, 'TreeForce', true)
+            local decalRadius = damageRadius * 1.83 -- 11/6
+            CreateDecal(position, rotation, 'scorch_010_albedo', '', 'Albedo', decalRadius, decalRadius, 250, 120, army)
         end
 
         -- create light flash
-        CreateLightParticle(unit, -1, army, 7, 12, 'glow_03', 'ramp_red_06')
-        CreateLightParticle(unit, -1, army, 7, 22, 'glow_03', 'ramp_antimatter_02')
+        local lightParticleSize = damageRadius * 1.17 -- * 7/6
+        CreateLightParticle(unit, -1, army, lightParticleSize, 12, 'glow_03', 'ramp_red_06')
+        CreateLightParticle(unit, -1, army, lightParticleSize, 22, 'glow_03', 'ramp_antimatter_02')
 
         -- create flying and burning debris
         local vx, _, vz = unit:GetVelocity()
@@ -106,18 +119,20 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
     ---@param self XRL0302
     TrackTargetThread = function(self)
         local navigator = self:GetNavigator()
+        if not navigator then return end
         local weapon = self:GetWeaponByLabel('Suicide')
 
+        local lastTarget
         while not IsDestroyed(self) do
 
             -- adjust behavior of the weapon so it only fires when we're trying to attack something
             if weapon then
-                if (
-                    -- we're trying to attack
-                    self:IsUnitState('Attacking') or
-                        -- engineer trying to take us
-                        self:IsUnitState('BeingCaptured') or self:IsUnitState('BeingReclaimed')
-                    )
+                if -- we're trying to attack
+                    self:IsUnitState('Attacking')
+                    or self:IsUnitState('Patrolling')
+                    -- engineer trying to take us
+                    or self:IsUnitState('BeingCaptured')
+                    or self:IsUnitState('BeingReclaimed')
                 then
                     weapon:SetEnabled(true)
                 else
@@ -127,12 +142,16 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
 
             -- adjust behavior of tracking a target so that we speed through the target instead of bump into it
             local command = self:GetCommandQueue()[1]
+            local target
             if command and command.commandType == 10 then
-                local target = command.target
-                if target then
-                    navigator:SetDestUnit(target)
-                    navigator:SetSpeedThroughGoal(true)
-                end
+                target = command.target
+            end
+            if not target then
+                lastTarget = nil
+                navigator:SetSpeedThroughGoal(false)
+            elseif target ~= lastTarget then
+                lastTarget = target
+                navigator:SetSpeedThroughGoal(true)
             end
 
             WaitTicks(6)

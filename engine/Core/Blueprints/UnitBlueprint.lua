@@ -100,7 +100,8 @@
 ---@field Physics UnitBlueprintPhysics
 ---@field Transport? UnitBlueprintTransport
 ---@field Veteran? UnitBlueprintVeterancy
----@field Weapon? WeaponBlueprint[]
+--- The weapon in the first index controls unit AI. Weapons with `DummyWeapon = true` must be at the end of the table.
+---@field Weapon? WeaponBlueprint[] 
 ---@field ModWeapon? WeaponBlueprint[] # Used during blueprint loading to mod `Weapon` table
 ---@field Wreckage? UnitBlueprintWreckage
 ---
@@ -465,6 +466,19 @@
 --- If this shield is one that unequivocally protects all attached units.
 --- Should not be defined with `AntiArtilleryShield`, `PersonalBubble`, or `PersonalShield`.
 ---@field TransportShield? boolean
+--- How much HP/s is restored per unit of buildpower assisting the shield. 
+--- Overrides `RegenAssistMult` during blueprint loading.
+---@field RegenPerBuildRate? number
+--- The energy cost per second per unit of buildpower assisting the shield.
+--- Must be present alongside `AssistCostMassPerBuildRate` to have an effect.
+--- If both shield and unit HP are damaged, the costs/effects are split equally between HP repair cost
+--- and shield assist cost.
+---@field AssistCostEnergyPerBuildRate? number
+--- The mass cost per second per unit of buildpower assisting the shield.
+--- Must be present alongside `AssistCostEnergyPerBuildRate` to have an effect.
+--- If both shield and unit HP are damaged, the costs/effects are split equally between HP repair cost
+--- and shield assist cost.
+---@field AssistCostMassPerBuildRate? number
 
 ---@class UnitBlueprintBlinkingLightsData
 ---@field BLBone Bone
@@ -809,6 +823,7 @@
 ---@field SelectionMeshScaleY? number
 ---@field SelectionMeshScaleZ? number
 ---@field UniformScale? number
+---@field UISelection? SoundHandle
 
 ---@class UnitBlueprintEnhancements : table<Enhancement, UnitBlueprintEnhancement>
 ---@field Slots table<EnhancementSlot, {name: UnlocalizedString, x: number, y: number}>
@@ -829,7 +844,7 @@
 ---@field Enhancements Enhancement[]
 ---@field BaseBlueprintId UnitId
 
----@class UnitBlueprintEnhancement
+---@class UnitBlueprintEnhancement : UnitBlueprintDefenseShield
 --- Cost of the enhancement in energy
 ---@field BuildCostEnergy number
 --- Cost of the enhancement in mass
@@ -954,9 +969,7 @@
 ---@field RegenPerSecond number
 --- Which unit categories are buffed by the aura
 ---@field UnitCategory UnparsedCategory
----
---- Used by RAS SACU to add damage to their death weapon
----@field DeathWeaponDamageAdd number
+
 
 
 
@@ -1124,6 +1137,9 @@
 ---@field Elevation number
 --- if true, terrain under building's skirt will be flattened
 ---@field FlattenSkirt boolean
+--- Determines what cells this unit occupies for pathfinding.
+--- Mobile units are forced to use the closest footprint spec that is defined in `footprints.lua`.
+--- Structures can define their own footprints.
 ---@field Footprint FootprintBlueprint
 --- unit fuels up at this rate per second. Required for air staging to undock automatically.
 ---@field FuelRechargeRate number

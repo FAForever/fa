@@ -202,9 +202,6 @@ URL0301 = ClassUnit(CCommandUnit) {
         local bpEcon = self.Blueprint.Economy
         self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
         self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
-
-        local deathNuke = self:GetWeaponByLabel("DeathWeapon") --[[@as SCUDeathWeapon]]
-        deathNuke:AddDamageMod(bp.DeathWeaponDamageAdd)
     end,
 
     ---@param self URL0301
@@ -213,10 +210,6 @@ URL0301 = ClassUnit(CCommandUnit) {
         local bpEcon = self.Blueprint.Economy
         self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
         self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
-
-        local deathNuke = self:GetWeaponByLabel("DeathWeapon") --[[@as SCUDeathWeapon]]
-        local baseBp = self.Blueprint.Enhancements["ResourceAllocation"]
-        deathNuke:AddDamageMod(-baseBp.DeathWeaponDamageAdd)
     end,
 
     ---@param self URL0301

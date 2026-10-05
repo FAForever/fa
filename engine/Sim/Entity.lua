@@ -212,7 +212,7 @@ function Entity:GetHeading()
 end
 
 --- Returns the amount of health this entity has
----@see entity:GetMaxHealth() for the maximum possible health
+---@see entity.GetMaxHealth for the maximum possible health
 ---@return number
 function Entity:GetHealth()
 end
@@ -228,7 +228,7 @@ end
 
 --- Returns the maximum amount of health this entity can have. Note that this may not be the same
 --- value as the original one in the entity's blueprint.
----@see entity:GetHealth() for the current amount of health
+---@see entity.GetHealth for the current amount of health
 ---@return number
 function Entity:GetMaxHealth()
 end
@@ -239,7 +239,7 @@ function Entity:GetOrientation()
 end
 
 --- Returns the parent entity (e.g. the transport a unit is on), or nil if none
----@return moho.entity_methods | nil
+---@return Entity?
 function Entity:GetParent()
 end
 

@@ -67,7 +67,7 @@ XSS0201 = ClassUnit(SSubUnit) {
         SSubUnit.OnStopBeingBuilt(self, builer, layer)
         self:SetSpeedMult(self.Blueprint.Physics.SubSpeedMultiplier or 1)
         if self.originalBuilder then
-            IssueDive({self})
+            IssueToUnitDive(self)
         end
     end
 }

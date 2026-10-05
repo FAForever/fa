@@ -20,37 +20,37 @@ function ReconBlip:IsKnownFake(army)
 end
 
 ---
----@param army number
+---@param army Army
 ---@return boolean
 function ReconBlip:IsMaybeDead(army)
 end
 
 ---
----@param army number
+---@param army Army
 ---@return boolean
 function ReconBlip:IsOnOmni(army)
 end
 
 ---
----@param army number
+---@param army Army
 ---@return boolean
 function ReconBlip:IsOnRadar(army)
 end
 
 ---
----@param army number
+---@param army Army
 ---@return boolean
 function ReconBlip:IsOnSonar(army)
 end
 
 ---
----@param army number
+---@param army Army
 ---@return boolean
 function ReconBlip:IsSeenEver(army)
 end
 
 ---
----@param army number
+---@param army Army
 ---@return boolean
 function ReconBlip:IsSeenNow(army)
 end

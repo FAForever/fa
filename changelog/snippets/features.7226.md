@@ -1,0 +1,1 @@
+- Add "restart session" button to the quit game dialog for skirmish missions (#7226).
