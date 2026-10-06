@@ -1,1 +1,1 @@
-- Fix being unable to end a paused game. The game is now resumed when it ends, and anyone can unpause a game that is over (#7296).
+- Fix being unable to reach the score screen after ending a paused game. The game is now automatically resumed when it ends (#7296).
