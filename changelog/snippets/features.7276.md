@@ -1,1 +1,1 @@
-- The "Restart the current session" hotkey (Ctrl-F10 by default) now also restarts replays (#7276).
+- Make the "Restart the current session" hotkey also restart replays (#7276).
