@@ -128,7 +128,7 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
         while not IsDestroyed(self) do
 
             -- adjust behavior of the weapon so it only fires when we're trying to attack something
-            if weapon then
+            if not IsDestroyed(weapon) then
                 if -- we're trying to attack
                     self:IsUnitState('Attacking')
                     or self:IsUnitState('Patrolling')
