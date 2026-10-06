@@ -125,21 +125,19 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
         if not weapon then return end
 
         local lastTarget
-        while not IsDestroyed(self) do
+        while not IsDestroyed(self) and not IsDestroyed(weapon) do
 
-            -- adjust behavior of the weapon so it only fires when we're trying to attack something
-            if not IsDestroyed(weapon) then
-                if -- we're trying to attack
-                    self:IsUnitState('Attacking')
-                    or self:IsUnitState('Patrolling')
-                    -- engineer trying to take us
-                    or self:IsUnitState('BeingCaptured')
-                    or self:IsUnitState('BeingReclaimed')
-                then
-                    weapon:SetEnabled(true)
-                else
-                    weapon:SetEnabled(false)
-                end
+            -- only let weapon fire when it makes sense
+            if -- we're trying to attack
+                self:IsUnitState('Attacking')
+                or self:IsUnitState('Patrolling')
+                -- engineer trying to take us
+                or self:IsUnitState('BeingCaptured')
+                or self:IsUnitState('BeingReclaimed')
+            then
+                weapon:SetEnabled(true)
+            else
+                weapon:SetEnabled(false)
             end
 
             -- adjust behavior of tracking a target so that we speed through the target instead of bump into it
