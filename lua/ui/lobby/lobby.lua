@@ -38,8 +38,6 @@ local FactionData = import("/lua/factions.lua")
 local TextArea = import("/lua/ui/controls/textarea.lua").TextArea
 local Presets = import("/lua/ui/lobby/presets.lua")
 
-local utils = import("/lua/system/utils.lua")
-
 local Trueskill = import("/lua/ui/lobby/trueskill.lua")
 local Player = Trueskill.Player
 local Rating = Trueskill.Rating
@@ -2495,7 +2493,7 @@ local function UpdateGame()
                         info.Name = mod.name
                         info.Author = mod.author
                         info.Location = mod.location
-                        info.Identifier = string.lower(utils.StringSplit(mod.location, '/')[2])
+                        info.Identifier = string.lower(string.split(mod.location, '/')[2])
                         info.UID = uid
                         table.insert(iconReplacements, info)
                     -- tell us (and then spam the author, not the dev) if it failed

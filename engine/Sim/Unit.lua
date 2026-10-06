@@ -184,7 +184,7 @@ function Unit:GetCurrentLayer()
 end
 
 --- Returns the current move location of the unit
----@return Vector
+---@return Vector | false
 function Unit:GetCurrentMoveLocation()
 end
 
@@ -193,7 +193,12 @@ end
 function Unit:GetFireState()
 end
 
----@return Unit
+--- Gets the unit's focus unit, which is usually the unit it is building/repairing/reclaiming/capturing.
+--- The focus may be set to an Entity (usually a Shield) or a Projectile, in which case this
+--- will return nil.
+---
+---@see Unit.SetFocusEntity
+---@return Unit?
 function Unit:GetFocusUnit()
 end
 
@@ -549,7 +554,7 @@ function Unit:SetCreator(unit)
 end
 
 --- sets a custom name for the unit, displayed in green text
----@param name string
+---@param name string | number
 function Unit:SetCustomName(name)
 end
 
@@ -569,6 +574,11 @@ end
 function Unit:SetFireState(fireState)
 end
 
+--- Sets the focus entity of the unit. 
+--- Usually set by the engine when an engineer starts building/repairing/reclaiming/capturing units.
+--- Shield units set their shield entity as the focus to make it repairable.
+---
+---@see Unit.GetFocusUnit
 ---@param focus FocusObject
 function Unit:SetFocusEntity(focus)
 end

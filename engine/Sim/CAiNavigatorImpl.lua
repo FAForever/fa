@@ -33,7 +33,12 @@ end
 function CNavigator:GetGoalPos()
 end
 
----@return unknown
+---@alias NavigatorStatus
+---| 0 # Idle
+---| 1 # Thinking
+---| 2 # Steering
+
+---@return NavigatorStatus
 function CNavigator:GetStatus()
 end
 

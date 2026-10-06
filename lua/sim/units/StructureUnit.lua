@@ -630,7 +630,7 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
                 for k, guard in guards do
                     if table.getn(guard:GetCommandQueue()) == 1 then
                         IssueToUnitClearCommands(guard)
-                        IssueGuard({guard}, self)
+                        IssueToUnitGuard(guard, self)
                     end
                 end
             end
@@ -886,9 +886,9 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
                 if progress < 0.99 then
                     self:StopSiloBuild()
                     if EntityCategoryContains(categories.STRATEGIC, self) then
-                        IssueSiloBuildNuke({ self })
+                        IssueToUnitSiloBuildNuke(self)
                     else
-                        IssueSiloBuildTactical({ self })
+                        IssueToUnitSiloBuildTactical(self)
                     end
 
                     self:GiveNukeSiloBlocks(progress)
@@ -929,7 +929,7 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
                 local progress = self:GetWorkProgress()
                 if progress < 0.99 then
                     self:StopSiloBuild()
-                    IssueSiloBuildTactical({ self })
+                    IssueToUnitSiloBuildTactical(self)
                     self:GiveNukeSiloBlocks(progress)
                     self:SetAutoMode(autoModeEnabled)
                 end
