@@ -65,7 +65,8 @@ local tech3categories = categories.TECH3
 ---@field Radius number
 ---@field LocationType string Name of the location
 ---@field PrimaryFactories table<PMBPlatoonType, FactoryUnit?>
----@field UseCenterPoint boolean If its `true` and no specific rally point is specified, `Location`` is used as the rally position.
+---@field UseCenterPoint boolean If its `true` and no specific rally point is specified, `Location` is used as the rally position.
+---@field Rally? Vector Position for rally point. If not provided, closest rally marker is used
 
 ---@class PBMPossiblePlatoon
 ---@field Builder PBMPlatoonBuilderTask
@@ -338,9 +339,14 @@ AIBrain = Class(StandardBrain) {
     ---@param self CampaignAIBrain
     InitializePlatoonBuildManager = function(self)
         if not self.PBM then
+            ---@class CachedBuildConditon: BuildCondition
+            ---@field LookupNumber integer Index into `AiPlatoonBuildManager.BuildConditionsTable` build condition cache
+            ---@field CachedResult boolean Result of the build condition
+
             ---@class AiPlatoonBuildManager
             ---@field Locations PBMBuildLocation[]
             ---@field Platoons {[PMBPlatoonType]: PBMPlatoonBuilderTask[]}
+            ---@field BuildConditionsTable CachedBuildConditon[]
             self.PBM = {
                 BuildCheckInterval = nil,
                 Platoons = {
@@ -1188,12 +1194,11 @@ AIBrain = Class(StandardBrain) {
     ---@param pType PMBPlatoonType
     ---@return PBMPossiblePlatoon[]
     PBMGetPossibleBuilders = function(self, location, list, pType)
-        local armyIndex = self:GetArmyIndex()
+        ---@type table<string, PBMPlatoonBuilder>
         local builderTable = ScenarioInfo.BuilderTable[self.CurrentPlan][pType]
         local RandomSamePriority = self.PBM.RandomSamePriority
         local suggestedFactories = {location.PrimaryFactories[pType]}
 
-        ---@type PBMPossiblePlatoon[]
         local possibleTemplates = {}
         local priorityLevel
 
@@ -1209,7 +1214,7 @@ AIBrain = Class(StandardBrain) {
                     and self:PBMHandleAvailable(entry) then
                 -- Fix up the primary factories to fit the proper table required by CanBuildPlatoon
                 local factories = self:CanBuildPlatoon(entry.PlatoonTemplate, suggestedFactories)
-                if factories and self:PBMCheckBuildConditions(globalBuilder.BuildConditions, armyIndex) then
+                if factories and self:PBMCheckBuildConditions(globalBuilder.BuildConditions) then
                     priorityLevel = entry.Priority
                     for _ = 1, self:PBMNumHandlesAvailable(entry) do
                         TableInsert(possibleTemplates, {Builder = entry, Index = i, Global = globalBuilder})
@@ -1320,14 +1325,12 @@ AIBrain = Class(StandardBrain) {
     ---@param globalBuilder PBMPlatoonBuilderFull
     ---@return boolean
     PBMCanTryFormingPlatoon = function(self, task, requireBuilding, numBuildOrders, location, globalBuilder)
-        local armyIndex = self:GetArmyIndex()
-
         if task.Priority > 0 and (requireBuilding and self:PBMCheckHandleBuilding(task)
                 and numBuildOrders and numBuildOrders == 0
                 and (not task.LocationType or task.LocationType == location.LocationType))
                 or (((self:PBMHandleAvailable(task)) and (not requireBuilding or not globalBuilder.RequiresConstruction))
                 and (not task.LocationType or task.LocationType == location.LocationType)
-                and self:PBMCheckBuildConditions(globalBuilder.BuildConditions, armyIndex)) then
+                and self:PBMCheckBuildConditions(globalBuilder.BuildConditions)) then
             return true
         end
         return false
@@ -1713,62 +1716,56 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
+    ---Returns `true` when all build conditions are passing or there are none specified.
     ---@param self CampaignAIBrain
-    ---@param bCs table
-    ---@param index number
+    ---@param buildConditions BuildCondition[]
     ---@return boolean
-    PBMCheckBuildConditions = function(self, bCs, index)
+    PBMCheckBuildConditions = function(self, buildConditions)
         local buildConditionsTable = self.PBM.BuildConditionsTable
-        for _, v in pairs(bCs) do
-            if not v.LookupNumber[index] then
-                local found = false
+        for _, bc in pairs(buildConditions) do
+            if not bc.LookupNumber then
+                local foundIndex = -1
 
-                for num, bcData in pairs(buildConditionsTable) do
-                    if bcData[1] == v[1] and bcData[2] == v[2] and TableGetn(bcData[3]) == TableGetn(v[3]) then
-                        local tablePos = 1
-                        found = num
-                        while tablePos <= TableGetn(v[3]) do
-                            if bcData[3][tablePos] ~= v[3][tablePos] then
-                                found = false
+                for num, cachedBc in pairs(buildConditionsTable) do
+                    local bcArgs, cachedArgs = bc[3], cachedBc[3]
+                    -- find build condition with matching file, fn and number of args
+                    if cachedBc[1] == bc[1] and cachedBc[2] == bc[2] and TableGetn(cachedArgs) == TableGetn(bcArgs) then
+                        local i = 1
+                        foundIndex = num
+                        -- go over the args to see if they match as well
+                        while i <= TableGetn(bcArgs) do
+                            if cachedArgs[i] ~= bcArgs[i] then
+                                foundIndex = -1
                                 break
                             end
-                            tablePos = tablePos + 1
+                            i = i + 1
                         end
+                        -- we have a match
+                        if foundIndex ~= -1 then break end
                     end
                 end
 
-                if found then
-                    if not v.LookupNumber then
-                        v.LookupNumber = {}
-                    end
-                    v.LookupNumber[index] = found
+                if foundIndex ~= -1 then
+                    bc.LookupNumber = foundIndex
                 else
-                    if not v.LookupNumber then
-                        v.LookupNumber = {}
-                    end
-                    TableInsert(buildConditionsTable, v)
-                    v.LookupNumber[index] = TableGetn(buildConditionsTable)
-                end
-            end
-            if not buildConditionsTable[v.LookupNumber[index]].Cached[index] then
-                if not buildConditionsTable[v.LookupNumber[index]].Cached then
-                    buildConditionsTable[v.LookupNumber[index]].Cached = {}
-                    buildConditionsTable[v.LookupNumber[index]].CachedVal = {}
-                end
-                buildConditionsTable[v.LookupNumber[index]].Cached[index] = true
-
-                local d = buildConditionsTable[v.LookupNumber[index]]
-                buildConditionsTable[v.LookupNumber[index]].CachedVal[index] = import(d[1])[d[2]](self, unpack(d[3]))
-                if not self.BCFuncCalls then
-                    self.BCFuncCalls = 0
-                end
-
-                if index == 3 then
-                    self.BCFuncCalls = self.BCFuncCalls + 1
+                    TableInsert(buildConditionsTable, bc)
+                    bc.LookupNumber = TableGetn(buildConditionsTable)
                 end
             end
 
-            if not buildConditionsTable[v.LookupNumber[index]].CachedVal[index] then
+            local cachedBc = buildConditionsTable[bc.LookupNumber]
+            -- we dont have result for our army yet
+            if cachedBc.CachedResult == nil then
+                local result = import(cachedBc[1])[cachedBc[2]](self, unpack(cachedBc[3]))
+                if result == nil then
+                    --WARN("Build condition returned 'nil' instead of 'false':", cachedBc[1], cachedBc[2], repr(cachedBc[3]))
+                    -- for the cache to work properly, we need to return a boolean value
+                    result = false
+                end
+                cachedBc.CachedResult = result
+            end
+
+            if not cachedBc.CachedResult then
                 return false
             end
         end
@@ -1777,9 +1774,8 @@ AIBrain = Class(StandardBrain) {
 
     ---@param self CampaignAIBrain
     PBMClearBuildConditionsCache = function(self)
-        local armyIndex = self:GetArmyIndex()
-        for _, v in pairs(self.PBM.BuildConditionsTable) do
-            v.Cached[armyIndex] = false
+        for _, bc in pairs(self.PBM.BuildConditionsTable) do
+            bc.CachedResult = nil
         end
     end,
 
