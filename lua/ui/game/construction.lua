@@ -1910,7 +1910,7 @@ function CreateExtraControls(controlType)
             SetPaused(sortedOptions.selection, checked)
             -- If we have exFacs platforms or exFac units selected, we'll pause their counterparts as well
             for _, exFac in EntityCategoryFilterDown(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, sortedOptions.selection) do
-                if exFac:FractionComplete() == 1 then
+                if exFac:GetFractionComplete() == 1 then
                     exFac:GetCreator():ProcessInfo('SetPaused', tostring(checked))
                 end
             end
