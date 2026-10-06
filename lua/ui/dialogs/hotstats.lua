@@ -248,15 +248,15 @@ function create_graph_bar(parent,name)
     local player_nbr_by_row=player_nbr
     if player_nbr>4 then row_nbr=2  player_nbr_by_row=math.ceil(player_nbr/2) end
 
-    space_bg_height=math.max((Height())*(row_nbr-1)*.1,35*(row_nbr-1))
-    bg_height=(Height()-space_bg_height)/row_nbr
+    local space_bg_height=math.max((Height())*(row_nbr-1)*.1,35*(row_nbr-1))
+    local bg_height=(Height()-space_bg_height)/row_nbr
 
-    space_between_columns=math.floor(30/player_nbr_by_row)
-    space_bg_width=space_between_columns*7
+    local space_between_columns=math.floor(30/player_nbr_by_row)
+    local space_bg_width=space_between_columns*7
 
     local bg_width=math.min((Width()-space_bg_width*(player_nbr_by_row-1))/player_nbr_by_row,400)
     local x_center=math.floor((Width()-player_nbr_by_row*bg_width - (player_nbr_by_row-1)*space_bg_width)/2)
-    dec={left=math.floor(bg_height*.1),top=50/row_nbr,right=80/player_nbr_by_row,bottom=math.max(math.floor(bg_height*.15),30)}
+    local dec={left=math.floor(bg_height*.1),top=50/row_nbr,right=80/player_nbr_by_row,bottom=math.max(math.floor(bg_height*.15),30)}
 
     local columns_width=(bg_width-dec.left-dec.right-(columns_nbr-1)*space_between_columns)/columns_nbr
     local row=0
@@ -303,9 +303,9 @@ function create_graph_bar(parent,name)
             value[columns_num][play.index]={}
             value[columns_num][play.index].columns_value=0
             value[columns_num][play.index].winner=false
-            part_num=0
+            local part_num=0
             for k,part in columns.data do
-                pat_num=part_num+1
+                part_num=part_num+1
                 value[columns_num][play.index][part_num]={}
                 value[columns_num][play.index][part_num].value=return_value(0,play.index,part.path)
                 value[columns_num][play.index].columns_value=value[columns_num][play.index].columns_value+ value[columns_num][play.index][part_num].value
@@ -445,7 +445,7 @@ function line(parent,x1,y1,x2,y2,color, size)
     grp.Top:Set(0)
     grp.Right:Set(0)
     grp.Bottom:Set(0)
-    function add_pixel(grp,parent,x1,y1,color,size)
+    local function add_pixel(grp,parent,x1,y1,color,size)
         local bmp=Bitmap(grp)
         bmp.Left:Set(parent.Left() +x1)
         bmp.Top:Set(parent.Top() +y1)
@@ -470,11 +470,11 @@ end
 
 function tps_format(seconds)
     if seconds<60 then return math.floor(seconds).."s" end
-    m=math.floor(seconds/60)
+    local m=math.floor(seconds/60)
     if m<60 then
         if math.floor(seconds-60*m) != 0 then return m.."m"..math.floor(seconds-60*m) else return m.."m" end
     end
-    h=math.floor(seconds/3600)
+    local h=math.floor(seconds/3600)
     if math.floor((seconds-3600*h)/60)==0 then return h.."h" end
     return h.."h"..math.floor((seconds-3600*h)/60)
 end
@@ -482,7 +482,7 @@ end
 -- allow to find the best value upper to one (ie if int=3785 -->5000)
 function arrange(int)
     local lg=math.log10(int)
-    digit=int/math.pow(10,math.floor(lg)) -- the first number
+    local digit=int/math.pow(10,math.floor(lg)) -- the first number
     if digit<2.4 then return 2.5*math.pow(10,math.floor(lg))
     elseif digit<4.9 then return 5*math.pow(10,math.floor(lg))
     elseif digit<7.5 then return 7.5*math.pow(10,math.floor(lg))
@@ -540,7 +540,7 @@ function page_graph(parent)
         :OffsetIn(parent, 0, 0, 0, 50)
         :End()
 
-    function reCreateGraph(dataPath, textDesc)
+    local function reCreateGraph(dataPath, textDesc)
         if page_active_graph then page_active_graph:Destroy() page_active_graph=false end
         page_active_graph=create_graph(graphArea,dataPath)
         Title_score:SetText(textDesc)
@@ -552,7 +552,7 @@ function page_graph(parent)
     local graph_list={}
     local Combo = import("/lua/ui/controls/combo.lua").Combo
     -- local BitmapCombo = import("/lua/ui/controls/combo.lua").BitmapCombo
-    combo_graph=Combo(page_active, 17, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
+    local combo_graph=Combo(page_active, 17, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
     combo_graph.Right:Set(function() return parent.Right() end)
     combo_graph.Bottom:Set(function() return parent.Top() end)
     combo_graph.Width:Set(250 * pixelScaleFactor)
@@ -608,7 +608,7 @@ function page_bar(parent)
         :OffsetIn(parent, 0, 0, 0, 50)
         :End()
 
-    function reCreateChart(chartGroup)
+    local function reCreateChart(chartGroup)
         if page_active_graph2 then page_active_graph2:Destroy() page_active_graph2=false end
         page_active_graph2=create_graph_bar(chartArea,chartGroup)
     end
@@ -883,9 +883,9 @@ function create_graph(parent,path)
         end
         
         -- ============ starting
-        t=CurrentTime()
+        local t=CurrentTime()
         WaitFrames(5)
-        t1=CurrentTime()
+        local t1=CurrentTime()
         -- LOG("------- calculating the timing of the frame")
         -- LOG("Time to display 1 frame (calculate with 10 frames):",(t1-t)/5,'  t:',t,'   t1:',t1)
         local delta_refresh=graphWidth()*(t1-t)/5*((player_nbr+1)/4)  -- the distance in time between the smallest halt possible to make a refresh
@@ -960,7 +960,7 @@ function create_graph(parent,path)
         local playerFinalValueLabel={}
         for index, dat in player do
             local rawValue = return_value(data_nbr + 1,dat.index,path)
-            val=math.floor(rawValue) --This is the value label that gets shown on the graph for each player, e.g. for the winner this will be the end-game high score achieved (not sure if this is the highest value at any point in the game or just the score at the end of the game)
+            local val=math.floor(rawValue) --This is the value label that gets shown on the graph for each player, e.g. for the winner this will be the end-game high score achieved (not sure if this is the highest value at any point in the game or just the score at the end of the game)
             playerFinalValueLabel[dat.index]=UIUtil.CreateText(dataArea,FormatNumber(val), 14, UIUtil.titleFont)
             Layouter(playerFinalValueLabel[dat.index])
                 :Color(dat.color)
@@ -985,13 +985,13 @@ function create_graph(parent,path)
         local delta_refresh=graphWidth()/(6*size) -- the distance in time between the smallest halt possible to make a refresh
         local delta=0 -- counter for refresh and small halt
         --if graph != nil and graph then graph:Destroy() graph=false end
-        graph2={} -- will containt a table for each line and each line will be a table of bitmap
+        local graph2={} -- will containt a table for each line and each line will be a table of bitmap
         for index, dat in player do     graph2[dat.index]={}    end -- init the different line
         WaitSeconds(0.001) -- give time to refresh and displayed the background
         -- ============ starting
-        t=CurrentTime()
+        local t=CurrentTime()
         WaitFrames(10)
-        t1=CurrentTime()
+        local t1=CurrentTime()
         --LOG("------- calculating the timing of the frame")
         --LOG("Time to display 1 frame (calculate with 10 frames):",(t1-t)/10,'  t:',t,'   t1:',t1)
         delta_refresh=graphWidth()*(t1-t)/10*((player_nbr+1)/4)

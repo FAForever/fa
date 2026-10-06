@@ -105,7 +105,7 @@ function FactoryRebuildUnits(factoryRebuildDataTable)
                     rebuiltUnit:Destroy()
                     rebuiltUnit = nil
                 end
-                IssueClearCommands({ factory })
+                IssueToUnitClearCommands(factory)
                 factory:SetPaused(false)
                 WARN(string.format(
                     [[FactoryRebuildUnits failed to rebuild correctly for factory %s (entity ID %d).
@@ -168,7 +168,7 @@ function UpgradeTransferredKennels(kennels)
                 end
             end
 
-            IssueUpgrade({ unit }, unit.UpgradesTo)
+            IssueToUnitUpgrade(unit, unit.UpgradesTo)
         end
     end
 
@@ -200,7 +200,7 @@ end
 ---@param units Unit[]
 function UpgradeUnits(units)
     for _, unit in units do
-        IssueUpgrade({ unit }, unit.UpgradesTo)
+        IssueToUnitUpgrade(unit, unit.UpgradesTo)
         if not unit.DefaultBuildRate then
             unit.DefaultBuildRate = unit:GetBuildRate()
         end
@@ -646,7 +646,7 @@ function TryRebuildUnits(trackers, army)
         rebuilder.TargetBuildTime = tracker.TargetBuildTime
         rebuilders[k] = rebuilder
 
-        IssueBuildMobile({ rebuilder }, tracker.UnitPos, tracker.UnitBlueprintID, {})
+        IssueToUnitBuildMobile(rebuilder, tracker.UnitPos, tracker.UnitBlueprintID, {})
     end
 
     WaitTicks(3) -- wait some ticks (3 is minimum), IssueBuildMobile() is not instant
@@ -1432,7 +1432,7 @@ function DisableAI(self)
     SorianUtils.AISendChat('enemies', self.Nickname, 'ilost')
     -- remove PlatoonHandle from all AI units before we kill / transfer the army
     local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-    if not table.empty(units) then
+    if not TableEmpty(units) then
         for _, unit in units do
             if not unit.Dead then
                 local handle = unit.PlatoonHandle
@@ -1440,7 +1440,7 @@ function DisableAI(self)
                     handle:Stop()
                     handle:PlatoonDisbandNoAssign()
                 end
-                IssueStop({ unit })
+                IssueToUnitStop(unit)
                 IssueToUnitClearCommands(unit)
             end
         end

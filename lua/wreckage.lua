@@ -11,6 +11,7 @@ local Prop = import("/lua/sim/prop.lua").Prop
 local CreateProp = CreateProp
 
 ---@class Wreckage : Prop
+---@field AssociatedBP BlueprintId BlueprintID of the unit
 Wreckage = Class(Prop) {
 
     IsWreckage = true,
@@ -62,7 +63,7 @@ Wreckage = Class(Prop) {
     ---@return Wreckage
     Clone = function(self)
         local clone = CreateWreckage(
-            __blueprints[self.AssociatedBP],
+            __blueprints[self.AssociatedBP] --[[@as UnitBlueprint]],
             self.CachePosition,
             self:GetOrientation(),
             self.MaxMassReclaim,
@@ -98,7 +99,7 @@ Wreckage = Class(Prop) {
         if not rebuilders[1] then return end
         local pos = self:GetPosition()
         for _, u in rebuilders do
-            IssueBuildMobile({u}, pos, bpid, {})
+            IssueToUnitBuildMobile(u, pos, bpid, {})
         end
         if assisters[1] then
             IssueGuard(assisters, pos)
@@ -116,7 +117,7 @@ Wreckage = Class(Prop) {
 ---@param deathHitBox? table
 ---@return Wreckage
 function CreateWreckage(bp, position, orientation, mass, energy, timeMult, deathHitBox)
-    local prop = CreateProp(position, bp.Wreckage.Blueprint)
+    local prop = CreateProp(position, bp.Wreckage.Blueprint) --[[@as Wreckage]]
     prop:SetOrientation(orientation, true)
     prop:SetScale(bp.Display.UniformScale)
 
