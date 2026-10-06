@@ -110,20 +110,27 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
         self.EffectsBagXRL = TrashBag()
         self.AmbientExhaustEffectsBagXRL = TrashBag()
 
-        self.Trash:Add(
-            ForkThread(
-                self.TrackTargetThread, self
-            )
-        )
+        self:StartTrackTargetThread()
     end,
 
+    --- Starts thread that makes weapon only enable on 
     ---@param self XRL0302
-    TrackTargetThread = function(self)
+    ---@return thread?
+    StartTrackTargetThread = function(self)
         local navigator = self:GetNavigator()
         if not navigator then return end
         local weapon = self:GetWeaponByLabel('Suicide')
         if not weapon then return end
 
+        return self.Trash:Add(
+            ForkThread(self.TrackTargetThread, self, navigator, weapon)
+        )
+    end,
+
+    ---@param self XRL0302
+    ---@param navigator Navigator
+    ---@param weapon XRL0302_Suicide
+    TrackTargetThread = function(self, navigator, weapon)
         local lastTarget
         while not IsDestroyed(self) and not IsDestroyed(weapon) do
 
