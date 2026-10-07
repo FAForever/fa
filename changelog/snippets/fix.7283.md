@@ -1,0 +1,1 @@
+- Fix uncommon error with fire beetle script where SetEnabled is called on a destroyed weapon game object (#7283).
