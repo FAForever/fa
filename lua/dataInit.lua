@@ -20,20 +20,20 @@ function FLOAT(f)
 end
 
 --- A basic 2D vector defined in the scenario
----@class UIScenarioVector2
+---@class ScenarioVector2
 ---@field [1] number # x
 ---@field [2] number # y
 ---@field type 'VECTOR2'
 
 ---@param x number
 ---@param y number
----@return UIScenarioVector2
+---@return ScenarioVector2
 function VECTOR2(x,y)
 	return { x, y, type = 'VECTOR2' }
 end
 
 --- A basic 3D vector defined in the scenario
----@class UIScenarioVector
+---@class ScenarioVector
 ---@field [1] number # x
 ---@field [2] number # y
 ---@field [3] number # z
@@ -42,13 +42,13 @@ end
 ---@param x number
 ---@param y number
 ---@param z number
----@return UIScenarioVector
+---@return ScenarioVector
 function VECTOR3(x,y,z)
 	return { x, y, z, type = 'VECTOR3' }
 end
 
 --- A basic area defined in the scenario.
----@class UIScenarioArea
+---@class ScenarioArea
 ---@field [1] number    # x0
 ---@field [2] number    # z0
 ---@field [3] number    # x1
@@ -59,7 +59,7 @@ end
 ---@param y0 number
 ---@param x1 number
 ---@param y1 number
----@return UIScenarioArea
+---@return ScenarioArea
 function RECTANGLE(x0,y0,x1,y1)
 	return { x0, y0, x1, y1, type = 'RECTANGLE' }
 end
@@ -70,11 +70,11 @@ function STRING(s)
 	return s
 end
 
----@class UIScenarioGroup : table
+---@class ScenarioGroup : table
 ---@field type 'GROUP'
 
 ---@param group table
----@return UIScenarioGroup
+---@return ScenarioGroup
 function GROUP(group)
 	group.type = 'GROUP'
 	return group

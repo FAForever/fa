@@ -11,8 +11,8 @@
 ---@field color string
 ---@field type string
 ---@field prop BlueprintId  # path to blueprint
----@field orientation UIScenarioVector
----@field position UIScenarioVector
+---@field orientation ScenarioVector
+---@field position ScenarioVector
 
 --- A chain of markers defined in the scenario.
 ---@class UIScenarioChain
@@ -22,10 +22,10 @@
 ---@field type UnitId
 ---@field orders string # Can be empty
 ---@field platoon string # Can be empty
----@field Position UIScenarioVector
----@field Orientation UIScenarioVector
+---@field Position ScenarioVector
+---@field Orientation ScenarioVector
 
----@class UIScenarioUnitGroup : UIScenarioGroup
+---@class UIScenarioUnitGroup : ScenarioGroup
 ---@field orders string # Can be empty
 ---@field platoon string # Can be empty
 ---@field Units { [string]: (UIScenarioUnitGroup | UIScenarioUnit) }
@@ -44,7 +44,7 @@
 --- Scenario entities of a map that defines all areas, (resource) markers, marker chains and armies as defined in the average _save file.
 ---@class UIScenarioSaveFile
 ---@field Props table       # Unknown
----@field Areas table<string, { rectangle: UIScenarioArea }>
+---@field Areas table<string, { rectangle: ScenarioArea }>
 ---@field MasterChain { _MASTERCHAIN_ : table<string, UIScenarioMarker> }
 ---@field Chains table<string, UIScenarioChain>
 ---@field Orders table      # Unknown
@@ -351,7 +351,7 @@ end
 -- I've made this function so it works with the old data format and the new
 -- Returning an empty table means scenario data was ill formed
 ---@param scenario UIScenarioInfoFile
----@return UIScenarioVector2[]
+---@return ScenarioVector2[]
 function GetStartPositions(scenario)
     local saveData = {}
     doscript('/lua/dataInit.lua', saveData)
@@ -561,7 +561,7 @@ end
 --- Retrieves all the starting positions for a scenario. Allocates and returns new tables on each call.
 ---@param scenarioInfo UIScenarioInfoFile
 ---@param scenarioSave UIScenarioSaveFile
----@return UIScenarioVector2[]?
+---@return ScenarioVector2[]?
 function GetStartPositionsFromScenario(scenarioInfo, scenarioSave)
     local armies = GetArmiesFromScenario(scenarioInfo)
     if not armies then
@@ -593,8 +593,8 @@ end
 
 ---Returns all units' (leaf nodes) positions under the specified group.
 ---@param tblNode? UIScenarioUnitGroup
----@param positions? UIScenarioVector[]
----@return UIScenarioVector[]
+---@param positions? ScenarioVector[]
+---@return ScenarioVector[]
 local function extractUnitPositions(tblNode, positions)
     positions = positions or {}
     if not tblNode then return positions end
@@ -613,8 +613,8 @@ end
 
 ---Extracts wreckage positions from all groups that contain `"wreck"` in their name.
 ---@param tblNode? UIScenarioUnitGroup
----@param positions? UIScenarioVector[]
----@return UIScenarioVector[]
+---@param positions? ScenarioVector[]
+---@return ScenarioVector[]
 local function extractPositionsFromWreckageGroups(tblNode, positions)
     positions = positions or {}
     if not tblNode then return positions end
@@ -635,9 +635,9 @@ end
 
 ---Returns all unit wreckage positions. Extracted from army groups that contain `"wreck"` in their name.
 ---@param scenario UIScenarioSaveFile
----@return UIScenarioVector[]
+---@return ScenarioVector[]
 function GetWreckagePositions(scenario)
-    ---@type UIScenarioVector[]
+    ---@type ScenarioVector[]
     local positions = {}
 
     for _, army in pairs(scenario.Armies) do
