@@ -135,6 +135,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field BuildArmManipulator? moho.BuilderArmManipulator
 ---@field Trash TrashBag
 ---@field Layer Layer
+---@field HorzMotionState? HorizontalMovementState
 ---@field Army Army
 ---@field Dead? boolean
 ---@field UnitId UnitId
@@ -3435,6 +3436,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         elseif new == 'Water' or new == 'Seabed' then
             self:PlayUnitSound('TransitionWater')
         end
+        self:UpdateUnitAmbientMoveSound(new)
 
         local movementEffects = self.Blueprint.Display.MovementEffects
         if not self.Footfalls and movementEffects[new].Footfall then
@@ -3464,17 +3466,16 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
 
         local layer = self.Layer
+        self.HorzMotionState = new
 
         -- play sounds / events when we start moving
         if old == 'Stopped' then
 
-            if not self:PlayUnitSound('StartMove' .. layer) then 
+            if not self:PlayUnitSound('StartMove' .. layer) then
                 self:PlayUnitSound('StartMove')
             end
 
-            if not self:PlayUnitAmbientSound('AmbientMove' .. layer) then 
-                self:PlayUnitAmbientSound('AmbientMove')
-            end
+            self:UpdateUnitAmbientMoveSound(layer, new)
         end
 
         -- play sounds / events when we stop moving
@@ -4156,6 +4157,27 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     StopUnitAmbientSound = function(self)
         (self.SoundEntity or self):SetAmbientSound(nil, nil)
         return true
+    end,
+
+    --- Plays the ambient move sound for the current layer if the unit is moving
+    ---@param self Unit
+    ---@param newLayer? Layer # defaults to `self.Layer`
+    ---@param newState? HorizontalMovementState # defaults to `self.HorzMotionState`
+    UpdateUnitAmbientMoveSound = function(self, newLayer, newState)
+        newState = newState or self.HorzMotionState
+        if newState == 'Stopped' or newState == 'Stopping' or not newState then
+            return
+        end
+
+        newLayer = newLayer or self.Layer
+        if self:PlayUnitAmbientSound('AmbientMove' .. newLayer) then
+            return
+        end
+        -- seabed units use the water sound
+        if newLayer == 'Seabed' and self:PlayUnitAmbientSound('AmbientMoveWater') then
+            return
+        end
+        self:PlayUnitAmbientSound('AmbientMove')
     end,
 
     -------------------------------------------------------------------------------------------
