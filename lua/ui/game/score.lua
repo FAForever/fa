@@ -68,10 +68,14 @@ function updatePlayerName(line)
     end
 
     if sessionInfo.Options.Divisions then
-        line.name:SetText(playerClan .. playerName .. playerDivision)
+        line.division:SetText(playerDivision)
     else
-        line.name:SetText(playerClan .. playerName .. playerRating)
+        line.division:SetText(playerRating)
     end
+
+    line.name:SetText(playerClan .. playerName)
+    line.name:SetDropShadow(true)
+    LayoutHelpers.AnchorToLeft(line.name, line.division)
 end
 
 function armyGroupHeight()
@@ -119,14 +123,20 @@ function CreateScoreUI(parent)
 
     LayoutHelpers.SetWidth(controls.bgTop, 320)
 
-    controls.time = UIUtil.CreateText(controls.bgTop, '0', 12, UIUtil.bodyFont)
+    controls.time = UIUtil.CreateText(controls.bgTop, '0', 12, UIUtil.bodyFont, true)
     controls.time:SetColor('ff00dbff')
     controls.timeIcon = Bitmap(controls.bgTop)
     Tooltip.AddControlTooltip(controls.timeIcon, 'score_time')
     Tooltip.AddControlTooltip(controls.time, 'score_time')
+    controls.gameSpeed = UIUtil.CreateText(controls.bgTop, '', 12, UIUtil.bodyFont, true)
+    controls.gameSpeed:SetColor('ffbadaff')
+    Tooltip.AddControlTooltip(controls.gameSpeed, 'score_game_speed')
+    controls.gameQuality = UIUtil.CreateText(controls.bgTop, '', 12, UIUtil.bodyFont, true)
+    controls.gameQuality:SetColor('ff00dbff')
+    Tooltip.AddControlTooltip(controls.gameQuality, 'score_game_quality')
     controls.unitIcon = Bitmap(controls.bgTop)
     Tooltip.AddControlTooltip(controls.unitIcon, 'score_units')
-    controls.units = UIUtil.CreateText(controls.bgTop, '0', 12, UIUtil.bodyFont)
+    controls.units = UIUtil.CreateText(controls.bgTop, '0', 12, UIUtil.bodyFont, true)
     controls.units:SetColor('ffff9900')
     Tooltip.AddControlTooltip(controls.units, 'score_units')
 
@@ -301,6 +311,12 @@ function SetupPlayerLines()
         LayoutHelpers.AtVerticalCenterIn(group.name, group)
         group.name:SetColor('ffffffff')
 
+        group.division = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont, true)
+        group.division:DisableHitTest()
+        LayoutHelpers.AtRightIn(group.division, group, 135)
+        LayoutHelpers.AtVerticalCenterIn(group.division, group)
+        group.division:SetColor('ffffffff')
+
         group.score = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
         group.score:DisableHitTest()
         LayoutHelpers.AtRightIn(group.score, group, sw * 2 + 16)
@@ -308,7 +324,7 @@ function SetupPlayerLines()
         group.score:SetColor('ffffffff')
 
         LayoutHelpers.AnchorToLeft(group.name, group.score, 5)
-        group.name:SetClipToWidth(true)
+        group.name:SetClipToWidth(true, true)
 
         if armyIndex ~= 0 then
             group.mass = Bitmap(group)
@@ -369,6 +385,19 @@ function SetupPlayerLines()
             Tooltip.AddControlTooltip(group.units, {text = '', body = bodyText}, 1)
         end
 
+        -- hover to see full name (incase they are cut off)
+        group.nameHover = Bitmap(group)
+        group.nameHover:SetAlpha(0)
+        LayoutHelpers.AnchorToLeft(group.nameHover, group.division)
+        LayoutHelpers.AtLeftIn(group.nameHover, group, 12)
+        group.nameHover.Height:Set(group.name.Height)
+        LayoutHelpers.AtVerticalCenterIn(group.nameHover, group)
+        Tooltip.AddAutoUpdatedControlTooltip(group.nameHover,
+            function() return group.name:GetText() or "" end,
+            function() return "" end,
+            0.5
+        )
+
         group.Height:Set(group.faction.Height)
         group.Width:Set(controls.armyGroup.Width)
         group.armyID = armyIndex
@@ -413,6 +442,7 @@ function SetupPlayerLines()
     observerLine:Hide()
     observerLine.OnHide = blockOnHide
     observerLine.name.Top:Set(observerLine.Top)
+    observerLine.name:SetDropShadow(true)
     LayoutHelpers.SetHeight(observerLine, 15)
 
     if SessionIsReplay() then
@@ -473,7 +503,7 @@ function SetupPlayerLines()
         end
 
         -- ui for share conditions
-        group.ShareConditions = UIUtil.CreateText(group, data.ShareConditionsTitle, 10, UIUtil.bodyFont)
+        group.ShareConditions = UIUtil.CreateText(group, data.ShareConditionsTitle, 10, UIUtil.bodyFont, true)
         Tooltip.AddForcedControlTooltipManual(group.ShareConditions, data.ShareConditionsTitle, data.ShareConditionsDescription)
         LayoutHelpers.AtLeftIn(group.ShareConditions, group)
         LayoutHelpers.AtVerticalCenterIn(group.ShareConditions, group)
@@ -482,7 +512,7 @@ function SetupPlayerLines()
         previous = AddDash()
 
         -- ui for map size
-        group.Size = UIUtil.CreateText(group, data.SizeText, 10, UIUtil.bodyFont)
+        group.Size = UIUtil.CreateText(group, data.SizeText, 10, UIUtil.bodyFont, true)
         LayoutHelpers.RightOf(group.Size, previous)
         LayoutHelpers.AtVerticalCenterIn(group.Size, group)
         group.Size:SetColor('ffffffff')
@@ -490,7 +520,7 @@ function SetupPlayerLines()
         previous = AddDash()
 
         -- ui for map name
-        group.MapName = UIUtil.CreateText(group, data.MapTitle, 10, UIUtil.bodyFont)
+        group.MapName = UIUtil.CreateText(group, data.MapTitle, 10, UIUtil.bodyFont, true)
         Tooltip.AddForcedControlTooltipManual(group.MapName, data.MapTitle, data.MapDescription)
         LayoutHelpers.RightOf(group.MapName, previous)
         LayoutHelpers.AtVerticalCenterIn(group.MapName, group)
@@ -615,11 +645,17 @@ local prevPlayableWidth = sessionInfo.PlayableAreaWidth
 local prevPlayableHeight = sessionInfo.PlayableAreaHeight
 
 function _OnBeat()
-    local s = string.format("%s (%+d / %+d)", GetGameTime(), gameSpeed, GetSimRate())
+    local t = string.format("%s", GetGameTime())
+    controls.time:SetText(t)
+
+    local s = string.format("(%+d / %+d)",gameSpeed, GetSimRate())
+    controls.gameSpeed:SetText(s)
+
     if sessionInfo.Options.Quality then
-        s = string.format("%s Q:%.2f%%", s, sessionInfo.Options.Quality)
+        local q = string.format("Q:%.2f%%", sessionInfo.Options.Quality)
+        controls.gameQuality:SetText(q)
     end
-    controls.time:SetText(s)
+
 
     if sessionInfo.Options.NoRushOption and sessionInfo.Options.NoRushOption ~= 'Off' then
         local norush = tonumber(sessionInfo.Options.NoRushOption) * 60
@@ -662,6 +698,7 @@ function _OnBeat()
                         if GetFocusArmy() ~= index then
                             line.name:SetColor('ffa0a0a0')
                             line.score:SetColor('ffa0a0a0')
+                            line.division:SetColor('ffa0a0a0')
                         end
                         line.mass_in:SetColor('ffa0a0a0')
                         line.energy_in:SetColor('ffa0a0a0')
@@ -714,26 +751,36 @@ function _OnBeat()
             if line.armyID == prevArmy then
                 if line.OOG then
                     line.name:SetColor('ffa0a0a0')
+                    line.division:SetColor('ffa0a0a0')
                     line.score:SetColor('ffa0a0a0')
                 else
                     line.name:SetColor('ffffffff')
+                    line.division:SetColor('ffffffff')
                     line.score:SetColor('ffffffff')
                 end
                 line.name:SetFont(UIUtil.bodyFont, 12)
+                line.division:SetFont(UIUtil.bodyFont, 12)
                 line.score:SetFont(UIUtil.bodyFont, 12)
             elseif line.armyID == curFA then
                 line.name:SetColor('ffff7f00')
+                line.division:SetColor('ffff7f00')
                 line.score:SetColor('ffff7f00')
+
                 line.name:SetFont('Arial Bold', 12)
+                line.division:SetFont('Arial Bold', 12)
                 line.score:SetFont('Arial Bold', 12)
             end
         end
         if curFA < 1 then
             observerLine.name:SetColor('ffff7f00')
+            observerLine.division:SetColor('ffff7f00')
+            observerLine.division:SetFont('Arial Bold', 12)
             observerLine.name:SetFont('Arial Bold', 12)
         elseif prevArmy < 1 then
             observerLine.name:SetColor('ffffffff')
+            observerLine.division:SetColor('ffffffff')
             observerLine.name:SetFont(UIUtil.bodyFont, 12)
+            observerLine.division:SetFont(UIUtil.bodyFont, 12)
         end
         if observerLine:IsHidden() and ((curFA < 1) or (sessionInfo.Options.CheatsEnabled == 'true')) then
             table.insert(controls.armyLines, table.getsize(controls.armyLines), observerLine)

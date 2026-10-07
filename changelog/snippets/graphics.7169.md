@@ -1,0 +1,1 @@
+- Improve scoreboard legibility with better alignment, tooltips, dropshadows, and text cropping (#7169).
