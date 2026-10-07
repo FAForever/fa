@@ -1,1 +1,1 @@
-- Your explanation here... [Don't forget to change the category in the filename] (#7328).
+- Document how the engine resolves unit footprints from the footprint specs (#7328).
