@@ -1,0 +1,1 @@
+- Add the option "Assist factories in range instantly". When it is on, engineers that are already in build range of a factory assist it immediately instead of first moving into position around it. Hold Control when giving the assist order to do the opposite (#7327).
