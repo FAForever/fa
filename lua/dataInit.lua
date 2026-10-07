@@ -74,7 +74,7 @@ end
 ---@field type 'GROUP'
 
 ---@param group table
----@return ScenarioGroup
+---@return UIScenarioGroup
 function GROUP(group)
 	group.type = 'GROUP'
 	return group
