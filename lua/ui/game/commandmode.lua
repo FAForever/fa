@@ -532,13 +532,28 @@ local function OnGuardCopy(guardees, unit)
     end
 end
 
+--- Cached value of the `assist_factory_instantly` option. Updated by the option's `set` callback
+local assistFactoryInstantly = Prefs.GetFromCurrentProfile('options.assist_factory_instantly') == 'On'
+
+--- Updates the cached value of the `assist_factory_instantly` option
+---@param value 'On' | 'Off'
+function UpdateAssistFactoryInstantlyOption(value)
+    assistFactoryInstantly = value == 'On'
+end
+
+--- Returns whether a guard order on a factory, issued now, skips the initial assist move of the engineers that are
+--- already in build range of the factory. Cheap enough to call every frame
+---@return boolean
+function IsFactoryAssistInstant()
+    -- Control inverts the option. Control only copies queues when assisting engineers, so it is free for factories.
+    -- The instant assist command mode forces it
+    return (modeData and modeData.instant) or (assistFactoryInstantly ~= IsKeyDown('Control'))
+end
+
 --- Skips the initial assist move of the engineers that are already in build range of the factory
 ---@param command UserCommand
 local function OnGuardFactoryInstantly(command)
-    -- Control inverts the option. Control only copies queues when assisting engineers, so it is free for factories.
-    -- The instant assist command mode forces it
-    local prefs = Prefs.GetFieldFromCurrentProfile('options').assist_factory_instantly
-    if ((modeData and modeData.instant) or ((prefs == 'On') ~= IsKeyDown('Control'))) and
+    if IsFactoryAssistInstant() and
         EntityCategoryFilterDown(categoriesEngineers, command.Units)[1]
     then
         SimCallback({ Func = 'AbortNavigationOfFactoryAssisters', Args = { Target = command.Target.EntityId } }, true)

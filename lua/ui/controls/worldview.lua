@@ -35,6 +35,15 @@ local KeyCodeAlt = 18
 local KeyCodeCtrl = 17
 local KeyCodeShift = 16
 
+-- upvalue globals for performance
+local GetRolloverInfo = GetRolloverInfo
+local EntityCategoryContains = EntityCategoryContains
+local EntityCategoryFilterDown = EntityCategoryFilterDown
+
+-- cached categories for performance
+local categoriesFactories = categories.STRUCTURE * categories.FACTORY
+local categoriesEngineers = categories.ENGINEER + categories.COMMAND
+
 ---@type table<UnitId, WeaponBlueprint[] | false>
 local unitsToWeaponsCached = { }
 
@@ -183,6 +192,7 @@ local orderToCursorCallback = {
     -- orders that have use of a cursors
     RULEUCC_Move = 'OnCursorMove',
     RULEUCC_Guard = 'OnCursorGuard',
+    RULEUCC_GuardInstant = 'OnCursorGuardInstant',
     RULEUCC_Repair = 'OnCursorRepair',
     RULEUCC_Attack = 'OnCursorAttack',
     RULEUCC_AttackAlt = 'OnCursorAttackAlt',
@@ -372,7 +382,7 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldVie
         local holdAltToAttackMove = Prefs.GetFieldFromCurrentProfile('options').alt_to_force_attack_move
 
         -- process precedence hierarchy
-        ---@type CommandCap | 'CommandHighlight'
+        ---@type CommandCap | 'CommandHighlight' | 'RULEUCC_GuardInstant'
         local order
 
         -- special override 
@@ -401,6 +411,21 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldVie
             -- 4. then if we hold alt, we'll show the attack cursor
             elseif IsKeyDown(KeyCodeAlt) and selection then
                 order = 'RULEUCC_Attack'
+            end
+        end
+
+        -- show that the engineers in build range of the hovered factory start assisting it immediately. Queued assists
+        -- (Shift) do not start immediately. Matches `OnGuardIssued` in commandmode.lua
+        if order == 'RULEUCC_Guard' and selection and
+            (not IsKeyDown(KeyCodeShift)) and
+            CommandMode.IsFactoryAssistInstant()
+        then
+            local blueprintId = GetRolloverInfo().blueprintId
+            if blueprintId and blueprintId ~= 'unknown' and
+                EntityCategoryContains(categoriesFactories, blueprintId) and
+                EntityCategoryFilterDown(categoriesEngineers, selection)[1]
+            then
+                order = 'RULEUCC_GuardInstant'
             end
         end
 
@@ -529,7 +554,7 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldVie
 
     --- Called when the order `RULEUCC_Guard` is being applied
     ---@param self WorldView
-    ---@param identifier 'RULEUCC_Guard'
+    ---@param identifier 'RULEUCC_Guard' | 'RULEUCC_GuardInstant'
     ---@param enabled boolean
     ---@param changed boolean
     OnCursorGuard = function(self, identifier, enabled, changed)
@@ -540,6 +565,17 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldVie
                 self:ApplyCursor()
             end
         end
+    end,
+
+    --- Called when the order `RULEUCC_Guard` is being applied to a factory that the engineers in build range assist
+    --- immediately
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_GuardInstant'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorGuardInstant = function(self, identifier, enabled, changed)
+        -- a separate event makes `OnCursor` apply the texture when the cursor switches to or from `RULEUCC_Guard`
+        self:OnCursorGuard(identifier, enabled, changed)
     end,
 
     --- Called when the order `RULEUCC_Repair` is being applied
