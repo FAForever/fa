@@ -1,7 +1,10 @@
 ---@meta
 
 ---@class EntityBlueprint : HitBox, Blueprint
---- alternate Unit footprint
+--- Alternate unit footprint for `Physics.AltMotionType`. Resolved like `Footprint`, using `AltMotionType`
+--- - It is only matched when `Footprint` resolves to ground caps
+--- - Without a match it copies the resolved `Footprint`
+--- - Without an `AltMotionType` it is the resolved `Footprint`
 ---@field AltFootprint? FootprintBlueprint
 --- unit average density in tons / m^3 (default is 0.49). Affects the behavior of units when they bump into each other. Units with more weight push units with less weight.
 ---@field AverageDensity? number
@@ -17,9 +20,14 @@
 ---@field CollisionShape CollisionShape
 --- the desired maximum number of shooters taking shots at the entity
 ---@field DesiredShooterCap number
---- Cells this unit occupies for pathfinding. If absent, uses the `SizeX` and `SizeZ` fields
---- Mobile units are forced to use the closest footprint spec that is defined in `footprints.lua`
---- Structures can define their own footprints
+--- Cells this entity occupies for pathfinding. Derived from the engine's `RUnitBlueprintPhysics::ComputeDerivedQuantities` (faf-re decompilation)
+--- - Footprint specs are registered by `SpecFootprints` in `lua/footprints.lua`, which `lua/RuleInit.lua` runs before blueprints load
+--- - A missing or 0 `SizeX`/`SizeZ` defaults to the `ceil` of the entity's `SizeX`/`SizeZ`
+--- - A unit with `Physics.MaxSpeed` 0 is treated as a structure
+--- - Structures keep their own footprint, except that `OccupancyCaps` is replaced by `Physics.BuildOnLayerCaps`
+--- - Mobile units derive occupancy caps from `Physics.MotionType` and ignore `OccupancyCaps`. Ground units then use the spec with exactly those caps whose size is closest, by the larger of the X and Z differences. Ties go to the first spec in `footprints.lua`. The whole spec (size, `MaxSlope`, water depths, flags) replaces the footprint. Air units are not matched
+--- - The skirt size is then raised to at least the footprint size
+--- - Example: an amphibious ACU with `SizeX` 1.2 gets size 2, which ties between `Amphibious1x1` and `Amphibious3x3`, so it uses `Amphibious1x1`
 ---@field Footprint? FootprintBlueprint
 --- component X,X of inertia tensor
 ---@field InertiaTensorX number
@@ -83,10 +91,13 @@
 ---@field SizeY number
 ---@field SizeZ number
 
+--- Pathfinding footprint of an entity. See `EntityBlueprint.Footprint` for how units resolve it
+--- Blueprints cannot set a maximum water depth. Only footprint specs (`FootprintSpec`) have one
 ---@class FootprintBlueprint
+---@field Flags? integer # footprint flags. `0x01` is `IgnoreStructures` (see `lua/footprints.lua`)
 ---@field MaxSlope? number
 ---@field MinWaterDepth? number
 ---@field OccupancyCaps? number
----@field SizeX? integer # defaults to 1
----@field SizeZ? integer # defaults to 1
+---@field SizeX? integer # defaults to the `ceil` of the entity's `SizeX`
+---@field SizeZ? integer # defaults to the `ceil` of the entity's `SizeZ`
 ---@field SizeMax? integer # Added by unit blueprint postprocessing. Defaults to 1.
