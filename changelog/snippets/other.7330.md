@@ -1,1 +1,1 @@
-- Your explanation here... [Don't forget to change the category in the filename] (#7330).
+- Add a texture artist skill for coding agents, with scripts to extract, inspect and preview textures and check DXT compression artifacts (#7330).
