@@ -115,7 +115,7 @@ RULEUCC_Guard = {'/textures/ui/common/game/cursors/guard-.dds', 15, 15, 10, 12},
 ```
 - Frames are `<prefix>NN.dds` with two digits starting at 01 (`guard-01.dds` .. `guard-10.dds`). Lua expands them, not the engine: `lua/maui/cursor.lua:39` `SetTexture` cuts at `.dds` and cycles `("%s%02d.dds"):format(...)` in a thread at `1/fps`. Animated cursors must therefore be `.dds`.
 - The hotspot is in texels from the top-left (15,15 is the centre of 32x32).
-- For a new id, add the entry and a `---| "NAME"` line to `---@alias CursorType` (`skins.lua:15`). Select it with `UIUtil.GetCursor(id)` (`uiutil.lua:518`) in a `WorldView:OnCursor*` handler (e.g. `OnCursorGuard`, `worldview.lua:535`), or via `Cursor = 'NAME'` in command-mode data (as `ATTACK_MOVE` does in `lua/ui/game/orders.lua`). A missing id logs `Requested cursor not found` and then errors.
+- For a new id, add the entry and a `---| "NAME"` line to `---@alias CursorType` (`skins.lua:15`). Select it with `UIUtil.GetCursor(id)` (`uiutil.lua:518`) in a `WorldView:OnCursor*` handler (e.g. `OnCursorGuard`, `worldview.lua:535`), or via `cursor = 'NAME'` (lowercase, read by `WorldView:OnUpdateCursor`) in command-mode data. A missing id logs `Requested cursor not found` and then errors.
 
 ## 9. Commit
 
