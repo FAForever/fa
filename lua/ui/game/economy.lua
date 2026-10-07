@@ -55,9 +55,9 @@ end
 
 function SetLayout(layout)
     import(UIUtil.GetLayoutFilename('economy')).SetLayout()
-    GameMain.RemoveBeatFunction(_BeatFunction)
+    GameMain.RemoveBeatFunction(_BeatFunction, 'economy.BeatFunction')
     ConfigureBeatFunction()
-    GameMain.AddBeatFunction(_BeatFunction, true)
+    GameMain.AddBeatFunction(_BeatFunction, true, 'economy.BeatFunction')
 
     return CommonLogic()
 end
@@ -332,18 +332,22 @@ function ConfigureBeatFunction()
         local warnOnResourceFull = resourceType == "MASS" and econ_warnings
         local getRateColour = getGetRateColour(warnOnResourceFull, econ_warnings)
 
+        ---@type fun(effVal: number, storedVal: number, maxStorageVal: number)
         local ShowUIWarnings
         if not econ_warnings then
             ShowUIWarnings = function() end
         else
             if warnOnResourceFull then
+                ---@param effVal number Resource produced divided by requested, in percent (multiplied by 100).
+                ---@param storedVal number
+                ---@param maxStorageVal number
                 ShowUIWarnings = function(effVal, storedVal, maxStorageVal)
                     if storedVal / maxStorageVal > 0.8 then
-                        if effVal > 2.0 then
+                        if effVal > 200 then
                             warningBG:SetToState('red')
-                        elseif effVal > 1.0 then
+                        elseif effVal > 100 then
                             warningBG:SetToState('yellow')
-                        elseif effVal < 1.0 then
+                        elseif effVal < 100 then
                             warningBG:SetToState('hide')
                         end
                     else
@@ -351,13 +355,16 @@ function ConfigureBeatFunction()
                     end
                 end
             else
+                ---@param effVal number Resource produced divided by requested, in percent (multiplied by 100).
+                ---@param storedVal number
+                ---@param maxStorageVal number
                 ShowUIWarnings = function(effVal, storedVal, maxStorageVal)
                     if storedVal / maxStorageVal < 0.2 then
-                        if effVal < 0.25 then
+                        if effVal < 25 then
                             warningBG:SetToState('red')
-                        elseif effVal < 0.75 then
+                        elseif effVal < 75 then
                             warningBG:SetToState('yellow')
-                        elseif effVal > 1.0 then
+                        elseif effVal > 100 then
                             warningBG:SetToState('hide')
                         end
                     else
@@ -481,4 +488,17 @@ end
 
 function InitialAnimation()
     import(UIUtil.GetLayoutFilename('economy')).InitAnimation()
+end
+
+__moduleinfo.OnDirty = function ()
+    ForkThread(import, __moduleinfo.name) 
+end
+
+__moduleinfo.OnReload = function (newModule)
+    for k, v in GUI do
+        if k == 'savedParent' then continue end
+        v:Destroy()
+    end
+    GameMain.RemoveBeatFunction(_BeatFunction, 'economy.BeatFunction')
+    newModule.CreateEconomyBar(savedParent)
 end
