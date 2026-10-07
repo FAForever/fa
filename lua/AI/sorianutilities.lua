@@ -615,8 +615,8 @@ function FinishAIChat(data)
                         v.ProcessBuild = nil
                     end
                     v.BuilderManagerData.EngineerManager:RemoveUnit(v)
-                    IssueStop({v})
-                    IssueClearCommands({v})
+                    IssueToUnitStop(v)
+                    IssueToUnitClearCommands(v)
                     AISendPing(v:GetPosition(), 'move', data.Army)
                     AISendChat(data.ToArmy, aiBrain.Nickname, 'giveengineer')
                     ChangeUnitArmy(v,data.ToArmy)
@@ -1058,7 +1058,7 @@ function LaunchNukesTimed(aiBrain, nukesToFire, target)
     local lastFT = nukes[1].flightTime
     for k,v in nukes do
         WaitSeconds(lastFT - v.flightTime)
-        IssueNuke({v.unit}, target)
+        IssueToUnitNuke(v.unit, target)
         lastFT = v.flightTime
     end
 end

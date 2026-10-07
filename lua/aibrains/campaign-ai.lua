@@ -366,9 +366,7 @@ AIBrain = Class(StandardBrain) {
 
             -- TURNING OFF AI POOL PLATOON, I MAY JUST REMOVE THAT PLATOON FUNCTIONALITY LATER
             local poolPlatoon = self:GetPlatoonUniquelyNamed('ArmyPool')
-            if poolPlatoon then
-                poolPlatoon:TurnOffPoolAI()
-            end
+            poolPlatoon:TurnOffPoolAI()
             self.HasPlatoonList = false
             self:PBMSetEnabled(true)
 			
@@ -626,7 +624,7 @@ AIBrain = Class(StandardBrain) {
                 local guarded = v:GetGuardedUnit()
                 if not guarded or guarded.EntityId ~= primary.EntityId then
                     IssueToUnitClearCommands(v)
-                    IssueFactoryAssist({v}, primary)
+                    IssueToUnitFactoryAssist(v, primary)
                 end
             end
         end

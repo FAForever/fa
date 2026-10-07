@@ -29,7 +29,7 @@ end
 --- Assigns units to a platoon
 ---@param platoon moho.platoon_methods | string Either a reference to a platoon, or the unique name of the platoon
 ---@param units Unit[]
----@param squad PlatoonSquads
+---@param squad PlatoonSquadType
 ---@param formation UnitFormations
 ---@return UnitFormations #Returns the name of the formation
 function CAiBrain:AssignUnitsToPlatoon(platoon, units, squad, formation)
@@ -406,9 +406,15 @@ end
 
 --- Returns platoon by unique name.
 ---
----@see moho.platoon_methods.UniquelyNamePlatoon To set the name.
+---@see moho.platoon_methods.UniquelyNamePlatoon # To set the name.
 ---@param name string
 ---@return Platoon?
+function CAiBrain:GetPlatoonUniquelyNamed(name)
+end
+
+--- `ArmyPool` is created by engine and contains all units for the army
+---@param name 'ArmyPool'
+---@return Platoon
 function CAiBrain:GetPlatoonUniquelyNamed(name)
 end
 
@@ -509,7 +515,7 @@ end
 
 --- TODO.
 ---@param platoon Platoon
----@param squad PlatoonSquads
+---@param squad PlatoonSquadType
 ---@param alliance AllianceType
 ---@param compareType 'LeastDefended'|'Closest'|'Furthest'|'HighestValue'
 ---@param category EntityCategory
@@ -519,7 +525,7 @@ end
 
 --- TODO.
 ---@param platoon Platoon
----@param squad PlatoonSquads
+---@param squad PlatoonSquadType
 ---@param alliance AllianceType
 ---@param compareType 'LeastDefended'|'Closest'|'Furthest'|'HighestValue'
 ---@param category EntityCategory

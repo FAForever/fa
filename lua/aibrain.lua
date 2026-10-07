@@ -653,7 +653,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     ---@param self AIBrain
     ---@param platoon Platoon | string Either a reference to a platoon, or the unique name of the platoon
     ---@param unit Unit
-    ---@param squad PlatoonSquads
+    ---@param squad PlatoonSquadType
     ---@param formation UnitFormations
     ---@return UnitFormations #Returns the name of the formation
     AssignUnitToPlatoon = function(self, platoon, unit, squad, formation)

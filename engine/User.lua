@@ -237,6 +237,7 @@ end
 
 --- Gets the current time in seconds, counting from 0 at application start.
 --- This is wall-clock time and is unaffected by gameplay.
+---@see GetSystemTimeSeconds Identical usage
 ---@return number
 function CurrentTime()
 end
@@ -511,7 +512,9 @@ end
 function GetNumRootFrames()
 end
 
---- Retrieves the value of a game option from the preference file. The value is retrieved from the 'option' table in the preference file.
+--- Retrieves the value of a game option from the preference file. 
+--- 
+--- The value is retrieved from the 'option' table for the current profile in the preference file.
 ---@param key string
 ---@return any
 function GetOptions(key)
@@ -559,7 +562,8 @@ function GetSessionClients()
 end
 
 --- Gets the "+/- game speed" value.
---- The actual sim rate can be calculated as `math.pow(2, x/3)`, where x is the game speed value.
+--- 
+--- The actual sim rate can be calculated using `math.pow(2, GetSimRate()/3)`
 ---@return number
 function GetSimRate()
 end
@@ -605,6 +609,7 @@ function GetSystemTime()
 end
 
 --- Returns System time in seconds
+---@see CurrentTime Identical usage
 ---@return number
 function GetSystemTimeSeconds()
 end

@@ -14,7 +14,7 @@ XSB3202 = ClassUnit(SSubUnit) {
         SSubUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
         if self.originalBuilder then
-            IssueDive({ self })
+            IssueToUnitDive(self)
         end
     end,
 

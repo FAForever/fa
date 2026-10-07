@@ -815,7 +815,7 @@ function InitializeScenarioArmies()
     local import = import
     local GetArmyBrain = GetArmyBrain
     local SetArmyEconomy = SetArmyEconomy
-    local StringStarts = StringStarts
+    local StringStarts = string.startsWith
     local SetArmyFactionIndex = SetArmyFactionIndex
     local SetArmyColorIndex = SetArmyColorIndex
     local SetArmyAIPersonality = SetArmyAIPersonality
@@ -1100,7 +1100,7 @@ function CreatePlatoons(strArmy, tblNode, tblResult, platoonList, currPlatoon, t
                     end
                     ---@type PlatoonSquadTemplate
                     local squadTp = currTemplate[i]
-                    ---@type BlueprintId, integer, integer, PlatoonSquads, UnitFormations
+                    ---@type BlueprintId, integer, integer, PlatoonSquadType, UnitFormations
                     local bpId, min, max, squad, formation = unpack(squadTp)
                     if tblData.type == bpId and platoon.squadCounter[i] < max then
                         platoon.squadCounter[i] = platoon.squadCounter[i] + 1

@@ -628,7 +628,7 @@ function EngineersBuildPlatoon(platoon)
             local plat
             for strName, tblData in unitGroup do
                 if eng and aiBrain:CanBuildStructureAt(tblData.type, tblData.Position) then
-                    IssueStop({eng})
+                    IssueToUnitStop(eng)
                     IssueToUnitClearCommands(eng)
                     local result = aiBrain:BuildStructure(eng, tblData.type, {tblData.Position[1], tblData.Position[3], 0}, false)
                     unitBeingBuilt = nil
@@ -1071,7 +1071,7 @@ function StartBaseBuildUnits(eng, engTable, data, aiBrain)
             local unit = ScenarioUtils.FindUnit(unitName, Scenario.Armies[aiBrain.Name].Units)
             if unit then
                 if aiBrain:CanBuildStructureAt(unit.type, unit.Position) then
-                    IssueStop({eng})
+                    IssueToUnitStop(eng)
                     IssueToUnitClearCommands(eng)
                     local result = aiBrain:BuildStructure(eng, unit.type, {unit.Position[1], unit.Position[3], 0}, false)
                     if result then
@@ -1117,7 +1117,7 @@ function StartBaseGroupOnceBuild(eng, engTable, data, aiBrain)
         end
         for _, v in buildGroup do
             if aiBrain:CanBuildStructureAt(v.type, v.Position) then
-                IssueStop({eng})
+                IssueToUnitStop(eng)
                 IssueToUnitClearCommands(eng)
                 local result = aiBrain:BuildStructure(eng, v.type, {v.Position[1], v.Position[3], 0}, false)
                 if result then
@@ -1297,11 +1297,11 @@ function StartBaseMaintainBase(platoon, eng, engTable, data, aiBrain)
             end
             if data.RandomPatrol then
                 for num, pos in GetRandomPatrolRoute(patrolPositions) do
-                    IssuePatrol({eng}, pos)
+                    IssueToUnitPatrol(eng, pos)
                 end
             else
                 for num, pos in patrolPositions do
-                    IssuePatrol({eng}, pos)
+                    IssueToUnitPatrol(eng, pos)
                 end
             end
         end
@@ -1372,7 +1372,7 @@ function AssistOtherEngineer(eng, engTable, unitBeingBuilt)
                     IssueGuard(engTable, eng)
                 end
                 if unitBeingBuilt and not unitBeingBuilt.Dead then
-                    IssueRepair({eng}, unitBeingBuilt)
+                    IssueToUnitRepair(eng, unitBeingBuilt)
                 end
                 break
             end
@@ -1409,7 +1409,7 @@ function EngineerBuildStructure(aiBrain, builder, building, brainBaseTemplate, b
                 for m, location in type do
                     if m > 1 then
                         if aiBrain:CanBuildStructureAt(structureCategory, {location[1], 0, location[2]}) then
-                            IssueStop({builder})
+                            IssueToUnitStop(builder)
                             IssueToUnitClearCommands(builder)
                             local result = aiBrain:BuildStructure(builder, structureCategory, location, false)
                             if result then
@@ -1422,7 +1422,7 @@ function EngineerBuildStructure(aiBrain, builder, building, brainBaseTemplate, b
         end
     else
         if aiBrain:FindPlaceToBuild(building, structureCategory, brainBaseTemplate, false, nil) then
-            IssueStop({builder})
+            IssueToUnitStop(builder)
             IssueToUnitClearCommands(builder)
             if AIBuildStructures.AIExecuteBuildStructure(aiBrain, builder, building, builder, false,
                                                          buildingTemplate, brainBaseTemplate) then
@@ -1661,7 +1661,7 @@ function ReorganizeEngineers(platoon, engTable)
                             end
                         end
                         IssueToUnitClearCommands(moveEng)
-                        IssueGuard({moveEng}, facLowData.Factory)
+                        IssueToUnitGuard(moveEng, facLowData.Factory)
                         break
                     end
                 end
@@ -1700,7 +1700,7 @@ function EngAssist(platoon, engTable)
                     end
                 end
                 IssueToUnitClearCommands(eng)
-                IssueGuard({eng}, lowFac.Factory)
+                IssueToUnitGuard(eng, lowFac.Factory)
                 table.remove(engTable, engNum)
             else
                 engNum = engNum + 1

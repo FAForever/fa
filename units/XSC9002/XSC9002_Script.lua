@@ -9,7 +9,7 @@ local SStructureUnit = import("/lua/seraphimunits.lua").SStructureUnit
 local SSJammerCrystalAmbient = import("/lua/effecttemplates.lua").SJammerCrystalAmbient
 
 local CreateUnitHPR = CreateUnitHPR
-local IssuePatrol = IssuePatrol
+local IssueToUnitPatrol = IssueToUnitPatrol
 local Random = Random
 local WaitSeconds = WaitSeconds
 local Vector = Vector
@@ -56,25 +56,26 @@ XSC9002 = ClassUnit(SStructureUnit) {
         local position = self:GetPosition()
         while not self.Dead do
             -- Spawn air blips
-            self.AirChildUnit = CreateUnitHPR('XSC9011', self.Army, position[1], position[2], position[3], 0, 0, 0)--[[@as XSC9011]]
-            self.AirChildUnit.parentCrystal = self
+            local unit = CreateUnitHPR('XSC9011', self.Army, position[1], position[2], position[3], 0, 0, 0)--[[@as XSC9011]]
+            self.AirChildUnit = unit
+            unit.parentCrystal = self
 
-            local unitTbl = {self.AirChildUnit}
+            ---@cast unit -nil
             local patrolPos = Vector(position[1] + Random(-10, 10), position[2], position[3] + Random(-10, 10))
-            IssuePatrol(unitTbl, patrolPos)
+            IssueToUnitPatrol(unit, patrolPos)
             patrolPos[1] = position[1] + Random(-10, 10)
             patrolPos[3] = position[3] + Random(-10, 10)
-            IssuePatrol(unitTbl, patrolPos)
+            IssueToUnitPatrol(unit, patrolPos)
             patrolPos[1] = position[1] + Random(-10, 10)
             patrolPos[3] = position[3] + Random(-10, 10)
-            IssuePatrol(unitTbl, patrolPos)
+            IssueToUnitPatrol(unit, patrolPos)
             patrolPos[1] = position[1] + Random(-10, 10)
             patrolPos[3] = position[3] + Random(-10, 10)
-            IssuePatrol(unitTbl, patrolPos)
+            IssueToUnitPatrol(unit, patrolPos)
 
             WaitSeconds(Random(7, 13))
 
-            self.AirChildUnit:Destroy()
+            unit:Destroy()
             self.AirChildUnit = nil
         end
     end,
