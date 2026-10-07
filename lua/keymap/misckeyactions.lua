@@ -530,6 +530,31 @@ import("/lua/ui/game/gamemain.lua").ObserveSelection:AddObserver(
     'KeyActionHardMove'
 )
 
+--- Starts the assist command mode, in which engineers in build range of the assisted factory start assisting it
+--- immediately regardless of the `assist_factory_instantly` option. Ends the mode instead when it is already active
+function StartInstantAssistCommandMode()
+    -- matches the `StartCommandMode` console command: it toggles the mode and requires a unit that can assist
+    local CommandMode = import("/lua/ui/game/commandmode.lua")
+    local modeData = CommandMode.GetCommandMode()[2]
+    if modeData and modeData.instant then
+        CommandMode.EndCommandMode(true)
+        return
+    end
+
+    local selection = GetSelectedUnits()
+    if not selection then
+        return
+    end
+
+    local availableOrders = GetUnitCommandData(selection)
+    for _, order in availableOrders do
+        if order == 'RULEUCC_Guard' then
+            CommandMode.StartCommandMode('order', { name = 'RULEUCC_Guard', instant = true })
+            return
+        end
+    end
+end
+
 LoadIntoTransports = function(clearCommands)
     print("Load units into transports")
     SimCallback({ Func = 'LoadIntoTransports', Args = { ClearCommands = clearCommands or false } }, true)

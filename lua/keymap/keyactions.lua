@@ -1419,6 +1419,10 @@ local keyActionsOrders = {
         action = 'StartCommandMode order RULEUCC_Guard',
         category = 'orders',
     },
+    ['guard_instant'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").StartInstantAssistCommandMode()',
+        category = 'orders',
+    },
     ['transport'] = {
         action = 'StartCommandMode order RULEUCC_Transport',
         category = 'orders',
@@ -1477,6 +1481,10 @@ local keyActionsOrders = {
     },
     ['shift_guard'] = {
         action = 'StartCommandMode order RULEUCC_Guard',
+        category = 'orders',
+    },
+    ['shift_guard_instant'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").StartInstantAssistCommandMode()',
         category = 'orders',
     },
     ['shift_transport'] = {

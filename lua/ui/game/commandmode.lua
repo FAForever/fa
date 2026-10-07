@@ -106,6 +106,7 @@ local MathAtan = math.atan
 ---@class CommandModeDataOrder : CommandModeDataBase
 ---@field name CommandCap
 ---@field consistent boolean    # Allows command mode to remain after you issue a command, without queueing the commands
+---@field instant? boolean      # Makes guard orders on factories skip the assist move of engineers in build range, regardless of the option and Control
 
 ---@class CommandModeDataBuild : CommandModeDataBase
 ---@field name string # blueprint id of the unit being built
@@ -534,9 +535,10 @@ end
 --- Skips the initial assist move of the engineers that are already in build range of the factory
 ---@param command UserCommand
 local function OnGuardFactoryInstantly(command)
-    -- Control inverts the option. Control only copies queues when assisting engineers, so it is free for factories
+    -- Control inverts the option. Control only copies queues when assisting engineers, so it is free for factories.
+    -- The instant assist command mode forces it
     local prefs = Prefs.GetFieldFromCurrentProfile('options').assist_factory_instantly
-    if (prefs == 'On') ~= IsKeyDown('Control') and
+    if ((modeData and modeData.instant) or ((prefs == 'On') ~= IsKeyDown('Control'))) and
         EntityCategoryFilterDown(categoriesEngineers, command.Units)[1]
     then
         SimCallback({ Func = 'AbortNavigationOfFactoryAssisters', Args = { Target = command.Target.EntityId } }, true)
