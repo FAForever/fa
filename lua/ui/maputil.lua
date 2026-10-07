@@ -18,11 +18,6 @@
 ---@class UIScenarioChain
 ---@field Markers string[]  # key of marker in the master chain
 
----@class UIScenarioUnitGroup : ScenarioGroup
----@field orders string # Can be empty
----@field platoon string # Can be empty
----@field Units { [string]: (UIScenarioUnitGroup | ScenarioUnit) }
-
 --- An army defined in the scenario.
 ---@class UIScenarioArmy
 ---@field personality string
@@ -32,7 +27,7 @@
 ---@field Economy { mass: number, energy: number }
 ---@field Alliances table
 ---@field PlatoonBuilders { Builders: table }
----@field Units UIScenarioUnitGroup
+---@field Units ScenarioUnitGroup
 
 --- Scenario entities of a map that defines all areas, (resource) markers, marker chains and armies as defined in the average _save file.
 ---@class UIScenarioSaveFile
@@ -585,7 +580,7 @@ function GetStartPositionsFromScenario(scenarioInfo, scenarioSave)
 end
 
 ---Returns all units' (leaf nodes) positions under the specified group.
----@param tblNode? UIScenarioUnitGroup
+---@param tblNode? ScenarioUnitGroup
 ---@param positions? ScenarioVector[]
 ---@return ScenarioVector[]
 local function extractUnitPositions(tblNode, positions)
@@ -594,7 +589,7 @@ local function extractUnitPositions(tblNode, positions)
 
     for strName, tblData in pairs(tblNode.Units) do
         if tblData.type == 'GROUP' then
-            ---@cast tblData UIScenarioUnitGroup
+            ---@cast tblData ScenarioUnitGroup
             positions = extractUnitPositions(tblData, positions)
         else
             table.insert(positions, tblData.Position)
@@ -605,7 +600,7 @@ local function extractUnitPositions(tblNode, positions)
 end
 
 ---Extracts wreckage positions from all groups that contain `"wreck"` in their name.
----@param tblNode? UIScenarioUnitGroup
+---@param tblNode? ScenarioUnitGroup
 ---@param positions? ScenarioVector[]
 ---@return ScenarioVector[]
 local function extractPositionsFromWreckageGroups(tblNode, positions)
@@ -614,7 +609,7 @@ local function extractPositionsFromWreckageGroups(tblNode, positions)
 
     for strName, tblData in pairs(tblNode.Units) do
         if tblData.type == 'GROUP' then
-            ---@cast tblData UIScenarioUnitGroup
+            ---@cast tblData ScenarioUnitGroup
             if string.find(string.lower(strName), "wreck") then
                 positions = extractUnitPositions(tblData, positions)
             else
