@@ -22,6 +22,7 @@ UnitBlueprint{
         TightTurnMultiplier = 1.1,
         TurnSpeed = 0.8,
         Winged = true,
+        EnableVisionWhileFalling = true,
     },
     Audio = {
         AirUnitWaterImpact = Sound { Bank = 'Explosions', Cue = 'Expl_Water_Lrg_01',      LodCutoff = 'UnitMove_LodCutoff' },

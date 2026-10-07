@@ -1,0 +1,1 @@
+- Add missing water vision radius to the Ythotha (#7313).

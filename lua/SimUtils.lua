@@ -16,6 +16,7 @@ local CreateWreckage = import("/lua/wreckage.lua").CreateWreckage
 local transferUnbuiltCategory = categories.ALLUNITS
 local transferUnitsCategory = categories.ALLUNITS - categories.INSIGNIFICANTUNIT
 local buildersCategory = categories.ALLUNITS - categories.CONSTRUCTION - categories.ENGINEER
+local engineersCategory = categories.ENGINEER - categories.SUBCOMMANDER - categories.COMMAND
 
 ---@class FactoryRebuildData
 ---@field FacRebuild_Progress number # progress -- save current progress for some later checks
@@ -104,7 +105,7 @@ function FactoryRebuildUnits(factoryRebuildDataTable)
                     rebuiltUnit:Destroy()
                     rebuiltUnit = nil
                 end
-                IssueClearCommands({ factory })
+                IssueToUnitClearCommands(factory)
                 factory:SetPaused(false)
                 WARN(string.format(
                     [[FactoryRebuildUnits failed to rebuild correctly for factory %s (entity ID %d).
@@ -167,7 +168,7 @@ function UpgradeTransferredKennels(kennels)
                 end
             end
 
-            IssueUpgrade({ unit }, unit.UpgradesTo)
+            IssueToUnitUpgrade(unit, unit.UpgradesTo)
         end
     end
 
@@ -199,7 +200,7 @@ end
 ---@param units Unit[]
 function UpgradeUnits(units)
     for _, unit in units do
-        IssueUpgrade({ unit }, unit.UpgradesTo)
+        IssueToUnitUpgrade(unit, unit.UpgradesTo)
         if not unit.DefaultBuildRate then
             unit.DefaultBuildRate = unit:GetBuildRate()
         end
@@ -645,7 +646,7 @@ function TryRebuildUnits(trackers, army)
         rebuilder.TargetBuildTime = tracker.TargetBuildTime
         rebuilders[k] = rebuilder
 
-        IssueBuildMobile({ rebuilder }, tracker.UnitPos, tracker.UnitBlueprintID, {})
+        IssueToUnitBuildMobile(rebuilder, tracker.UnitPos, tracker.UnitBlueprintID, {})
     end
 
     WaitTicks(3) -- wait some ticks (3 is minimum), IssueBuildMobile() is not instant
@@ -786,6 +787,7 @@ function GiveUnitsToPlayer(data, units)
             local area = { x0 = x0 - pad, x1 = x1 + pad, y0 = z0 - pad, y1 = z1 + pad }
             local fromBrain = ArmyBrains[owner]
             local fromName = fromBrain.Nickname or tostring(owner)
+            local toName = ArmyBrains[toArmy].Nickname or tostring(toArmy)
 
             -- Specialize the wording when every shared unit is an engineer
             -- — "shared 5 engineers" reads more naturally than "shared 5
@@ -793,33 +795,30 @@ function GiveUnitsToPlayer(data, units)
             -- transfers fall through to the generic noun.
             local allEngineers = true
             for _, unit in transferredUnits do
-                if not EntityCategoryContains(categories.ENGINEER, unit) then
+                if not EntityCategoryContains(engineersCategory, unit) then
                     allEngineers = false
                     break
                 end
             end
 
-            local locKey, fallback
-            if allEngineers then
-                if count == 1 then
-                    locKey, fallback = 'chat_engineers_received_one', '%s shared an engineer with you.'
+            local msg, args
+            if count == 1 then
+                if allEngineers then
+                    msg = '<LOC chat_engineers_received_one>%s sent %s an engineer'
                 else
-                    locKey, fallback = 'chat_engineers_received_many', '%s shared %d engineers with you.'
+                    msg = "<LOC chat_units_received_one>%s sent %s a unit"
                 end
+                args = { fromName, toName }
             else
-                if count == 1 then
-                    locKey, fallback = 'chat_units_received_one', '%s shared a unit with you.'
+                if allEngineers then
+                    msg = "<LOC chat_engineers_received_many>%s sent %s %d engineers"
                 else
-                    locKey, fallback = 'chat_units_received_many', '%s shared %d units with you.'
+                    msg = "<LOC chat_units_received_many>%s sent %s %d units"
                 end
+                args = { fromName, toName, count }
             end
 
-            local args = count == 1 and { fromName } or { fromName, count }
-            fromBrain:SendChatToPlayer(toArmy,
-                '<LOC ' .. locKey .. '>' .. fallback,
-                args,
-                { Area = area }
-            )
+            fromBrain:SendChatToAllies(msg, args, { Area = area }, 'ReceiveUnits')
         end
     end
 end
@@ -1433,7 +1432,7 @@ function DisableAI(self)
     SorianUtils.AISendChat('enemies', self.Nickname, 'ilost')
     -- remove PlatoonHandle from all AI units before we kill / transfer the army
     local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-    if not table.empty(units) then
+    if not TableEmpty(units) then
         for _, unit in units do
             if not unit.Dead then
                 local handle = unit.PlatoonHandle
@@ -1441,7 +1440,7 @@ function DisableAI(self)
                     handle:Stop()
                     handle:PlatoonDisbandNoAssign()
                 end
-                IssueStop({ unit })
+                IssueToUnitStop(unit)
                 IssueToUnitClearCommands(unit)
             end
         end
@@ -1587,22 +1586,19 @@ function GiveResourcesToPlayer(data)
     local energy = math.floor(energyGiven)
     local toArmy = data.To --[[@as integer]]
     local fromName = fromBrain.Nickname or tostring(data.From)
+    local toName = toBrain.Nickname or tostring(toArmy)
+    local msg, args
     if mass > 0 and energy > 0 then
-        fromBrain:SendChatToPlayer(toArmy,
-            "<LOC chat_resources_received_both>%s sent you %d mass and %d energy.",
-            { fromName, mass, energy }
-        )
+        msg = "<LOC chat_resources_received_both>%s sent %s %d mass and %d energy."
+        args = { fromName, toName, mass, energy }
     elseif mass > 0 then
-        fromBrain:SendChatToPlayer(toArmy,
-            "<LOC chat_resources_received_mass>%s sent you %d mass.",
-            { fromName, mass }
-        )
+        msg = "<LOC chat_resources_received_mass>%s sent %s %d mass."
+        args = { fromName, toName, mass }
     elseif energy > 0 then
-        fromBrain:SendChatToPlayer(toArmy,
-            "<LOC chat_resources_received_energy>%s sent you %d energy.",
-            { fromName, energy }
-        )
+        msg = "<LOC chat_resources_received_energy>%s sent %s %d energy."
+        args = { fromName, toName, energy }
     end
+    fromBrain:SendChatToAllies(msg, args, nil, 'ReceiveResources')
 end
 
 ---@param data {From: Army, To: Army}

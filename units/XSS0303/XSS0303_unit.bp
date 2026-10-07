@@ -137,6 +137,7 @@ UnitBlueprint{
         SelectionCenterOffsetZ = 9.1,
         SelectionSizeX = 2.8,
         SelectionSizeZ = 3.2,
+        UISelection = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Factory', LodCutoff = 'UnitMove_LodCutoff' },
     },
     Footprint = {
         SizeX = 5,

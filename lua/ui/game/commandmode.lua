@@ -193,7 +193,7 @@ function StartCommandMode(newCommandMode, data)
 end
 
 --- Called when the command mode ends and deconstructs all the data.
----@param isCancel boolean # set when we're at the end of (a sequence of) order(s), is usually always true. False when the mode is ended with right click, except for "ping" mode.
+---@param isCancel? boolean # set when we're at the end of (a sequence of) order(s), is usually always true. False when the mode is ended with right click, except for "ping" mode.
 function EndCommandMode(isCancel)
     if ignoreSelection then
         return
@@ -414,7 +414,7 @@ local function OnGuardUpgrade(guardees, unit)
 
     if upgradeRadarTech2 and
         EntityCategoryContains(categories.STRUCTURE * categories.RADAR * categories.TECH2, unit) and
-        unitBlueprint.Economy.ConsumptionPerSecondEnergy > unit:GetEconData().energyConsumed -- check for any adjacency
+        unitBlueprint.Economy.MaintenanceConsumptionPerSecondEnergy > unit:GetEconData().energyConsumed -- check for any adjacency
     then
         ForkThread(UpgradeUnit, unit)
         return

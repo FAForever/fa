@@ -53,6 +53,8 @@ jobs:
 
       - name: Download develop changelog
         if: inputs.additional-changelog == 'fafdevelop'
+        # No artifact exists when there are no snippets to process
+        continue-on-error: true
         uses: actions/download-artifact@v7
         with:
           name: changelog-fafdevelop
@@ -61,11 +63,14 @@ jobs:
         if: inputs.additional-changelog == 'fafdevelop'
         run: |
           FILE="${{ github.workspace }}/docs/_posts/fafdevelop.md"
-          cat changelog/snippets/sections/template-header-fafdevelop.md >> $FILE
-          cat changelog-fafdevelop.md >> $FILE
+          cat changelog/snippets/sections/template-header-fafdevelop.md >> "$FILE"
+          # the changelog file might not exist
+          if [ -f changelog-fafdevelop.md ]; then cat changelog-fafdevelop.md >> "$FILE"; fi
 
       - name: Download beta changelog
         if: inputs.additional-changelog == 'fafbeta'
+        # No artifact exists when there are no snippets to process
+        continue-on-error: true
         uses: actions/download-artifact@v7
         with:
           name: changelog-fafbeta
@@ -74,8 +79,8 @@ jobs:
         if: inputs.additional-changelog == 'fafbeta'
         run: |
           FILE="${{ github.workspace }}/docs/_posts/fafbeta.md"
-          cat changelog/snippets/sections/template-header-fafbeta.md >> $FILE
-          cat changelog-fafbeta.md >> $FILE
+          cat changelog/snippets/sections/template-header-fafbeta.md >> "$FILE"
+          if [ -f changelog-fafbeta.md ]; then cat changelog-fafbeta.md >> "$FILE"; fi
 
       - name: Setup python
         uses: actions/setup-python@v6

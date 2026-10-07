@@ -1,0 +1,1 @@
+- Fix being unable to reach the score screen after ending a paused game. The game is now automatically resumed when it ends (#7296).

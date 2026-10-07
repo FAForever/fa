@@ -1,6 +1,0 @@
-{% unit UAB2104 %}
-Seeker: T1 Anti-Air Turret
-{% endunit %}
-The Aeon T1 AA turret was weaker than the equivalent units of the other factions, which made it struggle more against T1 bombers and T2 gunships than expected. For comparison, the UEF and Seraphim turrets have 65.71 and 66.67 DPS, respectively. (#7182)
-- Sonic Pulse Battery:
-  - Damage (DPS): 14 (60) -> 15 (64.29)

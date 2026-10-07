@@ -185,7 +185,10 @@ UnitBlueprint{
         Icon = "amph",
         UnitName = "<LOC xsl0401_name>Ythotha",
     },
-    Intel = { VisionRadius = 50 },
+    Intel = {
+        VisionRadius = 50,
+        WaterVisionRadius = 48,
+    },
     LifeBarHeight = 0.075,
     LifeBarOffset = 2.3,
     LifeBarSize = 3.25,

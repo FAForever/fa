@@ -3,12 +3,14 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local FloatText = import("/lua/ui/controls/floattext.lua").FloatText
 
 local ChatLineInterface = import("/lua/ui/game/chat/ChatLineInterface.lua").ChatLineInterface
 
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
 local ChatConfigModel = import("/lua/ui/game/chat/config/ChatConfigModel.lua")
 local ChatUtils = import("/lua/ui/game/chat/ChatUtils.lua")
+local ChatController = import("/lua/ui/game/chat/chatcontroller.lua")
 
 local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
@@ -68,26 +70,50 @@ ChatFeedInterface = ClassUI(Group) {
         -- existing entry as a fresh feed line.
         self.LastHistoryLength = table.getn(model.History())
 
-        -- Opening the window discards active feed rows: anything worth
-        -- reading is now in the main view, and a stale fade countdown
-        -- across an open/close cycle would clutter content the user
-        -- already saw.
+        -- Opening the window hides the feed interface: anything worth
+        -- reading is now in the main view, and a visible feed interface
+        -- would overlap the text the user is already seeing.
         self.WindowVisibleObserver = self.Trash:Add(
             LazyVarDerive(model.WindowVisible, function(lv)
                 if lv() then
-                    self:ClearAll()
+                    self:Hide()
                 end
                 self:UpdateVisibility()
             end)
         )
 
-        -- Push to feed only while the window is hidden; bump
-        -- `LastHistoryLength` either way so we don't replay later.
+        -- Append new history entries in both visibility states and bump
+        -- `LastHistoryLength` after processing to avoid replaying entries.
         self.HistoryObserver = self.Trash:Add(
             LazyVarDerive(model.History, function(lv)
                 self:OnHistoryChanged(lv())
             end)
         )
+
+        ---@param _ UIChatLineInterface
+        ---@param entry UIChatEntry
+        ---@param event KeyEvent
+        self.OnBodyClicked = function(_, entry, event)
+            if event.Modifiers and event.Modifiers.Ctrl then
+                if CopyToClipboard(entry.Text or '') then
+                    -- Parent to the engine frame so the `event.MouseX/Y`
+                    -- screen coords map straight to Left/Top without going
+                    -- through the Layouter's `pixelScaleFactor` scaling.
+                    -- `event.MouseX/Y` carry the actual click position.
+                    -- `GetMouseScreenPos()` would freeze at the last
+                    -- pre-UI-occlusion position.
+                    local mouseX, mouseY = event.MouseX, event.MouseY
+                    local toast = FloatText(GetFrame(0), "Copied to clipboard!")
+                    -- Center horizontally on the cursor; the Width LazyVar
+                    -- settles after the inner Text is measured.
+                    toast.Left:SetFunction(function() return mouseX - toast.Width() / 2 end)
+                    toast.Top:Set(mouseY - LayoutHelpers.ScaleNumber(30))
+                    toast:Float()
+                end
+            else
+                self.OnCameraClicked(_, entry, event)
+            end
+        end
     end,
 
     ---@param self UIChatFeedInterface
@@ -99,10 +125,7 @@ ChatFeedInterface = ClassUI(Group) {
             -- resize tracks for free through the dependency graph.
             ---@diagnostic disable-next-line: param-type-mismatch
             Layouter(self)
-                :Left(self.Window.ChatLinesInterface.Left)
-                :Right(self.Window.ChatLinesInterface.Right)
-                :Top(self.Window.ChatLinesInterface.Top)
-                :Bottom(self.Window.ChatLinesInterface.Bottom)
+                :Fill(self.Window.ChatLinesInterface.Pool)
                 :End()
         else
             -- Standalone debug fallback for dev-hotkey `Toggle()`.
@@ -128,15 +151,13 @@ ChatFeedInterface = ClassUI(Group) {
     -- History handling
     ---------------------------------------------------------------------------
 
-    --- Reacts to history mutations: feeds in new entries while the chat window is hidden.
+    --- Reacts to history mutations: feeds in new entries
     ---@param self UIChatFeedInterface
     ---@param history UIChatEntry[]
     OnHistoryChanged = function(self, history)
         local newCount = table.getn(history)
-        if not ChatModel.GetSingleton().WindowVisible() then
-            for i = self.LastHistoryLength + 1, newCount do
-                self:AppendRow(history[i])
-            end
+        for i = self.LastHistoryLength + 1, newCount do
+            self:AppendRow(history[i])
         end
         self.LastHistoryLength = newCount
     end,
@@ -154,6 +175,8 @@ ChatFeedInterface = ClassUI(Group) {
         -- cache is empty. We borrow the chat panel's measure-line because
         -- it shares our row width by LazyVar bind.
         if not entry then return end
+
+        if not ChatController.IsValidEntry(entry) then return end
 
         if not entry.WrappedText and self.Window then
             ChatUtils.WrapEntry(entry, self.Window.ChatLinesInterface.ChatLineInterfaces[1])
@@ -178,11 +201,11 @@ ChatFeedInterface = ClassUI(Group) {
             else
                 line:SetContinuation(entry, chunk)
             end
-            -- `SetHeader` calls `EnableHitTest` on the cam icon when the
-            -- entry has a camera/location; disable hit-test last so
-            -- nothing on the row swallows clicks meant for worldview.
-            line:DisableHitTest(true)
             line:SetAlpha(1.0, true)
+
+            line.OnCameraClicked = self.OnCameraClicked
+            line.OnBodyClicked = self.OnBodyClicked
+            line.OnNameClicked = self.OnNameClicked
 
             -- Readability strip behind the row. Lives on the feed group
             -- (not the line) so we can drive its alpha independently of
@@ -198,6 +221,34 @@ ChatFeedInterface = ClassUI(Group) {
 
         self:LayoutRows()
         self:UpdateVisibility()
+    end,
+
+    ---@param _ UIChatLineInterface
+    ---@param entry UIChatEntry
+    ---@param event KeyEvent
+    OnCameraClicked = function(_, entry, event)
+        local cam = GetCamera('WorldCamera')
+        if entry.Location then
+            if entry.Location.Area then
+                cam:MoveToRegion(entry.Location.Area, 0.001)
+            elseif entry.Location.Position then
+                local settings = cam:SaveSettings()
+                settings.Focus = entry.Location.Position
+                cam:RestoreSettings(settings)
+            end
+        elseif entry.Camera then
+            cam:RestoreSettings(entry.Camera)
+        end
+    end,
+
+    ---@param _ UIChatLineInterface
+    ---@param entry UIChatEntry
+    ---@param event KeyEvent
+    OnNameClicked = function(_, entry, event)
+        if entry.ArmyID and entry.ArmyID ~= GetFocusArmy() then
+            ChatController.ActivateChat()
+            ChatController.SetRecipient(entry.ArmyID)
+        end
     end,
 
     --- Lays out feed rows pinned from the bottom up.
@@ -254,13 +305,13 @@ ChatFeedInterface = ClassUI(Group) {
     UpdateVisibility = function(self)
         -- `SetNeedsFrameUpdate` toggles in lockstep so we don't tick idle.
         local windowVisible = ChatModel.GetSingleton().WindowVisible()
-        if not windowVisible and table.getn(self.Rows) > 0 then
+        local hasRows = table.getn(self.Rows) > 0
+        if not windowVisible and hasRows then
             self:Show()
-            self:SetNeedsFrameUpdate(true)
         else
             self:Hide()
-            self:SetNeedsFrameUpdate(false)
         end
+        self:SetNeedsFrameUpdate(hasRows)
     end,
 
     --- Per-frame: ages each row, fades the line text and BG strip,

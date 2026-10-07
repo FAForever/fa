@@ -1,1 +1,0 @@
-- Fix the icon of the Aeon T1 power generator (#7095).

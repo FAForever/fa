@@ -1,1 +1,0 @@
-- Clean up code style and add annotations in `SelectedInfo.lua` (#7052).

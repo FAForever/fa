@@ -34,12 +34,13 @@ RecipientNotify = 'notify'
 ---@field BodyColor?  string             # explicit ARGB hex for the body text; bypasses the palette lookup (used by system / synthetic lines that always render the same colour)
 ---@field ColorKey?   string             # palette key (e.g. `'all_color'`, `'priv_color'`, `'link_color'`) resolved against `ChatConfigModel.GetOptions()` at render time; ignored when `BodyColor` is set
 ---@field ArmyID      number             # sender's army index
----@field Faction     number             # faction icon index (1-based)
+---@field Faction?    number             # faction icon index (1-based)
 ---@field Recipient   UIChatRecipient    # the target this message was directed to
 ---@field Camera?     table              # camera state (`SaveSettings` snapshot) when the sender attached their exact view
 ---@field Location?   UIChatEntryLocation # lightweight location hint from a sim-originated sender (AI brain, system message)
 ---@field Id?         string             # near-unique sender-stamped id (`tostring(msg)`); used to dedupe the `Sync.ChatMessages` replay/sim path against the live `SessionSendChatMessage` path
 ---@field WrappedText? string[]          # view-side cache: text wrapped to the current row width (populated by ChatInterface)
+---@field Type? ChatMessageType          # Handles resource/unit sharing mute options
 
 --- Reactive chat-state singleton: the single source of truth shared by every chat view.
 ---@class UIChatModel
