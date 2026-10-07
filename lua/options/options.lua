@@ -892,6 +892,21 @@ options = {
                     },
                 },
             },
+
+            {
+                title = "<LOC LAUNCH_IGNORE_SELECTION_TITLE>Launch commands ignore units",
+                key = 'launch_ignore_selection',
+                type = 'toggle',
+                default = 'always',
+                custom = {
+                    states = {
+                        { text = "<LOC LAUNCH_IGNORE_SELECTION_ALWAYS>Always", key = 'always' },
+                        { text = "<LOC LAUNCH_IGNORE_SELECTION_UNLESS_CTRL>Unless holding control", key = 'unless_ctrl' },
+                        { text = "<LOC LAUNCH_IGNORE_SELECTION_WITH_CTRL>Only when holding control", key = 'with_ctrl' },
+                        { text = "<LOC LAUNCH_IGNORE_SELECTION_NEVER>Never", key = 'never' },
+                    },
+                },
+            },
         },
     },
     ui = {

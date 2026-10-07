@@ -238,6 +238,7 @@ local orderToCursorCallback = {
 ---@field Trash TrashBag
 ---@field PaintingCanvas UIPaintingCanvas
 ---@field SelectionTolerance? number
+---@field LaunchIgnoreSelection? boolean # If launch commands currently ignore the units under the cursor
 ---@field Markers table<integer, table<number, PingGroup>>
 ---@field PingVis? boolean # If markers are visible
 ---@overload fun(parentControl: Control, cameraName: string, depth: number, isMiniMap: boolean, trackCamera: boolean?): WorldView
@@ -662,6 +663,40 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldVie
         end
     end,
 
+    --- Returns whether launch commands (tactical missiles and nukes) should ignore the units under the cursor
+    ---@param self WorldView
+    ---@return boolean
+    ShouldLaunchIgnoreSelection = function(self)
+        local option = Prefs.GetFieldFromCurrentProfile('options').launch_ignore_selection
+        if option == 'never' then
+            return false
+        elseif option == 'unless_ctrl' then
+            return not IsKeyDown(KeyCodeCtrl)
+        elseif option == 'with_ctrl' then
+            return IsKeyDown(KeyCodeCtrl)
+        end
+        return true
+    end,
+
+    --- Toggles the ignore mode for launch commands. Ignoring units under the cursor makes the
+    --- missile target the ground, while targeting a unit tracks its position across reloads and
+    --- can hit units whose hitbox is above the ground
+    ---@param self WorldView
+    ---@param enabled boolean
+    ---@param changed boolean
+    UpdateLaunchIgnoreMode = function(self, enabled, changed)
+        if enabled then
+            local ignore = self:ShouldLaunchIgnoreSelection()
+            if changed or ignore ~= self.LaunchIgnoreSelection then
+                self:EnableIgnoreMode(ignore)
+                self.LaunchIgnoreSelection = ignore
+            end
+        else
+            self:EnableIgnoreMode(false)
+            self.LaunchIgnoreSelection = nil
+        end
+    end,
+
     --- Called when the order `RULEUCC_Tactical` is being applied
     ---@param self WorldView
     ---@param identifier 'RULEUCC_Tactical'
@@ -673,12 +708,10 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldVie
                 local cursor = self.Cursor
                 cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
                 self:ApplyCursor()
-
-                self:EnableIgnoreMode(true)
             end
-        else
-            self:EnableIgnoreMode(false)
         end
+
+        self:UpdateLaunchIgnoreMode(enabled, changed)
 
         self:OnCursorDecals(identifier, enabled, changed, TacticalDecalFunc)
     end,
@@ -694,12 +727,10 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldVie
                 local cursor = self.Cursor
                 cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
                 self:ApplyCursor()
-
-                self:EnableIgnoreMode(true)
             end
-        else
-            self:EnableIgnoreMode(false)
         end
+
+        self:UpdateLaunchIgnoreMode(enabled, changed)
 
         self:OnCursorDecals(identifier, enabled, changed, NukeDecalFunc)
     end,

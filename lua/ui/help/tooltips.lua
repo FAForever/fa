@@ -1089,6 +1089,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0301>Splash Damage Indicator",
         description = "<LOC OPTIONS_0302>Shows a splash damage indicator when an attack command is possible, usually when you attempt to ground-fire with a unit with splash damage, like a bomber.\r\n\r\nDoes not interfere with how the attack command is processed, this is merely a visual change.",
     },
+    options_launch_ignore_selection = {
+        title = "<LOC LAUNCH_IGNORE_SELECTION_TITLE>Launch commands ignore units",
+        description = "<LOC LAUNCH_IGNORE_SELECTION_DESCRIPTION>Determines whether tactical missile and nuke launch commands ignore the units under the cursor and target the ground instead.\r\n\r\nTargeting a unit directly allows hitting units whose hitbox is above the ground, such as the Megalith, makes the impact point consistent, and lets queued launches follow the target as it moves between reloads.",
+    },
     options_cursor_depth_scanning = {
         title = "<LOC WATER_DEPTH_ASSISTANCE_TITLE>Water depth indication",
         description = "<LOC WATER_DEPTH_ASSISTANCE_DESCRIPTION>When enabled, adds visual elements to visualize the offset between the water surface and the ocean floor at the position of the cursor. A separate indicator turns red when naval units are guaranteed to not be able to path at the location due to lack of depth.",
