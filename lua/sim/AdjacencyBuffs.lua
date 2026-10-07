@@ -203,7 +203,7 @@ local AdjBuffFuncs = import("/lua/sim/adjacencybufffunctions.lua")
 
 local adj = {           -- SIZE4     SIZE8   SIZE12    SIZE16   SIZE20
     T1PowerGenerator={
-        EnergyActive=       {-0.0625, -0.03125, -0.0208, -0.01563, -0.0025},
+        EnergyActive=       {-0.0625, -0.03125, -0.0208, -0.01563, -0.01563},
         EnergyMaintenance=  {-0.0625, -0.03125, -0.0208, -0.01563, -0.0125},
         EnergyWeapon=       {-0.0250, -0.01250, -0.0083, -0.00625, -0.0050},
         RateOfFire=         {-0.0400, -0.01250, -0.0083, -0.00625, -0.0050},
@@ -215,7 +215,7 @@ local adj = {           -- SIZE4     SIZE8   SIZE12    SIZE16   SIZE20
         RateOfFire=         {-0.0625, -0.0625,  -0.0625, -0.0625,  -0.025},
     },
     T3PowerGenerator={
-        EnergyActive=       {-0.1875, -0.1875,  -0.1875, -0.1562,  -0.05},
+        EnergyActive=       {-0.1875, -0.1875,  -0.1875, -0.1562,  -0.1562},
         EnergyMaintenance=  {-0.1875, -0.1875,  -0.1875, -0.1875,  -0.1875},
         EnergyWeapon=       {-0.075,  -0.075,   -0.075,  -0.075,   -0.075},
         RateOfFire=         {-0.1,    -0.1,     -0.1,    -0.1,     -0.040},
@@ -230,10 +230,10 @@ local adj = {           -- SIZE4     SIZE8   SIZE12    SIZE16   SIZE20
         MassActive=         {-0.2, -0.1, -0.0667, -0.125, -0.125},
     },
     T1MassFabricator={
-        MassActive=         {-0.025, -0.0125, -0.008333, -0.0125, -0.0075},
+        MassActive=         {-0.025, -0.0125, -0.008333, -0.0125, -0.0125},
     },
     T3MassFabricator={
-        MassActive=         {-0.2, -0.2, -0.125, -0.2, -0.0375},
+        MassActive=         {-0.2, -0.2, -0.125, -0.2, -0.20},
     },
     T1EnergyStorage={
         EnergyProduction=   {0.25, 0.125, 0.083334, 0.0625, 0.05},
