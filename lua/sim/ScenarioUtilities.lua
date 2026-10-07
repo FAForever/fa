@@ -77,7 +77,7 @@
 ---@class ScenarioOrder
 ---@field type string
 ---@field target MarkerName
----@field foramtion? UnitFormations
+---@field formation? UnitFormations
 ---@field angle? number
 ---@field cmd fun(units: Unit[], target?: any)
 
