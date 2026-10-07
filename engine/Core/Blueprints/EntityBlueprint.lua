@@ -17,7 +17,9 @@
 ---@field CollisionShape CollisionShape
 --- the desired maximum number of shooters taking shots at the entity
 ---@field DesiredShooterCap number
---- Unit footprint. If absent, uses the `SizeX` and `SizeZ` fields.
+--- Cells this unit occupies for pathfinding. If absent, uses the `SizeX` and `SizeZ` fields
+--- Mobile units are forced to use the closest footprint spec that is defined in `footprints.lua`
+--- Structures can define their own footprints
 ---@field Footprint? FootprintBlueprint
 --- component X,X of inertia tensor
 ---@field InertiaTensorX number
