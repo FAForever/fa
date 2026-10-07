@@ -106,6 +106,7 @@ local MathAtan = math.atan
 ---@class CommandModeDataOrder : CommandModeDataBase
 ---@field name CommandCap
 ---@field consistent boolean    # Allows command mode to remain after you issue a command, without queueing the commands
+---@field instant? boolean      # Makes guard orders on factories skip the assist move of engineers in build range, regardless of the option and Control
 
 ---@class CommandModeDataBuild : CommandModeDataBase
 ---@field name string # blueprint id of the unit being built
@@ -531,12 +532,28 @@ local function OnGuardCopy(guardees, unit)
     end
 end
 
+--- Cached value of the `assist_factory_instantly` option. Updated by the option's `set` callback
+local assistFactoryInstantly = Prefs.GetFromCurrentProfile('options.assist_factory_instantly') == 'On'
+
+--- Updates the cached value of the `assist_factory_instantly` option
+---@param value 'On' | 'Off'
+function UpdateAssistFactoryInstantlyOption(value)
+    assistFactoryInstantly = value == 'On'
+end
+
+--- Returns whether a guard order on a factory, issued now, skips the initial assist move of the engineers that are
+--- already in build range of the factory. Cheap enough to call every frame
+---@return boolean
+function IsFactoryAssistInstant()
+    -- Control inverts the option. Control only copies queues when assisting engineers, so it is free for factories.
+    -- The instant assist command mode forces it
+    return (modeData and modeData.instant) or (assistFactoryInstantly ~= IsKeyDown('Control'))
+end
+
 --- Skips the initial assist move of the engineers that are already in build range of the factory
 ---@param command UserCommand
 local function OnGuardFactoryInstantly(command)
-    -- Control inverts the option. Control only copies queues when assisting engineers, so it is free for factories
-    local prefs = Prefs.GetFieldFromCurrentProfile('options').assist_factory_instantly
-    if (prefs == 'On') ~= IsKeyDown('Control') and
+    if IsFactoryAssistInstant() and
         EntityCategoryFilterDown(categoriesEngineers, command.Units)[1]
     then
         SimCallback({ Func = 'AbortNavigationOfFactoryAssisters', Args = { Target = command.Target.EntityId } }, true)

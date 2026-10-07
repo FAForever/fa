@@ -18,6 +18,7 @@
 ---| "RULEUCC_Capture"
 ---| "RULEUCC_Ferry"
 ---| "RULEUCC_Guard"
+---| "RULEUCC_GuardInstant"
 ---| "RULEUCC_Move"
 ---| "RULEUCC_Nuke"
 ---| "RULEUCC_Tactical"
@@ -187,6 +188,7 @@ skins = {
             RULEUCC_Capture = {'/textures/ui/common/game/cursors/capture-.dds', 15, 15, 9, 12},
             RULEUCC_Ferry = {'/textures/ui/common/game/cursors/ferry.dds', 15, 15},
             RULEUCC_Guard = {'/textures/ui/common/game/cursors/guard-.dds', 15, 15, 10, 12},
+            RULEUCC_GuardInstant = {'/textures/ui/common/game/cursors/guard_instant-.dds', 15, 15, 10, 12},
             RULEUCC_Move = {'/textures/ui/common/game/cursors/move-.dds', 15, 15, 12, 12},
             RULEUCC_Nuke = {'/textures/ui/common/game/cursors/launch.dds', 15, 15},
             RULEUCC_Tactical = {'/textures/ui/common/game/cursors/launch.dds', 15, 15},
