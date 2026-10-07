@@ -555,6 +555,20 @@ function StartInstantAssistCommandMode()
     end
 end
 
+--- Toggles the `assist_factory_instantly` option and prints the new state
+function ToggleAssistFactoryInstantly()
+    -- `Prefs.SetOption` runs the option's `set` callback and saves the preferences, like the options dialog does
+    local value = 'On'
+    local text = "<LOC _On>On"
+    if Prefs.GetOption('assist_factory_instantly') == 'On' then
+        value = 'Off'
+        text = "<LOC _Off>Off"
+    end
+
+    Prefs.SetOption('assist_factory_instantly', value)
+    print(LOC("<LOC ASSIST_FACTORY_INSTANTLY>Assist factories in range instantly") .. ": " .. LOC(text))
+end
+
 LoadIntoTransports = function(clearCommands)
     print("Load units into transports")
     SimCallback({ Func = 'LoadIntoTransports', Args = { ClearCommands = clearCommands or false } }, true)

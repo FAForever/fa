@@ -1423,6 +1423,10 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").StartInstantAssistCommandMode()',
         category = 'orders',
     },
+    ['toggle_assist_factory_instantly'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").ToggleAssistFactoryInstantly()',
+        category = 'orders',
+    },
     ['transport'] = {
         action = 'StartCommandMode order RULEUCC_Transport',
         category = 'orders',

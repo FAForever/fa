@@ -136,6 +136,7 @@ keyDescriptions = {
     ['ferry'] = '<LOC key_desc_0051>Ferry',
     ['guard'] = '<LOC key_desc_0052>Assist',
     ['guard_instant'] = '<LOC KEY_GUARD_INSTANT>Assist, engineers in build range of a factory start assisting it immediately',
+    ['toggle_assist_factory_instantly'] = '<LOC KEY_TOGGLE_ASSIST_FACTORY_INSTANTLY>Toggle the option to assist factories in range instantly',
     ['transport'] = '<LOC key_desc_0053>Transport',
     ['launch_tactical'] = '<LOC key_desc_0054>Launch a Tactical Missile',
     ['overcharge'] = '<LOC key_desc_0055>Overcharge',
