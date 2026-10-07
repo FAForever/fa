@@ -70,6 +70,9 @@ function STRING(s)
 	return s
 end
 
+---@class UIScenarioGroup : table
+---@field type 'GROUP'
+
 ---@param group table
 ---@return ScenarioGroup
 function GROUP(group)
