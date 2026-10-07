@@ -70,11 +70,8 @@ function STRING(s)
 	return s
 end
 
----@class UIScenarioGroup : table
----@field type 'GROUP'
-
 ---@param group table
----@return UIScenarioGroup
+---@return ScenarioGroup
 function GROUP(group)
 	group.type = 'GROUP'
 	return group

@@ -27,6 +27,7 @@ local SyncVoice = import("/lua/simsyncutils.lua").SyncVoice
 local CategoryToString = import("/lua/sim/categoryutils.lua").ToString
 local Cinematics = import("/lua/cinematics.lua")
 local Game = import("/lua/game.lua")
+local FormationCommands = import("/lua/sim/formationcommands.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 local SimCamera = import("/lua/simcamera.lua").SimCamera
 local SimUIVars = import("/lua/sim/simuistate.lua")
@@ -70,7 +71,7 @@ end
 function EndOperation(success, allPrimary, allSecondary, allBonus)
     if allSecondary == nil then allSecondary = false end
     if allBonus == nil then allBonus = false end
-    local opFile = string.gsub(ScenarioInfo.Options.ScenarioFile, 'scenario', 'operation')
+    local opFile = string.gsub(ScenarioInfo.Options.ScenarioFile, 'scenario', 'operation')--[[@as FileName]]
     local opData
     if DiskGetFileInfo(opFile) then
         opData = import(opFile)
@@ -287,7 +288,7 @@ function GiveUnitToArmy(unit, army, triggerOnGiven)
     IgnoreRestrictions(true)
 
     local newUnit = ChangeUnitArmy(unit, army)
-    local newBrain = ArmyBrains[army]
+    local newBrain = ArmyBrains[army]--[[@as CampaignAIBrain]]
     if not newBrain.IgnoreArmyCaps then
         SetIgnoreArmyUnitCap(army, false)
     end
@@ -388,9 +389,11 @@ function GetCatUnitsInArea(cat, area, brain)
         area = ScenarioUtils.AreaToRect(area)
     end
 
+    ---@type Unit[]|nil
     local entities = GetUnitsInRect(area)
     local result = {}
     if entities then
+        ---@type Unit[]
         local filteredList = EntityCategoryFilterDown(cat, entities)
 
         for _, entity in filteredList do
@@ -430,83 +433,6 @@ CreateUnitToPositionDistanceTrigger = TriggerFile.CreateUnitToPositionDistanceTr
 CreateUnitToMarkerDistanceTrigger = CreateUnitToPositionDistanceTrigger -- got renamed for some reason
 CreateUnitNearTypeTrigger = TriggerFile.CreateUnitNearTypeTrigger
 
--- platoon functions REQUIRE `squad` to be non-nil when present
-
---- Orders a platoon to move along a route
----@param platoon Platoon
----@param route (MarkerName | Vector)[]
----@param squad? PlatoonSquads
-function PlatoonMoveRoute(platoon, route, squad)
-    for _, node in route do
-        if type(node) == 'string' then
-            node = ScenarioUtils.MarkerToPosition(node)
-        end
-        if squad then
-            platoon:MoveToLocation(node, false, squad)
-        else
-            platoon:MoveToLocation(node, false)
-        end
-    end
-end
-
---- Orders platoon to patrol a route
----@param platoon Platoon
----@param route (MarkerName | Vector)[]
----@param squad? PlatoonSquads
-function PlatoonPatrolRoute(platoon, route, squad)
-    for _, node in route do
-        if type(node) == 'string' then
-            node = ScenarioUtils.MarkerToPosition(node)
-        end
-        if squad then
-            platoon:Patrol(node, squad)
-        else
-            platoon:Patrol(node)
-        end
-    end
-end
-
---- Orders a platoon to attack-move along a route
----@param platoon Platoon
----@param route (MarkerName | Vector)[]
----@param squad? PlatoonSquads
-function PlatoonAttackRoute(platoon, route, squad)
-    for _, node in route do
-        if type(node) == 'string' then
-            node = ScenarioUtils.MarkerToPosition(node)
-        end
-        if squad then
-            platoon:AggressiveMoveToLocation(node, squad)
-        else
-            platoon:AggressiveMoveToLocation(node)
-        end
-    end
-end
-
---- Orders a platoon to move along a chain
----@param platoon Platoon
----@param chain ChainName
----@param squad? PlatoonSquads
-function PlatoonMoveChain(platoon, chain, squad)
-    PlatoonMoveRoute(platoon, ScenarioUtils.ChainToPositions(chain), squad)
-end
-
---- Orders a platoon to patrol along a chain
----@param platoon Platoon
----@param chain ChainName
----@param squad? PlatoonSquads
-function PlatoonPatrolChain(platoon, chain, squad)
-    PlatoonPatrolRoute(platoon, ScenarioUtils.ChainToPositions(chain), squad)
-end
-
---- Orders a platoon to attack-move through a chain
----@param platoon Platoon
----@param chain ChainName
----@param squad? PlatoonSquads
-function PlatoonAttackChain(platoon, chain, squad)
-    PlatoonAttackRoute(platoon, ScenarioUtils.ChainToPositions(chain), squad)
-end
-
 --- Orders a group to patrol along a chain
 ---@param units Unit[]
 ---@param chain ChainName
@@ -529,21 +455,38 @@ function GroupPatrolRoute(units, route)
 end
 
 --- Orders a group to patrol a route in formation
+---
+---`IssueFormPatrol` Does NOT return `SimCommand`
 ---@param units Unit[]
 ---@param chain ChainName
 ---@param formation string
 function GroupFormPatrolChain(units, chain, formation)
-    for _, pos in ScenarioUtils.ChainToPositions(chain) do
-        IssueFormPatrol(units, pos, formation, 0)
+    local path = ScenarioUtils.ChainToPositions(chain)
+    local angles = FormationCommands.GetAnglesForRoute(path)
+
+    for i, pos in ipairs(path) do
+        IssueFormPatrol(units, pos, formation, angles[i])
     end
 end
 
---- Orders a group to attack-move a along a chain
+--- Orders a group to attack-move along a chain
 ---@param units Unit[]
 ---@param chain ChainName
 function GroupAttackChain(units, chain)
     for _, pos in ScenarioUtils.ChainToPositions(chain) do
         IssueAggressiveMove(units, pos)
+    end
+end
+
+--- Orders a group to attack-move along a route
+---@param units Unit[]
+---@param route (MarkerName | Vector)[]
+function GroupAttackRoute(units, route)
+    for _, node in route do
+        if type(node) == 'string' then
+            node = ScenarioUtils.MarkerToPosition(node)
+        end
+        IssueAggressiveMove(units, node)
     end
 end
 
@@ -554,6 +497,134 @@ function GroupMoveChain(units, chain)
     for _, pos in ScenarioUtils.ChainToPositions(chain) do
         IssueMove(units, pos)
     end
+end
+
+--- Orders a group to move along a route
+---@param units Unit[]
+---@param route (MarkerName | Vector)[]
+function GroupMoveRoute(units, route)
+    for _, node in route do
+        if type(node) == 'string' then
+            node = ScenarioUtils.MarkerToPosition(node)
+        end
+        IssueMove(units, node)
+    end
+end
+
+---Converts route from marker names to marker positions.
+---@param route any
+local function routeToPositions(route)
+    for k, v in pairs(route) do
+        if type(v) == "string" then
+            route[k] = ScenarioUtils.MarkerToPosition(v)
+        end
+    end
+end
+
+--- Orders a platoon to move along a route
+---@param platoon Platoon
+---@param route (MarkerName | Vector)[]
+---@param squad? PlatoonSquads Issues the commands to specific squad or to all squads of the platoon
+---@param formation? UnitFormations
+function PlatoonMoveRoute(platoon, route, squad, formation)
+    formation = formation or platoon:GetFormationFromPlatoonData()
+    local squads = FormationCommands.GetSquadsForFormationOrder(squad)
+    routeToPositions(route)
+
+    for _, squadName in pairs(squads) do
+        local units = platoon:GetSquadUnits(squadName)
+
+        if not table.empty(units) then
+            if formation == 'NoFormation' then
+                GroupMoveRoute(units, route)
+                return
+            end
+            local angles = FormationCommands.GetAnglesForRoute(route, platoon:GetSquadPosition(squadName))
+            FormationCommands.UnitsFormationOrder(units, IssueFormMove, route, angles, formation)
+        end
+    end
+end
+
+--- Orders platoon to patrol a route
+---
+--- `IssueFormPatrol` Does NOT return `SimCommand`
+---@param platoon Platoon
+---@param route (MarkerName | Vector)[]
+---@param squad? PlatoonSquads Issues the commands to specific squad or to all squads of the platoon
+---@param formation? UnitFormations
+function PlatoonPatrolRoute(platoon, route, squad, formation)
+    formation = formation or platoon:GetFormationFromPlatoonData()
+    local squads = FormationCommands.GetSquadsForFormationOrder(squad)
+    routeToPositions(route)
+
+    -- Since the patrol has no end, the angles are gonna be the same for all squads
+    local angles = FormationCommands.GetAnglesForRoute(route)
+
+    for _, squadName in pairs(squads) do
+        local units = platoon:GetSquadUnits(squadName)
+
+        if not table.empty(units) then
+            if formation == 'NoFormation' then
+                GroupPatrolRoute(units, route)
+                return
+            end
+            FormationCommands.UnitsFormationOrder(units, IssueFormPatrol, route, angles, formation)
+        end
+    end
+end
+
+--- Orders a platoon to attack-move along a route
+---@param platoon Platoon
+---@param route (MarkerName | Vector)[]
+---@param squad? PlatoonSquads Issues the commands to specific squad or to all squads of the platoon
+---@param formation? UnitFormations
+---@return SimCommand? command Last command issued to the platoon, if any
+function PlatoonAttackRoute(platoon, route, squad, formation)
+    formation = formation or platoon:GetFormationFromPlatoonData()
+    local squads = FormationCommands.GetSquadsForFormationOrder(squad)
+    routeToPositions(route)
+
+    local cmd
+    for _, squadName in pairs(squads) do
+        local units = platoon:GetSquadUnits(squadName)
+
+        if not table.empty(units) then
+            if formation == 'NoFormation' then
+                GroupAttackRoute(units, route)
+                return {}
+            end
+            local angles = FormationCommands.GetAnglesForRoute(route, platoon:GetSquadPosition(squadName))
+            local commands = FormationCommands.UnitsFormationOrder(units, IssueFormAggressiveMove, route, angles, formation)
+            cmd = commands[table.getn(commands)]
+        end
+    end
+
+    return cmd
+end
+
+--- Orders a platoon to move along a chain
+---@param platoon Platoon
+---@param chain ChainName
+---@param squad? PlatoonSquadType
+function PlatoonMoveChain(platoon, chain, squad)
+    PlatoonMoveRoute(platoon, ScenarioUtils.ChainToPositions(chain), squad)
+end
+
+--- Orders a platoon to patrol along a chain
+---@param platoon Platoon
+---@param chain ChainName
+---@param squad? PlatoonSquadType
+function PlatoonPatrolChain(platoon, chain, squad)
+    PlatoonPatrolRoute(platoon, ScenarioUtils.ChainToPositions(chain), squad)
+end
+
+--- Orders a platoon to attack-move through a chain
+---@param platoon Platoon
+---@param chain ChainName
+---@param squad? PlatoonSquads
+---@return SimCommand? command Last command issued to the platoon, if any
+function PlatoonAttackChain(platoon, chain, squad)
+    return PlatoonAttackRoute(platoon, ScenarioUtils.ChainToPositions(chain), squad)
 end
 
 ---@param units Unit[]
@@ -912,7 +983,7 @@ end
 ---@param unit Unit
 ---@param destroyUnit? boolean
 function FakeTeleportUnit(unit, destroyUnit)
-    IssueStop({unit})
+    IssueToUnitStop(unit)
     IssueToUnitClearCommands(unit)
     unit.CanBeKilled = false
 
@@ -1034,9 +1105,9 @@ function UpgradeUnit(unit)
         WARN("ScenarioFramework: UpgradeUnit: no upgrade found for unit: " .. unit.UnitId)
         return
     end
-    IssueStop({unit})
+    IssueToUnitStop(unit)
     IssueToUnitClearCommands(unit)
-    IssueUpgrade({unit}, upgradeBP)
+    IssueToUnitUpgrade(unit, upgradeBP)
 end
 
 --- Triggers a help text prompt to appear in the UI.
@@ -1216,7 +1287,7 @@ end
 ---@param x number
 ---@param z number
 ---@param lifetime number
----@param army number
+---@param army Army
 ---@return VizMarker
 function CreateVisibleArea(radius, x, z, lifetime, army)
     local spec = {
@@ -1230,7 +1301,7 @@ function CreateVisibleArea(radius, x, z, lifetime, army)
 end
 
 -- Sets the playable area for an operation to `rect`. Can be an area name or rectangle.
----@param rect Area | Rectangle
+---@param rect AreaName | Rectangle
 ---@param voFlag? boolean # defaults to `true`
 function SetPlayableArea(rect, voFlag)
     if voFlag == nil then
@@ -1433,9 +1504,13 @@ function SetLoyalistColor(army)
     SetArmyColor(army, 0, 100, 0)
 end
 
+---Gets the current platoon counter by `name` from the attack manager
 ---
+---Initializes to 0, if the platoon hasn't been tracked by the AM yet.
+---
+---@see AttackManager.PlatoonCount
 ---@param aiBrain CampaignAIBrain
----@param name string
+---@param name string Platoon name
 ---@return integer
 function AMPlatoonCounter(aiBrain, name)
     local platoonCount = aiBrain.AttackData.PlatoonCount
@@ -1745,7 +1820,7 @@ function KillBaseInAreaThread(units)
 end
 
 ---
----@param area Area
+---@param area AreaName
 ---@param callback? fun()
 ---@param duration? number
 function StartOperationJessZoom(area, callback, duration)
@@ -1954,8 +2029,8 @@ end
 ---@field markerCam boolean allows the NIS to use a marker rather than a unit
 ---@field resetCam boolean disables the interpolation at the end of the NIS, needed for NISs that appear outside of the playable area.
 ---@field overrideCam boolean allows an NIS to interrupt an NIS that is currently playing (typically used for end of operation cameras)
----@field playableAreaIn Area
----@field playableAreaOut Area
+---@field playableAreaIn string
+---@field playableAreaOut string
 ---@field vizRadius number (ogrids)
 
 ---------------
@@ -2113,7 +2188,7 @@ end
 
 --- Sets all `units` that are in `army` to be able to take damage and be killed. Flags if they weren't able
 --- to previously: `UndamagableFlagSet` for CanTakeDamage and `UnKillableFlagSet` for CanBeKilled.
----@param army number
+---@param army Army
 ---@param units Unit[]
 function FlagUnkillableSelect(army, units)
     for _, unit in units do
@@ -2159,7 +2234,7 @@ function FlagUnkillable(army, exceptions)
 end
 
 --- Reverts all units in `army` that had their `UnKillableFlagSet` or `UndamagableFlagSet`
----@param army number
+---@param army Army
 function UnflagUnkillable(army)
     local units = ArmyBrains[army]:GetListOfUnits(categories.ALLUNITS, false)
     for _, unit in units do
@@ -2231,7 +2306,6 @@ function AntiOffMapMainThread()
     local WaitTicks = WaitTicks
     local GetUnitsInRect = GetUnitsInRect
     local MoveOnMapThread = MoveOnMapThread
-    local IsHumanUnit = IsHumanUnit
     GenerateOffMapAreas()
 
     while ScenarioInfo.OffMapPreventionThreadAllowed do
@@ -2243,7 +2317,7 @@ function AntiOffMapMainThread()
                     -- This is to make sure that we only do this check for air units
                     if not unit.OffMapThread and EntityCategoryContains(categories.AIR, unit) then
                         -- This is to make it so it only impacts player armies, not AI or civilian or mission map armies
-                        if IsHumanUnit(unit) then
+                        if unit.Brain.Human then
                             unit.OffMapThread = unit:ForkThread(MoveOnMapThread)
                         else
                             -- So that we don't bother checking each AI unit more than once
@@ -2334,12 +2408,7 @@ end
 ---@param unit Unit
 ---@return boolean
 function IsHumanUnit(unit)
-    for _, army in ScenarioInfo.ArmySetup do
-        if army.ArmyIndex == unit.Army then
-            return army.Human
-        end
-    end
-    return false
+    return unit.Brain.Human
 end
 
 --- Returns if the unit is in the playable area

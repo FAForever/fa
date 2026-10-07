@@ -27,6 +27,13 @@
 -- - EnergyDrainedState
 -- - DeadState
 
+---@alias ShieldType
+---| "Bubble"
+---| "Personal"
+---| "AntiArtillery"
+---| "Unknown" # Any shield with not set type
+---| "None" # Not an actual shield type, but it's returned by units that don't have a shield
+
 local Entity = import("/lua/sim/entity.lua").Entity
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local Util = import("/lua/utilities.lua")
@@ -147,6 +154,8 @@ end
 ---@field Owner Unit
 ---@field MeshBp string
 ---@field MeshZBp string
+---@field Enabled boolean
+---@field ShieldType ShieldType
 ---@field SpillOverDmgMod number
 ---@field ShieldRechargeTime number
 ---@field ShieldEnergyDrainRechargeTime number
@@ -158,10 +167,22 @@ end
 ---@field SkipAttachmentCheck boolean
 ---@field AbsorptionTypeDamageTypeToMulti table<DamageType, number>
 ---@field DisallowCollisions boolean
+---@field AssistCostEnergyPerBuildRate? number
+---@field AssistCostMassPerBuildRate? number
+---@field StaticShield? boolean
+---@field CommandShield? boolean
+---@field DamagedTick table<string, integer>
+---@field DamagedRegular table<string, integer|false>
+---@field DamagedOverspill table<string, number>
+---@field LiveImpactEntities integer
+---@field ImpactEntitySpecs { Owner: Unit }
 Shield = ClassShield(moho.shield_methods, Entity) {
 
     RemainEnabledWhenAttached = false,
 
+    ---@param self Shield
+    ---@param spec table
+    ---@param owner any
     __init = function(self, spec, owner)
         -- This key deviates in name from the blueprints...
         spec.Size = spec.ShieldSize
@@ -195,6 +216,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         self.PassOverkillDamage = spec.PassOverkillDamage
         self.ImpactMeshBp = spec.ImpactMesh
         self.SkipAttachmentCheck = spec.SkipAttachmentCheck
+        self.AssistCostEnergyPerBuildRate = spec.AssistCostEnergyPerBuildRate
+        self.AssistCostMassPerBuildRate = spec.AssistCostMassPerBuildRate
         self.DisallowCollisions = false
 
         if spec.ImpactEffects ~= '' then
@@ -304,7 +327,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
             -- check if we need to suspend ourself
             if -- we're at zero health or lower
-            health <= 0
+                health <= 0
                 -- we're full health
                 or health == maxHealth
                 -- we're not enabled
@@ -315,11 +338,29 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 -- adjust shield bar one last time
                 self:UpdateShieldRatio(health / maxHealth)
 
+                -- Manage shield assisters: shield is full HP and cannot be assisted anymore
+                if health == maxHealth
+                    and self.AssistCostEnergyPerBuildRate and self.AssistCostMassPerBuildRate
+                then
+                    for _, unit in self.Owner.Repairers do
+                        if unit.Dead then continue end
+                        unit:UpdateConsumptionValues()
+                    end
+                end
+
                 -- suspend ourselves and wait
                 self.RegenThreadSuspended = true
                 SuspendCurrentThread()
                 self.RegenThreadSuspended = false
                 fromSuspension = true
+
+                -- Manage shield assisters: shield was damaged from full HP and can now be assisted
+                if self.AssistCostEnergyPerBuildRate and self.AssistCostMassPerBuildRate then
+                    for _, unit in self.Owner.Repairers do
+                        if unit.Dead then continue end
+                        unit:UpdateConsumptionValues()
+                    end
+                end
             end
 
             -- if we didn't suspend then check regeneration conditions
@@ -525,7 +566,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     ---@param amount number
     ---@param vector Vector
     ---@param dmgType DamageType
-    ---@param doOverspill boolean
+    ---@param doOverspill? boolean Defaults to `false`
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
 
         -- cache information used throughout the function
@@ -542,6 +583,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
         if dmgType == 'Overcharge' then
             local wep = instigator:GetWeaponByLabel('OverCharge')
+            ---@cast wep -nil
             if self.StaticShield then
                 amount = wep:GetBlueprint().Overcharge.structureDamage
             elseif self.CommandShield then
@@ -720,6 +762,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         self.LiveImpactEntities = self.LiveImpactEntities - 1
     end,
 
+    ---@param self Shield
     OnDestroy = function(self)
         EntitySetMesh(self, '')
         if self.MeshZ ~= nil then
@@ -731,8 +774,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     end,
 
     --- Called when a shield collides with a projectile to check if the collision is valid
-    ---@param self Shield The shield we're checking the collision for
-    ---@param other Projectile The projectile we're checking the collision with
+    ---@param self Shield # The shield we're checking the collision for
+    ---@param other Projectile # The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
 
         if self.DisallowCollisions then
@@ -776,8 +819,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     end,
 
     --- Called when a shield collides with a collision beam to check if the collision is valid
-    -- @param self The shield we're checking the collision for
-    -- @param firingWeapon The weapon the beam originates from that we're checking the collision with
+    ---@param self Shield # The shield we're checking the collision for
+    ---@param firingWeapon Weapon # The weapon the beam originates from that we're checking the collision with
     OnCollisionCheckWeapon = function(self, firingWeapon)
 
         if self.DisallowCollisions then
@@ -792,22 +835,27 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         return true
     end,
 
+    ---@param self Shield
     TurnOn = function(self)
         ChangeState(self, self.OnState)
     end,
 
+    ---@param self Shield
     TurnOff = function(self)
         ChangeState(self, self.OffState)
     end,
 
+    ---@param self Shield
     IsOn = function(self)
         return false
     end,
 
+    ---@param self Shield
     IsUp = function(self)
         return (self:IsOn() and self.Enabled)
     end,
 
+    ---@param self Shield
     RemoveShield = function(self)
         self._IsUp = false
 

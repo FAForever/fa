@@ -68,7 +68,7 @@ end
 --- This will move the camera to the position of a marker.
 ---
 --- If the transition duration isn't provided, the camera is snapped to the marker.
----@param marker Marker
+---@param marker MarkerName | Marker
 ---@param seconds? number
 function CameraMoveToMarker(marker, seconds)
     -- Adding this in case we just want to start the camera somewhere at the beginning of an operation without playing a full NIS
@@ -108,7 +108,7 @@ function CameraMoveToRectangle(rectangle, seconds)
 end
 
 --- This will move the camera to an area
----@param area string
+---@param area AreaName
 ---@param seconds? number
 function CameraMoveToArea(area, seconds)
     local rectangle = ScenarioUtils.AreaToRect(area)
@@ -215,6 +215,7 @@ function EnterNISMode()
     ScenarioInfo.Camera:UseGameClock()
     Sync.NISMode = 'on'
     ScenarioInfo.OpEnded = true
+
     -- Take Away UI
     -- Set Game Speed to normal
 end
@@ -223,6 +224,7 @@ end
 function ExitNISMode()
     -- Set Game Speed to user value
     -- Restore UI
+
     ScenarioInfo.OpEnded = false
     CameraRevertRotation()
     Sync.NISMode = 'off'

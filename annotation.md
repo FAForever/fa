@@ -88,7 +88,7 @@ In general, all annotated code in the repository is a good example. Some was wri
 ---@param boneA number | string
 ---@param entityB Entity | Unit | Prop
 ---@param boneB number | string
----@param army number
+---@param army Army
 ---@param blueprint BeamBlueprint
 ---@return moho.IEffect
 function AttachBeamEntityToEntity(entityA, boneA, entityB, boneB, army, blueprint)
