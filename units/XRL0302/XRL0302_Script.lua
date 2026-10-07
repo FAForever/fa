@@ -113,7 +113,9 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
         self:StartTrackTargetThread()
     end,
 
-    --- Starts thread that makes weapon only enable on 
+    --- Starts thread that makes detonation only trigger when trying to attack
+    --- or being captured/reclaimed, and makes the navigator better track
+    --- moving targets, when we have one.
     ---@param self XRL0302
     ---@return thread?
     StartTrackTargetThread = function(self)
