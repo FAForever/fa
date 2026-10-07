@@ -1,1 +1,1 @@
-- Your explanation here... [Don't forget to change the category in the filename] (#7326).
+- Interrupting pathfinding no longer affects engineers on patrol or attack move, which let them reclaim props from far outside their build range (#7326).
