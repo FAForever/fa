@@ -18,17 +18,10 @@
 ---@class UIScenarioChain
 ---@field Markers string[]  # key of marker in the master chain
 
----@class UIScenarioUnit
----@field type UnitId
----@field orders string # Can be empty
----@field platoon string # Can be empty
----@field Position ScenarioVector
----@field Orientation ScenarioVector
-
 ---@class UIScenarioUnitGroup : ScenarioGroup
 ---@field orders string # Can be empty
 ---@field platoon string # Can be empty
----@field Units { [string]: (UIScenarioUnitGroup | UIScenarioUnit) }
+---@field Units { [string]: (UIScenarioUnitGroup | ScenarioUnit) }
 
 --- An army defined in the scenario.
 ---@class UIScenarioArmy
