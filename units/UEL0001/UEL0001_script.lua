@@ -605,12 +605,15 @@ UEL0001 = ClassUnit(ACUUnit) {
         ---@cast wep -nil
         wep:AddDamageMod(bp.ZephyrDamageMod)
         wep:ChangeMaxRadius(bp.NewMaxRadius or 44)
+        wep:ChangeMuzzleBone(bp.NewMuzzleBone)
         local oc = self:GetWeaponByLabel('OverCharge')
         ---@cast oc -nil
         oc:ChangeMaxRadius(bp.NewMaxRadius or 44)
+        oc:ChangeMuzzleBone(bp.NewMuzzleBone)
         local aoc = self:GetWeaponByLabel('AutoOverCharge')
         ---@cast aoc -nil
         aoc:ChangeMaxRadius(bp.NewMaxRadius or 44)
+        aoc:ChangeMuzzleBone(bp.NewMuzzleBone)
     end,
 
     ---@param self UEL0001
@@ -624,12 +627,15 @@ UEL0001 = ClassUnit(ACUUnit) {
         local bpDisrupt = self.Blueprint.Weapon[1].MaxRadius
         ---@cast bpDisrupt -nil
         wep:ChangeMaxRadius(bpDisrupt or 22)
+        wep:ChangeMuzzleBone(nil)
         local oc = self:GetWeaponByLabel('OverCharge')
         ---@cast oc -nil
         oc:ChangeMaxRadius(bpDisrupt or 22)
+        oc:ChangeMuzzleBone(nil)
         local aoc = self:GetWeaponByLabel('AutoOverCharge')
         ---@cast aoc -nil
         aoc:ChangeMaxRadius(bpDisrupt or 22)
+        aoc:ChangeMuzzleBone(nil)
     end,
 
     -- RAS
