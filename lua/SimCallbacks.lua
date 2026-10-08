@@ -701,6 +701,27 @@ do
             return
         end
 
+        -- Patrolling engineers reclaim from as far as their guard scan radius once their path is interrupted
+        local candidates = engineers
+        local candidateCount = TableGetn(candidates)
+        engineers = {}
+        local engineerCount = 0
+        for k = 1, candidateCount do
+            local engineer = candidates[k]
+            if not engineer:IsUnitState('Patrolling') then
+                engineerCount = engineerCount + 1
+                engineers[engineerCount] = engineer
+            end
+        end
+
+        if engineerCount == 0 then
+            if (GetFocusArmy() == GetCurrentCommandSourceArmy()) then
+                print("Unable to interrupt path finding of units on patrol or attack move")
+            end
+
+            return
+        end
+
         -- prevent automation
         local gameTick = GetGameTick()
         local commandSource = GetCurrentCommandSource()
