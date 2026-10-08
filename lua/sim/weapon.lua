@@ -29,6 +29,7 @@ local DebugWeaponComponent = import("/lua/sim/weapons/components/debugweaponcomp
 ---@field CollideFriendly boolean       # weaponBlueprint.CollideFriendly or false
 ---@field DoTTime number                # weaponBlueprint.DoTTime
 ---@field DoTPulses number              # weaponBlueprint.DoTPulses
+---@field DoTSkipFirstPulse boolean      # weaponBlueprint.DoTSkipFirstPulse
 ---@field MetaImpactAmount any          # weaponBlueprint.MetaImpactAmount
 ---@field MetaImpactRadius any          # weaponBlueprint.MetaImpactRadius
 ---@field ArtilleryShieldBlocks boolean # weaponBlueprint.ArtilleryShieldBlocks
@@ -490,6 +491,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
             CollideFriendly = weaponBlueprint.CollideFriendly or false,
             DoTTime = weaponBlueprint.DoTTime,
             DoTPulses = weaponBlueprint.DoTPulses,
+            DoTSkipFirstPulse = weaponBlueprint.DoTSkipFirstPulse,
             MetaImpactAmount = weaponBlueprint.MetaImpactAmount,
             MetaImpactRadius = weaponBlueprint.MetaImpactRadius,
             ArtilleryShieldBlocks = weaponBlueprint.ArtilleryShieldBlocks,
