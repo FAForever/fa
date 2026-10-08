@@ -1,1 +1,1 @@
-- Your explanation here... [Don't forget to change the category in the filename] (#7332).
+- Annotate the `__fenv` global. It allows overriding the result of `getfenv` (#7332).
