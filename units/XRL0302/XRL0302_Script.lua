@@ -15,6 +15,7 @@ local DamageArea = DamageArea
 local CreateEmitterAtBone = CreateEmitterAtBone
 local CreateDecal = CreateDecal
 local CreateLightParticle = CreateLightParticle
+local IsDestroyed = IsDestroyed
 
 local DeathWeaponKamikaze = ClassWeapon(Weapon) {
     OnFire = function(self)
@@ -109,35 +110,43 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
         self.EffectsBagXRL = TrashBag()
         self.AmbientExhaustEffectsBagXRL = TrashBag()
 
-        self.Trash:Add(
-            ForkThread(
-                self.TrackTargetThread, self
-            )
+        self:StartTrackTargetThread()
+    end,
+
+    --- Starts thread that makes detonation only trigger when trying to attack
+    --- or being captured/reclaimed, and makes the navigator better track
+    --- moving targets, when we have one.
+    ---@param self XRL0302
+    ---@return thread?
+    StartTrackTargetThread = function(self)
+        local navigator = self:GetNavigator()
+        if not navigator then return end
+        local weapon = self:GetWeaponByLabel('Suicide')
+        if not weapon then return end
+
+        return self.Trash:Add(
+            ForkThread(self.TrackTargetThread, self, navigator, weapon)
         )
     end,
 
     ---@param self XRL0302
-    TrackTargetThread = function(self)
-        local navigator = self:GetNavigator()
-        if not navigator then return end
-        local weapon = self:GetWeaponByLabel('Suicide')
-
+    ---@param navigator Navigator
+    ---@param weapon XRL0302_Suicide
+    TrackTargetThread = function(self, navigator, weapon)
         local lastTarget
-        while not IsDestroyed(self) do
+        while not IsDestroyed(self) and not IsDestroyed(weapon) do
 
-            -- adjust behavior of the weapon so it only fires when we're trying to attack something
-            if weapon then
-                if -- we're trying to attack
-                    self:IsUnitState('Attacking')
-                    or self:IsUnitState('Patrolling')
-                    -- engineer trying to take us
-                    or self:IsUnitState('BeingCaptured')
-                    or self:IsUnitState('BeingReclaimed')
-                then
-                    weapon:SetEnabled(true)
-                else
-                    weapon:SetEnabled(false)
-                end
+            -- only let weapon fire when it makes sense
+            if -- we're trying to attack
+                self:IsUnitState('Attacking')
+                or self:IsUnitState('Patrolling')
+                -- engineer trying to take us
+                or self:IsUnitState('BeingCaptured')
+                or self:IsUnitState('BeingReclaimed')
+            then
+                weapon:SetEnabled(true)
+            else
+                weapon:SetEnabled(false)
             end
 
             -- adjust behavior of tracking a target so that we speed through the target instead of bump into it
