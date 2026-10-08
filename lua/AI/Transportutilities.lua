@@ -25,7 +25,7 @@ local tostring = tostring
 local type = type
 local VDist2 = VDist2
 local VDist3 = VDist3
-local WaitTicks = coroutine.yield
+local WaitTicks = WaitTicks
 
 local GetFuelRatio = moho.unit_methods.GetFuelRatio
 local GetFractionComplete = moho.entity_methods.GetFractionComplete

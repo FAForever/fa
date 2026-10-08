@@ -343,7 +343,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
             end
             while eng and not eng.Dead and
                 (0 < table.getn(eng:GetCommandQueue()) or eng:IsUnitState('Building') or eng:IsUnitState("Moving")) do
-                coroutine.yield(20)
+                WaitTicks(20)
             end
             self.MassPointTable = nil
             self:ChangeState(self.Searching)
@@ -392,7 +392,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                     else
                         IssueToUnitClearCommands(eng)
                         IssueToUnitMove(eng, AIUtils.ShiftPosition(enemyUnitPos, engPos, 50, false))
-                        coroutine.yield(60)
+                        WaitTicks(60)
                         action = true
                     end
                 end

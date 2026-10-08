@@ -10,6 +10,7 @@ local AIUtils = import("/lua/ai/aiutilities.lua")
 -- upvalue scope for performance
 local Random = Random
 local IsDestroyed = IsDestroyed
+local WaitTicks = WaitTicks
 
 local TableGetn = table.getn
 local TableEmpty = table.empty
@@ -370,7 +371,7 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                             break
                         end
                     end
-                    coroutine.yield(15)
+                    WaitTicks(15)
                 end
             end
             self:ChangeState(self.Searching)

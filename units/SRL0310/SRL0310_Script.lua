@@ -55,7 +55,7 @@ SRL0310 = Class(CLandUnit) {
                 :SetRate(-self.TransformAnimator:GetAnimationDuration() / dur)
                 :SetAnimationFraction(instant and 0 or 1)
             if not instant then
-                coroutine.yield(dur * 10)
+                WaitTicks(dur * 10)
             end
             self:SetImmobile(false)
             --self:RevertCollisionShape()
@@ -67,7 +67,7 @@ SRL0310 = Class(CLandUnit) {
                 :SetRate(self.TransformAnimator:GetAnimationDuration() / dur)
                 :SetAnimationFraction(instant and 1 or 0)
             if not instant then
-                coroutine.yield(dur * 10)
+                WaitTicks(dur * 10)
             end
             self:SetImmobile(false)
             ---Collision box partially in the water
