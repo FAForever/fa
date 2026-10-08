@@ -51,7 +51,9 @@ function ToggleRepeatBuild()
     for _, v in selection do
         v:ProcessInfo('SetRepeatQueue', isRepeatBuild)
         if EntityCategoryContains(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, v) then
-            v:GetCreator():ProcessInfo('SetRepeatQueue', isRepeatBuild)
+            if v:GetFractionComplete() == 1 then
+                v:GetCreator():ProcessInfo('SetRepeatQueue', isRepeatBuild)
+            end
         end
     end
 end
