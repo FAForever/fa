@@ -14,9 +14,16 @@ local TextArea = import("/lua/ui/controls/textarea.lua").TextArea
 
 local dialog = false
 local doesntCare = false
+local firstPause
 
 function UpdateDialog(beatNumber, strings)
     WARN("Desync at beat " .. beatNumber .. " tick " .. GetGameTimeSeconds())
+    -- beat 1 desyncs occur from mismatched ruleInit data (beat 0 checksum),
+    -- but that often doesn't lead to future gameplay desyncs.
+    if beatNumber >= 2 and not firstPause then
+        SessionRequestPause()
+        firstPause = true
+    end
     if doesntCare or dialog then
         return
     end
