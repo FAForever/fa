@@ -46,6 +46,7 @@ UnitBlueprint{
         "PRODUCTFA",
         "RECLAIM",
         "REPAIR",
+        "SACULOADOUTBASE",
         "SELECTABLE",
         "SERAPHIM",
         "SHOWATTACKRETICLE",
@@ -223,7 +224,6 @@ UnitBlueprint{
             HelpText = "<LOC xsl0301_AdvancedCombat_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system, nano-repair system and overcharge enhancements.",
             SelectionPriority = 1,
             SortCategory = "SORTOTHER",
-            UnitName = "<LOC xsl0301_AdvancedCombat_name>SACU (Advanced Combatant preset)",
         },
         Combat = {
             Description = "<LOC xsl0301_Combat_desc>SACU (Combatant preset)",
@@ -232,7 +232,6 @@ UnitBlueprint{
             HelpText = "<LOC xsl0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system enhancement.",
             SelectionPriority = 1,
             SortCategory = "SORTOTHER",
-            UnitName = "<LOC xsl0301_Combat_name>SACU (Combatant preset)",
         },
         Engineer = {
             Description = "<LOC xsl0301_Engineer_desc>SACU (Engineer preset)",
@@ -240,7 +239,6 @@ UnitBlueprint{
             Enhancements = { "EngineeringThroughput" },
             HelpText = "<LOC xsl0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the rapid fabricator enhancement.",
             SortCategory = "SORTOTHER",
-            UnitName = "<LOC xsl0301_Engineer_name>SACU (Engineer preset)",
         },
         Missile = {
             Description = "<LOC xsl0301_Missile_desc>SACU (Missile preset)",
@@ -251,7 +249,6 @@ UnitBlueprint{
             },
             HelpText = "<LOC xsl0301_Missile_help>Support Armored Command Unit. Enhanced during construction with the tactical missile launcher and rapid fabricator enhancements.",
             SortCategory = "SORTOTHER",
-            UnitName = "<LOC xsl0301_Missile_name>SACU (Missile preset)",
         },
         NanoCombat = {
             Description = "<LOC xsl0301_NanoCombat_desc>SACU (Nano Combatant preset)",
@@ -263,7 +260,6 @@ UnitBlueprint{
             HelpText = "<LOC xsl0301_NanoCombat_help>Support Armored Command Unit. Enhanced during construction with the enhanced sensor system and nano-repair system enhancements.",
             SelectionPriority = 1,
             SortCategory = "SORTOTHER",
-            UnitName = "<LOC xsl0301_NanoCombat_name>SACU (Nano Combatant preset)",
         },
         Rambo = {
             Description = "<LOC xsl0301_Rambo_desc>SACU (Rambo preset)",
@@ -276,7 +272,6 @@ UnitBlueprint{
             HelpText = "<LOC xsl0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with the personal shield generator, nano-repair system and overcharge enhancements.",
             SelectionPriority = 1,
             SortCategory = "SORTOTHER",
-            UnitName = "<LOC xsl0301_Rambo_name>SACU (Rambo preset)",
         },
     },
     Enhancements = {
@@ -286,8 +281,10 @@ UnitBlueprint{
             BuildTime = 5900,
             Icon = "dss",
             Name = "<LOC enhancements_0131>Nano-Repair System",
+            ShortName = "<LOC sacu_short_xsl_damagestabilization>Nano",
             NewHealth = 14000,
             NewRegenRate = 250,
+            SelectionPriority = 1,
             ShowBones = { "Back_Upgrade" },
             Slot = "LCH",
             UpgradeEffectBones = {
@@ -316,6 +313,7 @@ UnitBlueprint{
             BuildTime = 4200,
             Icon = "efm",
             Name = "<LOC enhancements_0143>Rapid Fabricator",
+            ShortName = "<LOC sacu_short_xsl_engineeringthroughput>Fab",
             NewBuildRate = 98,
             Slot = "LCH",
             UpgradeEffectBones = {
@@ -343,9 +341,11 @@ UnitBlueprint{
             BuildTime = 3100,
             Icon = "sre",
             Name = "<LOC enhancements_0141>Enhanced Sensor System",
+            ShortName = "<LOC sacu_short_xsl_enhancedsensors>Sensor",
             NewMaxRadius = 35,
             NewOmniRadius = 60,
             NewVisionRadius = 36,
+            SelectionPriority = 1,
             ShowBones = { "Back_Upgrade" },
             Slot = "Back",
             UpgradeEffectBones = { "Back_Upgrade" },
@@ -371,6 +371,7 @@ UnitBlueprint{
             BuildTime = 4200,
             Icon = "tmu",
             Name = "<LOC enhancements_0145>Tactical Missile Launcher",
+            ShortName = "<LOC sacu_short_xsl_missile>Missile",
             ShowBones = { "Back_Upgrade" },
             Slot = "Back",
             UpgradeEffectBones = { "Back_Upgrade" },
@@ -396,6 +397,8 @@ UnitBlueprint{
             BuildTime = 12600,
             Icon = "oc",
             Name = "<LOC enhancements_0139>Overcharge",
+            ShortName = "<LOC sacu_short_xsl_overcharge>OC",
+            SelectionPriority = 1,
             Slot = "RCH",
             UpgradeEffectBones = {
                 "Right_Arm_Muzzle",
@@ -424,9 +427,11 @@ UnitBlueprint{
             ImpactEffects = "SeraphimShieldHit01",
             MaintenanceConsumptionPerSecondEnergy = 300,
             Name = "<LOC enhancements_0028>Personal Shield Generator",
+            ShortName = "<LOC sacu_short_xsl_shield>Shield",
             OwnerShieldMesh = "/units/xsl0301/xsl0301_personalshield_mesh",
             PersonalShield = true,
             RegenAssistMult = 10,
+            SelectionPriority = 1,
             ShieldEnergyDrainRechargeTime = 5,
             ShieldMaxHealth = 20000,
             ShieldRechargeTime = 160,
@@ -475,6 +480,9 @@ UnitBlueprint{
             Icon = "pqt",
             MaintenanceConsumptionPerSecondEnergy = 10000,
             Name = "<LOC enhancements_0035>Personal Teleporter",
+            ShortName = "<LOC sacu_short_xsl_teleporter>Teleport",
+            -- Greys this out in the gateway build queue.
+            DisableInGateway = true,
             ShowBones = { "Back_Upgrade" },
             Slot = "RCH",
             UpgradeEffectBones = {
