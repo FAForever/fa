@@ -38,12 +38,12 @@ Write each checkbox as an observable result ("the health bar drops", "the order 
 
   - `CreateUnitAtMouse` takes a 0-indexed army. `GetFocusArmy()` and sim functions such as `CreateUnitHPR` are 1-indexed. Use `GetFocusArmy() - 1` for your own units. In a solo skirmish, army `1` is the hostile civilian army.
   - Space units with the offsets: about 15 apart for experimentals. Place units far away when distance matters to the test (projectile arcs, ranges).
-- Console snippets are run with the "Execute Paste Buffer" debug hotkey, which runs the clipboard as UI Lua. Give plain UI Lua without a `UI_Lua` prefix. Wrap sim code as `ConExecute[[SimLua <code>]]`, with a literal space after `SimLua`.
-- When a test needs a moving unit, make it reusable: issue a patrol in the sim instead of a single move that the tester has to race. The snippet below spawns a hostile unit at the mouse that patrols 40 units east and back:
+- Console snippets are run with the "[Debug] Execute Paste Buffer" hotkey, which runs the clipboard as UI Lua. It has no default key, so testers bind it in the key bindings menu. Give plain UI Lua without a `UI_Lua` prefix. Wrap sim code as `ConExecute[[SimLua <code>]]`, with a literal space after `SimLua`.
+- When a test needs a moving unit, make it reusable: give it a patrol loop in the sim instead of a single move that the tester has to race. A patrol loop needs two `IssuePatrol` orders, and the unit then walks the loop indefinitely. The snippet below spawns a hostile unit at the mouse that patrols 40 units east and back:
 
   ```lua
   local p = GetMouseWorldPos()
-  ConExecute(string.format('SimLua IssuePatrol({CreateUnitHPR("xrl0305", 2, %.1f, %.1f, %.1f, 0, 0, 0)}, {%.1f, %.1f, %.1f})', p[1], p[2], p[3], p[1] + 40, p[2], p[3]))
+  ConExecute(string.format('SimLua local u = {CreateUnitHPR("xrl0305", 2, %.1f, %.1f, %.1f, 0, 0, 0)} IssuePatrol(u, {%.1f, %.1f, %.1f}) IssuePatrol(u, {%.1f, %.1f, %.1f})', p[1], p[2], p[3], p[1] + 40, p[2], p[3], p[1], p[2], p[3]))
   ```
 
 ## Order and scope
@@ -85,7 +85,7 @@ ConExecute[[SimLua for _, u in ipairs(DebugGetSelection()) do if EntityCategoryC
 2. With the mouse over open ground, spawn a hostile Brick that patrols east and back:
    ```lua
    local p = GetMouseWorldPos()
-   ConExecute(string.format('SimLua IssuePatrol({CreateUnitHPR("xrl0305", 2, %.1f, %.1f, %.1f, 0, 0, 0)}, {%.1f, %.1f, %.1f})', p[1], p[2], p[3], p[1] + 40, p[2], p[3]))
+   ConExecute(string.format('SimLua local u = {CreateUnitHPR("xrl0305", 2, %.1f, %.1f, %.1f, 0, 0, 0)} IssuePatrol(u, {%.1f, %.1f, %.1f}) IssuePatrol(u, {%.1f, %.1f, %.1f})', p[1], p[2], p[3], p[1] + 40, p[2], p[3], p[1], p[2], p[3]))
    ```
    Holding Shift shows whether a launch order's line follows the unit or stays on the ground.
    For each option state, launch at the Brick with and without Ctrl. Nukes share the code path (`WorldView.UpdateLaunchIgnoreMode`), so the TML covers both:
