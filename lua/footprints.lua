@@ -19,8 +19,19 @@ IgnoreStructures = 0x01
 -- with that footprint, so keep the number of entries here down to the bare minimum we actually
 -- need.
 --
--- The script "data/lua/tests/dump_footprints.lua" can be used to figure out what footprint shapes
+-- The script "/lua/tests/dump_footprints.lua" can be used to figure out what footprint shapes
 -- the blueprints are currently expecting.
+--
+-- The engine matches each ground unit to one of these specs while blueprints load (see
+-- `EntityBlueprint.Footprint` in `/engine/Core/Blueprints/EntityBlueprint.lua`):
+-- - The occupancy caps come from the unit's `Physics.MotionType`. Only specs with exactly those
+--   caps are candidates
+-- - The size is the blueprint's `Footprint.SizeX`/`SizeZ`, or the `ceil` of the unit's `SizeX`/`SizeZ`
+-- - The closest spec wins, measured by the larger of the X and Z size differences. Ties go to
+--   the earlier entry, so the order within a caps group matters
+-- - The whole spec replaces the unit's footprint (size, `MaxSlope`, water depths, flags)
+-- - A motion type with no spec of its caps keeps its own footprint size
+-- - Specs with a duplicate `Name` are skipped with a warning
 
 SpecFootprints {
 
