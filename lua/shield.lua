@@ -65,7 +65,7 @@ local ForkThread = ForkThread
 local ResumeThread = ResumeThread
 local ChangeState = ChangeState
 local ArmyGetHandicap = ArmyGetHandicap
-local CoroutineYield = coroutine.yield
+local WaitTicks = WaitTicks
 local CreateEmitterAtBone = CreateEmitterAtBone
 local _c_CreateShield = _c_CreateShield
 local IssueClearCommands = IssueClearCommands
@@ -309,7 +309,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
         -- cache globals
         local GetGameTick = GetGameTick
-        local CoroutineYield = CoroutineYield
+        local WaitTicks = WaitTicks
         local SuspendCurrentThread = SuspendCurrentThread
 
         -- cache cfunctions
@@ -380,7 +380,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             end
 
             -- wait till next tick
-            CoroutineYield(1)
+            WaitTicks(1)
         end
     end,
 
@@ -754,7 +754,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         end
 
         -- hold up a bit
-        CoroutineYield(20)
+        WaitTicks(20)
 
         -- take out the entity again
         EntityDestroy(entity)
@@ -918,7 +918,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         end
 
         while curProgress < time do
-            CoroutineYield(1)
+            WaitTicks(1)
 
             curProgress = curProgress + 0.1
             local workProgress = curProgress / time
@@ -1365,7 +1365,7 @@ PersonalShield = ClassShield(Shield) {
         end
 
         -- hold a bit to lower the number of allowed effects
-        CoroutineYield(20)
+        WaitTicks(20)
 
         self.LiveImpactEntities = self.LiveImpactEntities - 1
     end,

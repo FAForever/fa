@@ -7,6 +7,7 @@ local TransportUtils = import("/lua/ai/transportutilities.lua")
 -- upvalue scope for performance
 local Random = Random
 local IsDestroyed = IsDestroyed
+local WaitTicks = WaitTicks
 
 local TableGetn = table.getn
 local TableEmpty = table.empty
@@ -149,7 +150,7 @@ AIPlatoonAdaptiveReturnToBaseBehavior = Class(AIPlatoon) {
                 local dist
                 local Stuck = 0
                 while not IsDestroyed(self) do
-                    coroutine.yield(1)
+                    WaitTicks(1)
                     if self.Dead then
                         return
                     end
@@ -185,7 +186,7 @@ AIPlatoonAdaptiveReturnToBaseBehavior = Class(AIPlatoon) {
                         end
                     end
                     --LOG('Lastdist '..Lastdist..' dist '..dist)
-                    coroutine.yield(15)
+                    WaitTicks(15)
                 end
             end
             local position = self:GetPlatoonPosition()

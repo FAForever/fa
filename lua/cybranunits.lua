@@ -94,7 +94,7 @@ local VDist2Sq = VDist2Sq
 local ArmyBrains = ArmyBrains
 local KillThread = KillThread
 local ForkThread = ForkThread
-local WaitTicks = coroutine.yield
+local WaitTicks = WaitTicks
 local IssueMove = IssueMove
 local IssueClearCommands = IssueClearCommands
 -- upvalued moho functions for performance
