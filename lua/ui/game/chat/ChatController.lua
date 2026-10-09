@@ -483,21 +483,7 @@ function Send(text, attachCamera)
     -- table-address recycling.
     msg.Id = string.format("%d %s", GameTick(), tostring(msg))
 
-    -- Replay-parser backwards compat: external replay tools scrape chat
-    -- out of recorded `GiveResourcesToPlayer` callback args. Fire one
-    -- zero-resource callback per outgoing message so they keep working.
-    -- Observers skip it (no army to ship).
-    if focusArmy ~= -1 then
-        local senderData = GetArmyData(focusArmy)
-        SimCallback({
-            Func = 'GiveResourcesToPlayer',
-            Args = {
-                From = focusArmy, To = focusArmy, Mass = 0, Energy = 0,
-                Sender = senderData and senderData.nickname or tostring(focusArmy),
-                Msg = msg,
-            },
-        }, false)
-    end
+    RecordForReplayParsers(msg)
 
     -- Sim-routed path: the sim re-broadcasts via `Sync.ChatMessages`.
     -- In live play it runs alongside `SessionSendChatMessage` and
@@ -523,6 +509,27 @@ function Send(text, attachCamera)
             SessionSendChatMessage(msg)
         end
     end
+end
+
+--- Replay-parser backwards compat: external replay tools scrape chat out
+--- of recorded `GiveResourcesToPlayer` callback args. Fires one
+--- zero-resource callback per outgoing message so they keep working. Also
+--- used by the Notify subsystem, which sends outside of `Send`. Observers
+--- skip it (no army to ship).
+---@param msg ChatPayload
+function RecordForReplayParsers(msg)
+    local focusArmy = GetFocusArmy()
+    if focusArmy == -1 then return end
+
+    local senderData = GetArmyData(focusArmy)
+    SimCallback({
+        Func = 'GiveResourcesToPlayer',
+        Args = {
+            From = focusArmy, To = focusArmy, Mass = 0, Energy = 0,
+            Sender = senderData and senderData.nickname or tostring(focusArmy),
+            Msg = msg,
+        },
+    }, false)
 end
 
 -------------------------------------------------------------------------------

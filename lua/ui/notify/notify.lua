@@ -3,6 +3,7 @@
 
 local Prefs = import("/lua/user/prefs.lua")
 local FindClients = import("/lua/ui/game/chat/ChatController.lua").FindClients
+local RecordForReplayParsers = import("/lua/ui/game/chat/ChatController.lua").RecordForReplayParsers
 local defaultMessages = import("/lua/ui/notify/defaultmessages.lua").defaultMessages
 local AddChatCommand = import("/lua/ui/notify/commands.lua").AddChatCommand
 local NotifyOverlay = import("/lua/ui/notify/notifyoverlay.lua")
@@ -232,6 +233,7 @@ function sendMessage(msg)
     if observer then
         SessionSendChatMessage(localClient, msg)
     else
+        RecordForReplayParsers(msg)
         SessionSendChatMessage(FindClients(), msg)
     end
 end
