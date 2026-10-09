@@ -7,6 +7,7 @@ Folder-specific guides extend this one. Read them when working in those folders:
 - [lua/ui/AGENTS.md](lua/ui/AGENTS.md): UI patterns (`__init` vs `__post_init`, LazyVars and `Derive`, `TrashBag`, fluent `Layouter`, skinning, hot reload).
 - [lua/ui/game/chat/AGENTS.md](lua/ui/game/chat/AGENTS.md): the MVC chat refactor.
 - [annotation.md](annotation.md): annotation and comment style. Applies to all new code.
+- [in-game-testing.md](in-game-testing.md): how to write an in-game test procedure for a PR.
 - [CONTRIBUTING.md](CONTRIBUTING.md): PR process, review, merge conventions.
 
 ---
@@ -269,7 +270,7 @@ To run the CI workflow itself locally, use Act with Docker as described in [docs
 
 The syntax test skips the `testmaps/` and `engine/` folders, and files that use `{&h &a}` syntax (`lua/lazyvar.lua`, `lua/system/class.lua`, `lua/sim/NavGenerator.lua`, `lua/system/categories.lua`). Add to that list in `tests/run-syntax-test.sh` if you introduce the syntax elsewhere.
 
-Real verification means running the game: copy `setup/bin/init_local_development.lua` into the FAF client's `bin` folder (usually `C:\ProgramData\FAForever\bin`), set `locationOfRepository` in it, and launch `ForgedAlliance.exe /init "init_local_development.lua" /EnableDiskWatch /showlog /nomovie`. Check the moho log for Lua errors. See [docs/development/setup.md](docs/development/setup.md). When you can't run the game, say so and state what the user should check in-game.
+Real verification means running the game: copy `setup/bin/init_local_development.lua` into the FAF client's `bin` folder (usually `C:\ProgramData\FAForever\bin`), set `locationOfRepository` in it, and launch `ForgedAlliance.exe /init "init_local_development.lua" /EnableDiskWatch /showlog /nomovie`. Check the moho log for Lua errors. See [docs/development/setup.md](docs/development/setup.md). When you can't run the game, say so and write a test procedure for the user following [in-game-testing.md](in-game-testing.md).
 
 ## Branches, PRs, changelog
 
