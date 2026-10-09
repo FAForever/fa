@@ -1,0 +1,1 @@
+- Changes made to reflect Balance Team Lead (Nomander) request. "When the projectile impacts something it should deal damage, wait 3.8s, and then continue on its path from the same position it impacted until it impacts something else or until it impacts the same target due to it having enough HP." (#7335)
