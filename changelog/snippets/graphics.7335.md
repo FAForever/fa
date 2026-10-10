@@ -1,0 +1,1 @@
+- New effects made to match new behavior with input from Nomander, Fichom, and others in the FAF community (#7335)
