@@ -82,6 +82,25 @@ local EmitterSetup = {
         emitter:SetEmitterCurveParam('Y_POSITION_CURVE', 0.2, 0)
         emitter:SetEmitterCurveParam('ENDSIZE_CURVE', 5, 0)
     end,
+    -- the splash of small units destroyed on the water (ExplosionSmallWater), as a single burst from one
+    -- point: they repeat every 5s, and the column and the spray are scattered around where they start
+    ['/effects/emitters/Watertower_s.bp'] = function(emitter)
+        emitter:SetEmitterParam('LIFETIME', 1)
+        emitter:SetEmitterParam('REPEATTIME', 1)
+        emitter:SetEmitterCurveParam('EMITRATE_CURVE', 6, 0)
+        emitter:SetEmitterCurveParam('SIZE_CURVE', 0, 0)
+    end,
+    ['/effects/emitters/Watersplash_s.bp'] = function(emitter)
+        emitter:SetEmitterParam('LIFETIME', 1)
+        emitter:SetEmitterParam('REPEATTIME', 1)
+        emitter:SetEmitterCurveParam('EMITRATE_CURVE', 10, 0)
+        emitter:SetEmitterCurveParam('SIZE_CURVE', 0, 0)
+    end,
+    ['/effects/emitters/Water_pie_s.bp'] = function(emitter)
+        emitter:SetEmitterParam('LIFETIME', 1)
+        emitter:SetEmitterParam('REPEATTIME', 1)
+        emitter:SetEmitterCurveParam('LIFETIME_CURVE', 20, 0)
+    end,
     -- the slow rings of the impact of the Salvation, all spreading as far, to 9
     ['/effects/emitters/aeon_quanticcluster_hit_08_emit.bp'] = function(emitter)
         emitter:SetEmitterCurveParam('ENDSIZE_CURVE', 9, 0)
@@ -123,10 +142,11 @@ HitBurst.Across = 0.97 -- from the path (75 degrees), so that it flies out nearl
 -- it as into a vortex. Motes fade in just outside the damage area and spiral flat into the core, turning
 -- faster as they close in, in a stream that thickens toward the second hit. From the start the air distorts
 -- in a circle closing in with them, and on the ground puffs of dust appear evenly around and curl in, more
--- and thicker toward the end. In the last moments a faint layer of tiny bits of debris collapses into it
+-- and thicker toward the end, or on the water waves roll in. In the last moments a faint layer of tiny bits of debris collapses into it
 -- (as on the impact of the Salvation). The second hit adds the slow rings of the Salvation, a flash of
 -- dark rays, electricity and a burst of distortion to the explosion. A shell that lodged after passing on,
--- where nothing exploded, kicks up dirt and a weak ripple of air as it lands. Nothing here is the energy
+-- where nothing exploded, kicks up dirt or a splash and a weak ripple of air as it lands. On the water the
+-- shell is held on the surface as on the ground, and both hits splash. Nothing here is the energy
 -- of the explosion: that would read as damage. Each mote is a small projectile drawn as a glowing point,
 -- set moving a few times
 local Vortex = {}
@@ -145,8 +165,8 @@ Vortex.FirstTick = 3 -- tick of the hold the first motes appear at, after the ex
 Vortex.DebrisSize = 1 / 3 -- of the damage radius: the radius of the layer of debris as it appears
 Vortex.DebrisTicks = 10 -- before the second hit, that the debris appears and collapses over
 Vortex.DistortSize = 0.6 -- of the damage radius: the radius of the distorted air as it appears
--- with the motes, puffs of the dust of the ground are picked up around the core and drawn into it, on the
--- ground only. Each is a few faint overlapping particles: the more, the thicker
+-- with the motes, on the ground puffs of dust are picked up around the core and drawn into it. Each is a
+-- few faint overlapping particles: the more, the thicker
 Vortex.DustPuffs = 30 -- more and more of them toward the end
 -- of the damage radius, where each appears: a puff (about 2 across) reaching the edge of the damage area
 Vortex.DustReach = { 0.7, 0.8 }
@@ -164,8 +184,35 @@ Vortex.CoreLift = 0.4
 -- their scale in flight
 Vortex.CoreSwell = 2.0 -- by the end of the hold, growing faster and faster
 Vortex.DirtScale = 1.3 -- of the dirt kicked up as the shell hits the ground, directly or lodging
+Vortex.SplashScale = 1 -- of the splash as the shell hits the water
+-- on the water, waves roll in instead of the dust: the crests of the ripples of idle units on the water
+-- (water_idle_ripples_03), running inward
+Vortex.WaveSize = 1.1 -- of the damage radius: the radius of each wave as it starts
+Vortex.WaveTicks = 12 -- that each takes to roll into the core
+Vortex.WaveEvery = 1.5 -- ticks between them, on average: whole ticks, 1 and 2 by turns
+Vortex.WaveLift = 0.15 -- above the water: flat effects right on it can be drawn under it
+Vortex.WaveCopies = 2 -- of each wave, overlapping: more for a stronger wave
 Vortex.DirtLife = 15 -- ticks the dirt lasts, give or take 30%
 Vortex.RippleRadius = 0.3 -- of the ripple of air of a shell that lodged, as a fraction of the damage radius
+
+
+--- A wave rolling in over the water to the shell: the crest of the ripples of idle units on the water
+--- (water_idle_ripples_03, emitting without end, scattered a little), as a single wave closing in from 2 to
+--- 0.2, just above the water (the core it is created at is higher), so that it is not drawn under it.
+--- Sizes are for scale 1
+---@param emitter moho.IEffect
+---@param ticks number  # that it takes to roll in
+local function SetUpWave(emitter, ticks)
+    emitter:SetEmitterParam('LIFETIME', 1)
+    emitter:SetEmitterCurveParam('EMITRATE_CURVE', Vortex.WaveCopies, 0)
+    emitter:SetEmitterCurveParam('LIFETIME_CURVE', ticks, 0)
+    emitter:SetEmitterCurveParam('VELOCITY_CURVE', 0, 0)
+    emitter:SetEmitterCurveParam('X_POSITION_CURVE', 0, 0)
+    emitter:SetEmitterCurveParam('Z_POSITION_CURVE', 0, 0)
+    emitter:SetEmitterCurveParam('Y_POSITION_CURVE', Vortex.WaveLift - Vortex.CoreLift, 0)
+    emitter:SetEmitterCurveParam('BEGINSIZE_CURVE', 2, 0)
+    emitter:SetEmitterCurveParam('ENDSIZE_CURVE', 0.2, 0)
+end
 
 --- The ripple of air of a shell that lodged: the distortion of the Mercy, small and quick (8 ticks, size
 --- 0.1 to 2)
@@ -192,9 +239,8 @@ local ReleaseBackstep = 1
 -- the engine default, which the weapon targeting expects
 local BallisticAcceleration = -4.9
 
--- impacts that end the shell immediately
+-- impacts that end the shell immediately. Water is held on as the ground is
 local FinalImpactTypes = {
-    Water = true,
     Underwater = true,
     UnitUnderwater = true,
 }
@@ -324,13 +370,19 @@ local function CreateUprightEffects(shell, effects, scale, setup)
     return created
 end
 
---- Kicks up dirt where the shell hits the ground, only as it hits, see Vortex
+--- Kicks up dirt where the shell hits the ground, only as it hits, or a splash where it hits the water,
+--- see Vortex
 ---@param shell AIFSonanceShell02
-local function KickUpDirt(shell)
-    local dirt = CreateUprightEffects(shell, EffectTemplate.ASonanceWeaponLodgeDirt02, Vortex.DirtScale)
-    for _, effect in dirt do
-        effect:SetEmitterParam('LIFETIME', 1)
-        effect:SetEmitterCurveParam('LIFETIME_CURVE', Vortex.DirtLife, 0.3 * Vortex.DirtLife)
+---@param targetType string
+local function KickUp(shell, targetType)
+    if targetType == 'Terrain' then
+        local dirt = CreateUprightEffects(shell, EffectTemplate.ASonanceWeaponLodgeDirt02, Vortex.DirtScale)
+        for _, effect in dirt do
+            effect:SetEmitterParam('LIFETIME', 1)
+            effect:SetEmitterCurveParam('LIFETIME_CURVE', Vortex.DirtLife, 0.3 * Vortex.DirtLife)
+        end
+    elseif targetType == 'Water' then
+        CreateUprightEffects(shell, EffectTemplate.ASonanceWeaponLodgeWater02, Vortex.SplashScale)
     end
 end
 
@@ -353,6 +405,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
     FxImpactUnit = EffectTemplate.ASonanceWeaponHit02Core,
     FxImpactProp = EffectTemplate.ASonanceWeaponHit02Core,
     FxImpactLand = EffectTemplate.ASonanceWeaponHit02Core,
+    FxImpactWater = EffectTemplate.ASonanceWeaponHit02Core,
 
     ---@param self AIFSonanceShell02
     OnCreate = function(self)
@@ -399,6 +452,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         self.FxLandHitScale = scale
         self.FxUnitHitScale = scale
         self.FxPropHitScale = scale
+        self.FxWaterHitScale = scale
         if targetType == 'Shield' and not self.HasHeld then
             self.HeldBy = targetEntity
         end
@@ -415,8 +469,11 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         self:ShakeCamera(25, 3, 0, 1.5)
 
         if self.HasHeld or FinalImpactTypes[targetType] then
-            -- the final explosion: the slow rings of the Salvation, at their own size
+            -- the final explosion: the slow rings of the Salvation, at their own size, and a splash on the water
             CreateUprightEffects(self, EffectTemplate.ASonanceWeaponFinalRings02, 1)
+            if targetType == 'Water' then
+                KickUp(self, targetType)
+            end
             self:BurstMotes()
             self:Destroy()
             return
@@ -425,9 +482,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         self.HasHeld = true
         self.HeldOn = targetType
         self.FirstImpactTick = GetGameTick()
-        if targetType == 'Terrain' then
-            KickUpDirt(self)
-        end
+        KickUp(self, targetType)
         self:BurstMotes()
 
         -- it killed what it hit: not destroying the shell is enough for it to fly on, as the railgun of
@@ -648,11 +703,9 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
             end
         end
 
-        -- landing after passing on: dirt in the ground, a ripple of air
+        -- landing after passing on: dirt in the ground or a splash in the water, a ripple of air
         if startTick > 1 then
-            if self.HeldOn == 'Terrain' then
-                KickUpDirt(self)
-            end
+            KickUp(self, self.HeldOn)
             CreateUprightEffects(self, EffectTemplate.ASonanceWeaponLodgeAir02, radius * Vortex.RippleRadius, SetUpRipple)
         end
 
@@ -667,7 +720,15 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         local debrisStart = MathMax(first, HoldTicks + 1 - Vortex.DebrisTicks)
         Plan(debrisStart, { 'debris', HoldTicks + 1 - debrisStart })
         Plan(first, { 'distort', HoldTicks + 1 - first })
-        if self.HeldOn == 'Terrain' then
+        if self.HeldOn == 'Water' then
+            -- the waves: the last rolls into the core as the second hit explodes
+            local lastWave = HoldTicks + 1 - Vortex.WaveTicks
+            local k = 0
+            while lastWave - MathFloor(k * Vortex.WaveEvery) >= first do
+                Plan(lastWave - MathFloor(k * Vortex.WaveEvery), { 'wave', Vortex.WaveTicks })
+                k = k + 1
+            end
+        elseif self.HeldOn == 'Terrain' then
             -- coming in evenly from all around: each, in the order they appear, turned on by the golden
             -- angle from the last, into the widest gap left, give or take a little
             local turn = 2 * MathPi * Random()
@@ -745,6 +806,10 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
                         CreateEmitterAtEntity(corePoint, army, EffectTemplate.ASonanceWeaponVortexDistort02)
                             :ScaleEmitter(radius * Vortex.DistortSize)
                             :SetEmitterCurveParam('LIFETIME_CURVE', mote, 0)
+                    elseif kind == 'wave' then
+                        local wave = CreateEmitterAtEntity(corePoint, army, EffectTemplate.ASonanceWeaponVortexWave02)
+                        SetUpWave(wave, mote)
+                        wave:ScaleEmitter(radius * Vortex.WaveSize)
                     elseif kind == 'dust' then
                         -- a puff appearing above the ground around the core, curling into it: setting off around
                         -- it (s, the way the motes turn), pulled in by a steady acceleration (a) that brings it to
@@ -811,6 +876,14 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
     ---@param speed number
     Release = function(self, vx, vy, vz, speed)
         self.FirstTarget = nil
+
+        -- on the water the shell is already where it hits: it hits there, rather than flying on to hit the
+        -- water again, which the engine does not register (it goes on to the seabed)
+        if self.HeldOn == 'Water' then
+            self:OnImpact('Water', nil)
+            return
+        end
+
         local x, y, z = self:GetPositionXYZ()
         local backstep = ReleaseBackstep / speed
         self:SetPosition(Vector(x - vx * backstep, y - vy * backstep, z - vz * backstep), true)

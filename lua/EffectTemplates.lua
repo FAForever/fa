@@ -1238,6 +1238,11 @@ ASonanceWeaponLodgeDirt02 = { -- hitting the ground, directly or lodging: a puff
     EmtBpPath .. 'dust_cloud_02_emit.bp',
     EmtBpPath .. 'destruction_explosion_debris_04_emit.bp',
 }
+ASonanceWeaponLodgeWater02 = { -- hitting the water: the splash of small units destroyed on the water, as one burst, set by the shell
+    EmtBpPath .. 'Watertower_s.bp',
+    EmtBpPath .. 'Watersplash_s.bp',
+    EmtBpPath .. 'Water_pie_s.bp',
+}
 -- held by a shield: the drill
 ASonanceWeaponDrillThrust02 = EmtBpPath .. 'aeon_sonance_drill_thrust_01_emit.bp' -- the streak of the trail of the shell, growing back up its path
 ASonanceWeaponRelease02 = { -- the drill flashes as the shell is released
@@ -1249,6 +1254,7 @@ ASonanceWeaponLodgeAir02 = { -- a weak ripple of air, lodging after passing on, 
 }
 ASonanceWeaponVortexDistort02 = EmtBpPath .. 'aeon_sonance_vortex_distort_01_emit.bp' -- the air distorted by debris, closing in with the swirling motes
 ASonanceWeaponVortexDust02 = EmtBpPath .. 'aeon_sonance_vortex_dust_01_emit.bp' -- a puff of dust curling into the shell
+ASonanceWeaponVortexWave02 = EmtBpPath .. 'water_idle_ripples_03_emit.bp' -- on the water, a wave rolling into the shell, set by the shell
 ASonanceWeaponVortexDebris02 = EmtBpPath .. 'aeon_sonance_vortex_debris_01_emit.bp' -- tiny bits of debris collapsing into the shell, as on the impact of the Salvation
 ASonanceWeaponVortexFinal02 = { -- added to the explosion of the second hit: electricity, distortion, dark rays
     EmtBpPath .. 'aeon_sonance_hit_01_elect_emit.bp',
