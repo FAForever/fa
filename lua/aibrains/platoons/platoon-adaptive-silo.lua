@@ -274,7 +274,7 @@ AssignToUnitsMachine = function(data, platoon, units)
                 silo.terraincallbackset = true
             end
             silo:SetAutoMode(true)
-            IssueClearCommands({silo})
+            IssueToUnitClearCommands(silo)
         end
 
         -- TODO: to be removed until we have a better system to populate the platoons

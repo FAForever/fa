@@ -4474,6 +4474,8 @@ key_desc_0408="Select all Bombers (Torpedo)"
 
 key_desc_quick_load="Load the game from the special quick save file"
 
+key_desc_temporary_template_create_or_use="Save a temporary template from the current selection or use the saved temporary template."
+
 keymap_category_0000="UI"
 keymap_category_0004="Selection"
 keymap_category_0025="Camera"
@@ -5730,11 +5732,11 @@ tooltipui0477="Recall aircraft to nearest air staging facility for refueling and
 tooltipui0478="Deploy"
 tooltipui0479="Omni Toggle"
 tooltipui0480="Turn the selected units omni on/off"
-tooltipui0481="Turn the selected units shields on/off"
+tooltipui0481="Turn the selected units shields on/off. Right click to discharge."
 tooltipui0482="Shield Dome Toggle"
-tooltipui0483="Turn the selected units shield dome on/off"
+tooltipui0483="Turn the selected units shield dome on/off. Right click to discharge."
 tooltipui0484="Personal Shield Toggle"
-tooltipui0485="Turn the selected units personal shields on/off"
+tooltipui0485="Turn the selected units personal shields on/off. Right click to discharge."
 tooltipui0486="Turn the selected units radar jamming on/off"
 tooltipui0487="Turn the selected units radar, sonar or Omni on/off"
 tooltipui0488="Radar Toggle"

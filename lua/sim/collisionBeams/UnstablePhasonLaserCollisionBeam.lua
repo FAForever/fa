@@ -32,7 +32,7 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) {
         -- add vision to make sure we can see the impact effect
         local position = self:GetPosition(1)
         if position then
-            local marker = VisionMarkerOpti({Owner = self.unit})
+            local marker = VisionMarkerOpti()
             marker:UpdatePosition(position[1], position[3])
             marker:UpdateDuration(1)
             marker:UpdateIntel(self.Army, 4, 'Vision', true)

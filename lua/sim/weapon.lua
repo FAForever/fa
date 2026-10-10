@@ -560,9 +560,17 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
             if bp.NukeOuterRingDamage and bp.NukeOuterRingRadius and bp.NukeOuterRingTicks and bp.NukeOuterRingTotalTime and
                 bp.NukeInnerRingDamage and bp.NukeInnerRingRadius and bp.NukeInnerRingTicks and bp.NukeInnerRingTotalTime then
                 proj.InnerRing = NukeDamage()
-                proj.InnerRing:OnCreate(bp.NukeInnerRingDamage, bp.NukeInnerRingRadius, bp.NukeInnerRingTicks, bp.NukeInnerRingTotalTime)
+                proj.InnerRing:OnCreate(bp.NukeInnerRingDamage + self.DamageMod,
+                    bp.NukeInnerRingRadius + self.DamageRadiusMod,
+                    bp.NukeInnerRingTicks,
+                    bp.NukeInnerRingTotalTime
+                )
                 proj.OuterRing = NukeDamage()
-                proj.OuterRing:OnCreate(bp.NukeOuterRingDamage, bp.NukeOuterRingRadius, bp.NukeOuterRingTicks, bp.NukeOuterRingTotalTime)
+                proj.OuterRing:OnCreate(bp.NukeOuterRingDamage + self.DamageMod,
+                    bp.NukeOuterRingRadius + self.DamageRadiusMod,
+                    bp.NukeOuterRingTicks,
+                    bp.NukeOuterRingTotalTime
+                )
 
                 -- Need to store these three for later, in case the missile lands after the launcher dies
                 proj.Launcher = self.unit

@@ -57,7 +57,7 @@ XRB2308 = ClassUnit(CStructureUnit) {
             newHARMS.SpottedByArmy = spottedByArmy
             newHARMS:SetFireState(fireState)
             if target then
-                IssueAttack({ newHARMS }, target)
+                IssueToUnitAttack(newHARMS, target)
             end
         end
     end,

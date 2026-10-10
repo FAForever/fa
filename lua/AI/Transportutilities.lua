@@ -27,7 +27,6 @@ local VDist2 = VDist2
 local VDist3 = VDist3
 local WaitTicks = coroutine.yield
 
-local AssignUnitsToPlatoon = moho.aibrain_methods.AssignUnitsToPlatoon
 local GetFuelRatio = moho.unit_methods.GetFuelRatio
 local GetFractionComplete = moho.entity_methods.GetFractionComplete
 local GetListOfUnits = moho.aibrain_methods.GetListOfUnits
@@ -94,7 +93,7 @@ function AssignTransportToPool( unit, aiBrain )
 		-- if not in need of repair or fuel -- 
 		if not ProcessAirUnits( unit, aiBrain ) then
             if aiBrain.TransportPool then
-                AssignUnitsToPlatoon( aiBrain, aiBrain.TransportPool, {unit}, 'Support','')
+                aiBrain:AssignUnitToPlatoon( aiBrain.TransportPool, unit, 'Support','')
             else
                 return
             end
@@ -327,7 +326,7 @@ function GetTransports( platoon, aiBrain)
 
                         -- this puts specials into the transport pool -- occurs to me that they
                         -- may get stuck in here if it turns out we cant use transports
-                        AssignUnitsToPlatoon( aiBrain, transportpool, {trans}, 'Support','none')
+                        aiBrain:AssignUnitToPlatoon( aiBrain.TransportPool, trans, 'Support','none')
                     
                         -- limit collection of armypool transports to 15
                         if transportcount == 15 then
@@ -666,7 +665,7 @@ function GetTransports( platoon, aiBrain)
                     LOG("*AI DEBUG "..aiBrain.Nickname.." "..platoon.BuilderName.." "..transportplatoon.BuilderName.." adds transport "..transport.EntityId)
                 end
                 
-				AssignUnitsToPlatoon( aiBrain, transportplatoon, {transport}, 'Support', 'BlockFormation')
+				aiBrain:AssignUnitToPlatoon( transportplatoon, transport, 'Support', 'BlockFormation')
 				IssueToUnitClearCommands(transport)
 				IssueToUnitMove(transport, location )
 
@@ -831,7 +830,7 @@ function ReturnTransportsToPool( aiBrain, units, move )
                 returnpool = aiBrain:MakePlatoon('TransportRTB'..tostring(v.EntityId), 'none')
                 returnpool.BuilderName = 'TransportRTB'..tostring(v.EntityId)
                 returnpool.PlanName = returnpool.BuilderName
-                AssignUnitsToPlatoon( aiBrain, returnpool, {v}, 'Unassigned', '')
+                aiBrain:AssignUnitToPlatoon( returnpool, v, 'Unassigned', '')
                 if TransportDialog then
                     LOG("*AI DEBUG "..aiBrain.Nickname.." "..returnpool.BuilderName.." Transport "..v.EntityId.." assigned" )
                 end
@@ -877,7 +876,7 @@ function ReturnTransportsToPool( aiBrain, units, move )
                             if TransportDialog then
                                 LOG("*AI DEBUG "..aiBrain.Nickname.." "..v.PlatoonHandle.BuilderName.." transport "..v.EntityId.." now in the Transport Pool  InUse is "..repr(v.InUse))
                             end
-                            AssignUnitsToPlatoon( aiBrain, aiBrain.TransportPool, {v}, 'Support', '' )
+                            aiBrain:AssignUnitToPlatoon( aiBrain.TransportPool, v, 'Support', '' )
                             v.PlatoonHandle = aiBrain.TransportPool
                             v.InUse = false
                             v.Assigning = false                            
@@ -886,7 +885,7 @@ function ReturnTransportsToPool( aiBrain, units, move )
                         if TransportDialog then
                             LOG("*AI DEBUG "..aiBrain.Nickname.." "..v.PlatoonHandle.BuilderName.." assigned unit "..v.EntityId.." "..v:GetBlueprint().Description.." to the Army Pool" )
                         end
-						AssignUnitsToPlatoon( aiBrain, aiBrain.ArmyPool, {v}, 'Unassigned', '' )
+						aiBrain:AssignUnitToPlatoon( aiBrain.ArmyPool, v, 'Unassigned', '' )
 						v.PlatoonHandle = aiBrain.ArmyPool
        					v.InUse = false
                         v.Assigning = false
@@ -910,7 +909,7 @@ function ReturnUnloadedUnitToPool( aiBrain, unit )
 		IssueToUnitClearCommands(unit)
 		local ident = Random(1,999999)
 		local returnpool = aiBrain:MakePlatoon('ReturnToPool'..tostring(ident), 'none')
-		AssignUnitsToPlatoon( aiBrain, returnpool, {unit}, 'Unassigned', 'None' )
+		aiBrain:AssignUnitToPlatoon( returnpool, unit, 'Unassigned', 'None' )
 		returnpool.PlanName = 'ReturnToBaseAI'
 		returnpool.BuilderName = 'FailedUnload'
 		while attached and not unit.Dead do
@@ -1466,7 +1465,7 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
 			end
 			local ident = Random(1,999999)
 			local returnpool = aiBrain:MakePlatoon('RTB - Excess in SortingOnTransport'..tostring(ident), 'none')
-			AssignUnitsToPlatoon( aiBrain, returnpool, currLeftovers, 'Unassigned', 'None' )
+			aiBrain:AssignUnitsToPlatoon( aiBrain, returnpool, currLeftovers, 'Unassigned', 'None' )
 			returnpool.PlanName = 'ReturnToBaseAI'
 			returnpool.BuilderName = 'SortUnitsOnTransportsLeftovers'..tostring(ident)
 			returnpool:SetAIPlan('ReturnToBaseAI',aiBrain)
@@ -1594,7 +1593,7 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
 						end
 					end
 					IssueToUnitClearCommands(v)
-					AssignUnitsToPlatoon( aiBrain, returnpool, {v}, 'Attack', 'None' )
+					aiBrain:AssignUnitToPlatoon( returnpool, v, 'Attack', 'None' )
 				end
 			end
 		end
@@ -1776,7 +1775,7 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
 	local watchcount = 0
     transport.Loading = true
 
-	IssueStop( {transport} )
+	IssueToUnitStop(transport)
     
     if TransportDialog then
         LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." transport "..transport.EntityId.." moving to "..repr(units[1]:GetPosition()).." for pickup - distance "..VDist3( transport:GetPosition(), units[1]:GetPosition()))
@@ -1792,7 +1791,7 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
 			unitsdead = false
 			loading = true
 			-- here is where we issue the Load command to the transport --
-			local ok, msg = pcall(IssueTransportLoad, {u}, transport )
+			local ok, msg = pcall(IssueToUnitTransportLoad, u, transport)
 			if not ok then
 				LOG("Unable to IssueTransportLoad to: " .. repr(u.Blueprint.BlueprintId))
 			end
@@ -1868,7 +1867,7 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
 				if (not u.Dead) and not IsUnitState( u, 'Attached') then
 					-- if the unit is not attached and the transport has space for it or it's a UEF Gunship (TransportHasSpaceFor command is unreliable)
 					if (not transport.Dead) and transport:TransportHasSpaceFor(u) then
-						IssueStop({u})
+						IssueToUnitStop(u)
 						if reissue > 1 then
 							if TransportDialog then
                                 LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport"..transport.EntityId.." Warping unit "..u.EntityId.." to transport ")
@@ -1899,7 +1898,7 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
 					LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." Reloading "..counter.." units - reload "..reloads)
 				end
 				IssueStop( newunits )
-				IssueStop( {transport} )
+				IssueToUnitStop(transport)
 				local goload = safecall("Unable to IssueTransportLoad", IssueTransportLoad, newunits, transport )
 				if goload and TransportDialog then
 					LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." reloads is "..reloads.." goload is "..repr(goload).." for "..transport:GetBlueprint().Description)
@@ -1920,11 +1919,11 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
     end
 
     if transport.InUse then
-        IssueStop( {transport} )
+        IssueToUnitStop(transport)
         if (not transport.Dead) then
             if not unitsdead then
                 -- have the transport guard his loading spot until everyone else has loaded up
-                IssueGuard( {transport}, GetPosition(transport) )
+                IssueToUnitGuard(transport, GetPosition(transport) )
                 if TransportDialog then
                     LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." begins to loiter after load")
                 end
@@ -2062,7 +2061,7 @@ function WatchUnitUnload( transport, unitlist, destination, aiBrain, UnitPlatoon
         LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." unloadwatch begins at "..repr(destination) )
     end
 	
-	IssueTransportUnload( {transport}, destination)
+	IssueToUnitTransportUnload(transport, destination)
     WaitTicks(4)
 	local watchcount = 0.3
 
@@ -2104,9 +2103,9 @@ function WatchUnitUnload( transport, unitlist, destination, aiBrain, UnitPlatoon
 					break			
 				elseif watchcount >= 8 then
 					LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." transport "..transport.EntityId.." watched unload for "..watchcount.." seconds")
-					IssueTransportUnload( {transport}, GetPosition(transport))
+					IssueToUnitTransportUnload(transport, GetPosition(transport))
 				elseif watchcount > 4 then
-					IssueTransportUnload( {transport}, GetPosition(transport))
+					IssueToUnitTransportUnload(transport, GetPosition(transport))
 				end
 			end
 		end
@@ -2165,7 +2164,7 @@ function TransportReturnToBase(unit, aiBrain)
 
 	local returnpool = aiBrain:MakePlatoon('AirRefit'..tostring(ident), 'none')
 	if not unit.Dead then
-		AssignUnitsToPlatoon( aiBrain, returnpool, {unit}, 'Unassigned', '')
+		aiBrain:AssignUnitToPlatoon( returnpool, unit, 'Unassigned', '')
 		unit.PlatoonHandle = returnpool
 	end
 	while (not unit.Dead) do
@@ -2197,18 +2196,18 @@ function TransportReturnToBase(unit, aiBrain)
 						LOG("*AI DEBUG "..aiBrain.Nickname.." Air Unit "..unit.Sync.id.." returning to base ")
 					end
 					returnPos = aiBrain.BuilderManagers[bestBaseName].Position
-					IssueStop ( {unit} )
-					IssueClearCommands( {unit} )
+					IssueToUnitStop(unit)
+					IssueToUnitClearCommands(unit)
 					local safePath, reason = NavUtils.PathToWithThreatThreshold('Air', platPos, returnPos, aiBrain, NavUtils.ThreatFunctions.AntiAir, 50, aiBrain.IMAPConfig.Rings)
 					if safePath then
 						-- use path
 						for _,p in safePath do
-							IssueMove( {unit}, p )
+							IssueToUnitMove(unit, p)
 						end
-						IssueMove( {unit}, returnPos)
+						IssueToUnitMove(unit, returnPos)
 					else
 						-- go direct -- possibly bad
-						IssueMove( {unit}, returnPos )
+						IssueToUnitMove(unit, returnPos)
 					end
 				end
 			end

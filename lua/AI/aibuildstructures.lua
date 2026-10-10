@@ -305,7 +305,7 @@ function DoHackyLogic(buildingType, builder)
                 if unitInstance then
                     TriggerFile.CreateUnitStopBeingBuiltTrigger(function(unitBeingBuilt)
                         local newPlatoon = aiBrain:MakePlatoon('', '')
-                        aiBrain:AssignUnitsToPlatoon(newPlatoon, {unitBeingBuilt}, 'Attack', 'None')
+                        aiBrain:AssignUnitToPlatoon(newPlatoon, unitBeingBuilt, 'Attack', 'None')
                         newPlatoon:StopAI()
                         newPlatoon:ForkAIThread(newPlatoon.TacticalAI)
                     end, unitInstance)
@@ -827,7 +827,7 @@ function AIMaintainBuildList(aiBrain, builder, buildingTemplate, brainBaseTempla
                         for m,location in type do
                             if m > 1 then
                                 if aiBrain:CanBuildStructureAt(v.StructureCategory, BuildToNormalLocation(location)) then
-                                    IssueStop({builder})
+                                    IssueToUnitStop(builder)
                                     IssueToUnitClearCommands(builder)
                                     aiBrain:BuildStructure(builder, v.StructureCategory, location, false)
                                     return true
@@ -837,7 +837,7 @@ function AIMaintainBuildList(aiBrain, builder, buildingTemplate, brainBaseTempla
                     end
                 end
             elseif aiBrain:FindPlaceToBuild(v.StructureType, v.StructureCategory,  brainBaseTemplate.Template, false, v.CloseToBuilder) then
-                IssueStop({builder})
+                IssueToUnitStop(builder)
                 IssueToUnitClearCommands(builder)
                 if AIExecuteBuildStructure(aiBrain, builder, v.StructureType , v.CloseToBuilder, false, buildingTemplate, brainBaseTemplate.Template) then
                     return true

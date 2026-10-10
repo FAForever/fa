@@ -135,13 +135,17 @@ function Entity:DetachFrom(skipBallistic)
 end
 
 --- Disables an intel type for this entity.
---- Throws an error if the intel type has not been initialized.
+--- Throws an error if the entity's intel manager has not been initialized.
+--- Units automatically initialize intel.
+---@see Entity.InitIntel # To initialize the intel manager.
 ---@param type IntelType
 function Entity:DisableIntel(type)
 end
 
 --- Enable an intel type for this entity.
---- Throws an error if the intel type has not been initialized.
+--- Throws an error if the entity's intel manager has not been initialized.
+--- Units automatically initialize intel.
+---@see Entity.InitIntel # To initialize the intel manager.
 ---@param type IntelType
 function Entity:EnableIntel(type)
 end
@@ -208,21 +212,23 @@ function Entity:GetHeading()
 end
 
 --- Returns the amount of health this entity has
----@see entity:GetMaxHealth() for the maximum possible health
+---@see entity.GetMaxHealth for the maximum possible health
 ---@return number
 function Entity:GetHealth()
 end
 
 --- Returns the radius for a given intel type on the entity.
---- Throws an error if the intel type has not been initialized.
+--- Throws an error if the entity's intel manager has not been initialized.
+--- Units automatically initialize intel.
+---@see Entity.InitIntel # To initialize the intel manager.
 ---@param type IntelType
----@return number | nil
+---@return integer
 function Entity:GetIntelRadius(type)
 end
 
 --- Returns the maximum amount of health this entity can have. Note that this may not be the same
 --- value as the original one in the entity's blueprint.
----@see entity:GetHealth() for the current amount of health
+---@see entity.GetHealth for the current amount of health
 ---@return number
 function Entity:GetMaxHealth()
 end
@@ -233,7 +239,7 @@ function Entity:GetOrientation()
 end
 
 --- Returns the parent entity (e.g. the transport a unit is on), or nil if none
----@return moho.entity_methods | nil
+---@return Entity?
 function Entity:GetParent()
 end
 
@@ -259,11 +265,11 @@ end
 function Entity:GetScale()
 end
 
---- Initializes the entity to provide intelligence of a partiuclar type for an army.
+--- Initializes the entity's intel to provide intelligence of a partiuclar type for an army.
 --- This lets the other intel methods work with this entity for that type of intel.
 ---@param army Army
----@param type IntelType
----@param radius? number
+---@param type IntelType # Logs a warning if using `"None"`, but still inits intel manager.
+---@param radius? integer
 function Entity:InitIntel(army, type, radius)
 end
 
@@ -350,9 +356,10 @@ function Entity:SetHealth(instigator, health)
 end
 
 --- Sets the radius on the entity of an intel type.
---- Throws an error if the intel type has not been initialized.
+--- Throws an error if the entity's intel manager has not been initialized.
+--- Units automatically initialize intel.
 ---@param type IntelType
----@param radius number
+---@param radius integer
 function Entity:SetIntelRadius(type, radius)
 end
 
