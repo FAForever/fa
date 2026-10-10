@@ -478,18 +478,7 @@ function Send(text, attachCamera)
         msg.camera = GetCamera('WorldCamera'):SaveSettings()
     end
 
-    -- Stamp an id for `OnSyncChatMessages` to dedupe the live and
-    -- sim-routed delivery paths. Tick suffix guards against
-    -- table-address recycling.
-    msg.Id = string.format("%d %s", GameTick(), tostring(msg))
-
-    RecordForReplayParsers(msg)
-
-    -- Sim-routed path: the sim re-broadcasts via `Sync.ChatMessages`.
-    -- In live play it runs alongside `SessionSendChatMessage` and
-    -- id-based dedupe prevents double-posting. In replays it is the
-    -- *only* path.
-    SimCallback({ Func = 'SendChatMessage', Args = { Msg = msg } }, false)
+    SendThroughSim(msg)
 
     if recipient == ChatModel.RecipientAllies then
         SessionSendChatMessage(FindClients(), msg)
@@ -511,25 +500,38 @@ function Send(text, attachCamera)
     end
 end
 
---- Replay-parser backwards compat: external replay tools scrape chat out
---- of recorded `GiveResourcesToPlayer` callback args. Fires one
---- zero-resource callback per outgoing message so they keep working. Also
---- used by the Notify subsystem, which sends outside of `Send`. Observers
---- skip it (no army to ship).
+--- Sends the sim side of an outgoing message, alongside the caller's
+--- `SessionSendChatMessage`. Also used by the Notify subsystem, which
+--- sends outside of `Send`.
 ---@param msg ChatPayload
-function RecordForReplayParsers(msg)
-    local focusArmy = GetFocusArmy()
-    if focusArmy == -1 then return end
+function SendThroughSim(msg)
+    -- Stamp an id for `OnSyncChatMessages` to dedupe the live and
+    -- sim-routed delivery paths. Tick suffix guards against
+    -- table-address recycling.
+    msg.Id = string.format("%d %s", GameTick(), tostring(msg))
 
-    local senderData = GetArmyData(focusArmy)
-    SimCallback({
-        Func = 'GiveResourcesToPlayer',
-        Args = {
-            From = focusArmy, To = focusArmy, Mass = 0, Energy = 0,
-            Sender = senderData and senderData.nickname or tostring(focusArmy),
-            Msg = msg,
-        },
-    }, false)
+    -- Replay-parser backwards compat: external replay tools scrape chat
+    -- out of recorded `GiveResourcesToPlayer` callback args. Fire one
+    -- zero-resource callback per outgoing message so they keep working.
+    -- Observers skip it (no army to ship).
+    local focusArmy = GetFocusArmy()
+    if focusArmy ~= -1 then
+        local senderData = GetArmyData(focusArmy)
+        SimCallback({
+            Func = 'GiveResourcesToPlayer',
+            Args = {
+                From = focusArmy, To = focusArmy, Mass = 0, Energy = 0,
+                Sender = senderData and senderData.nickname or tostring(focusArmy),
+                Msg = msg,
+            },
+        }, false)
+    end
+
+    -- Sim-routed path: the sim re-broadcasts via `Sync.ChatMessages`.
+    -- In live play it runs alongside `SessionSendChatMessage` and
+    -- id-based dedupe prevents double-posting. In replays it is the
+    -- *only* path.
+    SimCallback({ Func = 'SendChatMessage', Args = { Msg = msg } }, false)
 end
 
 -------------------------------------------------------------------------------

@@ -3,7 +3,7 @@
 
 local Prefs = import("/lua/user/prefs.lua")
 local FindClients = import("/lua/ui/game/chat/ChatController.lua").FindClients
-local RecordForReplayParsers = import("/lua/ui/game/chat/ChatController.lua").RecordForReplayParsers
+local SendThroughSim = import("/lua/ui/game/chat/ChatController.lua").SendThroughSim
 local defaultMessages = import("/lua/ui/notify/defaultmessages.lua").defaultMessages
 local AddChatCommand = import("/lua/ui/notify/commands.lua").AddChatCommand
 local NotifyOverlay = import("/lua/ui/notify/notifyoverlay.lua")
@@ -20,12 +20,14 @@ local messageLimits = {tech = 1, other = 1, experimentals = 1}
 local customMessagesDisabled
 
 local focusArmy
+local replay
 local observer
 local localClient
 
 function init(isReplay, parent, notifyMessages)
     messages = notifyMessages
     focusArmy = GetFocusArmy()
+    replay = isReplay
     observer = isReplay or focusArmy == -1
 
     local clients = GetSessionClients()
@@ -230,10 +232,12 @@ function focusArmyChanged()
 end
 
 function sendMessage(msg)
+    -- Replays show the players' own messages recorded through `SendThroughSim`
+    if replay then return end
     if observer then
         SessionSendChatMessage(localClient, msg)
     else
-        RecordForReplayParsers(msg)
+        SendThroughSim(msg)
         SessionSendChatMessage(FindClients(), msg)
     end
 end
