@@ -157,6 +157,20 @@ function ConfidenceMargin95(deviation, n)
     return TCritical95(n - 1) * deviation / math.sqrt(n)
 end
 
+--- Timer resolution in seconds above which short benchmarks can't be measured accurately
+CoarseTimerResolution = 0.001
+
+--- Computes the precision of a timestamp stored as a 32-bit float, which shrinks as it grows
+---@param timestamp number
+---@return number
+function TimestampResolution(timestamp)
+    local power = 1
+    while power * 2 <= timestamp do
+        power = power * 2
+    end
+    return power / 8388608 -- 2^23 mantissa bits, written out because ^ is XOR in LuaPlus
+end
+
 --- Computes the quartiles of a data set (needs at least 5 elements)
 ---@param t number[]
 ---@param n? integer

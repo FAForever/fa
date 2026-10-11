@@ -8322,6 +8322,9 @@ profiler_0057="Run every benchmark in every module in turn until each is within 
 profiler_0058="Log modules"
 profiler_0059="Log all modules"
 profiler_0060="Print a table of statistics for every module with data to the log"
+profiler_0061="Timer resolution: %.2f ms"
+profiler_0062="Coarse timer"
+profiler_0063="The game timer loses precision the longer the game has been running, so short benchmarks are measured inaccurately. Restart the game for accurate results."
 
 lobui_resource_sharing_label="Overflow"
 lobui_resource_sharing_help="Set whether distribution of excess resources to allies is initially enabled or disabled. Players can toggle it through the diplomacy menu when teams are unlocked."

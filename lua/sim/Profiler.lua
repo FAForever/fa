@@ -12,6 +12,8 @@ local SerializableDeepCopy = import("/lua/utilities.lua").SerializableDeepCopy
 local CollapseDebugInfo = import("/lua/shared/debugfunction.lua").CollapseDebugInfo
 local CreateEmptyProfilerTable = import("/lua/shared/profiler.lua").CreateEmptyProfilerTable
 local GetDebugFunctionInfo = import("/lua/shared/debugfunction.lua").GetDebugFunctionInfo
+local CoarseTimerResolution = import("/lua/shared/statistics.lua").CoarseTimerResolution
+local TimestampResolution = import("/lua/shared/statistics.lua").TimestampResolution
 
 
 ---@class BenchmarkOutput
@@ -131,19 +133,13 @@ function StopBenchmark()
     benchmarkThread = false
 end
 
--- Timestamps are 32-bit floats, so their precision shrinks as the game uptime grows
-local coarseTimerLimit = 0.001
 local coarseTimerWarned = 0
 
 --- Warns once per precision step when the timer is too coarse to measure short benchmarks
 ---@param timestamp number
 local function WarnCoarseTimer(timestamp)
-    local power = 1
-    while power * 2 <= timestamp do
-        power = power * 2
-    end
-    local resolution = power / 2 ^ 23 -- 23 mantissa bits
-    if resolution > coarseTimerLimit and resolution > coarseTimerWarned then
+    local resolution = TimestampResolution(timestamp)
+    if resolution > CoarseTimerResolution and resolution > coarseTimerWarned then
         coarseTimerWarned = resolution
         WARN(("Timer resolution is %.2f ms because of long game uptime, restart the game for accurate benchmarks"):format(resolution * 1000))
     end

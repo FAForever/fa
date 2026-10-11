@@ -2316,6 +2316,10 @@ Tooltips = {
         title = "<LOC profiler_0056>Run all modules to 5% error",
         description = "<LOC profiler_0057>Run every benchmark in every module in turn until each is within 5% error, then log the results",
     },
+    profiler_benchmark_timer = {
+        title = "<LOC profiler_0062>Coarse timer",
+        description = "<LOC profiler_0063>The game timer loses precision the longer the game has been running, so short benchmarks are measured inaccurately. Restart the game for accurate results.",
+    },
     profiler_benchmark_log_modules = {
         title = "<LOC profiler_0059>Log all modules",
         description = "<LOC profiler_0060>Print a table of statistics for every module with data to the log",

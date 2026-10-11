@@ -26,6 +26,8 @@ local Window = import("/lua/maui/window.lua").Window
 
 local ObservableCreate = import("/lua/shared/observable.lua").Create
 local CreateEmptyProfilerTable = import("/lua/shared/profiler.lua").CreateEmptyProfilerTable
+local CoarseTimerResolution = import("/lua/shared/statistics.lua").CoarseTimerResolution
+local TimestampResolution = import("/lua/shared/statistics.lua").TimestampResolution
 local Layouter = LayoutHelpers.ReusedLayoutFor
 local Summarize = ProfilerElements.Summarize
 
@@ -543,6 +545,7 @@ ProfilerStamps = Class(Group) {
 ---@field runButton Button
 ---@field runModulesButton Button
 ---@field summary StatisticSummary
+---@field timerWarning Text
 ProfilerBenchmarks = Class(Group) {
     ---@param self ProfilerBenchmarks
     ---@param parent Group
@@ -565,6 +568,7 @@ ProfilerBenchmarks = Class(Group) {
         self.progressLabel = UIUtil.CreateText(self.groupInteraction, "", 10, UIUtil.bodyFont, true)
         self.fileText = UIUtil.CreateText(self.groupNavigation, LOC("<LOC profiler_0007>Benchmark Modules"), 16, UIUtil.bodyFont, true)
         self.modulePicker = Combo(self.groupNavigation, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
+        self.timerWarning = UIUtil.CreateText(self.groupNavigation, "", 12, UIUtil.bodyFont, true)
         self.benchmarkText = UIUtil.CreateText(self.groupNavigation, "", 16, UIUtil.bodyFont, true) -- should immediately update, so no need to set label
         self.benchmarkList = ItemList(self.groupNavigation)
         self.benchmarkList.background = Bitmap(self.benchmarkList)
@@ -735,6 +739,14 @@ ProfilerBenchmarks = Class(Group) {
         local fileText = Layouter(self.fileText)
             :AtLeftTopIn(groupNavigation, 10, 10)
             :End()
+
+        local timerWarning = Layouter(self.timerWarning)
+            :AtRightIn(groupNavigation, 10)
+            :AtVerticalCenterIn(fileText)
+            :Color("FFFFA500")
+            :Hide()
+            :End()
+        Tooltip.AddControlTooltip(timerWarning, "profiler_benchmark_timer")
 
         local modulePicker = Layouter(self.modulePicker)
             :Below(fileText, 10)
@@ -1255,6 +1267,19 @@ ProfilerBenchmarks = Class(Group) {
         local disabled = benchmarkState.SelectedBenchmark == 0
         local running = benchmarkState.BenchmarkRunning
         self:SetRunButtonState(disabled, running)
+        self:UpdateTimerWarning()
+    end,
+
+    --- Shows the timer resolution when it is too coarse for short benchmarks
+    ---@param self ProfilerBenchmarks
+    UpdateTimerWarning = function(self)
+        local resolution = TimestampResolution(GetSystemTimeSeconds())
+        if resolution > CoarseTimerResolution then
+            self.timerWarning:SetText(LOCF("<LOC profiler_0061>Timer resolution: %.2f ms", resolution * 1000))
+            self.timerWarning:Show()
+        else
+            self.timerWarning:Hide()
+        end
     end,
 
     ---@param self ProfilerBenchmarks

@@ -113,6 +113,13 @@ luft.describe("Stat functions", function()
             luft.expect(removedOutliers).to.not_be(set.remove_outliers) -- should copy the list
         end
     end)
+    luft.test("Timestamp resolution", function()
+        luft.expect(TimestampResolution(365.5)).to.be(1 / 32768)
+        luft.expect(TimestampResolution(16383.9)).to.be(1 / 1024)
+        luft.expect(TimestampResolution(16384)).to.be(1 / 512)
+        luft.expect(TimestampResolution(32738.6)).to.be(1 / 512)
+        luft.expect(TimestampResolution(32768)).to.be(1 / 256)
+    end)
     luft.test("Confidence margin", function()
         luft.expect(ConfidenceMargin95(1, 1)).to.be(nil)
         luft.expect(ConfidenceMargin95(2, 2)).to.be.close.to(12.706 * 2 / math.sqrt(2))
