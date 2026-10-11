@@ -78,7 +78,7 @@ local State = {
         ---@type table<string, number>
         ParameterCountCache = {},
         --- Set while "All to 5%" steps through the benchmarks of a module
-        ---@type { module: number, index: number, waiting: boolean } | false
+        ---@type { module: number, index: number, waiting: boolean, allModules: boolean } | false
         RunAll = false,
         SelectedBenchmark = 0,
         SelectedModule = 1,
@@ -541,6 +541,7 @@ ProfilerStamps = Class(Group) {
 ---@field progressLabel Text
 ---@field runAllButton Button
 ---@field runButton Button
+---@field runModulesButton Button
 ---@field summary StatisticSummary
 ProfilerBenchmarks = Class(Group) {
     ---@param self ProfilerBenchmarks
@@ -555,6 +556,7 @@ ProfilerBenchmarks = Class(Group) {
         self.groupActions = Group(self.groupInput)
         self.autoRunButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0043>Run to 5%"), 14, 2)
         self.runAllButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0052>All to 5%"), 14, 2)
+        self.runModulesButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0055>Modules to 5%"), 14, 2)
         self.logModulesButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0058>Log modules"), 14, 2)
         self.logButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0046>Log"), 14, 2)
         self.logAllButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0049>Log all"), 14, 2)
@@ -576,7 +578,10 @@ ProfilerBenchmarks = Class(Group) {
             self:OnClickRunButton(true)
         end
         self.runAllButton.OnClick = function(button_self)
-            self:OnClickRunAllButton()
+            self:OnClickRunAllButton(false)
+        end
+        self.runModulesButton.OnClick = function(button_self)
+            self:OnClickRunAllButton(true)
         end
         self.logModulesButton.OnClick = function(button_self)
             self:LogModules()
@@ -663,6 +668,14 @@ ProfilerBenchmarks = Class(Group) {
             :Disable()
             :End()
         Tooltip.AddButtonTooltip(runAllButton, "profiler_benchmark_run_all_margin")
+
+        local runModulesButton = Layouter(self.runModulesButton)
+            :FromLeftIn(groupActions, 0.02)
+            :Below(runAllButton, 5)
+            :Over(groupActions, 10)
+            :Disable()
+            :End()
+        Tooltip.AddButtonTooltip(runModulesButton, "profiler_benchmark_run_modules_margin")
 
         local logButton = Layouter(self.logButton)
             :FromLeftIn(groupActions, 0.52)
@@ -837,9 +850,10 @@ ProfilerBenchmarks = Class(Group) {
         end
     end,
 
-    --- Starts or stops stepping through the benchmarks of the selected module
+    --- Starts or stops stepping through the benchmarks of the selected module, or of every module
     ---@param self ProfilerBenchmarks
-    OnClickRunAllButton = function(self)
+    ---@param allModules boolean
+    OnClickRunAllButton = function(self, allModules)
         local benchmarkState = State.Benchmarks
         if benchmarkState.RunAll then
             benchmarkState.RunAll = false
@@ -854,14 +868,31 @@ ProfilerBenchmarks = Class(Group) {
             return
         end
 
-        local moduleIndex = benchmarkState.SelectedModule
-        local module = benchmarkState.Modules and benchmarkState.Modules[moduleIndex]
-        if not module or module.faulty then
-            return
+        local moduleIndex = 0 -- before the first module
+        if not allModules then
+            moduleIndex = benchmarkState.SelectedModule
+            local module = benchmarkState.Modules and benchmarkState.Modules[moduleIndex]
+            if not module or module.faulty then
+                return
+            end
         end
-        benchmarkState.RunAll = {module = moduleIndex, index = 0, waiting = false}
+        benchmarkState.RunAll = {module = moduleIndex, index = 0, waiting = false, allModules = allModules}
         self:AdvanceRunAll()
         self:UpdateRunButtonState()
+    end,
+
+    --- Gets the first module after `index` that has benchmarks to run
+    ---@param self ProfilerBenchmarks
+    ---@param index number
+    ---@return number?
+    FindNextModule = function(self, index)
+        local modules = State.Benchmarks.Modules
+        for i = index + 1, table.getn(modules) do
+            local module = modules[i]
+            if not module.faulty and table.getn(module.benchmarks) > 0 then
+                return i
+            end
+        end
     end,
 
     --- Selects the next benchmark, which is started once its info arrives
@@ -876,8 +907,23 @@ ProfilerBenchmarks = Class(Group) {
         runAll.index = runAll.index + 1
         local module = benchmarkState.Modules[runAll.module]
         if not module or module.faulty or runAll.index > table.getn(module.benchmarks) then
-            benchmarkState.RunAll = false
-            SPEW("Finished running all benchmarks")
+            local nextModule = runAll.allModules and self:FindNextModule(runAll.module)
+            if not nextModule then
+                benchmarkState.RunAll = false
+                SPEW("Finished running all benchmarks")
+                if runAll.allModules then
+                    self:LogModules()
+                end
+                return
+            end
+
+            runAll.module = nextModule
+            runAll.index = 1
+            runAll.waiting = true
+            -- selecting the module also selects its last benchmark, so make that the one we want
+            benchmarkState.Modules[nextModule].LastBenchmarkSelected = 1
+            self.modulePicker:SetItem(nextModule)
+            BenchmarkModuleSelected:Set(nextModule)
             return
         end
         runAll.waiting = true
@@ -1254,16 +1300,26 @@ ProfilerBenchmarks = Class(Group) {
         local modules = State.Benchmarks.Modules
         local module = modules and modules[State.Benchmarks.SelectedModule]
         local canRunAll = module and not module.faulty and table.getn(module.benchmarks) > 0
+        local canRunModules = modules and self:FindNextModule(0) ~= nil
 
         -- only the button that started a run can stop it
         local runAllButton = self.runAllButton
-        local runningAll = runAll
+        local runningAll = runAll and not runAll.allModules
         if runningAll or (canRunAll and not running and not runAll) then
             runAllButton:Enable()
         else
             runAllButton:Disable()
         end
         runAllButton.label:SetText(runningAll and LOC("<LOC profiler_0010>Stop") or LOC("<LOC profiler_0052>All to 5%"))
+
+        local runModulesButton = self.runModulesButton
+        local runningModules = runAll and runAll.allModules
+        if runningModules or (canRunModules and not running and not runAll) then
+            runModulesButton:Enable()
+        else
+            runModulesButton:Disable()
+        end
+        runModulesButton.label:SetText(runningModules and LOC("<LOC profiler_0010>Stop") or LOC("<LOC profiler_0055>Modules to 5%"))
 
         if GetBenchmarkStatCache() then
             self.logButton:Enable()
