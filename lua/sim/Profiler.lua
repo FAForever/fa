@@ -131,6 +131,24 @@ function StopBenchmark()
     benchmarkThread = false
 end
 
+-- Timestamps are 32-bit floats, so their precision shrinks as the game uptime grows
+local coarseTimerLimit = 0.001
+local coarseTimerWarned = 0
+
+--- Warns once per precision step when the timer is too coarse to measure short benchmarks
+---@param timestamp number
+local function WarnCoarseTimer(timestamp)
+    local power = 1
+    while power * 2 <= timestamp do
+        power = power * 2
+    end
+    local resolution = power / 2 ^ 23 -- 23 mantissa bits
+    if resolution > coarseTimerLimit and resolution > coarseTimerWarned then
+        coarseTimerWarned = resolution
+        WARN(("Timer resolution is %.2f ms because of long game uptime, restart the game for accurate benchmarks"):format(resolution * 1000))
+    end
+end
+
 ---@param moduleIndex number
 ---@param benchmarkIndex number
 ---@param parameters any[]
@@ -188,6 +206,7 @@ function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
 
     -- initial benchmark sample time to scale sample rate based on
     local startTime = GetSystemTimeSecondsOnlyForProfileUse()
+    WarnCoarseTimer(startTime)
     local ok, err = pcall(RunTest)
     if not ok then
         Fail(err)
