@@ -617,7 +617,7 @@ ProfilerBenchmarks = Class(Group) {
             :Font(UIUtil.bodyFont, 14)
             :Colors(
                 UIUtil.fontColor, "00000000",
-                UIUtil.fontColor, "000000",
+                "FFFF00", "30bcfffe",
                 UIUtil.highlightColor, "bcfffe"
             )
             :MouseoverItem(true)
@@ -684,6 +684,9 @@ ProfilerBenchmarks = Class(Group) {
         benchmarkState.SelectedBenchmark = index
 
         self.benchmarkList:SetSelection(index - 1) -- to zero-index list
+        if index > 0 then
+            self.benchmarkList:ShowItem(index - 1)
+        end
         self:UpdateParametersLabel()
         self:UpdateBenchmarkStats()
         self:UpdateRunButtonState()
