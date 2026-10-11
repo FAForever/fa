@@ -145,6 +145,7 @@ function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
     if benchmark == nil then
         WARN("Can't find benchmark " .. tostring(moduleIndex) .. "," .. tostring(benchmarkIndex))
         Sync.BenchmarkOutput = {success = false}
+        benchmarkThread = false
         return
     end
     local test = benchmark.fn
@@ -171,6 +172,14 @@ function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
         output[testNumber] = test(unpack(parameters))
     end
 
+    -- Errors have to be caught here since a dead thread can't tell the UI the benchmark is over.
+    -- This can't wrap the whole thread because it yields between ticks.
+    local function Fail(reason)
+        WARN("Benchmark failed: " .. tostring(reason))
+        Sync.BenchmarkOutput = {success = false}
+        benchmarkThread = false
+    end
+
     testNumber = 0
     if baselineLoop then
         baselines = {}
@@ -179,11 +188,16 @@ function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
 
     -- initial benchmark sample time to scale sample rate based on
     local startTime = GetSystemTimeSecondsOnlyForProfileUse()
-    RunTest()
+    local ok, err = pcall(RunTest)
+    if not ok then
+        Fail(err)
+        return
+    end
     local time = GetSystemTimeSecondsOnlyForProfileUse() - startTime
     if type(output[1]) ~= "number" then
         SPEW("Bad benchmark: expected total time output")
         Sync.BenchmarkOutput = {success = false}
+        benchmarkThread = false
         return
     end
     -- calculate how many at a time and for how many ticks we should sample the benchmark
@@ -203,7 +217,11 @@ function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
 
     -- run the rest of the samples this tick
     for _ = 2, atATime do
-        RunTest()
+        ok, err = pcall(RunTest)
+        if not ok then
+            Fail(err)
+            return
+        end
     end
 
     SPEW("Running benchmark " .. atATime .. " at a time for " .. ticks .. " ticks")
@@ -234,7 +252,11 @@ function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
         end
         output = {}
         for _ = 1, atATime do
-            RunTest()
+            ok, err = pcall(RunTest)
+            if not ok then
+                Fail(err)
+                return
+            end
         end
 
         Sync.BenchmarkOutput = {
