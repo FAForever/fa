@@ -2308,6 +2308,10 @@ Tooltips = {
         title = "<LOC profiler_0044>Run to 5% error",
         description = "<LOC profiler_0045>Keep running until the 95% confidence interval of the mean is within 5% of the mean",
     },
+    profiler_benchmark_run_all_margin = {
+        title = "<LOC profiler_0053>Run all to 5% error",
+        description = "<LOC profiler_0054>Run every benchmark in this module in turn until each is within 5% error",
+    },
     profiler_benchmark_log = {
         title = "<LOC profiler_0047>Log statistics",
         description = "<LOC profiler_0048>Print the statistics of the selected benchmark to the log",
