@@ -64,12 +64,12 @@ function Depth1(loop)
     return final - start
 end
 
-function Depth2()
+function Depth2(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-    t2 = { key = "value", }
+    local t2 = { key = "value", }
     t2.__index = t2
-    t1 = { bob = "noise" }
+    local t1 = { bob = "noise" }
     setmetatable(t1, t2)
 
     local data
