@@ -2312,4 +2312,8 @@ Tooltips = {
         title = "<LOC profiler_0047>Log statistics",
         description = "<LOC profiler_0048>Print the statistics of the selected benchmark to the log",
     },
+    profiler_benchmark_log_all = {
+        title = "<LOC profiler_0050>Log all statistics",
+        description = "<LOC profiler_0051>Print a table of statistics for every benchmark in this module to the log",
+    },
 }

@@ -75,6 +75,8 @@ local State = {
         ---@type UserBenchmarkModule[]
         Modules = false,
         Parameters = {10000, 45},
+        ---@type table<string, number>
+        ParameterCountCache = {},
         SelectedBenchmark = 0,
         SelectedModule = 1,
         ---@type table<string, number[]>
@@ -247,6 +249,19 @@ local function GetBenchmarkName(modIndex, benIndex)
     return info.name
 end
 
+--- Checks whether any benchmark of a module has statistics
+---@param modIndex number
+---@return boolean
+local function ModuleHasData(modIndex)
+    local benchmarks = State.Benchmarks.Modules[modIndex].benchmarks
+    for benIndex = 1, table.getn(benchmarks or {}) do
+        if GetBenchmarkStatCache(modIndex, benIndex) then
+            return true
+        end
+    end
+    return false
+end
+
 ---@param lines string[]
 local function LogLines(lines)
     for _, line in ipairs(lines) do
@@ -283,6 +298,7 @@ function StartBenchmark(module, benchmark)
     benchmarkState.BenchmarkRunning = true
     benchmarkState.BenchmarkRunningMod = benchmarkState.SelectedModule
     benchmarkState.BenchmarkRunningBen = benchmarkState.SelectedBenchmark
+    benchmarkState.ParameterCountCache[GetBenchmarkCacheKey(module, benchmark)] = params
     local parameters = {}
     local benchmarkParams = benchmarkState.Parameters
     for i = 1, params do
@@ -513,6 +529,7 @@ ProfilerStamps = Class(Group) {
 ---@field groupInteraction Group
 ---@field groupNavigation Group
 ---@field groupOutput Group
+---@field logAllButton Button
 ---@field logButton Button
 ---@field modulePicker Combo
 ---@field parametersLabel ItemList
@@ -532,6 +549,7 @@ ProfilerBenchmarks = Class(Group) {
         self.groupActions = Group(self.groupInput)
         self.autoRunButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0043>Run to 5%"), 14, 2)
         self.logButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0046>Log"), 14, 2)
+        self.logAllButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0049>Log all"), 14, 2)
         self.runButton = UIUtil.CreateButtonStd(self.groupInteraction, "/widgets02/small", LOC("<LOC profiler_0006>Run"), 16, 2)
         self.parametersLabel = ItemList(self.groupInteraction, 0, 0)
         self.progressLabel = UIUtil.CreateText(self.groupInteraction, "", 10, UIUtil.bodyFont, true)
@@ -551,6 +569,9 @@ ProfilerBenchmarks = Class(Group) {
         end
         self.logButton.OnClick = function(button_self)
             self:OnClickLogButton()
+        end
+        self.logAllButton.OnClick = function(button_self)
+            self:OnClickLogAllButton()
         end
         self.modulePicker.OnClick = function(picker_self, index, text)
             -- index is already 1-indexed for Combo boxes
@@ -600,7 +621,7 @@ ProfilerBenchmarks = Class(Group) {
 
         local groupActions = Layouter(self.groupActions)
             :FillHorizontally(groupInteraction)
-            :Height(function() return self.autoRunButton.Height() + 10 end)
+            :Height(function() return 2 * self.autoRunButton.Height() + 15 end)
             :AnchorToTop(groupInteraction)
             :ResetTop()
             :End()
@@ -628,6 +649,14 @@ ProfilerBenchmarks = Class(Group) {
             :Disable()
             :End()
         Tooltip.AddButtonTooltip(logButton, "profiler_benchmark_log")
+
+        local logAllButton = Layouter(self.logAllButton)
+            :FromLeftIn(groupActions, 0.52)
+            :Below(logButton, 5)
+            :Over(groupActions, 10)
+            :Disable()
+            :End()
+        Tooltip.AddButtonTooltip(logAllButton, "profiler_benchmark_log_all")
 
         -- Interaction components
 
@@ -795,6 +824,73 @@ ProfilerBenchmarks = Class(Group) {
         end
         LogLines(ProfilerReport.FormatSummary(
             GetBenchmarkName(benchmarkState.SelectedModule, benchmarkState.SelectedBenchmark), summary, parameters, baseline))
+    end,
+
+    ---@param self ProfilerBenchmarks
+    OnClickLogAllButton = function(self)
+        if not self:LogModule(State.Benchmarks.SelectedModule) then
+            WARN("No benchmark data to log")
+        end
+    end,
+
+    --- Logs a table of the module's benchmarks, if any of them have data
+    ---@param self ProfilerBenchmarks
+    ---@param moduleIndex number
+    ---@return boolean logged
+    LogModule = function(self, moduleIndex)
+        local benchmarkState = State.Benchmarks
+        local module = benchmarkState.Modules and benchmarkState.Modules[moduleIndex]
+        if not module or module.faulty then
+            return false
+        end
+
+        local mode = self.summary:GetMode()
+        local rows = {}
+        local pooledBaselines = {} -- by parameter count, since that picks the baseline loop
+        local hasData = false
+        for benchmarkIndex = 1, table.getn(module.benchmarks) do
+            local stats, baselines = GetBenchmarkStatCache(moduleIndex, benchmarkIndex)
+            local params = benchmarkState.ParameterCountCache[GetBenchmarkCacheKey(moduleIndex, benchmarkIndex)]
+            -- benchmarks that haven't been run get a blank row
+            table.insert(rows, {
+                name = GetBenchmarkName(moduleIndex, benchmarkIndex),
+                summary = stats and Summarize(stats, baselines, mode),
+                params = params,
+            })
+
+            if stats then
+                hasData = true
+                if params and baselines and baselines[1] ~= nil then
+                    local pool = pooledBaselines[params] or {n = 0}
+                    pooledBaselines[params] = pool
+                    for i = 1, baselines.n do
+                        pool.n = pool.n + 1
+                        pool[pool.n] = baselines[i]
+                    end
+                end
+            end
+        end
+        if not hasData then
+            return false
+        end
+
+        local paramCounts = {}
+        for params in pooledBaselines do
+            table.insert(paramCounts, params)
+        end
+        table.sort(paramCounts)
+        local baselineRows = {}
+        for _, params in ipairs(paramCounts) do
+            table.insert(baselineRows, {
+                name = ("Baseline, %d parameter%s"):format(params, params == 1 and "" or "s"),
+                summary = Summarize(pooledBaselines[params], nil, "none"),
+                params = params,
+            })
+        end
+
+        LOG(('Benchmark statistics for "%s"'):format(module.name ~= "" and module.name or module.file))
+        LogLines(ProfilerReport.FormatTable(rows, baselineRows))
+        return true
     end,
 
     ---@param self ProfilerBenchmarks
@@ -1037,10 +1133,20 @@ ProfilerBenchmarks = Class(Group) {
             autoRunButton.label:SetText(LOC("<LOC profiler_0043>Run to 5%"))
         end
 
+        local modules = State.Benchmarks.Modules
+        local module = modules and modules[State.Benchmarks.SelectedModule]
+        local hasBenchmarks = module and not module.faulty and table.getn(module.benchmarks) > 0
+
         if GetBenchmarkStatCache() then
             self.logButton:Enable()
         else
             self.logButton:Disable()
+        end
+
+        if hasBenchmarks and ModuleHasData(State.Benchmarks.SelectedModule) then
+            self.logAllButton:Enable()
+        else
+            self.logAllButton:Disable()
         end
 
         -- clearing mid-run would pull the samples out from under it

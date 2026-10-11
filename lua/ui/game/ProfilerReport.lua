@@ -137,3 +137,181 @@ function FormatSummary(name, summary, parameters, baseline)
     end
     return lines
 end
+
+---@param text string
+---@param width integer
+---@param alignLeft boolean
+---@return string
+local function Pad(text, width, alignLeft)
+    local fill = string.rep(" ", width - string.len(text))
+    if alignLeft then
+        return text .. fill
+    end
+    return fill .. text
+end
+
+---@class BenchmarkReportRow
+---@field name string
+---@field summary? BenchmarkSummary missing for benchmarks that have not been run
+---@field params? integer parameter count
+
+--- Writes summaries as a pipe table with a row per benchmark and the baselines in rows below.
+--- Baselines are always raw times. Mode and parameter count columns are only added when the
+--- benchmarks differ in them, otherwise they are noted below the table. Benchmarks that have not
+--- been run get a blank row with 0 samples.
+---@param rows BenchmarkReportRow[]
+---@param baselines? BenchmarkReportRow[]
+---@return string[]
+function FormatTable(rows, baselines)
+    local rowCount = table.getn(rows)
+    if rowCount == 0 then
+        return {}
+    end
+    baselines = baselines or {}
+
+    local ranRows = {}
+    for _, row in ipairs(rows) do
+        if row.summary then
+            table.insert(ranRows, row)
+        end
+    end
+    if not ranRows[1] then
+        return {}
+    end
+
+    local firstMode = ranRows[1].summary.mode
+    local mixedModes = false
+    local allRaw = true
+    for _, row in ipairs(ranRows) do
+        mixedModes = mixedModes or row.summary.mode ~= firstMode
+        allRaw = allRaw and row.summary.mode == "none"
+    end
+
+    local firstParams = ranRows[1].params
+    local mixedParams = false
+    for _, row in ipairs(ranRows) do
+        mixedParams = mixedParams or row.params ~= firstParams
+    end
+
+    local entries = {}
+    for _, row in ipairs(rows) do
+        local summary = row.summary
+        table.insert(entries, {name = row.name, summary = summary, scale = summary and GetUnit(summary) or 1,
+            mode = summary and summary.mode or "", params = row.params})
+    end
+    for _, row in ipairs(baselines) do
+        table.insert(entries, {name = row.name, summary = row.summary, scale = 1000, mode = "-", params = row.params})
+    end
+
+    -- rows in the same unit share their decimal places
+    local decimalsByScale = {}
+    for _, scale in ipairs({1, 1000}) do
+        local group = {}
+        for _, entry in ipairs(entries) do
+            if entry.summary and entry.scale == scale then
+                table.insert(group, entry.summary)
+            end
+        end
+        decimalsByScale[scale] = GetValueDecimals(group, scale)
+    end
+
+    local unit = allRaw and " ms" or ""
+    local headers = {
+        "Name", "Samples", "Mean" .. unit, "+/- 95%" .. unit, "+/- 95% %", "Dev" .. unit, "CV %",
+        "Median" .. unit, "Min" .. unit, "Max" .. unit, "Skew",
+    }
+    local paramsColumn = mixedParams and (mixedModes and 3 or 2)
+    if mixedModes then
+        table.insert(headers, 2, "Mode")
+    end
+    if paramsColumn then
+        table.insert(headers, paramsColumn, "Params")
+    end
+
+    local cells = {}
+    for i, entry in ipairs(entries) do
+        local summary = entry.summary
+        local scale = entry.scale
+        local decimals = decimalsByScale[scale]
+        local function Value(x)
+            return x and Fixed(x * scale, decimals) or "-"
+        end
+        local function Percent(x)
+            return x and Fixed(x * 100, 2) or "-"
+        end
+
+        if summary then
+            cells[i] = {
+                string.format('"%s"', entry.name),
+                tostring(summary.n),
+                Value(summary.mean),
+                Value(summary.margin),
+                Percent(summary.relativeMargin),
+                Value(summary.deviation),
+                Percent(summary.cv),
+                Value(summary.median),
+                Value(summary.min),
+                Value(summary.max),
+                Fixed(summary.skewness, 2),
+            }
+        else
+            cells[i] = {string.format('"%s"', entry.name), "0", "", "", "", "", "", "", "", "", ""}
+        end
+        if mixedModes then
+            table.insert(cells[i], 2, entry.mode)
+        end
+        if paramsColumn then
+            table.insert(cells[i], paramsColumn, entry.params and tostring(entry.params) or "")
+        end
+    end
+
+    local columns = table.getn(headers)
+    local widths = {}
+    for c = 1, columns do
+        local width = string.len(headers[c])
+        for i = 1, table.getn(cells) do
+            width = MathMax(width, string.len(cells[i][c]))
+        end
+        widths[c] = width
+    end
+
+    local rule = "|"
+    for c = 1, columns do
+        rule = rule .. string.rep("-", widths[c] + 2) .. "|"
+    end
+    local function Row(texts)
+        local line = "|"
+        for c = 1, columns do
+            local alignLeft = c == 1 or (mixedModes and c == 2)
+            line = line .. " " .. Pad(texts[c], widths[c], alignLeft) .. " |"
+        end
+        return line
+    end
+
+    local lines = {rule, Row(headers), rule}
+    for i = 1, rowCount do
+        table.insert(lines, Row(cells[i]))
+    end
+    if baselines[1] then
+        table.insert(lines, rule)
+        for i = rowCount + 1, table.getn(cells) do
+            table.insert(lines, Row(cells[i]))
+        end
+    end
+    table.insert(lines, rule)
+
+    if not mixedModes then
+        table.insert(lines, "Mode: " .. ModeDescriptions[firstMode] .. (allRaw and ", in ms" or ""))
+    end
+    if not mixedParams and firstParams then
+        table.insert(lines, "Parameter count: " .. firstParams)
+    end
+    if baselines[1] and not allRaw then
+        if mixedModes then
+            table.insert(lines, "Baselines and rows with mode none are in ms, the other rows are ratios.")
+        else
+            table.insert(lines, "Baselines are in ms.")
+        end
+    end
+    return lines
+end

@@ -8310,6 +8310,9 @@ profiler_0045="Keep running until the 95% confidence interval of the mean is wit
 profiler_0046="Log"
 profiler_0047="Log statistics"
 profiler_0048="Print the statistics of the selected benchmark to the log"
+profiler_0049="Log all"
+profiler_0050="Log all statistics"
+profiler_0051="Print a table of statistics for every benchmark in this module to the log"
 
 lobui_resource_sharing_label="Overflow"
 lobui_resource_sharing_help="Set whether distribution of excess resources to allies is initially enabled or disabled. Players can toggle it through the diplomacy menu when teams are unlocked."
