@@ -119,6 +119,44 @@ function Skewness(t, n, m, d)
     end
 end
 
+-- Two-sided 95% critical values of Student's t, indexed by degrees of freedom
+local TCritical95Table = {
+    12.706, 4.303, 3.182, 2.776, 2.571, 2.447, 2.365, 2.306, 2.262, 2.228,
+    2.201, 2.179, 2.160, 2.145, 2.131, 2.120, 2.110, 2.101, 2.093, 2.086,
+    2.080, 2.074, 2.069, 2.064, 2.060, 2.056, 2.052, 2.048, 2.045, 2.042,
+}
+
+--- Gets the two-sided 95% critical value of Student's t distribution. Rounds up to the next
+--- tabulated degrees of freedom, so it never understates the interval.
+---@param df integer
+---@return number
+function TCritical95(df)
+    if df < 1 then
+        return TCritical95Table[1]
+    elseif df <= 30 then
+        return TCritical95Table[df]
+    elseif df <= 40 then
+        return 2.021
+    elseif df <= 60 then
+        return 2.000
+    elseif df <= 120 then
+        return 1.980
+    end
+    return 1.960
+end
+
+--- Computes the half-width of the 95% confidence interval of a mean, or nil when there are not
+--- enough samples
+---@param deviation number
+---@param n integer
+---@return number?
+function ConfidenceMargin95(deviation, n)
+    if n < 2 then
+        return nil
+    end
+    return TCritical95(n - 1) * deviation / math.sqrt(n)
+end
+
 --- Computes the quartiles of a data set (needs at least 5 elements)
 ---@param t number[]
 ---@param n? integer

@@ -109,6 +109,12 @@ luft.describe("Stat functions", function()
             luft.expect(removedOutliers).to.not_be(set.remove_outliers) -- should copy the list
         end
     end)
+    luft.test("Confidence margin", function()
+        luft.expect(ConfidenceMargin95(1, 1)).to.be(nil)
+        luft.expect(ConfidenceMargin95(2, 2)).to.be.close.to(12.706 * 2 / math.sqrt(2))
+        luft.expect(ConfidenceMargin95(3, 31)).to.be.close.to(2.021 * 3 / math.sqrt(31))
+        luft.expect(ConfidenceMargin95(1, 1000)).to.be.close.to(1.96 / math.sqrt(1000))
+    end)
 end)
 
 luft.finish()
