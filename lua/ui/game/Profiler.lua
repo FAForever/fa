@@ -535,6 +535,7 @@ ProfilerStamps = Class(Group) {
 ---@field groupOutput Group
 ---@field logAllButton Button
 ---@field logButton Button
+---@field logModulesButton Button
 ---@field modulePicker Combo
 ---@field parametersLabel ItemList
 ---@field progressLabel Text
@@ -554,6 +555,7 @@ ProfilerBenchmarks = Class(Group) {
         self.groupActions = Group(self.groupInput)
         self.autoRunButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0043>Run to 5%"), 14, 2)
         self.runAllButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0052>All to 5%"), 14, 2)
+        self.logModulesButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0058>Log modules"), 14, 2)
         self.logButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0046>Log"), 14, 2)
         self.logAllButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0049>Log all"), 14, 2)
         self.runButton = UIUtil.CreateButtonStd(self.groupInteraction, "/widgets02/small", LOC("<LOC profiler_0006>Run"), 16, 2)
@@ -575,6 +577,9 @@ ProfilerBenchmarks = Class(Group) {
         end
         self.runAllButton.OnClick = function(button_self)
             self:OnClickRunAllButton()
+        end
+        self.logModulesButton.OnClick = function(button_self)
+            self:LogModules()
         end
         self.logButton.OnClick = function(button_self)
             self:OnClickLogButton()
@@ -630,7 +635,7 @@ ProfilerBenchmarks = Class(Group) {
 
         local groupActions = Layouter(self.groupActions)
             :FillHorizontally(groupInteraction)
-            :Height(function() return 2 * self.autoRunButton.Height() + 15 end)
+            :Height(function() return 3 * self.autoRunButton.Height() + 20 end)
             :AnchorToTop(groupInteraction)
             :ResetTop()
             :End()
@@ -674,6 +679,14 @@ ProfilerBenchmarks = Class(Group) {
             :Disable()
             :End()
         Tooltip.AddButtonTooltip(logAllButton, "profiler_benchmark_log_all")
+
+        local logModulesButton = Layouter(self.logModulesButton)
+            :FromLeftIn(groupActions, 0.52)
+            :Below(logAllButton, 5)
+            :Over(groupActions, 10)
+            :Disable()
+            :End()
+        Tooltip.AddButtonTooltip(logModulesButton, "profiler_benchmark_log_modules")
 
         -- Interaction components
 
@@ -919,6 +932,17 @@ ProfilerBenchmarks = Class(Group) {
     ---@param self ProfilerBenchmarks
     OnClickLogAllButton = function(self)
         if not self:LogModule(State.Benchmarks.SelectedModule) then
+            WARN("No benchmark data to log")
+        end
+    end,
+
+    ---@param self ProfilerBenchmarks
+    LogModules = function(self)
+        local logged = false
+        for moduleIndex = 1, table.getn(State.Benchmarks.Modules) do
+            logged = self:LogModule(moduleIndex) or logged
+        end
+        if not logged then
             WARN("No benchmark data to log")
         end
     end,
@@ -1251,6 +1275,19 @@ ProfilerBenchmarks = Class(Group) {
             self.logAllButton:Enable()
         else
             self.logAllButton:Disable()
+        end
+
+        local anyHasData = false
+        for moduleIndex = 1, modules and table.getn(modules) or 0 do
+            if ModuleHasData(moduleIndex) then
+                anyHasData = true
+                break
+            end
+        end
+        if anyHasData then
+            self.logModulesButton:Enable()
+        else
+            self.logModulesButton:Disable()
         end
 
         -- clearing mid-run would pull the samples out from under it

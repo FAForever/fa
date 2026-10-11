@@ -2312,6 +2312,10 @@ Tooltips = {
         title = "<LOC profiler_0053>Run all to 5% error",
         description = "<LOC profiler_0054>Run every benchmark in this module in turn until each is within 5% error",
     },
+    profiler_benchmark_log_modules = {
+        title = "<LOC profiler_0059>Log all modules",
+        description = "<LOC profiler_0060>Print a table of statistics for every module with data to the log",
+    },
     profiler_benchmark_log = {
         title = "<LOC profiler_0047>Log statistics",
         description = "<LOC profiler_0048>Print the statistics of the selected benchmark to the log",

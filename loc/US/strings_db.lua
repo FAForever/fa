@@ -8316,6 +8316,9 @@ profiler_0051="Print a table of statistics for every benchmark in this module to
 profiler_0052="All to 5%"
 profiler_0053="Run all to 5% error"
 profiler_0054="Run every benchmark in this module in turn until each is within 5% error"
+profiler_0058="Log modules"
+profiler_0059="Log all modules"
+profiler_0060="Print a table of statistics for every module with data to the log"
 
 lobui_resource_sharing_label="Overflow"
 lobui_resource_sharing_help="Set whether distribution of excess resources to allies is initially enabled or disabled. Players can toggle it through the diplomacy menu when teams are unlocked."
