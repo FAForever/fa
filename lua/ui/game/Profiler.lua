@@ -675,6 +675,14 @@ ProfilerBenchmarks = Class(Group) {
     ---@param self ProfilerBenchmarks
     ---@param index number
     SelectBenchmark = function(self, index)
+        local benchmarkState = State.Benchmarks
+        -- leaving a running benchmark stops it so its results don't end up on this page
+        if benchmarkState.BenchmarkRunning and
+            (benchmarkState.SelectedModule ~= benchmarkState.BenchmarkRunningMod or index ~= benchmarkState.BenchmarkRunningBen) then
+            StopBenchmark()
+        end
+        benchmarkState.SelectedBenchmark = index
+
         self.benchmarkList:SetSelection(index - 1) -- to zero-index list
         self:UpdateParametersLabel()
         self:UpdateBenchmarkStats()
@@ -795,8 +803,11 @@ ProfilerBenchmarks = Class(Group) {
         local benchmarkState = State.Benchmarks
         local mod = benchmarkState.BenchmarkRunningMod
         local ben = benchmarkState.BenchmarkRunningBen
-        ---@diagnostic disable-next-line: param-type-mismatch
-        self.summary:SetStats(AddBenchmarkStatCache(data, baselines, mod, ben))
+        local stats, cachedBaselines = AddBenchmarkStatCache(data, baselines, mod, ben)
+        if mod == benchmarkState.SelectedModule and ben == benchmarkState.SelectedBenchmark then
+            ---@diagnostic disable-next-line: param-type-mismatch
+            self.summary:SetStats(stats, cachedBaselines)
+        end
     end,
 
     ---@param self ProfilerBenchmarks
