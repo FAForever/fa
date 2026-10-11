@@ -70,6 +70,10 @@ local testSets = {
         list = {-6, 0, 1, 3, 4, 5, 6, 12},
         quartiles = {-6, 0, 3.5, 6, 12},
         remove_outliers = {0, 1, 3, 4, 5, 6, 12},
+    }, { -- subtest 15
+        list = {0, 0, 0, 0, 0, 0, 3},
+        quartiles = {0, 0, 0, 0, 3},
+        remove_outliers = {0, 0, 0, 0, 0, 0, 3},
     },
 }
 

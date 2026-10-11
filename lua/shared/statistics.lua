@@ -200,7 +200,7 @@ function GetQuartiles(t, n)
 end
 
 --- Removes items that are more than 1.5 times the interquartile range away from
---- the median into a new table
+--- the median into a new table. Keeps everything when the interquartile range is zero.
 ---@param t number[]
 ---@param n? integer
 ---@return number[] trimmed
@@ -217,6 +217,14 @@ function RemoveOutliers(t, n)
     else
         local _, q1, q2, q3, _ = GetQuartiles(t, n)
         local iqr15 = (q3 - q1) * 1.5
+
+        -- a zero range (coarse timer) would reject everything that is not the median
+        if iqr15 == 0 then
+            for i = 1, n do
+                trimmed[i] = t[i]
+            end
+            return trimmed, n
+        end
 
         local size = 0
         for i = 1, n do
