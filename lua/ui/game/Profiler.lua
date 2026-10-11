@@ -29,6 +29,11 @@ local CreateEmptyProfilerTable = import("/lua/shared/profiler.lua").CreateEmptyP
 local Layouter = LayoutHelpers.ReusedLayoutFor
 local Summarize = ProfilerElements.Summarize
 
+-- "Run to 5%" repeats the benchmark until the 95% confidence interval of the mean is this narrow
+local AutoRunMargin = 0.05
+local AutoRunMinSamples = 5
+local AutoRunMaxSamples = 1000
+
 local sessionInfo = SessionGetScenarioInfo()
 local data = CreateEmptyProfilerTable()
 
@@ -59,6 +64,7 @@ local State = {
     Samples = {},
     Stamps = {},
     Benchmarks = {
+        AutoRun = false,
         BenchmarkProgress = 0,
         BenchmarkRunning = false,
         ---@type number
@@ -267,14 +273,16 @@ function StartBenchmark(module, benchmark)
     -- from the sim on stop to set to false. This is so that we can't send benchmark requests
     -- to the sim while one is running.
     local benchmarkState = State.Benchmarks
-    benchmarkState.BenchmarkRunning = true
-    benchmarkState.BenchmarkRunningMod = benchmarkState.SelectedModule
-    benchmarkState.BenchmarkRunningBen = benchmarkState.SelectedBenchmark
     local params = benchmarkState.ParameterCount
     if not params then
         WARN("Missing debug function to start benchmark")
+        -- nothing will come back from the sim, so don't wait on it
+        benchmarkState.AutoRun = false
         return
     end
+    benchmarkState.BenchmarkRunning = true
+    benchmarkState.BenchmarkRunningMod = benchmarkState.SelectedModule
+    benchmarkState.BenchmarkRunningBen = benchmarkState.SelectedBenchmark
     local parameters = {}
     local benchmarkParams = benchmarkState.Parameters
     for i = 1, params do
@@ -495,6 +503,7 @@ ProfilerStamps = Class(Group) {
 }
 
 ---@class ProfilerBenchmarks : Group
+---@field autoRunButton Button
 ---@field benchmarkText Text
 ---@field benchmarkList ItemList | { background: Bitmap }
 ---@field bytecode BytecodeArea
@@ -521,6 +530,7 @@ ProfilerBenchmarks = Class(Group) {
         self.groupInteraction = Group(self.groupInput)
         self.groupNavigation = Group(self.groupInput)
         self.groupActions = Group(self.groupInput)
+        self.autoRunButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0043>Run to 5%"), 14, 2)
         self.logButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0046>Log"), 14, 2)
         self.runButton = UIUtil.CreateButtonStd(self.groupInteraction, "/widgets02/small", LOC("<LOC profiler_0006>Run"), 16, 2)
         self.parametersLabel = ItemList(self.groupInteraction, 0, 0)
@@ -535,6 +545,9 @@ ProfilerBenchmarks = Class(Group) {
 
         self.runButton.OnClick = function(button_self)
             self:OnClickRunButton()
+        end
+        self.autoRunButton.OnClick = function(button_self)
+            self:OnClickRunButton(true)
         end
         self.logButton.OnClick = function(button_self)
             self:OnClickLogButton()
@@ -587,7 +600,7 @@ ProfilerBenchmarks = Class(Group) {
 
         local groupActions = Layouter(self.groupActions)
             :FillHorizontally(groupInteraction)
-            :Height(function() return self.logButton.Height() + 10 end)
+            :Height(function() return self.autoRunButton.Height() + 10 end)
             :AnchorToTop(groupInteraction)
             :ResetTop()
             :End()
@@ -598,6 +611,15 @@ ProfilerBenchmarks = Class(Group) {
             :End()
 
         -- Action components
+
+        -- run buttons on the left, the matching log buttons on the right
+        local autoRunButton = Layouter(self.autoRunButton)
+            :FromLeftIn(groupActions, 0.02)
+            :AtTopIn(groupActions, 5)
+            :Over(groupActions, 10)
+            :Disable()
+            :End()
+        Tooltip.AddButtonTooltip(autoRunButton, "profiler_benchmark_run_margin")
 
         local logButton = Layouter(self.logButton)
             :FromLeftIn(groupActions, 0.52)
@@ -694,16 +716,57 @@ ProfilerBenchmarks = Class(Group) {
         self.progressLabel:Hide()
     end,
 
+    --- Starts the selected benchmark, or stops the running one
     ---@param self ProfilerBenchmarks
-    OnClickRunButton = function(self)
+    ---@param autoRun? boolean keep running until the margin is reached
+    OnClickRunButton = function(self, autoRun)
         local benchmarkState = State.Benchmarks
         if benchmarkState.BenchmarkRunning then
+            benchmarkState.AutoRun = false
             StopBenchmark()
             return
         end
         local module = benchmarkState.SelectedModule
         local benchmark = benchmarkState.SelectedBenchmark
         if module > 0 and benchmark > 0 then
+            benchmarkState.AutoRun = autoRun == true
+            StartBenchmark(module, benchmark)
+        end
+    end,
+
+    --- Starts another run until the margin is reached, called when a run finishes
+    ---@param self ProfilerBenchmarks
+    ---@param output BenchmarkOutput
+    ContinueAutoRun = function(self, output)
+        local benchmarkState = State.Benchmarks
+        if not benchmarkState.AutoRun or output.success == nil then
+            return
+        end
+        benchmarkState.AutoRun = false
+        if not output.success then
+            return
+        end
+
+        local module = benchmarkState.BenchmarkRunningMod
+        local benchmark = benchmarkState.BenchmarkRunningBen
+        local stats, baselines = GetBenchmarkStatCache(module, benchmark)
+        -- cleared, or the selection (and its parameters) changed
+        if not stats
+            or module ~= benchmarkState.SelectedModule or benchmark ~= benchmarkState.SelectedBenchmark then
+            return
+        end
+
+        local summary = Summarize(stats, baselines, self.summary:GetMode())
+        local margin = summary.relativeMargin
+        -- a zero mean has no relative margin, but identical samples can't improve any further
+        if summary.n >= AutoRunMinSamples and summary.mean == 0 and summary.margin == 0 then
+            WARN("Benchmark samples are all zero, the timer is too coarse to measure it")
+        elseif margin and summary.n >= AutoRunMinSamples and margin <= AutoRunMargin then
+            SPEW(("Benchmark reached +/-%.1f%% with %d samples"):format(margin * 100, summary.n))
+        elseif stats.n >= AutoRunMaxSamples then
+            WARN(("Benchmark did not reach +/-%.0f%% within %d samples"):format(AutoRunMargin * 100, stats.n))
+        else
+            benchmarkState.AutoRun = true
             StartBenchmark(module, benchmark)
         end
     end,
@@ -749,6 +812,7 @@ ProfilerBenchmarks = Class(Group) {
         -- leaving a running benchmark stops it so its results don't end up on this page
         if benchmarkState.BenchmarkRunning and
             (benchmarkState.SelectedModule ~= benchmarkState.BenchmarkRunningMod or index ~= benchmarkState.BenchmarkRunningBen) then
+            benchmarkState.AutoRun = false
             StopBenchmark()
         end
         benchmarkState.SelectedBenchmark = index
@@ -958,6 +1022,19 @@ ProfilerBenchmarks = Class(Group) {
             runButton.label:SetText(LOC("<LOC profiler_0010>Stop"))
         else
             runButton.label:SetText(LOC("<LOC profiler_0006>Run"))
+        end
+
+        local autoRunButton = self.autoRunButton
+        local autoRunning = running and State.Benchmarks.AutoRun
+        if disabled or (running and not autoRunning) then
+            autoRunButton:Disable()
+        else
+            autoRunButton:Enable()
+        end
+        if autoRunning then
+            autoRunButton.label:SetText(LOC("<LOC profiler_0010>Stop"))
+        else
+            autoRunButton.label:SetText(LOC("<LOC profiler_0043>Run to 5%"))
         end
 
         if GetBenchmarkStatCache() then
@@ -1213,6 +1290,7 @@ ProfilerWindow = ClassUI(Window) {
             benchmarkState.BenchmarkProgress = benchmarkState.BenchmarkProgress + complete
         end
         benchmarksTab:AddBenchmarkStats(output.data, output.baselines)
+        benchmarksTab:ContinueAutoRun(output)
         benchmarksTab:UpdateBenchmarkProgress()
         benchmarksTab:UpdateRunButtonState()
     end,

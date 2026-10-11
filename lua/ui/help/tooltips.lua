@@ -2304,6 +2304,10 @@ Tooltips = {
         title = "<LOC profiler_0041>Clear stats",
         description = "<LOC profiler_0042>Clear all samples for this benchmark",
     },
+    profiler_benchmark_run_margin = {
+        title = "<LOC profiler_0044>Run to 5% error",
+        description = "<LOC profiler_0045>Keep running until the 95% confidence interval of the mean is within 5% of the mean",
+    },
     profiler_benchmark_log = {
         title = "<LOC profiler_0047>Log statistics",
         description = "<LOC profiler_0048>Print the statistics of the selected benchmark to the log",
