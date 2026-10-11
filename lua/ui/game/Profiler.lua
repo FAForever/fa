@@ -889,6 +889,14 @@ ProfilerBenchmarks = Class(Group) {
         else
             runButton.label:SetText(LOC("<LOC profiler_0006>Run"))
         end
+
+        -- clearing mid-run would pull the samples out from under it
+        local clearButton = self.summary.clearButton
+        if running then
+            clearButton:Disable()
+        else
+            clearButton:Enable()
+        end
     end,
 
     ---@param self ProfilerBenchmarks
