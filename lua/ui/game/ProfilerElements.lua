@@ -1,5 +1,6 @@
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local ProfilerReport = import("/lua/ui/game/profilerreport.lua")
 local Statistics = import("/lua/shared/statistics.lua")
 local Tooltip = import("/lua/ui/game/tooltip.lua")
 
@@ -615,6 +616,11 @@ StatisticSummary = Class(Group) {
             self.baselines = baselines
             local mode = self:GetMode()
             local samples, mean, deviation, skewness = DoStats(stats, baselines, mode, true)
+            -- raw times are in seconds, ratios are unitless
+            if mode == "none" then
+                mean = ProfilerReport.FormatMilliseconds(mean, 4)
+                deviation = ProfilerReport.FormatMilliseconds(deviation, 4)
+            end
             self.samples:SetText(samples)
             self.mean:SetText(mean)
             self.deviation:SetText(deviation)

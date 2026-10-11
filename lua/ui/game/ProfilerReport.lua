@@ -38,6 +38,14 @@ local function Sig(value, sig)
     return Fixed(value, Decimals(value, sig))
 end
 
+--- Formats a time given in seconds as milliseconds
+---@param seconds number
+---@param sig integer
+---@return string
+function FormatMilliseconds(seconds, sig)
+    return Sig(seconds * 1000, sig) .. " ms"
+end
+
 --- Times are shown in milliseconds, baseline ratios are unitless
 ---@param summary BenchmarkSummary
 ---@return number scale
