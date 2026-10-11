@@ -11,6 +11,7 @@
 
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local ProfilerElements = import("/lua/ui/game/profilerelements.lua")
+local ProfilerReport = import("/lua/ui/game/profilerreport.lua")
 local ProfilerUtilities = import("/lua/ui/game/profilerutilities.lua")
 local Tooltip = import("/lua/ui/game/tooltip.lua")
 local UIUtil = import("/lua/ui/uiutil.lua")
@@ -26,8 +27,7 @@ local Window = import("/lua/maui/window.lua").Window
 local ObservableCreate = import("/lua/shared/observable.lua").Create
 local CreateEmptyProfilerTable = import("/lua/shared/profiler.lua").CreateEmptyProfilerTable
 local Layouter = LayoutHelpers.ReusedLayoutFor
-
-
+local Summarize = ProfilerElements.Summarize
 
 local sessionInfo = SessionGetScenarioInfo()
 local data = CreateEmptyProfilerTable()
@@ -227,6 +227,25 @@ local function AddBenchmarkStatCache(data, baselines, modIndex, benIndex)
         return nil
     end
     return sCache, bCache
+end
+
+--- Gets the title of a benchmark, or its function name when it has no title
+---@param modIndex number
+---@param benIndex number
+---@return string
+local function GetBenchmarkName(modIndex, benIndex)
+    local info = State.Benchmarks.Modules[modIndex].benchmarks[benIndex]
+    if info.title ~= "" then
+        return info.title
+    end
+    return info.name
+end
+
+---@param lines string[]
+local function LogLines(lines)
+    for _, line in ipairs(lines) do
+        LOG(line)
+    end
 end
 
 ---@param module number
@@ -480,10 +499,12 @@ ProfilerStamps = Class(Group) {
 ---@field benchmarkList ItemList | { background: Bitmap }
 ---@field bytecode BytecodeArea
 ---@field fileText Text
+---@field groupActions Group
 ---@field groupInput Group
 ---@field groupInteraction Group
 ---@field groupNavigation Group
 ---@field groupOutput Group
+---@field logButton Button
 ---@field modulePicker Combo
 ---@field parametersLabel ItemList
 ---@field progressLabel Text
@@ -499,6 +520,8 @@ ProfilerBenchmarks = Class(Group) {
         self.groupOutput = Group(self)
         self.groupInteraction = Group(self.groupInput)
         self.groupNavigation = Group(self.groupInput)
+        self.groupActions = Group(self.groupInput)
+        self.logButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0046>Log"), 14, 2)
         self.runButton = UIUtil.CreateButtonStd(self.groupInteraction, "/widgets02/small", LOC("<LOC profiler_0006>Run"), 16, 2)
         self.parametersLabel = ItemList(self.groupInteraction, 0, 0)
         self.progressLabel = UIUtil.CreateText(self.groupInteraction, "", 10, UIUtil.bodyFont, true)
@@ -512,6 +535,9 @@ ProfilerBenchmarks = Class(Group) {
 
         self.runButton.OnClick = function(button_self)
             self:OnClickRunButton()
+        end
+        self.logButton.OnClick = function(button_self)
+            self:OnClickLogButton()
         end
         self.modulePicker.OnClick = function(picker_self, index, text)
             -- index is already 1-indexed for Combo boxes
@@ -535,6 +561,7 @@ ProfilerBenchmarks = Class(Group) {
                 hook(summary_self)
             end
             SetBenchmarkStatCache(nil)
+            self:UpdateRunButtonState()
         end
 
         BenchmarkModuleSelected:AddObserver(function(index)
@@ -558,10 +585,27 @@ ProfilerBenchmarks = Class(Group) {
             :ResetTop()
             :End()
 
+        local groupActions = Layouter(self.groupActions)
+            :FillHorizontally(groupInteraction)
+            :Height(function() return self.logButton.Height() + 10 end)
+            :AnchorToTop(groupInteraction)
+            :ResetTop()
+            :End()
+
         local groupNavigation = Layouter(self.groupNavigation)
             :Fill(groupInput)
-            :AnchorToTop(groupInteraction, 5)
+            :AnchorToTop(groupActions, 5)
             :End()
+
+        -- Action components
+
+        local logButton = Layouter(self.logButton)
+            :FromLeftIn(groupActions, 0.52)
+            :AtTopIn(groupActions, 5)
+            :Over(groupActions, 10)
+            :Disable()
+            :End()
+        Tooltip.AddButtonTooltip(logButton, "profiler_benchmark_log")
 
         -- Interaction components
 
@@ -662,6 +706,32 @@ ProfilerBenchmarks = Class(Group) {
         if module > 0 and benchmark > 0 then
             StartBenchmark(module, benchmark)
         end
+    end,
+
+    ---@param self ProfilerBenchmarks
+    OnClickLogButton = function(self)
+        local benchmarkState = State.Benchmarks
+        local stats, baselines = GetBenchmarkStatCache()
+        if not stats then
+            WARN("No benchmark data to log")
+            return
+        end
+
+        local summary = Summarize(stats, baselines, self.summary:GetMode())
+        local parameters
+        local count = benchmarkState.ParameterCount
+        if count and count > 0 then
+            parameters = {}
+            for i = 1, count do
+                parameters[i] = tostring(benchmarkState.Parameters[i])
+            end
+        end
+        local baseline
+        if baselines and baselines[1] ~= nil then
+            baseline = Summarize(baselines, nil, "none")
+        end
+        LogLines(ProfilerReport.FormatSummary(
+            GetBenchmarkName(benchmarkState.SelectedModule, benchmarkState.SelectedBenchmark), summary, parameters, baseline))
     end,
 
     ---@param self ProfilerBenchmarks
@@ -888,6 +958,12 @@ ProfilerBenchmarks = Class(Group) {
             runButton.label:SetText(LOC("<LOC profiler_0010>Stop"))
         else
             runButton.label:SetText(LOC("<LOC profiler_0006>Run"))
+        end
+
+        if GetBenchmarkStatCache() then
+            self.logButton:Enable()
+        else
+            self.logButton:Disable()
         end
 
         -- clearing mid-run would pull the samples out from under it

@@ -2304,4 +2304,8 @@ Tooltips = {
         title = "<LOC profiler_0041>Clear stats",
         description = "<LOC profiler_0042>Clear all samples for this benchmark",
     },
+    profiler_benchmark_log = {
+        title = "<LOC profiler_0047>Log statistics",
+        description = "<LOC profiler_0048>Print the statistics of the selected benchmark to the log",
+    },
 }
