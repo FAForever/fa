@@ -20,6 +20,8 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+-- UnitDatabaseData: {"DoTPulses": 2, "DoTTimeTicks": "${HoldTicks}"}
+
 local AArtilleryProjectile = import("/lua/aeonprojectiles.lua").AArtilleryProjectile
 local AArtilleryProjectileOnCreate = AArtilleryProjectile.OnCreate
 local AArtilleryProjectileOnImpact = AArtilleryProjectile.OnImpact
