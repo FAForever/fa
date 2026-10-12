@@ -108,11 +108,11 @@
 --- Name of the weapon. Used for lobby restrictions and for debugging:
 --- `dbg weapons` in the console shows the weapon names.
 ---@field DisplayName string
---- number of times the Damage over Time damage will be dealt
----@field DoTPulses number
 --- if true, the impact deals only `InitialDamage` and no DoT pulse is consumed at impact:
 --- all `DoTPulses` are dealt over `DoTTime`. Projectile weapons only, ignored by beams.
----@field DoTSkipFirstPulse? boolean
+---@field DoTDelayFirstPulse? boolean
+--- number of times the Damage over Time damage will be dealt
+---@field DoTPulses number
 --- duration that the Damage over Time will last in seconds
 ---@field DoTTime number
 --- If `FixBombTrajectory` is set, then bombs dropped with this weapon will be aimed at the position
