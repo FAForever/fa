@@ -1,0 +1,1 @@
+- Make the "Restart the current session" hotkey also restart replays (#7276).

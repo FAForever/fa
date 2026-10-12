@@ -1,0 +1,1 @@
+- Fix pressing the external factory button on unbuilt Fatboys and Czars selecting the engineers building them (#7302).

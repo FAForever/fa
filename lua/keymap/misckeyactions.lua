@@ -51,7 +51,9 @@ function ToggleRepeatBuild()
     for _, v in selection do
         v:ProcessInfo('SetRepeatQueue', isRepeatBuild)
         if EntityCategoryContains(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, v) then
-            v:GetCreator():ProcessInfo('SetRepeatQueue', isRepeatBuild)
+            if v:GetFractionComplete() == 1 then
+                v:GetCreator():ProcessInfo('SetRepeatQueue', isRepeatBuild)
+            end
         end
     end
 end
@@ -691,5 +693,19 @@ SelectCommander = function(zoomTo)
         end
     elseif zoomTo then
         UIZoomTo(selectedUnits, 0)
+    end
+end
+
+function RestartSessionOrReplay()
+    if SessionIsReplay() then
+        local ok = LaunchReplaySession(GetFrontEndData('replay_filename'))
+        if not ok then
+            local filename = tostring(GetFrontEndData('replay_filename'))
+            local msg = string.format('Issue starting replay "%s"', filename)
+            print(msg)
+            WARN(msg)
+        end
+    elseif SessionIsActive() and SessionCanRestart() then
+        RestartSession()
     end
 end
