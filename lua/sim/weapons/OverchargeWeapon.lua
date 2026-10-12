@@ -87,23 +87,9 @@ OverchargeWeapon = ClassWeapon(DefaultProjectileWeapon) {
         DefaultProjectileWeapon.OnCreate(self)
         self.EnergyRequired = self.Blueprint.EnergyRequired
         self:SetWeaponEnabled(false)
-        local aimControl = self.AimControl
-        aimControl:SetEnabled(false)
-        aimControl:SetPrecedence(0)
+        self:AimManipulatorSetEnabled(false)
+        self.AimControl:SetPrecedence(0)
         self.unit:SetOverchargePaused(false)
-    end,
-
-    --- The overcharge aim controller only takes over the arm while overcharge is enabled
-    ---@param self OverchargeWeapon
-    ---@param aimControl moho.AimManipulator
-    OnAimControlRebuilt = function(self, aimControl)
-        if self.enabled then
-            aimControl:SetEnabled(true)
-            aimControl:SetPrecedence(20)
-        else
-            aimControl:SetEnabled(false)
-            aimControl:SetPrecedence(0)
-        end
     end,
 
     ---@param self OverchargeWeapon
@@ -142,7 +128,7 @@ OverchargeWeapon = ClassWeapon(DefaultProjectileWeapon) {
             unit:SetWeaponEnabledByLabel(weaponLabel, false)
         end
         unit:BuildManipulatorSetEnabled(false)
-        aimControl:SetEnabled(true)
+        self:AimManipulatorSetEnabled(true)
         aimControl:SetPrecedence(20)
         unit.BuildArmManipulator:SetPrecedence(0)
         aimControl:SetHeadingPitch(unit:GetWeaponManipulatorByLabel(weaponLabel):GetHeadingPitch())
@@ -162,7 +148,7 @@ OverchargeWeapon = ClassWeapon(DefaultProjectileWeapon) {
         end
 
         unit:BuildManipulatorSetEnabled(false)
-        aimControl:SetEnabled(false)
+        self:AimManipulatorSetEnabled(false)
         aimControl:SetPrecedence(0)
         unit.BuildArmManipulator:SetPrecedence(0)
         unit:GetWeaponManipulatorByLabel(weaponLabel):SetHeadingPitch(aimControl:GetHeadingPitch())
