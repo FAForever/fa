@@ -4,6 +4,8 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------------------
 
+-- UnitDatabaseData: {"files": ["effects/Entities/SBOOhwalliBombEffectController01/SBOOhwalliBombEffectController01_script.lua", "effects/Entities/SBOOhwalliBombEffect01/SBOOhwalliBombEffect01_script.lua"], "tooltip": "The explosion spawns ${PlumeCount} fireball plumes that land randomly nearby, each dealing ${PlumeDamage} damage in a ${PlumeDamageRadius} radius."}
+
 local SOhwalliStrategicBombProjectile = import("/lua/seraphimprojectiles.lua").SOhwalliStrategicBombProjectile
 local SOhwalliStrategicBombProjectileOnCreate = SOhwalliStrategicBombProjectile.OnCreate
 
