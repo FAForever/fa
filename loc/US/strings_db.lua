@@ -7633,6 +7633,8 @@ OPTIONS_0283="UI Scale"
 OPTIONS_0284="Changes the size of all UI elements. (requires game restart)"
 OPTIONS_0285="Automatic Extractor Selection"
 OPTIONS_0286="After selecting an engineer, hover the mouse over a mass extractor spot to auto preselect a mass extractor for building"
+OPTIONS_ECON_OVERLAY_SCALE_TITLE="Scale Economy Overlay"
+OPTIONS_ECON_OVERLAY_SCALE_DESCRIPTION="Adjusts the size of the economy overlay.\nRequires a game restart if overlay was enabled this session."
 
 lobui_0414 = "%d Build Restrictions"
 lobui_0415 = "1 Build Restriction"
