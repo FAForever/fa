@@ -428,4 +428,45 @@ end
 function Entity:SinkAway(dy)
 end
 
+--- Called by the engine when an entity attached to this one is destroyed
+---@type nil | fun(self: Entity, attached: Entity)
+Entity.OnAttachedDestroyed = nil
+
+--- Called by the engine when an entity attached to this one is killed
+---@type nil | fun(self: Entity, attached: Entity)
+Entity.OnAttachedKilled = nil
+
+--- Called by the engine when a projectile is about to hit this entity. Return true to let the
+--- projectile collide with it. Without this callback, projectiles pass through.
+---@type nil | fun(self: Entity, other: Projectile): boolean
+Entity.OnCollisionCheck = nil
+
+--- Called by the engine when the beam of a beam weapon passes through this entity. Return true to
+--- let the beam hit it. Without this callback, beams pass through.
+---@type nil | fun(self: Entity, firingWeapon: Weapon): boolean
+Entity.OnCollisionCheckWeapon = nil
+
+--- Called by the engine when the entity takes damage from `Damage` or `DamageArea`, with the
+--- amount left after armor. Not called when that amount is 0. The engine does not change the
+--- entity's health itself.
+---@type nil | fun(self: Entity, instigator: Unit | Projectile | Entity | nil, amount: number, vector: Vector, damageType: DamageType)
+Entity.OnDamage = nil
+
+--- Called by the engine when the health fraction of the entity crosses a multiple of 0.25. Both
+--- values are rounded down to a multiple of 0.25.
+---@type nil | fun(self: Entity, new: number, old: number)
+Entity.OnHealthChanged = nil
+
+--- Called by the engine when the entity changes layer
+---@type nil | fun(self: Entity, new: Layer, old: Layer)
+Entity.OnLayerChange = nil
+
+--- Called by the engine when the entity this one is attached to is destroyed
+---@type nil | fun(self: Entity, parent: Entity)
+Entity.OnParentDestroyed = nil
+
+--- Called by the engine when the entity this one is attached to is killed
+---@type nil | fun(self: Entity, parent: Entity)
+Entity.OnParentKilled = nil
+
 return Entity

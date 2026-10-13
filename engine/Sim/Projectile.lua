@@ -237,4 +237,30 @@ end
 function Projectile:SetDamage(amount, radius)
 end
 
+--- Called by the engine when the projectile is created, after `OnPreCreate` and `OnLayerChange`
+---@type nil | fun(self: Projectile, inWater: boolean)
+Projectile.OnCreate = nil
+
+--- Called by the engine when the projectile moves from the air into water, after `OnLayerChange`
+---@type nil | fun(self: Projectile)
+Projectile.OnEnterWater = nil
+
+--- Called by the engine when the projectile moves from water into the air, after `OnLayerChange`
+---@type nil | fun(self: Projectile)
+Projectile.OnExitWater = nil
+
+--- Called by the engine when the projectile impacts something. `targetEntity` is nil when it
+--- hits the terrain, water or nothing.
+---@type nil | fun(self: Projectile, targetType: ImpactType, targetEntity: Unit | Prop | Projectile | Entity | nil)
+Projectile.OnImpact = nil
+
+--- Called by the engine when a tracking projectile loses its target. The projectile then stops
+--- tracking.
+---@type nil | fun(self: Projectile)
+Projectile.OnLostTarget = nil
+
+--- Called by the engine at the start of creating the projectile, before `OnCreate`
+---@type nil | fun(self: Projectile)
+Projectile.OnPreCreate = nil
+
 return Projectile

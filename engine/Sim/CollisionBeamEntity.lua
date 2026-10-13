@@ -37,4 +37,21 @@ end
 function CCollisionBeamEntity:__init(spec)
 end
 
+--- Called by the engine when the beam is created
+---@type nil | fun(self: CollisionBeam)
+CCollisionBeamEntity.OnCreate = nil
+
+--- Called by the engine when `Disable` is called, before collision checking stops
+---@type nil | fun(self: CollisionBeam)
+CCollisionBeamEntity.OnDisable = nil
+
+--- Called by the engine when `Enable` is called, before collision checking starts
+---@type nil | fun(self: CollisionBeam)
+CCollisionBeamEntity.OnEnable = nil
+
+--- Called by the engine on each collision check while the beam is enabled. `targetEntity` is nil
+--- when the beam hits the terrain, water or nothing.
+---@type nil | fun(self: CollisionBeam, impactType: ImpactType, targetEntity: Unit | Prop | Projectile | Entity | nil)
+CCollisionBeamEntity.OnImpact = nil
+
 return CCollisionBeamEntity
