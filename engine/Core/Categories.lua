@@ -6,12 +6,16 @@ local categoryValue
 
 ---@type table<CategoryName | UnitId, EntityCategory>
 categories = {
+    --- Lua-side (`lua/ui/game/orders.lua`): adds the blueprint `Abilities` buttons to the orders panel
     ABILITYBUTTON = categoryValue,
     ADVANCEDCOMBATPRESET = categoryValue,
     AEON = categoryValue,
     AIR = categoryValue,
+    --- Engine: aircraft can dock at the unit (Dock order, refuel and call-to-staging behavior)
     AIRSTAGINGPLATFORM = categoryValue,
+    --- Engine: added to every projectile blueprint automatically
     ALLPROJECTILES = categoryValue,
+    --- Engine: added to every unit blueprint automatically
     ALLUNITS = categoryValue,
     AMPHIBIOUS = categoryValue,
     --- Used for units that can target air units
@@ -31,6 +35,7 @@ categories = {
     ARTILLERY = categoryValue,
     ASF = categoryValue,
     BATTLESHIP = categoryValue,
+    --- Engine: weapons never pick the unit as an automatic target. `Entity:Kill` gives the instigator no kill (`KILLS` stat) for it
     BENIGN = categoryValue,
     --- Used for units that die when attacking
     BOMB = categoryValue,
@@ -56,9 +61,13 @@ categories = {
     BUILTBYTIER3COMMANDER = categoryValue,
     BUILTBYTIER3ENGINEER = categoryValue,
     BUILTBYTIER3FACTORY = categoryValue,
+    --- Engine (UI): aircraft in this category get no dock cursor over an `AIRSTAGINGPLATFORM`
     CANNOTUSEAIRSTAGING = categoryValue,
+    --- Engine: the transport can carry `COMMAND` units. Without it, transports refuse them
     CANTRANSPORTCOMMANDER = categoryValue,
+    --- Engine: the unit accepts capture orders. The target needs `Capturable` in its blueprint
     CAPTURE = categoryValue,
+    --- Engine: units attached to a carrier cannot be selected or hovered and reject move and guard orders
     CARRIER = categoryValue,
     --- Allows the unit to land on water. Is introduced by https://github.com/FAForever/FA-Binary-Patches/pull/20
     CANLANDONWATER = categoryValue,
@@ -68,9 +77,10 @@ categories = {
     COMBATPRESET = categoryValue,
     COMMAND = categoryValue,
     CONSTRUCTION = categoryValue,
+    --- Lua-side (`lua/ui/game/construction.lua`): when a factory is selected, shows the unit one tech tab lower
     CONSTRUCTIONSORTDOWN = categoryValue,
     COUNTERINTELLIGENCE = categoryValue,
-    --- Allows queuing commands before the unit is finished building
+    --- Not read by the engine or by Lua
     CQUEMOV = categoryValue,
     CRABEGG = categoryValue,
     CRUISER = categoryValue,
@@ -81,20 +91,23 @@ categories = {
     DESTROYER = categoryValue,
     DIESTOOCDEPLETINGSHIELD = categoryValue,
     DIRECTFIRE = categoryValue,
+    --- Engine (UI): the structure can be drag-built in a line, as walls are
     DRAGBUILD = categoryValue,
     DUMMYGSRWEAPON = categoryValue,
     DUMMYUNIT = categoryValue,
     ECONOMIC = categoryValue,
     ENERGYPRODUCTION = categoryValue,
     ENERGYSTORAGE = categoryValue,
-    --- Unit counts as an engineer for GetIdleEngineers()
+    --- Engine: the unit accepts build orders. In the UI it counts for `GetIdleEngineers`, unless it is also `COMMAND`, `SCOUT` or `UNTARGETABLE`, or has a `General.QuickSelectPriority`
     ENGINEER = categoryValue,
     ENGINEERPRESET = categoryValue,
     ENGINEERSTATION = categoryValue,
     EXPERIMENTAL = categoryValue,
     --- Replaces the unit's command queue with the rally point orders. Also gives it a default rally point order upon creation
     FACTORY = categoryValue,
+    --- Engine: the pathfinder prefers water for this unit when its destinations are underwater
     FAVORSWATER = categoryValue,
+    --- Engine: marks a ferry beacon, the target of ferry orders. Can be hovered even when `UNTARGETABLE`
     FERRYBEACON = categoryValue,
     FIELDENGINEER = categoryValue,
     FRIGATE = categoryValue,
@@ -106,10 +119,12 @@ categories = {
     HOVER = categoryValue,
     HYDROCARBON = categoryValue,
     INDIRECTFIRE = categoryValue,
+    --- Engine (UI): the unit's orders are not drawn as command lines
     INSIGNIFICANTUNIT = categoryValue,
     INTEL = categoryValue,
     INTELJAMMERPRESET = categoryValue,
     INTELLIGENCE = categoryValue,
+    --- Lua-side (`lua/system/blueprints-props.lua`): makes a prop indestructible by switching its script to `PropInvulnerable`
     INVULNERABLE = categoryValue,
     ISPREENHANCEDUNIT = categoryValue,
     LAND = categoryValue,
@@ -127,57 +142,88 @@ categories = {
     NAVALCARRIER = categoryValue,
     NAVAL = categoryValue,
 
-    --- Allows this unit to be built by engineers
+    --- Lua-side (`lua/ui/game/construction.lua`, `lua/ui/game/buildmode.lua`): the build menu places this mobile unit on the map like a structure, as for experimentals built by engineers.
+    --- Engine: a unit in this category accepts build orders, like `FACTORY`, `ENGINEER` and `POD`
     NEEDMOBILEBUILD = categoryValue,
     --- Unit doesn't use a formation when assisting other units
     NOFORMATION = categoryValue,
-    --- Prevents splash damage being applied to the entity
+    --- Engine: prevents area damage being applied to the entity
     NOSPLASHDAMAGE = categoryValue,
     NUKE = categoryValue,
     NUKESUB = categoryValue,
+    --- Lua-side (`lua/sim/units/StructureUnit.lua`): the prop is not cleared when a structure starts building on top of it. Added to wreckage by `lua/system/blueprints-props.lua`
+    OBSTRUCTSBUILDING = categoryValue,
     OMNI = categoryValue,
     OPERATION = categoryValue,
     OPTICS = categoryValue,
     ORBITALSYSTEM = categoryValue,
+    --- Lua-side (`lua/ui/game/rangeoverlayparams.lua`): shows the unit in the anti-air range overlay.
+    --- Engine (UI): lets an amphibious or surfacing unit count as able to attack air targets
     OVERLAYANTIAIR = categoryValue,
+    --- Lua-side (`lua/ui/game/rangeoverlayparams.lua`): shows the unit in the anti-navy range overlay.
+    --- Engine (UI): lets an amphibious unit on land count as able to attack naval targets
     OVERLAYANTINAVY = categoryValue,
+    --- Lua-side (`lua/ui/game/rangeoverlayparams.lua`): shows the unit in the counter-intel range overlay
     OVERLAYCOUNTERINTEL = categoryValue,
+    --- Lua-side (`lua/ui/game/rangeoverlayparams.lua`): shows the unit in the countermeasure range overlay
     OVERLAYCOUNTERMEASURE = categoryValue,
+    --- Lua-side (`lua/ui/game/rangeoverlayparams.lua`): shows the unit in the countermeasure range overlay
     OVERLAYDEFENSE = categoryValue,
+    --- Lua-side (`lua/ui/game/rangeoverlayparams.lua`): shows the unit in the direct fire range overlay.
+    --- Engine (UI): lets an amphibious or surfacing unit count as able to attack land targets
     OVERLAYDIRECTFIRE = categoryValue,
+    --- Lua-side (`lua/ui/game/rangeoverlayparams.lua`): shows the unit in the indirect fire range overlay
     OVERLAYINDIRECTFIRE = categoryValue,
+    --- Lua-side (`lua/ui/game/rangeoverlayparams.lua`): shows the unit in the build range overlay.
+    --- Engine: that ring uses the blueprint `AI.StagingPlatformScanRadius`, or `AI.GuardScanRadius` when that is 0
     OVERLAYMISC = categoryValue,
+    --- Lua-side (`lua/ui/game/rangeoverlayparams.lua`): shows the unit in the omni range overlay
     OVERLAYOMNI = categoryValue,
+    --- Lua-side (`lua/ui/game/rangeoverlayparams.lua`): shows the unit in the radar range overlay
     OVERLAYRADAR = categoryValue,
+    --- Lua-side (`lua/ui/game/rangeoverlayparams.lua`): shows the unit in the sonar range overlay
     OVERLAYSONAR = categoryValue,
-    -- Allows unit to reclaim and repair on patrol/aggressive move tasks.
+    --- Engine: the unit reclaims and repairs nearby targets while on patrol or attack-move. A `COMMAND` or `SACU_BEHAVIOR` unit skips this while moving in formation
     PATROLHELPER = categoryValue,
     PERSONALSHIELD = categoryValue,
+    --- Engine: a pod attached to its parent rejects move, guard, reclaim, capture and repair orders. Pods accept build orders
     POD = categoryValue,
+    --- Engine: the unit gets transport logic without the `RULEUCC_Transport` command cap, so pods can attach to it
     PODSTAGINGPLATFORM = categoryValue,
     PRODUCTDL = categoryValue,
     PRODUCTFA = categoryValue,
     PRODUCTSC1 = categoryValue,
+    --- Engine (UI): the projectile draws a strategic icon when zoomed out
     PROJECTILE = categoryValue,
     RADAR = categoryValue,
-    -- Causes orders given to the unit to be added to the rally point queue
+    --- Engine (UI): orders given to the unit are added to its rally point queue
     RALLYPOINT = categoryValue,
     RAMBOPRESET = categoryValue,
     RASPRESET = categoryValue,
+    --- Engine: the entity can be reclaimed. Reclaim orders, the reclaim cursor and patrol reclaim skip entities without it
     RECLAIMABLE = categoryValue,
+    --- Engine: the unit accepts reclaim orders
     RECLAIM = categoryValue,
+    --- Engine (UI): right-clicking an own or allied unit in this category with reclaimers selected issues a reclaim order
     RECLAIMFRIENDLY = categoryValue,
+    --- Engine: the unit accepts repair orders
     REPAIR = categoryValue,
     RESEARCH = categoryValue,
+    --- Engine: a `PATROLHELPER` unit skips patrol reclaim and repair while moving in formation, as for `COMMAND`. Added to every `SUBCOMMANDER` by `lua/system/blueprints-units.lua`
+    SACU_BEHAVIOR = categoryValue,
     SATELLITE = categoryValue,
     SCOUT = categoryValue,
+    --- Engine (UI): the unit can be selected. Units without it cannot be selected
     SELECTABLE = categoryValue,
     SERAPHIM = categoryValue,
     SHIELD = categoryValue,
     SHIELDCOLLIDE = categoryValue,
     SHIELDCOMBATPRESET = categoryValue,
+    --- Lua-side (`lua/ui/controls/worldview.lua`): draws the damage radius of the selected unit's missile weapons at the cursor
     SHOWATTACKRETICLE = categoryValue,
+    --- Engine (UI): shows the factory build queue of the unit (`SetCurrentFactoryForQueueDisplay`)
     SHOWQUEUE = categoryValue,
+    --- Engine: the unit can build missiles with silo build orders
     SILO = categoryValue,
     SIMPLECOMBATPRESET = categoryValue,
     SIZE4 = categoryValue,
@@ -188,11 +234,17 @@ categories = {
     SNIPEMODE = categoryValue,
     SNIPER = categoryValue,
     SONAR = categoryValue,
+    --- Lua-side (`lua/ui/game/construction.lua`): groups the unit in the build menu. Group order: `SORTCONSTRUCTION`, `SORTECONOMY`, `SORTDEFENSE`, `SORTSTRATEGIC`, `SORTINTEL`, `SORTOTHER`, then the rest
     SORTCONSTRUCTION = categoryValue,
+    --- Lua-side (`lua/ui/game/construction.lua`): groups the unit in the build menu. Group order: `SORTCONSTRUCTION`, `SORTECONOMY`, `SORTDEFENSE`, `SORTSTRATEGIC`, `SORTINTEL`, `SORTOTHER`, then the rest
     SORTDEFENSE = categoryValue,
+    --- Lua-side (`lua/ui/game/construction.lua`): groups the unit in the build menu. Group order: `SORTCONSTRUCTION`, `SORTECONOMY`, `SORTDEFENSE`, `SORTSTRATEGIC`, `SORTINTEL`, `SORTOTHER`, then the rest
     SORTECONOMY = categoryValue,
+    --- Lua-side (`lua/ui/game/construction.lua`): groups the unit in the build menu. Group order: `SORTCONSTRUCTION`, `SORTECONOMY`, `SORTDEFENSE`, `SORTSTRATEGIC`, `SORTINTEL`, `SORTOTHER`, then the rest
     SORTINTEL = categoryValue,
+    --- Lua-side (`lua/ui/game/construction.lua`): groups the unit in the build menu. Group order: `SORTCONSTRUCTION`, `SORTECONOMY`, `SORTDEFENSE`, `SORTSTRATEGIC`, `SORTINTEL`, `SORTOTHER`, then the rest
     SORTOTHER = categoryValue,
+    --- Lua-side (`lua/ui/game/construction.lua`): groups the unit in the build menu. Group order: `SORTCONSTRUCTION`, `SORTECONOMY`, `SORTDEFENSE`, `SORTSTRATEGIC`, `SORTINTEL`, `SORTOTHER`, then the rest
     SORTSTRATEGIC = categoryValue,
     SPECIALHIGHPRI = categoryValue,
     SPECIALLOWPRI = categoryValue,
@@ -211,7 +263,7 @@ categories = {
     TACTICAL = categoryValue,
     TACTICALMISSILEPLATFORM = categoryValue,
     TANK = categoryValue,
-    -- Unit does not mantain any formation when on attack task
+    --- Engine: the unit leaves its formation on attack orders. Aircraft in it follow a moving target directly and ignore movement damping
     TARGETCHASER = categoryValue,
     TECH1 = categoryValue,
     TECH2 = categoryValue,
@@ -223,15 +275,22 @@ categories = {
     TRANSPORTBUILTBYTIER1FACTORY = categoryValue,
     TRANSPORTBUILTBYTIER2FACTORY = categoryValue,
     TRANSPORTBUILTBYTIER3FACTORY = categoryValue,
+    --- Engine (UI): with this transport selected, right-clicking a unit that cannot fly loads that unit
     TRANSPORTFOCUS = categoryValue,
     UEF = categoryValue,
+    --- Not read by the engine or by Lua. Remove `SELECTABLE` to make a unit unselectable
     UNSELECTABLE = categoryValue,
+    --- Lua-side (`lua/ui/dialogs/createunit.logic.lua`): hides the unit from the create unit (cheat spawn) dialog
     UNSPAWNABLE = categoryValue,
+    --- Engine (UI): when the unit is not also `SELECTABLE`, the cursor cannot hover or target it. Also excludes it from `GetIdleEngineers`
     UNTARGETABLE = categoryValue,
     USEBUILDPRESETS = categoryValue,
+    --- Lua-side (`lua/ui/game/unitview.lua`): shows the missile count only when the unit has a missile enhancement
     VERIFYMISSILEUI = categoryValue,
+    --- Engine: other armies can see the unit through vision, radar or sonar. Units without it never show to other armies
     VISIBLETORECON = categoryValue,
     VOLATILE = categoryValue,
+    --- Engine (UI): double-clicking the unit does not select other units of the same type
     WALL = categoryValue,
     -- sACU Preset Enhancements
     AdvancedCoolingUpgrade = categoryValue,
@@ -385,6 +444,7 @@ categories = {
 ---| "OVERLAYANTIAIR"
 ---| "OVERLAYANTINAVY"
 ---| "OVERLAYCOUNTERINTEL"
+---| "OVERLAYCOUNTERMEASURE"
 ---| "OVERLAYDEFENSE"
 ---| "OVERLAYDIRECTFIRE"
 ---| "OVERLAYINDIRECTFIRE"
@@ -409,6 +469,7 @@ categories = {
 ---| "RECLAIMFRIENDLY"
 ---| "REPAIR"
 ---| "RESEARCH"
+---| "SACU_BEHAVIOR"
 ---| "SATELLITE"
 ---| "SCOUT"
 ---| "SELECTABLE"
