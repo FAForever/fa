@@ -43,6 +43,23 @@ Put a change on the lowest class that covers every unit it should affect. Change
 - After `WaitTicks`, `WaitSeconds` or `WaitFor`, the entity may be gone. Check `IsDestroyed(self)` before calling engine methods on it. Examples: `DisabledWhileReloadingThread` in [weapon.lua](weapon.lua), `RetargetThread` in [Projectile.lua](Projectile.lua).
 - Never keep a cached vector (such as the `cachedPosition` argument of `Projectile.DoDamage`) across a wait or pass it to a thread. It is overwritten by the next call.
 
+### Order within a tick
+
+Read from the [faf-re](https://github.com/Draiget/faf-re) decompilation (`Sim::AdvanceBeat`), so treat it as evidence:
+
+1. Player commands for the tick, including `SimCallback` handlers.
+2. Each army's tick, in army order: platoon cleanup, economy, then weapon targeting and firing (`OnGotTarget`, `OnLostTarget`, `OnFire`). Weapons fire before unit orders run.
+3. Unit command tasks: script task `TaskTick`, build and reclaim callbacks.
+4. Lua threads: everything started with `ForkThread`, including state `Main` threads.
+5. Entity ticks: motion, projectile collisions and impacts, and the damage and kills they cause (`OnImpact`, `OnDamage`, `OnKilled`, `OnLayerChange`).
+6. Intel: one army per tick updates its blips, spreading the cost over as many ticks as there are armies. That army gets its `OnIntelChange` callbacks, and units it gets new blips for get `OnDetectedBy` ([../defaultcomponents.lua](../defaultcomponents.lua) `IntelComponent`).
+7. Weapon cleanup for units killed this tick, then `OnDestroy` for every entity `Destroy()`ed this tick.
+8. Sync to the UI. The engine deletes destroyed entities here, so `IsDestroyed` is true from the next tick.
+
+A `ForkThread` from steps 1 to 4 runs in the same tick, because new threads go to the end of the thread list. One from step 5 or later first runs next tick. `WaitTicks(n)` with `n >= 2` waits `n - 1` ticks, `WaitTicks(1)` waits 1, and `WaitTicks(0)` continues at once. `WaitSeconds` adds 1 to make up for that.
+
+The order explains the 1-tick gaps in weapon fire cycles. The engine's fire task (step 2) doesn't fire while the unit is busy. [DefaultProjectileWeapon.lua](weapons/DefaultProjectileWeapon.lua) sets busy while firing and reloading, and clears it in `RackSalvoFireReadyState.Main` (step 4). So when the fire cooldown ends during a salvo or reload, the next `OnFire` comes one tick after the weapon is ready again. [unitviewdetail.lua](../ui/game/unitviewdetail.lua) adds that tick when it estimates DPS.
+
 ## States
 
 `State { ... }` and `ChangeState(self, self.SomeState)` are defined in [../system/class.lua](../system/class.lua). `ChangeState` calls `OnExitState`, swaps the instance's metatable to the state, calls `OnEnterState`, then forks the state's `Main` and kills the previous `Main` thread. Methods and fields defined in a state override the class's while it is active, e.g. each rack salvo state in [weapons/DefaultProjectileWeapon.lua](weapons/DefaultProjectileWeapon.lua) sets its own `StateName`. Other examples: `IdleState`, `WorkingState` and `DeadState` in [Unit.lua](Unit.lua), and the shield states in [../shield.lua](../shield.lua).
