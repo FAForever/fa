@@ -55,7 +55,7 @@ Every caller shares the same instance, so:
 ## Modules and imports
 
 - Load modules with `import("/lua/path/file.lua")` using absolute, lowercase-tolerant virtual paths (the engine's filesystem is case-insensitive). Implementation: [lua/system/import.lua](lua/system/import.lua).
-- Don't use `lazyimport`. It defers loading a module until first access, so the importer is never recorded as a dependent, and dirtying the module doesn't reload it ([#4484](https://github.com/FAForever/fa/pull/4484)). It also broke mod hooks, which is why [#4612](https://github.com/FAForever/fa/pull/4612) removed its uses. Lazy loading for performance needs measurements showing it helps.
+- Don't use `lazyimport`: the importer isn't recorded as a dependent, so hot reload skips it, and it breaks mod hooks ([#4484](https://github.com/FAForever/fa/pull/4484), [#4612](https://github.com/FAForever/fa/pull/4612)).
 - `local` keeps a variable private to the file.
 - Performance-sensitive files cache globals and methods as upvalues at the top of the file. See [Performance](#performance).
 - `__moduleinfo.OnDirty` / `OnReload` support hot reload when the game runs with `/EnableDiskWatch`.
@@ -204,29 +204,7 @@ TrashAdd(self.Trash, thread)          -- instead of self.Trash:Add(thread)
 
 ### Cached values instead of engine calls
 
-Crossing into C (a "CFunction" or a `moho` method) costs more than reading a Lua field. Sim objects cache values that never change, or that the engine reports through a callback, as fields. Read these instead of calling the getter:
-
-| Field | Instead of | Set in |
-|---|---|---|
-| `self.Blueprint` | `self:GetBlueprint()` | `OnPreCreate` (units), `OnCreate` (weapons, projectiles, props) |
-| `self.Army` | `self:GetArmy()` | `OnPreCreate` (units), `OnCreate` (weapons, projectiles) |
-| `self.Brain` | `self:GetAIBrain()` | `OnPreCreate` (units), `OnCreate` (weapons) |
-| `self.EntityId` | `self:GetEntityId()` | `OnPreCreate` (units), `OnCreate` (props) |
-| `self.UnitId` | `self:GetUnitId()` | `OnPreCreate` (units) |
-| `self.Layer` | `self:GetCurrentLayer()` | `OnLayerChange` (units) |
-| `ArmyBrains[i]` | `GetArmyBrain(i)` | sim setup. 50–100x faster ([value-access.lua](lua/benchmarks/value-access.lua)) |
-
-The units are in [Unit.lua](lua/sim/Unit.lua), weapons in [weapon.lua](lua/sim/weapon.lua), projectiles in [Projectile.lua](lua/sim/Projectile.lua) and props in [Prop.lua](lua/sim/Prop.lua). A weapon's `OnCreate` runs before its unit's and reads the unit's values, so units set theirs in `OnPreCreate`.
-
-Checking whether a unit is gone is not one of these swaps, because the checks answer different questions:
-
-- `unit:BeenDestroyed()` is true as soon as `Destroy()` is called on the unit.
-- `unit.Dead` is a Lua field. `Kill` sets it before `OnKilled` runs. A unit destroyed without being killed gets it in `OnDestroy`, which the engine calls for every entity destroyed during the tick, at the end of that tick. It only exists on sim units: UI `UserUnit`s don't have it, so use `IsDestroyed(unit)` there.
-- `IsDestroyed(obj)` is true once the engine has deleted the C object behind `obj`, which happens after the tick ends, and accepts `nil`.
-
-A killed unit is `.Dead` long before its death thread calls `Destroy()`. For a unit destroyed directly (reclaimed, cancelled, `Destroy()` from script), Lua running later in the same tick sees `BeenDestroyed()` true while `.Dead` and `IsDestroyed` are still false. From the next tick on, all three are true. This order comes from the [faf-re](https://github.com/Draiget/faf-re) decompilation (`Sim::AdvanceBeat`, `Entity::Destroy`, `EntityDB::Purge`).
-
-After a `WaitTicks`/`WaitSeconds` in a thread, check `IsDestroyed(self)` before calling engine methods on `self`.
+Crossing into C (a "CFunction" or a `moho` method) costs more than reading a Lua field. Sim objects cache common values such as `self.Blueprint` and `self.Army` as fields: read those instead of calling the getters ([lua/sim/AGENTS.md](lua/sim/AGENTS.md#cached-fields)). `ArmyBrains[i]` is 50–100x faster than `GetArmyBrain(i)` ([value-access.lua](lua/benchmarks/value-access.lua)). `unit.Dead`, `unit:BeenDestroyed()` and `IsDestroyed(unit)` look like a field-for-getter swap but aren't interchangeable ([Destroyed checks](lua/sim/AGENTS.md#destroyed-checks)).
 
 ### Other engine calls
 

@@ -28,7 +28,7 @@ Setup: <map/lobby settings that matter>. Spawn:
 
 Write each checkbox as an observable result ("the health bar drops", "the order line follows the unit"), not as an action. When the expected result isn't obvious, give the reason it should happen: the mechanic, code path or value it follows from. The tester can then tell a real failure from a wrong expectation.
 
-The commit SHA keeps the results meaningful after more commits are pushed. Leave out who tested; the PR comment already shows that.
+Leave out who tested; the PR comment already shows that.
 
 ## Setup
 
@@ -45,12 +45,7 @@ The commit SHA keeps the results meaningful after more commits are pushed. Leave
   - `CreateUnitAtMouse` takes a 0-indexed army. `GetFocusArmy()` and sim functions such as `CreateUnitHPR` are 1-indexed. Use `GetFocusArmy() - 1` for your own units. In a solo skirmish, army `1` is the hostile civilian army.
   - Space units with the offsets: about 15 apart for experimentals. Place units far away when distance matters to the test (projectile arcs, ranges).
 - Console snippets are run with the "[Debug] Execute Paste Buffer" hotkey, which runs the clipboard as UI Lua. It has no default key, so testers bind it in the key bindings menu. Give plain UI Lua without a `UI_Lua` prefix. Wrap sim code as `ConExecute[[SimLua <code>]]`, with a literal space after `SimLua`.
-- When a test needs a moving unit, make it reusable: give it a patrol loop in the sim instead of a single move that the tester has to race. A patrol loop needs two `IssuePatrol` orders, and the unit then walks the loop indefinitely. The snippet below spawns a hostile unit at the mouse that patrols 40 units east and back:
-
-  ```lua
-  local p = GetMouseWorldPos()
-  ConExecute(string.format('SimLua local u = {CreateUnitHPR("xrl0305", 2, %.1f, %.1f, %.1f, 0, 0, 0)} IssuePatrol(u, {%.1f, %.1f, %.1f}) IssuePatrol(u, {%.1f, %.1f, %.1f})', p[1], p[2], p[3], p[1] + 40, p[2], p[3], p[1], p[2], p[3]))
-  ```
+- When a test needs a moving unit, make it reusable: give it a patrol loop in the sim instead of a single move that the tester has to race. A patrol loop needs two `IssuePatrol` orders, and the unit then walks the loop indefinitely. Step 2 of the [Example](#example) has a snippet.
 
 ## Order and scope
 
@@ -69,41 +64,34 @@ The commit SHA keeps the results meaningful after more commits are pushed. Leave
 
 Snippets can do more than spawn units. Use them to set up state, run the test and log the result, so the tester compares numbers instead of judging by eye:
 
-- Console commands from [lua/keymap/debugKeyActions.lua](lua/keymap/debugKeyActions.lua) can go in a snippet with `ConExecute`, e.g. `dbg Collision` to draw hitboxes, `dbg weapons` for weapon ranges, `ShowStats frame` for frame times, `Nodamage`, and `WLD_SingleStep` for stepping a paused game. `wld_RunWithTheWind 1` runs the sim as fast as possible for long tests.
-- A test that waits for an outcome forks a sim thread that waits for it, then `LOG`s the numbers. This one measures how much damage a Ythotha's lightning storm does to your own and to enemy units:
+- Console commands from [lua/keymap/debugKeyActions.lua](lua/keymap/debugKeyActions.lua) can go in a snippet with `ConExecute`, e.g. `dbg Collision` to draw hitboxes, `dbg weapons` for weapon ranges and `Nodamage`. `wld_RunWithTheWind 1` runs the sim as fast as possible for long tests, and `0` turns it off.
+- A test that waits for an outcome forks a sim thread that waits for it, then `LOG`s the numbers and cleans up. This one spawns a Ythotha lightning storm and two hostile targets, makes the targets durable, speeds up the sim, and logs the damage each target took once the storm expires:
 
   ```lua
-  CreateUnitAtMouse('xsl0402', GetFocusArmy() - 1,  0, 40, 0)
-  CreateUnitAtMouse('xsl0402', GetFocusArmy() - 1,  0,  0, 0)
-  CreateUnitAtMouse('xsb0301', GetFocusArmy() - 1, 15, 40, 0) -- factories are LAND, so the storm targets them
-  CreateUnitAtMouse('xsb0301', 1,                  15,  0, 0)
+  CreateUnitAtMouse('xsl0402', GetFocusArmy() - 1,   0, 0, 0)
+  CreateUnitAtMouse('xsb0101', 1,                   15, 0, 0)
+  CreateUnitAtMouse('xsb0301', 1,                  -15, 0, 0)
   ConExecute [[SimLua -- intentional space
-  local units = table.cat(ArmyBrains[GetFocusArmy()]:GetListOfUnits(categories.xsb0301, false), ArmyBrains[2]:GetListOfUnits(categories.xsb0301, false))
+  local storm = ArmyBrains[GetFocusArmy()]:GetListOfUnits(categories.xsl0402, false)[1]
+  local targets = ArmyBrains[2]:GetListOfUnits(categories.xsb0101 + categories.xsb0301, false)
   local hp = 500000
-  for _, u in units do
+  for _, u in targets do
       u:SetMaxHealth(hp)
       u:SetHealth(u, hp)
   end
-  local storms = ArmyBrains[GetFocusArmy()]:GetListOfUnits(categories.xsl0402, false)
-  for _, u in storms do
-      u.Blueprint.MaxMoveRange = 0
-  end
-  local storm = storms[1]
-  SimConExecute('wld_runwiththewind')
+  SimConExecute('wld_RunWithTheWind 1')
   ForkThread(function()
       while not storm.Dead do
           WaitTicks(1)
       end
-      for _, u in units do
-          LOG(string.format('Army %d damage taken: %f', u.Army, hp - u:GetHealth()))
+      for _, u in targets do
+          LOG(string.format('%s damage taken: %f', u.UnitId, hp - u:GetHealth()))
           u:Destroy()
       end
-      SimConExecute('wld_runwiththewind')
+      SimConExecute('wld_RunWithTheWind 0')
   end
   )]] -- intentionally on a new line
   ```
-
-  Each storm has a factory next to it, one yours and one hostile. The storms expire on their own, and the damage each army took is in the log.
 - When the data can only come from inside the changed code (timings, intermediate values, unit stats), put the logging in a test commit on a separate branch on top of the PR branch, and link it from the procedure. The PR branch stays clean, and the tester gets objective data points instead of impressions.
 
 ## Variants by change type
@@ -113,7 +101,7 @@ Most PRs fit one of these. A PR that spans several uses the steps of each.
 - **Feature or option:** the [outline](#outline) as written.
 - **Bug fix:** the first step reproduces the bug on `develop` with exact steps, and the next step runs the same steps on the branch. Then regression checks. Leave out UI checks unless the fix changes the UI.
 - **Balance and blueprint values:** expected results are numbers worked out from the change (damage per second, time to kill, range, build time). Measure them with a snippet that logs them, and compare them with `develop`. Skip the log check for value-only changes.
-- **Performance:** only test performance when the changed code does many table operations or engine calls relative to how often it runs (every frame, every tick, for every unit). Judge that from how much similar code nearby avoids those operations (cached upvalues, preallocated tables). Time the code in a test commit, on `develop` and on the branch, and give both numbers. `CreateTimer()` from [lua/system/utils.lua](lua/system/utils.lua) is global, but it uses `CurrentTime`, which only exists in the UI; in the sim, time with `GetSystemTimeSecondsOnlyForProfileUse` like the benchmarks in [lua/benchmarks/](lua/benchmarks/).
+- **Performance:** only test performance when the changed code does many table operations or engine calls relative to how often it runs (every frame, every tick, for every unit). Judge that from how much similar code nearby avoids those operations (cached upvalues, preallocated tables). Time the code in a test commit, on `develop` and on the branch, and give both numbers.
 - **Lobby and menus:** there are no units and no sim, so spawns and `SimLua` snippets don't apply; the steps are UI actions. Behavior between players needs several instances from [scripts/LaunchFAInstances.ps1](scripts/LaunchFAInstances.ps1).
 - **UI that feeds the sim:** when UI code decides what gets sent to the sim (sim callbacks, orders built from local UI state), test with a host and a client from [scripts/LaunchFAInstances.ps1](scripts/LaunchFAInstances.ps1): do the action on one instance and check that the game doesn't desync. Other changes don't need this.
 
