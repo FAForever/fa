@@ -875,6 +875,10 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             -- they need a RackSalvoReloadTime that's 1/RateOfFire set to avoid firing twice on the first shot
             local unit = self.unit
             local bp = self.Blueprint
+
+            -- The engine doesn't fire while the unit is busy. Its fire task runs in the army tick, before
+            -- this thread, so if the fire cooldown ended during a salvo or reload, the next `OnFire` comes
+            -- one tick after this. `unitviewdetail.lua` adds that tick when it estimates DPS
             if bp.ManualFire and not bp.OverChargeWeapon then
                 unit:SetBusy(true)
             else
