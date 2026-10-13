@@ -77,7 +77,8 @@ Snippets can do more than spawn units. Use them to set up state, run the test an
   CreateUnitAtMouse('xsl0402', GetFocusArmy() - 1,  0,  0, 0)
   CreateUnitAtMouse('xsb0301', GetFocusArmy() - 1, 15, 40, 0) -- factories are LAND, so the storm targets them
   CreateUnitAtMouse('xsb0301', 1,                  15,  0, 0)
-  ConExecute [[SimLua local units = table.cat(ArmyBrains[GetFocusArmy()]:GetListOfUnits(categories.xsb0301, false), ArmyBrains[2]:GetListOfUnits(categories.xsb0301, false))
+  ConExecute [[SimLua -- intentional space
+  local units = table.cat(ArmyBrains[GetFocusArmy()]:GetListOfUnits(categories.xsb0301, false), ArmyBrains[2]:GetListOfUnits(categories.xsb0301, false))
   local hp = 500000
   for _, u in units do
       u:SetMaxHealth(hp)
@@ -98,7 +99,8 @@ Snippets can do more than spawn units. Use them to set up state, run the test an
           u:Destroy()
       end
       SimConExecute('wld_runwiththewind')
-  end)]]
+  end
+  )]] -- intentionally on a new line
   ```
 
   Each storm has a factory next to it, one yours and one hostile. The storms expire on their own, and the damage each army took is in the log.
