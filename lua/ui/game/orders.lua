@@ -1422,10 +1422,16 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
             -- finally, make sure our units are all of the same type
             local bp = exFacs[1]:GetUnitId()
             if table.getn(EntityCategoryFilterDown(categories[bp], exFacs)) == table.getn(exFacs) then
+                local inserted = false
                 for _, exFac in exFacs do
-                    table.insert(assistingUnitList['ExFac'], exFac:GetCreator())
+                    if exFac:GetFractionComplete() == 1 then
+                        table.insert(assistingUnitList['ExFac'], exFac:GetCreator())
+                        inserted = true
+                    end
                 end
-                table.insert(availableOrders, 'ExFac')
+                if inserted then
+                    table.insert(availableOrders, 'ExFac')
+                end
             end
         end
     end

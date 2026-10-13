@@ -108,6 +108,9 @@
 --- Name of the weapon. Used for lobby restrictions and for debugging:
 --- `dbg weapons` in the console shows the weapon names.
 ---@field DisplayName string
+--- if true, the impact deals only `InitialDamage` and no DoT pulse is consumed at impact:
+--- all `DoTPulses` are dealt over `DoTTime`. Projectile weapons only, ignored by beams.
+---@field DoTDelayFirstPulse? boolean
 --- number of times the Damage over Time damage will be dealt
 ---@field DoTPulses number
 --- duration that the Damage over Time will last in seconds
