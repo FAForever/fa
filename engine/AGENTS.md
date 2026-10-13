@@ -44,21 +44,24 @@ return Unit
 
 - The class name is the `moho.*` table name the engine exposes (`moho.entity_methods`, `moho.bitmap_methods`), not the file name. Inherit with `:` the way the engine does: [Sim/Unit.lua](Sim/Unit.lua) extends `moho.entity_methods`, the MAUI controls extend `moho.control_methods`, and root classes extend `Destroyable`.
 - Lua classes build on these: `---@class Entity : moho.entity_methods, InternalObject` above `Entity = Class(moho.entity_methods)` in [lua/sim/Entity.lua](../lua/sim/Entity.lua). Put Lua-side fields and overrides there, not in the stub.
-- Methods have empty bodies. Every `@param` and `@return` has a type. Use the real types (`Unit`, `Vector`, `Bone`) rather than `any` when known.
-- Engine callbacks (methods the engine calls on the Lua object) are declared as typed fields set to `nil`, with a `Called by the engine when ...` description:
+- Methods have empty bodies. Every `@param` and `@return` has a type. Use specific types such as `Unit`, `Vector` or `Bone` rather than `any` when known.
+- Engine callbacks (methods the engine calls on the Lua object) are `nil` in the engine class and implemented by the Lua classes. Declare them as fields set to `nil`, typed `nil | fun(...)`, with a `Called by the engine when ...` description. The function type gives the parameters the engine passes and the values it expects back when the callback exists:
 
 ```lua
 --- Called by the engine when the unit was out of fuel and recharges fuel
----@type fun(self: Unit)
+---@type nil | fun(self: Unit)
 Unit.OnGotFuel = nil
 ```
 
 ## Annotation markers
 
+The full list is in the [LuaLS annotation reference](https://luals.github.io/wiki/annotations/). The ones used most here:
+
 - `---@unknown` marks a function whose purpose or arguments are not known ([Sim/Entity.lua](Sim/Entity.lua) `AddShooter`). Replace it when you learn the behavior.
 - `---@deprecated <reason>` marks engine functions that are slower than plain Lua, such as the vector math helpers in [Core.lua](Core.lua). The reason names the alternative.
-- `---@see Name # description` links related functions and counterparts (`BeginLoggingStats` and `EndLoggingStats`).
-- `---@overload` and `---@generic` describe functions with several call signatures.
+- `---@see Name # description` links related functions and counterparts (`BeginLoggingStats` and `EndLoggingStats`). It can reference a field one level deep in a class as `<class>.<field>`, e.g. `---@see Unit.OnGotFuel`.
+- `---@overload fun(...)` adds another call signature. The LuaLS reference recommends declaring the function several times in meta files instead. Neither reliably narrows the return type to the signature that matches the arguments. It doesn't work for `EntityCategoryFilterDown` in [Core.lua](Core.lua).
+- `---@generic T` makes a template-like signature, where a type in the return value follows a parameter's type.
 
 ## Documenting behavior
 
