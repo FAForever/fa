@@ -199,12 +199,34 @@ TrashAdd(self.Trash, thread)          -- instead of self.Trash:Add(thread)
 - Upvalue at file scope, not inside the loop. Fetching into a local on each iteration is slower than using the global ([math-generic.lua](lua/benchmarks/math-generic.lua)).
 - [lua/sim/Unit.lua](lua/sim/Unit.lua) and [lua/system/trashbag.lua](lua/system/trashbag.lua) show the pattern. `trashbag.lua` has a copy-paste block of the `Trash*` upvalues.
 
-### Avoid engine calls
+### Cached values instead of engine calls
 
-Crossing into C (a "CFunction" or a `moho` method) is expensive compared with plain Lua.
+Crossing into C (a "CFunction" or a `moho` method) costs more than reading a Lua field. Sim objects cache values that never change, or that the engine reports through a callback, as fields. Read these instead of calling the getter:
 
-- Read fields instead of calling getters. `unit.Dead` is about 17x faster than `unit:BeenDestroyed()` ([function-origin.lua](lua/benchmarks/function-origin.lua)). Use `self.Blueprint` instead of `self:GetBlueprint()`.
-- Prefer Lua-side tables over engine lookups: `ArmyBrains[i]` is 50–100x faster than `GetArmyBrain(i)` ([value-access.lua](lua/benchmarks/value-access.lua)).
+| Field | Instead of | Set in |
+|---|---|---|
+| `self.Blueprint` | `self:GetBlueprint()` | `OnPreCreate` (units), `OnCreate` (weapons, projectiles, props) |
+| `self.Army` | `self:GetArmy()` | `OnPreCreate` (units), `OnCreate` (weapons, projectiles) |
+| `self.Brain` | `self:GetAIBrain()` | `OnPreCreate` (units), `OnCreate` (weapons) |
+| `self.EntityId` | `self:GetEntityId()` | `OnPreCreate` (units), `OnCreate` (props) |
+| `self.UnitId` | `self:GetUnitId()` | `OnPreCreate` (units) |
+| `self.Layer` | `self:GetCurrentLayer()` | `OnLayerChange` (units) |
+| `ArmyBrains[i]` | `GetArmyBrain(i)` | sim setup. 50–100x faster ([value-access.lua](lua/benchmarks/value-access.lua)) |
+
+The units are in [Unit.lua](lua/sim/Unit.lua), weapons in [weapon.lua](lua/sim/weapon.lua), projectiles in [Projectile.lua](lua/sim/Projectile.lua) and props in [Prop.lua](lua/sim/Prop.lua). A weapon's `OnCreate` runs before its unit's and reads the unit's values, so units set theirs in `OnPreCreate`.
+
+Checking whether a unit is gone is not one of these swaps, because the checks answer different questions:
+
+- `unit:BeenDestroyed()` is true as soon as `Destroy()` is called on the unit.
+- `unit.Dead` is a Lua field. `Kill` sets it before `OnKilled` runs. A unit destroyed without being killed gets it in `OnDestroy`, which the engine calls for every entity destroyed during the tick, at the end of that tick. It only exists on sim units: UI `UserUnit`s don't have it, so use `IsDestroyed(unit)` there.
+- `IsDestroyed(obj)` is true once the engine has deleted the C object behind `obj`, which happens after the tick ends, and accepts `nil`.
+
+A killed unit is `.Dead` long before its death thread calls `Destroy()`. For a unit destroyed directly (reclaimed, cancelled, `Destroy()` from script), Lua running later in the same tick sees `BeenDestroyed()` true while `.Dead` and `IsDestroyed` are still false. From the next tick on, all three are true. This order comes from the [faf-re](https://github.com/Draiget/faf-re) decompilation (`Sim::AdvanceBeat`, `Entity::Destroy`, `EntityDB::Purge`).
+
+Code that decides game outcomes uses `IsDestroyed`. A comment in [AbstractVictoryCondition.lua](lua/sim/VictoryCondition/AbstractVictoryCondition.lua) warns that switching it to `.Dead` would re-introduce the "draw bug". After a `WaitTicks`/`WaitSeconds` in a thread, check `IsDestroyed(self)` before calling engine methods on `self`.
+
+### Other engine calls
+
 - **Distances.** `VDist3` is fast thanks to an [engine patch](https://github.com/FAForever/FA-Binary-Patches/pull/54), so upvalue and use it ([VDist3.lua](lua/benchmarks/VDist3.lua)). `VDist2` is not patched: inline Lua math beats it. When you only compare distances, compare squared distances and skip the square root ([VDist2.lua](lua/benchmarks/VDist2.lua)).
 - `ForkThread` costs far more than a function call ([function-threads.lua](lua/benchmarks/function-threads.lua)). Check the conditions that would end the thread at once *before* forking it.
 
