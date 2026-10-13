@@ -78,6 +78,12 @@ A `ForkThread` from steps 1 to 4 runs in the same tick, because new threads go t
 
 These aren't interchangeable: Lua running later in the tick of a direct `Destroy()` sees `BeenDestroyed()` true while `.Dead` and `IsDestroyed` are still false. From the next tick on, all three are true.
 
+Engine methods keep working until step 8, then error with "Game object has been destroyed". `BeenDestroyed()` itself is safe on a deleted entity, but not on `nil`. Use:
+
+- `BeenDestroyed()` to skip work on an entity that is going away, including one destroyed earlier this tick. Effects, threads or orders started on it are lost at the end of the tick.
+- `.Dead` to check whether a unit was killed.
+- `IsDestroyed(obj)` before calling methods after a wait, and on values that may be `nil`.
+
 ## States
 
 `State { ... }` and `ChangeState(self, self.SomeState)` are defined in [../system/class.lua](../system/class.lua). `ChangeState` calls `OnExitState`, swaps the instance's metatable to the state, calls `OnEnterState`, then forks the state's `Main` and kills the previous `Main` thread. Methods and fields defined in a state override the class's while it is active, e.g. each rack salvo state in [weapons/DefaultProjectileWeapon.lua](weapons/DefaultProjectileWeapon.lua) sets its own `StateName`. Other examples: `IdleState`, `WorkingState` and `DeadState` in [Unit.lua](Unit.lua), and the shield states in [../shield.lua](../shield.lua).
