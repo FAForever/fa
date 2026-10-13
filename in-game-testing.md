@@ -34,7 +34,7 @@ Leave out who tested; the PR comment already shows that.
 
 - Leave out what every test needs: checking out the branch, launching the game, starting a skirmish with cheats on. Only list settings that change the result.
 - Don't add an AI to get an enemy. Maps made with the modern map editor have a hostile civilian army (`ARMY_17`) and a neutral one (`NEUTRAL_CIVILIAN`). Civilians are enemies by default (lobby option "Civilians"), and their brains don't give orders, so spawned units stay where they are. Only some of the original maps lack these armies.
-- Spawn every unit the procedure needs, your own and hostile, in a single copyable block of `CreateUnitAtMouse(blueprintId, army, offsetX, offsetZ, rotation)` calls:
+- Spawn every unit the procedure needs, your own and hostile, in a single copyable block of `CreateUnitAtMouse(blueprintId, army, offsetX, offsetZ, rotation)` calls. Automated tests spawn in the sim instead (see [Console commands and data](#console-commands-and-data)):
 
   ```lua
   CreateUnitAtMouse('ueb2108', GetFocusArmy() - 1,  -5.00,   0.00, 0)
@@ -42,7 +42,7 @@ Leave out who tested; the PR comment already shows that.
   CreateUnitAtMouse('xrl0403', 1,                     0.00, 120.00, 0)
   ```
 
-  - `CreateUnitAtMouse` takes a 0-indexed army. `GetFocusArmy()` and sim functions such as `CreateUnitHPR` are 1-indexed. Use `GetFocusArmy() - 1` for your own units. In a solo skirmish, army `1` is the hostile civilian army.
+  - `CreateUnitAtMouse` takes a 0-indexed army. `GetFocusArmy()` and sim functions such as `CreateUnitHPR` are 1-indexed. Use `GetFocusArmy() - 1` for your own units. In a solo skirmish without AIs, army `1` is the hostile civilian army.
   - Space units with the offsets: about 15 apart for experimentals. Place units far away when distance matters to the test (projectile arcs, ranges).
 - Console snippets are run with the "[Debug] Execute Paste Buffer" hotkey, which runs the clipboard as UI Lua. It has no default key, so testers bind it in the key bindings menu. Give plain UI Lua without a `UI_Lua` prefix. Wrap sim code as `ConExecute[[SimLua <code>]]`, with a literal space after `SimLua`.
 - When a test needs a moving unit, make it reusable: give it a patrol loop in the sim instead of a single move that the tester has to race. A patrol loop needs two `IssuePatrol` orders, and the unit then walks the loop indefinitely. Step 2 of the [Example](#example) has a snippet.
@@ -70,17 +70,18 @@ Snippets can do more than spawn units. Use them to set up state, run the test an
   ```lua
   local p = GetMouseWorldPos()
   ConExecute(string.format('SimLua local x, y, z = %f, %f, %f\n', p[1], p[2], p[3]) .. [[
-  -- spawn with CreateUnitHPR(id, army, x, y, z, 0, 0, 0): your units with GetFocusArmy(),
-  -- hostile ones with 'ARMY_17'. Space them with offsets on x and z
+  -- every entity created for the test, so they can be cleaned up
   local units = {
+      -- CreateUnitHPR(bpId, army, x, y, z, 0, 0, 0),
+      -- army: GetFocusArmy() for yours, 'ARMY_17' for hostile ones. Space units with offsets on x and z
   }
-  -- set up state for the test, e.g. SetMaxHealth/SetHealth, or SetAlliance for cross-army tests
+  -- set up state for the test, e.g. SetMaxHealth/SetHealth. For cross-army tests, SetAlliance and say in the step which army each unit is in
   SimConExecute('wld_RunWithTheWind 1')
   ForkThread(function()
       -- wait until the outcome, e.g. while not units[1].Dead do WaitTicks(1) end
-      -- LOG the measured values
       for _, u in units do
           if not IsDestroyed(u) then
+              -- LOG the measured values, e.g. LOG(u.UnitId, ' health: ', u:GetHealth())
               u:Destroy()
           end
       end
@@ -89,8 +90,7 @@ Snippets can do more than spawn units. Use them to set up state, run the test an
   )]]) -- intentionally on a new line
   ```
 
-  - Spawning in the sim keeps a reference to every unit, so nothing has to be found again and everything can be cleaned up. `CreateUnitHPR` also takes an army name, and `'ARMY_17'` is the hostile civilian army in any game, while its index depends on the players and AIs in the lobby.
-  - When the test is about how armies interact, say which army each unit belongs to and set the alliance it needs.
+  - `CreateUnitHPR` also takes an army name. Use `'ARMY_17'` on any map that has it, because its index depends on the players and AIs in the lobby.
   - Only the mouse position goes through `string.format`. The rest is a plain string, so commenting out the first and last lines leaves normal Lua to edit with LuaLS.
 - When the data can only come from inside the changed code (timings, intermediate values, unit stats), put the logging in a test commit on a separate branch on top of the PR branch, and link it from the procedure. The PR branch stays clean, and the tester gets objective data points instead of impressions.
 
