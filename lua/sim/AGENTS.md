@@ -45,7 +45,7 @@ Put a change on the lowest class that covers every unit it should affect. Change
 
 ## States
 
-`State { ... }` and `ChangeState(self, self.SomeState)` are defined in [../system/class.lua](../system/class.lua). `ChangeState` calls `OnExitState`, swaps the instance's metatable to the state, calls `OnEnterState`, then forks the state's `Main` and kills the previous `Main` thread. Methods defined in a state override the class methods while it is active. Examples: `IdleState`, `WorkingState` and `DeadState` in [Unit.lua](Unit.lua), the rack salvo states in [weapons/DefaultProjectileWeapon.lua](weapons/DefaultProjectileWeapon.lua).
+`State { ... }` and `ChangeState(self, self.SomeState)` are defined in [../system/class.lua](../system/class.lua). `ChangeState` calls `OnExitState`, swaps the instance's metatable to the state, calls `OnEnterState`, then forks the state's `Main` and kills the previous `Main` thread. Methods and fields defined in a state override the class's while it is active, e.g. each rack salvo state in [weapons/DefaultProjectileWeapon.lua](weapons/DefaultProjectileWeapon.lua) sets its own `StateName`. Other examples: `IdleState`, `WorkingState` and `DeadState` in [Unit.lua](Unit.lua), and the shield states in [../shield.lua](../shield.lua).
 
 ## Buffs
 
@@ -53,8 +53,9 @@ Put a change on the lowest class that covers every unit it should affect. Change
 
 ## Damage
 
-- A weapon builds a damage table from its blueprint and caches it ([weapon.lua](weapon.lua) `GetDamageTable`). Projectiles use it as the metatable of their `DamageData`. Change damage through `AddDamageMod`, `AddDamageRadiusMod`, `DisableBuff` or `ReEnableBuff`, which invalidate the cache.
+- A weapon builds a damage table from its blueprint and caches it ([weapon.lua](weapon.lua) `GetDamageTable`). Projectiles use it as the metatable of their `DamageData`. Change damage through `AddDamageMod`, `AddDamageRadiusMod`, `DisableBuff` or `ReEnableBuff`, which invalidate the cache. Fields without such a function are changed by editing the cached table directly.
 - [Projectile.lua](Projectile.lua) `DoDamage` calls the engine's `Damage` / `DamageArea`, which call the target's `OnDamage`. On units, `OnDamage` routes to an active personal shield or to `DoTakeDamage`.
+- `DamageArea` also calls `OnGetDamageAbsorption` on each enemy bubble shield that the damage sphere touches from outside, and reduces the damage to everything inside that shield by the returned amount ([../shield.lua](../shield.lua); faf-re `SIM_DoDamage`).
 - Damage over time runs in threads from [DefaultDamage.lua](DefaultDamage.lua) (`UnitDoTThread`, `AreaDoTThread`).
 
 ## Other subfolders
@@ -62,11 +63,19 @@ Put a change on the lowest class that covers every unit it should affect. Change
 | Folder | Contents |
 |---|---|
 | [commands/](commands/) | Multi-unit orders (copy and distribute queue, ringing, self-destruct, load in transport). Called from [../SimCallbacks.lua](../SimCallbacks.lua) |
-| [tasks/](tasks/) | `ScriptTask` subclasses ([ScriptTask.lua](ScriptTask.lua)) run by `IssueScript` or a `RULEUCC_Script` order, selected by `TaskName`. `TaskTick` returns a `TASKSTATUS` value |
+| [tasks/](tasks/) | Script tasks, see below |
 | [collisionBeams/](collisionBeams/) | Collision beam classes used by beam weapons |
 | [VictoryCondition/](VictoryCondition/) | Victory condition classes |
 | `NavGenerator.lua`, `NavUtils.lua`, `NavDebug/` | Navigation mesh and pathing queries |
 | `*Manager.lua`, `Builder.lua` | AI managers. See the AI row in the root [Repository layout](../../AGENTS.md#repository-layout) |
+
+## Script tasks
+
+[tasks/](tasks/) holds `ScriptTask` subclasses ([ScriptTask.lua](ScriptTask.lua)): custom orders. A UI command mode with `name = 'RULEUCC_Script'`, or `IssueScript` in sim code, names the task with `TaskName`, and the engine calls its `TaskTick`. The returned `TASKSTATUS` ([ScriptTask.lua](ScriptTask.lua) documents each value) says how many ticks to wait before the next call, or that the task is done. Unlike a sim callback, the order's entity or position target goes through the engine's order system, so Lua cheats can't forge it as easily.
+
+- The engine never draws script orders on the command graph: its graph builder skips that command type (faf-re `AddCommandQueueToCommandGraph`), so the `UNITCOMMAND_Script` entry in [commandgraphparams.lua](../ui/game/commandgraphparams.lua) has no effect. Script tasks suit instant orders and orders that don't need a command-graph line.
+- Existing tasks work around this. Attack move issues a script order, then [commandmode.lua](../ui/game/commandmode.lua) `OnScriptIssued` sends the `AttackMove` sim callback, which reads the order's position and issues a real aggressive move. [EnhanceTask.lua](tasks/EnhanceTask.lua) shows progress with `SetWorkProgress` and the UI's enhancement queue.
+- There are few examples and mods can't easily add tasks, so treat new script tasks as experimental.
 
 ## Testing
 
