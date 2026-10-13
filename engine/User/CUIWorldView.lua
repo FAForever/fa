@@ -129,5 +129,27 @@ end
 function CUIWorldView:ZoomScale(x, y, wheelRot, wheelDelta)
 end
 
+--- Called by the engine every frame while input isn't locked with `LockInput`, with the time
+--- since the last frame in seconds.
+---@type nil | fun(self: WorldView, delta: number)
+CUIWorldView.OnFrame = nil
+
+--- Called by the engine when strategic icons are hidden or shown again, which happens while the
+--- camera rotates and in free camera mode.
+---@type nil | fun(self: WorldView, areIconsVisible: boolean)
+CUIWorldView.OnIconsVisible = nil
+
+--- Called by the engine every frame while the world view draws the world and custom rendering is
+--- enabled with `SetCustomRender`, with the time since the last frame. The `UI_Draw*` functions
+--- only work inside this callback.
+---
+--- Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/47
+---@type nil | fun(self: WorldView, delta: number)
+CUIWorldView.OnRenderWorld = nil
+
+--- Called by the engine every frame while the mouse is over the world view.
+---@type nil | fun(self: WorldView)
+CUIWorldView.OnUpdateCursor = nil
+
 
 return CUIWorldView

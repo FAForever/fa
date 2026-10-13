@@ -97,4 +97,18 @@ end
 function CMauiBitmap:SetColorMask(color)
 end
 
+--- Called by the engine when an animation reaches the end of its frame pattern, whether or not
+--- it loops.
+---@type nil | fun(self: Bitmap)
+CMauiBitmap.OnAnimationFinished = nil
+
+--- Called by the engine on every frame change of an animation, with the 0-based position in the
+--- frame pattern.
+---@type nil | fun(self: Bitmap, frameNumber: number)
+CMauiBitmap.OnAnimationFrame = nil
+
+--- Called by the engine when an animation with more than one frame is stopped with `Stop`.
+---@type nil | fun(self: Bitmap)
+CMauiBitmap.OnAnimationStopped = nil
+
 return CMauiBitmap

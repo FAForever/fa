@@ -173,4 +173,53 @@ end
 function CLobby:SendData(peerId, data)
 end
 
+--- Called by the engine when the connection to the host fails or the host leaves.
+---@type nil | fun(self: moho.lobby_methods, reason: "HostLeft")
+CLobby.ConnectionFailed = nil
+
+--- Called by the engine when the connection to the host is established, with the local peer id,
+--- the local player name the host assigned, and the host peer id.
+---@type nil | fun(self: moho.lobby_methods, localPeerId: UILobbyPeerId, newLocalName: string, hostPeerId: UILobbyPeerId)
+CLobby.ConnectionToHostEstablished = nil
+
+--- Called by the engine when data from another peer arrives. The engine sets `SenderID` and
+--- `SenderName`; the rest is whatever the sender passed to `SendData` or `BroadcastData`.
+---@type nil | fun(self: moho.lobby_methods, data: UILobbyReceivedMessage)
+CLobby.DataReceived = nil
+
+--- Called by the engine when the local player is ejected from the lobby, with the reason, such as
+--- `"KickedByHost"` or `"LobbyFull"`.
+---@type nil | fun(self: moho.lobby_methods, reason: string)
+CLobby.Ejected = nil
+
+--- Called by the engine when a peer reports the peers it is connected to.
+---@type nil | fun(self: moho.lobby_methods, peerId: UILobbyPeerId, peerConnectedTo: UILobbyPeerId[])
+CLobby.EstablishedPeers = nil
+
+--- Called by the engine on the host when a discovery request arrives. The engine sends the
+--- returned table to the requester, which receives it in `GameFound` or `GameUpdated`.
+---@type nil | fun(self: moho.lobby_methods): UILobbydDiscoveryInfo?
+CLobby.GameConfigRequested = nil
+
+--- Called by the engine when `LaunchGame` succeeds.
+---@type nil | fun(self: moho.lobby_methods)
+CLobby.GameLaunched = nil
+
+--- Called by the engine when the lobby starts hosting.
+---@type nil | fun(self: moho.lobby_methods)
+CLobby.Hosting = nil
+
+--- Called by the engine when `LaunchGame` fails, with a reason key such as `"NoConfig"` or
+--- `"StartSpots"`, or an empty string when the scenario can't be loaded.
+---@type nil | fun(self: moho.lobby_methods, reasonKey: string)
+CLobby.LaunchFailed = nil
+
+--- Called by the engine when a peer disconnects.
+---@type nil | fun(self: moho.lobby_methods, peerName: string, peerId: UILobbyPeerId)
+CLobby.PeerDisconnected = nil
+
+--- Called by the engine with a status message about the connection.
+---@type nil | fun(self: moho.lobby_methods, text: string)
+CLobby.SystemMessage = nil
+
 return CLobby

@@ -36,4 +36,16 @@ end
 function CMauiMovie:Stop()
 end
 
+--- Called by the engine when the movie reaches its end without looping.
+---@type nil | fun(self: Movie)
+CMauiMovie.OnFinished = nil
+
+--- Called by the engine when the movie is stopped with `Stop`.
+---@type nil | fun(self: Movie)
+CMauiMovie.OnStopped = nil
+
+--- Called by the engine when the subtitle text of the movie changes.
+---@type nil | fun(self: Movie, text: string)
+CMauiMovie.OnSubtitle = nil
+
 return CMauiMovie

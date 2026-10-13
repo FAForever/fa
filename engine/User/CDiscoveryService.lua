@@ -25,4 +25,19 @@ end
 function CDiscoveryService:Destroy()
 end
 
+--- Called by the engine when a new lobby answers the discovery request, with the 0-based index of
+--- the lobby and the configuration it sent.
+---@type nil | fun(self: UILobbyDiscoveryService, index: number, gameConfig: UILobbydDiscoveryInfo)
+CDiscoveryService.GameFound = nil
+
+--- Called by the engine when a known lobby answers the discovery request again, with the 0-based
+--- index of the lobby and the configuration it sent.
+---@type nil | fun(self: UILobbyDiscoveryService, index: number, gameConfig: UILobbydDiscoveryInfo)
+CDiscoveryService.GameUpdated = nil
+
+--- Called by the engine when a lobby stops answering or the service is reset, with the 0-based
+--- index of the lobby. Indices of the lobbies after it shift down by one.
+---@type nil | fun(self: UILobbyDiscoveryService, index: number)
+CDiscoveryService.RemoveGame = nil
+
 return CDiscoveryService
