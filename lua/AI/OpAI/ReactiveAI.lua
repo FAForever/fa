@@ -50,9 +50,9 @@ TrackingCategories = {
 
 --- AI that is built with a predefined platoon template as response to the provided trigger type
 ---
----@see ReactAITriggerEvent for list of available events
----@see ReactAIReactionType for the types of reactive AIs
----@see OpAI.SetChildActive to disable certain children
+---@see ReactAITriggerEvent # for list of available events
+---@see ReactAIReactionType # for the types of reactive AIs
+---@see OpAI.SetChildActive # to disable certain children
 ---@class ReactiveAI : OpAI
 ---@field ReactionData table<ReactAIReactionType, table<ReactAITriggerEvent, ReactAIBuilderTypeBase>>
 ---@overload fun(): ReactiveAI

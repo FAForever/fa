@@ -152,8 +152,8 @@ function CreateAttachedBeam(object, bone, army, length, thickness, blueprint)
 end
 
 --- creates an emitter that is attached to an entity at a bone
----@see CreateEmitterAtBone(object, bone, army, blueprint) # to create the emitter at an entity's bone without attaching it there
----@see CreateEmitterAtEntity(object, bone, army, blueprint) # to create the emitter at an entity without attaching it there
+---@see CreateEmitterAtBone # to create the emitter at an entity's bone without attaching it there
+---@see CreateEmitterAtEntity # to create the emitter at an entity without attaching it there
 ---@param object BoneObject
 ---@param bone Bone
 ---@param army Army
@@ -163,8 +163,8 @@ function CreateAttachedEmitter(object, bone, army, blueprint)
 end
 
 --- creates a beam, which then needs to be attached to a bone
----@see AttachBeamToEntity(emitter, entity, bone, army) # to attach the beam to an entity bone
----@see CreateBeamEmitterOnEntity(object, tobone, army, blueprint) # to create an attached beam emitter at once
+---@see AttachBeamToEntity # to attach the beam to an entity bone
+---@see CreateBeamEmitterOnEntity # to create an attached beam emitter at once
 ---@param blueprint FileName
 ---@param army Army
 ---@return moho.IEffect
@@ -172,7 +172,7 @@ function CreateBeamEmitter(blueprint, army)
 end
 
 --- creates a beam and attaches it to an entity, usually used for weaponry
----@see CreateBeamEmitter(blueprint, army) # to create the beam without attaching it to anything
+---@see CreateBeamEmitter # to create the beam without attaching it to anything
 ---@param object BoneObject
 ---@param tobone Bone
 ---@param army Army
@@ -248,8 +248,8 @@ function CreateEconomyEvent(unit, totalEnergy, totalMass, timeInSeconds, callbac
 end
 
 --- creates an emitter at an entity's bone, but does not attach the emitter to it
----@see CreateEmitterAtEntity(object, army, blueprint) # for an at-object version
----@see CreateEmitterOnEntity(object, army, blueprint) # for an on-object version
+---@see CreateEmitterAtEntity # for an at-object version
+---@see CreateEmitterOnEntity # for an on-object version
 ---@param object BoneObject
 ---@param army Army
 ---@param blueprint FileName
@@ -258,8 +258,8 @@ function CreateEmitterAtBone(object, bone, army, blueprint)
 end
 
 --- creates an emitter at an entity, but does not attach the emitter to it
----@see CreateEmitterAtBone(object, bone, army, blueprint) # for an at-bone version
----@see CreateEmitterOnEntity(object, army, blueprint) # for an on-object version
+---@see CreateEmitterAtBone # for an at-bone version
+---@see CreateEmitterOnEntity # for an on-object version
 ---@param object BoneObject
 ---@param army Army
 ---@param blueprint FileName
@@ -268,8 +268,8 @@ function CreateEmitterAtEntity(object, army, blueprint)
 end
 
 --- creates an emitter on an object and attaches the emitter to it
----@see CreateEmitterAtBone(object, bone, army, blueprint) # for an at-bone version
----@see CreateEmitterAtEntity(object, army, blueprint) # for an at-object version
+---@see CreateEmitterAtBone # for an at-bone version
+---@see CreateEmitterAtEntity # for an at-object version
 ---@param object BoneObject
 ---@param army Army
 ---@param blueprint FileName
@@ -296,7 +296,7 @@ function CreateInitialArmyUnit(army, unitId)
 end
 
 --- Creates a light particle that provides vision, is often used in combination with effects
----@see CreateLightParticleIntel() # intel-giving version
+---@see CreateLightParticleIntel # intel-giving version
 ---@param object BoneObject
 ---@param bone Bone
 ---@param army Army
@@ -309,7 +309,7 @@ function CreateLightParticle(object, bone, army, size, lifetime, texture, rampNa
 end
 
 --- Creates a light particle, is often used in combination with effects
----@see CreateLightParticle() # non intel-giving version
+---@see CreateLightParticle # non intel-giving version
 ---@param object BoneObject
 ---@param bone Bone
 ---@param army Army
@@ -322,7 +322,7 @@ function CreateLightParticleIntel(object, bone, army, size, lifetime, texture, r
 end
 
 --- Spawns a prop, using the default orientation
----@see CreatePropHPR() # heading-pitch-roll version
+---@see CreatePropHPR # heading-pitch-roll version
 ---@param location Vector
 ---@param blueprintId string
 ---@return Prop
@@ -330,7 +330,7 @@ function CreateProp(location, blueprintId)
 end
 
 --- Spawns a prop with control over orientation
----@see CreateProp() # simple version
+---@see CreateProp # simple version
 ---@param blueprintPath string full path to the prop's blueprint
 ---@param x number
 ---@param y number
@@ -387,7 +387,7 @@ function CreateSlider(object, bone, goalX, goalY, goalZ, speed, worldSpace)
 end
 
 --- Adds a splat to the game at a position and heading
----@see CreateSplatOnBone() # adds the splat at an entity bone
+---@see CreateSplatOnBone # adds the splat at an entity bone
 ---@param position Vector
 ---@param heading number
 ---@param texture string
@@ -401,7 +401,7 @@ function CreateSplat(position, heading, texture, sizeX, sizeZ, lodParam, duratio
 end
 
 --- Adds a splat to the game at an entity bone position and heading
----@see CreateSplatOnBone() # adds the splat at a position
+---@see CreateSplat # adds the splat at a position
 ---@param object BoneObject
 ---@param offset Vector
 ---@param bone Bone
@@ -443,8 +443,8 @@ function CreateTrail(object, bone, army, trailBlueprint)
 end
 
 --- Creates a unit from a blueprint for an army, at a position with quaternion orientation
----@see CreateUnit2() # simple version
----@see CreateUnitHPR() # heading-pitch-roll version
+---@see CreateUnit2 # simple version
+---@see CreateUnitHPR # heading-pitch-roll version
 ---@param blueprintId string
 ---@param army Army
 ---@param x number
@@ -460,8 +460,8 @@ function CreateUnit(blueprintId, army, x, y, z, qx, qy, qz, qw, layer)
 end
 
 --- Creates a unit from a blueprint for an army, at an X-Z map point with a heading
----@see CreateUnit() # quaternion version
----@see CreateUnitHPR() # heading-pitch-roll version
+---@see CreateUnit # quaternion version
+---@see CreateUnitHPR # heading-pitch-roll version
 ---@param blueprintId string
 ---@param army Army
 ---@param layer Layer
@@ -473,8 +473,8 @@ function CreateUnit2(blueprintId, army, layer, x, z, heading)
 end
 
 --- Creates a unit from a blueprint for an army, at a position with heading, pitch, and roll
----@see CreateUnit() # quaternion version
----@see CreateUnit2() # simple version
+---@see CreateUnit # quaternion version
+---@see CreateUnit2 # simple version
 ---@param blueprint UnitId
 ---@param army Army
 ---@param x number
@@ -813,7 +813,7 @@ function IssueClearFactoryCommands(factories)
 end
 
 --- Orders a group of units to destroy themselves, doesn't leave a wreckage
----@see IssueKillSelf() # an alternative that does leave a wreckage
+---@see IssueKillSelf # an alternative that does leave a wreckage
 ---@param units Unit[]
 ---@return SimCommand
 function IssueDestroySelf(units)
@@ -891,7 +891,7 @@ function IssueGuard(units, target)
 end
 
 --- Orders a group of units to kill themselves
----@see IssueDestroySelf() # an alternative that does not leave a wreckage
+---@see IssueDestroySelf # an alternative that does not leave a wreckage
 ---@param units Unit[]
 ---@return SimCommand
 function IssueKillSelf(units)
@@ -912,7 +912,7 @@ function IssueMoveOffFactory(units, position)
 end
 
 --- Orders a group of units to launch a strategic missile at a position
----@see IssueTactical() # for tactical missiles
+---@see IssueTactical # for tactical missiles
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
@@ -987,7 +987,7 @@ function IssueStop(units)
 end
 
 --- Orders a group of units to launch a tactical missile
----@see IssueNuke() # for nuclear missiles
+---@see IssueNuke # for nuclear missiles
 ---@param units Unit[]
 ---@param target Unit | Vector
 ---@return SimCommand
@@ -1100,7 +1100,7 @@ end
 --- Only returns a unit when called from the `SimLua` console command's thread.
 --- 
 ---@see DebugGetSelection # For multiple selected units, in any sim thread.
----@see __selected_unit The unit this function returns
+---@see __selected_unit # The unit this function returns
 ---@return Unit?
 function SelectedUnit()
 end

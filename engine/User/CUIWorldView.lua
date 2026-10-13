@@ -67,7 +67,7 @@ function CUIWorldView:HasHighlightCommand()
 end
 
 --- Returns true if the cartographic shared is applied.
----@see CUIWorldView:SetCartographic
+---@see moho.UIWorldView.SetCartographic
 ---@return boolean
 function CUIWorldView:IsCartographic()
 end

@@ -50,7 +50,7 @@ CDRTargetPriorities = {
 --- - returning to base if got too far during fight
 --- - return to base if on low HP
 --- - finish construction projects if they were abandonned for fighting
----@see PlatoonCDRData For required platoon data.
+---@see PlatoonCDRData # For required platoon data.
 ---@param platoon Platoon | PlatoonCDRData
 function CDROverchargeBehavior(platoon)
     local cdr = platoon:GetPlatoonUnits()[1] --[[@as OpAIACUUnit]]

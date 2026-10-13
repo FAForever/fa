@@ -218,8 +218,8 @@ LazyVarMetaTable = {
     end,
 
     --- Lazy variable represents a value or a function
-    ---@see SetFunction when the parameter is a function
-    ---@see SetValue when the parameter is a value
+    ---@see SetFunction # when the parameter is a function
+    ---@see SetValue # when the parameter is a value
     ---@param self LazyVar
     ---@param value any
     Set = function(self, value)
@@ -259,7 +259,7 @@ LazyVarMetaTable = {
         return self[2]
     end,
 
-    ---@see This value is empty when `ExtendedErrorMessages` is set to false
+    --- This value is empty when `ExtendedErrorMessages` is set to false
     ---@param self LazyVar
     ---@return string
     GetTrace = function(self)

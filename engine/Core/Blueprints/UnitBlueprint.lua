@@ -792,7 +792,7 @@
 ---@field TeleportMassMod? number
 --- Multiplied by the resulting total energy cost of the teleport to get its required time.
 --- Treated as `0.01` when absent.
----@see TeleportDelay For an additional flat delay that also delays teleport FX showing at the destination.
+---@see TeleportDelay # For an additional flat delay that also delays teleport FX showing at the destination.
 ---@field TeleportTimeMod? number
 --- Whether to use the new distance-based teleport cost calculation method, or revert to the old unit cost based method.
 ---@field UseVariableTeleportCosts? boolean
@@ -991,7 +991,7 @@
 --- Extra time taken to teleport before other teleport time calculations. Defaults to 0 seconds.
 --- If `UseVariableTeleportCosts` is false, then this also delays teleport FX appearing at the destination.
 --- If `UseVariableTeleportCosts` is true, then destination FX appear after 0.4x the total teleport time.
----@see TeleportTimeMod For an energy-scaling teleport time that does not delay teleport FX at the destination.
+---@see TeleportTimeMod # For an energy-scaling teleport time that does not delay teleport FX at the destination.
 ---@field TeleportDelay? number
 --- if present, adds a flat energy cost to the "teleport" ability. Defaults to 150000 energy. Only applies when `UseVariableTeleportCosts` is true.
 ---@field TeleportFlatEnergyCost? number

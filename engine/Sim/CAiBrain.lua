@@ -270,7 +270,7 @@ end
 --- | 'DamageStats_TotalDamageDealt'
 
 --- Return a blueprint stat filtered by category.
----@see CAiBrain:GetArmyStat(...) for army related statistics
+---@see moho.aibrain_methods.GetArmyStat # for army related statistics
 ---@param statName AIBrainBlueprintStatUnits | AIBrainBlueprintStatEnemies | AIBrainBlueprintStatEconomy | AIBrainBlueprintStatDamage
 ---@param category EntityCategory 's category, example: categories.TECH2 .
 ---@return number

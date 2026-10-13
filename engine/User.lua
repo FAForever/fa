@@ -154,7 +154,7 @@ end
 
 --- Creates a console output receiver that calls the given function on console output.
 ---
----@see RemoveConsoleOutputReciever Destroy the receiver and stop calling the function.
+---@see RemoveConsoleOutputReciever # Destroy the receiver and stop calling the function.
 ---@param func fun(text: string)
 ---@return ConsoluteOutputReceiverHandle
 function AddConsoleOutputReciever(func)
@@ -237,7 +237,7 @@ end
 
 --- Gets the current time in seconds, counting from 0 at application start.
 --- This is wall-clock time and is unaffected by gameplay.
----@see GetSystemTimeSeconds Identical usage
+---@see GetSystemTimeSeconds # Identical usage
 ---@return number
 function CurrentTime()
 end
@@ -377,7 +377,7 @@ end
 --- disregarding if they start with `/` like other commandline options.
 ---
 --- Returns `false` if there are not `maxArgs` tokens after the `option`.
----@see GetCommandLineArgTable(option) for parsing key-values
+---@see GetCommandLineArgTable # for parsing key-values
 ---@param option string
 ---@param maxArgs number
 ---@return (string | number | integer)[] | false
@@ -409,7 +409,7 @@ end
 ---
 --- In the game options you can add a second adapter under the 'Video' tab.
 ---
----@see GetNumRootFrames to determine the number of root frames.
+---@see GetNumRootFrames # to determine the number of root frames.
 ---
 --- See also the following modules that manage these frames:
 --- - Primary adapter: lua\ui\game\worldview.lua
@@ -609,7 +609,7 @@ function GetSystemTime()
 end
 
 --- Returns System time in seconds
----@see CurrentTime Identical usage
+---@see CurrentTime # Identical usage
 ---@return number
 function GetSystemTimeSeconds()
 end
@@ -1002,7 +1002,7 @@ function PrefetchSession(mapname, mods, hipri)
 end
 
 --- Destroys a console output receiver.
----@see AddConsoleOutputReciever To create receivers.
+---@see AddConsoleOutputReciever # To create receivers.
 ---@param handle ConsoluteOutputReceiverHandle
 function RemoveConsoleOutputReciever(handle)
 end

@@ -208,7 +208,7 @@ function Entity:GetHeading()
 end
 
 --- Returns the amount of health this entity has
----@see entity.GetMaxHealth for the maximum possible health
+---@see moho.entity_methods.GetMaxHealth # for the maximum possible health
 ---@return number
 function Entity:GetHealth()
 end
@@ -222,7 +222,7 @@ end
 
 --- Returns the maximum amount of health this entity can have. Note that this may not be the same
 --- value as the original one in the entity's blueprint.
----@see entity.GetHealth for the current amount of health
+---@see moho.entity_methods.GetHealth # for the current amount of health
 ---@return number
 function Entity:GetMaxHealth()
 end
@@ -369,7 +369,7 @@ function Entity:SetMesh(meshBp, keepActor)
 end
 
 --- Defines the orientation of the entity
----@see entity:SetPosition(vector, immediate) for setting the position
+---@see moho.entity_methods.SetPosition # for setting the position
 ---@param orientation Quaternion
 ---@param immediately boolean
 function Entity:SetOrientation(orientation, immediately)
@@ -379,7 +379,7 @@ end
 function Entity:SetParentOffset(vector)
 end
 
----@see entity:SetOrientation(vector, immediate) for setting the orientation
+---@see moho.entity_methods.SetOrientation # for setting the orientation
 ---@param vector Vector
 ---@param immediate? boolean
 function Entity:SetPosition(vector, immediate)

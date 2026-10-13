@@ -231,7 +231,7 @@ end
 
 --- Returns number of nuclear missiles this unit has available.
 --- This is the method to call for both SML's and SMD's.
----@see GetTacticalSiloAmmoCount() # for tactical missiles
+---@see moho.unit_methods.GetTacticalSiloAmmoCount # for tactical missiles
 ---@return number
 function Unit:GetNukeSiloAmmoCount()
 end
@@ -285,7 +285,7 @@ function Unit:GetStat(statName, defaultVal)
 end
 
 --- Returns number of tactical missiles this unit has available
----@see GetNukeSiloAmmoCount() # for nuclear missiles
+---@see moho.unit_methods.GetNukeSiloAmmoCount # for nuclear missiles
 ---@return number
 function Unit:GetTacticalSiloAmmoCount()
 end
@@ -334,14 +334,14 @@ end
 --- Use `Unit:GiveNukeSiloBlocks()` to use this feature.
 
 --- Adds nuclear missiles to the unit
----@see GiveTacticalSiloAmmo() # for tactical missiles
+---@see moho.unit_methods.GiveTacticalSiloAmmo # for tactical missiles
 ---@param amount number
 ---@param inBlocks? boolean
 function Unit:GiveNukeSiloAmmo(amount, inBlocks)
 end
 
 --- Adds tactical missiles to the unit
----@see GiveNukeSiloAmmo() # for nuclear missiles
+---@see moho.unit_methods.GiveNukeSiloAmmo # for nuclear missiles
 ---@param amount number
 function Unit:GiveTacticalSiloAmmo(amount)
 end
@@ -445,13 +445,13 @@ end
 
 --- Removes nuclear missiles from the unit.
 --- This is the method to call for both SML's and SMD's.
----@see Unit:RemoveTacticalSiloAmmo(amount) # for tactical missiles
+---@see moho.unit_methods.RemoveTacticalSiloAmmo # for tactical missiles
 ---@param amount number
 function Unit:RemoveNukeSiloAmmo(amount)
 end
 
 --- Removes tactical missiles from the unit
----@see Unit:RemoveNukeSiloAmmo(amount) # for nuclear missiles
+---@see moho.unit_methods.RemoveNukeSiloAmmo # for nuclear missiles
 ---@param amount number
 function Unit:RemoveTacticalSiloAmmo(amount)
 end

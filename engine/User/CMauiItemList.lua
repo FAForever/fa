@@ -73,7 +73,7 @@ end
 --- Sets the alpha of a given item list's background, if children is true, also set children's alpha
 ---@param alpha number
 ---@param children? boolean
----@see itemlist.lua:SetAlphaOfColors Lua implementation that can set the alpha of the text in an item list.
+---@see ItemList.SetAlphaOfColors # Lua implementation that can set the alpha of the text in an item list.
 function CMauiItemList:SetAlpha(alpha, children)
 end
 

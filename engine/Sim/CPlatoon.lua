@@ -69,7 +69,7 @@ end
 --- Destroys the platoon and its units, if no `squad` is specified
 ---
 --- In both cases, the units are destroyed after they complete their orders.
----@see moho.aibrain_methods.DisbandPlatoon For removing the platoon without destroying it's units.
+---@see moho.aibrain_methods.DisbandPlatoon # For removing the platoon without destroying it's units.
 ---@param squad? PlatoonSquadType If specified only the squad units are destroyed. The platoon itself is **NOT** destroyed.
 function CPlatoon:Destroy(squad)
 end
@@ -199,8 +199,8 @@ end
 
 --- Returns platoon's unique name if it has it.
 ---
----@see moho.platoon_methods.UniquelyNamePlatoon To set the name
----@see moho.aibrain_methods.GetPlatoonUniquelyNamed To get the platoon by the unique name.
+---@see moho.platoon_methods.UniquelyNamePlatoon # To set the name
+---@see moho.aibrain_methods.GetPlatoonUniquelyNamed # To get the platoon by the unique name.
 ---@return string uniqueName Defaults to empty string
 function CPlatoon:GetPlatoonUniqueName()
 end
@@ -345,8 +345,8 @@ end
 
 --- Gives a unique name to the platoon.
 ---
----@see moho.platoon_methods.GetPlatoonUniqueName to get the name of the platoon.
----@see moho.aibrain_methods.GetPlatoonUniquelyNamed To get the platoon by the unique name.
+---@see moho.platoon_methods.GetPlatoonUniqueName # to get the name of the platoon.
+---@see moho.aibrain_methods.GetPlatoonUniquelyNamed # To get the platoon by the unique name.
 ---@param name string
 function CPlatoon:UniquelyNamePlatoon(name)
 end
@@ -367,7 +367,7 @@ end
 
 --- Orders the units to use the ferry beacon
 ---
----@see moho.platoon_methods.GetFerryBeacons To get list of available beacons to use.
+---@see moho.platoon_methods.GetFerryBeacons # To get list of available beacons to use.
 ---@param category EntityCategory
 ---@param beacon TransportBeaconUnit
 ---@return PlatoonCommand
