@@ -380,7 +380,12 @@ end
 function CPlatoon:UseTeleporter(gameObject, squad)
 end
 
----@type fun(self: Platoon, plan: string)
+--- Called by the engine after the platoon is created, and after `OnDestroy` when its AI plan changes.
+---@type nil | fun(self: Platoon, plan: string)
 CPlatoon.OnCreate = nil
+
+--- Called by the engine when `AssignUnitsToPlatoon` adds units to the platoon.
+---@type nil | fun(self: Platoon)
+CPlatoon.OnUnitsAddedToPlatoon = nil
 
 return CPlatoon

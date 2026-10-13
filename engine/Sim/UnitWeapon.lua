@@ -235,8 +235,49 @@ end
 function UnitWeapon:WeaponHasTarget()
 end
 
---- Called by the engine to check if the weapon is allowed to fire.
----@type fun(self: Weapon): boolean
+--- Called by the engine during an overcharge attack order, to check if the weapon may fire.
+--- Returning false makes the order wait before checking again.
+---@type nil | fun(self: Weapon): boolean
 UnitWeapon.CanWeaponFire = nil
+
+--- Called by the engine after the weapon is constructed.
+---@type nil | fun(self: Weapon)
+UnitWeapon.OnCreate = nil
+
+--- Called by the engine when the unit's weapons are destroyed.
+---@type nil | fun(self: Weapon)
+UnitWeapon.OnDestroy = nil
+
+--- Called by the engine on the overcharge weapon when an overcharge attack order ends.
+---@type nil | fun(self: Weapon)
+UnitWeapon.OnDisableWeapon = nil
+
+--- Called by the engine on the overcharge weapon when an overcharge attack order starts.
+---@type nil | fun(self: Weapon)
+UnitWeapon.OnEnableWeapon = nil
+
+--- Called by the engine when the weapon fires, and by `FireWeapon`.
+---@type nil | fun(self: Weapon)
+UnitWeapon.OnFire = nil
+
+--- Called by the engine when the weapon gets a target.
+---@type nil | fun(self: Weapon)
+UnitWeapon.OnGotTarget = nil
+
+--- Called by the engine on each weapon of the unit when its weapons must stop firing.
+---@type nil | fun(self: Weapon)
+UnitWeapon.OnHaltFire = nil
+
+--- Called by the engine when the weapon loses its target.
+---@type nil | fun(self: Weapon)
+UnitWeapon.OnLostTarget = nil
+
+--- Called by the engine when an aim manipulator of the weapon starts tracking a target.
+---@type nil | fun(self: Weapon, label: string)
+UnitWeapon.OnStartTracking = nil
+
+--- Called by the engine when an aim manipulator of the weapon stops tracking a target.
+---@type nil | fun(self: Weapon, label: string)
+UnitWeapon.OnStopTracking = nil
 
 return UnitWeapon

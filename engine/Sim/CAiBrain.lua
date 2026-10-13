@@ -603,12 +603,48 @@ end
 function CAiBrain:TakeResource(type, amount)
 end
 
+--- Called by the engine when the army has no players left in control of it.
+---@type nil | fun(self: AIBrain)
+CAiBrain.AbandonedByPlayer = nil
+
+--- Called by the engine after an AI army's brain is created, with the army's plan or `"None"`.
+---@type nil | fun(self: AIBrain, planName: string)
+CAiBrain.OnCreateAI = nil
+
+--- Called by the engine after a human army's brain is created, with the army's plan or `"None"`.
+---@type nil | fun(self: AIBrain, planName: string)
+CAiBrain.OnCreateHuman = nil
+
 --- Called by the engine when a unit fails unit transfer due to issues other than unit cap.
----@type fun(self: moho.aibrain_methods)
+---@type nil | fun(self: AIBrain)
 CAiBrain.OnFailedUnitTransfer = nil
 
+--- Called by the engine when the army gains or loses a kind of intel on a blip.
+---@type nil | fun(self: AIBrain, blip: Blip, reconType: ReconTypes, val: boolean)
+CAiBrain.OnIntelChange = nil
+
+--- Called by the engine when the user state sends the `PlayBusyStagingPlatformsVO` info pair for a unit of the army.
+---@type nil | fun(self: AIBrain)
+CAiBrain.OnPlayBusyStagingPlatformsVO = nil
+
+--- Called by the engine when the user state sends the `PlayNoStagingPlatformsVO` info pair for a unit of the army.
+---@type nil | fun(self: AIBrain)
+CAiBrain.OnPlayNoStagingPlatformsVO = nil
+
+--- Called by the engine when `ArmyInitializePrebuiltUnits` runs for the army.
+---@type nil | fun(self: AIBrain)
+CAiBrain.OnSpawnPreBuiltUnits = nil
+
+--- Called by the engine when all conditions of a stat trigger of the army are met.
+---@type nil | fun(self: AIBrain, triggerName: string)
+CAiBrain.OnStatsTrigger = nil
+
+--- Called by the engine when a unit of the army can't land on its carrier because the carrier is full.
+---@type nil | fun(self: AIBrain)
+CAiBrain.OnTransportFull = nil
+
 --- Called by the engine when a unit fails to create due to unit cap.
----@type fun(self: moho.aibrain_methods)
+---@type nil | fun(self: AIBrain)
 CAiBrain.OnUnitCapLimitReached = nil
 
 return CAiBrain

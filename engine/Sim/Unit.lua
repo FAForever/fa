@@ -741,25 +741,385 @@ end
 function Unit:TransportHasSpaceFor(target)
 end
 
+--- Called by the engine when the unit starts a build order, to check if it may build the blueprint. Returning false skips the build.
+---@type nil | fun(self: Unit, blueprint: UnitBlueprint): boolean
+Unit.CheckBuildRestriction = nil
+
+--- Called by the engine before it kills the unit, and to allow a self-destruct order.
+--- Returning false cancels the kill, unless the unit is a commander outside the playable area.
+--- When a transport is destroyed, its cargo is killed only if this returns true.
+---@type nil | fun(self: Unit, other: Unit): boolean
+Unit.CheckCanBeKilled = nil
+
+--- Called by the engine on a commander in a destroyed transport when `CheckCanBeKilled` returned false.
+--- Returning true deals 10000 damage to the commander instead of killing it.
+---@type nil | fun(self: Unit, transport: Unit): boolean
+Unit.CheckCanTakeDamage = nil
+
+--- Called by the engine when the unit's repair task ends.
+---@type nil | fun(self: Unit)
+Unit.ClearWork = nil
+
+--- Called by the engine when the unit is fully reclaimed, to create its wreck. The engine passes 0 as the overkill ratio.
+--- The reclaimer continues on the returned prop.
+---@type nil | fun(self: Unit, overkillRatio: number): Prop | nil
+Unit.CreateWreckageProp = nil
+
+--- Called by the engine on a unit in a transport's storage, right before the engine destroys it with the transport.
+---@type nil | fun(self: Unit)
+Unit.DestroyedOnTransport = nil
+
+--- Called by the engine on each unit attached to a capture target.
+--- Returns the time in seconds, energy cost and mass cost to capture it. The engine adds up the results.
+---@type nil | fun(self: Unit, target: Unit): number, number, number
+Unit.GetCaptureCosts = nil
+
+--- Called by the engine when the unit starts building silo ammo. Returns the build rate.
+---@type nil | fun(self: Unit): number
+Unit.GetEconomyBuildRate = nil
+
+--- Called by the engine when the unit starts building silo ammo. Returns the multiplier for the ammo's energy cost.
+---@type nil | fun(self: Unit): number
+Unit.GetEnergyBuildAdjMod = nil
+
+--- Called by the engine when the unit starts building silo ammo. Returns the multiplier for the ammo's mass cost.
+---@type nil | fun(self: Unit): number
+Unit.GetMassBuildAdjMod = nil
+
+--- Called by the engine on an unfinished unit when a builder starts rebuilding it.
+--- Returns a number the engine multiplies with the unit's build progress.
+---@type nil | fun(self: Unit, blueprint: UnitBlueprint): number
+Unit.GetRebuildBonus = nil
+
+--- Called by the engine each tick of reclaiming.
+--- Returns the time in seconds, energy and mass to reclaim the target at full health.
+---@type nil | fun(self: Unit, target: Unit | Prop): number, number, number
+Unit.GetReclaimCosts = nil
+
+--- Called by the engine when it creates each weapon of the unit. Returns the Lua class for the weapon.
+--- The engine passes the weapon's blueprint label, or its index when the label is empty.
+---@type nil | fun(self: Unit, label: string | integer): Weapon
+Unit.GetWeaponClass = nil
+
+--- Called by the engine when the unit starts repairing a unit that is upgrading.
+---@type nil | fun(self: Unit, target: Unit)
+Unit.InheritWork = nil
+
+--- Called by the engine when the unit is put into a transport's storage.
+---@type nil | fun(self: Unit, transport: Unit)
+Unit.OnAddToStorage = nil
+
+--- Called by the engine on both units when a structure finishes building next to another structure.
+---@type nil | fun(self: Unit, adjacentUnit: Unit, triggerUnit: Unit)
+Unit.OnAdjacentTo = nil
+
+--- Called by the engine when a bone watched by a collision manipulator turns away from the unit's orientation.
+---@type nil | fun(self: Unit, bone: string, x: number, y: number, z: number)
+Unit.OnAnimCollision = nil
+
+--- Called by the engine when a bone watched by a collision manipulator goes below the terrain.
+---@type nil | fun(self: Unit, bone: string, x: number, y: number, z: number)
+Unit.OnAnimTerrainCollision = nil
+
+--- Called by the engine when the unit's focus entity changes to a new entity.
+---@type nil | fun(self: Unit)
+Unit.OnAssignedFocusEntity = nil
+
+--- Called by the engine when auto mode is turned off.
+---@type nil | fun(self: Unit)
+Unit.OnAutoModeOff = nil
+
+--- Called by the engine when auto mode is turned on.
+---@type nil | fun(self: Unit)
+Unit.OnAutoModeOn = nil
+
+--- Called by the engine when a builder progresses the unit's construction.
+---@type nil | fun(self: Unit, builder: Unit, oldProg: number, newProg: number)
+Unit.OnBeingBuiltProgress = nil
+
+--- Called by the engine when the unit progresses its build target.
+---@type nil | fun(self: Unit, target: Unit, oldProg: number, newProg: number)
+Unit.OnBuildProgress = nil
+
+--- Called by the engine when the unit is captured.
+---@type nil | fun(self: Unit, captor: Unit)
+Unit.OnCaptured = nil
+
+--- Called by the engine when the unit's resource consumption turns on.
+---@type nil | fun(self: Unit)
+Unit.OnConsumptionActive = nil
+
+--- Called by the engine when the unit's resource consumption turns off.
+---@type nil | fun(self: Unit)
+Unit.OnConsumptionInActive = nil
+
+--- Called by the engine after the unit is constructed.
+---@type nil | fun(self: Unit)
+Unit.OnCreate = nil
+
+--- Called by the engine when the unit takes point damage, with the index of the instigator's army.
+---@type nil | fun(self: Unit, armyIndex: integer)
+Unit.OnDamageBy = nil
+
+--- Called by the engine when a decaying unit reaches 0 health.
+---@type nil | fun(self: Unit)
+Unit.OnDecayed = nil
+
+--- Called by the engine when an army creates a new blip for the unit.
+---@type nil | fun(self: Unit, armyIndex: integer)
+Unit.OnDetectedBy = nil
+
 --- Called by the engine when the unit takes >= 2 times as much damage due to armor multi or handicap divisor.
----@type fun(self: Unit, type: DamageType)
+---@type nil | fun(self: Unit, type: DamageType)
 Unit.OnExtraDamageDealt = nil
+
+--- Called by the engine when a capture of this unit fails.
+---@type nil | fun(self: Unit, captor: Unit)
+Unit.OnFailedBeingCaptured = nil
+
+--- Called by the engine when the unit fails to capture its target.
+---@type nil | fun(self: Unit, target: Unit)
+Unit.OnFailedCapture = nil
+
+--- Called by the engine when a teleport order of the unit fails.
+---@type nil | fun(self: Unit)
+Unit.OnFailedTeleport = nil
+
+--- Called by the engine when the unit is removed before its construction finished.
+---@type nil | fun(self: Unit)
+Unit.OnFailedToBeBuilt = nil
+
+--- Called by the engine when the unit stops building before its target finished.
+---@type nil | fun(self: Unit)
+Unit.OnFailedToBuild = nil
+
+--- Called by the engine when the unit gets a ferry order.
+---@type nil | fun(self: Unit)
+Unit.OnFerryPointSet = nil
+
+--- Called by the engine when the unit was out of fuel and recharges fuel (either by air staging or by landing).
+---@type nil | fun(self: Unit)
+Unit.OnGotFuel = nil
+
+--- Called by the engine when the falling unit hits the ground or the water.
+---@type nil | fun(self: Unit, with: "Terrain" | "Water")
+Unit.OnImpact = nil
+
+--- Called by the engine when the unit is killed.
+---@type nil | fun(self: Unit, instigator: Unit | Projectile | nil, type: DamageType, overkillRatio: number)
+Unit.OnKilled = nil
+
+--- Called by the engine when the horizontal movement state of the unit changes.
+---@type nil | fun(self: Unit, new: HorizontalMovementState, old: HorizontalMovementState)
+Unit.OnMotionHorzEventChange = nil
 
 --- Called by the engine when a unit changes motion state,
 --- usually when it attaches/detaches from other entities such as transports.
----@type fun(self: Unit, new: MotionState, old: MotionState)
+---@type nil | fun(self: Unit, new: MotionState, old: MotionState)
 Unit.OnMotionStateChange = nil
 
---- Called by the engine when the unit starts refueling at an air staging platform.
----@type fun(self: Unit)
-Unit.OnStartRefueling = nil
+--- Called by the engine when the turning state of an air unit changes.
+---@type nil | fun(self: Unit, new: string, old: string)
+Unit.OnMotionTurnEventChange = nil
+
+--- Called by the engine when the vertical movement state of the unit changes.
+---@type nil | fun(self: Unit, new: VerticalMovementState, old: VerticalMovementState)
+Unit.OnMotionVertEventChange = nil
+
+--- Called by the engine on both units when one of two adjacent structures is killed or destroyed.
+---@type nil | fun(self: Unit, adjacentUnit: Unit)
+Unit.OnNotAdjacentTo = nil
+
+--- Called by the engine when a bone watched by a collision manipulator comes back above the terrain.
+---@type nil | fun(self: Unit, bone: string, x: number, y: number, z: number)
+Unit.OnNotAnimTerrainCollision = nil
+
+--- Called by the engine when the unit finishes building silo ammo, after `OnSiloBuildEnd`.
+---@type nil | fun(self: Unit, weapon: Weapon)
+Unit.OnNukeArmed = nil
+
+--- Called by the engine when the unit fires a nuke.
+---@type nil | fun(self: Unit)
+Unit.OnNukeLaunched = nil
+
+--- Called by the engine when the unit is paused.
+---@type nil | fun(self: Unit)
+Unit.OnPaused = nil
+
+--- Called by the engine while the unit is constructed, before its intel and weapons exist. `OnCreate` follows.
+---@type nil | fun(self: Unit)
+Unit.OnPreCreate = nil
+
+--- Called by the engine when the builder arm of the unit starts aiming at its build target.
+---@type nil | fun(self: Unit)
+Unit.OnPrepareArmToBuild = nil
+
+--- Called by the engine when `SetProductionActive(true)` or the `DebugSetProductionActive` console command turns production on.
+---@type nil | fun(self: Unit)
+Unit.OnProductionActive = nil
+
+--- Called by the engine when `SetProductionActive(false)` or the `DebugSetProductionInActive` console command turns production off.
+---@type nil | fun(self: Unit)
+Unit.OnProductionInActive = nil
+
+--- Called by the engine when the unit is reclaimed.
+---@type nil | fun(self: Unit, reclaimer: Unit)
+Unit.OnReclaimed = nil
+
+--- Called by the engine when the unit is taken out of a transport's storage.
+---@type nil | fun(self: Unit, transport: Unit)
+Unit.OnRemoveFromStorage = nil
 
 --- Called by the engine when the unit runs out of fuel.
----@type fun(self: Unit)
+---@type nil | fun(self: Unit)
 Unit.OnRunOutOfFuel = nil
 
---- Called by the engine when the unit was out of fuel and recharges fuel (either by air staging or by landing).
----@type fun(self: Unit)
-Unit.OnGotFuel = nil
+--- Called by the engine when a script bit of the unit turns off.
+---@type nil | fun(self: Unit, bit: UnitScriptBit)
+Unit.OnScriptBitClear = nil
+
+--- Called by the engine when a script bit of the unit turns on.
+---@type nil | fun(self: Unit, bit: UnitScriptBit)
+Unit.OnScriptBitSet = nil
+
+--- Called by the engine on a unit built by a mobile builder when the unit's blueprint has `General.SeedUnit`.
+---@type nil | fun(self: Unit, seedUnit: string)
+Unit.OnSeedUnitBuilt = nil
+
+--- Called by the engine when the unit finishes building silo ammo.
+---@type nil | fun(self: Unit, weapon: Weapon)
+Unit.OnSiloBuildEnd = nil
+
+--- Called by the engine when the unit starts building silo ammo.
+---@type nil | fun(self: Unit, weapon: Weapon)
+Unit.OnSiloBuildStart = nil
+
+--- Called by the engine when the unit gets a special action order.
+---@type nil | fun(self: Unit, location: Vector)
+Unit.OnSpecialAction = nil
+
+--- Called by the engine when construction of the unit starts.
+---@type nil | fun(self: Unit, builder: Unit, layer: Layer)
+Unit.OnStartBeingBuilt = nil
+
+--- Called by the engine when a unit starts to capture this unit.
+---@type nil | fun(self: Unit, captor: Unit)
+Unit.OnStartBeingCaptured = nil
+
+--- Called by the engine when the unit starts building a unit.
+---@type nil | fun(self: Unit, built: Unit, order: BuildOrderType)
+Unit.OnStartBuild = nil
+
+--- Called by the engine when the builder arm of the unit starts tracking its build target.
+---@type nil | fun(self: Unit)
+Unit.OnStartBuilderTracking = nil
+
+--- Called by the engine when the unit starts capturing a target.
+---@type nil | fun(self: Unit, target: Unit)
+Unit.OnStartCapture = nil
+
+--- Called by the engine when the unit starts reclaiming a target.
+---@type nil | fun(self: Unit, target: Unit | Prop)
+Unit.OnStartReclaim = nil
+
+--- Called by the engine when the unit starts refueling at an air staging platform.
+---@type nil | fun(self: Unit)
+Unit.OnStartRefueling = nil
+
+--- Called by the engine when repeat build is turned on.
+---@type nil | fun(self: Unit)
+Unit.OnStartRepeatQueue = nil
+
+--- Called by the engine when the unit starts sacrificing itself into a target.
+---@type nil | fun(self: Unit, target: Unit)
+Unit.OnStartSacrifice = nil
+
+--- Called by the engine when the unit starts moving to a transport to be loaded.
+---@type nil | fun(self: Unit, transport: Unit, bone: Bone)
+Unit.OnStartTransportBeamUp = nil
+
+--- Called by the engine when the transport starts loading units.
+---@type nil | fun(self: Unit)
+Unit.OnStartTransportLoading = nil
+
+--- Called by the engine when construction of the unit finishes.
+---@type nil | fun(self: Unit, builder: Unit, layer: Layer)
+Unit.OnStopBeingBuilt = nil
+
+--- Called by the engine when a unit finishes capturing this unit.
+---@type nil | fun(self: Unit, captor: Unit)
+Unit.OnStopBeingCaptured = nil
+
+--- Called by the engine when the unit stops building a unit.
+---@type nil | fun(self: Unit, built: Unit, order: string)
+Unit.OnStopBuild = nil
+
+--- Called by the engine when the builder arm of the unit stops tracking its build target.
+---@type nil | fun(self: Unit)
+Unit.OnStopBuilderTracking = nil
+
+--- Called by the engine when the unit stops capturing a target.
+---@type nil | fun(self: Unit, target: Unit)
+Unit.OnStopCapture = nil
+
+--- Called by the engine when the unit stops reclaiming a target.
+---@type nil | fun(self: Unit, target: Unit | Prop)
+Unit.OnStopReclaim = nil
+
+--- Called by the engine when repeat build is turned off.
+---@type nil | fun(self: Unit)
+Unit.OnStopRepeatQueue = nil
+
+--- Called by the engine when the unit stops sacrificing itself into a target.
+---@type nil | fun(self: Unit, target: Unit)
+Unit.OnStopSacrifice = nil
+
+--- Called by the engine when the unit stops moving to a transport to be loaded.
+---@type nil | fun(self: Unit)
+Unit.OnStopTransportBeamUp = nil
+
+--- Called by the engine when the transport stops loading units.
+---@type nil | fun(self: Unit)
+Unit.OnStopTransportLoading = nil
+
+--- Called by the engine when the unit is teleported.
+---@type nil | fun(self: Unit, teleporter: Unit, location: Vector, orientation: Quaternion)
+Unit.OnTeleportUnit = nil
+
+--- Called by the engine when the terrain type under the unit changes.
+---@type nil | fun(self: Unit, new: TerrainType, old: TerrainType)
+Unit.OnTerrainTypeChange = nil
+
+--- Called by the engine when the transport ends a load order before all units are loaded.
+---@type nil | fun(self: Unit)
+Unit.OnTransportAborted = nil
+
+--- Called by the engine when a unit attaches to the transport.
+---@type nil | fun(self: Unit, attachBone: Bone, attachedUnit: Unit)
+Unit.OnTransportAttach = nil
+
+--- Called by the engine when a unit detaches from the transport.
+---@type nil | fun(self: Unit, attachBone: Bone, detachedUnit: Unit)
+Unit.OnTransportDetach = nil
+
+--- Called by the engine when the transport starts a load order.
+---@type nil | fun(self: Unit)
+Unit.OnTransportOrdered = nil
+
+--- Called by the engine when the transport can't carry a unit that was ordered into it.
+---@type nil | fun(self: Unit)
+Unit.OnTransportReject = nil
+
+--- Called by the engine when the unit is unpaused.
+---@type nil | fun(self: Unit)
+Unit.OnUnpaused = nil
+
+--- Called by the engine when the unit is killed, before `OnKilled`, and when it is destroyed.
+---@type nil | fun(self: Unit)
+Unit.SetDead = nil
+
+--- Called by the engine when deciding whether to repair or guard a shield unit. Returns true if its shield is on.
+---@type nil | fun(self: Unit): boolean
+Unit.ShieldIsOn = nil
 
 return Unit
