@@ -65,33 +65,33 @@ Leave out who tested; the PR comment already shows that.
 Snippets can do more than spawn units. Use them to set up state, run the test and log the result, so the tester compares numbers instead of judging by eye:
 
 - Console commands from [lua/keymap/debugKeyActions.lua](lua/keymap/debugKeyActions.lua) can go in a snippet with `ConExecute`, e.g. `dbg Collision` to draw hitboxes, `dbg weapons` for weapon ranges and `Nodamage`. `wld_RunWithTheWind 1` runs the sim as fast as possible for long tests, and `0` turns it off.
-- A test that waits for an outcome forks a sim thread that waits for it, then `LOG`s the numbers and cleans up. This one spawns a Ythotha lightning storm and two hostile targets, makes the targets durable, speeds up the sim, and logs the damage each target took once the storm expires:
+- A test that waits for an outcome runs entirely in the sim: spawn the units, set them up, speed up the sim, and fork a thread that waits for the outcome, logs it and cleans up. Template, with the test-specific parts as comments:
 
   ```lua
-  CreateUnitAtMouse('xsl0402', GetFocusArmy() - 1,   0, 0, 0)
-  CreateUnitAtMouse('xsb0101', 1,                   15, 0, 0)
-  CreateUnitAtMouse('xsb0301', 1,                  -15, 0, 0)
-  ConExecute [[SimLua -- intentional space
-  local storm = ArmyBrains[GetFocusArmy()]:GetListOfUnits(categories.xsl0402, false)[1]
-  local targets = ArmyBrains[2]:GetListOfUnits(categories.xsb0101 + categories.xsb0301, false)
-  local hp = 500000
-  for _, u in targets do
-      u:SetMaxHealth(hp)
-      u:SetHealth(u, hp)
-  end
+  local p = GetMouseWorldPos()
+  ConExecute(string.format('SimLua local x, y, z = %f, %f, %f\n', p[1], p[2], p[3]) .. [[
+  -- spawn with CreateUnitHPR(id, army, x, y, z, 0, 0, 0): your units with GetFocusArmy(),
+  -- hostile ones with 'ARMY_17'. Space them with offsets on x and z
+  local units = {
+  }
+  -- set up state for the test, e.g. SetMaxHealth/SetHealth, or SetAlliance for cross-army tests
   SimConExecute('wld_RunWithTheWind 1')
   ForkThread(function()
-      while not storm.Dead do
-          WaitTicks(1)
-      end
-      for _, u in targets do
-          LOG(string.format('%s damage taken: %f', u.UnitId, hp - u:GetHealth()))
-          u:Destroy()
+      -- wait until the outcome, e.g. while not units[1].Dead do WaitTicks(1) end
+      -- LOG the measured values
+      for _, u in units do
+          if not IsDestroyed(u) then
+              u:Destroy()
+          end
       end
       SimConExecute('wld_RunWithTheWind 0')
   end
-  )]] -- intentionally on a new line
+  )]]) -- intentionally on a new line
   ```
+
+  - Spawning in the sim keeps a reference to every unit, so nothing has to be found again and everything can be cleaned up. `CreateUnitHPR` also takes an army name, and `'ARMY_17'` is the hostile civilian army in any game, while its index depends on the players and AIs in the lobby.
+  - When the test is about how armies interact, say which army each unit belongs to and set the alliance it needs.
+  - Only the mouse position goes through `string.format`. The rest is a plain string, so commenting out the first and last lines leaves normal Lua to edit with LuaLS.
 - When the data can only come from inside the changed code (timings, intermediate values, unit stats), put the logging in a test commit on a separate branch on top of the PR branch, and link it from the procedure. The PR branch stays clean, and the tester gets objective data points instead of impressions.
 
 ## Variants by change type
