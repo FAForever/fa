@@ -1,2 +1,1 @@
-- Fix a rare crash that could happen while drawings or other shapes are shown in the world. An engine patch that runs while they are drawn wrote outside its memory and corrupted Lua tables (#7336, [FA-Binary-Patches#176](https://github.com/FAForever/FA-Binary-Patches/pull/176)).
-
+- Fix crashes and desyncs that could happen while drawings or other shapes are shown in the world, with the frequency depending on the user's machine. The majority of these crashes/desyncs have occurred after patch 3822 when the painting feature was introduced. Specifically this fixes an engine patch writing outside its memory and corrupting Lua tables (#7336, [FA-Binary-Patches#176](https://github.com/FAForever/FA-Binary-Patches/pull/176)).
