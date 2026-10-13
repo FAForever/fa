@@ -74,10 +74,11 @@ AbstractVictoryCondition = Class(DebugComponent) {
     ---@return boolean
     UnitIsEligible = function(self, unit)
 
-        -- this can happen occasionally, note that we explicitly do **not** use the `.Dead` property! The
-        -- use of that property depends on the execution order in Lua. It is deterministic, but it will
-        -- generate strange results when for example two ACUs die in the same tick. Using `.Dead` will
-        -- re-introduce the 'draw bug' that bugged the community for years.
+        -- `GetListOfUnits` already leaves out units that were killed or had `Destroy()` called, so this
+        -- only matters for units from other sources. `IsDestroyed` is true once the engine has deleted
+        -- the unit after its tick, and engine methods such as `GetFractionComplete` error from then on.
+        -- `unit.Dead` (set on kill, or in `OnDestroy` at the end of the tick `Destroy()` is called) and
+        -- `unit:BeenDestroyed()` (set by `Destroy()`) are true earlier, while the unit still exists
 
         if IsDestroyed(unit) then
             return false

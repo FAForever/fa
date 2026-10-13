@@ -226,7 +226,7 @@ Checking whether a unit is gone is not one of these swaps, because the checks an
 
 A killed unit is `.Dead` long before its death thread calls `Destroy()`. For a unit destroyed directly (reclaimed, cancelled, `Destroy()` from script), Lua running later in the same tick sees `BeenDestroyed()` true while `.Dead` and `IsDestroyed` are still false. From the next tick on, all three are true. This order comes from the [faf-re](https://github.com/Draiget/faf-re) decompilation (`Sim::AdvanceBeat`, `Entity::Destroy`, `EntityDB::Purge`).
 
-Code that decides game outcomes uses `IsDestroyed`. A comment in [AbstractVictoryCondition.lua](lua/sim/VictoryCondition/AbstractVictoryCondition.lua) warns that switching it to `.Dead` would re-introduce the "draw bug". After a `WaitTicks`/`WaitSeconds` in a thread, check `IsDestroyed(self)` before calling engine methods on `self`.
+After a `WaitTicks`/`WaitSeconds` in a thread, check `IsDestroyed(self)` before calling engine methods on `self`.
 
 ### Other engine calls
 
