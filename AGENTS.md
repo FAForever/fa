@@ -51,7 +51,8 @@ Every caller shares the same instance, so:
 
 ## Modules and imports
 
-- Load modules with `import("/lua/path/file.lua")` using absolute, lowercase-tolerant virtual paths (the engine's filesystem is case-insensitive). `lazyimport` defers loading until first access. Implementation: [lua/system/import.lua](lua/system/import.lua).
+- Load modules with `import("/lua/path/file.lua")` using absolute, lowercase-tolerant virtual paths (the engine's filesystem is case-insensitive). Implementation: [lua/system/import.lua](lua/system/import.lua).
+- Don't use `lazyimport`. It defers loading a module until first access, so the importer is never recorded as a dependent, and dirtying the module doesn't reload it ([#4484](https://github.com/FAForever/fa/pull/4484)). It also broke mod hooks, which is why [#4612](https://github.com/FAForever/fa/pull/4612) removed its uses. Lazy loading for performance needs measurements showing it helps.
 - `local` keeps a variable private to the file.
 - Performance-sensitive files cache globals and methods as upvalues at the top of the file. See [Performance](#performance).
 - `__moduleinfo.OnDirty` / `OnReload` support hot reload when the game runs with `/EnableDiskWatch`.
