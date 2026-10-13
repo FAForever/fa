@@ -20,6 +20,8 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+require "./tests/packages/fafMockLibrary.lua"
+
 ---@type Luft
 local luft = require "./tests/packages/luft"
 
