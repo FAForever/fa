@@ -84,8 +84,9 @@ function Entity:AttachTo(entity, bone)
 end
 
 
---- Returns whether the engine-side C object of this entity has been destroyed
----@see IsDestroyed(entity) as an alternative
+--- Returns true once `Destroy()` has been called on the entity, even though the engine only
+--- deletes it at the end of the tick. Unlike other methods, it doesn't error after the deletion.
+---@see IsDestroyed # true only after the deletion, and accepts `nil`
 ---@return boolean
 function Entity:BeenDestroyed()
 end

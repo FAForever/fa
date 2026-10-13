@@ -18,7 +18,8 @@
 ---@class moho.weapon_methods
 local UnitWeapon = {}
 
----
+--- Returns whether the weapon has been destroyed, like `IsDestroyed`. Weapons are destroyed with
+--- their unit at the end of the tick.
 ---@return boolean
 function UnitWeapon:BeenDestroyed()
 end
