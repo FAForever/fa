@@ -32,7 +32,7 @@ Display strings use `<LOC key>fallback`. The keys live in [loc/US/strings_db.lua
 [Blueprints.lua](../lua/system/Blueprints.lua) and the `blueprints-*.lua` files overwrite or add these. Don't hand-tune them in a blueprint:
 
 - `BlueprintId`, `CategoriesHash`, `TechCategory`, `LayerCategory`, `FactionCategory`, `SizeVolume`, `VetThresholds`, `VetEnabled`, `Intel.State`.
-- `OVERLAY*` and `WEAK*` categories, from weapon range categories and DPS ([blueprints-units.lua](../lua/system/blueprints-units.lua)). Many blueprints already list `OVERLAY*` categories, which is harmless.
+- `OVERLAY*` and `WEAK*` categories, from weapon range categories and DPS ([blueprints-units.lua](../lua/system/blueprints-units.lua)). Many blueprints already list `OVERLAY*` categories, which is harmless. The range overlays draw only for units with the matching `OVERLAY*` category ([rangeoverlayparams.lua](../lua/ui/game/rangeoverlayparams.lua)).
 - `Defense.*ThreatLevel`, unless `Defense.SkipDynamicThreatCalculations` is set ([blueprints-ai.lua](../lua/system/blueprints-ai.lua)).
 - `Display.Mesh.LODs[*].LODCutoff`, from the unit size ([blueprints-lod.lua](../lua/system/blueprints-lod.lua)).
 - Defaults when unset: `AI.GuardScanRadius`, `Physics.TransportSpeedReduction`, `Interface.HelpText`, and the weapon fields `TargetCheckInterval`, `TrackingRadius` and `AlwaysRecheckTarget` ([blueprints-weapons.lua](../lua/system/blueprints-weapons.lua)). Setting them in the blueprint overrides the default.
@@ -66,17 +66,16 @@ TypeClass = URL0107
 - Read blueprint values through `self.Blueprint`. Newer scripts upvalue engine functions at file scope under a `-- upvalue for performance` comment (`local TrashBagAdd = TrashBag.Add`, see [UAB1103_script.lua](UAB1103/UAB1103_script.lua)).
 - A few legacy scripts still use `Class(...)` instead of `ClassUnit(...)`. Use `ClassUnit` in new code.
 
-## Balance vs. behavior changes
+## Balance and fix changes
 
-- **Balance**: edit blueprint values only. Use the `balance` changelog category and get balance team sign-off ([Branches, PRs, changelog](../AGENTS.md#branches-prs-changelog)).
-- **Behavior**: edit the unit script, or the shared class in `lua/` or `lua/sim/` when several units are affected. Keep it in a separate PR or commit from balance edits.
+A blueprint or script change can be a balance change, a bug fix, or both. A fix that changes gameplay noticeably (for example, how shields repair) gets a changelog snippet in both the `balance` and `fix` sections, so competitive players see it. Balance changes need balance team sign-off ([Branches, PRs, changelog](../AGENTS.md#branches-prs-changelog)). Behavior shared by several units goes in the shared class in `lua/` or `lua/sim/`, not in each unit script.
 
 ## Tests
 
 - [tests/run-syntax-test.sh](../tests/run-syntax-test.sh) runs `luac -p` over every `.bp` file.
 - [tests/run-blueprint-tests.sh](../tests/run-blueprint-tests.sh) runs [tests/blueprint/unit.spec.lua](../tests/blueprint/unit.spec.lua), which checks:
   - `VisionRadius` is a multiple of 2, and the other intel and stealth radii are multiples of 4 (the intel grid cell size).
-  - Radar, sonar, stealth and cloak radii differ from each other, so range rings don't hide each other.
+  - `RadarRadius` differs from `SonarRadius`, `RadarStealthFieldRadius`, `SonarStealthFieldRadius` and `CloakFieldRadius`, so the radar ring doesn't hide the others.
   - `RateOfFire` and enhancement `NewRateOfFire` match a value the tick rate can produce. Weapons with `DummyWeapon` are skipped.
 - That spec keys units by `Description`, so units sharing a description (every "Land Factory") are only tested once.
 
