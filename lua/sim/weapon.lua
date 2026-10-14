@@ -72,6 +72,7 @@ local WeaponMethods = moho.weapon_methods
 
 ---@class Weapon : moho.weapon_methods, InternalObject, DebugWeaponComponent
 ---@field AimControl? moho.AimManipulator
+---@field AimControlEnabled? boolean # last value passed to `AimManipulatorSetEnabled`, as the aim controller can not be queried for it
 ---@field AimLeft? moho.AimManipulator
 ---@field AimRight? moho.AimManipulator
 ---@field Army Army
@@ -305,6 +306,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     ---@param self Weapon
     ---@param enabled boolean
     AimManipulatorSetEnabled = function(self, enabled)
+        self.AimControlEnabled = enabled
         local aimControl = self.AimControl
         if aimControl then
             aimControl:SetEnabled(enabled)
