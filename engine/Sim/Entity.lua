@@ -87,6 +87,7 @@ end
 --- Returns true once `Destroy()` has been called on the entity, even though the engine only
 --- deletes it at the end of the tick. Unlike other methods, it doesn't error after the deletion.
 ---@see IsDestroyed # true only after the deletion, and accepts `nil`
+---@see moho.unit_methods.SetDead # sets `Dead` at the end of the tick for units destroyed without `Kill`
 ---@return boolean
 function Entity:BeenDestroyed()
 end
@@ -281,6 +282,9 @@ end
 function Entity:IsValidBone(bone, allowNil)
 end
 
+---@see moho.unit_methods.CheckCanBeKilled # called first on units
+---@see moho.unit_methods.SetDead # called before `OnKilled`
+---@see moho.unit_methods.OnKilled
 ---@overload fun()
 ---@param instigator Unit
 ---@param damageType DamageType

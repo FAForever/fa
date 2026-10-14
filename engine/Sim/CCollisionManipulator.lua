@@ -9,7 +9,9 @@ end
 function CCollisionManipulator:Disable()
 end
 
---- Make manipulator check for terrain height intersection
+--- Make manipulator check for intersection with the terrain or water surface
+---@see moho.unit_methods.OnAnimTerrainCollision # called instead of `OnAnimCollision` when enabled
+---@see moho.unit_methods.OnNotAnimTerrainCollision
 ---@param bool boolean
 function CCollisionManipulator:EnableTerrainCheck(bool)
 end
