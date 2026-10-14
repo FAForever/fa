@@ -75,6 +75,7 @@ end
 --- Unlocks the input for the camera that is attached to this worldview. Used for cinematics.
 ---
 --- See also `UnlockInput` to unlock the input and `IsInputLocked` to determine the current state.
+---@see moho.UIWorldView.OnFrame # Not called while the input is locked
 ---@param camera Camera
 function CUIWorldView:LockInput(camera)
 end
@@ -117,11 +118,15 @@ end
 
 --- Called by the engine every frame while input isn't locked with `LockInput`, with the time
 --- since the last frame in seconds.
+---@see moho.UIWorldView.LockInput # Stops these calls
+---@see moho.UIWorldView.UnlockInput # Resumes these calls
 ---@type nil | fun(self: WorldView, delta: number)
 CUIWorldView.OnFrame = nil
 
---- Called by the engine when strategic icons are hidden or shown again, which happens while the
---- camera rotates and in free camera mode.
+--- Called by the engine when strategic icons are hidden or shown again. Icons are hidden while the
+--- camera is rotated by holding `Space`, and while `cam_Free` (free camera mode) is on. The engine
+--- checks this each frame, before `OnFrame`, so it is not called while input is locked. Zooming
+--- and `ui_RenderIcons` don't trigger it.
 ---@type nil | fun(self: WorldView, areIconsVisible: boolean)
 CUIWorldView.OnIconsVisible = nil
 
@@ -143,6 +148,7 @@ end
 --- If true, enables the rendering of custom world shapes. See also all shapes at /lua/ui/game/shapes.
 ---
 --- Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/47
+---@see moho.UIWorldView.OnRenderWorld # Called every frame while enabled
 ---@param bool boolean
 function CUIWorldView:SetCustomRender(bool)
 end
@@ -152,6 +158,7 @@ end
 --- only work inside this callback.
 ---
 --- Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/47
+---@see moho.UIWorldView.SetCustomRender # Enables this callback
 ---@type nil | fun(self: WorldView, delta: number)
 CUIWorldView.OnRenderWorld = nil
 

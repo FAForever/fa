@@ -46,8 +46,8 @@
 --- every field is meaningful for every event Type, so MouseX/Y are -1
 --- on key events and WheelDelta/Rotation are 0 outside wheel events.
 ---
---- For `Edit.OnNonTextKeyPressed` the function gets `(self, keycode, event)`
---- — `keycode` is the raw VK_* code (compare against `UIUtil.VK_*`) and
+--- For `Edit.OnNonTextKeyPressed` the function gets `(self, keycode, event)`.
+--- `keycode` is a Windows virtual-key code (see `VK_KeyCode`) and
 --- `event.Modifiers` is the modifier state at the time of the press.
 ---@class KeyEvent
 ---@field Type           KeyEventType   # "Char" / "KeyDown" / "ButtonPress" / "MouseEnter" / "MouseExit" / "WheelRotation" / ...
@@ -72,6 +72,7 @@ function CMauiEdit:AcquireFocus()
 end
 
 ---
+---@see moho.edit_methods.OnTextChanged # Called with the new and the previous text
 function CMauiEdit:ClearText()
 end
 
@@ -202,6 +203,7 @@ function CMauiEdit:SetNewHighlightForegroundColor(color)
 end
 
 ---
+---@see moho.edit_methods.OnTextChanged # Called with the new and the previous text
 ---@param text string
 function CMauiEdit:SetText(text)
 end
@@ -221,28 +223,34 @@ end
 CMauiEdit.HandleEvent = nil
 
 --- Called by the engine when a character key is pressed, before the character is inserted.
---- Return `true` to handle the character yourself, so the engine doesn't insert it.
----@type nil | fun(self: Edit, charcode: number): boolean?
+--- `charcode` is the character code, which includes `Tab` (9) and `Space` (32). Return `true` to
+--- handle the character yourself, so the engine doesn't insert it.
+---@type nil | fun(self: Edit, charcode: integer): boolean?
 CMauiEdit.OnCharPressed = nil
 
---- Called by the engine when the user presses `Enter`, with the current text. Return `true` to
---- keep the text; otherwise the engine clears it.
----@type nil | fun(self: Edit, text: string): boolean?
+--- Called by the engine when the user presses `Enter`. `currentText` is the text in the edit when
+--- the key is pressed. Return `true` to keep the text; otherwise the engine clears it.
+---@type nil | fun(self: Edit, currentText: string): boolean?
 CMauiEdit.OnEnterPressed = nil
 
---- Called by the engine when the user presses `Escape`, with the current text. Return `true` to
---- keep the text and focus; otherwise the engine clears the text, or abandons keyboard focus if
---- the text is already empty.
----@type nil | fun(self: Edit, text: string): boolean?
+--- Called by the engine when the user presses `Escape`. `currentText` is the text in the edit when
+--- the key is pressed. Return `true` to keep the text and focus; otherwise the engine clears the
+--- text, or abandons keyboard focus if the text is already empty.
+---@type nil | fun(self: Edit, currentText: string): boolean?
 CMauiEdit.OnEscPressed = nil
 
 --- Called by the engine when a key that doesn't type a character is pressed, with its Windows
---- VK keycode. Keys the engine uses for editing, such as `Backspace`, `Delete`, `Home` or the
---- arrow keys, are handled by the engine and don't reach this callback.
----@type nil | fun(self: Edit, keycode: number, event: KeyEvent)
+--- virtual-key code. `event.KeyCode` holds the wxWidgets code of the same key instead. Keys the
+--- engine uses for editing (`Backspace`, `Delete`, `Insert`, `Home`, `End`, `Left` and `Right`)
+--- and `Enter` and `Escape` don't reach this callback. `Up`, `Down`, `Page Up` and `Page Down`
+--- do.
+---@see VK_KeyCode # The codes, and the `UIUtil.VK_*` constants
+---@type nil | fun(self: Edit, keycode: VK_KeyCode, event: KeyEvent)
 CMauiEdit.OnNonTextKeyPressed = nil
 
 --- Called by the engine when the text changes, with the new and the previous text.
+---@see moho.edit_methods.SetText # Changes the text
+---@see moho.edit_methods.ClearText # Clears the text
 ---@type nil | fun(self: Edit, newText: string, oldText: string)
 CMauiEdit.OnTextChanged = nil
 

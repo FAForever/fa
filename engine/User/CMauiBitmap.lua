@@ -24,6 +24,8 @@ function CMauiBitmap:Loop(loop)
 end
 
 ---
+---@see moho.bitmap_methods.OnAnimationFrame # Called on every frame change
+---@see moho.bitmap_methods.OnAnimationFinished # Called at the end of the frame pattern
 function CMauiBitmap:Play()
 end
 
@@ -83,6 +85,7 @@ function CMauiBitmap:ShareTextures(bitmap)
 end
 
 ---
+---@see moho.bitmap_methods.OnAnimationStopped # Called when an animation is stopped
 function CMauiBitmap:Stop()
 end
 
@@ -99,15 +102,18 @@ end
 
 --- Called by the engine when an animation reaches the end of its frame pattern, whether or not
 --- it loops.
+---@see moho.bitmap_methods.Play # Plays the animation
 ---@type nil | fun(self: Bitmap)
 CMauiBitmap.OnAnimationFinished = nil
 
 --- Called by the engine on every frame change of an animation, with the 0-based position in the
 --- frame pattern.
----@type nil | fun(self: Bitmap, frameNumber: number)
+---@see moho.bitmap_methods.Play # Plays the animation
+---@type nil | fun(self: Bitmap, frameNumber: integer)
 CMauiBitmap.OnAnimationFrame = nil
 
 --- Called by the engine when an animation with more than one frame is stopped with `Stop`.
+---@see moho.bitmap_methods.Stop # Stops the animation
 ---@type nil | fun(self: Bitmap)
 CMauiBitmap.OnAnimationStopped = nil
 

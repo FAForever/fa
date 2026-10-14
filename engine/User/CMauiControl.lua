@@ -15,6 +15,7 @@ function CMauiControl:AbandonKeyboardFocus()
 end
 
 ---
+---@see moho.control_methods.OnKeyboardFocusChange # Called on the control that had keyboard focus
 ---@param blocksKeyDown boolean
 function CMauiControl:AcquireKeyboardFocus(blocksKeyDown)
 end
@@ -75,6 +76,7 @@ function CMauiControl:GetRootFrame()
 end
 
 --- Stops rendering and hit testing the control
+---@see moho.control_methods.OnHide # Can cancel the change
 function CMauiControl:Hide()
 end
 
@@ -105,6 +107,7 @@ function CMauiControl:SetAlpha(alpha, children)
 end
 
 --- Sets the hidden state of the control
+---@see moho.control_methods.OnHide # Can cancel the change
 ---@param hidden boolean
 function CMauiControl:SetHidden(hidden)
 end
@@ -115,6 +118,7 @@ function CMauiControl:SetName(name)
 end
 
 ---
+---@see moho.control_methods.OnFrame # Called every frame while enabled
 ---@param needsIt boolean
 function CMauiControl:SetNeedsFrameUpdate(needsIt)
 end
@@ -131,12 +135,14 @@ function CMauiControl:SetRenderPass(pass)
 end
 
 --- Starts rendering and hit testing the control
+---@see moho.control_methods.OnHide # Can cancel the change
 function CMauiControl:Show()
 end
 
 --- Called by the engine when a scrollbar attached to this control needs its size. Returns the
 --- minimum and maximum of the scroll range, then of the visible part. The engine logs a warning
 --- and uses zeros unless all four values are returned.
+---@see moho.scrollbar_methods.SetScrollable # Attaches a scrollbar
 ---@type nil | fun(self: Control, axis: ScrollAxis): rangeMin: number, rangeMax: number, visibleMin: number, visibleMax: number
 CMauiControl.GetScrollValues = nil
 
@@ -145,7 +151,10 @@ CMauiControl.GetScrollValues = nil
 ---@type nil | fun(self: Control, event: KeyEvent): boolean
 CMauiControl.HandleEvent = nil
 
---- Called by the engine to ask whether the control can scroll along an axis.
+--- Declared by the engine's scrollable interface, but no engine code calls it: scrollbars and the
+--- mouse wheel scroll the control without asking. Lua code calls it to decide whether to show a
+--- scrollbar or handle the mouse wheel, e.g. `optionGrid:IsScrollable("Vert")` in
+--- `/lua/ui/dialogs/options.lua`.
 ---@type nil | fun(self: Control, axis: ScrollAxis): boolean
 CMauiControl.IsScrollable = nil
 
@@ -155,12 +164,17 @@ CMauiControl.OnDestroy = nil
 
 --- Called by the engine every frame while the control needs frame updates, with the time since
 --- the last frame in seconds.
----@see Control.SetNeedsFrameUpdate
+---@see Control.SetNeedsFrameUpdate # Enables frame updates
 ---@type nil | fun(self: Control, delta: number)
 CMauiControl.OnFrame = nil
 
 --- Called by the engine when the control is shown or hidden, before the change. Return `true` to
---- cancel the change for this control and its children.
+--- cancel the change for this control and its children, including the control's own hidden state.
+--- Examples are in `/lua/maui/grid.lua`, `/lua/ui/controls/acubutton.lua` and
+--- `/lua/ui/controls/combo.lua`.
+---@see moho.control_methods.SetHidden # Shows or hides the control
+---@see moho.control_methods.Hide # Hides the control
+---@see moho.control_methods.Show # Shows the control
 ---@type nil | fun(self: Control, hidden: boolean): boolean?
 CMauiControl.OnHide = nil
 
@@ -170,6 +184,7 @@ CMauiControl.OnInit = nil
 
 --- Called by the engine on the control that had keyboard focus when any control acquires
 --- keyboard focus, including when it acquires focus again itself.
+---@see moho.control_methods.AcquireKeyboardFocus # Acquires keyboard focus
 ---@type nil | fun(self: Control)
 CMauiControl.OnKeyboardFocusChange = nil
 
@@ -177,13 +192,19 @@ CMauiControl.OnKeyboardFocusChange = nil
 ---@type nil | fun(self: Control)
 CMauiControl.OnLoseKeyboardFocus = nil
 
---- Called by the engine when a scrollbar scrolls this control by lines. Negative values scroll up.
---- The engine also calls this, not `ScrollPages`, when the scrollbar scrolls by pages; `delta`
---- is then the number of pages.
+--- Called by the engine when a scrollbar scrolls this control. Negative values scroll up. The
+--- engine calls this for both lines and pages and never calls a `ScrollPages` callback, so `delta`
+--- is a number of lines or pages and the two can't be told apart:
+--- - Lines (±1): the mouse wheel over a vertical scrollbar, and `Scrollbar:DoScrollLines`.
+--- - Pages (±1): a click on the scrollbar track above or below the thumb, and
+---   `Scrollbar:DoScrollPages`.
+---@see moho.scrollbar_methods.DoScrollLines # Scrolls by lines
+---@see moho.scrollbar_methods.DoScrollPages # Scrolls by pages
 ---@type nil | fun(self: Control, axis: ScrollAxis, delta: number)
 CMauiControl.ScrollLines = nil
 
---- Called by the engine when a scrollbar sets the first visible line of this control.
+--- Called by the engine when the user drags the thumb of a scrollbar, with the new first visible
+--- line of this control.
 ---@type nil | fun(self: Control, axis: ScrollAxis, top: number)
 CMauiControl.ScrollSetTop = nil
 
