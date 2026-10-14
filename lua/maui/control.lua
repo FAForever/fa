@@ -134,14 +134,16 @@ Control = ClassUI(moho.control_methods) {
         return 0, 0, 0, 0
     end,
 
-    --- Called when the scrollbar wants to scroll a specific number of lines (negative indicates scroll up)
+    --- Called when the scrollbar wants to scroll a specific number of lines (negative indicates scroll up).
+    --- The engine also calls this when the scrollbar scrolls by pages, with `delta` in pages
     ---@param self Control
     ---@param axis ScrollAxis
     ---@param delta number
     ScrollLines = function(self, axis, delta)
     end,
 
-    --- Called when the scrollbar wants to scroll a specific number of pages (negative indicates scroll up)
+    --- Scrolls a specific number of pages (negative indicates scroll up). The engine never calls this,
+    --- scrollbars call `ScrollLines` for pages too, so only Lua code calls it
     ---@param self Control
     ---@param axis ScrollAxis
     ---@param delta number
