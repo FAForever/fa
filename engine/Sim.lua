@@ -64,7 +64,10 @@ end
 function ArmyGetHandicap(army)
 end
 
---- initializes the prebuilt units of an army via `AIBrain:OnSpawnPreBuiltUnits()`
+--- Calls `OnSpawnPreBuiltUnits` on the brain of the army, if the brain defines it. Same as calling it on the brain directly.
+--- The engine reaches it through the Lua function `InitializePrebuiltUnits` in simInit.lua
+---@see moho.aibrain_methods.OnSpawnPreBuiltUnits # Called on the brain
+---@see InitializePrebuiltUnits # Lua entry point the engine calls
 ---@param army Army
 function ArmyInitializePrebuiltUnits(army)
 end
@@ -105,6 +108,8 @@ end
 --- Changes the army of a unit, returning the new unit and destroying the old one
 --- Modified by an engine patch to allow commanders to be given.
 --- `COMMAND` units are filtered out in SimHooks.lua for legacy compatibility.
+---@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the unit cap stops it
+---@see moho.aibrain_methods.OnFailedUnitTransfer # Called when the transfer fails for other reasons
 ---@param unit Unit
 ---@param army Army
 ---@param allowCommanders? boolean
@@ -213,9 +218,12 @@ end
 function CreateBuilderArmController(unit, turretBone, barrelBone, aimBone)
 end
 
---- Creates a collision detection manipulator, calling the function
---- `self:OnAnimTerrainCollision(bone, x, y, z)`
---- when a bone that is being watched collides with the terrain
+--- Creates a collision detection manipulator for the bones it watches.
+--- By default it calls `OnAnimCollision` when a bone drops to the unit's ground level (footfalls).
+--- With the terrain check enabled, it calls `OnAnimTerrainCollision` and `OnNotAnimTerrainCollision` when a bone crosses the terrain or water surface instead
+---@see Unit.OnAnimCollision
+---@see Unit.OnAnimTerrainCollision
+---@see moho.CollisionManipulator.EnableTerrainCheck
 ---@param unit Unit
 ---@return moho.CollisionManipulator
 function CreateCollisionDetector(unit)
@@ -445,6 +453,7 @@ end
 --- Creates a unit from a blueprint for an army, at a position with quaternion orientation
 ---@see CreateUnit2 # simple version
 ---@see CreateUnitHPR # heading-pitch-roll version
+---@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the unit cap stops it
 ---@param blueprintId string
 ---@param army Army
 ---@param x number
@@ -462,6 +471,7 @@ end
 --- Creates a unit from a blueprint for an army, at an X-Z map point with a heading
 ---@see CreateUnit # quaternion version
 ---@see CreateUnitHPR # heading-pitch-roll version
+---@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the unit cap stops it
 ---@param blueprintId string
 ---@param army Army
 ---@param layer Layer
@@ -475,6 +485,7 @@ end
 --- Creates a unit from a blueprint for an army, at a position with heading, pitch, and roll
 ---@see CreateUnit # quaternion version
 ---@see CreateUnit2 # simple version
+---@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the unit cap stops it
 ---@param blueprint UnitId
 ---@param army Army
 ---@param x number
@@ -793,6 +804,7 @@ function IssueBuildAllMobile(units, position, blueprintID, table)
 end
 
 --- Orders a group of units to capture a target, usually engineers
+---@see Unit.OnStartCapture # Called when the capture starts
 ---@param units Unit[]
 ---@param target Unit
 ---@return SimCommand
@@ -840,6 +852,7 @@ function IssueFactoryRallyPoint(units, position)
 end
 
 --- Orders a group of units to setup a ferry
+---@see Unit.OnFerryPointSet # Called on each unit
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
@@ -913,6 +926,7 @@ end
 
 --- Orders a group of units to launch a strategic missile at a position
 ---@see IssueTactical # for tactical missiles
+---@see Unit.OnNukeLaunched # Called when the order gives its target to the silo weapon
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
@@ -920,6 +934,9 @@ function IssueNuke(units, position)
 end
 
 --- Orders a group of units to use Overcharge at a target
+---@see moho.weapon_methods.OnEnableWeapon # Called when the order starts
+---@see moho.weapon_methods.OnDisableWeapon # Called when the order ends
+---@see moho.weapon_methods.CanWeaponFire # Called to check if the weapon may fire
 ---@param units Unit[]
 ---@param target Unit
 ---@return SimCommand
@@ -936,11 +953,13 @@ end
 --- Orders a group of units to pause building, upgrading, and other tasks.
 --- This pause order is put into the order queue, so it may not apply immediately.
 --- Use `Unit:SetPaused` to pause a unit in the middle of a task.
+---@see Unit.OnPaused # Called when the order pauses the unit
 ---@param units Unit[]
 function IssuePause(units)
 end
 
 --- Orders a group of units to reclaim a target
+---@see Unit.OnStartReclaim # Called when the reclaim starts
 ---@param units Unit[]
 ---@param target ReclaimObject
 ---@return SimCommand
@@ -955,6 +974,7 @@ function IssueRepair(units, target)
 end
 
 --- Orders a group of units to sacrifice, yielding part of their build cost to a target
+---@see Unit.OnStartSacrifice # Called when the sacrifice starts
 ---@param tblUnits Unit[]
 ---@param target Unit
 ---@return SimCommand
@@ -963,6 +983,7 @@ end
 
 --- Orders a group of units to run a script sequence, as an example:
 --- `{ TaskName = "EnhanceTask", Enhancement = "AdvancedEngineering" }`
+---@see moho.ScriptTask_Methods.OnCreate # Called on the new task
 ---@param tblUnits Unit[]
 ---@param order Task
 ---@return ScriptTask
@@ -970,12 +991,14 @@ function IssueScript(tblUnits, order)
 end
 
 --- Orders a group of units (SML or SMD) to build a nuke
+---@see Unit.OnSiloBuildStart # Called when the missile starts building
 ---@param units Unit[]
 ---@return SimCommand
 function IssueSiloBuildNuke(units)
 end
 
 --- Orders a group of units to build a tactical missile
+---@see Unit.OnSiloBuildStart # Called when the missile starts building
 ---@param units Unit[]
 ---@return SimCommand
 function IssueSiloBuildTactical(units)
@@ -995,6 +1018,8 @@ function IssueTactical(units, target)
 end
 
 --- Orders a group of units to teleport to a position
+---@see Unit.OnTeleportUnit # Called when the order starts
+---@see Unit.OnFailedTeleport # Called when the order ends before the teleport
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
@@ -1008,6 +1033,8 @@ function IssueTeleportToBeacon(units, beacon)
 end
 
 --- Orders a group of units to attach themselves to a transport
+---@see Unit.OnTransportOrdered # Called on the transport
+---@see moho.aibrain_methods.OnTransportFull # Called when the transport or carrier is full
 ---@param units Unit[]
 ---@param transport Unit
 ---@return SimCommand
@@ -1065,6 +1092,8 @@ end
 function MetaImpact(instigator, location, maxRadius, amount, affectsCategory, damageFriendly)
 end
 
+---@see Unit.OnStartRepeatQueue # Called on `to` when repeat build turns on
+---@see Unit.OnStopRepeatQueue # Called on `to` when repeat build turns off
 ---@param from Unit
 ---@param to Unit
 function NotifyUpgrade(from, to)
@@ -1198,13 +1227,6 @@ end
 function SetArmyUnitCap(army, unitCap)
 end
 
---- Sets the command source of an army to match another army's command source.
----@param targetArmyIndex number        # The target army that we're managing command sources for. This is a 0-based index, unlike army indices that are 1-based.
----@param sourceHumanIndex number       # The source index that is added or removed as a command source. This is a 0-based index, including only actual sources. Mimics the index of `GetClientSessions` in the UI.
----@param enable boolean                # Whether or not the source index is a command source for the target army
-function SetCommandSource(targetArmyIndex, sourceHumanIndex, enable)
-end
-
 --- sets an army to ignore unit cap
 ---@param army Army
 ---@param ignore boolean
@@ -1216,19 +1238,6 @@ end
 ---@param army Army
 ---@param ignore boolean
 function SetIgnorePlayableRect(army, ignore)
-end
-
---- Changes the distance at which the default navigator switches to a lower resolution
---- pathfinding grid (from "personal" per-unit waypoints to waypoints shared by many units),
---- typically resulting in units moving in columns over large distances instead of maintaining their formation.
----
---- Default engine value is 50.
----
---- Useful console commands for debugging: "dbg navwaypoints", "dbg navpath", "dbg navsteering"
----
---- Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/132
----@param distance number
-function SetNavigatorPersonalPosMaxDistance(distance)
 end
 
 --- sets the playable area of a map
@@ -1293,6 +1302,7 @@ function TryCopyPose(unitFrom, entityTo, copyWorldTransform)
 end
 
 --- instantly moves an entity to a location with an orientation
+---@see Unit.OnTeleportUnit # Lua teleports units with this
 ---@param object Object
 ---@param location Vector
 ---@param orientation? Quaternion no orientation change if absent
@@ -1307,4 +1317,30 @@ end
 ---@param shield Shield
 ---@param spec UnitBlueprintDefenseShield
 function _c_CreateShield(shield, spec)
+end
+
+-- Added by FA-Binary-Patches
+
+--- Sets the command source of an army to match another army's command source.
+--- Removing the last command source doesn't call `AbandonedByPlayer`.
+---
+--- Introduced by https://github.com/FAForever/FA-Binary-Patches/blob/master/section/SimSetCommandSource.cpp
+---@see moho.aibrain_methods.AbandonedByPlayer # Called when the last command source leaves the game
+---@param targetArmyIndex number        # The target army that we're managing command sources for. This is a 0-based index, unlike army indices that are 1-based.
+---@param sourceHumanIndex number       # The source index that is added or removed as a command source. This is a 0-based index, including only actual sources. Mimics the index of `GetClientSessions` in the UI.
+---@param enable boolean                # Whether or not the source index is a command source for the target army
+function SetCommandSource(targetArmyIndex, sourceHumanIndex, enable)
+end
+
+--- Changes the distance at which the default navigator switches to a lower resolution
+--- pathfinding grid (from "personal" per-unit waypoints to waypoints shared by many units),
+--- typically resulting in units moving in columns over large distances instead of maintaining their formation.
+---
+--- Default engine value is 50.
+---
+--- Useful console commands for debugging: "dbg navwaypoints", "dbg navpath", "dbg navsteering"
+---
+--- Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/132
+---@param distance number
+function SetNavigatorPersonalPosMaxDistance(distance)
 end

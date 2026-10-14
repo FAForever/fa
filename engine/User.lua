@@ -894,6 +894,8 @@ function IssueCommand(command, luaParams, clear)
 end
 
 ---
+---@see moho.aibrain_methods.OnPlayNoStagingPlatformsVO # Called when the army has no air staging platform
+---@see moho.aibrain_methods.OnPlayBusyStagingPlatformsVO # Called when all air staging platforms are full
 ---@param clear boolean
 function IssueDockCommand(clear)
 end
@@ -987,6 +989,9 @@ end
 
 --- Make `dragger` the active dragger from a particular frame.
 --- You can pass `nil` to cancel the current dragger.
+---@see moho.dragger_methods.OnMove # Called while the mouse moves
+---@see moho.dragger_methods.OnRelease # Called when the button is released
+---@see moho.dragger_methods.OnCancel # Called on the previous active dragger
 ---@param originFrame Frame
 ---@param keycode 'LBUTTON' | 'MBUTTON' | 'RBUTTON'
 ---@param dragger Dragger | nil
@@ -1137,6 +1142,8 @@ function SetActiveBuildTemplate(template)
 end
 
 --- Set if anyone in the list is auto building or auto assisting
+---@see Unit.OnAutoModeOn # Called in the sim when `mode` is true
+---@see Unit.OnAutoModeOff # Called in the sim when `mode` is false
 ---@param units UserUnit[]
 ---@param mode boolean
 function SetAutoMode(units, mode)
@@ -1200,12 +1207,16 @@ function SetOverlayFilters(list)
 end
 
 --- Pause or unpause the given units
+---@see Unit.OnPaused # Called in the sim when a unit pauses
+---@see Unit.OnUnpaused # Called in the sim when a unit unpauses
 ---@param units UserUnit[]
 ---@param pause boolean
 function SetPaused(units, pause)
 end
 
 --- Pause or unpause the given unit
+---@see Unit.OnPaused # Called in the sim when the unit pauses
+---@see Unit.OnUnpaused # Called in the sim when the unit unpauses
 ---@param unit UserUnit
 ---@param pause boolean
 function SetPausedOfUnit(unit, pause)
@@ -1286,6 +1297,8 @@ function ToggleFireState(units, fireState)
 end
 
 ---
+---@see Unit.OnScriptBitSet # Called in the sim when a bit turns on
+---@see Unit.OnScriptBitClear # Called in the sim when a bit turns off
 ---@param units UserUnit[]
 ---@param bit number
 ---@param state boolean
