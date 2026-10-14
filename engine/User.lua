@@ -344,7 +344,9 @@ end
 function GetArmiesTable()
 end
 
---- Returns a table of avatar units for the army
+--- Returns the focus army's units whose blueprint `General.QuickSelectPriority` is positive, sorted by
+--- ascending priority
+---@see UnitBlueprintGeneral.QuickSelectPriority
 ---@return UserUnit[]
 function GetArmyAvatars()
 end

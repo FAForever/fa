@@ -976,9 +976,14 @@
 --- if the unit always self-destructs immediately, skipping any countdown sequence
 ---@field InstantDeathOnSelfDestruct? boolean
 ---@field OrderOverrides table<CommandCap, OrderInfo>
---- indicates unit has it's own avatar button in the quick select interface,
---- and it's sorting priority
----@field QuickSelectPriority integer
+--- When positive, the unit gets its own avatar button in the quick select interface. The engine
+--- lists it in `GetArmyAvatars`, sorted by ascending value, with ties in creation order, and leaves
+--- it out of `GetIdleEngineers` even when it is an `ENGINEER`. Read once when the unit is created
+--- in the UI. `lua/ui/game/avatars.lua` keys its buttons by entity ID, so the layout doesn't keep
+--- the sort order. `lua/ui/game/gamemain.lua` names the first avatar after the player when it is a
+--- `COMMAND` unit. The ACUs use 1
+---@see GetArmyAvatars # Returns the units with a positive priority
+---@field QuickSelectPriority? integer
 --- how long to wait before rolling the unit off the factory
 ---@field RolloffDelay? number
 --- Determines if a unit will be selected in a drag selection, only the highest priority units will
