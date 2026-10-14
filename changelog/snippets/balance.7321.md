@@ -1,0 +1,1 @@
+- Reduce the Seraphim SACU collision box to match the SACUs of the other factions (#7321).
