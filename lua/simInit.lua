@@ -308,6 +308,9 @@ function OnCreateArmyBrain(index, brain, name, nickname)
     end
 end
 
+--- Called by the engine after `BeginSession` for each non-civilian army when the `PrebuiltUnits` game option is `"On"`
+---@see ArmyInitializePrebuiltUnits # Engine function that runs `AIBrain.OnSpawnPreBuiltUnits`
+---@param name string # Army name
 function InitializePrebuiltUnits(name)
     ArmyInitializePrebuiltUnits(name)
 end
