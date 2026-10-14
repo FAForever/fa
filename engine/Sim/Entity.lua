@@ -452,9 +452,9 @@ Entity.OnCollisionCheckWeapon = nil
 ---@type nil | fun(self: Entity, instigator: Unit | Projectile | Entity | nil, amount: number, vector: Vector, damageType: DamageType)
 Entity.OnDamage = nil
 
---- Called by the engine when the health fraction of the entity crosses a multiple of 0.25. Both
---- values are rounded down to a multiple of 0.25.
----@type nil | fun(self: Entity, new: number, old: number)
+--- Called by the engine when the health of the entity crosses a 25% threshold, with the new and the
+--- old threshold as fractions of its max health
+---@type nil | fun(self: Entity, new: 0 | 0.25 | 0.5 | 0.75 | 1, old: 0 | 0.25 | 0.5 | 0.75 | 1)
 Entity.OnHealthChanged = nil
 
 --- Called by the engine when the entity changes layer
