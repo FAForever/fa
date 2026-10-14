@@ -93,6 +93,55 @@ VK_UP = 38
 VK_DOWN = 40
 VK_PAUSE = 310
 
+--- Windows virtual-key code that `Edit.OnNonTextKeyPressed` receives. The engine converts the
+--- key's wxWidgets code to it with `wxCharCodeWXToMSW`. A key without a Windows code keeps its
+--- wxWidgets code (above 300). `KeyEvent.KeyCode` holds the wxWidgets code instead. The two codes
+--- are the same for `VK_BACKSPACE`, `VK_TAB`, `VK_ENTER`, `VK_ESCAPE` and `VK_SPACE`. `VK_PAUSE` is
+--- the wxWidgets code of `Pause`
+---@alias VK_KeyCode
+---| 3 # Cancel (Ctrl+Break)
+---| 12 # Clear (Numpad 5 with Num Lock off)
+---| 16 # Shift
+---| 17 # Ctrl, `VK_CONTROL`
+---| 18 # Alt
+---| 19 # Pause
+---| 20 # Caps Lock
+---| 33 # Page Up, `VK_PRIOR`
+---| 34 # Page Down, `VK_NEXT`
+---| 38 # Up arrow, `VK_UP`
+---| 40 # Down arrow, `VK_DOWN`
+---| 41 # Select
+---| 42 # Print
+---| 43 # Execute
+---| 47 # Help
+---| 112 # F1
+---| 113 # F2
+---| 114 # F3
+---| 115 # F4
+---| 116 # F5
+---| 117 # F6
+---| 118 # F7
+---| 119 # F8
+---| 120 # F9
+---| 121 # F10
+---| 122 # F11
+---| 123 # F12
+---| 124 # F13
+---| 125 # F14
+---| 126 # F15
+---| 127 # F16
+---| 128 # F17
+---| 129 # F18
+---| 130 # F19
+---| 131 # F20
+---| 132 # F21
+---| 133 # F22
+---| 134 # F23
+---| 135 # F24
+---| 144 # Num Lock
+---| 145 # Scroll Lock
+---| integer # wxWidgets code of a key without a Windows code
+
 local currentSkin = LazyVar.Create()
 
 currentLayout = false
