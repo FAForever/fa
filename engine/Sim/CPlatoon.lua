@@ -338,6 +338,7 @@ function CPlatoon:Stop(squad)
 end
 
 --- Runs Platoon's `OnDestroy` then runs `OnCreate` with the new plan.
+---@see moho.platoon_methods.OnCreate # Called with the new plan
 ---@param plan string
 ---@return string
 function CPlatoon:SwitchAIPlan(plan)
@@ -380,11 +381,14 @@ end
 function CPlatoon:UseTeleporter(gameObject, squad)
 end
 
---- Called by the engine after the platoon is created, and after `OnDestroy` when its AI plan changes.
+--- Called by the engine after the platoon is created, and after `OnDestroy` when its AI plan changes
+---@see moho.aibrain_methods.MakePlatoon # Creates a platoon
+---@see moho.platoon_methods.SwitchAIPlan # Changes the AI plan
 ---@type nil | fun(self: Platoon, plan: string)
 CPlatoon.OnCreate = nil
 
---- Called by the engine when `AssignUnitsToPlatoon` adds units to the platoon.
+--- Called by the engine when `AssignUnitsToPlatoon` adds units to the platoon
+---@see moho.aibrain_methods.AssignUnitsToPlatoon # Adds units
 ---@type nil | fun(self: Platoon)
 CPlatoon.OnUnitsAddedToPlatoon = nil
 

@@ -135,6 +135,7 @@ function UnitWeapon:DoInstaHit(bone, r, g, b, glow, width, texture, lifetime)
 end
 
 ---
+---@see moho.weapon_methods.OnFire # Called when it fires
 ---@return boolean
 function UnitWeapon:FireWeapon()
 end
@@ -183,6 +184,7 @@ function UnitWeapon:PlaySound(params)
 end
 
 --- Force the weapon to recheck its targets. Also resets the counter for AttackGroundTries
+---@see moho.weapon_methods.OnLostTarget # Called when the weapon had a target
 function UnitWeapon:ResetTarget()
 end
 
@@ -209,11 +211,13 @@ function UnitWeapon:SetFiringRandomness(randomness)
 end
 
 ---
+---@see moho.weapon_methods.OnGotTarget # Called when the weapon had no target
 ---@param entity Entity | Unit
 function UnitWeapon:SetTargetEntity(entity)
 end
 
 ---
+---@see moho.weapon_methods.OnGotTarget # Called when the weapon had no target
 ---@param location Vector
 function UnitWeapon:SetTargetGround(location)
 end
@@ -225,6 +229,8 @@ end
 
 --- Transfers target from this weapon to another.  
 --- The other weapon may still change targets automatically afterwards.
+---@see moho.weapon_methods.OnGotTarget # Called on the other weapon when it had no target
+---@see moho.weapon_methods.OnLostTarget # Called on the other weapon when the target is empty
 ---@param otherWeapon Weapon
 function UnitWeapon:TransferTarget(otherWeapon)
 end
@@ -236,47 +242,61 @@ function UnitWeapon:WeaponHasTarget()
 end
 
 --- Called by the engine during an overcharge attack order, to check if the weapon may fire.
---- Returning false makes the order wait before checking again.
+--- Returning false makes the order wait before checking again
+---@see IssueOverCharge # Overcharge attack order
 ---@type nil | fun(self: Weapon): boolean
 UnitWeapon.CanWeaponFire = nil
 
---- Called by the engine after the weapon is constructed.
+--- Called by the engine after the weapon is constructed
 ---@type nil | fun(self: Weapon)
 UnitWeapon.OnCreate = nil
 
---- Called by the engine when the unit's weapons are destroyed.
+--- Called by the engine when the unit's weapons are destroyed
 ---@type nil | fun(self: Weapon)
 UnitWeapon.OnDestroy = nil
 
---- Called by the engine on the overcharge weapon when an overcharge attack order ends.
+--- Called by the engine on the overcharge weapon when an overcharge attack order ends
+---@see IssueOverCharge # Overcharge attack order
 ---@type nil | fun(self: Weapon)
 UnitWeapon.OnDisableWeapon = nil
 
---- Called by the engine on the overcharge weapon when an overcharge attack order starts.
+--- Called by the engine on the overcharge weapon when an overcharge attack order starts
+---@see IssueOverCharge # Overcharge attack order
 ---@type nil | fun(self: Weapon)
 UnitWeapon.OnEnableWeapon = nil
 
---- Called by the engine when the weapon fires, and by `FireWeapon`.
+--- Called by the engine when the weapon fires, and by `FireWeapon`
+---@see moho.weapon_methods.FireWeapon # Fires the weapon
 ---@type nil | fun(self: Weapon)
 UnitWeapon.OnFire = nil
 
---- Called by the engine when the weapon gets a target.
+--- Called by the engine when the weapon gets a target while it had none.
+--- Switching from one target to another calls neither this nor `OnLostTarget`
+---@see moho.weapon_methods.SetTargetEntity # Sets a target
+---@see moho.weapon_methods.SetTargetGround # Sets a target
+---@see moho.weapon_methods.TransferTarget # Sets the target of another weapon
 ---@type nil | fun(self: Weapon)
 UnitWeapon.OnGotTarget = nil
 
---- Called by the engine on each weapon of the unit when its weapons must stop firing.
+--- Called by the engine on each weapon of the unit when its attack-ground order changes, such as when the player moves the order.
+--- The engine clears the unit's desired target after this
 ---@type nil | fun(self: Weapon)
 UnitWeapon.OnHaltFire = nil
 
---- Called by the engine when the weapon loses its target.
+--- Called by the engine when the weapon loses its target and has none left
+---@see moho.weapon_methods.ResetTarget # Clears the target
+---@see moho.weapon_methods.TransferTarget # Sets the target of another weapon
 ---@type nil | fun(self: Weapon)
 UnitWeapon.OnLostTarget = nil
 
---- Called by the engine when an aim manipulator of the weapon starts tracking a target.
+--- Called by the engine when the heading (yaw) bone of an aim manipulator of the weapon starts turning, toward a target or back to its rest pose.
+--- It counts as turning while it turns more than 0.001 radians in a tick. Pitch changes don't count.
+--- Not called again until `OnStopTracking`, so a turret that follows a moving target without pausing gets one call
 ---@type nil | fun(self: Weapon, label: string)
 UnitWeapon.OnStartTracking = nil
 
---- Called by the engine when an aim manipulator of the weapon stops tracking a target.
+--- Called by the engine when the heading (yaw) bone of an aim manipulator of the weapon stops turning, after `OnStartTracking`.
+--- It stops when it turns 0.001 radians or less in a tick, such as when it reaches the target heading
 ---@type nil | fun(self: Weapon, label: string)
 UnitWeapon.OnStopTracking = nil
 

@@ -27,6 +27,7 @@ function CAiBrain:AssignThreatAtPosition(position, threat, decay, threatType)
 end
 
 --- Assigns units to a platoon
+---@see moho.platoon_methods.OnUnitsAddedToPlatoon # Called when units are added
 ---@param platoon moho.platoon_methods | string Either a reference to a platoon, or the unique name of the platoon
 ---@param units Unit[]
 ---@param squad PlatoonSquadType
@@ -80,6 +81,7 @@ function CAiBrain:CheckBlockingTerrain(attackPosition, targetPosition, arcType)
 end
 
 --- Spawns a resource building near the given position, used for spawning the prebuild base
+---@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the unit cap stops it
 ---@param blueprintID string
 ---@param posX number
 ---@param posY number
@@ -88,6 +90,7 @@ function CAiBrain:CreateResourceBuildingNearest(blueprintID, posX, posY)
 end
 
 --- Spawns a structure near the given position, used for spawning the prebuild base
+---@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the unit cap stops it
 ---@param blueprintID string
 ---@param posX number
 ---@param posY number
@@ -500,6 +503,7 @@ end
 ---@see moho.aibrain_methods.GetPlatoonsList # To get all platoons
 ---@see moho.aibrain_methods.GetPlatoonUniquelyNamed # To get platoon by a unique name.
 ---@see moho.platoon_methods.UniquelyNamePlatoon # To set platoon's unique name.
+---@see moho.platoon_methods.OnCreate # Called on the new platoon
 ---@param name string # Name of the platoon. Can be shared by more platoons.
 ---@param aiPlan string # plan to follow for this platoon or `''`, the function for the plan is in '/lua/platoon.lua'.
 ---@return Platoon
@@ -561,6 +565,7 @@ end
 ---| "Equal"
 
 --- Creates a new stat trigger.
+---@see moho.aibrain_methods.OnStatsTrigger # Called when all conditions of the trigger are met
 ---@param statName AIBrainBlueprintStatUnits | AIBrainBlueprintStatEnemies | AIBrainBlueprintStatEconomy | AIBrainBlueprintStatDamage # army's stat
 ---@param triggerName string # unique name of the trigger. See `RemoveArmyStatsTrigger` to remove occupied names.
 ---@param compareType ComparatorString # available types: `LessThan`, `LessThanOrEqual`, `GreaterThan`, `GreaterThanOrEqual`, `Equal`
@@ -603,47 +608,77 @@ end
 function CAiBrain:TakeResource(type, amount)
 end
 
---- Called by the engine when the army has no players left in control of it.
+--- Called by the engine when a command source leaves the game and the army has no command sources left.
+--- The army stays in play while it has a command source, including one added with `SetCommandSource`.
+--- Removing the last command source with `SetCommandSource` doesn't call this
+---@see SetCommandSource # Adds or removes command sources of an army
 ---@type nil | fun(self: AIBrain)
 CAiBrain.AbandonedByPlayer = nil
 
---- Called by the engine after an AI army's brain is created, with the army's plan or `"None"`.
+--- Called by the engine after an AI army's brain is created, with the army's plan or `"None"`
 ---@type nil | fun(self: AIBrain, planName: string)
 CAiBrain.OnCreateAI = nil
 
---- Called by the engine after a human army's brain is created, with the army's plan or `"None"`.
+--- Called by the engine after a human army's brain is created, with the army's plan or `"None"`
 ---@type nil | fun(self: AIBrain, planName: string)
 CAiBrain.OnCreateHuman = nil
 
---- Called by the engine when a unit fails unit transfer due to issues other than unit cap.
+--- Called by the engine when a unit fails unit transfer due to issues other than unit cap
+---@see ChangeUnitArmy # Transfers a unit
 ---@type nil | fun(self: AIBrain)
 CAiBrain.OnFailedUnitTransfer = nil
 
---- Called by the engine when the army gains or loses a kind of intel on a blip.
+--- Called by the engine when the army gains or loses a kind of intel on a blip
 ---@type nil | fun(self: AIBrain, blip: Blip, reconType: ReconTypes, val: boolean)
 CAiBrain.OnIntelChange = nil
 
 --- Called by the engine when the user state sends the `PlayBusyStagingPlatformsVO` info pair for a unit of the army.
+--- `IssueDockCommand` sends it when the army has air staging platforms but none has a free slot
+---@see IssueDockCommand # Sends the info pair
+---@see UserUnit.ProcessInfo # Sends any info pair
 ---@type nil | fun(self: AIBrain)
 CAiBrain.OnPlayBusyStagingPlatformsVO = nil
 
 --- Called by the engine when the user state sends the `PlayNoStagingPlatformsVO` info pair for a unit of the army.
+--- `IssueDockCommand` sends it when the army has no air staging platform
+---@see IssueDockCommand # Sends the info pair
+---@see UserUnit.ProcessInfo # Sends any info pair
 ---@type nil | fun(self: AIBrain)
 CAiBrain.OnPlayNoStagingPlatformsVO = nil
 
---- Called by the engine when `ArmyInitializePrebuiltUnits` runs for the army.
+--- Called by the engine function `ArmyInitializePrebuiltUnits`.
+--- After `BeginSession`, when the `PrebuiltUnits` game option is `"On"`, the engine calls the Lua function
+--- `InitializePrebuiltUnits` in simInit.lua for each non-civilian army, which calls `ArmyInitializePrebuiltUnits`
+---@see ArmyInitializePrebuiltUnits # Calls it
+---@see InitializePrebuiltUnits # Lua entry point the engine calls
 ---@type nil | fun(self: AIBrain)
 CAiBrain.OnSpawnPreBuiltUnits = nil
 
 --- Called by the engine when all conditions of a stat trigger of the army are met.
+--- Each `SetArmyStatsTrigger` call adds a condition to the trigger with that name.
+--- The engine removes the trigger when it fires
+---@see moho.aibrain_methods.SetArmyStatsTrigger # Adds a condition to a trigger
+---@see moho.aibrain_methods.RemoveArmyStatsTrigger # Removes a trigger
 ---@type nil | fun(self: AIBrain, triggerName: string)
 CAiBrain.OnStatsTrigger = nil
 
---- Called by the engine when a unit of the army can't land on its carrier because the carrier is full.
+--- Called by the engine when a unit can't be loaded because the transport, carrier or air staging platform is full:
+--- - On the transport's army when a load order assigns it more units than it has slots.
+---   Not for teleporters and air staging platforms, or while the transport is assist-moving, ferrying or guarding
+--- - On the aircraft's army when it can't land on a full carrier or air staging platform
+---
+--- `Unit.OnStartTransportBeamUp` also calls it when the unit's attach slot is taken
+---@see IssueTransportLoad # Load order
 ---@type nil | fun(self: AIBrain)
 CAiBrain.OnTransportFull = nil
 
---- Called by the engine when a unit fails to create due to unit cap.
+--- Called by the engine when a unit fails to create due to unit cap, including units created by factories, engineers, unit transfer and Lua
+---@see CreateUnit # Creates a unit
+---@see CreateUnit2 # Creates a unit
+---@see CreateUnitHPR # Creates a unit
+---@see ChangeUnitArmy # Transfers a unit
+---@see moho.aibrain_methods.CreateUnitNearSpot # Creates a unit
+---@see moho.aibrain_methods.CreateResourceBuildingNearest # Creates a unit
 ---@type nil | fun(self: AIBrain)
 CAiBrain.OnUnitCapLimitReached = nil
 
