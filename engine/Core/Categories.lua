@@ -10,6 +10,7 @@ categories = {
     ABILITYBUTTON = categoryValue,
     ADVANCEDCOMBATPRESET = categoryValue,
     AEON = categoryValue,
+    --- Engine: a unit built by a factory skips the factory's queued transport-load orders, as `NAVAL` units do. Only transports that are staging platforms (`AIRSTAGINGPLATFORM`, `PODSTAGINGPLATFORM`) carry it, and other transports refuse it. Counted in the army stats (`CArmyStats`)
     AIR = categoryValue,
     --- Engine: aircraft can dock at the unit (Dock order, refuel and call-to-staging behavior)
     AIRSTAGINGPLATFORM = categoryValue,
@@ -18,7 +19,7 @@ categories = {
     --- Engine: added to every unit blueprint automatically
     ALLUNITS = categoryValue,
     AMPHIBIOUS = categoryValue,
-    --- Used for units that can target air units
+    --- Used for units that can target air units. Engine: counted in the army stats (`CArmyStats`)
     ANTIAIR = categoryValue,
     --- Used by support commander presets
     ANTIAIRPRESET = categoryValue,
@@ -32,6 +33,7 @@ categories = {
     ANTISUB = categoryValue,
     --- Used for units that can target torpedoes
     ANTITORPEDO = categoryValue,
+    --- Engine: counted in the army stats (`CArmyStats`)
     ARTILLERY = categoryValue,
     ASF = categoryValue,
     BATTLESHIP = categoryValue,
@@ -61,18 +63,22 @@ categories = {
     BUILTBYTIER3COMMANDER = categoryValue,
     BUILTBYTIER3ENGINEER = categoryValue,
     BUILTBYTIER3FACTORY = categoryValue,
+    --- Engine (UI): right-clicking a unit in it doesn't give a guard order. No FAF unit has it
+    CAMPAIGNGATE = categoryValue,
     --- Engine (UI): aircraft in this category get no dock cursor over an `AIRSTAGINGPLATFORM`
     CANNOTUSEAIRSTAGING = categoryValue,
     --- Engine: the transport can carry `COMMAND` units. Without it, transports refuse them
     CANTRANSPORTCOMMANDER = categoryValue,
-    --- Engine: the unit accepts capture orders. The target needs `Capturable` in its blueprint
+    --- Engine: the unit accepts capture orders. The target must be capturable (`Unit:SetCapturable`), not allied, alive and finished
     CAPTURE = categoryValue,
-    --- Engine: units attached to a carrier cannot be selected or hovered and reject move and guard orders
+    --- Engine: the unit uses the carrier tasks to load, launch and dock aircraft. Units attached to it can't be hovered in the world view, but unlike units in other transports they accept move, patrol, attack-move and guard orders
     CARRIER = categoryValue,
     CIVILIAN = categoryValue,
     CIVILLIAN = categoryValue,
     CLOAKPRESET = categoryValue,
     COMBATPRESET = categoryValue,
+    --- Engine: transports without `CANTRANSPORTCOMMANDER` refuse the unit. `Entity:Kill` kills it outside the playable area even when its `CheckCanBeKilled` returns false. When its transport dies and its `CheckCanBeKilled` returns false, it takes 10000 damage through `OnDamage` if its `CheckCanTakeDamage` allows. `ChangeUnitArmy` returns nil for a unit that has a `COMMAND` unit attached. A `PATROLHELPER` unit in it skips patrol reclaim and repair on attack-move and in formation. Killing it adds to the `Enemies_Commanders_Destroyed` stat
+    --- Engine (UI): excluded from `GetIdleEngineers`. Transports without `CANTRANSPORTCOMMANDER` get no load cursor over it
     COMMAND = categoryValue,
     CONSTRUCTION = categoryValue,
     --- Lua-side (`lua/ui/game/construction.lua`): when a factory is selected, shows the unit one tech tab lower
@@ -82,37 +88,48 @@ categories = {
     CRUISER = categoryValue,
     CYBRAN = categoryValue,
     DEBUG = categoryValue,
+    --- Engine: counted in the army stats (`CArmyStats`)
     DEFENSE = categoryValue,
     DEFENSIVEBOAT = categoryValue,
     DESTROYER = categoryValue,
     DIESTOOCDEPLETINGSHIELD = categoryValue,
+    --- Engine: an attack order on a target that none of the unit's weapons can hit is kept, and the unit moves to the target. Without this category the order ends at once, unless the unit moves in formation or is a submarine with `AI.AutoSurfaceToAttack`
     DIRECTFIRE = categoryValue,
-    --- Engine (UI): the structure can be drag-built in a line, as walls are
+    --- Engine (UI): the unit can be drag-built in a line.
+    --- Lua-side (`lua/system/Blueprints.lua`): added to every `MOBILE` unit
     DRAGBUILD = categoryValue,
     DUMMYGSRWEAPON = categoryValue,
     DUMMYUNIT = categoryValue,
     ECONOMIC = categoryValue,
+    --- Engine: counted in the army stats (`CArmyStats`)
     ENERGYPRODUCTION = categoryValue,
     ENERGYSTORAGE = categoryValue,
-    --- Engine: the unit accepts build orders. In the UI it counts for `GetIdleEngineers`, unless it is also `COMMAND`, `SCOUT` or `UNTARGETABLE`, or has a `General.QuickSelectPriority`
+    --- Engine: the unit accepts build orders and uses the engineer behavior of guard orders. Weapons of its army don't pick a unit as automatic target while an engineer of the army captures it. Counted in the army stats (`CArmyStats`).
+    --- Engine (UI): the unit counts for `GetIdleEngineers`, unless it is also `COMMAND`, `SCOUT` or `UNTARGETABLE`, or has a positive `General.QuickSelectPriority`
     ENGINEER = categoryValue,
     ENGINEERPRESET = categoryValue,
     ENGINEERSTATION = categoryValue,
+    --- Engine: a unit created where only air fits starts on the land layer instead of the air layer. Experimental aircraft on guard orders don't speed through their goals as other escorting aircraft do.
+    --- Engine (UI): transports get no load cursor over it
     EXPERIMENTAL = categoryValue,
-    --- Replaces the unit's command queue with the rally point orders. Also gives it a default rally point order upon creation
+    --- Engine: a unit with buildable categories gets a factory build queue for its rally point orders, which every unit it builds inherits. The queue starts with a move to `Economy.InitialRallyX` and `Economy.InitialRallyZ`, and gets it again whenever it empties. An immobile factory reserves its skirt in the occupancy grid. The unit accepts build orders, and accepts orders while it is being built. A factory can only guard factories. A unit given a transport-load order onto a factory waits there for a ferry. Counted in the army stats (`CArmyStats`).
+    --- Engine (UI): the unit can be selected while it is being built. With `STRUCTURE`, it counts for `GetIdleFactories`
     FACTORY = categoryValue,
-    --- Engine: the pathfinder prefers water for this unit when its destinations are underwater
+    --- Engine: when the unit and all its destinations are on water, its path requests use its `Physics.AltFootprint`, so the path stays on water. Every other `FAVORSWATER` unit in the same order must also be on water with destinations on water. Otherwise it paths with its normal footprint. It is a switch between the two footprints, not a cost weighting
     FAVORSWATER = categoryValue,
     --- Engine: marks a ferry beacon, the target of ferry orders. Can be hovered even when `UNTARGETABLE`
     FERRYBEACON = categoryValue,
     FIELDENGINEER = categoryValue,
     FRIGATE = categoryValue,
     GATE = categoryValue,
+    --- Engine: cached on the unit at creation, but nothing reads it. No FAF unit has it
+    GRIDBASEDMOTION = categoryValue,
     GROUNDATTACK = categoryValue,
     HELPER = categoryValue,
     HIGHALTAIR = categoryValue,
     HIGHPRIAIR = categoryValue,
     HOVER = categoryValue,
+    --- Engine (AI): the AI brain's `FindPlaceToBuild` and `CreateResourceBuildingNearest` place units in it on hydrocarbon markers
     HYDROCARBON = categoryValue,
     INDIRECTFIRE = categoryValue,
     --- Engine (UI): the unit's orders are not drawn as command lines
@@ -123,27 +140,35 @@ categories = {
     --- Lua-side (`lua/system/blueprints-props.lua`): makes a prop indestructible by switching its script to `PropInvulnerable`
     INVULNERABLE = categoryValue,
     ISPREENHANCEDUNIT = categoryValue,
+    --- Engine: transports on assist-move and ferry orders only pick up `MOBILE` `LAND` units. Counted in the army stats (`CArmyStats`)
     LAND = categoryValue,
     LIGHTBOAT = categoryValue,
+    --- Engine (AI): counted in the AI influence map (`CInfluenceMap`)
     MASSEXTRACTION = categoryValue,
     MASSFABRICATION = categoryValue,
+    --- Engine: counted in the army stats (`CArmyStats`)
     MASSPRODUCTION = categoryValue,
     MASSSTORAGE = categoryValue,
+    --- Engine: attack orders use the melee attack task, and its weapons check melee range instead of firing solutions. No FAF unit has it
+    MELEE = categoryValue,
     MISSILE = categoryValue,
     MISSILEPRESET = categoryValue,
+    --- Engine: targets in it count as moving targets for weapon aiming. Transports on assist-move and ferry orders only pick up `MOBILE` `LAND` units. Also read by AI brain functions such as `GetAvailableFactories`
     MOBILE = categoryValue,
     MOBILESONAR = categoryValue,
     NANOCOMBATPRESET = categoryValue,
     NAVALCARRIER = categoryValue,
+    --- Engine: a unit built by a factory skips the factory's queued transport-load orders, as `AIR` units do. Counted in the army stats (`CArmyStats`)
     NAVAL = categoryValue,
 
     --- Lua-side (`lua/ui/game/construction.lua`, `lua/ui/game/buildmode.lua`): the build menu places this mobile unit on the map like a structure, as for experimentals built by engineers.
-    --- Engine: a unit in this category accepts build orders, like `FACTORY`, `ENGINEER` and `POD`
+    --- Engine: the unit accepts build orders, which otherwise only `FACTORY`, `ENGINEER` and `POD` units accept. The Fatboy, Megalith, Tempest, Atlantis and CZAR build units through it. `FACTORY` would give them the factory build queue and its rally point orders, and `ENGINEER` the engineer guard behavior and the idle engineer list
     NEEDMOBILEBUILD = categoryValue,
     --- Unit doesn't use a formation when assisting other units
     NOFORMATION = categoryValue,
     --- Engine: prevents area damage being applied to the entity
     NOSPLASHDAMAGE = categoryValue,
+    --- Engine: counted in the army stats (`CArmyStats`)
     NUKE = categoryValue,
     NUKESUB = categoryValue,
     OMNI = categoryValue,
@@ -151,10 +176,10 @@ categories = {
     OPTICS = categoryValue,
     ORBITALSYSTEM = categoryValue,
     --- Lua-side (`lua/ui/game/rangeoverlayparams.lua`): shows the unit in the anti-air range overlay.
-    --- Engine (UI): lets an amphibious or surfacing unit count as able to attack air targets
+    --- Engine (UI): `UserUnit:CanAttackTarget` and the attack order count a mobile unit with auto-surface mode on as able to attack air units, since it surfaces to attack. This ignores the `FireTargetLayerCaps` of its weapons
     OVERLAYANTIAIR = categoryValue,
     --- Lua-side (`lua/ui/game/rangeoverlayparams.lua`): shows the unit in the anti-navy range overlay.
-    --- Engine (UI): lets an amphibious unit on land count as able to attack naval targets
+    --- Engine (UI): `UserUnit:CanAttackTarget` and the attack order count an amphibious unit on land as able to attack submerged and seabed units, since it moves into the water to attack. This ignores the `FireTargetLayerCaps` of its weapons
     OVERLAYANTINAVY = categoryValue,
     --- Lua-side (`lua/ui/game/rangeoverlayparams.lua`): shows the unit in the counter-intel range overlay
     OVERLAYCOUNTERINTEL = categoryValue,
@@ -163,12 +188,12 @@ categories = {
     --- Lua-side (`lua/ui/game/rangeoverlayparams.lua`): shows the unit in the countermeasure range overlay
     OVERLAYDEFENSE = categoryValue,
     --- Lua-side (`lua/ui/game/rangeoverlayparams.lua`): shows the unit in the direct fire range overlay.
-    --- Engine (UI): lets an amphibious or surfacing unit count as able to attack land targets
+    --- Engine (UI): `UserUnit:CanAttackTarget` and the attack order count a mobile unit with auto-surface mode on, and an amphibious unit on the seabed, as able to attack land units, since they surface or walk onto land to attack. This ignores the `FireTargetLayerCaps` of their weapons
     OVERLAYDIRECTFIRE = categoryValue,
     --- Lua-side (`lua/ui/game/rangeoverlayparams.lua`): shows the unit in the indirect fire range overlay
     OVERLAYINDIRECTFIRE = categoryValue,
     --- Lua-side (`lua/ui/game/rangeoverlayparams.lua`): shows the unit in the build range overlay.
-    --- Engine: that ring uses the blueprint `AI.StagingPlatformScanRadius`, or `AI.GuardScanRadius` when that is 0
+    --- Engine: the build range ring uses the blueprint `AI.StagingPlatformScanRadius`, or `AI.GuardScanRadius` when that is 0
     OVERLAYMISC = categoryValue,
     --- Lua-side (`lua/ui/game/rangeoverlayparams.lua`): shows the unit in the omni range overlay
     OVERLAYOMNI = categoryValue,
@@ -176,12 +201,15 @@ categories = {
     OVERLAYRADAR = categoryValue,
     --- Lua-side (`lua/ui/game/rangeoverlayparams.lua`): shows the unit in the sonar range overlay
     OVERLAYSONAR = categoryValue,
-    --- Engine: the unit reclaims and repairs nearby targets while on patrol or attack-move. A `COMMAND` or `SACU_BEHAVIOR` unit skips this while moving in formation
+    --- Engine: the unit reclaims and repairs nearby targets while on patrol or attack-move. A `COMMAND` or `SACU_BEHAVIOR` unit skips this on attack-move and on a patrol or attack-move in formation
     PATROLHELPER = categoryValue,
     PERSONALSHIELD = categoryValue,
-    --- Engine: a pod attached to its parent rejects move, guard, reclaim, capture and repair orders. Pods accept build orders
+    --- Engine: when its command queue is empty, the unit gets an assist-commander order: it helps its creator's work, or docks on its creator when that is `PODSTAGINGPLATFORM`. While docked, it can be selected and accepts move, patrol, attack-move, guard, reclaim, capture and repair orders, which units in other transports reject. It accepts build orders.
+    --- Engine (UI): an unload drag with only pods selected in the transport gives them a move order
     POD = categoryValue,
-    --- Engine: the unit gets transport logic without the `RULEUCC_Transport` command cap, so pods can attach to it
+    --- Engine: the unit rejects transport load and dock orders, as units already in a transport do. No FAF unit has it
+    PODS = categoryValue,
+    --- Engine: the unit gets transport logic without the `RULEUCC_Transport` command cap, so `POD` units it created dock on it. The transport counts as a staging platform, as for `AIRSTAGINGPLATFORM`: it only carries aircraft. A docked aircraft with `Physics.FuelUseTime` refuels and repairs with this unit's `AI.RefuelingMultiplier` and staging repair values, but pods have no fuel, so they get neither. Unlike `AIRSTAGINGPLATFORM`, dock orders and the dock cursor don't target it
     PODSTAGINGPLATFORM = categoryValue,
     PRODUCTDL = categoryValue,
     PRODUCTFA = categoryValue,
@@ -193,6 +221,8 @@ categories = {
     RALLYPOINT = categoryValue,
     RAMBOPRESET = categoryValue,
     RASPRESET = categoryValue,
+    --- Engine: the unit gets a builder. When a structure it guards dies, it queues and rebuilds that structure. A guard order on a structure sends it to the structure's position. No FAF unit has it
+    REBUILDER = categoryValue,
     --- Engine: the entity can be reclaimed. Reclaim orders, the reclaim cursor and patrol reclaim skip entities without it
     RECLAIMABLE = categoryValue,
     --- Engine: the unit accepts reclaim orders
@@ -203,18 +233,21 @@ categories = {
     REPAIR = categoryValue,
     RESEARCH = categoryValue,
     SATELLITE = categoryValue,
+    --- Engine (UI): excluded from `GetIdleEngineers`
     SCOUT = categoryValue,
     --- Engine (UI): the unit can be selected. Units without it cannot be selected
     SELECTABLE = categoryValue,
     SERAPHIM = categoryValue,
+    --- Engine: building or repairing the unit also regenerates its shield, scaled by `Defense.Shield.RegenAssistMult`, and repair goes on until the shield is full. Units on guard orders repair a unit in it whose shield is damaged
     SHIELD = categoryValue,
     SHIELDCOLLIDE = categoryValue,
     SHIELDCOMBATPRESET = categoryValue,
-    --- Lua-side (`lua/ui/controls/worldview.lua`): draws the damage radius of the selected unit's missile weapons at the cursor
+    --- Lua-side (`lua/ui/controls/worldview.lua`): with the unit selected, the attack, nuke, tactical and overcharge cursors draw the damage radius of its matching weapons
     SHOWATTACKRETICLE = categoryValue,
     --- Engine (UI): shows the factory build queue of the unit (`SetCurrentFactoryForQueueDisplay`)
     SHOWQUEUE = categoryValue,
-    --- Engine: the unit can build missiles with silo build orders
+    --- Engine: the unit can build missiles with silo build orders.
+    --- Engine (UI): right-clicking an unfinished immobile unit in it with repair-capable units selected gives no repair order, as for `FACTORY`
     SILO = categoryValue,
     SIMPLECOMBATPRESET = categoryValue,
     SIZE4 = categoryValue,
@@ -239,12 +272,15 @@ categories = {
     SORTSTRATEGIC = categoryValue,
     SPECIALHIGHPRI = categoryValue,
     SPECIALLOWPRI = categoryValue,
+    --- Engine: like a `POD`, the unit gets an assist-commander order when its command queue is empty. With auto mode on, it repairs, helps build or reclaims for allied units within its `AI.GuardScanRadius`. Otherwise a mobile one docks on its creator, and an immobile one waits
     STATIONASSISTPOD = categoryValue,
     STEALTH = categoryValue,
     STEALTHFIELD = categoryValue,
     STEALTHPRESET = categoryValue,
     STRATEGICBOMBER = categoryValue,
     STRATEGIC = categoryValue,
+    --- Engine (UI): with `FACTORY`, the unit counts for `GetIdleFactories`. A guard order on it sends selected `REBUILDER` units to its position. Counted in the army stats (`CArmyStats`).
+    --- Engine (AI): read by AI brain functions such as `CanBuildStructureAt`
     STRUCTURE = categoryValue,
     SUBCOMMANDER = categoryValue,
     SUBMERSIBLE = categoryValue,
@@ -256,12 +292,20 @@ categories = {
     TANK = categoryValue,
     --- Engine: the unit leaves its formation on attack orders. Aircraft in it follow a moving target directly and ignore movement damping
     TARGETCHASER = categoryValue,
+    --- Engine: counted in the army stats (`CArmyStats`)
     TECH1 = categoryValue,
+    --- Engine: counted in the army stats (`CArmyStats`)
     TECH2 = categoryValue,
+    --- Engine: counted in the army stats (`CArmyStats`)
     TECH3 = categoryValue,
     TECH_TWO = categoryValue,
+    --- Engine: the transport logic of the unit teleports its cargo: load and dock orders onto it call a teleport, and unload orders onto a target set the destination. No FAF unit has it
+    TELEPORTATION = categoryValue,
+    --- Engine (UI): with a `TELEPORTATION` unit selected, a transport order onto it gives an unload order there, and its order lines use a teleport colour. No FAF unit has it
     TELEPORTBEACON = categoryValue,
     TORPEDO = categoryValue,
+    --- Engine: only units in it accept ferry orders. Factories hand built units to ferrying transports in it, a transport in it descends faster when landing, and in an assist-move order with `MOBILE` `LAND` units it carries them. Counted in the army stats (`CArmyStats`).
+    --- Engine (UI): right-click and drag orders treat it as a transport
     TRANSPORTATION = categoryValue,
     TRANSPORTBUILTBYTIER1FACTORY = categoryValue,
     TRANSPORTBUILTBYTIER2FACTORY = categoryValue,
@@ -275,6 +319,8 @@ categories = {
     UNSPAWNABLE = categoryValue,
     --- Engine (UI): when the unit is not also `SELECTABLE`, the cursor cannot hover or target it. Also excludes it from `GetIdleEngineers`
     UNTARGETABLE = categoryValue,
+    --- Engine: an immobile unit in it doesn't occupy ground when created, and a unit in it attached to a transport doesn't count as cargo. No FAF unit has it
+    UPGRADE = categoryValue,
     USEBUILDPRESETS = categoryValue,
     --- Lua-side (`lua/ui/game/unitview.lua`): shows the missile count only when the unit has a missile enhancement
     VERIFYMISSILEUI = categoryValue,
@@ -314,16 +360,16 @@ categories = {
 
     --- Engine: the unit can land on water. Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/20
     CANLANDONWATER = categoryValue,
-    --- Engine: the unit accepts upgrade orders while it is being built. Introduced by https://github.com/FAForever/FA-Binary-Patches/blob/master/section/BuildUnit.cpp
+    --- Engine: the unit accepts orders while it is being built, which the base engine allows only for `FACTORY` units, so upgrades can be queued on it. Engine (UI): it can be selected while it is being built. Introduced by https://github.com/FAForever/FA-Binary-Patches/blob/master/section/BuildUnit.cpp and https://github.com/FAForever/FA-Binary-Patches/blob/master/section/SelectUnit.cpp
     CQUEMOV = categoryValue,
     --- Engine (UI): drag selection gives an unfinished unit with this category the lowest selection priority. Introduced by https://github.com/FAForever/FA-Binary-Patches/blob/master/section/selectionPriority.cpp
     LOWSELECTPRIO = categoryValue,
     --- Engine: a structure can't be built on top of a prop with this category. Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/16
     --- Lua-side (`lua/sim/units/StructureUnit.lua`): the prop is not cleared when a structure starts building on top of it. Added to wreckage by `lua/system/blueprints-props.lua`
     OBSTRUCTSBUILDING = categoryValue,
-    --- Engine: a `PATROLHELPER` unit with this category skips patrol reclaim and repair while moving in formation, like a `COMMAND` unit. The patch renames the engine's `SUBCOMMANDER` check to this category, and `lua/system/blueprints-units.lua` adds it to every `SUBCOMMANDER` unit. Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/13
+    --- Engine: a `PATROLHELPER` unit with this category skips patrol reclaim and repair on attack-move and on a patrol or attack-move in formation, like a `COMMAND` unit. The patch renames the engine's `SUBCOMMANDER` check to this category, and `lua/system/blueprints-units.lua` adds it to every `SUBCOMMANDER` unit. Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/13
     SACU_BEHAVIOR = categoryValue,
-    --- Engine (UI): without the patch, double-clicking a wall doesn't select the other walls of that type. The patch removes that exception. Introduced by https://github.com/FAForever/FA-Binary-Patches/blob/master/hooks/WallSelection.cpp
+    --- Engine (UI): the `select_all_units_of_same_type` hotkey (`UI_ExpandCurrentSelection`) skips walls. Without the patch, double-clicking a wall doesn't select the other walls of that type, and the patch removes that exception. Introduced by https://github.com/FAForever/FA-Binary-Patches/blob/master/hooks/WallSelection.cpp
     WALL = categoryValue,
 }
 
@@ -370,6 +416,7 @@ categories = {
 ---| "BUILTBYTIER3COMMANDER"
 ---| "BUILTBYTIER3ENGINEER"
 ---| "BUILTBYTIER3FACTORY"
+---| "CAMPAIGNGATE"
 ---| "CANNOTUSEAIRSTAGING"
 ---| "CANTRANSPORTCOMMANDER"
 ---| "CAPTURE"
@@ -409,6 +456,7 @@ categories = {
 ---| "FIELDENGINEER"
 ---| "FRIGATE"
 ---| "GATE"
+---| "GRIDBASEDMOTION"
 ---| "GROUNDATTACK"
 ---| "HELPER"
 ---| "HIGHALTAIR"
@@ -429,6 +477,7 @@ categories = {
 ---| "MASSFABRICATION"
 ---| "MASSPRODUCTION"
 ---| "MASSSTORAGE"
+---| "MELEE"
 ---| "MISSILE"
 ---| "MISSILEPRESET"
 ---| "MOBILE"
@@ -460,6 +509,7 @@ categories = {
 ---| "PATROLHELPER"
 ---| "PERSONALSHIELD"
 ---| "POD"
+---| "PODS"
 ---| "PODSTAGINGPLATFORM"
 ---| "PRODUCTDL"
 ---| "PRODUCTFA"
@@ -469,6 +519,7 @@ categories = {
 ---| "RALLYPOINT"
 ---| "RAMBOPRESET"
 ---| "RASPRESET"
+---| "REBUILDER"
 ---| "RECLAIMABLE"
 ---| "RECLAIM"
 ---| "RECLAIMFRIENDLY"
@@ -522,6 +573,7 @@ categories = {
 ---| "TECH2"
 ---| "TECH3"
 ---| "TECH_TWO"
+---| "TELEPORTATION"
 ---| "TELEPORTBEACON"
 ---| "TORPEDO"
 ---| "TRANSPORTATION"
@@ -533,6 +585,7 @@ categories = {
 ---| "UNSELECTABLE"
 ---| "UNSPAWNABLE"
 ---| "UNTARGETABLE"
+---| "UPGRADE"
 ---| "USEBUILDPRESETS"
 ---| "VERIFYMISSILEUI"
 ---| "VISIBLETORECON"
