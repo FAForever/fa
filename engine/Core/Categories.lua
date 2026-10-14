@@ -69,8 +69,6 @@ categories = {
     CAPTURE = categoryValue,
     --- Engine: units attached to a carrier cannot be selected or hovered and reject move and guard orders
     CARRIER = categoryValue,
-    --- Allows the unit to land on water. Is introduced by https://github.com/FAForever/FA-Binary-Patches/pull/20
-    CANLANDONWATER = categoryValue,
     CIVILIAN = categoryValue,
     CIVILLIAN = categoryValue,
     CLOAKPRESET = categoryValue,
@@ -80,8 +78,6 @@ categories = {
     --- Lua-side (`lua/ui/game/construction.lua`): when a factory is selected, shows the unit one tech tab lower
     CONSTRUCTIONSORTDOWN = categoryValue,
     COUNTERINTELLIGENCE = categoryValue,
-    --- Not read by the engine or by Lua
-    CQUEMOV = categoryValue,
     CRABEGG = categoryValue,
     CRUISER = categoryValue,
     CYBRAN = categoryValue,
@@ -129,7 +125,6 @@ categories = {
     ISPREENHANCEDUNIT = categoryValue,
     LAND = categoryValue,
     LIGHTBOAT = categoryValue,
-    LOWSELECTPRIO = categoryValue,
     MASSEXTRACTION = categoryValue,
     MASSFABRICATION = categoryValue,
     MASSPRODUCTION = categoryValue,
@@ -151,8 +146,6 @@ categories = {
     NOSPLASHDAMAGE = categoryValue,
     NUKE = categoryValue,
     NUKESUB = categoryValue,
-    --- Lua-side (`lua/sim/units/StructureUnit.lua`): the prop is not cleared when a structure starts building on top of it. Added to wreckage by `lua/system/blueprints-props.lua`
-    OBSTRUCTSBUILDING = categoryValue,
     OMNI = categoryValue,
     OPERATION = categoryValue,
     OPTICS = categoryValue,
@@ -209,8 +202,6 @@ categories = {
     --- Engine: the unit accepts repair orders
     REPAIR = categoryValue,
     RESEARCH = categoryValue,
-    --- Engine: a `PATROLHELPER` unit skips patrol reclaim and repair while moving in formation, as for `COMMAND`. Added to every `SUBCOMMANDER` by `lua/system/blueprints-units.lua`
-    SACU_BEHAVIOR = categoryValue,
     SATELLITE = categoryValue,
     SCOUT = categoryValue,
     --- Engine (UI): the unit can be selected. Units without it cannot be selected
@@ -290,8 +281,6 @@ categories = {
     --- Engine: other armies can see the unit through vision, radar or sonar. Units without it never show to other armies
     VISIBLETORECON = categoryValue,
     VOLATILE = categoryValue,
-    --- Engine (UI): double-clicking the unit does not select other units of the same type
-    WALL = categoryValue,
     -- sACU Preset Enhancements
     AdvancedCoolingUpgrade = categoryValue,
     CloakingGenerator = categoryValue,
@@ -319,7 +308,23 @@ categories = {
     SystemIntegrityCompensator = categoryValue,
 
     -- Populates a dummy factory that can take over the factory aspect of the unit
-    EXTERNALFACTORY = categoryValue
+    EXTERNALFACTORY = categoryValue,
+
+    -- Added or changed by FA-Binary-Patches
+
+    --- Engine: the unit can land on water. Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/20
+    CANLANDONWATER = categoryValue,
+    --- Engine: the unit accepts upgrade orders while it is being built. Introduced by https://github.com/FAForever/FA-Binary-Patches/blob/master/section/BuildUnit.cpp
+    CQUEMOV = categoryValue,
+    --- Engine (UI): drag selection gives an unfinished unit with this category the lowest selection priority. Introduced by https://github.com/FAForever/FA-Binary-Patches/blob/master/section/selectionPriority.cpp
+    LOWSELECTPRIO = categoryValue,
+    --- Engine: a structure can't be built on top of a prop with this category. Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/16
+    --- Lua-side (`lua/sim/units/StructureUnit.lua`): the prop is not cleared when a structure starts building on top of it. Added to wreckage by `lua/system/blueprints-props.lua`
+    OBSTRUCTSBUILDING = categoryValue,
+    --- Engine: a `PATROLHELPER` unit with this category skips patrol reclaim and repair while moving in formation, like a `COMMAND` unit. The patch renames the engine's `SUBCOMMANDER` check to this category, and `lua/system/blueprints-units.lua` adds it to every `SUBCOMMANDER` unit. Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/13
+    SACU_BEHAVIOR = categoryValue,
+    --- Engine (UI): without the patch, double-clicking a wall doesn't select the other walls of that type. The patch removes that exception. Introduced by https://github.com/FAForever/FA-Binary-Patches/blob/master/hooks/WallSelection.cpp
+    WALL = categoryValue,
 }
 
 ---@alias CategoryName

@@ -17,20 +17,6 @@ end
 function CUIWorldView:CameraReset()
 end
 
---- If true, enables the rendering of custom world shapes. See also all shapes at /lua/ui/game/shapes.
---- 
---- This is introduced via an assembly patch. For more information: https://github.com/FAForever/FA-Binary-Patches/pull/47
----@param bool boolean
-function CUIWorldView:SetCustomRender(bool)
-end
-
----Projects multiple vectors at once.
----@generic T
----@param positions table<T, Vector>
----@return table<T, Vector2>
-function CUIWorldView:ProjectMultiple(positions)
-end
-
 --- If true, enables the rendering of resources. Note that resources can **never** be rendered when the camera is in free mode.
 ---@param enable boolean
 function CUIWorldView:EnableResourceRendering(enable)
@@ -139,6 +125,28 @@ CUIWorldView.OnFrame = nil
 ---@type nil | fun(self: WorldView, areIconsVisible: boolean)
 CUIWorldView.OnIconsVisible = nil
 
+--- Called by the engine every frame while the mouse is over the world view.
+---@type nil | fun(self: WorldView)
+CUIWorldView.OnUpdateCursor = nil
+
+-- Added by FA-Binary-Patches
+
+--- Projects multiple vectors at once.
+---
+--- Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/40
+---@generic T
+---@param positions table<T, Vector>
+---@return table<T, Vector2>
+function CUIWorldView:ProjectMultiple(positions)
+end
+
+--- If true, enables the rendering of custom world shapes. See also all shapes at /lua/ui/game/shapes.
+---
+--- Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/47
+---@param bool boolean
+function CUIWorldView:SetCustomRender(bool)
+end
+
 --- Called by the engine every frame while the world view draws the world and custom rendering is
 --- enabled with `SetCustomRender`, with the time since the last frame. The `UI_Draw*` functions
 --- only work inside this callback.
@@ -146,10 +154,5 @@ CUIWorldView.OnIconsVisible = nil
 --- Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/47
 ---@type nil | fun(self: WorldView, delta: number)
 CUIWorldView.OnRenderWorld = nil
-
---- Called by the engine every frame while the mouse is over the world view.
----@type nil | fun(self: WorldView)
-CUIWorldView.OnUpdateCursor = nil
-
 
 return CUIWorldView

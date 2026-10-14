@@ -69,7 +69,7 @@ Stubs are the only documentation of engine functions. Record what a consumer nee
 
 - Units and side effects, in the description.
 - Engine quirks and typos: [Sim/Entity.lua](Sim/Entity.lua) notes that "Thread" in `AddThreadScroller` should have been "Tread".
-- Functions or fields added by [FA-Binary-Patches](https://github.com/FAForever/FA-Binary-Patches): link the patch PR, e.g. `Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/132`.
+- Functions or fields added by [FA-Binary-Patches](https://github.com/FAForever/FA-Binary-Patches): link the patch PR, e.g. `Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/132`. Group them at the bottom of the file under `-- Added by FA-Binary-Patches`, since they are add-ons to the base engine.
 - Complex engine logic: a `--[[ ]]` Lua pseudocode block above the function, as for `CanFire` in [Sim/UnitWeapon.lua](Sim/UnitWeapon.lua).
 - Caveats for blueprint fields go on the field in [Core/Blueprints/](Core/Blueprints/), e.g. `RenderFireClock` in [WeaponBlueprint.lua](Core/Blueprints/WeaponBlueprint.lua).
 
