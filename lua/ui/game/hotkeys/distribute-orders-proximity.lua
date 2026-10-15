@@ -34,7 +34,7 @@ DistributeOrdersProximity = function(clearCommands)
         local validUnits = EntityCategoryFilterOut(categories.FACTORY, selection)
 
         if table.empty(validUnits) then
-            print("No orders to distribute")
+            print("No orders to distribute (proximity)")
             return
         end
 
@@ -57,13 +57,13 @@ DistributeOrdersProximity = function(clearCommands)
         local queue = nearestUnit:GetCommandQueue()
         local queueCount = table.getn(queue)
         if queueCount > 0 then
-            print(string.format("Distributing orders"))
+            print(string.format("Distributing orders (proximity)"))
             SimCallback({ Func = 'DistributeOrdersProximity', Args = { Target = nearestUnit:GetEntityId(), ClearCommands = clearCommands or false } }, true)
         else
-            print("No orders to distribute")
+            print("No orders to distribute (proximity)")
         end
     else
-        print("No orders to distribute")
+        print("No orders to distribute (proximity)")
     end
 end
 
@@ -74,10 +74,10 @@ DistributeOrdersProximityOfMouseContext = function(clearCommands)
     if target then
         local orderCount = table.getn(target:GetCommandQueue())
         if orderCount > 0 then
-            print(string.format("Distributing orders"))
+            print(string.format("Distributing orders (proximity)"))
             SimCallback({ Func = 'DistributeOrdersProximity', Args = { Target = target:GetEntityId() }, ClearCommands = clearCommands or false }, true)
         else
-            print("No orders to distribute")
+            print("No orders to distribute (proximity)")
         end
     end
 end

@@ -465,9 +465,9 @@ DistributeOrdersProximity = function(units, target, clearCommands, doPrint)
 
     if doPrint and (GetFocusArmy() == brain:GetArmyIndex()) then
         if distributedOrders > 0 then
-            print(string.format("Distributed %d orders", tostring(distributedOrders)))
+            print(string.format("Distributed %d orders (proximity)", tostring(distributedOrders)))
         else
-            print(string.format("No orders to distribute"))
+            print(string.format("No orders to distribute (proximity)"))
         end
     end
 end
