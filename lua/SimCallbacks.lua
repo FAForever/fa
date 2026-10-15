@@ -722,6 +722,45 @@ do
 end
 
 do
+    local CategoriesEngineers = categories.ENGINEER + categories.COMMAND
+    local CategoriesFactories = categories.STRUCTURE * categories.FACTORY
+
+    --- Aborts the initial assist move of the engineers that are already in build range of the factory they assist
+    ---@param data { Target: EntityId }
+    ---@param selection Unit[]
+    Callbacks.AbortNavigationOfFactoryAssisters = function(data, selection)
+        -- no anti-automation guard: this only skips the assist move of engineers in range of the factory they assist
+
+        -- verify selection
+        selection = SecureUnits(selection)
+        if TableEmpty(selection) then
+            return
+        end
+
+        local engineers = EntityCategoryFilterDown(CategoriesEngineers, selection)
+        if TableEmpty(engineers) then
+            return
+        end
+
+        -- verify the target
+        local targetId = data.Target
+        if type(targetId) ~= 'string' then
+            return
+        end
+
+        local target = GetUnitById(targetId) --[[@as Unit]]
+        if (not target) or
+            IsDestroyed(target) or
+            (not EntityCategoryContains(CategoriesFactories, target))
+        then
+            return
+        end
+
+        import("/lua/sim/commands/abort-factory-assist-navigation.lua").AbortNavigationOfFactoryAssisters(engineers, target)
+    end
+end
+
+do
     local CommandSourceGuards = {}
 
     ---@param data { }
