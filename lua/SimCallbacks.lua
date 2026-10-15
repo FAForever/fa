@@ -137,10 +137,13 @@ Callbacks.ValidateMassStorageAssist = function(data, units)
             print('found adjacent t1/t2 mass extractor: ' .. tostring(extractor.EntityId))
 
             local assistingUnits = SecureUnits(units)
+            local referenceQueue
+            local queueCount
+
             for _, unit in assistingUnits do
                 local queue = unit:GetCommandQueue()
-                local queueCount = TableGetn(queue)
-                local lastCommand = queue[queueCount]
+                local unitQueueCount = TableGetn(queue)
+                local lastCommand = queue[unitQueueCount]
 
                 -- The callback runs after the original command is issued. Only replace that
                 -- command when it is the final guard/assist order and still targets the storage.
@@ -148,38 +151,57 @@ Callbacks.ValidateMassStorageAssist = function(data, units)
                     or (lastCommand.commandType ~= 9 and lastCommand.commandType ~= 15)
                     or (lastCommand.target ~= target and lastCommand.targetId ~= target.EntityId)
                 then
-                    continue
+                    return
                 end
 
-                -- Do not disturb queues containing commands that cannot be reconstructed.
-                local canReplayQueue = true
-                for index = 1, queueCount - 1 do
-                    local commandInfo = UnitQueueDataToCommand[queue[index].commandType]
-                    if not commandInfo or not commandInfo.Callback then
-                        canReplayQueue = false
-                        break
+                if not referenceQueue then
+                    referenceQueue = queue
+                    queueCount = unitQueueCount
+                elseif unitQueueCount ~= queueCount then
+                    return
+                else
+                    for index = 1, queueCount do
+                        local order = queue[index]
+                        local referenceOrder = referenceQueue[index]
+                        if order.commandType ~= referenceOrder.commandType
+                            or order.target ~= referenceOrder.target
+                            or order.targetId ~= referenceOrder.targetId
+                            or order.blueprintId ~= referenceOrder.blueprintId
+                            or order.x ~= referenceOrder.x
+                            or order.y ~= referenceOrder.y
+                            or order.z ~= referenceOrder.z
+                        then
+                            return
+                        end
                     end
                 end
-
-                if not canReplayQueue then
-                    continue
-                end
-
-                local singleUnit = { unit }
-                IssueClearCommands(singleUnit)
-
-                for index = 1, queueCount - 1 do
-                    local order = queue[index]
-                    local issueOrder = UnitQueueDataToCommand[order.commandType].Callback
-                    if order.commandType == 8 then
-                        issueOrder(singleUnit, PopulateLocation(order, {}), order.blueprintId, {})
-                    else
-                        issueOrder(singleUnit, order.target or PopulateLocation(order, {}))
-                    end
-                end
-
-                IssueGuard(singleUnit, extractor)
             end
+
+            if not referenceQueue then
+                return
+            end
+
+            -- Do not disturb queues containing commands that cannot be reconstructed.
+            for index = 1, queueCount - 1 do
+                local commandInfo = UnitQueueDataToCommand[referenceQueue[index].commandType]
+                if not commandInfo or not commandInfo.Callback then
+                    return
+                end
+            end
+
+            IssueClearCommands(assistingUnits)
+
+            for index = 1, queueCount - 1 do
+                local order = referenceQueue[index]
+                local issueOrder = UnitQueueDataToCommand[order.commandType].Callback
+                if order.commandType == 8 then
+                    issueOrder(assistingUnits, PopulateLocation(order, {}), order.blueprintId, {})
+                else
+                    issueOrder(assistingUnits, order.target or PopulateLocation(order, {}))
+                end
+            end
+
+            IssueGuard(assistingUnits, extractor)
         end
     end
 end
