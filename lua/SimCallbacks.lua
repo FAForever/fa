@@ -108,6 +108,19 @@ end
 Callbacks.EmptyCallback = function(data, units)
 end
 
+--- Prints a diagnostic when a guard order targets a completed mass storage.
+---@param data { Target: EntityId }
+Callbacks.ValidateMassStorageAssist = function(data, units)
+    local target = data and GetEntityById(data.Target)
+    if IsEntity(target)
+        and not target.Dead
+        and EntityCategoryContains(categories.MASSSTORAGE, target)
+        and target:GetFractionComplete() == 1
+    then
+        print('found assist order on complete mass storage')
+    end
+end
+
 --- Callback takes a boolean and toggles a stat on given units between 0 and 1
 ---@param data table<string, boolean>
 Callbacks.SetStatByCallback = function(data, units)

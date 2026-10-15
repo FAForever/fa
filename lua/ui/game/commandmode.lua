@@ -346,6 +346,7 @@ end
 local categoriesFactories = categories.STRUCTURE * categories.FACTORY
 local categoriesShields = categories.MOBILE * categories.SHIELD
 local categoriesStructure = categories.STRUCTURE
+local categoriesMassStorage = categories.MASSSTORAGE
 
 ---@param unit UserUnit
 local function UpgradeUnit(unit)
@@ -535,6 +536,14 @@ local function OnGuardIssued(command)
     if command.Target.EntityId then
         local unit = GetUnitById(command.Target.EntityId) ---@cast unit UserUnit
         local guards = command.Units
+
+        if EntityCategoryContains(categoriesMassStorage, unit) then
+            SimCallback({
+                Func = 'ValidateMassStorageAssist',
+                Args = { Target = command.Target.EntityId },
+            }, true)
+        end
+
         if unit:GetArmy() == GetFocusArmy() then
             OnGuardUpgrade(guards, unit)
             OnGuardUnpause(guards, unit)
