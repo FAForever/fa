@@ -133,6 +133,12 @@ Callbacks.ValidateMassStorageAssist = function(data, units)
 
         if extractor then
             print('found adjacent t1/t2 mass extractor: ' .. tostring(extractor.EntityId))
+
+            local assistingUnits = SecureUnits(units)
+            if assistingUnits[1] then
+                IssueClearCommands(assistingUnits)
+                IssueGuard(assistingUnits, extractor)
+            end
         end
     end
 end
