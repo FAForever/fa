@@ -25,3 +25,4 @@ textures/ui/common/BUTTON/BACKUP/
 act.exe
 *.venv
 lua_changelog
+init_local_development.lua
