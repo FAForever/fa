@@ -1,0 +1,1 @@
+- Althotbuilding now builds the highest tech unit availalbe or the current tech tab. No confirmation or right/left click needed. When selecting units with no builders, hotbuild keys can filter the selection by the keys used to build them (#7217).
