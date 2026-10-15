@@ -605,6 +605,36 @@ do
 end
 
 do
+
+    --- Processes the orders and re-distributes them over the units according to proximity
+    ---@param data { Target: EntityId, ClearCommands: boolean }
+    ---@param selection Unit[]
+    Callbacks.DistributeOrdersProximity = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            return
+        end
+
+        -- verify the target
+        local target = (data.Target and GetUnitById(data.Target)) --[[@as Unit]]
+        if (not target) or
+            (not target.Army) or
+            (not OkayToMessWithArmy(target.Army))
+        then
+            return
+        end
+
+        import("/lua/sim/commands/distribute-orders-proximity.lua").DistributeOrdersProximity(
+            selection,
+            target,
+            data.ClearCommands or false,
+            true
+        )
+    end
+end
+
+do
     --- Processes the orders and re-distributes them over the units
     ---@param data { Target: EntityId, ClearCommands: boolean }
     ---@param selection Unit[]
