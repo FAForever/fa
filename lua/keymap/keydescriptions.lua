@@ -564,6 +564,10 @@ keyDescriptions = {
     ['shift_spreadattack'] = '<LOC key_desc_shift_distribute_orders>Distribute orders',
     ['spreadattack_context'] = '<LOC key_desc_distribute_orders>Distribute orders from the unit beneath the mouse cursor',
     ['shift_spreadattack_context'] = '<LOC key_desc_shift_distribute_orders>Distribute orders from the unit beneath the mouse cursor',
+    ['distribute_orders_proximity'] = '<LOC key_desc_distribute_orders_proximity>Distribute orders by proximity',
+    ['shift_distribute_orders_proximity'] = '<LOC key_desc_shift_distribute_orders_proximity>Distribute orders by proximity',
+    ['distribute_orders_proximity_context'] = '<LOC key_desc_distribute_orders_proximity_context>Distribute orders by proximity from the unit beneath the mouse cursor',
+    ['shift_distribute_orders_proximity_context'] = '<LOC key_desc_shift_distribute_orders_proximity_context>Distribute orders by proximity from the unit beneath the mouse cursor',
     ['cycle_context_based_templates'] = '<LOC key_desc_context_based_templates>Cycle context templates',
     ['shift_cycle_context_based_templates'] = '<LOC key_desc_shift_context_based_templates>Cycle context templates',
 
