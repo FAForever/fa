@@ -220,7 +220,7 @@ end
 
 --- Looks up army data by army index (number) or nickname (string). For
 --- nickname lookups the returned table has `ArmyID` set to the matching index.
----@param army number | string
+---@param army Army | string
 ---@return table | nil
 local function GetArmyData(army)
     local armies = GetArmiesTable()
@@ -563,7 +563,7 @@ function Init()
     -- `RegisterChatFunc` overwrites, so re-running `Init` just rebinds
     -- the handlers.
     import("/lua/ui/game/gamemain.lua").RegisterChatFunc(OnReceive, 'Chat')
-    import("/lua/usersync.lua").AddOnSyncHashedCallback(OnSyncChatMessages, 'ChatMessages', 'Chat')
+    AddOnSyncHashedCallback(OnSyncChatMessages, 'ChatMessages', 'Chat')
     RegisterBuiltinCommands()
 
     -- Build the chat tree eagerly so the sibling feed is mounted in

@@ -26,24 +26,24 @@ InainoEffectController01 = Class(NullShell) {
     end,
 
     ---@param self InainoEffectController01
-    ---@param army number
+    ---@param army Army
     CreateInitialHit = function(self, army)
         for k, v in EffectTemplate.SIFInainoHit01 do
-            emit = CreateEmitterAtEntity(self,army,v)
+            CreateEmitterAtEntity(self,army,v)
         end
     end,
 
     ---@param self InainoEffectController01
-    ---@param army number
+    ---@param army Army
     CreateInitialBuildup = function(self, army)
         WaitSeconds(2.0)
         for k, v in EffectTemplate.SIFInainoHit02 do
-            emit = CreateEmitterAtEntity(self,army,v)
+            CreateEmitterAtEntity(self,army,v)
         end
     end,
 
     ---@param self InainoEffectController01
-    ---@param army number
+    ---@param army Army
     MainBlast = function(self, army)
         WaitSeconds(5.00)
 
@@ -55,7 +55,7 @@ InainoEffectController01 = Class(NullShell) {
 
         -- Create explosion effects
         for k, v in EffectTemplate.SIFInainoDetonate01 do
-            emit = CreateEmitterAtEntity(self,army,v)
+            CreateEmitterAtEntity(self,army,v)
         end
         self:ShakeCamera(55, 10, 0, 2.5)
 

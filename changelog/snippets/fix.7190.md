@@ -1,0 +1,1 @@
+- Fix `blueprints.lua` erroring when adding a new blueprint during a blueprint reload (#7190).

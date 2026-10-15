@@ -73,7 +73,7 @@ function CameraImpl:Reset()
 end
 
 --- Applies the provided settings to the camera
----@see `CameraImpl:SaveSettings` to retrieve the settings
+---@see Camera.SaveSettings to retrieve the settings
 ---@param settings UserCameraSettings
 function CameraImpl:RestoreSettings(settings)
 end
@@ -83,7 +83,7 @@ function CameraImpl:RevertRotation()
 end
 
 --- Returns the current camera settings
----@see `CameraImpl:RestoreSettings` to apply the settings
+---@see Camera.RestoreSettings to apply the settings
 ---@return UserCameraSettings
 function CameraImpl:SaveSettings()
 end
