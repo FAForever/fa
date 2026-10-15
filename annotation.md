@@ -1,6 +1,6 @@
 # Annotating
 
-All future contributions should be properly annotated. With it [our Lua extension](https://github.com/FAForever/fa-lua-vscode-extension) is able to provide intellisense support for our game, mod and campaign developers. You can find all the supported annotations on the [official repository](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations). Note that the annotations supports markdown.
+All future contributions should be properly annotated. With it [our Lua extension](https://github.com/FAForever/fa-lua-vscode-extension) is able to provide intellisense support for our game, mod and campaign developers. You can find all the supported annotations on the [LuaLS annotation reference](https://luals.github.io/wiki/annotations/). Note that the annotations supports markdown.
 
 ## Conventions
 
