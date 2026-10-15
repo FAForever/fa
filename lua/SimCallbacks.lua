@@ -48,6 +48,7 @@ local GetCurrentCommandSourceArmy = SimUtils.GetCurrentCommandSourceArmy
 
 -- upvalue categories for performance
 local CategoriesTransportation = categories.TRANSPORTATION
+local CategoriesTech1Tech2MassExtraction = categories.MASSEXTRACTION * (categories.TECH1 + categories.TECH2)
 
 --- List of callbacks that is being populated throughout this file
 ---@type table<string, fun(data: table, units?: Unit[])>
@@ -118,6 +119,21 @@ Callbacks.ValidateMassStorageAssist = function(data, units)
         and target:GetFractionComplete() == 1
     then
         print('found assist order on complete mass storage')
+
+        local extractor
+        for _, adjacentUnit in target.AdjacentUnits or {} do
+            if IsEntity(adjacentUnit)
+                and not adjacentUnit.Dead
+                and EntityCategoryContains(CategoriesTech1Tech2MassExtraction, adjacentUnit)
+                and (not extractor or adjacentUnit.EntityId < extractor.EntityId)
+            then
+                extractor = adjacentUnit
+            end
+        end
+
+        if extractor then
+            print('found adjacent t1/t2 mass extractor: ' .. tostring(extractor.EntityId))
+        end
     end
 end
 
