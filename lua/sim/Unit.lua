@@ -45,7 +45,31 @@ local DefaultTerrainType = GetTerrainType(-1, -1)
 
 local GetNearestPlayablePoint = import("/lua/scenarioframework.lua").GetNearestPlayablePoint
 
+--- Helper function that returns a unit's shield and its assist costs,
+--- or nil if the shield cannot be assisted or does not have custom assist costs.
+---@param unit Unit
+---@return Shield? shield
+---@return number? energyPerBuildRate
+---@return number? massPerBuildRate
+local function GetShieldAssistRates(unit)
+    if not unit.IsCategoryShield then return end
+    local shield = unit.MyShield
+    if not shield then return end
 
+    local energy = shield.AssistCostEnergyPerBuildRate
+    local mass = shield.AssistCostMassPerBuildRate
+    if not energy or not mass then
+        return -- defaults to repair cost
+    end
+
+    -- engine does not regen shield shield HP if unit says shield is off or
+    -- if the shield is not the focus entity
+    if not unit:ShieldIsOn() or unit:GetFocusUnit() ~= nil then
+        return
+    end
+
+    return shield, energy, mass
+end
 
 --- Structures that are reused for performance reasons
 --- Maps unit.techCategory to a number so we can do math on it for naval units
@@ -119,6 +143,7 @@ SyncMeta = {
 
 local cUnit = moho.unit_methods
 local cUnitGetBuildRate = cUnit.GetBuildRate
+local UnitSetMaxHealth = _G.moho.unit_methods.SetMaxHealth
 
 ---@class UnitBuffsTable
 ---@field Affects table<BuffAffectName, table<BuffName, BlueprintBuffAffectState>>
@@ -135,6 +160,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field BuildArmManipulator? moho.BuilderArmManipulator
 ---@field Trash TrashBag
 ---@field Layer Layer
+---@field HorzMotionState? HorizontalMovementState
 ---@field Army Army
 ---@field Dead? boolean
 ---@field UnitId UnitId
@@ -198,6 +224,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field DeathWeaponEnabled? boolean # If not set, it is treated as enabled
 ---@field Sinking? boolean
 ---@field Detector? moho.CollisionManipulator
+---@field IsCategoryShield? boolean
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent, FastDecayComponent) {
 
     IsUnit = true,
@@ -377,6 +404,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         -- Temporarily disable the unit's weapons when it is transferred to prevent bypassing the fire rate
         self:AddOnGivenCallback(self.OnGivenDisableWeapons)
+
+        -- cache category check
+        self.IsCategoryShield = self.Blueprint.CategoriesHash["SHIELD"]
     end,
 
     -------------------------------------------------------------------------------------------
@@ -1222,6 +1252,20 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
     end,
 
+    ---@param self Unit
+    UpdateShieldAssistersConsumption = function(self)
+        if self.IsCategoryShield then
+            local myShield = self.MyShield
+            ---@diagnostic disable-next-line: need-check-nil
+            if myShield.AssistCostEnergyPerBuildRate and myShield.AssistCostMassPerBuildRate then
+                for _, unit in self.Repairers do
+                    if unit.Dead then continue end
+                    unit:UpdateConsumptionValues()
+                end
+            end
+        end
+    end,
+
     -- Called when we start building a unit, turn on/off, get/lose bonuses, or on
     -- any other change that might affect our build rate or resource use.
     ---@param self Unit
@@ -1264,12 +1308,39 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                     time, energy, mass = focus:GetBuildCosts(focus.SiloProjectile)
                     energy = (energy / siloBuildRate) * (self:GetBuildRate() or 0)
                     mass = (mass / siloBuildRate) * (self:GetBuildRate() or 0)
-                else
-                    time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
-                    if self:IsUnitState('Repairing') and focus.isFinishedUnit then -- also applies to shield assisting
+                elseif self:IsUnitState('Repairing') and focus.isFinishedUnit then
+                    -- repairing a unit or assisting a shield
+                    local focusShield, shieldAssistEnergyRate, shieldAssistMassRate = GetShieldAssistRates(focus)
+                    if not focusShield then
+                        time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
                         energy = energy * repairRatio
                         mass = mass * repairRatio
+                    else -- repairing a shield with custom assist costs
+                        local repairingFocusUnit = focus:GetMaxHealth() > focus:GetHealth()
+                        local repairingFocusShield = focusShield:GetMaxHealth() > focusShield:GetHealth()
+
+                        if repairingFocusUnit then
+                            time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
+                            energy = energy * repairRatio
+                            mass = mass * repairRatio
+                        end
+
+                        if repairingFocusShield then
+                            local buildRate = self:GetBuildRate()
+                            -- Engine splits repair effect 50/50 so reduce costs in that case
+                            if repairingFocusUnit then
+                                energy = energy * 0.5
+                                mass = mass * 0.5
+                                shieldAssistEnergyRate = shieldAssistEnergyRate * 0.5
+                                shieldAssistMassRate = shieldAssistMassRate * 0.5
+                            end
+                            energy = energy + shieldAssistEnergyRate * buildRate * time
+                            mass = mass + shieldAssistMassRate * buildRate * time
+                        end
                     end
+                else
+                    -- building a unit
+                    time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
                 end
             end
 
@@ -1475,6 +1546,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         -- inform the brain of the event
         self.Brain:OnUnitHealthChanged(self, new, old)
+
+        -- Manage shield assisters: unit is damaged/no longer damaged so assist consumption changes
+        if new == 1 or old == 1 then
+            self:UpdateShieldAssistersConsumption()
+        end
     end,
 
     ---@param self Unit
@@ -3468,13 +3544,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         if new == 'Land' then
             self:PlayUnitSound('TransitionLand')
-            self:PlayUnitAmbientSound('AmbientMoveLand')
         elseif new == 'Water' or new == 'Seabed' then
             self:PlayUnitSound('TransitionWater')
-            self:PlayUnitAmbientSound('AmbientMoveWater')
-        elseif new == 'Sub' then
-            self:PlayUnitAmbientSound('AmbientMoveSub')
         end
+        self:UpdateUnitAmbientMoveSound(new)
 
         local movementEffects = self.Blueprint.Display.MovementEffects
         if not self.Footfalls and movementEffects[new].Footfall then
@@ -3504,17 +3577,16 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
 
         local layer = self.Layer
+        self.HorzMotionState = new
 
         -- play sounds / events when we start moving
         if old == 'Stopped' then
 
-            if not self:PlayUnitSound('StartMove' .. layer) then 
+            if not self:PlayUnitSound('StartMove' .. layer) then
                 self:PlayUnitSound('StartMove')
             end
 
-            if not self:PlayUnitAmbientSound('AmbientMove' .. layer) then 
-                self:PlayUnitAmbientSound('AmbientMove')
-            end
+            self:UpdateUnitAmbientMoveSound(layer, new)
         end
 
         -- play sounds / events when we stop moving
@@ -4198,6 +4270,27 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         return true
     end,
 
+    --- Plays the ambient move sound for the current layer if the unit is moving
+    ---@param self Unit
+    ---@param newLayer? Layer # defaults to `self.Layer`
+    ---@param newState? HorizontalMovementState # defaults to `self.HorzMotionState`
+    UpdateUnitAmbientMoveSound = function(self, newLayer, newState)
+        newState = newState or self.HorzMotionState
+        if newState == 'Stopped' or newState == 'Stopping' or not newState then
+            return
+        end
+
+        newLayer = newLayer or self.Layer
+        if self:PlayUnitAmbientSound('AmbientMove' .. newLayer) then
+            return
+        end
+        -- seabed units use the water sound
+        if newLayer == 'Seabed' and self:PlayUnitAmbientSound('AmbientMoveWater') then
+            return
+        end
+        self:PlayUnitAmbientSound('AmbientMove')
+    end,
+
     -------------------------------------------------------------------------------------------
     -- UNIT CALLBACKS
     -------------------------------------------------------------------------------------------
@@ -4538,6 +4631,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self:UpdateStat("HitpointsRegeneration", value)
     end,
 
+    ---@param self Unit
+    ---@param maxhealth number
+    SetMaxHealth = function(self, maxhealth)
+        UnitSetMaxHealth(self, maxhealth)
+        self:UpdateShieldAssistersConsumption()
+    end,
+
     -------------------------------------------------------------------------------------------
     -- SHIELDS
     -------------------------------------------------------------------------------------------
@@ -4589,8 +4689,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
     end,
 
+    --- Called by the engine to determine whether or not the unit's shield can be assisted
     ---@param self Unit
-    ---@return boolean
+    ---@return boolean?
     ShieldIsOn = function(self)
         if self.MyShield then
             return self.MyShield:IsOn()
@@ -5343,6 +5444,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     OnShieldDisabled = function(self) 
         -- for AI events
         self.Brain:OnUnitShieldDisabled(self)
+
+        -- Manage shield assisters: shield is disabled and cannot be assisted anymore
+        self:UpdateShieldAssistersConsumption()
     end,
 
     -- Called by the brain when the unit registered itself
