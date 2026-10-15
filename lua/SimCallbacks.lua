@@ -120,7 +120,7 @@ Callbacks.ValidateMassStorageAssist = function(data, units)
         and EntityCategoryContains(categories.MASSSTORAGE, target)
         and target:GetFractionComplete() == 1
     then
-        print('found assist order on complete mass storage')
+        -- print('found assist order on complete mass storage')
 
         local extractor
         for _, adjacentUnit in target.AdjacentUnits or {} do
@@ -134,7 +134,7 @@ Callbacks.ValidateMassStorageAssist = function(data, units)
         end
 
         if extractor then
-            print('found adjacent t1/t2 mass extractor: ' .. tostring(extractor.EntityId))
+            -- print('found adjacent t1/t2 mass extractor: ' .. tostring(extractor.EntityId))
 
             local assistingUnits = SecureUnits(units)
             local referenceQueue
