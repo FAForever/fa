@@ -118,7 +118,7 @@ A replay stores the same configuration in the replay file, and `LaunchReplaySess
 Debugging a desync:
 
 - Launch with `/synclog <folder>` to log everything that feeds the sim checksum, one file per beat. The sim keeps the files for the last `sim_ChecksumPeriod + 20` beats (the period defaults to 50) and deletes them on a clean exit, so the beats around a desync remain.
-- The rolling checksum is seeded from the game rules when the sim is set up: the footprints, the number of blueprints, and each blueprint's ID and load order, but not their contents. A desync on the first checksum (beat 0) therefore usually means the clients loaded a different set of blueprints, e.g. different mods or game files. After that, each checksum adds each army's economy, the entities that moved (ID, health, position, orientation, velocity) and the RNG state. Map data such as terrain height is never hashed directly: different map files only cause a desync once they make units behave differently.
+- The rolling checksum is seeded from the game rules when the sim is set up: the footprints, then every blueprint in load order (its ID and the values the engine parsed from it), then the number of unit, projectile, prop and mesh blueprints. A desync on the first checksum (beat 0) therefore usually means the clients loaded different blueprints or blueprint values, e.g. different mods or game files. After that, each checksum adds each army's economy, the entities that moved (ID, health, position, orientation, velocity) and the RNG state. Map data such as terrain height is never hashed directly: different map files only cause a desync once they make units behave differently.
 
 Details: [docs/development-start-here/lua-contexts.md](docs/development-start-here/lua-contexts.md).
 
