@@ -112,7 +112,7 @@ Callbacks.EmptyCallback = function(data, units)
 end
 
 --- Prints a diagnostic when a guard order targets a completed mass storage.
----@param data { Target: EntityId }
+---@param data { Target: EntityId, RequestId: number }
 Callbacks.ValidateMassStorageAssist = function(data, units)
     local target = data and GetEntityById(data.Target)
     if IsEntity(target)
@@ -202,6 +202,16 @@ Callbacks.ValidateMassStorageAssist = function(data, units)
             end
 
             IssueGuard(assistingUnits, extractor)
+
+            local commandSourceArmy = GetCurrentCommandSourceArmy()
+            if commandSourceArmy and data.RequestId then
+                Sync.MassStorageAssistRedirect = Sync.MassStorageAssistRedirect or {}
+                TableInsert(Sync.MassStorageAssistRedirect, {
+                    Army = commandSourceArmy,
+                    RequestId = data.RequestId,
+                    Extractor = extractor.EntityId,
+                })
+            end
         end
     end
 end
