@@ -653,7 +653,7 @@ do
             return
         end
 
-        import("/lua/sim/commands/distribute-orders-proximity.lua").DistributeOrdersProximity(
+        import("/lua/sim/commands/distribute-queue-proximity.lua").DistributeOrdersProximity(
             selection,
             target,
             data.ClearCommands or false,

@@ -1690,22 +1690,22 @@ local keyActionsOrdersQueueBased = {
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
     ['distribute_orders_proximity'] = {
-        action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-orders-proximity.lua").DistributeOrdersProximity(true)',
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-queue-proximity.lua").DistributeOrdersProximity(true)',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
     ['shift_distribute_orders_proximity'] = {
-        action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-orders-proximity.lua").DistributeOrdersProximity(true)',
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-queue-proximity.lua").DistributeOrdersProximity(true)',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
     ['distribute_orders_proximity_context'] = {
-        action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-orders-proximity.lua").DistributeOrdersProximityOfMouseContext(true)',
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-queue-proximity.lua").DistributeOrdersProximityOfMouseContext(true)',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
     ['shift_distribute_orders_proximity_context'] = {
-        action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-orders-proximity.lua").DistributeOrdersProximityOfMouseContext(true)',
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-queue-proximity.lua").DistributeOrdersProximityOfMouseContext(true)',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
