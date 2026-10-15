@@ -18,7 +18,9 @@ local SimPing = import("/lua/simping.lua")
 local SimTriggers = import("/lua/scenariotriggers.lua")
 local SUtils = import("/lua/ai/sorianutilities.lua")
 local ScenarioFramework = import("/lua/scenarioframework.lua")
-local UnitQueueDataToCommand = import("/lua/sim/commands/shared.lua").UnitQueueDataToCommand
+local CommandUtils = import("/lua/sim/commands/shared.lua")
+local UnitQueueDataToCommand = CommandUtils.UnitQueueDataToCommand
+local PopulateLocation = CommandUtils.PopulateLocation
 
 -- upvalue table operations for performance
 local TableInsert = table.insert
@@ -135,9 +137,48 @@ Callbacks.ValidateMassStorageAssist = function(data, units)
             print('found adjacent t1/t2 mass extractor: ' .. tostring(extractor.EntityId))
 
             local assistingUnits = SecureUnits(units)
-            if assistingUnits[1] then
-                IssueClearCommands(assistingUnits)
-                IssueGuard(assistingUnits, extractor)
+            for _, unit in assistingUnits do
+                local queue = unit:GetCommandQueue()
+                local queueCount = TableGetn(queue)
+                local lastCommand = queue[queueCount]
+
+                -- The callback runs after the original command is issued. Only replace that
+                -- command when it is the final guard/assist order and still targets the storage.
+                if not lastCommand
+                    or (lastCommand.commandType ~= 9 and lastCommand.commandType ~= 15)
+                    or (lastCommand.target ~= target and lastCommand.targetId ~= target.EntityId)
+                then
+                    continue
+                end
+
+                -- Do not disturb queues containing commands that cannot be reconstructed.
+                local canReplayQueue = true
+                for index = 1, queueCount - 1 do
+                    local commandInfo = UnitQueueDataToCommand[queue[index].commandType]
+                    if not commandInfo or not commandInfo.Callback then
+                        canReplayQueue = false
+                        break
+                    end
+                end
+
+                if not canReplayQueue then
+                    continue
+                end
+
+                local singleUnit = { unit }
+                IssueClearCommands(singleUnit)
+
+                for index = 1, queueCount - 1 do
+                    local order = queue[index]
+                    local issueOrder = UnitQueueDataToCommand[order.commandType].Callback
+                    if order.commandType == 8 then
+                        issueOrder(singleUnit, PopulateLocation(order, {}), order.blueprintId, {})
+                    else
+                        issueOrder(singleUnit, order.target or PopulateLocation(order, {}))
+                    end
+                end
+
+                IssueGuard(singleUnit, extractor)
             end
         end
     end
