@@ -1074,6 +1074,12 @@ Unit.OnScriptBitSet = nil
 ---@type nil | fun(self: Unit, blueprintId: UnitId)
 Unit.OnSeedUnitBuilt = nil
 
+--- Called by the engine on a `TELEPORTATION` transport when an unload order makes a unit its teleport beacon, with the beacon's position
+---@see IssueTeleportToBeacon
+---@see moho.unit_methods.OnTeleportUnit # Called on each cargo unit when it teleports
+---@type nil | fun(self: Unit, position: Vector)
+Unit.OnSetTeleportDest = nil
+
 --- Called by the engine when the unit finishes building any silo missile, tactical or nuclear.
 ---@see Unit.OnNukeArmed # Called right after
 ---@see Unit.OnSiloBuildStart
@@ -1200,6 +1206,7 @@ Unit.OnStopTransportLoading = nil
 
 --- Called by the engine when the unit starts a teleport order, with the destination and orientation.
 --- The engine doesn't move the unit: Lua charges the teleport, then moves it with `Warp`.
+--- For cargo of a `TELEPORTATION` transport, `teleporter` is the transport and `location` the beacon's position.
 ---@see IssueTeleport
 ---@see Warp
 ---@see Unit.OnFailedTeleport # Called when the order ends before the teleport completes

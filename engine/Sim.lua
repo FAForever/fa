@@ -1026,8 +1026,10 @@ end
 function IssueTeleport(units, position)
 end
 
+--- Orders `TELEPORTATION` transports to unload onto `beacon`, which makes it their teleport beacon
+---@see moho.unit_methods.OnSetTeleportDest # Called on each transport
 ---@param units Unit[]
----@param beacon unknown
+---@param beacon Unit
 ---@return SimCommand
 function IssueTeleportToBeacon(units, beacon)
 end
