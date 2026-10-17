@@ -15,7 +15,7 @@ end
 function CUnitScriptTask:GetUnit()
 end
 
---- Called by the engine after the task is constructed, with the LuaParams table of the order
+--- Called by the engine after the task is created, with the `order` table passed to `IssueScript`
 ---@see IssueScript # Issues a script task order
 ---@type nil | fun(self: ScriptTask, commandData: table)
 CUnitScriptTask.OnCreate = nil
@@ -24,7 +24,8 @@ CUnitScriptTask.OnCreate = nil
 ---@type nil | fun(self: ScriptTask)
 CUnitScriptTask.OnDestroy = nil
 
---- Called by the engine to run the task. The returned status sets when the engine calls it again
+--- Called by the engine to run a step of the task. The returned status tells the engine when to call it again,
+--- or that the task is done
 ---@type nil | fun(self: ScriptTask): ScriptTaskStatus
 CUnitScriptTask.TaskTick = nil
 

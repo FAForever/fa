@@ -129,7 +129,7 @@ CMauiItemList.OnDoubleClick = nil
 ---@type nil | fun(self: ItemList, row: integer)
 CMauiItemList.OnKeySelect = nil
 
---- Called by the engine when the row under the mouse changes, with its 0-based index or `-1`
+--- Called by the engine when the row under the mouse changes, with its 0-based index, or `-1` when the mouse leaves the list
 ---@see moho.item_list_methods.ShowMouseoverItem # Enables this callback
 ---@type nil | fun(self: ItemList, row: integer)
 CMauiItemList.OnMouseoverItem = nil

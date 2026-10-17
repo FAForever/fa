@@ -26,8 +26,8 @@ Prop.OnCreate = nil
 ---@type nil | fun(self: Prop, instigator: Unit | Projectile | Entity | nil, type: DamageType, overkillRatio: number)
 Prop.OnKilled = nil
 
---- Called by the engine when the prop is reclaimed. `reclaimer` is nil when the prop's reclaim
---- progress reaches zero, after which the engine destroys the prop
+--- Called by the engine when the prop is reclaimed. `reclaimer` is nil on the call made when none of
+--- the prop is left, after which the engine destroys the prop
 ---@type nil | fun(self: Prop, reclaimer?: Unit)
 Prop.OnReclaimed = nil
 

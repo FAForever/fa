@@ -896,8 +896,8 @@ function IssueCommand(command, luaParams, clear)
 end
 
 ---
----@see moho.aibrain_methods.OnPlayNoStagingPlatformsVO # Called when the army has no air staging platform
----@see moho.aibrain_methods.OnPlayBusyStagingPlatformsVO # Called when all air staging platforms are full
+---@see moho.aibrain_methods.OnPlayNoStagingPlatformsVO # Called in the sim when the army has no air staging platform
+---@see moho.aibrain_methods.OnPlayBusyStagingPlatformsVO # Called in the sim when all air staging platforms are full
 ---@param clear boolean
 function IssueDockCommand(clear)
 end

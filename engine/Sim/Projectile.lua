@@ -251,7 +251,7 @@ Projectile.OnExitWater = nil
 
 --- Called by the engine when the projectile impacts something. `targetEntity` is nil when it
 --- hits the terrain, water or nothing
----@type nil | fun(self: Projectile, targetType: ImpactType, targetEntity: Unit | Prop | Projectile | Entity | nil)
+---@type nil | fun(self: Projectile, impactType: ImpactType, targetEntity: Unit | Prop | Projectile | Entity | nil)
 Projectile.OnImpact = nil
 
 --- Called by the engine when a tracking projectile loses its target. The projectile then stops

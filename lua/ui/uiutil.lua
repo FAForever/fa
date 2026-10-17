@@ -93,11 +93,10 @@ VK_UP = 38
 VK_DOWN = 40
 VK_PAUSE = 310
 
---- Windows virtual-key code that `Edit.OnNonTextKeyPressed` receives. The engine converts the
---- key's wxWidgets code to it with `wxCharCodeWXToMSW`. A key without a Windows code keeps its
---- wxWidgets code (above 300). `KeyEvent.KeyCode` holds the wxWidgets code instead. The two codes
---- are the same for `VK_BACKSPACE`, `VK_TAB`, `VK_ENTER`, `VK_ESCAPE` and `VK_SPACE`. `VK_PAUSE` is
---- the wxWidgets code of `Pause`
+--- Windows virtual-key code that `Edit.OnNonTextKeyPressed` receives. A key without a Windows code
+--- gets its wxWidgets code instead (above 300). `KeyEvent.KeyCode` holds the wxWidgets code. Of the
+--- `UIUtil.VK_*` constants, only `VK_BACKSPACE`, `VK_TAB`, `VK_ENTER`, `VK_ESCAPE` and `VK_SPACE`
+--- match both codes. `VK_PAUSE` (310) is the wxWidgets code of `Pause`, which arrives here as 19
 ---@alias VK_KeyCode
 ---| 3 # Cancel (Ctrl+Break)
 ---| 12 # Clear (Numpad 5 with Num Lock off)

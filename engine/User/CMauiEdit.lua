@@ -240,10 +240,13 @@ CMauiEdit.OnEnterPressed = nil
 CMauiEdit.OnEscPressed = nil
 
 --- Called by the engine when a key that doesn't type a character is pressed, with its Windows
---- virtual-key code. `event.KeyCode` holds the wxWidgets code of the same key instead. Keys the
---- engine uses for editing (`Backspace`, `Delete`, `Insert`, `Home`, `End`, `Left` and `Right`)
---- and `Enter` and `Escape` don't reach this callback. `Up`, `Down`, `Page Up` and `Page Down`
---- do
+--- virtual-key code. `event.KeyCode` holds the wxWidgets code of the same key instead. These keys
+--- don't reach this callback:
+--- - `Enter` and `Escape`.
+--- - Keys the engine uses for editing: `Backspace`, `Delete`, `Insert`, `Home`, `End`, `Left` and
+---   `Right`.
+---
+--- `Up`, `Down`, `Page Up` and `Page Down` do reach it
 ---@see VK_KeyCode # The codes, and the `UIUtil.VK_*` constants
 ---@type nil | fun(self: Edit, keycode: VK_KeyCode, event: KeyEvent)
 CMauiEdit.OnNonTextKeyPressed = nil

@@ -69,7 +69,7 @@ end
 --- Destroys the platoon and its units, if no `squad` is specified
 ---
 --- In both cases, the units are destroyed after they complete their orders.
----@see moho.aibrain_methods.DisbandPlatoon # For removing the platoon without destroying it's units
+---@see moho.aibrain_methods.DisbandPlatoon # For removing the platoon without destroying its units
 ---@param squad? PlatoonSquadType If specified only the squad units are destroyed. The platoon itself is **NOT** destroyed.
 function CPlatoon:Destroy(squad)
 end

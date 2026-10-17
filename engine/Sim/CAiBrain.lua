@@ -81,7 +81,7 @@ function CAiBrain:CheckBlockingTerrain(attackPosition, targetPosition, arcType)
 end
 
 --- Spawns a resource building near the given position, used for spawning the prebuild base
----@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the unit cap stops it
+---@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the army is at its unit cap
 ---@param blueprintID string
 ---@param posX number
 ---@param posY number
@@ -90,7 +90,7 @@ function CAiBrain:CreateResourceBuildingNearest(blueprintID, posX, posY)
 end
 
 --- Spawns a structure near the given position, used for spawning the prebuild base
----@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the unit cap stops it
+---@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the army is at its unit cap
 ---@param blueprintID string
 ---@param posX number
 ---@param posY number
@@ -632,14 +632,16 @@ CAiBrain.OnFailedUnitTransfer = nil
 ---@type nil | fun(self: AIBrain, blip: Blip, reconType: ReconTypes, val: boolean)
 CAiBrain.OnIntelChange = nil
 
---- Called by the engine when the user state sends the `PlayBusyStagingPlatformsVO` info pair for a unit of the army.
+--- Called by the engine when the user state sends the `PlayBusyStagingPlatformsVO` info pair for a unit of the army,
+--- to play the voice-over that all air staging platforms are busy.
 --- `IssueDockCommand` sends it when the army has air staging platforms but none has a free slot
 ---@see IssueDockCommand # Sends the info pair
 ---@see UserUnit.ProcessInfo # Sends any info pair
 ---@type nil | fun(self: AIBrain)
 CAiBrain.OnPlayBusyStagingPlatformsVO = nil
 
---- Called by the engine when the user state sends the `PlayNoStagingPlatformsVO` info pair for a unit of the army.
+--- Called by the engine when the user state sends the `PlayNoStagingPlatformsVO` info pair for a unit of the army,
+--- to play the voice-over that the army has no air staging platform.
 --- `IssueDockCommand` sends it when the army has no air staging platform
 ---@see IssueDockCommand # Sends the info pair
 ---@see UserUnit.ProcessInfo # Sends any info pair
@@ -663,9 +665,9 @@ CAiBrain.OnSpawnPreBuiltUnits = nil
 CAiBrain.OnStatsTrigger = nil
 
 --- Called by the engine when a unit can't be loaded because the transport, carrier or air staging platform is full:
---- - On the transport's army when a load order assigns it more units than it has slots.
----   Not for teleporters and air staging platforms, or while the transport is assist-moving, ferrying or guarding
---- - On the aircraft's army when it can't land on a full carrier or air staging platform
+--- - On the transport's army when a load order assigns a transport more units than it has slots.
+---   Load orders on teleporters and air staging platforms don't call it, nor do transports that are assist-moving, ferrying or guarding
+--- - On the aircraft's army when an aircraft can't land on a full carrier or air staging platform
 ---
 --- `Unit.OnStartTransportBeamUp` also calls it when the unit's attach slot is taken
 ---@see IssueTransportLoad # Load order

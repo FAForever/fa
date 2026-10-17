@@ -125,8 +125,8 @@ CUIWorldView.OnFrame = nil
 
 --- Called by the engine when strategic icons are hidden or shown again. Icons are hidden while the
 --- camera is rotated by holding `Space`, and while `cam_Free` (free camera mode) is on. The engine
---- checks this each frame, before `OnFrame`, so it is not called while input is locked. Zooming
---- and `ui_RenderIcons` don't trigger it
+--- checks icon visibility each frame, before `OnFrame`, so this callback isn't called while input is
+--- locked. Zooming and `ui_RenderIcons` don't trigger it
 ---@type nil | fun(self: WorldView, areIconsVisible: boolean)
 CUIWorldView.OnIconsVisible = nil
 
@@ -154,7 +154,7 @@ function CUIWorldView:SetCustomRender(bool)
 end
 
 --- Called by the engine every frame while the world view draws the world and custom rendering is
---- enabled with `SetCustomRender`, with the time since the last frame. The `UI_Draw*` functions
+--- enabled with `SetCustomRender`, with the time since the last frame in seconds. The `UI_Draw*` functions
 --- only work inside this callback
 ---
 --- Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/47

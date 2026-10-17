@@ -84,8 +84,8 @@ function Entity:AttachTo(entity, bone)
 end
 
 
---- Returns true once `Destroy()` has been called on the entity, even though the engine only
---- deletes it at the end of the tick. Unlike other methods, it doesn't error after the deletion
+--- Returns true once `Destroy()` has been called on the entity. Unlike other methods, it can still be
+--- called after the engine deletes the entity at the end of the tick
 ---@see IsDestroyed # True only after the deletion, and accepts `nil`
 ---@see moho.unit_methods.SetDead # Sets `Dead` at the end of the tick for units destroyed without `Kill`
 ---@return boolean

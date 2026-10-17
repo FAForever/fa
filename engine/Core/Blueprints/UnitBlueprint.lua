@@ -792,7 +792,7 @@
 ---@field TeleportMassMod? number
 --- Multiplied by the resulting total energy cost of the teleport to get its required time.
 --- Treated as `0.01` when absent.
----@see TeleportDelay # For an additional flat delay that also delays teleport FX showing at the destination
+---@see UnitBlueprintGeneral.TeleportDelay # For an additional flat delay that also delays teleport FX showing at the destination
 ---@field TeleportTimeMod? number
 --- Whether to use the new distance-based teleport cost calculation method, or revert to the old unit cost based method.
 ---@field UseVariableTeleportCosts? boolean
@@ -976,12 +976,8 @@
 --- if the unit always self-destructs immediately, skipping any countdown sequence
 ---@field InstantDeathOnSelfDestruct? boolean
 ---@field OrderOverrides table<CommandCap, OrderInfo>
---- When positive, the unit gets its own avatar button in the quick select interface. The engine
---- lists it in `GetArmyAvatars`, sorted by ascending value, with ties in creation order, and leaves
---- it out of `GetIdleEngineers` even when it is an `ENGINEER`. Read once when the unit is created
---- in the UI. `lua/ui/game/avatars.lua` keys its buttons by entity ID, so the layout doesn't keep
---- the sort order. `lua/ui/game/gamemain.lua` names the first avatar after the player when it is a
---- `COMMAND` unit. The ACUs use 1
+--- When positive, the unit gets its own avatar button in the quick select interface. `GetArmyAvatars`
+--- lists it, sorted by ascending value, and `GetIdleEngineers` leaves it out. Only the ACUs set it, to 1
 ---@see GetArmyAvatars # Returns the units with a positive priority
 ---@field QuickSelectPriority? integer
 --- how long to wait before rolling the unit off the factory
@@ -996,7 +992,7 @@
 --- Extra time taken to teleport before other teleport time calculations. Defaults to 0 seconds.
 --- If `UseVariableTeleportCosts` is false, then this also delays teleport FX appearing at the destination.
 --- If `UseVariableTeleportCosts` is true, then destination FX appear after 0.4x the total teleport time.
----@see TeleportTimeMod # For an energy-scaling teleport time that does not delay teleport FX at the destination
+---@see UnitBlueprintEconomy.TeleportTimeMod # For an energy-scaling teleport time that does not delay teleport FX at the destination
 ---@field TeleportDelay? number
 --- if present, adds a flat energy cost to the "teleport" ability. Defaults to 150000 energy. Only applies when `UseVariableTeleportCosts` is true.
 ---@field TeleportFlatEnergyCost? number

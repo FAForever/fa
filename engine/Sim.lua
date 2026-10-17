@@ -108,7 +108,7 @@ end
 --- Changes the army of a unit, returning the new unit and destroying the old one
 --- Modified by an engine patch to allow commanders to be given.
 --- `COMMAND` units are filtered out in SimHooks.lua for legacy compatibility.
----@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the unit cap stops it
+---@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the new army is at its unit cap
 ---@see moho.aibrain_methods.OnFailedUnitTransfer # Called when the transfer fails for other reasons
 ---@param unit Unit
 ---@param army Army
@@ -220,7 +220,8 @@ end
 
 --- Creates a collision detection manipulator for the bones it watches.
 --- By default it calls `OnAnimCollision` when a bone drops to the unit's ground level (footfalls).
---- With the terrain check enabled, it calls `OnAnimTerrainCollision` and `OnNotAnimTerrainCollision` when a bone crosses the terrain or water surface instead
+--- With the terrain check enabled, it instead calls `OnAnimTerrainCollision` and `OnNotAnimTerrainCollision`
+--- when a bone crosses the terrain or water surface
 ---@see moho.unit_methods.OnAnimCollision
 ---@see moho.unit_methods.OnAnimTerrainCollision
 ---@see moho.CollisionManipulator.EnableTerrainCheck
@@ -453,7 +454,7 @@ end
 --- Creates a unit from a blueprint for an army, at a position with quaternion orientation
 ---@see CreateUnit2 # Simple version
 ---@see CreateUnitHPR # Heading-pitch-roll version
----@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the unit cap stops it
+---@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the army is at its unit cap
 ---@param blueprintId string
 ---@param army Army
 ---@param x number
@@ -471,7 +472,7 @@ end
 --- Creates a unit from a blueprint for an army, at an X-Z map point with a heading
 ---@see CreateUnit # Quaternion version
 ---@see CreateUnitHPR # Heading-pitch-roll version
----@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the unit cap stops it
+---@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the army is at its unit cap
 ---@param blueprintId string
 ---@param army Army
 ---@param layer Layer
@@ -485,7 +486,7 @@ end
 --- Creates a unit from a blueprint for an army, at a position with heading, pitch, and roll
 ---@see CreateUnit # Quaternion version
 ---@see CreateUnit2 # Simple version
----@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the unit cap stops it
+---@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the army is at its unit cap
 ---@param blueprint UnitId
 ---@param army Army
 ---@param x number
@@ -1304,7 +1305,7 @@ function TryCopyPose(unitFrom, entityTo, copyWorldTransform)
 end
 
 --- instantly moves an entity to a location with an orientation
----@see moho.unit_methods.OnTeleportUnit # Lua teleports units with this
+---@see moho.unit_methods.OnTeleportUnit # Lua callback that teleports units with `Warp`
 ---@param object Object
 ---@param location Vector
 ---@param orientation? Quaternion no orientation change if absent
@@ -1326,7 +1327,7 @@ end
 --- Sets the command source of an army to match another army's command source.
 --- Removing the last command source doesn't call `AbandonedByPlayer`
 ---
---- Introduced by https://github.com/FAForever/FA-Binary-Patches/blob/master/section/SimSetCommandSource.cpp
+--- Introduced by https://github.com/FAForever/FA-Binary-Patches/commit/e23e4ea9ad1aeed74b718aaf27eff6bd28742b95
 ---@see moho.aibrain_methods.AbandonedByPlayer # Called when the last command source leaves the game
 ---@param targetArmyIndex number        # The target army that we're managing command sources for. This is a 0-based index, unlike army indices that are 1-based.
 ---@param sourceHumanIndex number       # The source index that is added or removed as a command source. This is a 0-based index, including only actual sources. Mimics the index of `GetClientSessions` in the UI.
