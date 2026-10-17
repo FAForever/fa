@@ -85,9 +85,9 @@ end
 
 
 --- Returns true once `Destroy()` has been called on the entity, even though the engine only
---- deletes it at the end of the tick. Unlike other methods, it doesn't error after the deletion.
----@see IsDestroyed # true only after the deletion, and accepts `nil`
----@see moho.unit_methods.SetDead # sets `Dead` at the end of the tick for units destroyed without `Kill`
+--- deletes it at the end of the tick. Unlike other methods, it doesn't error after the deletion
+---@see IsDestroyed # True only after the deletion, and accepts `nil`
+---@see moho.unit_methods.SetDead # Sets `Dead` at the end of the tick for units destroyed without `Kill`
 ---@return boolean
 function Entity:BeenDestroyed()
 end
@@ -210,7 +210,7 @@ function Entity:GetHeading()
 end
 
 --- Returns the amount of health this entity has
----@see moho.entity_methods.GetMaxHealth # for the maximum possible health
+---@see moho.entity_methods.GetMaxHealth # For the maximum possible health
 ---@return number
 function Entity:GetHealth()
 end
@@ -224,7 +224,7 @@ end
 
 --- Returns the maximum amount of health this entity can have. Note that this may not be the same
 --- value as the original one in the entity's blueprint.
----@see moho.entity_methods.GetHealth # for the current amount of health
+---@see moho.entity_methods.GetHealth # For the current amount of health
 ---@return number
 function Entity:GetMaxHealth()
 end
@@ -282,8 +282,8 @@ end
 function Entity:IsValidBone(bone, allowNil)
 end
 
----@see moho.unit_methods.CheckCanBeKilled # called first on units
----@see moho.unit_methods.SetDead # called before `OnKilled`
+---@see moho.unit_methods.CheckCanBeKilled # Called first on units
+---@see moho.unit_methods.SetDead # Called before `OnKilled`
 ---@see moho.unit_methods.OnKilled
 ---@overload fun()
 ---@param instigator Unit
@@ -374,7 +374,7 @@ function Entity:SetMesh(meshBp, keepActor)
 end
 
 --- Defines the orientation of the entity
----@see moho.entity_methods.SetPosition # for setting the position
+---@see moho.entity_methods.SetPosition # For setting the position
 ---@param orientation Quaternion
 ---@param immediately boolean
 function Entity:SetOrientation(orientation, immediately)
@@ -384,7 +384,7 @@ end
 function Entity:SetParentOffset(vector)
 end
 
----@see moho.entity_methods.SetOrientation # for setting the orientation
+---@see moho.entity_methods.SetOrientation # For setting the orientation
 ---@param vector Vector
 ---@param immediate? boolean
 function Entity:SetPosition(vector, immediate)
@@ -441,18 +441,18 @@ Entity.OnAttachedDestroyed = nil
 Entity.OnAttachedKilled = nil
 
 --- Called by the engine when a projectile is about to hit this entity. Return true to let the
---- projectile collide with it. Without this callback, projectiles pass through.
+--- projectile collide with it. Without this callback, projectiles pass through
 ---@type nil | fun(self: Entity, other: Projectile): boolean
 Entity.OnCollisionCheck = nil
 
 --- Called by the engine when the beam of a beam weapon passes through this entity. Return true to
---- let the beam hit it. Without this callback, beams pass through.
+--- let the beam hit it. Without this callback, beams pass through
 ---@type nil | fun(self: Entity, firingWeapon: Weapon): boolean
 Entity.OnCollisionCheckWeapon = nil
 
 --- Called by the engine when the entity takes damage from `Damage` or `DamageArea`, with the
 --- amount left after armor. Not called when that amount is 0. The engine does not change the
---- entity's health itself.
+--- entity's health itself
 ---@type nil | fun(self: Entity, instigator: Unit | Projectile | Entity | nil, amount: number, vector: Vector, damageType: DamageType)
 Entity.OnDamage = nil
 

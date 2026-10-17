@@ -50,7 +50,7 @@ CCollisionBeamEntity.OnDisable = nil
 CCollisionBeamEntity.OnEnable = nil
 
 --- Called by the engine on each collision check while the beam is enabled. `targetEntity` is nil
---- when the beam hits the terrain, water or nothing.
+--- when the beam hits the terrain, water or nothing
 ---@type nil | fun(self: CollisionBeam, impactType: ImpactType, targetEntity: Unit | Prop | Projectile | Entity | nil)
 CCollisionBeamEntity.OnImpact = nil
 

@@ -73,7 +73,7 @@ end
 --- Sets the alpha of a given item list's background, if children is true, also set children's alpha
 ---@param alpha number
 ---@param children? boolean
----@see ItemList.SetAlphaOfColors # Lua implementation that can set the alpha of the text in an item list.
+---@see ItemList.SetAlphaOfColors # Lua implementation that can set the alpha of the text in an item list
 function CMauiItemList:SetAlpha(alpha, children)
 end
 
@@ -105,7 +105,7 @@ end
 
 --- Enables or disables highlighting the row under the mouse. While enabled, the engine calls
 --- `OnMouseoverItem` when the row under the mouse changes, with its 0-based index, or `-1` when the
---- mouse leaves the list.
+--- mouse leaves the list
 ---@see moho.item_list_methods.OnMouseoverItem # Called when the row under the mouse changes
 ---@param show boolean
 function CMauiItemList:ShowMouseoverItem(show)
@@ -116,20 +116,20 @@ end
 function CMauiItemList:ShowSelection(show)
 end
 
---- Called by the engine when the user clicks a row, with its 0-based index.
+--- Called by the engine when the user clicks a row, with its 0-based index
 ---@type nil | fun(self: ItemList, row: integer, event: KeyEvent)
 CMauiItemList.OnClick = nil
 
---- Called by the engine when the user double-clicks a row, with its 0-based index.
+--- Called by the engine when the user double-clicks a row, with its 0-based index
 ---@type nil | fun(self: ItemList, row: integer, event: KeyEvent)
 CMauiItemList.OnDoubleClick = nil
 
 --- Called by the engine when the selection changes by keyboard (arrow keys, `Page Up`,
---- `Page Down`, `Home` or `End`), with the 0-based index of the newly selected row.
+--- `Page Down`, `Home` or `End`), with the 0-based index of the newly selected row
 ---@type nil | fun(self: ItemList, row: integer)
 CMauiItemList.OnKeySelect = nil
 
---- Called by the engine when the row under the mouse changes, with its 0-based index or `-1`.
+--- Called by the engine when the row under the mouse changes, with its 0-based index or `-1`
 ---@see moho.item_list_methods.ShowMouseoverItem # Enables this callback
 ---@type nil | fun(self: ItemList, row: integer)
 CMauiItemList.OnMouseoverItem = nil

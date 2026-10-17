@@ -14,19 +14,19 @@ end
 --- - Any world view is destroyed, or the UI Lua state is replaced.
 ---
 --- Destroying the dragger removes it as the active dragger without calling this. There is an
---- active dragger only between `PostDragger` and the end of the drag.
+--- active dragger only between `PostDragger` and the end of the drag
 ---@see PostDragger # Makes a dragger the active dragger
 ---@type nil | fun(self: Dragger)
 CMauiLuaDragger.OnCancel = nil
 
 --- Called by the engine when the mouse moves during the drag, with the cursor position in screen
---- coordinates.
+--- coordinates
 ---@see PostDragger # Makes a dragger the active dragger
 ---@type nil | fun(self: Dragger, x: number, y: number)
 CMauiLuaDragger.OnMove = nil
 
 --- Called by the engine when the mouse button that `PostDragger` named is released, with the
---- cursor position in screen coordinates.
+--- cursor position in screen coordinates
 ---@see PostDragger # Makes a dragger the active dragger
 ---@type nil | fun(self: Dragger, x: number, y: number)
 CMauiLuaDragger.OnRelease = nil

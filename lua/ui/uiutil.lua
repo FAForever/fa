@@ -851,7 +851,7 @@ end
 --- the standard long-name convention from the given texture path. These are:
 --- `topLeft.dds`, `topRight.dds`, `bottomLeft.dds`, `bottomRight.dds`, `left.dds`, `right.dds`,
 --- `top.dds` and `bottom.dds`
----@see Border # for an explanation of how the textures are arranged.
+---@see Border # For an explanation of how the textures are arranged
 ---@param control Control
 ---@param texturePath FileName
 ---@param fudgeX? number The amount of overlap in the X direction the border textures shall have with the control. The default fudgefactors are suitable for use with the widely-used "laser box" borders (which is `62`).

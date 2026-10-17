@@ -14,7 +14,7 @@ end
 ---@type nil | fun(self: Prop)
 Prop.BeingReclaimed = nil
 
---- Called by the engine when a moving unit pushes into the prop. Naval units don't trigger it.
+--- Called by the engine when a moving unit pushes into the prop. Naval units don't trigger it
 ---@type nil | fun(self: Prop, other: Unit, nx: number, ny: number, nz: number, depth: number)
 Prop.OnCollision = nil
 
@@ -27,7 +27,7 @@ Prop.OnCreate = nil
 Prop.OnKilled = nil
 
 --- Called by the engine when the prop is reclaimed. `reclaimer` is nil when the prop's reclaim
---- progress reaches zero, after which the engine destroys the prop.
+--- progress reaches zero, after which the engine destroys the prop
 ---@type nil | fun(self: Prop, reclaimer?: Unit)
 Prop.OnReclaimed = nil
 

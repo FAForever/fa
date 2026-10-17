@@ -218,8 +218,8 @@ LazyVarMetaTable = {
     end,
 
     --- Lazy variable represents a value or a function
-    ---@see SetFunction # when the parameter is a function
-    ---@see SetValue # when the parameter is a value
+    ---@see SetFunction # When the parameter is a function
+    ---@see SetValue # When the parameter is a value
     ---@param self LazyVar
     ---@param value any
     Set = function(self, value)

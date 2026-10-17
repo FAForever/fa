@@ -141,29 +141,29 @@ end
 
 --- Called by the engine when a scrollbar attached to this control needs its size. Returns the
 --- minimum and maximum of the scroll range, then of the visible part. The engine logs a warning
---- and uses zeros unless all four values are returned.
+--- and uses zeros unless all four values are returned
 ---@see moho.scrollbar_methods.SetScrollable # Attaches a scrollbar
 ---@type nil | fun(self: Control, axis: ScrollAxis): rangeMin: number, rangeMax: number, visibleMin: number, visibleMax: number
 CMauiControl.GetScrollValues = nil
 
 --- Called by the engine when an input event reaches this control. Return `true` to consume the
---- event; otherwise the engine passes it to the parent control.
+--- event; otherwise the engine passes it to the parent control
 ---@type nil | fun(self: Control, event: KeyEvent): boolean
 CMauiControl.HandleEvent = nil
 
 --- Declared by the engine's scrollable interface, but no engine code calls it: scrollbars and the
 --- mouse wheel scroll the control without asking. Lua code calls it to decide whether to show a
 --- scrollbar or handle the mouse wheel, e.g. `optionGrid:IsScrollable("Vert")` in
---- `/lua/ui/dialogs/options.lua`.
+--- `/lua/ui/dialogs/options.lua`
 ---@type nil | fun(self: Control, axis: ScrollAxis): boolean
 CMauiControl.IsScrollable = nil
 
---- Called by the engine when the control is destroyed, before its children are destroyed.
+--- Called by the engine when the control is destroyed, before its children are destroyed
 ---@type nil | fun(self: Control)
 CMauiControl.OnDestroy = nil
 
 --- Called by the engine every frame while the control needs frame updates, with the time since
---- the last frame in seconds.
+--- the last frame in seconds
 ---@see Control.SetNeedsFrameUpdate # Enables frame updates
 ---@type nil | fun(self: Control, delta: number)
 CMauiControl.OnFrame = nil
@@ -171,24 +171,24 @@ CMauiControl.OnFrame = nil
 --- Called by the engine when the control is shown or hidden, before the change. Return `true` to
 --- cancel the change for this control and its children, including the control's own hidden state.
 --- Examples are in `/lua/maui/grid.lua`, `/lua/ui/controls/acubutton.lua` and
---- `/lua/ui/controls/combo.lua`.
+--- `/lua/ui/controls/combo.lua`
 ---@see moho.control_methods.SetHidden # Shows or hides the control
 ---@see moho.control_methods.Hide # Hides the control
 ---@see moho.control_methods.Show # Shows the control
 ---@type nil | fun(self: Control, hidden: boolean): boolean?
 CMauiControl.OnHide = nil
 
---- Called by the engine when the control is created by its `InternalCreate*` function.
+--- Called by the engine when the control is created by its `InternalCreate*` function
 ---@type nil | fun(self: Control)
 CMauiControl.OnInit = nil
 
 --- Called by the engine on the control that had keyboard focus when any control acquires
---- keyboard focus, including when it acquires focus again itself.
+--- keyboard focus, including when it acquires focus again itself
 ---@see moho.control_methods.AcquireKeyboardFocus # Acquires keyboard focus
 ---@type nil | fun(self: Control)
 CMauiControl.OnKeyboardFocusChange = nil
 
---- Called by the engine on the control with keyboard focus when the user clicks a different control.
+--- Called by the engine on the control with keyboard focus when the user clicks a different control
 ---@type nil | fun(self: Control)
 CMauiControl.OnLoseKeyboardFocus = nil
 
@@ -204,7 +204,7 @@ CMauiControl.OnLoseKeyboardFocus = nil
 CMauiControl.ScrollLines = nil
 
 --- Called by the engine when the user drags the thumb of a scrollbar, with the new first visible
---- line of this control.
+--- line of this control
 ---@type nil | fun(self: Control, axis: ScrollAxis, top: number)
 CMauiControl.ScrollSetTop = nil
 

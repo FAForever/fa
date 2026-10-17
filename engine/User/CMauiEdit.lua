@@ -218,24 +218,24 @@ end
 function CMauiEdit:ShowCaret(show)
 end
 
---- Engine does not call HandleEvent for Edit controls.
+--- Engine does not call HandleEvent for Edit controls
 ---@type nil
 CMauiEdit.HandleEvent = nil
 
 --- Called by the engine when a character key is pressed, before the character is inserted.
 --- `charcode` is the character code, which includes `Tab` (9) and `Space` (32). Return `true` to
---- handle the character yourself, so the engine doesn't insert it.
+--- handle the character yourself, so the engine doesn't insert it
 ---@type nil | fun(self: Edit, charcode: integer): boolean?
 CMauiEdit.OnCharPressed = nil
 
 --- Called by the engine when the user presses `Enter`. `currentText` is the text in the edit when
---- the key is pressed. Return `true` to keep the text; otherwise the engine clears it.
+--- the key is pressed. Return `true` to keep the text; otherwise the engine clears it
 ---@type nil | fun(self: Edit, currentText: string): boolean?
 CMauiEdit.OnEnterPressed = nil
 
 --- Called by the engine when the user presses `Escape`. `currentText` is the text in the edit when
 --- the key is pressed. Return `true` to keep the text and focus; otherwise the engine clears the
---- text, or abandons keyboard focus if the text is already empty.
+--- text, or abandons keyboard focus if the text is already empty
 ---@type nil | fun(self: Edit, currentText: string): boolean?
 CMauiEdit.OnEscPressed = nil
 
@@ -243,12 +243,12 @@ CMauiEdit.OnEscPressed = nil
 --- virtual-key code. `event.KeyCode` holds the wxWidgets code of the same key instead. Keys the
 --- engine uses for editing (`Backspace`, `Delete`, `Insert`, `Home`, `End`, `Left` and `Right`)
 --- and `Enter` and `Escape` don't reach this callback. `Up`, `Down`, `Page Up` and `Page Down`
---- do.
+--- do
 ---@see VK_KeyCode # The codes, and the `UIUtil.VK_*` constants
 ---@type nil | fun(self: Edit, keycode: VK_KeyCode, event: KeyEvent)
 CMauiEdit.OnNonTextKeyPressed = nil
 
---- Called by the engine when the text changes, with the new and the previous text.
+--- Called by the engine when the text changes, with the new and the previous text
 ---@see moho.edit_methods.SetText # Changes the text
 ---@see moho.edit_methods.ClearText # Clears the text
 ---@type nil | fun(self: Edit, newText: string, oldText: string)

@@ -154,7 +154,7 @@ end
 
 --- Creates a console output receiver that calls the given function on console output.
 ---
----@see RemoveConsoleOutputReciever # Destroy the receiver and stop calling the function.
+---@see RemoveConsoleOutputReciever # Destroy the receiver and stop calling the function
 ---@param func fun(text: string)
 ---@return ConsoluteOutputReceiverHandle
 function AddConsoleOutputReciever(func)
@@ -379,7 +379,7 @@ end
 --- disregarding if they start with `/` like other commandline options.
 ---
 --- Returns `false` if there are not `maxArgs` tokens after the `option`.
----@see GetCommandLineArgTable # for parsing key-values
+---@see GetCommandLineArgTable # For parsing key-values
 ---@param option string
 ---@param maxArgs number
 ---@return (string | number | integer)[] | false
@@ -411,7 +411,7 @@ end
 ---
 --- In the game options you can add a second adapter under the 'Video' tab.
 ---
----@see GetNumRootFrames # to determine the number of root frames.
+---@see GetNumRootFrames # To determine the number of root frames
 ---
 --- See also the following modules that manage these frames:
 --- - Primary adapter: lua\ui\game\worldview.lua
@@ -1009,7 +1009,7 @@ function PrefetchSession(mapname, mods, hipri)
 end
 
 --- Destroys a console output receiver.
----@see AddConsoleOutputReciever # To create receivers.
+---@see AddConsoleOutputReciever # To create receivers
 ---@param handle ConsoluteOutputReceiverHandle
 function RemoveConsoleOutputReciever(handle)
 end

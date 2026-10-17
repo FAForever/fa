@@ -117,7 +117,7 @@ function CUIWorldView:ZoomScale(x, y, wheelRot, wheelDelta)
 end
 
 --- Called by the engine every frame while input isn't locked with `LockInput`, with the time
---- since the last frame in seconds.
+--- since the last frame in seconds
 ---@see moho.UIWorldView.LockInput # Stops these calls
 ---@see moho.UIWorldView.UnlockInput # Resumes these calls
 ---@type nil | fun(self: WorldView, delta: number)
@@ -126,17 +126,17 @@ CUIWorldView.OnFrame = nil
 --- Called by the engine when strategic icons are hidden or shown again. Icons are hidden while the
 --- camera is rotated by holding `Space`, and while `cam_Free` (free camera mode) is on. The engine
 --- checks this each frame, before `OnFrame`, so it is not called while input is locked. Zooming
---- and `ui_RenderIcons` don't trigger it.
+--- and `ui_RenderIcons` don't trigger it
 ---@type nil | fun(self: WorldView, areIconsVisible: boolean)
 CUIWorldView.OnIconsVisible = nil
 
---- Called by the engine every frame while the mouse is over the world view.
+--- Called by the engine every frame while the mouse is over the world view
 ---@type nil | fun(self: WorldView)
 CUIWorldView.OnUpdateCursor = nil
 
 -- Added by FA-Binary-Patches
 
---- Projects multiple vectors at once.
+--- Projects multiple vectors at once
 ---
 --- Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/40
 ---@generic T
@@ -145,7 +145,7 @@ CUIWorldView.OnUpdateCursor = nil
 function CUIWorldView:ProjectMultiple(positions)
 end
 
---- If true, enables the rendering of custom world shapes. See also all shapes at /lua/ui/game/shapes.
+--- If true, enables the rendering of custom world shapes. See also all shapes at /lua/ui/game/shapes
 ---
 --- Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/47
 ---@see moho.UIWorldView.OnRenderWorld # Called every frame while enabled
@@ -155,7 +155,7 @@ end
 
 --- Called by the engine every frame while the world view draws the world and custom rendering is
 --- enabled with `SetCustomRender`, with the time since the last frame. The `UI_Draw*` functions
---- only work inside this callback.
+--- only work inside this callback
 ---
 --- Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/47
 ---@see moho.UIWorldView.SetCustomRender # Enables this callback

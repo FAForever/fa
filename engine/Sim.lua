@@ -157,8 +157,8 @@ function CreateAttachedBeam(object, bone, army, length, thickness, blueprint)
 end
 
 --- creates an emitter that is attached to an entity at a bone
----@see CreateEmitterAtBone # to create the emitter at an entity's bone without attaching it there
----@see CreateEmitterAtEntity # to create the emitter at an entity without attaching it there
+---@see CreateEmitterAtBone # To create the emitter at an entity's bone without attaching it there
+---@see CreateEmitterAtEntity # To create the emitter at an entity without attaching it there
 ---@param object BoneObject
 ---@param bone Bone
 ---@param army Army
@@ -168,8 +168,8 @@ function CreateAttachedEmitter(object, bone, army, blueprint)
 end
 
 --- creates a beam, which then needs to be attached to a bone
----@see AttachBeamToEntity # to attach the beam to an entity bone
----@see CreateBeamEmitterOnEntity # to create an attached beam emitter at once
+---@see AttachBeamToEntity # To attach the beam to an entity bone
+---@see CreateBeamEmitterOnEntity # To create an attached beam emitter at once
 ---@param blueprint FileName
 ---@param army Army
 ---@return moho.IEffect
@@ -177,7 +177,7 @@ function CreateBeamEmitter(blueprint, army)
 end
 
 --- creates a beam and attaches it to an entity, usually used for weaponry
----@see CreateBeamEmitter # to create the beam without attaching it to anything
+---@see CreateBeamEmitter # To create the beam without attaching it to anything
 ---@param object BoneObject
 ---@param tobone Bone
 ---@param army Army
@@ -256,8 +256,8 @@ function CreateEconomyEvent(unit, totalEnergy, totalMass, timeInSeconds, callbac
 end
 
 --- creates an emitter at an entity's bone, but does not attach the emitter to it
----@see CreateEmitterAtEntity # for an at-object version
----@see CreateEmitterOnEntity # for an on-object version
+---@see CreateEmitterAtEntity # For an at-object version
+---@see CreateEmitterOnEntity # For an on-object version
 ---@param object BoneObject
 ---@param army Army
 ---@param blueprint FileName
@@ -266,8 +266,8 @@ function CreateEmitterAtBone(object, bone, army, blueprint)
 end
 
 --- creates an emitter at an entity, but does not attach the emitter to it
----@see CreateEmitterAtBone # for an at-bone version
----@see CreateEmitterOnEntity # for an on-object version
+---@see CreateEmitterAtBone # For an at-bone version
+---@see CreateEmitterOnEntity # For an on-object version
 ---@param object BoneObject
 ---@param army Army
 ---@param blueprint FileName
@@ -276,8 +276,8 @@ function CreateEmitterAtEntity(object, army, blueprint)
 end
 
 --- creates an emitter on an object and attaches the emitter to it
----@see CreateEmitterAtBone # for an at-bone version
----@see CreateEmitterAtEntity # for an at-object version
+---@see CreateEmitterAtBone # For an at-bone version
+---@see CreateEmitterAtEntity # For an at-object version
 ---@param object BoneObject
 ---@param army Army
 ---@param blueprint FileName
@@ -304,7 +304,7 @@ function CreateInitialArmyUnit(army, unitId)
 end
 
 --- Creates a light particle that provides vision, is often used in combination with effects
----@see CreateLightParticleIntel # intel-giving version
+---@see CreateLightParticleIntel # Intel-giving version
 ---@param object BoneObject
 ---@param bone Bone
 ---@param army Army
@@ -317,7 +317,7 @@ function CreateLightParticle(object, bone, army, size, lifetime, texture, rampNa
 end
 
 --- Creates a light particle, is often used in combination with effects
----@see CreateLightParticle # non intel-giving version
+---@see CreateLightParticle # Non intel-giving version
 ---@param object BoneObject
 ---@param bone Bone
 ---@param army Army
@@ -330,7 +330,7 @@ function CreateLightParticleIntel(object, bone, army, size, lifetime, texture, r
 end
 
 --- Spawns a prop, using the default orientation
----@see CreatePropHPR # heading-pitch-roll version
+---@see CreatePropHPR # Heading-pitch-roll version
 ---@param location Vector
 ---@param blueprintId string
 ---@return Prop
@@ -338,7 +338,7 @@ function CreateProp(location, blueprintId)
 end
 
 --- Spawns a prop with control over orientation
----@see CreateProp # simple version
+---@see CreateProp # Simple version
 ---@param blueprintPath string full path to the prop's blueprint
 ---@param x number
 ---@param y number
@@ -395,7 +395,7 @@ function CreateSlider(object, bone, goalX, goalY, goalZ, speed, worldSpace)
 end
 
 --- Adds a splat to the game at a position and heading
----@see CreateSplatOnBone # adds the splat at an entity bone
+---@see CreateSplatOnBone # Adds the splat at an entity bone
 ---@param position Vector
 ---@param heading number
 ---@param texture string
@@ -409,7 +409,7 @@ function CreateSplat(position, heading, texture, sizeX, sizeZ, lodParam, duratio
 end
 
 --- Adds a splat to the game at an entity bone position and heading
----@see CreateSplat # adds the splat at a position
+---@see CreateSplat # Adds the splat at a position
 ---@param object BoneObject
 ---@param offset Vector
 ---@param bone Bone
@@ -451,8 +451,8 @@ function CreateTrail(object, bone, army, trailBlueprint)
 end
 
 --- Creates a unit from a blueprint for an army, at a position with quaternion orientation
----@see CreateUnit2 # simple version
----@see CreateUnitHPR # heading-pitch-roll version
+---@see CreateUnit2 # Simple version
+---@see CreateUnitHPR # Heading-pitch-roll version
 ---@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the unit cap stops it
 ---@param blueprintId string
 ---@param army Army
@@ -469,8 +469,8 @@ function CreateUnit(blueprintId, army, x, y, z, qx, qy, qz, qw, layer)
 end
 
 --- Creates a unit from a blueprint for an army, at an X-Z map point with a heading
----@see CreateUnit # quaternion version
----@see CreateUnitHPR # heading-pitch-roll version
+---@see CreateUnit # Quaternion version
+---@see CreateUnitHPR # Heading-pitch-roll version
 ---@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the unit cap stops it
 ---@param blueprintId string
 ---@param army Army
@@ -483,8 +483,8 @@ function CreateUnit2(blueprintId, army, layer, x, z, heading)
 end
 
 --- Creates a unit from a blueprint for an army, at a position with heading, pitch, and roll
----@see CreateUnit # quaternion version
----@see CreateUnit2 # simple version
+---@see CreateUnit # Quaternion version
+---@see CreateUnit2 # Simple version
 ---@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the unit cap stops it
 ---@param blueprint UnitId
 ---@param army Army
@@ -825,7 +825,7 @@ function IssueClearFactoryCommands(factories)
 end
 
 --- Orders a group of units to destroy themselves, doesn't leave a wreckage
----@see IssueKillSelf # an alternative that does leave a wreckage
+---@see IssueKillSelf # An alternative that does leave a wreckage
 ---@param units Unit[]
 ---@return SimCommand
 function IssueDestroySelf(units)
@@ -904,7 +904,7 @@ function IssueGuard(units, target)
 end
 
 --- Orders a group of units to kill themselves
----@see IssueDestroySelf # an alternative that does not leave a wreckage
+---@see IssueDestroySelf # An alternative that does not leave a wreckage
 ---@param units Unit[]
 ---@return SimCommand
 function IssueKillSelf(units)
@@ -925,7 +925,7 @@ function IssueMoveOffFactory(units, position)
 end
 
 --- Orders a group of units to launch a strategic missile at a position
----@see IssueTactical # for tactical missiles
+---@see IssueTactical # For tactical missiles
 ---@see Unit.OnNukeLaunched # Called when the order gives its target to the silo weapon
 ---@param units Unit[]
 ---@param position Vector
@@ -1010,7 +1010,7 @@ function IssueStop(units)
 end
 
 --- Orders a group of units to launch a tactical missile
----@see IssueNuke # for nuclear missiles
+---@see IssueNuke # For nuclear missiles
 ---@param units Unit[]
 ---@param target Unit | Vector
 ---@return SimCommand
@@ -1324,7 +1324,7 @@ end
 -- Added by FA-Binary-Patches
 
 --- Sets the command source of an army to match another army's command source.
---- Removing the last command source doesn't call `AbandonedByPlayer`.
+--- Removing the last command source doesn't call `AbandonedByPlayer`
 ---
 --- Introduced by https://github.com/FAForever/FA-Binary-Patches/blob/master/section/SimSetCommandSource.cpp
 ---@see moho.aibrain_methods.AbandonedByPlayer # Called when the last command source leaves the game
@@ -1336,9 +1336,9 @@ end
 
 --- Changes the distance at which the default navigator switches to a lower resolution
 --- pathfinding grid (from "personal" per-unit waypoints to waypoints shared by many units),
---- typically resulting in units moving in columns over large distances instead of maintaining their formation.
+--- typically resulting in units moving in columns over large distances instead of maintaining their formation
 ---
---- Default engine value is 50.
+--- Default engine value is 50
 ---
 --- Useful console commands for debugging: "dbg navwaypoints", "dbg navpath", "dbg navsteering"
 ---
