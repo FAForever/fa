@@ -496,8 +496,8 @@ function Unit:SetAccMult(accelMult)
 end
 
 --- enable silo auto-build or unit auto-assist
----@see Unit.OnAutoModeOn # Called when `mode` is true
----@see Unit.OnAutoModeOff # Called when `mode` is false
+---@see moho.unit_methods.OnAutoModeOn # Called when `mode` is true
+---@see moho.unit_methods.OnAutoModeOff # Called when `mode` is false
 ---@param mode boolean
 function Unit:SetAutoMode(mode)
 end
@@ -531,8 +531,8 @@ function Unit:SetCapturable(capturable)
 end
 
 --- Turns the resource consumption of the unit on or off
----@see Unit.OnConsumptionActive # Called when consumption turns on
----@see Unit.OnConsumptionInActive # Called when consumption turns off
+---@see moho.unit_methods.OnConsumptionActive # Called when consumption turns on
+---@see moho.unit_methods.OnConsumptionInActive # Called when consumption turns off
 ---@param active boolean
 function Unit:SetConsumptionActive(active)
 end
@@ -604,16 +604,16 @@ end
 
 --- Pauses building, upgrading, and other tasks this unit can perform.
 --- Assisting units are unaffected.
----@see Unit.OnPaused
----@see Unit.OnUnpaused
+---@see moho.unit_methods.OnPaused
+---@see moho.unit_methods.OnUnpaused
 ---@param paused boolean
 function Unit:SetPaused(paused)
 end
 
 --- Enables or disables resource production for the unit.
 --- Used for mass fabricators or extractors for example.
----@see Unit.OnProductionActive # Called when `active` is true
----@see Unit.OnProductionInActive # Called when `active` is false
+---@see moho.unit_methods.OnProductionActive # Called when `active` is true
+---@see moho.unit_methods.OnProductionInActive # Called when `active` is false
 ---@param active boolean
 function Unit:SetProductionActive(active)
 end
@@ -639,8 +639,8 @@ function Unit:SetRegenRate(rate)
 end
 
 --- sets the script bit, which calls `OnScriptBitSet` or `OnScriptBitClear` for the Sim Unit and `OnSelectionChanged` on the User side if the bit is toggled
----@see Unit.OnScriptBitSet
----@see Unit.OnScriptBitClear
+---@see moho.unit_methods.OnScriptBitSet
+---@see moho.unit_methods.OnScriptBitClear
 ---@param bit ToggleCap
 ---@param state boolean # `true` -> `OnScriptBitSet`; `false` -> `OnScriptBitClear`
 function Unit:SetScriptBit(bit, state)
@@ -732,15 +732,15 @@ function Unit:ToggleFireState()
 end
 
 --- toggles the script bit
----@see Unit.OnScriptBitSet
----@see Unit.OnScriptBitClear
+---@see moho.unit_methods.OnScriptBitSet
+---@see moho.unit_methods.OnScriptBitClear
 ---@param bit number
 function Unit:ToggleScriptBit(bit)
 end
 
 --- detaches all units from this transport
----@see Unit.CheckCanBeKilled # Called on attached units when `destroySomeUnits` is true
----@see Unit.DestroyedOnTransport # Called on units in storage before destroying them
+---@see moho.unit_methods.CheckCanBeKilled # Called on attached units when `destroySomeUnits` is true
+---@see moho.unit_methods.DestroyedOnTransport # Called on units in storage before destroying them
 ---@param destroySomeUnits boolean
 function Unit:TransportDetachAllUnits(destroySomeUnits)
 end
@@ -765,19 +765,19 @@ Unit.CheckBuildRestriction = nil
 --- When a transport is destroyed, each unit attached to it has a 99% chance to be picked for death. A picked unit is killed only if this returns true. The other units are detached
 ---@see moho.entity_methods.Kill # Calls this first
 ---@see moho.unit_methods.TransportDetachAllUnits # Calls this on attached units when destroying them
----@see Unit.CheckCanTakeDamage # Called on a picked commander when this returns false
+---@see moho.unit_methods.CheckCanTakeDamage # Called on a picked commander when this returns false
 ---@type nil | fun(self: Unit, other: Unit): boolean
 Unit.CheckCanBeKilled = nil
 
 --- Called by the engine on a commander attached to a destroyed transport, when the commander was picked for death (99% chance) and `CheckCanBeKilled` returned false.
 --- Returning true deals 10000 damage to the commander instead of killing it. Returning false detaches it unharmed
----@see Unit.CheckCanBeKilled
+---@see moho.unit_methods.CheckCanBeKilled
 ---@type nil | fun(self: Unit, transport: Unit): boolean
 Unit.CheckCanTakeDamage = nil
 
 --- Called by the engine when the unit's repair task ends, to clear the enhancement work copied by `InheritWork`.
 --- The engine calls it at the end of every repair task, also when the task did not call `InheritWork`
----@see Unit.InheritWork
+---@see moho.unit_methods.InheritWork
 ---@type nil | fun(self: Unit)
 Unit.ClearWork = nil
 
@@ -793,13 +793,13 @@ Unit.DestroyedOnTransport = nil
 
 --- Called by the engine on the capturing unit when it starts a capture: once for the target, then once for each unit attached to the target.
 --- Returns the time in seconds, energy cost and mass cost. The engine adds up the results, converting each time to ticks (at least 1)
----@see Unit.OnStartCapture
+---@see moho.unit_methods.OnStartCapture
 ---@type nil | fun(self: Unit, target: Unit): number, number, number
 Unit.GetCaptureCosts = nil
 
 --- Called by the engine when the unit starts building a silo missile, tactical or nuclear. Returns the build rate for the missile.
 --- The engine uses at least 0.1
----@see Unit.OnSiloBuildStart
+---@see moho.unit_methods.OnSiloBuildStart
 ---@type nil | fun(self: Unit): number
 Unit.GetEconomyBuildRate = nil
 
@@ -828,7 +828,7 @@ Unit.GetWeaponClass = nil
 
 --- Called by the engine when the unit starts repairing a unit in the `Enhancing` state, e.g. when it assists a commander's enhancement.
 --- Lua copies the target's enhancement work to the unit
----@see Unit.ClearWork
+---@see moho.unit_methods.ClearWork
 ---@type nil | fun(self: Unit, target: Unit)
 Unit.InheritWork = nil
 
@@ -844,14 +844,14 @@ Unit.OnAdjacentTo = nil
 --- Lua uses it for footfalls: the foot of a walking unit touching down. It fires once per drop, and again only after the bone rose back above 0.1.
 --- `x`, `y` and `z` are the bone's offset from the unit's position, in the unit's frame. Not called when the detector has the terrain check enabled
 ---@see CreateCollisionDetector
----@see Unit.OnAnimTerrainCollision # Called instead when the terrain check is enabled
+---@see moho.unit_methods.OnAnimTerrainCollision # Called instead when the terrain check is enabled
 ---@type nil | fun(self: Unit, bone: string, x: number, y: number, z: number)
 Unit.OnAnimCollision = nil
 
 --- Called by the engine when a bone watched by a collision detector with the terrain check enabled goes below the terrain or water surface.
 --- It fires once per crossing. `x`, `y` and `z` are the bone's world position
 ---@see moho.CollisionManipulator.EnableTerrainCheck
----@see Unit.OnNotAnimTerrainCollision # Called when the bone comes back above the surface
+---@see moho.unit_methods.OnNotAnimTerrainCollision # Called when the bone comes back above the surface
 ---@type nil | fun(self: Unit, bone: string, x: number, y: number, z: number)
 Unit.OnAnimTerrainCollision = nil
 
@@ -875,19 +875,19 @@ Unit.OnAutoModeOn = nil
 
 --- Called by the engine when a builder's work moves the unit's build progress past 25%, 50% or 75%.
 --- `oldProg` and `newProg` are the progress before and after that work. The builder's `OnBuildProgress` is called first
----@see Unit.OnBuildProgress
+---@see moho.unit_methods.OnBuildProgress
 ---@type nil | fun(self: Unit, builder: Unit, oldProg: number, newProg: number)
 Unit.OnBeingBuiltProgress = nil
 
 --- Called by the engine when the unit's work moves its build target's progress past 25%, 50% or 75%.
 --- `oldProg` and `newProg` are the progress before and after that work. The target's `OnBeingBuiltProgress` follows
----@see Unit.OnBeingBuiltProgress
+---@see moho.unit_methods.OnBeingBuiltProgress
 ---@type nil | fun(self: Unit, target: Unit, oldProg: number, newProg: number)
 Unit.OnBuildProgress = nil
 
 --- Called by the engine when a capture of this unit completes, right after `OnStopBeingCaptured`
----@see Unit.OnStopBeingCaptured
----@see Unit.OnFailedBeingCaptured # Called instead when the capture ends early
+---@see moho.unit_methods.OnStopBeingCaptured
+---@see moho.unit_methods.OnFailedBeingCaptured # Called instead when the capture ends early
 ---@type nil | fun(self: Unit, captor: Unit)
 Unit.OnCaptured = nil
 
@@ -905,8 +905,8 @@ Unit.OnConsumptionInActive = nil
 
 --- Called by the engine when the unit is created, after `OnPreCreate`.
 --- A unit created complete gets `OnStopBeingBuilt` right after this. A unit created to be built gets it when its construction finishes
----@see Unit.OnPreCreate
----@see Unit.OnStopBeingBuilt
+---@see moho.unit_methods.OnPreCreate
+---@see moho.unit_methods.OnStopBeingBuilt
 ---@type nil | fun(self: Unit)
 Unit.OnCreate = nil
 
@@ -929,33 +929,33 @@ Unit.OnExtraDamageDealt = nil
 
 --- Called by the engine when a capture of this unit ends before it completes: the capture order is cancelled or replaced, or its target changes.
 --- Not called when this unit is dead or being destroyed
----@see Unit.OnFailedCapture # Called on the captor right after
----@see Unit.OnStopBeingCaptured # Called instead when the capture completes
+---@see moho.unit_methods.OnFailedCapture # Called on the captor right after
+---@see moho.unit_methods.OnStopBeingCaptured # Called instead when the capture completes
 ---@type nil | fun(self: Unit, captor: Unit)
 Unit.OnFailedBeingCaptured = nil
 
 --- Called by the engine when the unit's capture ends before it completes: the capture order is cancelled or replaced, or its target changes.
 --- Not called when the target is dead or being destroyed
----@see Unit.OnFailedBeingCaptured # Called on the target right before
----@see Unit.OnStopCapture # Called instead when the capture completes
+---@see moho.unit_methods.OnFailedBeingCaptured # Called on the target right before
+---@see moho.unit_methods.OnStopCapture # Called instead when the capture completes
 ---@type nil | fun(self: Unit, target: Unit)
 Unit.OnFailedCapture = nil
 
 --- Called by the engine when the unit's teleport order ends before the teleport completes, e.g. when the order is cancelled or replaced
----@see Unit.OnTeleportUnit
+---@see moho.unit_methods.OnTeleportUnit
 ---@type nil | fun(self: Unit)
 Unit.OnFailedTeleport = nil
 
 --- Called by the engine when a factory or upgrade build of the unit stops before the unit finished, e.g. when the order is cancelled.
 --- Not called when a mobile builder stops building it. Lua destroys the unit
----@see Unit.OnFailedToBuild # Called on the builder right before
----@see Unit.OnStopBeingBuilt # Called instead when the construction finishes
+---@see moho.unit_methods.OnFailedToBuild # Called on the builder right before
+---@see moho.unit_methods.OnStopBeingBuilt # Called instead when the construction finishes
 ---@type nil | fun(self: Unit)
 Unit.OnFailedToBeBuilt = nil
 
 --- Called by the engine when the unit stops building before its target finished
----@see Unit.OnStopBuild # Called on both finished and unfinished builds
----@see Unit.OnFailedToBeBuilt
+---@see moho.unit_methods.OnStopBuild # Called on both finished and unfinished builds
+---@see moho.unit_methods.OnFailedToBeBuilt
 ---@type nil | fun(self: Unit)
 Unit.OnFailedToBuild = nil
 
@@ -974,7 +974,7 @@ Unit.OnImpact = nil
 
 --- Called by the engine when the unit is killed
 ---@see moho.entity_methods.Kill
----@see Unit.SetDead # Called first
+---@see moho.unit_methods.SetDead # Called first
 ---@type nil | fun(self: Unit, instigator: Unit | Projectile | nil, type: DamageType, overkillRatio: number)
 Unit.OnKilled = nil
 
@@ -997,13 +997,13 @@ Unit.OnNotAdjacentTo = nil
 
 --- Called by the engine when a bone watched by a collision detector with the terrain check enabled comes back above the terrain or water surface.
 --- `x`, `y` and `z` are the bone's world position
----@see Unit.OnAnimTerrainCollision
+---@see moho.unit_methods.OnAnimTerrainCollision
 ---@type nil | fun(self: Unit, bone: string, x: number, y: number, z: number)
 Unit.OnNotAnimTerrainCollision = nil
 
 --- Called by the engine when the unit finishes building any silo missile, right after `OnSiloBuildEnd`.
 --- Despite the name, the engine also calls it for tactical missiles
----@see Unit.OnSiloBuildEnd
+---@see moho.unit_methods.OnSiloBuildEnd
 ---@type nil | fun(self: Unit, weapon: Weapon)
 Unit.OnNukeArmed = nil
 
@@ -1041,7 +1041,7 @@ Unit.OnProductionActive = nil
 Unit.OnProductionInActive = nil
 
 --- Called by the engine when the unit is fully reclaimed
----@see Unit.OnStopReclaim # Called on the reclaimer whether or not the reclaim completes
+---@see moho.unit_methods.OnStopReclaim # Called on the reclaimer whether or not the reclaim completes
 ---@type nil | fun(self: Unit, reclaimer: Unit)
 Unit.OnReclaimed = nil
 
@@ -1081,15 +1081,15 @@ Unit.OnSeedUnitBuilt = nil
 Unit.OnSetTeleportDest = nil
 
 --- Called by the engine when the unit finishes building any silo missile, tactical or nuclear
----@see Unit.OnNukeArmed # Called right after
----@see Unit.OnSiloBuildStart
+---@see moho.unit_methods.OnNukeArmed # Called right after
+---@see moho.unit_methods.OnSiloBuildStart
 ---@type nil | fun(self: Unit, weapon: Weapon)
 Unit.OnSiloBuildEnd = nil
 
 --- Called by the engine when the unit starts building any silo missile, tactical or nuclear
 ---@see IssueSiloBuildTactical
 ---@see IssueSiloBuildNuke
----@see Unit.OnSiloBuildEnd
+---@see moho.unit_methods.OnSiloBuildEnd
 ---@type nil | fun(self: Unit, weapon: Weapon)
 Unit.OnSiloBuildStart = nil
 
@@ -1105,7 +1105,7 @@ Unit.OnSpecialAction = nil
 Unit.OnStartBeingBuilt = nil
 
 --- Called by the engine when a unit starts to capture this unit
----@see Unit.OnStartCapture # Called on the captor right after
+---@see moho.unit_methods.OnStartCapture # Called on the captor right after
 ---@type nil | fun(self: Unit, captor: Unit)
 Unit.OnStartBeingCaptured = nil
 
@@ -1143,29 +1143,29 @@ Unit.OnStartRepeatQueue = nil
 Unit.OnStartSacrifice = nil
 
 --- Called by the engine when the unit has reached its transport and starts rising to the transport's attach bone to be loaded
----@see Unit.OnStopTransportBeamUp
+---@see moho.unit_methods.OnStopTransportBeamUp
 ---@type nil | fun(self: Unit, transport: Unit, bone: Bone)
 Unit.OnStartTransportBeamUp = nil
 
 --- Called by the engine when this transport or carrier starts loading units: for a load order, or for a carrier retrieving its units
----@see Unit.OnStopTransportLoading
+---@see moho.unit_methods.OnStopTransportLoading
 ---@type nil | fun(self: Unit)
 Unit.OnStartTransportLoading = nil
 
 --- Called by the engine when construction of the unit finishes, or right after `OnCreate` for a unit created complete.
 --- `builder` is nil for a unit created complete without a creator
----@see Unit.OnFailedToBeBuilt # Called instead when a factory or upgrade build stops early
+---@see moho.unit_methods.OnFailedToBeBuilt # Called instead when a factory or upgrade build stops early
 ---@type nil | fun(self: Unit, builder: Unit | nil, layer: Layer)
 Unit.OnStopBeingBuilt = nil
 
 --- Called by the engine when a capture of this unit completes, before `OnCaptured`
----@see Unit.OnCaptured # Called right after
----@see Unit.OnFailedBeingCaptured # Called instead when the capture ends early
+---@see moho.unit_methods.OnCaptured # Called right after
+---@see moho.unit_methods.OnFailedBeingCaptured # Called instead when the capture ends early
 ---@type nil | fun(self: Unit, captor: Unit)
 Unit.OnStopBeingCaptured = nil
 
 --- Called by the engine when the unit stops building or repairing a unit, whether or not the target finished
----@see Unit.OnFailedToBuild # Also called when the target did not finish
+---@see moho.unit_methods.OnFailedToBuild # Also called when the target did not finish
 ---@type nil | fun(self: Unit, built: Unit, order: BuildOrderType)
 Unit.OnStopBuild = nil
 
@@ -1175,12 +1175,12 @@ Unit.OnStopBuilderTracking = nil
 
 --- Called by the engine when the unit completes capturing its target, before the target's `OnStopBeingCaptured` and `OnCaptured`.
 --- Also called when the target is gone or can't be captured, with the unit itself as `target`
----@see Unit.OnFailedCapture # Called instead when the capture ends early
+---@see moho.unit_methods.OnFailedCapture # Called instead when the capture ends early
 ---@type nil | fun(self: Unit, target: Unit)
 Unit.OnStopCapture = nil
 
 --- Called by the engine when the unit stops reclaiming a target, whether or not the target was fully reclaimed
----@see Unit.OnReclaimed # Called on a fully reclaimed target
+---@see moho.unit_methods.OnReclaimed # Called on a fully reclaimed target
 ---@type nil | fun(self: Unit, target: Unit | Prop)
 Unit.OnStopReclaim = nil
 
@@ -1195,12 +1195,12 @@ Unit.OnStopRepeatQueue = nil
 Unit.OnStopSacrifice = nil
 
 --- Called by the engine when the unit stops rising into its transport: it reached the attach bone, or the load was interrupted
----@see Unit.OnStartTransportBeamUp
+---@see moho.unit_methods.OnStartTransportBeamUp
 ---@type nil | fun(self: Unit)
 Unit.OnStopTransportBeamUp = nil
 
 --- Called by the engine when this transport or carrier stops loading units, whether or not all units were loaded
----@see Unit.OnTransportAborted # Called after this when the load order ended before all units were loaded
+---@see moho.unit_methods.OnTransportAborted # Called after this when the load order ended before all units were loaded
 ---@type nil | fun(self: Unit)
 Unit.OnStopTransportLoading = nil
 
@@ -1209,7 +1209,7 @@ Unit.OnStopTransportLoading = nil
 --- For cargo of a `TELEPORTATION` transport, `teleporter` is the transport and `location` the beacon's position
 ---@see IssueTeleport
 ---@see Warp
----@see Unit.OnFailedTeleport # Called when the order ends before the teleport completes
+---@see moho.unit_methods.OnFailedTeleport # Called when the order ends before the teleport completes
 ---@type nil | fun(self: Unit, teleporter: Unit, location: Vector, orientation: Quaternion)
 Unit.OnTeleportUnit = nil
 

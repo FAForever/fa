@@ -221,8 +221,8 @@ end
 --- Creates a collision detection manipulator for the bones it watches.
 --- By default it calls `OnAnimCollision` when a bone drops to the unit's ground level (footfalls).
 --- With the terrain check enabled, it calls `OnAnimTerrainCollision` and `OnNotAnimTerrainCollision` when a bone crosses the terrain or water surface instead
----@see Unit.OnAnimCollision
----@see Unit.OnAnimTerrainCollision
+---@see moho.unit_methods.OnAnimCollision
+---@see moho.unit_methods.OnAnimTerrainCollision
 ---@see moho.CollisionManipulator.EnableTerrainCheck
 ---@param unit Unit
 ---@return moho.CollisionManipulator
@@ -804,7 +804,7 @@ function IssueBuildAllMobile(units, position, blueprintID, table)
 end
 
 --- Orders a group of units to capture a target, usually engineers
----@see Unit.OnStartCapture # Called when the capture starts
+---@see moho.unit_methods.OnStartCapture # Called when the capture starts
 ---@param units Unit[]
 ---@param target Unit
 ---@return SimCommand
@@ -852,7 +852,7 @@ function IssueFactoryRallyPoint(units, position)
 end
 
 --- Orders a group of units to setup a ferry
----@see Unit.OnFerryPointSet # Called on each unit
+---@see moho.unit_methods.OnFerryPointSet # Called on each unit
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
@@ -926,7 +926,7 @@ end
 
 --- Orders a group of units to launch a strategic missile at a position
 ---@see IssueTactical # For tactical missiles
----@see Unit.OnNukeLaunched # Called when the order gives its target to the silo weapon
+---@see moho.unit_methods.OnNukeLaunched # Called when the order gives its target to the silo weapon
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
@@ -953,13 +953,13 @@ end
 --- Orders a group of units to pause building, upgrading, and other tasks.
 --- This pause order is put into the order queue, so it may not apply immediately.
 --- Use `Unit:SetPaused` to pause a unit in the middle of a task.
----@see Unit.OnPaused # Called when the order pauses the unit
+---@see moho.unit_methods.OnPaused # Called when the order pauses the unit
 ---@param units Unit[]
 function IssuePause(units)
 end
 
 --- Orders a group of units to reclaim a target
----@see Unit.OnStartReclaim # Called when the reclaim starts
+---@see moho.unit_methods.OnStartReclaim # Called when the reclaim starts
 ---@param units Unit[]
 ---@param target ReclaimObject
 ---@return SimCommand
@@ -974,7 +974,7 @@ function IssueRepair(units, target)
 end
 
 --- Orders a group of units to sacrifice, yielding part of their build cost to a target
----@see Unit.OnStartSacrifice # Called when the sacrifice starts
+---@see moho.unit_methods.OnStartSacrifice # Called when the sacrifice starts
 ---@param tblUnits Unit[]
 ---@param target Unit
 ---@return SimCommand
@@ -991,14 +991,14 @@ function IssueScript(tblUnits, order)
 end
 
 --- Orders a group of units (SML or SMD) to build a nuke
----@see Unit.OnSiloBuildStart # Called when the missile starts building
+---@see moho.unit_methods.OnSiloBuildStart # Called when the missile starts building
 ---@param units Unit[]
 ---@return SimCommand
 function IssueSiloBuildNuke(units)
 end
 
 --- Orders a group of units to build a tactical missile
----@see Unit.OnSiloBuildStart # Called when the missile starts building
+---@see moho.unit_methods.OnSiloBuildStart # Called when the missile starts building
 ---@param units Unit[]
 ---@return SimCommand
 function IssueSiloBuildTactical(units)
@@ -1018,8 +1018,8 @@ function IssueTactical(units, target)
 end
 
 --- Orders a group of units to teleport to a position
----@see Unit.OnTeleportUnit # Called when the order starts
----@see Unit.OnFailedTeleport # Called when the order ends before the teleport
+---@see moho.unit_methods.OnTeleportUnit # Called when the order starts
+---@see moho.unit_methods.OnFailedTeleport # Called when the order ends before the teleport
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
@@ -1035,7 +1035,7 @@ function IssueTeleportToBeacon(units, beacon)
 end
 
 --- Orders a group of units to attach themselves to a transport
----@see Unit.OnTransportOrdered # Called on the transport
+---@see moho.unit_methods.OnTransportOrdered # Called on the transport
 ---@see moho.aibrain_methods.OnTransportFull # Called when the transport or carrier is full
 ---@param units Unit[]
 ---@param transport Unit
@@ -1094,8 +1094,8 @@ end
 function MetaImpact(instigator, location, maxRadius, amount, affectsCategory, damageFriendly)
 end
 
----@see Unit.OnStartRepeatQueue # Called on `to` when repeat build turns on
----@see Unit.OnStopRepeatQueue # Called on `to` when repeat build turns off
+---@see moho.unit_methods.OnStartRepeatQueue # Called on `to` when repeat build turns on
+---@see moho.unit_methods.OnStopRepeatQueue # Called on `to` when repeat build turns off
 ---@param from Unit
 ---@param to Unit
 function NotifyUpgrade(from, to)
@@ -1304,7 +1304,7 @@ function TryCopyPose(unitFrom, entityTo, copyWorldTransform)
 end
 
 --- instantly moves an entity to a location with an orientation
----@see Unit.OnTeleportUnit # Lua teleports units with this
+---@see moho.unit_methods.OnTeleportUnit # Lua teleports units with this
 ---@param object Object
 ---@param location Vector
 ---@param orientation? Quaternion no orientation change if absent

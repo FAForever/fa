@@ -274,10 +274,10 @@ function UserUnit:IsStunned()
 end
 
 --- Sends a setting change for this unit to the sim
----@see Unit.OnAutoModeOn # `SetAutoMode` calls it or `OnAutoModeOff` in the sim
----@see Unit.OnPaused # `SetPaused` calls it or `OnUnpaused` in the sim
----@see Unit.OnStartRepeatQueue # `SetRepeatQueue` calls it or `OnStopRepeatQueue` in the sim
----@see Unit.OnScriptBitSet # `ToggleScriptBit` calls it or `OnScriptBitClear` in the sim
+---@see moho.unit_methods.OnAutoModeOn # `SetAutoMode` calls it or `OnAutoModeOff` in the sim
+---@see moho.unit_methods.OnPaused # `SetPaused` calls it or `OnUnpaused` in the sim
+---@see moho.unit_methods.OnStartRepeatQueue # `SetRepeatQueue` calls it or `OnStopRepeatQueue` in the sim
+---@see moho.unit_methods.OnScriptBitSet # `ToggleScriptBit` calls it or `OnScriptBitClear` in the sim
 ---@see moho.aibrain_methods.OnPlayNoStagingPlatformsVO # `PlayNoStagingPlatformsVO` calls it in the sim
 ---@see moho.aibrain_methods.OnPlayBusyStagingPlatformsVO # `PlayBusyStagingPlatformsVO` calls it in the sim
 ---@param command 'SetAutoMode' | 'SetFireState' | 'SetAutoSurfaceMode' | 'SetRepeatQueue' | 'SetPaused' | 'CustomName' | 'ToggleScriptBit' | 'PlayNoStagingPlatformsVO' | 'PlayBusyStagingPlatformsVO' 

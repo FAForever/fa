@@ -59,7 +59,7 @@ The full list is in the [LuaLS annotation reference](https://luals.github.io/wik
 
 - `---@unknown` marks a function whose purpose or arguments are not known ([Sim/Entity.lua](Sim/Entity.lua) `AddShooter`). Replace it when you learn the behavior.
 - `---@deprecated <reason>` marks engine functions that are slower than plain Lua, such as the vector math helpers in [Core.lua](Core.lua). The reason names the alternative.
-- `---@see Name # description` links related functions (`BeginLoggingStats` and `EndLoggingStats`). It can reference a field one level deep in a class as `<class>.<field>`, e.g. `---@see Unit.OnGotFuel`.
+- `---@see Name # description` links related functions (`BeginLoggingStats` and `EndLoggingStats`). It can reference a field one level deep in a class as `<class>.<field>`. Link engine methods and callbacks through their moho class, e.g. `---@see moho.unit_methods.OnGotFuel`.
 - `---@overload fun(...)` adds a call signature, but doesn't reliably narrow the return type by argument (e.g. `EntityCategoryFilterDown`).
 - `---@generic T` makes a template-like signature, where the return type follows a parameter's type.
 
@@ -69,7 +69,7 @@ Stubs are the only documentation of engine functions. Record what a consumer nee
 
 - Units and side effects, in the description.
 - Engine quirks and typos: [Sim/Entity.lua](Sim/Entity.lua) notes that "Thread" in `AddThreadScroller` should have been "Tread".
-- Functions or fields added by [FA-Binary-Patches](https://github.com/FAForever/FA-Binary-Patches): link the patch PR, e.g. `Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/132`. Group them at the bottom of the file under `-- Added by FA-Binary-Patches`, since they are add-ons to the base engine.
+- Functions or fields added by [FA-Binary-Patches](https://github.com/FAForever/FA-Binary-Patches): link the patch PR, e.g. `Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/132`. Group them at the bottom of the file under `-- Added by FA-Binary-Patches` (or `Changed by`, for engine behavior a patch changes). When a patch predates the repository's PRs, link the commit that added it.
 - Complex engine logic: a `--[[ ]]` Lua pseudocode block above the function, as for `CanFire` in [Sim/UnitWeapon.lua](Sim/UnitWeapon.lua).
 - Caveats for blueprint fields go on the field in [Core/Blueprints/](Core/Blueprints/), e.g. `RenderFireClock` in [WeaponBlueprint.lua](Core/Blueprints/WeaponBlueprint.lua).
 

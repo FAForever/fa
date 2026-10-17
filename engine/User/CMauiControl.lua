@@ -164,7 +164,7 @@ CMauiControl.OnDestroy = nil
 
 --- Called by the engine every frame while the control needs frame updates, with the time since
 --- the last frame in seconds
----@see Control.SetNeedsFrameUpdate # Enables frame updates
+---@see moho.control_methods.SetNeedsFrameUpdate
 ---@type nil | fun(self: Control, delta: number)
 CMauiControl.OnFrame = nil
 

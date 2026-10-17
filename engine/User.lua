@@ -1144,8 +1144,8 @@ function SetActiveBuildTemplate(template)
 end
 
 --- Set if anyone in the list is auto building or auto assisting
----@see Unit.OnAutoModeOn # Called in the sim when `mode` is true
----@see Unit.OnAutoModeOff # Called in the sim when `mode` is false
+---@see moho.unit_methods.OnAutoModeOn # Called in the sim when `mode` is true
+---@see moho.unit_methods.OnAutoModeOff # Called in the sim when `mode` is false
 ---@param units UserUnit[]
 ---@param mode boolean
 function SetAutoMode(units, mode)
@@ -1209,16 +1209,16 @@ function SetOverlayFilters(list)
 end
 
 --- Pause or unpause the given units
----@see Unit.OnPaused # Called in the sim when a unit pauses
----@see Unit.OnUnpaused # Called in the sim when a unit unpauses
+---@see moho.unit_methods.OnPaused # Called in the sim when a unit pauses
+---@see moho.unit_methods.OnUnpaused # Called in the sim when a unit unpauses
 ---@param units UserUnit[]
 ---@param pause boolean
 function SetPaused(units, pause)
 end
 
 --- Pause or unpause the given unit
----@see Unit.OnPaused # Called in the sim when the unit pauses
----@see Unit.OnUnpaused # Called in the sim when the unit unpauses
+---@see moho.unit_methods.OnPaused # Called in the sim when the unit pauses
+---@see moho.unit_methods.OnUnpaused # Called in the sim when the unit unpauses
 ---@param unit UserUnit
 ---@param pause boolean
 function SetPausedOfUnit(unit, pause)
@@ -1299,8 +1299,8 @@ function ToggleFireState(units, fireState)
 end
 
 ---
----@see Unit.OnScriptBitSet # Called in the sim when a bit turns on
----@see Unit.OnScriptBitClear # Called in the sim when a bit turns off
+---@see moho.unit_methods.OnScriptBitSet # Called in the sim when a bit turns on
+---@see moho.unit_methods.OnScriptBitClear # Called in the sim when a bit turns off
 ---@param units UserUnit[]
 ---@param bit number
 ---@param state boolean
