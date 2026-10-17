@@ -68,7 +68,7 @@ From `Sim::AdvanceBeat` in the [faf-re](https://github.com/Draiget/faf-re) decom
 7. Weapon cleanup for units killed this tick, then `OnDestroy` for every entity `Destroy()`ed this tick.
 8. Sync to the UI. The engine deletes destroyed entities here, so `IsDestroyed` is true from the next tick.
 
-A `ForkThread` from steps 1 to 4 runs in the same tick, because new threads go to the end of the thread list. One from step 5 or later first runs next tick. `WaitTicks(n)` with `n >= 2` waits `n - 1` ticks, `WaitTicks(1)` waits 1, and `WaitTicks(0)` continues at once. `WaitSeconds` adds 1 to make up for that. For an example of the order mattering, see the 1-tick gap between salvos at `RackSalvoFireReadyState` in [DefaultProjectileWeapon.lua](weapons/DefaultProjectileWeapon.lua).
+A `ForkThread` from steps 1 to 4 runs in the same tick, because new threads go to the end of the thread list. One from step 5 or later first runs next tick. `WaitTicks(n)` with `n >= 2` waits `n - 1` ticks, and `WaitTicks(1)` waits 1. `WaitTicks` with 0 or less raises an error, and without an argument it ends the thread. `WaitSeconds` adds 1 to make up for that. For an example of the order mattering, see the 1-tick gap between salvos at `RackSalvoFireReadyState` in [DefaultProjectileWeapon.lua](weapons/DefaultProjectileWeapon.lua).
 
 ### Destroyed checks
 
