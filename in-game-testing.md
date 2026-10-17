@@ -87,8 +87,8 @@ Snippets can do more than spawn units. Use them to set up state, run the test an
           end
       end
       SimConExecute('wld_RunWithTheWind 0')
-  end
-  )]]) -- intentionally on a new line
+  end)
+  ]]) -- intentionally on a new line
   ```
 
   - `CreateUnitHPR` also takes an army name. Use `'ARMY_17'` on any map that has it, because its index depends on the players and AIs in the lobby.
