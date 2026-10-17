@@ -161,6 +161,9 @@ end
 ---@param str UnlocalizedString
 ---@return LocalizedString
 function LOC(str)
+    if str == "<LOC Engine0002>%s disconnected." and rawget(_G, 'SimCallback') then
+        SimCallback({Func = 'RollRandom', Args = EmptyTable}, false)
+    end
     -- Note - we use [[foo]] string syntax here instead of "foo", so the localizing
     -- script won't try to mess with *our* strings.
     if str == nil then
