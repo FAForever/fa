@@ -69,11 +69,11 @@ Snippets can do more than spawn units. Use them to set up state, run the test an
 
   ```lua
   local p = GetMouseWorldPos()
-  ConExecute(string.format('SimLua local x, y, z = %f, %f, %f\n', p[1], p[2], p[3]) .. [[
+  ConExecute(string.format('SimLua local x, y, z, focusArmy = %f, %f, %f, %d\n', p[1], p[2], p[3], GetFocusArmy()) .. [[
   -- every entity created for the test, so they can be cleaned up
   local units = {
       -- CreateUnitHPR(bpId, army, x, y, z, 0, 0, 0),
-      -- army: GetFocusArmy() for yours, 'ARMY_17' for hostile ones. Space units with offsets on x and z
+      -- army: focusArmy for yours, 'ARMY_17' for hostile ones. Space units with offsets on x and z
   }
   -- set up state for the test, e.g. SetMaxHealth/SetHealth. For cross-army tests, SetAlliance and say in the step which army each unit is in
   SimConExecute('wld_RunWithTheWind 1')
@@ -91,7 +91,8 @@ Snippets can do more than spawn units. Use them to set up state, run the test an
   ```
 
   - `CreateUnitHPR` also takes an army name. Use `'ARMY_17'` on any map that has it, because its index depends on the players and AIs in the lobby.
-  - Only the mouse position goes through `string.format`. The rest is a plain string, so commenting out the first and last lines leaves normal Lua to edit with LuaLS.
+  - `focusArmy` is the tester's army, read in the UI. `GetFocusArmy()` in the sim returns each player's own army, so calling it there desyncs a local multiplayer test. Call it in the sim only when that is intended.
+  - Only the mouse position and focus army go through `string.format`. The rest is a plain string, so commenting out the first and last lines leaves normal Lua to edit with LuaLS.
 - When the data can only come from inside the changed code (timings, intermediate values, unit stats), put the logging in a test commit on a separate branch on top of the PR branch, and link it from the procedure. The PR branch stays clean, and the tester gets objective data points instead of impressions.
 
 ## Variants by change type
