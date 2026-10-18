@@ -15,9 +15,26 @@ end
 function CUnitScriptTask:GetUnit()
 end
 
---- Called by the engine after the task is created, with the `order` table passed to `IssueScript`
----@see IssueScript # Issues a script task order
----@type nil | fun(self: ScriptTask, commandData: table)
+--- Parameters of a script order, issued from the sim or the UI.
+--- All units given the order in one command share the same table.
+--- Each task in `lua/sim/tasks/` declares a subclass with its own fields
+---@see IssueScript # Issues the order from the sim
+---@see IssueCommand # Issues the order from the UI to the selection, without a target
+---@see IssueUnitCommand # Issues the order from the UI to the given units, without a target
+---@see IssueUnitCommandToUnit # Issues the order from the UI to one unit, without a target
+---@see VerifyScriptCommand # Returns the parameters of an order given with a target in command mode
+---@see CommandModeDataOrderScript # Command mode data of an order given with a target
+---@class ScriptTaskParams : table
+--- The engine runs the class of this name from `/lua/sim/tasks/<TaskName>.lua`, or `ScriptTask` when it can't find it
+---@field TaskName string
+
+--- Called by the engine after the task is created, with the parameters of the order
+---@see IssueScript # Issues the order from the sim
+---@see IssueCommand # Issues the order from the UI to the selection, without a target
+---@see IssueUnitCommand # Issues the order from the UI to the given units, without a target
+---@see IssueUnitCommandToUnit # Issues the order from the UI to one unit, without a target
+---@see VerifyScriptCommand # Returns the parameters of an order given with a target in command mode
+---@type nil | fun(self: ScriptTask, commandData: ScriptTaskParams)
 CUnitScriptTask.OnCreate = nil
 
 --- Called by the engine when the task is destroyed, after it completes, or when another order cancels it

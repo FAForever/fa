@@ -8,8 +8,11 @@ local ScriptTask = import("/lua/sim/scripttask.lua").ScriptTask
 local TASKSTATUS = import("/lua/sim/scripttask.lua").TASKSTATUS
 local AIRESULT = import("/lua/sim/scripttask.lua").AIRESULT
 
+---@class AttackMoveTaskParams : ScriptTaskParams
+---@field TaskName "AttackMove"
+
 ---@class AttackMoveTask : ScriptTask
----@field CommandData { TaskName: "AttackMove" } # LuaParams table from the user side. This table is shared by all units ordered the task from one command.
+---@field CommandData AttackMoveTaskParams
 AttackMove = Class(ScriptTask) {
 
     -- Called by the engine every tick. Function must return a value in TaskStatus

@@ -986,7 +986,7 @@ end
 --- `{ TaskName = "EnhanceTask", Enhancement = "AdvancedEngineering" }`
 ---@see moho.ScriptTask_Methods.OnCreate # Called on the new task
 ---@param tblUnits Unit[]
----@param order Task
+---@param order ScriptTaskParams
 ---@return ScriptTask
 function IssueScript(tblUnits, order)
 end

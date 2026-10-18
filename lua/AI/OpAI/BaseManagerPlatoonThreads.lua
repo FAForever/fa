@@ -1659,6 +1659,7 @@ function UnitUpgradeThread(unit)
             local platoon = aiBrain:MakePlatoon('', '')
             aiBrain:AssignUnitToPlatoon(platoon, unit, 'Support', 'NoFormation')
 
+            ---@type EnhanceTaskParams
             local order = {
                 TaskName = "EnhanceTask",
                 Enhancement = upgradeName
