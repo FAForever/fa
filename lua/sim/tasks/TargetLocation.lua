@@ -10,6 +10,7 @@ local AIRESULT = import("/lua/sim/scripttask.lua").AIRESULT
 
 ---@class TargetLocationTaskParams : VerifiedScriptTaskParams
 ---@field TaskName "TargetLocation"
+---@field Location Vector # The clicked position, or the clicked unit's position at the time. Set by the UI, so it can be any value
 
 ---@class TargetLocationTask : ScriptTask
 ---@field CommandData TargetLocationTaskParams

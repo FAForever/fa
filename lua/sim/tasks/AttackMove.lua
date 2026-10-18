@@ -11,6 +11,8 @@ local AIRESULT = import("/lua/sim/scripttask.lua").AIRESULT
 ---@class AttackMoveTaskParams : ScriptTaskParams
 ---@field TaskName "AttackMove"
 
+--- Does nothing. The `AttackMove` sim callback checks that the unit's last order is a script order with a target,
+--- which proves the player clicked to give it, then issues an attack move to that target
 ---@class AttackMoveTask : ScriptTask
 ---@field CommandData AttackMoveTaskParams
 AttackMove = Class(ScriptTask) {

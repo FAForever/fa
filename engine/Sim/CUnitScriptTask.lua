@@ -19,7 +19,10 @@ end
 --- All units given the order in one command share the same table.
 --- Each task in `lua/sim/tasks/` declares a subclass with its own fields.
 --- Like `SimCallback` arguments, the values come from player input and the UI can send anything:
---- the task must validate them. The sim only checks that the player controls the units
+--- the task must validate them. The sim only checks that the player controls the units.
+--- Orders issued from the UI with `IssueCommand` and similar functions have no target, so their position in `GetCommandQueue` is 0, 0, 0.
+--- A nonzero position shows that the player clicked to give the order
+---@see moho.unit_methods.GetCommandQueue # Returns the target position of each queued order
 ---@see IssueScript # Issues the order from the sim
 ---@see IssueCommand # Issues the order from the UI to the selection, without a target
 ---@see IssueUnitCommand # Issues the order from the UI to the given units, without a target

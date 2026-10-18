@@ -8,11 +8,11 @@
 local CM = import("/lua/ui/game/commandmode.lua")
 
 --- Parameters of a script order given with a target in command mode.
+--- Besides `TaskName`, the engine reads only these fields. Each task declares the other fields it reads in a subclass.
 --- These checks only run in the UI, so a UI mod or console command can send any values:
 --- the sim task must validate them
 ---@class VerifiedScriptTaskParams : ScriptTaskParams
 ---@field UserValidated boolean # The engine issues the order only when true. The sim task receives it too
----@field Location Vector # Copied from `data.Target.Position`. The engine sends the clicked unit or position as the order target separately
 ---@field AuthorizedUnits? UserUnit[] # Units the engine gives the order to, instead of the selection. Removed before the table goes to the sim
 
 --- Called by the engine when the player clicks in `RULEUCC_Script` command mode, on a unit or the ground.
