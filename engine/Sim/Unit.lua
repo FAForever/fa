@@ -55,13 +55,7 @@ local Unit = {}
 
 ---@class UnitCommand
 ---@field _c_object userdata
----@field blueprintId? string -- For build commands
----@field commandType integer -- Integer representation of CommandType, see UnitQueueDataToCommand for details
 ---@field target? Prop|Unit|Entity -- For commands that target an entity
----@field targetId? EntityId
----@field x number -- X coordinate of command target
----@field y number -- Y coordinate of command target
----@field z number -- Z coordinate of command target
 
 --- Adds a command cap to the unit
 ---@param category moho.EntityCategory
@@ -1284,6 +1278,17 @@ Unit.SetDead = nil
 --- Called by the engine when deciding whether to repair or guard a shield unit. Returns true if its shield is on
 ---@type nil | fun(self: Unit): boolean
 Unit.ShieldIsOn = nil
+
+-- Added by FA-Binary-Patches
+
+--- Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/22
+---@class UnitCommand
+---@field blueprintId? string -- For build commands
+---@field commandType integer -- Integer representation of CommandType, see UnitQueueDataToCommand for details
+---@field targetId? EntityId
+---@field x number -- X coordinate of command target
+---@field y number -- Y coordinate of command target
+---@field z number -- Z coordinate of command target
 
 -- Changed by FA-Binary-Patches
 
