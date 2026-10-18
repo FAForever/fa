@@ -3308,7 +3308,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         self.WorkItem = tempEnhanceBp
         self.WorkItemBuildCostEnergy = tempEnhanceBp.BuildCostEnergy
-        self.WorkItemBuildCostMass = tempEnhanceBp.BuildCostEnergy
+        self.WorkItemBuildCostMass = tempEnhanceBp.BuildCostMass
         self.WorkItemBuildTime = tempEnhanceBp.BuildTime
         self.WorkProgress = 0
 
