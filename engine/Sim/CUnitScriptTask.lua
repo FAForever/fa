@@ -17,7 +17,9 @@ end
 
 --- Parameters of a script order, issued from the sim or the UI.
 --- All units given the order in one command share the same table.
---- Each task in `lua/sim/tasks/` declares a subclass with its own fields
+--- Each task in `lua/sim/tasks/` declares a subclass with its own fields.
+--- Like `SimCallback` arguments, the values come from player input and the UI can send anything:
+--- the task must validate them. The sim only checks that the player controls the units
 ---@see IssueScript # Issues the order from the sim
 ---@see IssueCommand # Issues the order from the UI to the selection, without a target
 ---@see IssueUnitCommand # Issues the order from the UI to the given units, without a target
