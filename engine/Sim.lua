@@ -1305,7 +1305,6 @@ function TryCopyPose(unitFrom, entityTo, copyWorldTransform)
 end
 
 --- instantly moves an entity to a location with an orientation
----@see moho.unit_methods.OnTeleportUnit # Lua callback that teleports units with `Warp`
 ---@param object Object
 ---@param location Vector
 ---@param orientation? Quaternion no orientation change if absent

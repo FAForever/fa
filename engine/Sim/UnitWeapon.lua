@@ -289,14 +289,14 @@ UnitWeapon.OnHaltFire = nil
 ---@type nil | fun(self: Weapon)
 UnitWeapon.OnLostTarget = nil
 
---- Called by the engine when an aim manipulator of the weapon starts turning its yaw bone (more than 0.001 radians in a tick),
+--- Called by the engine when an aim manipulator of the weapon starts turning its yaw bone
 --- toward a target or back to its rest pose. Pitch changes don't count.
 --- Not called again until `OnStopTracking`, so a turret that follows a moving target without pausing gets one call.
 --- `label` is the label of the aim manipulator, from `CreateAimController`
 ---@type nil | fun(self: Weapon, label: string)
 UnitWeapon.OnStartTracking = nil
 
---- Called by the engine when an aim manipulator of the weapon stops turning its yaw bone (0.001 radians or less in a tick)
+--- Called by the engine when an aim manipulator of the weapon stops turning its yaw bone
 --- after `OnStartTracking`, such as when it reaches the target heading.
 --- `label` is the label of the aim manipulator, from `CreateAimController`
 ---@type nil | fun(self: Weapon, label: string)

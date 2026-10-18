@@ -931,7 +931,9 @@ Unit.OnCreate = nil
 Unit.OnDamageBy = nil
 
 --- Called by the engine when an unfinished unit decays to 0 health.
---- An unfinished unit that no builder works on decays: each tick, it loses some build progress and the same fraction of its max health
+--- An unfinished unit that no builder works on decays: each tick, it loses
+--- `0.1 / max(BuildCostEnergy, BuildCostMass, BuildTime)` build progress
+--- and the same fraction of its max health
 ---@type nil | fun(self: Unit)
 Unit.OnDecayed = nil
 
@@ -964,8 +966,8 @@ Unit.OnFailedCapture = nil
 ---@type nil | fun(self: Unit)
 Unit.OnFailedTeleport = nil
 
---- Called by the engine when a factory or upgrade build of the unit stops before the unit finished, e.g. when the order is cancelled.
---- Not called when an engineer or other mobile builder stops building it, so the unfinished unit stays
+--- Called by the engine when a factory or upgrade build of the unit stops
+--- before the unit finished, e.g. when the order is cancelled
 ---@see moho.unit_methods.OnFailedToBuild # Called on the builder right before
 ---@see moho.unit_methods.OnStopBeingBuilt # Called instead when the construction finishes
 ---@type nil | fun(self: Unit)

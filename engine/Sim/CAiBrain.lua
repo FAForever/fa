@@ -665,9 +665,9 @@ CAiBrain.OnSpawnPreBuiltUnits = nil
 CAiBrain.OnStatsTrigger = nil
 
 --- Called by the engine when a unit can't be loaded because the transport, carrier or air staging platform is full:
---- - On the transport's army when a load order assigns a transport more units than it has slots.
+--- - On the transport's army when a load order assigns the transport more units than it has slots.
 ---   Load orders on teleporters and air staging platforms don't call it, nor do transports that are assist-moving, ferrying or guarding
---- - On the aircraft's army when an aircraft can't land on a full carrier or air staging platform
+--- - On the aircraft's army when the aircraft can't land on a full carrier or air staging platform
 ---
 --- `Unit.OnStartTransportBeamUp` also calls it when the unit's attach slot is taken
 ---@see IssueTransportLoad # Load order
