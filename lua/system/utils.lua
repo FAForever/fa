@@ -106,16 +106,41 @@ function table.copy(t)
     return r
 end
 
---- table.find(t,val) returns the key for val if it is in t table.
---- Otherwise, return nil
-function table.find(t,val)
-    if not t then return end -- prevents looping over nil table
+---Returns the key of the first occurrence of `what` in this table, or `nil` if there are none.
+---@generic K, V
+---@param t table<K, V>?
+---@param what V
+---@return K? key
+function table.find(t, what)
+    if not t then return end
     for k,v in t do
-        if v == val then
-            return k
-        end
+        if v == what then return k end
     end
-    -- return nil by falling off the end
+end
+
+---Returns the key of the first element in the table that causes `fn` to return `true`, or `nil` if there are none.
+---@generic K, V
+---@param t table<K, V>
+---@param fn fun(value: V): boolean?
+---@return K? key
+function table.findCustom(t, fn)
+    if not t then return end
+    for k, v in t do
+        if fn(v) then return k end
+    end
+end
+
+---Returns `true` if the table contains the given `value`.
+---@generic K, V
+---@param t table<K, V>
+---@param value V
+---@return boolean
+function table.has(t, value)
+    if not t then return false end
+    for k, v in t do
+        if v == value then return true end
+    end
+    return false
 end
 
 --- table.subset(t1,t2) returns true iff every key/value pair in t1 is also in t2

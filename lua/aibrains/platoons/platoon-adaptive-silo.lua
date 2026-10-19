@@ -5,6 +5,7 @@ local MarkerUtils = import("/lua/sim/markerutilities.lua")
 -- upvalue scope for performance
 local Random = Random
 local IsDestroyed = IsDestroyed
+local WaitTicks = WaitTicks
 
 local TableGetn = table.getn
 local TableEmpty = table.empty
@@ -196,7 +197,7 @@ AIPlatoonAdaptiveSilo = Class(AIPlatoon) {
                                 self:ChangeState(self.Idling)
                             end
                         end
-                        coroutine.yield(1)
+                        WaitTicks(1)
                     end
                 end
                 if target then
@@ -274,7 +275,7 @@ AssignToUnitsMachine = function(data, platoon, units)
                 silo.terraincallbackset = true
             end
             silo:SetAutoMode(true)
-            IssueClearCommands({silo})
+            IssueToUnitClearCommands(silo)
         end
 
         -- TODO: to be removed until we have a better system to populate the platoons

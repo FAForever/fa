@@ -10,6 +10,7 @@ local AIUtils = import("/lua/ai/aiutilities.lua")
 -- upvalue scope for performance
 local Random = Random
 local IsDestroyed = IsDestroyed
+local WaitTicks = WaitTicks
 
 local TableGetn = table.getn
 local TableEmpty = table.empty
@@ -370,7 +371,7 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                             break
                         end
                     end
-                    coroutine.yield(15)
+                    WaitTicks(15)
                 end
             end
             self:ChangeState(self.Searching)
@@ -672,16 +673,14 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
     ---@param self AIPlatoon
     ---@param units Unit[]
     OnUnitsAddedToAttackSquad = function(self, units)
-        local cache = { false }
         local count = TableGetn(units)
 
         if count > 0 then
             local scouts = self:GetSquadUnits('Scout')
             if scouts then
+                IssueClearCommands(scouts)
                 for k, scout in scouts do
-                    cache[1] = scout
-                    IssueClearCommands(cache)
-                    IssueGuard(cache, units[Random(1, count)])
+                    IssueToUnitGuard(scout, units[Random(1, count)])
                 end
             end
         end
@@ -690,14 +689,12 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
     ---@param self AIPlatoon
     ---@param units Unit[]
     OnUnitsAddedToScoutSquad = function(self, units)
-        local cache = { false }
         local attacks = self:GetSquadUnits('Attack')
         local count = TableGetn(attacks)
         if attacks then
-            for k, scout in units do
-                cache[1] = scout
-                IssueClearCommands(cache)
-                IssueGuard(cache, attacks[Random(1, count)])
+            IssueClearCommands(units)
+            for k, unit in units do
+                IssueToUnitGuard(unit, attacks[Random(1, count)])
             end
         end
 
@@ -745,9 +742,9 @@ AssignToUnitsMachine = function(data, platoon, units)
         local count = TableGetn(platoon:GetSquadUnits('Attack'))
         local scouts = platoon:GetSquadUnits('Scout')
         if scouts then
+            IssueClearCommands(scouts)
             for k, scout in scouts do
-                IssueClearCommands(scout)
-                IssueGuard(scout, units[Random(1, count)])
+                IssueToUnitGuard(scout, units[Random(1, count)])
             end
         end
 

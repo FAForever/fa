@@ -135,7 +135,7 @@ function CDROverChargeThread(cdr)
                             if aiBrain:GetEconomyStored('ENERGY') >= weapon.EnergyRequired and not target.Dead then
                                 overCharging = true
                                 IssueToUnitClearCommands(cdr)
-                                IssueOverCharge({ cdr }, target)
+                                IssueToUnitOverCharge(cdr, target)
                             elseif not target.Dead then
                                 local tarPos = target:GetPosition()
                                 IssueToUnitClearCommands(cdr)
@@ -191,7 +191,7 @@ function CDRRepairBuildingUnit(cdr, plat)
 
     if targetUnit and not targetUnit:BeenDestroyed() and targetUnit:GetFractionComplete() < 1 then
         IssueToUnitClearCommands(cdr)
-        IssueRepair({ cdr }, targetUnit)
+        IssueToUnitRepair(cdr, targetUnit)
 
         repeat
             WaitSeconds(1)

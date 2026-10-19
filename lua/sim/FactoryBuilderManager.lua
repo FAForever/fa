@@ -89,9 +89,9 @@ FactoryBuilderManager = Class(BuilderManager) {
                     if newRally then
                         self.RallyPoint = newRally
                         -- LOG('*AI DEBUG: Setting a new Rally Point Location')
+                        IssueClearFactoryCommands(self.FactoryList)
                         for k,v in self.FactoryList do
-                            IssueClearFactoryCommands({v})
-                            IssueFactoryRallyPoint({v}, self.RallyPoint)
+                            IssueToUnitFactoryRallyPoint(v, self.RallyPoint)
                         end
                     end
                 end
@@ -517,8 +517,8 @@ FactoryBuilderManager = Class(BuilderManager) {
         local rally = false
 
         if self.RallyPoint then
-            IssueClearFactoryCommands({factory})
-            IssueFactoryRallyPoint({factory}, self.RallyPoint)
+            IssueToUnitClearFactoryCommands(factory)
+            IssueToUnitFactoryRallyPoint(factory, self.RallyPoint)
             return true
         end
 
@@ -554,8 +554,8 @@ FactoryBuilderManager = Class(BuilderManager) {
             rally = position
         end
 
-        IssueClearFactoryCommands({factory})
-        IssueFactoryRallyPoint({factory}, rally)
+        IssueToUnitClearFactoryCommands(factory)
+        IssueToUnitFactoryRallyPoint(factory, rally)
         self.RallyPoint = rally
         return true
     end,

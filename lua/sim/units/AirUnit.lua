@@ -8,6 +8,8 @@ local EffectUtil = import("/lua/effectutilities.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local DefaultExplosions = import("/lua/defaultexplosions.lua")
 
+local VisionMarkerOpti = import('/lua/sim/VizMarker.lua').VisionMarkerOpti
+
 ---@class AirUnit : MobileUnit
 AirUnit = ClassUnit(MobileUnit) {
     -- Contrails
@@ -127,8 +129,6 @@ AirUnit = ClassUnit(MobileUnit) {
             self.colliderProj = nil
         end
 
-        self:DisableUnitIntel('Killed')
-        self:DisableIntel('Vision') -- Disable vision seperately, it's not handled in DisableUnitIntel
         self:ForkThread(self.DeathThread, self.OverKillRatio)
     end,
 
@@ -181,6 +181,8 @@ AirUnit = ClassUnit(MobileUnit) {
         if self:GetFractionComplete() == 1 and
             (self.Layer == 'Air' or EntityCategoryContains(categories.TRANSPORTATION, self))
         then
+            local army = self.Army
+
             self.Dead = true
             -- We want to skip all the visual/audio/shield bounce/death weapon stuff if we're in internal storage
             if type ~= "TransportDamage" then
@@ -197,8 +199,7 @@ AirUnit = ClassUnit(MobileUnit) {
 
                 -- Store our death weapon's damage on the unit so it can be edited remotely by the shield bouncer projectile
                 local bp = self.Blueprint
-                local i = 1
-                for i, numweapons in bp.Weapon do
+                for i, _ in bp.Weapon do
                     if bp.Weapon[i].Label == 'DeathImpact' then
                         self.deathWep = bp.Weapon[i]
                         break
@@ -213,15 +214,29 @@ AirUnit = ClassUnit(MobileUnit) {
                 end
 
                 -- Create a projectile we'll use to interact with Shields
-                local proj = self:CreateProjectileAtBone('/projectiles/ShieldCollider/ShieldCollider_proj.bp', 0)
+                local proj = self:CreateProjectileAtBone('/projectiles/ShieldCollider/ShieldCollider_proj.bp', 0) --[[@as ShiledCollider]]
                 self.colliderProj = proj
                 proj:Start(self, 0)
                 self.Trash:Add(proj)
+
+                self:DisableUnitIntel('Killed')
+
+                if not self.Blueprint.Air.EnableVisionWhileFalling then
+                    self:DisableIntel('Vision') -- Disable vision seperately, it's not handled in DisableUnitIntel
+                else
+                    -- Create a vision entity so vision shading is visible
+
+                    local x, y, z = self:GetPositionXYZ(0)
+                    ---@type VisionMarkerOpti
+                    local vizEnt = self.Trash:Add(VisionMarkerOpti({ Army = army }))
+                    vizEnt:UpdateIntel(army, self:GetIntelRadius("Vision"), "Vision", true)
+                    vizEnt:UpdatePosition(x, z)
+                    vizEnt:AttachTo(self, 0)
+                end
             end
 
             self:VeterancyDispersal()
 
-            local army = self.Army
             -- awareness for traitor game mode and game statistics
             ArmyBrains[army].LastUnitKilledBy = (instigator or self).Army
             ArmyBrains[army]:AddUnitStat(self.UnitId, "lost", 1)

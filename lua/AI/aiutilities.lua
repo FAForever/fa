@@ -14,6 +14,8 @@ local Buff = import("/lua/sim/buff.lua")
 local SUtils = import("/lua/ai/sorianutilities.lua")
 local AIBehaviors = import("/lua/ai/aibehaviors.lua")
 
+local WaitTicks = WaitTicks
+
 ---@param aiBrain AIBrain
 function AIGetEconomyNumbers(aiBrain)
     local econ = {}
@@ -1193,7 +1195,7 @@ function AIEngineersAssistFactories(aiBrain, engineers, factories)
         end
 
         if lowNum then
-            IssueGuard({unit}, factoryData[key].Factory)
+            IssueToUnitGuard(unit, factoryData[key].Factory)
             factoryData[key].NumGuards = factoryData[key].NumGuards + 1
         else
             aiBrain:AssignUnitToPlatoon('ArmyPool', unit, 'Unassigned', 'NoFormation')
@@ -1849,7 +1851,7 @@ function UseTransports(units, transports, location, transportPlatoon)
 
     local attached = true
     repeat
-        coroutine.yield(20)
+        WaitTicks(20)
         local allDead = true
         local transDead = true
         for k, v in units do
@@ -1920,7 +1922,7 @@ function UseTransports(units, transports, location, transportPlatoon)
 
     local attached = true
     while attached do
-        coroutine.yield(20)
+        WaitTicks(20)
         local allDead = true
         for _, v in transports do
             if not v.Dead then
@@ -2173,11 +2175,11 @@ function EngineerTryReclaimCaptureArea(aiBrain, eng, pos)
             if unit:IsCapturable() then
                 -- if we can capture the unit/building then do so
                 unit.CaptureInProgress = true
-                IssueCapture({eng}, unit)
+                IssueToUnitCapture(eng, unit)
             else
                 -- if we can't capture then reclaim
                 unit.ReclaimInProgress = true
-                IssueReclaim({eng}, unit)
+                IssueToUnitReclaim(eng, unit)
             end
             Reclaiming = true
         end
@@ -2187,7 +2189,7 @@ function EngineerTryReclaimCaptureArea(aiBrain, eng, pos)
     if Reclaimables and not table.empty( Reclaimables ) then
         for k,v in Reclaimables do
             if v.MaxMassReclaim > 0 or v.MaxEnergyReclaim > 0 then
-                IssueReclaim({eng}, v)
+                IssueToUnitReclaim(eng, v)
                 Reclaiming = true
             end
         end
@@ -2209,7 +2211,7 @@ function EngineerTryRepair(aiBrain, eng, whatToBuild, pos)
     local checkUnits = aiBrain:GetUnitsAroundPoint(structureCat, pos, 1, 'Ally')
     if checkUnits and not table.empty(checkUnits) then
         for num, unit in checkUnits do
-            IssueRepair({eng}, unit)
+            IssueToUnitRepair(eng, unit)
         end
         return true
     end
@@ -3213,7 +3215,7 @@ function EngAvoidLocalDanger(aiBrain, eng)
                 if unit and not IsDestroyed(unit) and unit:GetFractionComplete() == 1 then
                     if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 156 then
                         IssueToUnitClearCommands(eng)
-                        IssueReclaim({eng}, unit)
+                        IssueToUnitReclaim(eng, unit)
                         action = true
                         break
                     end
@@ -3224,7 +3226,7 @@ function EngAvoidLocalDanger(aiBrain, eng)
                 if unit and not IsDestroyed(unit) and unit:GetFractionComplete() == 1 then
                     if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 156 then
                         IssueToUnitClearCommands(eng)
-                        IssueReclaim({eng}, unit)
+                        IssueToUnitReclaim(eng, unit)
                         action = true
                         break
                     end
@@ -3232,7 +3234,7 @@ function EngAvoidLocalDanger(aiBrain, eng)
             else
                 IssueToUnitClearCommands(eng)
                 IssueToUnitMove(eng, ShiftPosition(enemyUnitPos, engPos, 50, false))
-                coroutine.yield(60)
+                WaitTicks(60)
                 action = true
             end
         end
@@ -3259,7 +3261,7 @@ function EngLocalExtractorBuild(aiBrain, eng)
             EngineerTryReclaimCaptureArea(aiBrain, eng, massMarker.Position, 2)
             EngineerTryRepair(aiBrain, eng, whatToBuild, massMarker.Position)
             if massMarker.BorderWarning then
-                IssueBuildMobile({eng}, massMarker.Position, whatToBuild, {})
+                IssueToUnitBuildMobile(eng, massMarker.Position, whatToBuild, {})
                 action = true
             else
                 aiBrain:BuildStructure(eng, whatToBuild, {massMarker.Position[1], massMarker.Position[3], 0}, false)
@@ -3267,7 +3269,7 @@ function EngLocalExtractorBuild(aiBrain, eng)
             end
         end
         while eng and not eng.Dead and (0<table.getn(eng:GetCommandQueue()) or eng:IsUnitState('Building') or eng:IsUnitState("Moving")) do
-            coroutine.yield(20)
+            WaitTicks(20)
         end
         return action
     end
@@ -3375,7 +3377,7 @@ function EngPerformReclaim(eng, minimumReclaim)
         if table.getn(closeReclaim) > 0 then
             IssueToUnitClearCommands(eng)
             for _, rec in closeReclaim do
-                IssueReclaim({eng}, rec)
+                IssueToUnitReclaim(eng, rec)
             end
             action = true
         end
