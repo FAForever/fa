@@ -44,7 +44,7 @@ GPG-modified **LuaPlus 5.0**, not 5.1+. [Details](docs/development-start-here/lu
 
 ## Modules and imports
 
-- `import("/lua/path/file.lua")` with absolute paths. The filesystem is case-insensitive.
+- `import("/lua/path/file.lua")` with absolute paths. The filesystem is case-insensitive, but lower-case is preferred.
 - Top-level assignments in an imported file are module fields, not globals. Use `import` and module scope in new code. Add a state global only when every file in that state needs it ([details](lua/system/AGENTS.md#module-scope-vs-lua-state-globals)).
 - Don't use `lazyimport`: hot reload skips its importers, and it breaks mod hooks ([#4484](https://github.com/FAForever/fa/pull/4484), [#4612](https://github.com/FAForever/fa/pull/4612)).
 
