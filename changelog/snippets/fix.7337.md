@@ -1,4 +1,3 @@
 - Fix two issues with repairing shields (#7337, [FA-Binary-Patches#175](https://github.com/FAForever/FA-Binary-Patches/pull/175)):
-  - Fix shields being repaired while turned off when the unit carrying them is also damaged.
   - Fix shield repair ignoring resource stalls. A stalling builder now repairs shields at the same reduced rate as it builds.
-
+  - Fix shields being repaired while turned off when the unit carrying them is also damaged.
