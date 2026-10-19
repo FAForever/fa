@@ -96,6 +96,10 @@ Snippets can do more than spawn units. Use them to set up state, run the test an
   - Only the mouse position and focus army go through `string.format`. The rest is a plain string, so commenting out the `ConExecute` line and the last line leaves normal Lua to edit with LuaLS, with the UI locals declaring the same names.
 - When the data can only come from inside the changed code (timings, intermediate values, unit stats), put the logging in a test commit on a separate branch on top of the PR branch, and link it from the procedure. The PR branch stays clean, and the tester gets objective data points instead of impressions.
 
+## Testing in live games
+
+FAForever organization members can deploy a branch to the `FAF Beta Balance` or `FAF Develop` game types without merging it. They force-push it to `staging/fafbeta` or `staging/fafdevelop`, then run the matching deploy workflow ([deploy-fafbeta.yaml](.github/workflows/deploy-fafbeta.yaml), [deploy-fafdevelop.yaml](.github/workflows/deploy-fafdevelop.yaml)). The staging branches are reset from `develop` on a schedule, so the deploy is temporary. Force-pushing shared branches is outward-facing: only do it when the user explicitly asks. See [docs/deployment.md](docs/deployment.md).
+
 ## Variants by change type
 
 Most PRs fit one of these. A PR that spans several uses the steps of each.
