@@ -142,9 +142,9 @@ categories = {
     --- Counted in the army stats.
     --- Engine (UI): the unit can be selected while it is being built. With `STRUCTURE`, it counts for `GetIdleFactories`
     FACTORY = categoryValue,
-    --- Engine: when the unit and all its destinations are on water, its path requests use its `Physics.AltFootprint`, so the path stays on water.
+    --- Engine: when the unit and all its destinations are on water, its path requests use its `AltFootprint`, so the path stays on water.
     --- Every other `FAVORSWATER` unit in the same order must also be on water with destinations on water.
-    --- Otherwise it paths with its normal footprint. It is a switch between the two footprints, not a cost weighting
+    --- Otherwise it paths with its normal footprint.
     FAVORSWATER = categoryValue,
     --- Engine: marks a ferry beacon, the target of ferry orders. Can be hovered even when `UNTARGETABLE`
     FERRYBEACON = categoryValue,
