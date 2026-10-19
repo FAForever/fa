@@ -8,6 +8,7 @@ Folder-specific guides extend this one. Read them when working in those folders:
 - [lua/ui/game/chat/AGENTS.md](lua/ui/game/chat/AGENTS.md): the MVC chat refactor.
 - [lua/sim/AGENTS.md](lua/sim/AGENTS.md): sim code, including the sim files outside `lua/sim/`. Unit, weapon and projectile class chains, lifecycle, threads, states, buffs, damage.
 - [units/AGENTS.md](units/AGENTS.md): unit blueprints and scripts, unit IDs, values computed at load, blueprint tests.
+- [units/unit-names.md](units/unit-names.md): unit IDs by name, tech and role. Look up units the user names in plain language here.
 - [engine/AGENTS.md](engine/AGENTS.md): writing and correcting the engine annotation stubs.
 - [annotation.md](annotation.md): annotation and comment style. Applies to all new code.
 - [in-game-testing.md](in-game-testing.md): how to write an in-game test procedure for a PR.

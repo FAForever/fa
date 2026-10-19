@@ -11,7 +11,7 @@ Unit blueprints and unit scripts. Read the root [AGENTS.md](../AGENTS.md) first:
 
 ## Unit IDs
 
-The letters are prefix, faction, then type. Examples: `UEL0001` (UEF land ACU), `XSL0001` (Seraphim ACU), `UEB0101` (UEF T1 land factory).
+The letters are prefix, faction, then type. Examples: `UEL0001` (UEF land ACU), `XSL0001` (Seraphim ACU), `UEB0101` (UEF T1 land factory). To find the ID of a unit by name, tech or role, search [unit-names.md](unit-names.md), and rerun [scripts/generate-unit-names.py](../scripts/generate-unit-names.py) after adding, removing or renaming a unit.
 
 | Position | Values |
 |---|---|
