@@ -27,6 +27,12 @@
 LaunchDir = ""      -- filled with whatever directory the exe is in
 __EngineStats = { } -- populated by the engine, each frame in the UI thread
 
+-- variables read by the engine
+
+--- returned by `getfenv` if it is present in the target environment
+---@see getfenv
+__fenv = {}
+
 --- Returns a to the power of b.
 ---
 --- Note: this is not the ^ operator, which is XOR, this is a separate function.

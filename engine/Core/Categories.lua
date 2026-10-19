@@ -117,6 +117,7 @@ categories = {
     --- Lua-side (`lua/system/Blueprints.lua`): added to every `MOBILE` unit
     DRAGBUILD = categoryValue,
     DUMMYGSRWEAPON = categoryValue,
+    --- Lua-side: dummy units, such as the Cybran build drone. `GetUnitsInRect` and the AI brain's `GetUnitsAroundPoint` exclude them
     DUMMYUNIT = categoryValue,
     ECONOMIC = categoryValue,
     --- Engine: counted in the army stats
@@ -382,7 +383,7 @@ categories = {
     --- Not for `EXPERIMENTAL` units, and `COMMAND` units need `CANTRANSPORTCOMMANDER`
     TRANSPORTFOCUS = categoryValue,
     UEF = categoryValue,
-    --- Not read by the engine or by Lua. Remove `SELECTABLE` to make a unit unselectable
+    --- Not read by the engine or by Lua. Remove `SELECTABLE` or use `Unit:SetUnSelectable` to make a unit unselectable
     UNSELECTABLE = categoryValue,
     --- Lua-side (`lua/ui/dialogs/createunit.logic.lua`): hides the unit from the create unit (cheat spawn) dialog
     UNSPAWNABLE = categoryValue,

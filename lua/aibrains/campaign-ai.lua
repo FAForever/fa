@@ -624,7 +624,7 @@ AIBrain = Class(StandardBrain) {
                 local guarded = v:GetGuardedUnit()
                 if not guarded or guarded.EntityId ~= primary.EntityId then
                     IssueToUnitClearCommands(v)
-                    IssueFactoryAssist({v}, primary)
+                    IssueToUnitFactoryAssist(v, primary)
                 end
             end
         end

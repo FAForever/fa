@@ -65,7 +65,7 @@ local ForkThread = ForkThread
 local ResumeThread = ResumeThread
 local ChangeState = ChangeState
 local ArmyGetHandicap = ArmyGetHandicap
-local CoroutineYield = coroutine.yield
+local WaitTicks = WaitTicks
 local CreateEmitterAtBone = CreateEmitterAtBone
 local _c_CreateShield = _c_CreateShield
 local IssueClearCommands = IssueClearCommands
@@ -167,6 +167,8 @@ end
 ---@field SkipAttachmentCheck boolean
 ---@field AbsorptionTypeDamageTypeToMulti table<DamageType, number>
 ---@field DisallowCollisions boolean
+---@field AssistCostEnergyPerBuildRate? number
+---@field AssistCostMassPerBuildRate? number
 ---@field StaticShield? boolean
 ---@field CommandShield? boolean
 ---@field DamagedTick table<string, integer>
@@ -214,6 +216,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         self.PassOverkillDamage = spec.PassOverkillDamage
         self.ImpactMeshBp = spec.ImpactMesh
         self.SkipAttachmentCheck = spec.SkipAttachmentCheck
+        self.AssistCostEnergyPerBuildRate = spec.AssistCostEnergyPerBuildRate
+        self.AssistCostMassPerBuildRate = spec.AssistCostMassPerBuildRate
         self.DisallowCollisions = false
 
         if spec.ImpactEffects ~= '' then
@@ -305,7 +309,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
         -- cache globals
         local GetGameTick = GetGameTick
-        local CoroutineYield = CoroutineYield
+        local WaitTicks = WaitTicks
         local SuspendCurrentThread = SuspendCurrentThread
 
         -- cache cfunctions
@@ -323,7 +327,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
             -- check if we need to suspend ourself
             if -- we're at zero health or lower
-            health <= 0
+                health <= 0
                 -- we're full health
                 or health == maxHealth
                 -- we're not enabled
@@ -334,11 +338,29 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 -- adjust shield bar one last time
                 self:UpdateShieldRatio(health / maxHealth)
 
+                -- Manage shield assisters: shield is full HP and cannot be assisted anymore
+                if health == maxHealth
+                    and self.AssistCostEnergyPerBuildRate and self.AssistCostMassPerBuildRate
+                then
+                    for _, unit in self.Owner.Repairers do
+                        if unit.Dead then continue end
+                        unit:UpdateConsumptionValues()
+                    end
+                end
+
                 -- suspend ourselves and wait
                 self.RegenThreadSuspended = true
                 SuspendCurrentThread()
                 self.RegenThreadSuspended = false
                 fromSuspension = true
+
+                -- Manage shield assisters: shield was damaged from full HP and can now be assisted
+                if self.AssistCostEnergyPerBuildRate and self.AssistCostMassPerBuildRate then
+                    for _, unit in self.Owner.Repairers do
+                        if unit.Dead then continue end
+                        unit:UpdateConsumptionValues()
+                    end
+                end
             end
 
             -- if we didn't suspend then check regeneration conditions
@@ -358,7 +380,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             end
 
             -- wait till next tick
-            CoroutineYield(1)
+            WaitTicks(1)
         end
     end,
 
@@ -732,7 +754,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         end
 
         -- hold up a bit
-        CoroutineYield(20)
+        WaitTicks(20)
 
         -- take out the entity again
         EntityDestroy(entity)
@@ -896,7 +918,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         end
 
         while curProgress < time do
-            CoroutineYield(1)
+            WaitTicks(1)
 
             curProgress = curProgress + 0.1
             local workProgress = curProgress / time
@@ -1343,7 +1365,7 @@ PersonalShield = ClassShield(Shield) {
         end
 
         -- hold a bit to lower the number of allowed effects
-        CoroutineYield(20)
+        WaitTicks(20)
 
         self.LiveImpactEntities = self.LiveImpactEntities - 1
     end,

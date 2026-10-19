@@ -764,6 +764,7 @@ function IsUnit(object)
 end
 
 --- Orders a group of units to attack-move to a target
+---@see IssueToUnitAggressiveMove # Single unit variant
 ---@param units Unit[]
 ---@param target Unit | Vector | Prop | Blip
 ---@return SimCommand
@@ -771,23 +772,28 @@ function IssueAggressiveMove(units, target)
 end
 
 --- Orders a group of units to attack a target
+---@see IssueToUnitAttack # Single unit variant
 ---@param units Unit[]
 ---@param target Unit | Vector | Prop | Blip
 ---@return SimCommand
 function IssueAttack(units, target)
 end
 
---- Orders a group of units to build a unit.
+--- Orders factories to build a unit.
 --- Takes 1 tick to apply.
+---@see IssueToUnitBuildFactory # Single unit variant
+---@see IssueBuildMobile # Builds the unit with engineers
 ---@param units Unit[]
 ---@param blueprintID string
----@param count number
+---@param count integer
 ---@return SimCommand
 function IssueBuildFactory(units, blueprintID, count)
 end
 
 --- Orders a group of units to build a unit, the nearest unit is given the order
 --- Takes some time to apply (at least 3 ticks).
+---@see IssueToUnitBuildMobile # Single unit variant
+---@see IssueBuildFactory # Builds the unit in a factory
 ---@param units Unit[]
 ---@param position Vector
 ---@param blueprintID string
@@ -806,13 +812,15 @@ end
 
 --- Orders a group of units to capture a target, usually engineers
 ---@see moho.unit_methods.OnStartCapture # Called when the capture starts
+---@see IssueToUnitCapture # Single unit variant
 ---@param units Unit[]
 ---@param target Unit
 ---@return SimCommand
 function IssueCapture(units, target)
 end
 
---- Clears out all commands issued on the group of units, this happens immediately. See `IssueToUnitClearCommands` when you want to computationally efficiently apply it to a single unit 
+--- Clears out all commands issued on the group of units, this happens immediately
+---@see IssueToUnitClearCommands # Single unit variant
 ---@param units Unit[]
 ---@return SimCommand
 function IssueClearCommands(units)
@@ -820,6 +828,7 @@ end
 
 --- Clears out all commands issued on the group of factories without affecting
 --- the build queue, allows you to change the rally point
+---@see IssueToUnitClearFactoryCommands # Single unit variant
 ---@param factories Unit[]
 ---@return SimCommand
 function IssueClearFactoryCommands(factories)
@@ -827,18 +836,21 @@ end
 
 --- Orders a group of units to destroy themselves, doesn't leave a wreckage
 ---@see IssueKillSelf # An alternative that does leave a wreckage
+---@see IssueToUnitDestroySelf # Single unit variant
 ---@param units Unit[]
 ---@return SimCommand
 function IssueDestroySelf(units)
 end
 
 --- Orders a group of units to dive
+---@see IssueToUnitDive # Single unit variant
 ---@param units Unit[]
 ---@return SimCommand
 function IssueDive(units)
 end
 
 --- Orders a group of factories to assist another factory
+---@see IssueToUnitFactoryAssist # Single unit variant
 ---@param units Unit[]
 ---@param target Unit
 ---@return SimCommand
@@ -846,6 +858,7 @@ function IssueFactoryAssist(units, target)
 end
 
 --- Orders a group of factories to set their rally point
+---@see IssueToUnitFactoryRallyPoint # Single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
@@ -854,6 +867,7 @@ end
 
 --- Orders a group of units to setup a ferry
 ---@see moho.unit_methods.OnFerryPointSet # Called on each unit
+---@see IssueToUnitFerry # Single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
@@ -898,6 +912,7 @@ function IssueFormPatrol(units, position, formation, degrees)
 end
 
 --- Orders a group of units to guard a target
+---@see IssueToUnitGuard # Single unit variant
 ---@param units Unit[]
 ---@param target Unit | Vector
 ---@return SimCommand
@@ -906,19 +921,22 @@ end
 
 --- Orders a group of units to kill themselves
 ---@see IssueDestroySelf # An alternative that does not leave a wreckage
+---@see IssueToUnitKillSelf # Single unit variant
 ---@param units Unit[]
 ---@return SimCommand
 function IssueKillSelf(units)
 end
 
---- Orders a group of units to move to a position.  See `IssueToUnitMove` when you want to computationally efficiently apply it to a single unit 
+--- Orders a group of units to move to a position
+---@see IssueToUnitMove # Single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
 function IssueMove(units, position)
 end
 
---- Orders a group of units to move off a factory build site. See `IssueToUnitMoveOffFactory` when you want to computationally efficiently apply it to a single unit
+--- Orders a group of units to move off a factory build site
+---@see IssueToUnitMoveOffFactory # Single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
@@ -928,6 +946,7 @@ end
 --- Orders a group of units to launch a strategic missile at a position
 ---@see IssueTactical # For tactical missiles
 ---@see moho.unit_methods.OnNukeLaunched # Called when the order gives its target to the silo weapon
+---@see IssueToUnitNuke # Single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
@@ -938,6 +957,7 @@ end
 ---@see moho.weapon_methods.OnEnableWeapon # Called when the order starts
 ---@see moho.weapon_methods.OnDisableWeapon # Called when the order ends
 ---@see moho.weapon_methods.CanWeaponFire # Called to check if the weapon may fire
+---@see IssueToUnitOverCharge # Single unit variant
 ---@param units Unit[]
 ---@param target Unit
 ---@return SimCommand
@@ -945,6 +965,7 @@ function IssueOverCharge(units, target)
 end
 
 --- Orders a group of units to patrol to a position
+---@see IssueToUnitPatrol # Single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
@@ -955,12 +976,14 @@ end
 --- This pause order is put into the order queue, so it may not apply immediately.
 --- Use `Unit:SetPaused` to pause a unit in the middle of a task.
 ---@see moho.unit_methods.OnPaused # Called when the order pauses the unit
+---@see IssueToUnitPause # Single unit variant
 ---@param units Unit[]
 function IssuePause(units)
 end
 
 --- Orders a group of units to reclaim a target
 ---@see moho.unit_methods.OnStartReclaim # Called when the reclaim starts
+---@see IssueToUnitReclaim # Single unit variant
 ---@param units Unit[]
 ---@param target ReclaimObject
 ---@return SimCommand
@@ -968,6 +991,7 @@ function IssueReclaim(units, target)
 end
 
 --- Orders a group of units to repair a target
+---@see IssueToUnitRepair # Single unit variant
 ---@param units Unit[]
 ---@param target Unit
 ---@return SimCommand
@@ -976,23 +1000,26 @@ end
 
 --- Orders a group of units to sacrifice, yielding part of their build cost to a target
 ---@see moho.unit_methods.OnStartSacrifice # Called when the sacrifice starts
----@param tblUnits Unit[]
+---@see IssueToUnitSacrifice # Single unit variant
+---@param units Unit[]
 ---@param target Unit
 ---@return SimCommand
-function IssueSacrifice(tblUnits, target)
+function IssueSacrifice(units, target)
 end
 
 --- Orders a group of units to run a script sequence, as an example:
 --- `{ TaskName = "EnhanceTask", Enhancement = "AdvancedEngineering" }`
 ---@see moho.ScriptTask_Methods.OnCreate # Called on the new task
----@param tblUnits Unit[]
+---@see IssueToUnitScript # Single unit variant
+---@param units Unit[]
 ---@param order ScriptTaskParams
 ---@return ScriptTask
-function IssueScript(tblUnits, order)
+function IssueScript(units, order)
 end
 
 --- Orders a group of units (SML or SMD) to build a nuke
 ---@see moho.unit_methods.OnSiloBuildStart # Called when the missile starts building
+---@see IssueToUnitSiloBuildNuke # Single unit variant
 ---@param units Unit[]
 ---@return SimCommand
 function IssueSiloBuildNuke(units)
@@ -1000,18 +1027,21 @@ end
 
 --- Orders a group of units to build a tactical missile
 ---@see moho.unit_methods.OnSiloBuildStart # Called when the missile starts building
+---@see IssueToUnitSiloBuildTactical # Single unit variant
 ---@param units Unit[]
 ---@return SimCommand
 function IssueSiloBuildTactical(units)
 end
 
 --- Orders a group of units to stop, this happens immediately
+---@see IssueToUnitStop # Single unit variant
 ---@param units Unit[]
 function IssueStop(units)
 end
 
 --- Orders a group of units to launch a tactical missile
 ---@see IssueNuke # For nuclear missiles
+---@see IssueToUnitTactical # Single unit variant
 ---@param units Unit[]
 ---@param target Unit | Vector
 ---@return SimCommand
@@ -1021,6 +1051,7 @@ end
 --- Orders a group of units to teleport to a position
 ---@see moho.unit_methods.OnTeleportUnit # Called when the order starts
 ---@see moho.unit_methods.OnFailedTeleport # Called when the order ends before the teleport
+---@see IssueToUnitTeleport # Single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
@@ -1029,6 +1060,7 @@ end
 
 --- Orders `TELEPORTATION` transports to unload onto `beacon`, which makes it their teleport beacon
 ---@see moho.unit_methods.OnSetTeleportDest # Called on each transport
+---@see IssueToUnitTeleportToBeacon # Single unit variant
 ---@param units Unit[]
 ---@param beacon Unit
 ---@return SimCommand
@@ -1038,6 +1070,7 @@ end
 --- Orders a group of units to attach themselves to a transport
 ---@see moho.unit_methods.OnTransportOrdered # Called on the transport
 ---@see moho.aibrain_methods.OnTransportFull # Called when the transport or carrier is full
+---@see IssueToUnitTransportLoad # Single unit variant
 ---@param units Unit[]
 ---@param transport Unit
 ---@return SimCommand
@@ -1045,22 +1078,24 @@ function IssueTransportLoad(units, transport)
 end
 
 --- Orders a group of transports to unload their cargo at a position
+---@see IssueToUnitTransportUnload # Single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
 function IssueTransportUnload(units, position)
 end
 
---- Orders a group of ~~transports~~ or carriers to unload specific units,
---- appears to work only for carriers
+--- Orders a group of ~~transports~~ or carriers to unload specific units by `categories`
+---@see IssueToUnitTransportUnloadSpecific # Single unit variant
 ---@param units Unit[]
----@param position Vector
 ---@param category EntityCategory
+---@param position Vector
 ---@return SimCommand
 function IssueTransportUnloadSpecific(units, category, position)
 end
 
 --- Orders a group of units to upgrade
+---@see IssueToUnitUpgrade # Single unit variant
 ---@param units Unit[]
 ---@param blueprintID string
 ---@return SimCommand
