@@ -346,6 +346,26 @@ end
 local categoriesFactories = categories.STRUCTURE * categories.FACTORY
 local categoriesShields = categories.MOBILE * categories.SHIELD
 local categoriesStructure = categories.STRUCTURE
+local categoriesMassStorage = categories.MASSSTORAGE
+
+local massStorageAssistRequestId = 0
+local pendingMassStorageAssistRequests = {}
+
+---@param army number
+---@param requestId number
+---@return string
+local function GetMassStorageAssistRequestKey(army, requestId)
+    return tostring(army) .. ':' .. tostring(requestId)
+end
+
+---@param key string
+---@param request table
+local function ExpireMassStorageAssistRequest(key, request)
+    WaitTicks(100)
+    if pendingMassStorageAssistRequests[key] == request then
+        pendingMassStorageAssistRequests[key] = nil
+    end
+end
 
 ---@param unit UserUnit
 local function UpgradeUnit(unit)
@@ -439,6 +459,24 @@ local function OnGuardUpgrade(guardees, unit)
         return
     end
 end
+
+---@param responses { Army: number, RequestId: number, Extractor: EntityId }[]
+local function OnMassStorageAssistRedirect(responses)
+    for _, response in responses or {} do
+        local key = GetMassStorageAssistRequestKey(response.Army, response.RequestId)
+        local request = pendingMassStorageAssistRequests[key]
+        if request then
+            pendingMassStorageAssistRequests[key] = nil
+
+            local extractor = GetUnitById(response.Extractor)
+            if extractor and extractor:GetArmy() == GetFocusArmy() then
+                OnGuardUpgrade(request.Guards, extractor)
+            end
+        end
+    end
+end
+
+AddOnSyncHashedCallback(OnMassStorageAssistRedirect, 'MassStorageAssistRedirect', 'MassStorageAssistRedirect')
 
 --- Thread to keep track of when to unpause, 
 --- logic is a bit convoluted but guarantees that we still have access to the user units as the game progresses
@@ -535,6 +573,28 @@ local function OnGuardIssued(command)
     if command.Target.EntityId then
         local unit = GetUnitById(command.Target.EntityId) ---@cast unit UserUnit
         local guards = command.Units
+
+        if EntityCategoryContains(categoriesMassStorage, unit) then
+            massStorageAssistRequestId = massStorageAssistRequestId + 1
+            local requestArmy = GetFocusArmy()
+            local requestKey = GetMassStorageAssistRequestKey(requestArmy, massStorageAssistRequestId)
+            local requestGuards = {}
+            for _, guard in guards do
+                TableInsert(requestGuards, guard)
+            end
+            local request = { Guards = requestGuards }
+            pendingMassStorageAssistRequests[requestKey] = request
+            ForkThread(ExpireMassStorageAssistRequest, requestKey, request)
+
+            SimCallback({
+                Func = 'ValidateMassStorageAssist',
+                Args = {
+                    Target = command.Target.EntityId,
+                    RequestId = massStorageAssistRequestId,
+                },
+            }, true)
+        end
+
         if unit:GetArmy() == GetFocusArmy() then
             OnGuardUpgrade(guards, unit)
             OnGuardUnpause(guards, unit)
