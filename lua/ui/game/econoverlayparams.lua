@@ -1,4 +1,6 @@
-local scale = import('/lua/user/prefs.lua').GetOption('econ_overlay_scale')
+local uiScale = import("/lua/maui/layouthelpers.lua").GetPixelScaleFactor()
+
+-- textures are only available for these scales
 local scaleSuffix = {
     [0.8] = '_0.8x',
     [1] = '',
@@ -7,11 +9,20 @@ local scaleSuffix = {
     [1.75] = '_1.75x',
     [2] = '_2.0x',
 }
-local suffix = scaleSuffix[scale or 1] or ''
+
+-- pick the texture suffix whose scale is closest to the UI scale
+local econScale = 1
+for available, _ in scaleSuffix do
+    if math.abs(available - uiScale) < math.abs(econScale - uiScale) then
+        econScale = available
+    end
+end
+local suffix = scaleSuffix[econScale]
+
 ---@param number number
 ---@return integer
 local function ScaleNumber(number)
-    return math.floor(number * scale)
+    return math.floor(number * econScale)
 end
 
 EconOverlayParams = {
@@ -25,10 +36,3 @@ EconOverlayParams = {
     energyTopOffset = ScaleNumber(13.0),
     massTopOffset = ScaleNumber(1.0),
 }
-
-local scaleOptionItem = import('/lua/options/optionslogic.lua').FindOptionItem('econ_overlay_scale')
-if scaleOptionItem then
-    -- engine only imports this file once per application opening
-    -- which means once imported, it needs a restart to be updated
-    scaleOptionItem.restart = true
-end

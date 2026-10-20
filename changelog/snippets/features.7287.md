@@ -1,1 +1,1 @@
-- Add an option to scale the economy overlay (#7287).
+- Scale the economy overlay with the UI scale option (#7287).
