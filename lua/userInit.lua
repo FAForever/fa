@@ -370,8 +370,9 @@ do
         return GetIsPaused(UnitsCache)
     end
 
-    --- Retrieves the orders, toggles and buildable categories of the given unit. You can use `GetUnitCommandFromCommandCap` to convert the toggles to unit commands
+    --- Retrieves the orders, toggles and buildable categories of the given unit
     ---@see GetUnitCommandData # Variant for a list of units
+    ---@see GetUnitCommandFromCommandCap # Convert the orders to unit commands
     ---@param unit UserUnit
     ---@return EngineCommandCap[] orders
     ---@return EngineToggleCap[] availableToggles
