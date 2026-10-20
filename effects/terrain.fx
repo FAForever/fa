@@ -3417,6 +3417,320 @@ technique Terrain252B <
     }
 }
 
+// Triplanar mapping, used by the T variants of Terrain400 for Stratum2 and Stratum3. Flat
+// ground samples them from above, steep ground from the sides like Terrain200B. Unlike the
+// biplanar shaders, these two strata can therefore hold any texture, not only cliffs.
+// Like the biplanar shaders, they need the map-wide normal map in Stratum7.
+
+// Of the three projections (YZ, XZ and top-down) only the two with the largest normal
+// components are sampled, as in biplanar mapping by Inigo Quilez, so the cost stays
+// that of the biplanar shaders. Weights start at a normal component of 1/sqrt(3): a
+// projection can only be swapped out while its component is below that, so it always
+// has a weight of zero when it is swapped and switching never shows a seam. Ground up
+// to 35° is therefore sampled from above only, ground from 55° from the sides only.
+struct TriplanarSelection {
+    // xy: first projection, the stronger of the two side projections
+    // zw: the weaker side projection, used as second projection where the terrain is steep
+    float4 sideUV;
+    float2 weights;
+    // 1 where the second projection is the top-down one
+    float topSecond;
+};
+
+TriplanarSelection selectTriplanarProjections(float3 position) {
+    // The choice reads two mip levels coarser than the shading does. Map normals baked at
+    // several pixels per unit carry detail that would flip the projections every unit or so,
+    // and each flip leaves a line where neighbouring pixels sample different planes and the
+    // GPU picks a far too small mip level. A bias of 3 overflows the constant registers of
+    // the 2XXT shaders under ps_2_a; 2 reuses a constant they already hold.
+    float2 terrainNormal = tex2Dbias(Stratum7NormalSampler, float4(position.xy, 0, 2)).ag * 2 - 1;
+    float2 side = abs(terrainNormal);
+    float up = sqrt(saturate(1 - dot(terrainNormal, terrainNormal)));
+
+    float sideMax = max(side.x, side.y);
+    float sideMin = min(side.x, side.y);
+    float minorTop = step(up, sideMin);
+    float minorYZ = step(side.x, side.y);
+
+    TriplanarSelection selection;
+    selection.sideUV.xy = lerp(position.yz, position.xz, minorYZ);
+    selection.sideUV.zw = lerp(position.xz, position.yz, minorYZ);
+    // 0.5773 is just below 1/sqrt(3), the smallest value the largest component of a unit
+    // vector can have, so the weights never both become zero. No scaling to (0, 1) is
+    // needed as the weights are normalised, and leaving it out keeps the shader within
+    // the constant registers of ps_2_a.
+    selection.weights = max(float2(sideMax, lerp(up, sideMin, minorTop)) - 0.5773, 0);
+    selection.weights = selection.weights / (selection.weights.x + selection.weights.y);
+    selection.topSecond = 1 - minorTop;
+    return selection;
+}
+
+// The uv of the second projection: the weaker side projection where the terrain is steep, else the top-down one
+float2 secondTriplanarUV(TriplanarSelection selection, float2 topUV) {
+    return lerp(selection.sideUV.zw, topUV, selection.topSecond);
+}
+
+// ----------------------------------------------------------------------------
+//#region Terrain400
+
+// These shaders blend all layers at once by height, as Unity's terrain shaders do
+// (HeightBasedSplatModify): every layer's height is multiplied by its weight, the
+// highest one wins and the others fade in within a transition range of it. The
+// 2XX shaders instead lay the strata over each other in order and compare each
+// layer's height only with its own opacity, so a low layer cannot hold its ground
+// against a high one above it.
+// The stratum masks are weights: the lower layer gets what the strata leave
+// (1 - their sum), and a sum above 1 is scaled back to 1.
+// SpecularColor.r is the height transition: 0 cuts hard, larger values blend softer.
+// Unlike Terrain200 no stratum is sampled rotated; the shaders need those registers.
+// The texture layout is that of Terrain200, except that each stratum carries its height in the
+// alpha of both its albedo and its normal map; the atlas in the upper slot only supplies the roughness.
+// The lower layer has a fixed height of 0.5: its albedo alpha stays the macrotexture's opacity.
+// In the T variants Stratum2 and Stratum3 use triplanar mapping (selectTriplanarProjections).
+
+// Roughness of a layer from the height and roughness atlas. It is always read from the top mip:
+// with ps_2_a's few registers there is no room for the gradient reads atlas2D() makes, and an
+// implicit mip would jump at every tile border, where frac() breaks the derivatives.
+float layerRoughness(float2 uv, uniform float2 offset, uniform bool firstBatch) {
+    float4 r = tex2Dbias(UpperAlbedoSampler, float4(frac(uv) / 4 + offset + 0.125, 0, -16));
+    return firstBatch ? r.x : r.z;
+}
+
+// Turns the masks into the weights of the lower layer and the seven strata
+void terrain400Weights(float4 mask0, float4 mask1, out float4 weightsA, out float4 weightsB) {
+    float strata = dot(mask0, 1) + dot(mask1.xyz, 1);
+    float scale = 1 / max(strata, 1);
+    weightsA = float4(saturate(1 - strata), mask0.xyz * scale);
+    weightsB = float4(mask0.w, mask1.xyz) * scale;
+}
+
+// Height based modification of the weights, after Unity's HeightBasedSplatModify
+void terrain400HeightBlend(float4 heightsA, float4 heightsB, inout float4 weightsA, inout float4 weightsB) {
+    float4 weightedA = heightsA * weightsA;
+    float4 weightedB = heightsB * weightsB;
+    float4 highest4 = max(weightedA, weightedB);
+    float highest = max(max(highest4.x, highest4.y), max(highest4.z, highest4.w));
+    // Like Unity the transition never reaches 0, and every layer with weight keeps a share of 1 % of
+    // it: that keeps the sum above zero while the highest layer still wins by about 100 to 1.
+    float transition = max(SpecularColor.r, 0.001);
+    weightsA = (max(weightedA + transition - highest, 0) + 0.01 * transition) * weightsA;
+    weightsB = (max(weightedB + transition - highest, 0) + 0.01 * transition) * weightsB;
+    float sum = dot(weightsA, 1) + dot(weightsB, 1);
+    weightsA = weightsA / sum;
+    weightsB = weightsB / sum;
+}
+
+// A stratum's albedo, from above or, in the triplanar variants, from the two strongest projections
+float4 terrain400Stratum(sampler2D s, float2 position, float2 scale, TriplanarSelection selection, float2 secondUV, uniform bool triplanar) {
+    if (triplanar) {
+        return tex2D(s, selection.sideUV.xy * scale) * selection.weights.x + tex2D(s, secondUV * scale) * selection.weights.y;
+    }
+    return tex2D(s, position * scale);
+}
+
+float4 Terrain400NormalsPS ( VS_OUTPUT inV, uniform bool triplanar ) : COLOR
+{
+    // height is in the z coordinate
+    float3 position = TerrainScale.xxx * inV.mTexWT;
+
+    float4 mask0 = tex2D(UtilitySamplerA, position.xy);
+    float4 mask1 = tex2D(UtilitySamplerB, position.xy);
+
+    TriplanarSelection selection = selectTriplanarProjections(position);
+    float2 secondUV = secondTriplanarUV(selection, position.xy);
+
+    // normal in rgb, height in alpha: reading the albedo for the height as well would take
+    // more than the 16 samplers of ps_2_a
+    float4 lowerNormal    = tex2D(LowerNormalSampler,    position.xy * LowerNormalTile.xy);
+    float4 stratum0Normal = tex2D(Stratum0NormalSampler, position.xy * Stratum0AlbedoTile.xy);
+    float4 stratum1Normal = tex2D(Stratum1NormalSampler, position.xy * Stratum1AlbedoTile.xy);
+    float4 stratum2Normal = terrain400Stratum(Stratum2NormalSampler, position.xy, Stratum2AlbedoTile.xy, selection, secondUV, triplanar);
+    float4 stratum3Normal = terrain400Stratum(Stratum3NormalSampler, position.xy, Stratum3AlbedoTile.xy, selection, secondUV, triplanar);
+    float4 stratum4Normal = tex2D(Stratum4NormalSampler, position.xy * Stratum4AlbedoTile.xy);
+    float4 stratum5Normal = tex2D(Stratum5NormalSampler, position.xy * Stratum5AlbedoTile.xy);
+    float4 stratum6Normal = tex2D(Stratum6NormalSampler, position.xy * Stratum6AlbedoTile.xy);
+
+    float4 weightsA;
+    float4 weightsB;
+    terrain400Weights(mask0, mask1, weightsA, weightsB);
+    terrain400HeightBlend(float4(0.5, stratum0Normal.a, stratum1Normal.a, stratum2Normal.a),
+                          float4(stratum3Normal.a, stratum4Normal.a, stratum5Normal.a, stratum6Normal.a), weightsA, weightsB);
+
+    // the weights sum to 1, so the stored values can be blended first and unpacked once
+    float3 packed = lowerNormal.rgb    * weightsA.x + stratum0Normal.rgb * weightsA.y
+                  + stratum1Normal.rgb * weightsA.z + stratum2Normal.rgb * weightsA.w
+                  + stratum3Normal.rgb * weightsB.x + stratum4Normal.rgb * weightsB.y
+                  + stratum5Normal.rgb * weightsB.z + stratum6Normal.rgb * weightsB.w;
+
+    return float4( 0.5 + 0.5 * normalize(packed * 2 - 1), 1);
+}
+
+float4 Terrain400AlbedoPS ( VS_OUTPUT inV, uniform bool triplanar, uniform float macrotextureblend ) : COLOR
+{
+    float3 position = TerrainScale.xxx * inV.mTexWT;
+
+    // do arithmetics to get range from (0, 1) to (-1, 1) as normal maps store their values as (0, 1)
+    float3 normal = normalize(2 * SampleScreen(NormalSampler,inV.mTexSS).xyz - 1);
+
+    float4 mask0 = tex2D(UtilitySamplerA, position.xy);
+    float4 mask1 = tex2D(UtilitySamplerB, position.xy);
+
+    TriplanarSelection selection = selectTriplanarProjections(position);
+    float2 secondUV = secondTriplanarUV(selection, position.xy);
+
+    // rgb albedo, height in alpha
+    float4 lowerAlbedo    = tex2D(LowerAlbedoSampler,    position.xy * LowerAlbedoTile.xy);
+    float4 stratum0Albedo = tex2D(Stratum0AlbedoSampler, position.xy * inV.nearScales.xx);
+    float4 stratum1Albedo = tex2D(Stratum1AlbedoSampler, position.xy * inV.nearScales.yy);
+    float4 stratum2Albedo = terrain400Stratum(Stratum2AlbedoSampler, position.xy, inV.nearScales.zz, selection, secondUV, triplanar);
+    float4 stratum3Albedo = terrain400Stratum(Stratum3AlbedoSampler, position.xy, inV.nearScales.ww, selection, secondUV, triplanar);
+    float4 stratum4Albedo = tex2D(Stratum4AlbedoSampler, position.xy * Stratum4AlbedoTile.xy);
+    float4 stratum5Albedo = tex2D(Stratum5AlbedoSampler, position.xy * Stratum5AlbedoTile.xy);
+    float4 stratum6Albedo = tex2D(Stratum6AlbedoSampler, position.xy * Stratum6AlbedoTile.xy);
+
+    float4 weightsA;
+    float4 weightsB;
+    terrain400Weights(mask0, mask1, weightsA, weightsB);
+    terrain400HeightBlend(float4(0.5, stratum0Albedo.a, stratum1Albedo.a, stratum2Albedo.a),
+                          float4(stratum3Albedo.a, stratum4Albedo.a, stratum5Albedo.a, stratum6Albedo.a), weightsA, weightsB);
+
+    float4 albedo;
+    albedo.rgb = lowerAlbedo.rgb * weightsA.x + stratum0Albedo.rgb * weightsA.y + stratum1Albedo.rgb * weightsA.z + stratum2Albedo.rgb * weightsA.w
+               + stratum3Albedo.rgb * weightsB.x + stratum4Albedo.rgb * weightsB.y + stratum5Albedo.rgb * weightsB.z + stratum6Albedo.rgb * weightsB.w;
+    // the roughness of the triplanar strata is read from above, like their atlas layout
+    albedo.a = weightsA.x * layerRoughness(position.xy * LowerAlbedoTile.xy,    float2(0.0, 0.0), true)
+             + weightsA.y * layerRoughness(position.xy * inV.nearScales.xx,     float2(0.5, 0.0), true)
+             + weightsA.z * layerRoughness(position.xy * inV.nearScales.yy,     float2(0.0, 0.5), true)
+             + weightsA.w * layerRoughness(position.xy * inV.nearScales.zz,     float2(0.5, 0.5), true)
+             + weightsB.x * layerRoughness(position.xy * inV.nearScales.ww,     float2(0.0, 0.0), false)
+             + weightsB.y * layerRoughness(position.xy * Stratum4AlbedoTile.xy, float2(0.5, 0.0), false)
+             + weightsB.z * layerRoughness(position.xy * Stratum5AlbedoTile.xy, float2(0.0, 0.5), false)
+             + weightsB.w * layerRoughness(position.xy * Stratum6AlbedoTile.xy, float2(0.5, 0.5), false);
+    albedo.rgb = blendMacrotexture(position.xy, macrotextureblend, albedo.rgb);
+
+    float waterDepth = tex2D(Stratum7AlbedoSampler, position).r;
+    float3 color = applyPbrShading(inV, waterDepth, albedo, normal, mask1.w);
+
+    return float4(color, 0.01f);
+}
+
+technique Terrain400Normals
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RG )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(false);
+        PixelShader = compile ps_2_a Terrain400NormalsPS(false);
+    }
+}
+
+technique Terrain400TNormals
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RG )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(false);
+        PixelShader = compile ps_2_a Terrain400NormalsPS(true);
+    }
+}
+
+technique Terrain400 <
+    string usage = "composite";
+    string normals = "Terrain400Normals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain400AlbedoPS(false, 0);
+    }
+}
+
+technique Terrain401 <
+    string usage = "composite";
+    string normals = "Terrain400Normals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain400AlbedoPS(false, 1);
+    }
+}
+
+technique Terrain402 <
+    string usage = "composite";
+    string normals = "Terrain400Normals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain400AlbedoPS(false, 2);
+    }
+}
+
+technique Terrain400T <
+    string usage = "composite";
+    string normals = "Terrain400TNormals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain400AlbedoPS(true, 0);
+    }
+}
+
+technique Terrain401T <
+    string usage = "composite";
+    string normals = "Terrain400TNormals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain400AlbedoPS(true, 1);
+    }
+}
+
+technique Terrain402T <
+    string usage = "composite";
+    string normals = "Terrain400TNormals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain400AlbedoPS(true, 2);
+    }
+}
+
+//#endregion
+// ----------------------------------------------------------------------------
+
 //#endregion
 // ----------------------------------------------------------------------------
 
