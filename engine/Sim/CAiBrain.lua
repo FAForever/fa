@@ -375,8 +375,8 @@ return units
 ---
 --- This function does **not** take into account intel.
 ---@param category EntityCategory
----@param needToBeIdle boolean # Not functional
----@param requireBuilt? boolean # Not functional. Defaults to `true`
+---@param needToBeIdle boolean # Not functional, due to the engine bug above
+---@param requireBuilt? boolean # Defaults to `true`. Not functional, due to the engine bug above
 ---@return Unit[]
 function CAiBrain:GetListOfUnits(category, needToBeIdle, requireBuilt)
 end

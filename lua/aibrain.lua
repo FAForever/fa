@@ -638,8 +638,8 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     --- Returns list of units by category. Excludes dummy units.
     ---@param self AIBrain
     ---@param cats EntityCategory Unit's category, example: categories.TECH2 .
-    ---@param needToBeIdle boolean true/false Unit has to be idle (appears to be not functional).
-    ---@param requireBuilt? boolean true/false defaults to false which excludes units that are NOT finished (appears to be not functional).
+    ---@param needToBeIdle boolean Unit has to be idle. Not functional, due to an engine bug (see `CAiBrain:GetListOfUnits`)
+    ---@param requireBuilt? boolean Excludes units that are not finished. Defaults to `true` in the engine, but this function passes `false` when it is `nil`. Not functional, due to an engine bug (see `CAiBrain:GetListOfUnits`)
     ---@return Unit[]
     GetListOfUnits = function(self, cats, needToBeIdle, requireBuilt)
         -- defaults to false, prevent sending nil
