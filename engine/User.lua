@@ -625,8 +625,9 @@ end
 function GetUIControlsAlpha()
 end
 
---- Given a set of units, gets the union of orders and unit categories (for determining builds). You can use `GetUnitCommandFromCommandCap` to convert the toggles to unit commands
+--- Given a set of units, gets the union of orders and unit categories (for determining builds)
 ---@see GetUnitCommandDataOfUnit # Single unit variant
+---@see GetUnitCommandFromCommandCap # Convert the orders to unit commands
 ---@param unitSet UserUnit[]
 ---@return EngineCommandCap[] orders
 ---@return EngineToggleCap[] availableToggles
