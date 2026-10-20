@@ -353,12 +353,30 @@ end
 function CAiBrain:GetHighestThreatPosition(ring, restriction, threatType, armyIndex)
 end
 
---- Returns a list of units that match the categories.
+--[[
+The engine checks each unit, but adds the ones that pass back into the set it reads from, which
+already holds them, so the checks have no effect
+
+local units = army:GetUnits(category)
+for _, unit in units do
+    if not (unit:IsDead() or unit:DestroyQueued())
+        and not (requireBuilt and unit:IsBeingBuilt())
+        and not (needToBeIdle and not unit:IsIdleState())
+    then
+        units:Add(unit)
+    end
+end
+return units
+]]
+
+--- Returns every unit of the army that matches the categories. Units that are killed, destroyed this
+--- tick, being built or busy are included until the engine deletes them at the end of the tick they
+--- are destroyed in.
 ---
 --- This function does **not** take into account intel.
 ---@param category EntityCategory
----@param needToBeIdle boolean
----@param requireBuilt? boolean # Appears to be not functional
+---@param needToBeIdle boolean # Not functional
+---@param requireBuilt? boolean # Not functional. Defaults to `true`
 ---@return Unit[]
 function CAiBrain:GetListOfUnits(category, needToBeIdle, requireBuilt)
 end
