@@ -1,0 +1,1 @@
+- Add the Terrain400 terrain shaders, which blend all strata at once by height, with triplanar variants for Stratum2 and Stratum3 (#7344).
