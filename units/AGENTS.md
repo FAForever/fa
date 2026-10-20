@@ -11,7 +11,7 @@ Unit blueprints and unit scripts. Read the root [AGENTS.md](../AGENTS.md) first:
 
 ## Unit IDs
 
-The letters are prefix, faction, then type. Examples: `UEL0001` (UEF land ACU), `XSL0001` (Seraphim ACU), `UEB0101` (UEF T1 land factory).
+The letters are prefix, faction, then type. Examples: `UEL0001` (UEF land ACU), `XSL0001` (Seraphim ACU), `UEB0101` (UEF T1 land factory). To find the ID of a unit by name, tech or role, search [unit-names.md](unit-names.md), and rerun [scripts/generate-unit-names.py](../scripts/generate-unit-names.py) after adding, removing or renaming a unit.
 
 | Position | Values |
 |---|---|
@@ -63,7 +63,7 @@ TypeClass = URL0107
 
 - Inherit from the faction class libraries: `terranunits.lua`, `aeonunits.lua`, `cybranunits.lua`, `seraphimunits.lua` (or [defaultunits.lua](../lua/defaultunits.lua)), with weapons from the matching `*weapons.lua`.
 - Keys of `Weapons` are blueprint weapon `Label`s. A blueprint weapon without a matching entry uses the base `Weapon` class (`GetWeaponClass` in [Unit.lua](../lua/sim/Unit.lua)).
-- [UAB1103_script.lua](UAB1103/UAB1103_script.lua) shows the current style: cached fields and upvalued engine functions (root [Performance](../AGENTS.md#performance)).
+- [UAB1103_script.lua](UAB1103/UAB1103_script.lua) shows the current style: cached fields and upvalued engine functions ([performance.md](../performance.md)).
 
 ## Balance and fix changes
 
