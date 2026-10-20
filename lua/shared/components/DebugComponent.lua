@@ -31,11 +31,11 @@ DebugComponent = ClassSimple {
     -- - https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-fafbeta.yaml
     -- - https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-fafdevelop.yaml
     
-    EnabledSpewing = true,
-    EnabledLogging = true,
-    EnabledWarnings = true,
+    EnabledSpewing = false,
+    EnabledLogging = false,
+    EnabledWarnings = false,
     EnabledErrors = true,
-    EnabledDrawing = true,
+    EnabledDrawing = false,
 
     --#endregion
 }
