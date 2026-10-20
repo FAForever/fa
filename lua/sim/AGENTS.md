@@ -1,6 +1,6 @@
 # Sim: Units, Weapons and Projectiles
 
-This guide covers working with simulation code: the class chains for units, weapons and projectiles, their lifecycle callbacks, threads, states, buffs and damage. It extends the root [AGENTS.md](../../AGENTS.md). Read its [Determinism and desyncs](../../AGENTS.md#determinism-and-desyncs), [Classes](../../AGENTS.md#classes) and [Performance](../../AGENTS.md#performance) sections first.
+This guide covers working with simulation code: the class chains for units, weapons and projectiles, their lifecycle callbacks, threads, states, buffs and damage. It extends the root [AGENTS.md](../../AGENTS.md). Read its [Determinism and desyncs](../../AGENTS.md#determinism-and-desyncs), [Classes](../../AGENTS.md#classes) and [Performance](../../AGENTS.md#performance) sections first, and [performance.md](../../performance.md) before changing a hot path.
 
 ## Sim code outside this folder
 
@@ -104,7 +104,7 @@ Engine methods keep working until step 8, then error with "Game object has been 
 | [collisionBeams/](collisionBeams/) | Collision beam classes used by beam weapons |
 | [VictoryCondition/](VictoryCondition/) | Victory condition classes |
 | `NavGenerator.lua`, `NavUtils.lua`, `NavDebug/` | Navigation mesh and pathing queries |
-| `*Manager.lua`, `Builder.lua` | AI managers. See the AI row in the root [Repository layout](../../AGENTS.md#repository-layout) |
+| `*Manager.lua`, `Builder.lua` | AI managers. The rest of the AI is in `lua/AI/` and `lua/aibrains/` |
 
 ## Script tasks
 

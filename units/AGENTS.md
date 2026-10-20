@@ -63,7 +63,7 @@ TypeClass = URL0107
 
 - Inherit from the faction class libraries: `terranunits.lua`, `aeonunits.lua`, `cybranunits.lua`, `seraphimunits.lua` (or [defaultunits.lua](../lua/defaultunits.lua)), with weapons from the matching `*weapons.lua`.
 - Keys of `Weapons` are blueprint weapon `Label`s. A blueprint weapon without a matching entry uses the base `Weapon` class (`GetWeaponClass` in [Unit.lua](../lua/sim/Unit.lua)).
-- [UAB1103_script.lua](UAB1103/UAB1103_script.lua) shows the current style: cached fields and upvalued engine functions (root [Performance](../AGENTS.md#performance)).
+- [UAB1103_script.lua](UAB1103/UAB1103_script.lua) shows the current style: cached fields and upvalued engine functions ([performance.md](../performance.md)).
 
 ## Balance and fix changes
 
