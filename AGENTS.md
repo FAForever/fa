@@ -109,3 +109,7 @@ Real verification means running the game ([setup](docs/development/setup.md)): c
 - **Not every asset is in the repo.** The base game's `units.scd`, `textures.scd` and other archives are still mounted (`allowedAssetsScd` in [init_faf.lua](init_faf.lua)). A path with no file here usually comes from them. Don't "fix" or delete it.
 - If a function isn't in `engine/`, it doesn't exist. Don't assume a convenient one does.
 - **[faf-re](https://github.com/Draiget/faf-re)** is an incomplete decompilation of the engine. Use it only as a last resort, when the stubs and docs are missing details or contradict observed results. Its code is evidence, not proof. Say so when a conclusion depends on it.
+
+## Personal notes
+
+Notes about one person or machine, such as the path to their FAF client or repository, or their workflow preferences, don't go in the tracked guides. In Claude Code, write them to `CLAUDE.local.md` at the repository root. It is gitignored and loads with `CLAUDE.md`. Each git worktree has its own copy, so notes shared across worktrees go in a file under `~/.claude/`, imported from `CLAUDE.local.md` with `@~/.claude/<file>.md`. In other harnesses, use their personal or global instructions file.
