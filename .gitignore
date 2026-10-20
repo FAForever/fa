@@ -28,3 +28,4 @@ lua_changelog
 
 # personal agent instructions
 CLAUDE.local.md
+AGENTS.override.md
