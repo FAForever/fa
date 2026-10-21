@@ -165,7 +165,9 @@ end
 function AddInputCapture(control)
 end
 
----
+--- Adds the selectable units to the selection
+---@see SelectUnits # Replaces the selection
+---@see categories.SELECTABLE # Rules for which units are selectable
 ---@param selection UserUnit[]
 function AddSelectUnits(selection)
 end
@@ -1031,7 +1033,10 @@ end
 function SavePreferences()
 end
 
---- Select the specified units
+--- Select the specified units. Skips units that aren't selectable.
+--- For a unit that isn't selectable because it is in a transport, selects the transport instead
+---@see AddSelectUnits # Adds to the selection
+---@see categories.SELECTABLE # Rules for which units are selectable
 ---@param units UserUnit[]?
 function SelectUnits(units)
 end

@@ -1000,8 +1000,8 @@
 ---@field QuickSelectPriority? integer
 --- how long to wait before rolling the unit off the factory
 ---@field RolloffDelay? number
---- Determines if a unit will be selected in a drag selection, only the highest priority units will
---- get selected (1 is highest).
+--- Determines if a unit will be selected in a box selection without shift: only the highest priority units will
+--- get selected (1 is highest). Box selection with shift ignores it. See `categories.SELECTABLE`
 ---@field SelectionPriority integer
 ---@field TarmacDecal? any unused
 ---@field TarmacGlowDecal? any unused

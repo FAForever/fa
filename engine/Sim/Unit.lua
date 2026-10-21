@@ -695,6 +695,7 @@ function Unit:SetTurnMult(mult)
 end
 
 --- sets if the unit can be selected
+---@see categories.SELECTABLE # Rules for which units are selectable
 ---@param unselectable boolean
 function Unit:SetUnSelectable(unselectable)
 end
