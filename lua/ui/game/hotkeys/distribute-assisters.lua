@@ -23,12 +23,11 @@ function DistributeAssisters(assisterCategory, targetCategory)
             local assisterIds = {}
             local targetIds = {}
 
-            for _, assister in assisters do
-                table.insert(assisterIds, assister:GetEntityId())
+            for i = 1, table.getn(assisters) do
+                assisterIds[i] = assisters[i]:GetEntityId()
             end
-
-            for _, target in targets do
-                table.insert(targetIds, target:GetEntityId())
+            for i = 1, table.getn(targets) do
+                targetIds[i] = targets[i]:GetEntityId()
             end
 
             print(string.format("%d assisters assisting %d units", table.getn(assisters), table.getn(targets)))
