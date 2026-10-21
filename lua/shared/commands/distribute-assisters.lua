@@ -35,7 +35,7 @@ local OnlySupportCategory = categories.ALLUNITS
 
 ---@type EntityCategory
 AssisterCategory = (
-    categories.SCOUT * categories.LAND
+    categories.SCOUT
     + categories.MOBILE * OnlySupportCategory * (
         categories.SHIELD
         + categories.COUNTERINTELLIGENCE * categories.OVERLAYCOUNTERINTEL
