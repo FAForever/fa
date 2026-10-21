@@ -74,7 +74,10 @@ end
 function Unit:AddToggleCap(capName)
 end
 
---- Adds unit to the storage of the carrier
+--- Adds unit to the storage of the carrier. When the storage is full, logs a warning instead
+---@see moho.unit_methods.TransportHasAvailableStorage # Checked before adding the unit
+---@see moho.unit_methods.OnAddToStorage # Called on the stored unit
+---@see UnitBlueprintTransport.StorageSlots # Number of units the storage holds
 ---@param unit Unit
 function Unit:AddUnitToStorage(unit)
 end
@@ -749,7 +752,9 @@ end
 function Unit:TransportDetachAllUnits(destroySomeUnits)
 end
 
---- returns true if this transport is full or not
+--- Returns whether the storage has room for another unit: the stored and reserved units are fewer than `StorageSlots`
+---@see moho.unit_methods.AddUnitToStorage # Adds a unit to the storage when this is true
+---@see UnitBlueprintTransport.StorageSlots # Number of units the storage holds
 ---@return boolean
 function Unit:TransportHasAvailableStorage()
 end
@@ -795,6 +800,7 @@ Unit.CreateWreckageProp = nil
 
 --- Called by the engine on a unit in a transport's storage, right before the engine destroys it with the transport
 ---@see moho.unit_methods.TransportDetachAllUnits
+---@see moho.unit_methods.OnAddToStorage # Called when the unit is put into storage
 ---@type nil | fun(self: Unit)
 Unit.DestroyedOnTransport = nil
 
@@ -844,6 +850,9 @@ Unit.GetWeaponClass = nil
 Unit.InheritWork = nil
 
 --- Called by the engine when the unit is put into a transport's storage
+---@see moho.unit_methods.AddUnitToStorage # Puts a unit into storage from Lua
+---@see moho.unit_methods.OnRemoveFromStorage # Called when the unit leaves storage
+---@see moho.unit_methods.DestroyedOnTransport # Called when the transport is destroyed with the unit in storage
 ---@type nil | fun(self: Unit, transport: Unit)
 Unit.OnAddToStorage = nil
 
@@ -1073,6 +1082,7 @@ Unit.OnProductionInActive = nil
 Unit.OnReclaimed = nil
 
 --- Called by the engine when the unit is taken out of a transport's storage
+---@see moho.unit_methods.OnAddToStorage # Called when the unit is put into storage
 ---@type nil | fun(self: Unit, transport: Unit)
 Unit.OnRemoveFromStorage = nil
 
