@@ -154,6 +154,10 @@ local keyActionsCamera = {
         action = 'UI_TrackUnit CameraHead2',
         category = 'camera',
     },
+    ['track_unit_split_screen'] = {
+        action = 'UI_Lua import("/lua/ui/game/tracking.lua").ToggleSplitScreenTracking()',
+        category = 'camera',
+    },
     ['reset_camera'] = {
         action = 'UI_Lua import("/lua/ui/game/zoomslider.lua").ToggleWideView()',
         category = 'camera',
@@ -1908,6 +1912,10 @@ local keyActionsUI = {
     },
     ['split_screen_disable'] = {
         action = 'UI_Lua import("/lua/ui/game/borders.lua").SplitMapGroup(false)',
+        category = 'ui',
+    },
+    ['toggle_split_screen'] = {
+        action = 'UI_Lua import("/lua/ui/game/borders.lua").ToggleSplitScreen()',
         category = 'ui',
     },
     ['toggle_notify_customiser'] = {
