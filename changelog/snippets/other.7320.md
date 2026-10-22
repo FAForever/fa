@@ -1,0 +1,1 @@
+- Fix documentation of the table pre-allocation syntax (#7320).

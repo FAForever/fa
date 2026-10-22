@@ -28,18 +28,6 @@
 # The primary check is whether we launched the script from the correct 
 # directory. The active directory should always be '(...)/fa/changelog/snippets'
 
-templateHeader="sections/template-header.md"
-if ! [ -e "$templateHeader" ]; then
-    echo "No markdown template for the header found. Are you starting the script from the wrong directory?"
-    exit 1
-fi
-
-templateFooter="sections/template-footer.md"
-if ! [ -e "$templateFooter" ]; then
-    echo "No markdown template for the footer found. Are you starting the script from the wrong directory?"
-    exit 1
-fi
-
 templateFix="sections/template-fix.md"
 if ! [ -e "$templateFix" ]; then
     echo "No markdown template for bug fixes found. Are you starting the script from the wrong directory?"
@@ -127,9 +115,6 @@ echo "Writing output to: $output"
 
 rm -f "$output"
 
-# Add the initial header
-cat "$templateHeader" >>"$output"
-
 process_snippets "balance" "$templateBalance" "$output"
 process_snippets "features" "$templateFeatures" "$output"
 process_snippets "fix" "$templateFix" "$output"
@@ -137,8 +122,5 @@ process_snippets "graphics" "$templateGraphics" "$output"
 process_snippets "ai" "$templateAI" "$output"
 process_snippets "performance" "$templatePerformance" "$output"
 process_snippets "other" "$templateOther" "$output"
-
-# Add the final footer
-cat "$templateFooter" >>"$output"
 
 #endregion

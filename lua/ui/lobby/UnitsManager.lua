@@ -5,7 +5,6 @@
 -- ==========================================================================================
 local Mods     = import("/lua/mods.lua")
 local UIUtil   = import("/lua/ui/uiutil.lua")
-local Utils    = import("/lua/system/utils.lua")
 local Tooltip  = import("/lua/ui/game/tooltip.lua")
 local Group    = import("/lua/maui/group.lua").Group
 local Popup    = import("/lua/ui/controls/popups/popup.lua").Popup

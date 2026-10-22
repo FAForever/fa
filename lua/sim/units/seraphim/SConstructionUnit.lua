@@ -59,7 +59,7 @@ SConstructionUnit = ClassUnit(ConstructionUnit) {
         -- is overwritten to add support for the second build arm manipulator
         local buildbones = self.Blueprint.General.BuildBonesAlt1
         if buildbones then
-            buildArmManipulator = CreateBuilderArmController(self,
+            local buildArmManipulator = CreateBuilderArmController(self,
                 buildbones.YawBone or 0,
                 buildbones.PitchBone or 0,
                 buildbones.AimBone or 0

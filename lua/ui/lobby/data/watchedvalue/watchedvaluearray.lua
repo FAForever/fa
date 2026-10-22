@@ -2,7 +2,8 @@ local WatchedValueTable = import("/lua/ui/lobby/data/watchedvalue/watchedvalueta
 
 --- A WatchedValueTable with integral keys. Note that `false` is indistinguishable from `nil` in this
 -- structure, because Lua.
----@class WatchedValueArray : WatchedValueTable
+---@class WatchedValueArray<V> : WatchedValueTable
+---@field pairs fun(): fun(t: table<integer, WatchedValue<V>>, k: integer): (integer, V), table<integer, WatchedValue<V>>, nil
 WatchedValueArray = Class(WatchedValueTable) {
     __init = function(self, size)
         local initialMapping = {}

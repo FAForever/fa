@@ -105,8 +105,8 @@ CommandUnit = ClassUnit(WalkingLandUnit) {
         -- to start this build, not us.
         if not self:GetGuardedUnit() and unitBeingBuilt:GetFractionComplete() == 0 and
             not self:CanBuild(unitBeingBuilt.Blueprint.BlueprintId) then
-            IssueStop({ self })
-            IssueClearCommands({ self })
+            IssueToUnitStop(self)
+            IssueToUnitClearCommands(self)
             unitBeingBuilt:Destroy()
         end
     end,

@@ -166,12 +166,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/heavylandattack_editorfunctions.lua', 'HeavyLandAttackChildArtillery',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -195,16 +195,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/heavylandattack_editorfunctions.lua', 'HeavyLandAttackChildDirectFire',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1 , 2 },
-                                {'default_brain','1','2'}
+                                { 1 , 2 },
+                                {'1','2'}
                             },
                         },
                         PlatoonData = {
@@ -228,12 +228,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/heavylandattack_editorfunctions.lua', 'HeavyLandAttackChildArtillery',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -257,12 +257,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/heavylandattack_editorfunctions.lua', 'HeavyLandAttackChildDirectFire',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -286,12 +286,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/heavylandattack_editorfunctions.lua', 'HeavyLandAttackChildDirectFire',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -315,16 +315,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/heavylandattack_editorfunctions.lua', 'HeavyLandAttackChildDirectFire',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1 , 3 },
-                                {'default_brain','1','3'}
+                                { 1 , 3 },
+                                {'1','3'}
                             },
                         },
                         PlatoonData = {
@@ -348,12 +348,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/heavylandattack_editorfunctions.lua', 'HeavyLandAttackChildDirectFire',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -377,12 +377,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/heavylandattack_editorfunctions.lua', 'HeavyLandAttackChildAntiAir',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -406,12 +406,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/heavylandattack_editorfunctions.lua', 'HeavyLandAttackChildArtillery',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -435,12 +435,12 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/heavylandattack_editorfunctions.lua', 'HeavyLandAttackChildAntiAir',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -464,16 +464,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/heavylandattack_editorfunctions.lua', 'HeavyLandAttackChildDefensive',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 3 , 0 },
-                                {'default_brain','3','0'}
+                                { 3 , 0 },
+                                {'3','0'}
                             },
                         },
                         PlatoonData = {
@@ -497,18 +497,18 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/ai/opai/heavylandattack_editorfunctions.lua', 'HeavyLandAttackMasterCountDifficulty',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonBuildCallbacks = {
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMUnlockPlatoon',
-                                {'default_brain','default_platoon'},
-                                {'default_brain','default_platoon'}
+                                {'default_platoon'},
+                                {'default_platoon'}
                             },
                         },
                         PlatoonAddFunctions = {
@@ -536,16 +536,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/heavylandattack_editorfunctions.lua', 'HeavyLandAttackChildDefensive',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1 , 2 },
-                                {'default_brain','1','2'}
+                                { 1 , 2 },
+                                {'1','2'}
                             },
                         },
                         PlatoonData = {
@@ -569,16 +569,16 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/ai/opai/heavylandattack_editorfunctions.lua', 'HeavyLandAttackChildDirectFire',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 3 , 0 },
-                                {'default_brain','3','0'}
+                                { 3 , 0 },
+                                {'3','0'}
                             },
                         },
                         PlatoonData = {

@@ -13,6 +13,7 @@
 ---@alias ShareOption "CivilianDeserter" | "Defectors" | "FullShare" | "PartialShare" | "ShareUntilDeath" | "TransferToKiller"
 ---@alias DisconnectShareOption ShareOption | "SameAsShare"
 ---@alias DisconnectShareCommandersOption "Explode" | "Permanent" | "Recall" | "RecallDelayed"
+---@alias CommonArmyOption "Off" | "UnionWhenDisconnected" | "Union" | "Common"
 
 --- Additionally, extra options can be specified by the map in `mapname .. 'options.lua'`
 ---@class GameOptions
@@ -42,6 +43,7 @@
 ---@field UnitCap '125' | '250' | '375' | '500' | '625' | '750' | '875' | '1000' | '1250' | '1500'
 ---@field Unranked 'No' | 'Yes'
 ---@field Victory VictoryCondition
+---@field CommonArmy CommonArmyOption
 ---
 ---@field BuildMult AIMultiplierOptionValue
 ---@field CheatMult AIMultiplierOptionValue

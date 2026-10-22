@@ -74,15 +74,6 @@ local StandardBrainOnUnitStopBeingBuilt = StandardBrain.OnUnitStopBeingBuilt
 ---@field EngineerManager AIEngineerManager
 ---@field StructureManager AIStructureManager
 
----@class TriggerSpec
----@field Callback function
----@field ReconTypes ReconTypes
----@field Blip boolean
----@field Value boolean
----@field Category EntityCategory
----@field OnceOnly boolean
----@field TargetAIBrain AIBrain
-
 ---@class EasyAIBrain: AIBrain, AIBrainEconomyComponent
 ---@field AIBaseTemplates EasyAIBrainBaseTemplates
 ---@field GridReclaim AIGridReclaim
@@ -255,7 +246,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@param self EasyAIBrain
     ---@param platoon AIPlatoon
     ---@param units Unit[]
-    ---@param squad PlatoonSquads
+    ---@param squad PlatoonSquadType
     ---@param formation UnitFormations
     AssignUnitsToPlatoon = function(self, platoon, units, squad, formation)
         StandardBrain.AssignUnitsToPlatoon(self, platoon, units, squad, formation)
@@ -306,7 +297,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
             platoon.Base = nearestBase
             platoon.Brain = self
             setmetatable(platoon, import("/lua/aibrains/platoons/platoon-simple-engineer.lua").AIPlatoonEngineerSimple)
-            self:AssignUnitsToPlatoon(platoon, { unit }, 'Support', 'GrowthFormation')
+            self:AssignUnitToPlatoon(platoon, unit , 'Support', 'GrowthFormation')
             ChangeState(platoon, platoon.Start)
         end
 

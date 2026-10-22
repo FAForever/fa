@@ -71,7 +71,7 @@ jobs:
         working-directory: docs
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           sparse-checkout: |
             docs
@@ -84,13 +84,16 @@ jobs:
 
       # Retrieve the generated changelogs
       - name: Download artifact changelog of FAF Develop
-        uses: actions/download-artifact@v4
+        # No artifact exists when there are no snippets to process
+        continue-on-error: true
+        uses: actions/download-artifact@v7
         with:
           name: changelog-fafdevelop
           path: docs/generated
 
       - name: Download artifact changelog of FAF Beta
-        uses: actions/download-artifact@v4
+        continue-on-error: true
+        uses: actions/download-artifact@v7
         with:
           name: changelog-fafbeta
           path: docs/generated
@@ -98,8 +101,8 @@ jobs:
       # Append the generated changelogs to the Jekyll-compatible templates
       - name: Append the generated changelogs
         run: |
-          cat generated/fafdevelop.md >> changelog/fafdevelop.md
-          cat generated/fafbeta.md >> changelog/fafbeta.md
+          cat generated/changelog-fafdevelop.md >> changelog/fafdevelop.md || true
+          cat generated/changelog-fafbeta.md >> changelog/fafbeta.md || true
 
       # Add links to the files in the posts directory
       - name: Update changelog posts directory
@@ -123,7 +126,7 @@ jobs:
 
       - name: Setup Pages
         id: pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
@@ -146,4 +149,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

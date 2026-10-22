@@ -1,0 +1,12 @@
+<link rel="stylesheet" href="{{ '/assets/css/just-the-docs-faf-dark.css' | relative_url }}" id="dark-scheme-stylesheet" disabled>
+<script>
+  (function () {
+    var stored = localStorage.getItem('faf-color-scheme');
+    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var dark = stored ? stored === 'dark' : prefersDark;
+    if (dark) {
+      document.getElementById('dark-scheme-stylesheet').removeAttribute('disabled');
+      document.documentElement.setAttribute('data-color-scheme', 'dark');
+    }
+  })();
+</script>
