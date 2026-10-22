@@ -108,6 +108,7 @@ keyDescriptions = {
     ['track_unit'] = '<LOC key_desc_0038>Track a unit in the Primary view',
     ['track_unit_minimap'] = '<LOC key_desc_0039>Track a unit in the Strategic view',
     ['track_unit_second_mon'] = '<LOC key_desc_0040>Track a unit on the Second Monitor',
+    ['track_unit_split_screen'] = '<LOC key_track_unit_split_screen>Track a unit in the split screen view',
     ['select_air'] = '<LOC key_desc_0046>Select all Air units',
     ['select_naval'] = '<LOC key_desc_0048>Select all Naval units',
     ['cap_frames'] = '<LOC key_desc_0050>Capture Frames',
@@ -193,6 +194,7 @@ keyDescriptions = {
 
     ['split_screen_enable'] = '<LOC key_desc_0084>Enable split screen',
     ['split_screen_disable'] = '<LOC key_desc_0085>Disable split screen',
+    ['toggle_split_screen'] = '<LOC key_toggle_split_screen>Toggle split screen',
     ['pause_single_step'] = '<LOC key_desc_0086>While paused, step forward one tick',
     ['chat_page_up'] = '<LOC key_desc_0087>Chat page up',
     ['chat_page_down'] = '<LOC key_desc_0088>Chat page down',
