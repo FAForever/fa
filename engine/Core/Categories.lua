@@ -4,7 +4,7 @@
 ---@type EntityCategory
 local categoryValue
 
----@type table<CategoryName | UnitId, EntityCategory>
+---@class categories : { [UnitId]: EntityCategory }
 categories = {
     --- Lua-side (`lua/ui/game/orders.lua`): adds the blueprint `Abilities` buttons to the orders panel
     ABILITYBUTTON = categoryValue,
