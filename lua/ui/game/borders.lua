@@ -136,7 +136,7 @@ function SplitMapGroup(splitState, forceSplit)
     SetLayout()
 end
 
---- Toggles the split-screen view.
+--- Toggles the split screen view.
 function ToggleSplitScreen()
     local WorldView = import("/lua/ui/game/worldview.lua")
     local splitScreen = WorldView.viewRight and not IsDestroyed(WorldView.viewRight)

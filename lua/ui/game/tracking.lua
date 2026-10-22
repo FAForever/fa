@@ -94,7 +94,7 @@ local function StartSplitScreenTrackingWatcher()
     )
 end
 
---- Toggles tracking of the selected unit in the split-screen view.
+--- Toggles tracking of the selected unit in the split screen view.
 function ToggleSplitScreenTracking()
     if not HasSplitScreen() then
         StopSplitScreenTrackingIndicator()
