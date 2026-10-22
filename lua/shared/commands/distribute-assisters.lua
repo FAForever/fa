@@ -20,6 +20,8 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+local EntityCategoryFilterDown = EntityCategoryFilterDown
+
 local OnlySupportCategory = categories.ALLUNITS
     -- Exclude armed support-capable units such as Monkeylords and Fatboys.
     - categories.DIRECTFIRE
@@ -45,6 +47,12 @@ AssisterCategory = (
     - categories.INSIGNIFICANTUNIT
     - categories.UNSELECTABLE
 
+--- Units that can be assisted with regular mouse orders
+local validTargetsCat = categories.SELECTABLE
+    -- external factories are attached to a CARRIER category
+    -- anchor unit, making it not possible to target them for orders
+    - categories.EXTERNALFACTORYUNIT
+
 --- Separates a selection into eligible assisters and assist targets.
 ---@param selection Unit[] | UserUnit[]
 ---@param assisterCategory? EntityCategory
@@ -56,7 +64,14 @@ function GetAssistersAndTargets(selection, assisterCategory, targetCategory)
     targetCategory = targetCategory or (categories.ALLUNITS - assisterCategory)
 
     local assisters = EntityCategoryFilterDown(assisterCategory, selection)
-    local targets = EntityCategoryFilterDown(targetCategory - assisterCategory, selection)
+    local targets = EntityCategoryFilterDown(validTargetsCat * targetCategory - assisterCategory, selection)
 
     return assisters, targets
+end
+
+--- Filters out units that cannot be assisted with regular mouse orders
+---@param selection Unit[] | UserUnit[]
+---@return Unit[] | UserUnit[]
+function FilterOutInvalidTargets(selection)
+    return EntityCategoryFilterDown(validTargetsCat, selection)
 end

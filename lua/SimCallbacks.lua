@@ -19,6 +19,7 @@ local SimTriggers = import("/lua/scenariotriggers.lua")
 local SUtils = import("/lua/ai/sorianutilities.lua")
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 local UnitQueueDataToCommand = import("/lua/sim/commands/shared.lua").UnitQueueDataToCommand
+local FilterOutInvalidTargets = import("/lua/shared/commands/distribute-assisters.lua").FilterOutInvalidTargets
 
 -- upvalue table operations for performance
 local TableInsert = table.insert
@@ -542,11 +543,21 @@ Callbacks.DistributeAssisters = function(data)
     if not assisters[1] or not targets[1] then
         return
     end
+    targets = FilterOutInvalidTargets(targets) --[[@as Unit[] ]]
 
     local sourceAssister = assisters[1]
     IssueToUnitClearCommands(sourceAssister)
     for i = 1, TableGetn(targets) do
-        IssueToUnitGuard(sourceAssister, targets[i])
+        local target = targets[i]
+        local targetCats = target.Blueprint.CategoriesHash
+        local parent = target:GetParent()
+        if not target.Dead
+            and not target:IsUnitState('UnSelectable')
+            and not target:IsUnitState('Attached')
+            and not (parent and parent:GetBlueprint().CategoriesHash['CARRIER'])
+        then
+            IssueToUnitGuard(sourceAssister, targets[i])
+        end
     end
 
     import("/lua/sim/commands/distribute-queue.lua").DistributeOrders(assisters, sourceAssister, true, false)
