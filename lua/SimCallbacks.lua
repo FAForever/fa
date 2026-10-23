@@ -186,8 +186,8 @@ Callbacks.ValidateMassStorageAssist = function(data, units)
                 local unitQueueCount = TableGetn(queue)
                 local lastCommand = queue[unitQueueCount]
 
-                -- The callback runs after the original command is issued. Only replace that
-                -- command when it is the final guard/assist order and still targets the storage.
+                -- Confirm the final queued guard still targets the storage that triggered this
+                -- callback before clearing and rebuilding the queue.
                 if not lastCommand
                     or (lastCommand.commandType ~= 9 and lastCommand.commandType ~= 15)
                     or (lastCommand.target ~= target and lastCommand.targetId ~= target.EntityId)
@@ -201,6 +201,10 @@ Callbacks.ValidateMassStorageAssist = function(data, units)
                 elseif unitQueueCount ~= queueCount then
                     return
                 else
+                    -- Only rebuild the queue when every assisting unit has the same commands and
+                    -- targets. Replaying matching queues for the entire selection preserves shared
+                    -- group orders; replaying each unit separately would create individual assist
+                    -- orders and duplicate command lines in the UI.
                     for index = 1, queueCount do
                         local order = queue[index]
                         local referenceOrder = referenceQueue[index]
