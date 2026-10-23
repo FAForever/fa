@@ -19,6 +19,7 @@ local SimTriggers = import("/lua/scenariotriggers.lua")
 local SUtils = import("/lua/ai/sorianutilities.lua")
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 local CommandUtils = import("/lua/sim/commands/shared.lua")
+local GameIsRestricted = import("/lua/game.lua").IsRestricted
 local UnitQueueDataToCommand = CommandUtils.UnitQueueDataToCommand
 local PopulateLocation = CommandUtils.PopulateLocation
 
@@ -135,7 +136,7 @@ local function UpgradeAndPauseExtractor(extractor, preference)
     end
 
     local upgradeTo = extractor.Blueprint.General.UpgradesTo
-    if not upgradeTo or upgradeTo == '' or Game.IsRestricted(upgradeTo, extractor.Army) then
+    if not upgradeTo or upgradeTo == '' or GameIsRestricted(upgradeTo, extractor.Army) then
         return
     end
 
