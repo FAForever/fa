@@ -44,6 +44,7 @@ local IssueClearCommands = IssueClearCommands
 local IssueBuildMobile = IssueBuildMobile
 local IssueAggressiveMove = IssueAggressiveMove
 local IssueGuard = IssueGuard
+local IssueUpgrade = IssueUpgrade
 local IssueFerry = IssueFerry
 
 local GetCurrentCommandSourceArmy = SimUtils.GetCurrentCommandSourceArmy
@@ -111,8 +112,40 @@ end
 Callbacks.EmptyCallback = function(data, units)
 end
 
---- Prints a diagnostic when a guard order targets a completed mass storage.
----@param data { Target: EntityId, RequestId: number }
+---@param extractor Unit
+---@param preference string
+local function UpgradeAndPauseExtractor(extractor, preference)
+    local shouldUpgrade =
+        preference == 'Tech1Tech2Extractors'
+        or (preference == 'Tech1Extractors' and EntityCategoryContains(categories.TECH1, extractor))
+
+    if not shouldUpgrade
+        or not OkayToMessWithArmy(extractor.Army)
+        or extractor:IsUnitState('Upgrading')
+        or extractor:GetFocusUnit()
+    then
+        return
+    end
+
+    local upgradeTo = extractor.Blueprint.General.UpgradesTo
+    if not upgradeTo or upgradeTo == '' or Game.IsRestricted(upgradeTo, extractor.Army) then
+        return
+    end
+
+    if extractor:IsPaused() then
+        extractor:SetPaused(false)
+    end
+
+    IssueUpgrade({ extractor }, upgradeTo)
+    WaitTicks(5)
+
+    if not extractor.Dead then
+        extractor:SetPaused(true)
+    end
+end
+
+--- Redirects a guard order on a completed mass storage to its adjacent extractor.
+---@param data { Target: EntityId, UpgradePreference: string }
 Callbacks.ValidateMassStorageAssist = function(data, units)
     local target = data and GetEntityById(data.Target)
     if IsEntity(target)
@@ -202,16 +235,7 @@ Callbacks.ValidateMassStorageAssist = function(data, units)
             end
 
             IssueGuard(assistingUnits, extractor)
-
-            local commandSourceArmy = GetCurrentCommandSourceArmy()
-            if commandSourceArmy and data.RequestId then
-                Sync.MassStorageAssistRedirect = Sync.MassStorageAssistRedirect or {}
-                TableInsert(Sync.MassStorageAssistRedirect, {
-                    Army = commandSourceArmy,
-                    RequestId = data.RequestId,
-                    Extractor = extractor.EntityId,
-                })
-            end
+            ForkThread(UpgradeAndPauseExtractor, extractor, data.UpgradePreference)
         end
     end
 end
