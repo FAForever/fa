@@ -574,7 +574,8 @@ local function OnGuardIssued(command)
         local unit = GetUnitById(command.Target.EntityId) ---@cast unit UserUnit
         local guards = command.Units
 
-        if EntityCategoryContains(categoriesMassStorage, unit) then
+        local assistToStorage = Prefs.GetFieldFromCurrentProfile('options').assist_to_storage
+        if assistToStorage == 'On' and EntityCategoryContains(categoriesMassStorage, unit) then
             massStorageAssistRequestId = massStorageAssistRequestId + 1
             local requestArmy = GetFocusArmy()
             local requestKey = GetMassStorageAssistRequestKey(requestArmy, massStorageAssistRequestId)

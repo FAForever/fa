@@ -1,1 +1,1 @@
-- Redirect assist orders issued on completed mass storages to their adjacent T1 or T2 mass extractor while preserving shared command queues and extractor auto-upgrade behavior (#7338).
+- Add an option to redirect assist orders issued on completed mass storages to their adjacent T1 or T2 mass extractor while preserving shared command queues and extractor auto-upgrade behavior (#7338).
