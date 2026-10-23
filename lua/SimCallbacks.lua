@@ -21,7 +21,6 @@ local ScenarioFramework = import("/lua/scenarioframework.lua")
 local CommandUtils = import("/lua/sim/commands/shared.lua")
 local GameIsRestricted = import("/lua/game.lua").IsRestricted
 local UnitQueueDataToCommand = CommandUtils.UnitQueueDataToCommand
-local PopulateLocation = CommandUtils.PopulateLocation
 
 -- upvalue table operations for performance
 local TableInsert = table.insert
@@ -153,7 +152,7 @@ local function UpgradeAndPauseExtractor(extractor, preference)
 end
 
 --- Redirects a guard order on a completed mass storage to its adjacent extractor.
----@param data { Target: EntityId, UpgradePreference: string }
+---@param data { CommandId: number, Target: EntityId, UpgradePreference: string }
 Callbacks.ValidateMassStorageAssist = function(data, units)
     local target = data and GetEntityById(data.Target)
     if IsEntity(target)
@@ -178,75 +177,38 @@ Callbacks.ValidateMassStorageAssist = function(data, units)
             -- print('found adjacent t1/t2 mass extractor: ' .. tostring(extractor.EntityId))
 
             local assistingUnits = SecureUnits(units)
-            local referenceQueue
-            local queueCount
+            if type(data.CommandId) ~= 'number' then
+                return
+            end
 
             for _, unit in assistingUnits do
                 local queue = unit:GetCommandQueue()
                 local unitQueueCount = TableGetn(queue)
                 local lastCommand = queue[unitQueueCount]
 
-                -- Confirm the final queued guard still targets the storage that triggered this
-                -- callback before clearing and rebuilding the queue.
+                -- Keep the original order in place until every unit has been validated. The UI
+                -- later deletes this exact shared command by ID, so no queue reconstruction is
+                -- needed and all preceding group orders retain their original engine identity.
                 if not lastCommand
                     or (lastCommand.commandType ~= 9 and lastCommand.commandType ~= 15)
                     or (lastCommand.target ~= target and lastCommand.targetId ~= target.EntityId)
                 then
                     return
                 end
-
-                if not referenceQueue then
-                    referenceQueue = queue
-                    queueCount = unitQueueCount
-                elseif unitQueueCount ~= queueCount then
-                    return
-                else
-                    -- Only rebuild the queue when every assisting unit has the same commands and
-                    -- targets. Replaying matching queues for the entire selection preserves shared
-                    -- group orders; replaying each unit separately would create individual assist
-                    -- orders and duplicate command lines in the UI.
-                    for index = 1, queueCount do
-                        local order = queue[index]
-                        local referenceOrder = referenceQueue[index]
-                        if order.commandType ~= referenceOrder.commandType
-                            or order.target ~= referenceOrder.target
-                            or order.targetId ~= referenceOrder.targetId
-                            or order.blueprintId ~= referenceOrder.blueprintId
-                            or order.x ~= referenceOrder.x
-                            or order.y ~= referenceOrder.y
-                            or order.z ~= referenceOrder.z
-                        then
-                            return
-                        end
-                    end
-                end
             end
 
-            if not referenceQueue then
+            if TableEmpty(assistingUnits) then
                 return
             end
 
-            -- Do not disturb queues containing commands that cannot be reconstructed.
-            for index = 1, queueCount - 1 do
-                local commandInfo = UnitQueueDataToCommand[referenceQueue[index].commandType]
-                if not commandInfo or not commandInfo.Callback then
-                    return
-                end
-            end
-
-            IssueClearCommands(assistingUnits)
-
-            for index = 1, queueCount - 1 do
-                local order = referenceQueue[index]
-                local issueOrder = UnitQueueDataToCommand[order.commandType].Callback
-                if order.commandType == 8 then
-                    issueOrder(assistingUnits, PopulateLocation(order, {}), order.blueprintId, {})
-                else
-                    issueOrder(assistingUnits, order.target or PopulateLocation(order, {}))
-                end
-            end
-
             IssueGuard(assistingUnits, extractor)
+
+            Sync.MassStorageAssistRedirects = Sync.MassStorageAssistRedirects or {}
+            TableInsert(Sync.MassStorageAssistRedirects, {
+                Army = GetCurrentCommandSourceArmy(),
+                CommandId = data.CommandId,
+            })
+
             ForkThread(UpgradeAndPauseExtractor, extractor, data.UpgradePreference)
         end
     end

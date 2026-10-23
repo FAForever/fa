@@ -22,6 +22,7 @@ local IsKeyDown = IsKeyDown
 local GetUnitById = GetUnitById
 local IsDestroyed = IsDestroyed
 local SimCallback = SimCallback
+local DeleteCommand = DeleteCommand
 local EntityCategoryContains = EntityCategoryContains
 local EntityCategoryFilterDown = EntityCategoryFilterDown
 local AddCommandFeedbackBlip = AddCommandFeedbackBlip
@@ -348,6 +349,21 @@ local categoriesShields = categories.MOBILE * categories.SHIELD
 local categoriesStructure = categories.STRUCTURE
 local categoriesMassStorage = categories.MASSSTORAGE
 
+-- The sim confirms that the storage assist can be redirected before asking the
+-- issuing UI to remove the original command by its shared player-command ID.
+AddOnSyncHashedCallback(
+    function(redirects)
+        local focusArmy = GetFocusArmy()
+        for _, redirect in redirects do
+            if redirect.Army == focusArmy then
+                DeleteCommand(redirect.CommandId)
+            end
+        end
+    end,
+    'MassStorageAssistRedirects',
+    'CommandModeMassStorageAssist'
+)
+
 -- Keep this behavior synchronized with the mass-storage assist upgrade path in
 -- `Callbacks.ValidateMassStorageAssist` in `/lua/SimCallbacks.lua`.
 --
@@ -545,14 +561,40 @@ local function OnGuardIssued(command)
         local guards = command.Units
 
         local assistToStorage = Prefs.GetFieldFromCurrentProfile('options').assist_to_storage
-        if assistToStorage == 'On' and EntityCategoryContains(categoriesMassStorage, unit) then
-            SimCallback({
-                Func = 'ValidateMassStorageAssist',
-                Args = {
-                    Target = command.Target.EntityId,
-                    UpgradePreference = Prefs.GetFieldFromCurrentProfile('options').assist_to_upgrade,
-                },
-            }, true)
+        if assistToStorage == 'On'
+            and EntityCategoryContains(categoriesMassStorage, unit)
+            and unit:GetFractionComplete() == 1
+        then
+            local commandId
+            for _, guard in guards do
+                local queue = guard:GetCommandQueue()
+                local lastCommand = queue[TableGetN(queue)]
+                if not lastCommand or not lastCommand.ID then
+                    commandId = nil
+                    break
+                end
+
+                if commandId and commandId ~= lastCommand.ID then
+                    commandId = nil
+                    break
+                end
+
+                commandId = lastCommand.ID
+            end
+
+            -- A single ID means the engine stored this as one shared group order.
+            -- The sim callback keeps that order available for validation, appends
+            -- the replacement guard, then syncs the ID back for targeted deletion.
+            if commandId then
+                SimCallback({
+                    Func = 'ValidateMassStorageAssist',
+                    Args = {
+                        CommandId = commandId,
+                        Target = command.Target.EntityId,
+                        UpgradePreference = Prefs.GetFieldFromCurrentProfile('options').assist_to_upgrade,
+                    },
+                }, true)
+            end
         end
 
         if unit:GetArmy() == GetFocusArmy() then
