@@ -501,19 +501,6 @@ options = {
             -- },
 
             {
-                title = "<LOC ASSIST_TO_STORAGE>Redirect mass storage assist orders",
-                key = 'assist_to_storage',
-                type = 'toggle',
-                default = 'Off',
-                custom = {
-                    states = {
-                        { text = "<LOC _Off>Off", key = 'Off' },
-                        { text = "<LOC _On>On", key = 'On' },
-                    },
-                },
-            },
-
-            {
                 title = "<LOC ASSIST_TO_UPGRADE_MASS>Assist to upgrade mass extractors",
                 key = 'assist_to_upgrade',
                 type = 'toggle',
@@ -703,6 +690,19 @@ options = {
                         { text = "<LOC LAUNCH_IGNORE_SELECTION_UNLESS_CTRL>Unless holding control",  key = 'unless_ctrl' },
                         { text = "<LOC LAUNCH_IGNORE_SELECTION_WITH_CTRL>Only when holding control", key = 'with_ctrl' },
                         { text = "<LOC LAUNCH_IGNORE_SELECTION_NEVER>Never",                         key = 'never' },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC ASSIST_TO_STORAGE>Redirect mass storage assist orders",
+                key = 'assist_to_storage',
+                type = 'toggle',
+                default = 'Off',
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>Off", key = 'Off' },
+                        { text = "<LOC _On>On", key = 'On' },
                     },
                 },
             },
