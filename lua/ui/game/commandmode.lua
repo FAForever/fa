@@ -348,6 +348,13 @@ local categoriesShields = categories.MOBILE * categories.SHIELD
 local categoriesStructure = categories.STRUCTURE
 local categoriesMassStorage = categories.MASSSTORAGE
 
+-- Keep this behavior synchronized with the mass-storage assist upgrade path in
+-- `Callbacks.ValidateMassStorageAssist` in `/lua/SimCallbacks.lua`.
+--
+-- The logic is intentionally duplicated because direct assist orders are handled
+-- in the user layer, while mass-storage redirects resolve their adjacent extractor
+-- in the simulation layer. Changes to upgrade eligibility, timing, or pause behavior
+-- must be applied to both implementations.
 ---@param unit UserUnit
 local function UpgradeUnit(unit)
     -- do not upgrade units that are already upgrading

@@ -112,6 +112,13 @@ end
 Callbacks.EmptyCallback = function(data, units)
 end
 
+-- Keep this behavior synchronized with `OnGuardUpgrade` and `UpgradeUnit` in
+-- `/lua/ui/game/commandmode.lua`.
+--
+-- The logic is intentionally duplicated because direct assist orders are handled
+-- in the user layer, while mass-storage redirects resolve their adjacent extractor
+-- in the simulation layer. Changes to upgrade eligibility, timing, or pause behavior
+-- must be applied to both implementations.
 ---@param extractor Unit
 ---@param preference string
 local function UpgradeAndPauseExtractor(extractor, preference)
