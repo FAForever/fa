@@ -1,0 +1,30 @@
+-- A mote swirling into the held Emissary shell (uab2302), moved by the shell script. Drawn as a glowing point
+-- (three crossed squares textured with a soft glow, made by gen_mote_mesh.py) with SonanceFade (unlit
+-- and additive, defined in effects/mesh.fx), so that it can fade in: the draw scale carries its fade and size, set
+-- by the shell script. It starts fully faded out (10) at a size of 0.2
+ProjectileBlueprint{
+    Display = {
+        Mesh = {
+            LODs = {
+                {
+                    LODCutoff = 400,
+                    ShaderName = "SonanceFade",
+                    MeshName = "/effects/Entities/AIFSonanceVortexMote01/AIFSonanceVortexMote01_lod0.scm",
+                    AlbedoName = "/textures/particles/glow_02.dds",
+                },
+            },
+        },
+        UniformScale = 10.2,
+    },
+    Physics = {
+        CollideEntity = false,
+        CollideSurface = false,
+        DestroyOnWater = false,
+        InitialSpeed = 0,
+        Lifetime = 15,
+        RotationalVelocity = 0,
+        RotationalVelocityRange = 0,
+        UseGravity = false,
+        VelocityAlign = false,
+    },
+}

@@ -1,0 +1,156 @@
+-- used by uab2302 : the streak of the trail of the shell, growing back up the path of the held shell
+EmitterBlueprint {
+	BlueprintId = 'aeon_sonance_drill_thrust_01',
+	Lifetime = 35.00,
+	Repeattime = 35.00,
+	TextureFramecount = 1.00,
+	Blendmode = 3.00,
+	LocalVelocity = false,
+	LocalAcceleration = false,
+	Gravity = false,
+	AlignRotation = true,
+	AlignToBone = false,
+	Flat = false,
+	LODCutoff = -1.00,
+	EmitIfVisible = true,
+	CatchupEmit = true,
+	CreateIfVisible = false,
+	SnapToWaterline = false,
+	OnlyEmitOnWater = false,
+	ParticleResistance = false,
+	InterpolateEmission = true,
+	TextureStripcount = 1.00,
+	SortOrder = 0.00,
+	LowFidelity = true,
+	MedFidelity = true,
+	HighFidelity = true,
+	Texture = '/textures/particles/muzzle_flash_add_03.dds',
+	RampTexture = '/textures/particles/aeon_sonance_ramp_thrust_01.dds',
+	XDirectionCurve = {
+		XRange = 35.00,
+		Keys = {
+			{ x=17.500,y=0.000,z=0.000 },
+		},
+	},
+	YDirectionCurve = {
+		XRange = 35.00,
+		Keys = {
+			{ x=17.500,y=1.000,z=0.000 },
+		},
+	},
+	ZDirectionCurve = {
+		XRange = 35.00,
+		Keys = {
+			{ x=17.500,y=0.000,z=0.000 },
+		},
+	},
+	EmitRateCurve = {
+		XRange = 35.00,
+		Keys = {
+			{ x=17.500,y=4.000,z=0.000 },
+		},
+	},
+	LifetimeCurve = {
+		XRange = 35.00,
+		Keys = {
+			{ x=17.500,y=10.000,z=0.000 },
+		},
+	},
+	VelocityCurve = {
+		XRange = 35.00,
+		Keys = {
+			{ x=0.000,y=0.050,z=0.000 },
+			{ x=35.000,y=1.000,z=0.000 },
+		},
+	},
+	XAccelCurve = {
+		XRange = 35.00,
+		Keys = {
+			{ x=17.500,y=0.000,z=0.000 },
+		},
+	},
+	YAccelCurve = {
+		XRange = 35.00,
+		Keys = {
+			{ x=17.500,y=0.000,z=0.000 },
+		},
+	},
+	ZAccelCurve = {
+		XRange = 35.00,
+		Keys = {
+			{ x=17.500,y=0.000,z=0.000 },
+		},
+	},
+	ResistanceCurve = {
+		XRange = 35.00,
+		Keys = {
+			{ x=17.500,y=0.000,z=0.000 },
+		},
+	},
+	SizeCurve = {
+		XRange = 35.00,
+		Keys = {
+			{ x=17.500,y=0.000,z=0.000 },
+		},
+	},
+	XPosCurve = {
+		XRange = 35.00,
+		Keys = {
+			{ x=17.500,y=0.000,z=0.000 },
+		},
+	},
+	YPosCurve = {
+		XRange = 35.00,
+		Keys = {
+			{ x=17.500,y=0.000,z=0.000 },
+		},
+	},
+	ZPosCurve = {
+		XRange = 35.00,
+		Keys = {
+			{ x=17.500,y=0.000,z=0.000 },
+		},
+	},
+	StartSizeCurve = {
+		XRange = 35.00,
+		Keys = {
+			{ x=17.500,y=1.000,z=0.000 },
+		},
+	},
+	EndSizeCurve = {
+		XRange = 35.00,
+		Keys = {
+			{ x=17.500,y=2.000,z=0.500 },
+		},
+	},
+	InitialRotationCurve = {
+		XRange = 35.00,
+		Keys = {
+			{ x=17.500,y=180.000,z=360.000 },
+		},
+	},
+	RotationRateCurve = {
+		XRange = 35.00,
+		Keys = {
+			{ x=17.500,y=0.000,z=60.000 },
+		},
+	},
+	FrameRateCurve = {
+		XRange = 35.00,
+		Keys = {
+			{ x=17.500,y=1.000,z=0.000 },
+		},
+	},
+	TextureSelectionCurve = {
+		XRange = 35.00,
+		Keys = {
+			{ x=17.500,y=0.000,z=0.000 },
+		},
+	},
+	RampSelectionCurve = {
+		XRange = 35.00,
+		Keys = {
+			{ x=17.500,y=0.500,z=1.000 },
+		},
+	},
+}
