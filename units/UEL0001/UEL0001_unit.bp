@@ -314,6 +314,7 @@ UnitBlueprint{
             Icon = "hamc",
             Name = "<LOC enhancements_0041>Zephyr Amplifier",
             NewMaxRadius = 30,
+            NewMuzzleBone = "Right_Upgrade_Muzzle",
             ShowBones = { "Right_Upgrade" },
             Slot = "RCH",
             UpgradeEffectBones = {
