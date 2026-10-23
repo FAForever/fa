@@ -1,8 +1,8 @@
 local UIUtil = import("/lua/ui/uiutil.lua")
+local DiskGetFileInfo = UIUtil.DiskGetFileInfo
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
-local GameCommon = import("/lua/ui/game/gamecommon.lua")
 local ItemList = import("/lua/maui/itemlist.lua").ItemList
 local Prefs = import("/lua/user/prefs.lua")
 local options = Prefs.GetFromCurrentProfile('options')
@@ -11,6 +11,7 @@ local WrapText = import("/lua/maui/text.lua").WrapText
 local armorDefinition = import("/lua/armordefinition.lua").armordefinition
 
 local controls = import("/lua/ui/controls.lua").Get()
+local SacuLoadout = import("/lua/ui/game/sacuLoadout.lua")
 
 local MathFloor = math.floor
 
@@ -86,7 +87,7 @@ function ShowView(showUpKeep, enhancement, showecon, showShield)
     end
 end
 
-function ShowEnhancement(bp, bpID, iconID, iconPrefix, userUnit)
+function ShowEnhancement(bp, bpID, iconID, iconPrefix, userUnit, disabledInGateway)
     if not CheckFormat() then
         View:Hide()
         return
@@ -135,11 +136,17 @@ function ShowEnhancement(bp, bpID, iconID, iconPrefix, userUnit)
     end
 
     if View.Description then
-        -- If enhancement of preset, then remove extension. (ual0301_Engineer -> ual0301)
-        if string.find(bpID, '_') then
-            bpID = string.sub(bpID, 1, string.find(bpID, "_[^_]*$")-1)
+        if disabledInGateway then
+            -- Shows the gateway-disabled message instead of the description.
+            CreateLines(View.Description, {{color = UIUtil.fontColor,
+                lines = WrapText(LOC('<LOC sacu_gateway_disabled_tooltip>This cannot be built in from the gateway.'), View.Description.Value[1].Width(), function(text)
+                    return View.Description.Value[1]:GetStringAdvance(text)
+                end)}})
+        else
+            local unitBp = __blueprints[bpID]
+            bpID = unitBp and unitBp.BaseBlueprintId or bpID
+            WrapAndPlaceText(nil, nil, bpID.."-"..iconID, View.Description)
         end
-        WrapAndPlaceText(nil, nil, bpID.."-"..iconID, View.Description)
     end
 
     local showShield = false
@@ -881,8 +888,12 @@ function Show(bp, builderUnit, bpID)
         View.ShieldStat.Value:SetText(bp.Defense.Shield.ShieldMaxHealth)
     end
 
-    local iconName = GameCommon.GetCachedUnitIconFileNames(bp)
-    View.UnitImg:SetTexture(iconName)
+    local iconId = SacuLoadout.UnitBuildIconId(bp.BlueprintId)
+    if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. iconId .. '_icon.dds', true)) then
+        View.UnitImg:SetTexture(UIUtil.UIFile('/icons/units/' .. iconId .. '_icon.dds', true))
+    else
+        View.UnitImg:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
+    end
     LayoutHelpers.SetDimensions(View.UnitImg, 46, 46)
 
     ShowView(showUpKeep, false, showecon, showShield)

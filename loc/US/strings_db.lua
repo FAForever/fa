@@ -87,6 +87,50 @@ xsl0301_Rambo_desc="SACU (Rambo Preset)"
 xsl0301_Rambo_help="Enhanced during construction with the Personal Shield Generator, Nano-Repair System and Overcharge."
 xsl0301_Rambo_name=""
 
+--SACU Loadout Short Names (Custom SACU's PR)
+--Aeon
+sacu_short_ual_engineeringfocusingmodule="Fab"
+sacu_short_ual_resourceallocation="RAS"
+sacu_short_ual_sacrifice="Sacrifice"
+sacu_short_ual_shield="Shield"
+sacu_short_ual_shieldheavy="HeavyShield"
+sacu_short_ual_stabilitysuppressant="Reacton"
+sacu_short_ual_systemintegritycompensator="Nano"
+sacu_short_ual_teleporter="Teleport"
+
+--UEF
+sacu_short_uel_advancedcoolingupgrade="Energy"
+sacu_short_uel_highexplosiveordnance="Plasma"
+sacu_short_uel_pod="Drone"
+sacu_short_uel_radarjammer="Jammer"
+sacu_short_uel_resourceallocation="RAS"
+sacu_short_uel_sensorrangeenhancer="Sensor"
+sacu_short_uel_shield="Shield"
+sacu_short_uel_shieldgeneratorfield="ShieldField"
+
+--Cybran
+sacu_short_url_cloakinggenerator="Cloak"
+sacu_short_url_empcharge="EMP"
+sacu_short_url_focusconvertor="Amp"
+sacu_short_url_nanitemissilesystem="AA"
+sacu_short_url_resourceallocation="RAS"
+sacu_short_url_selfrepairsystem="Nano"
+sacu_short_url_stealthgenerator="Stealth"
+sacu_short_url_switchback="Fab"
+
+--Seraphim
+sacu_short_xsl_damagestabilization="Nano"
+sacu_short_xsl_engineeringthroughput="Fab"
+sacu_short_xsl_enhancedsensors="Sensor"
+sacu_short_xsl_missile="Missile"
+sacu_short_xsl_overcharge="OC"
+sacu_short_xsl_shield="Shield"
+sacu_short_xsl_teleporter="Teleport"
+
+sacu_gateway_disabled_tooltip="This cannot be built in from the gateway."
+tooltipui2002="Queue SACU loadout"
+tooltipui2003="Queue a SACU with the upgrades selected on the enhancement tab. Shift-click queues 5."
+
 A02_M01_OBJ_010_113="(%s%%/%s%%)"
 Abasi="Abasi"
 Aeon="Aeon"
