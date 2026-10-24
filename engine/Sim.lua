@@ -1128,7 +1128,7 @@ end
 --- Skips dead units, units being built, units that can't move, and allies of the instigator unless `damageFriendly` is
 --- true. Also skips units inside an enemy shield that the radius overlaps, unless that shield contains `location`
 ---@see moho.unit_methods.OnMotionStateChange # Called with `"Ballistic"` when the fall starts
----@see moho.entity_methods.AddWorldImpulse # How the engine calculates a unit's mass
+---@see EntityBlueprint.InertiaTensorX # How mass and size limit the spin
 ---@see moho.unit_methods.OnImpact # Called when a unit lands dead
 ---@param instigator Unit | Projectile | nil
 ---@param location Vector
