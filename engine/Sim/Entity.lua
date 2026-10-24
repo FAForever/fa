@@ -59,7 +59,8 @@ end
 
 --- Applies the impulse `I` at the point `P`, both in world space, to the entity's physics body. Adds `I` divided by the mass
 --- to the body's velocity, and the cross product of `P` minus the body's center with `I` to its angular momentum, so a point
---- off the center also spins the body. Does nothing to an entity without a physics body, such as a plain Lua `Entity`.
+--- off the center also spins the body. Only mobile units have a physics body, created with their movement. On structures,
+--- props, projectiles and plain Lua entities, it does nothing.
 --- Only the flight of air units reads the body's velocity, so the impulse pushes and spins flying air units until their
 --- flight control corrects it. A falling unit only reads the body's spin, and only while it has a random spin from `MetaImpact`.
 --- A unit's mass is `AverageDensity` times `SizeX`, `SizeY` and `SizeZ`, and FAF sets `AverageDensity` to `MaxHealth`, so scale
