@@ -1936,6 +1936,18 @@ float3 applyPbrShading(VS_OUTPUT inV, float2 waterDepth, float4 albedo, float3 n
     return color;
 }
 
+// Terrain400: the macrotexture's opacity scaled down by the share of layers it leaves uncovered
+float3 blendMacrotexture (float2 position, uniform float macrotextureblend, float3 albedo, float uncovered) {
+    float4 macrotexture = tex2D(LowerAlbedoSampler, position.xy * LowerAlbedoTile.xy);
+    float opacity = macrotexture.a * (1 - uncovered);
+    if (macrotextureblend == 1) {
+        albedo = lerp(albedo, macrotexture.rgb, opacity);
+    } else if (macrotextureblend == 2) {
+        albedo = lerp(albedo, 2 * macrotexture.rgb * albedo, opacity);
+    }
+    return albedo;
+}
+
 float3 blendMacrotexture (float2 position, uniform float macrotextureblend, float3 albedo) {
     if (macrotextureblend == 1) {
         float4 macrotexture = tex2D(LowerAlbedoSampler, position.xy * LowerAlbedoTile.xy);
@@ -3484,16 +3496,20 @@ float2 secondTriplanarUV(TriplanarSelection selection, float2 topUV) {
 // SpecularColor.r is the height transition: 0 cuts hard, larger values blend softer.
 // Unlike Terrain200 no stratum is sampled rotated; the shaders need those registers.
 // The texture layout is that of Terrain200, except that each stratum carries its height in the
-// alpha of both its albedo and its normal map; the atlas in the upper slot only supplies the roughness.
+// alpha of both its albedo and its normal map. The atlas in the upper slot supplies the roughness, and in
+// the channel that used to hold the height how far the macrotexture leaves the layer uncovered: 0 covers it
+// as usual, 1 keeps the macrotexture off it entirely. The share is taken after the height blend, so on
+// a stratum of pebbles with 1 the macrotexture recedes exactly where a pebble wins and stays on the ground
+// between them.
 // The lower layer has a fixed height of 0.5: its albedo alpha stays the macrotexture's opacity.
 // In the T variants Stratum2 and Stratum3 use triplanar mapping (selectTriplanarProjections).
 
-// Roughness of a layer from the height and roughness atlas. It is always read from the top mip:
+// Roughness (x) and macrotexture uncovering (y) of a layer from the atlas. It is always read from the top mip:
 // with ps_2_a's few registers there is no room for the gradient reads atlas2D() makes, and an
 // implicit mip would jump at every tile border, where frac() breaks the derivatives.
-float layerRoughness(float2 uv, uniform float2 offset, uniform bool firstBatch) {
+float2 layerAtlas(float2 uv, uniform float2 offset, uniform bool firstBatch) {
     float4 r = tex2Dbias(UpperAlbedoSampler, float4(frac(uv) / 4 + offset + 0.125, 0, -16));
-    return firstBatch ? r.x : r.z;
+    return firstBatch ? r.xy : r.zw;
 }
 
 // Turns the masks into the weights of the lower layer and the seven strata
@@ -3598,15 +3614,16 @@ float4 Terrain400AlbedoPS ( VS_OUTPUT inV, uniform bool triplanar, uniform float
     albedo.rgb = lowerAlbedo.rgb * weightsA.x + stratum0Albedo.rgb * weightsA.y + stratum1Albedo.rgb * weightsA.z + stratum2Albedo.rgb * weightsA.w
                + stratum3Albedo.rgb * weightsB.x + stratum4Albedo.rgb * weightsB.y + stratum5Albedo.rgb * weightsB.z + stratum6Albedo.rgb * weightsB.w;
     // the roughness of the triplanar strata is read from above, like their atlas layout
-    albedo.a = weightsA.x * layerRoughness(position.xy * LowerAlbedoTile.xy,    float2(0.0, 0.0), true)
-             + weightsA.y * layerRoughness(position.xy * inV.nearScales.xx,     float2(0.5, 0.0), true)
-             + weightsA.z * layerRoughness(position.xy * inV.nearScales.yy,     float2(0.0, 0.5), true)
-             + weightsA.w * layerRoughness(position.xy * inV.nearScales.zz,     float2(0.5, 0.5), true)
-             + weightsB.x * layerRoughness(position.xy * inV.nearScales.ww,     float2(0.0, 0.0), false)
-             + weightsB.y * layerRoughness(position.xy * Stratum4AlbedoTile.xy, float2(0.5, 0.0), false)
-             + weightsB.z * layerRoughness(position.xy * Stratum5AlbedoTile.xy, float2(0.0, 0.5), false)
-             + weightsB.w * layerRoughness(position.xy * Stratum6AlbedoTile.xy, float2(0.5, 0.5), false);
-    albedo.rgb = blendMacrotexture(position.xy, macrotextureblend, albedo.rgb);
+    float2 atlas = weightsA.x * layerAtlas(position.xy * LowerAlbedoTile.xy,    float2(0.0, 0.0), true)
+                 + weightsA.y * layerAtlas(position.xy * inV.nearScales.xx,     float2(0.5, 0.0), true)
+                 + weightsA.z * layerAtlas(position.xy * inV.nearScales.yy,     float2(0.0, 0.5), true)
+                 + weightsA.w * layerAtlas(position.xy * inV.nearScales.zz,     float2(0.5, 0.5), true)
+                 + weightsB.x * layerAtlas(position.xy * inV.nearScales.ww,     float2(0.0, 0.0), false)
+                 + weightsB.y * layerAtlas(position.xy * Stratum4AlbedoTile.xy, float2(0.5, 0.0), false)
+                 + weightsB.z * layerAtlas(position.xy * Stratum5AlbedoTile.xy, float2(0.0, 0.5), false)
+                 + weightsB.w * layerAtlas(position.xy * Stratum6AlbedoTile.xy, float2(0.5, 0.5), false);
+    albedo.a = atlas.x;
+    albedo.rgb = blendMacrotexture(position.xy, macrotextureblend, albedo.rgb, atlas.y);
 
     float waterDepth = tex2D(Stratum7AlbedoSampler, position).r;
     float3 color = applyPbrShading(inV, waterDepth, albedo, normal, mask1.w);
