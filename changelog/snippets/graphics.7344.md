@@ -1,1 +1,1 @@
-- Add the Terrain400 terrain shaders, which blend all strata at once by height, with triplanar variants for Stratum2 and Stratum3 (#7344).
+- Add new terrain shaders for mappers: terrain textures blend by height, so rock, sand and grass meet in crisp, natural edges, and cliff textures can wrap around steep slopes without stretching. Existing maps look the same (#7344).
