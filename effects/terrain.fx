@@ -3429,8 +3429,8 @@ technique Terrain252B <
     }
 }
 
-// Triplanar mapping, used by the T variants of Terrain400 for Stratum2 and Stratum3. Flat
-// ground samples them from above, steep ground from the sides like Terrain200B. Unlike the
+// Triplanar mapping, used by the T variants of Terrain200, 250 and 400 for Stratum2 and Stratum3.
+// Flat ground samples them from above, steep ground from the sides like Terrain200B. Unlike the
 // biplanar shaders, these two strata can therefore hold any texture, not only cliffs.
 // Like the biplanar shaders, they need the map-wide normal map in Stratum7.
 
@@ -3482,6 +3482,249 @@ float2 secondTriplanarUV(TriplanarSelection selection, float2 topUV) {
     return lerp(selection.sideUV.zw, topUV, selection.topSecond);
 }
 
+float4 Terrain200TNormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
+{
+    // height is now in the z coordinate
+    float3 position = TerrainScale.xxx * inV.mTexWT;
+    // 30° rotation
+    float2x2 rotationMatrix = float2x2(float2(SpecularColor.b, -SpecularColor.a), float2(SpecularColor.a, SpecularColor.b));
+    float2 rotated_pos = mul(position.xy, rotationMatrix);
+
+    float4 mask0 = tex2D(UtilitySamplerA, position.xy);
+    float4 mask1 = tex2D(UtilitySamplerB, position.xy);
+
+    if (halfRange) {
+        mask0 = saturate(mask0 * 2 - 1);
+        mask1 = saturate(mask1 * 2 - 1);
+    }
+
+    float3 lowerNormal    = normalize(tex2D(LowerNormalSampler,    position.xy * LowerNormalTile.xy   ).rgb * 2 - 1);
+    float3 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, rotated_pos * Stratum0AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum1Normal = normalize(tex2D(Stratum1NormalSampler, position.xy * Stratum1AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum4Normal = normalize(tex2D(Stratum4NormalSampler, rotated_pos * Stratum4AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum5Normal = normalize(tex2D(Stratum5NormalSampler, position.xy * Stratum5AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum6Normal = normalize(tex2D(Stratum6NormalSampler, rotated_pos * Stratum6AlbedoTile.xy).rgb * 2 - 1);
+
+    // We need to rotate the normal vectors back.
+    stratum0Normal.xy = mul(rotationMatrix, stratum0Normal.xy);
+    stratum4Normal.xy = mul(rotationMatrix, stratum4Normal.xy);
+    stratum6Normal.xy = mul(rotationMatrix, stratum6Normal.xy);
+
+    float stratum0Height = sampleHeight(rotated_pos, Stratum0AlbedoTile.xy, Stratum0NormalTile.xy, float2(0.5, 0.0), true);
+    float stratum1Height = sampleHeight(position.xy, Stratum1AlbedoTile.xy, Stratum1NormalTile.xy, float2(0.0, 0.5), true);
+    float stratum4Height = sampleHeight(rotated_pos, Stratum4AlbedoTile.xy, Stratum4NormalTile.xy, float2(0.5, 0.0), false);
+    float stratum5Height = sampleHeight(position.xy, Stratum5AlbedoTile.xy, Stratum5NormalTile.xy, float2(0.0, 0.5), false);
+    float stratum6Height = sampleHeight(rotated_pos, Stratum6AlbedoTile.xy, Stratum6NormalTile.xy, float2(0.5, 0.5), false);
+
+    TriplanarSelection triplanar = selectTriplanarProjections(position);
+    float2 stratum2UV = secondTriplanarUV(triplanar, rotated_pos);
+    float2 stratum3UV = secondTriplanarUV(triplanar, position.xy);
+
+    float3 stratum2NormalA = normalize(tex2D(Stratum2NormalSampler, triplanar.sideUV.xy * Stratum2AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum2NormalB = normalize(tex2D(Stratum2NormalSampler, stratum2UV * Stratum2AlbedoTile.xy).rgb * 2 - 1);
+    // Only the top-down projection is rotated, so only it needs to be rotated back
+    stratum2NormalB.xy = lerp(stratum2NormalB.xy, mul(rotationMatrix, stratum2NormalB.xy), triplanar.topSecond);
+    float3 stratum2Normal = stratum2NormalA * triplanar.weights.x + stratum2NormalB * triplanar.weights.y;
+    float3 stratum3NormalA = normalize(tex2D(Stratum3NormalSampler, triplanar.sideUV.xy * Stratum3AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum3NormalB = normalize(tex2D(Stratum3NormalSampler, stratum3UV * Stratum3AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum3Normal = stratum3NormalA * triplanar.weights.x + stratum3NormalB * triplanar.weights.y;
+
+    float stratum2Height = triplanar.weights.x * sampleHeight(triplanar.sideUV.xy, Stratum2AlbedoTile.xy, Stratum2NormalTile.xy, float2(0.5, 0.5), true)
+                         + triplanar.weights.y * sampleHeight(stratum2UV,          Stratum2AlbedoTile.xy, Stratum2NormalTile.xy, float2(0.5, 0.5), true);
+    float stratum3Height = triplanar.weights.x * sampleHeight(triplanar.sideUV.xy, Stratum3AlbedoTile.xy, Stratum3NormalTile.xy, float2(0.0, 0.0), false)
+                         + triplanar.weights.y * sampleHeight(stratum3UV,          Stratum3AlbedoTile.xy, Stratum3NormalTile.xy, float2(0.0, 0.0), false);
+
+    float3 normal = lowerNormal;
+    normal = splatBlendNormal(normal, stratum0Normal, stratum0Height, mask0.x, SpecularColor.r);
+    normal = splatBlendNormal(normal, stratum1Normal, stratum1Height, mask0.y, SpecularColor.r);
+    normal = splatBlendNormal(normal, stratum2Normal, stratum2Height, mask0.z, SpecularColor.r);
+    normal = splatBlendNormal(normal, stratum3Normal, stratum3Height, mask0.w, SpecularColor.r);
+    normal = splatBlendNormal(normal, stratum4Normal, stratum4Height, mask1.x, SpecularColor.r);
+    normal = splatBlendNormal(normal, stratum5Normal, stratum5Height, mask1.y, SpecularColor.r);
+    normal = splatBlendNormal(normal, stratum6Normal, stratum6Height, mask1.z, SpecularColor.r);
+
+    return float4( 0.5 + 0.5 * normal.rgb, 1);
+}
+
+float4 Terrain200TAlbedoPS ( VS_OUTPUT inV, uniform bool halfRange, uniform float macrotextureblend ) : COLOR
+{
+    float3 position = TerrainScale.xxx * inV.mTexWT;
+    // 30° rotation
+    float2x2 rotationMatrix = float2x2(float2(SpecularColor.b, -SpecularColor.a), float2(SpecularColor.a, SpecularColor.b));
+    float2 rotated_pos = mul(position.xy, rotationMatrix);
+
+    // do arithmetics to get range from (0, 1) to (-1, 1) as normal maps store their values as (0, 1)
+    float3 normal = normalize(2 * SampleScreen(NormalSampler,inV.mTexSS).xyz - 1);
+
+    float4 mask0 = tex2D(UtilitySamplerA, position.xy);
+    float4 mask1 = tex2D(UtilitySamplerB, position.xy);
+
+    if (halfRange) {
+        mask0 = saturate(mask0 * 2 - 1);
+        // Don't touch the roughness mask
+        mask1.xyz = saturate(mask1.xyz * 2 - 1);
+    }
+
+    // This shader wouldn't compile because it would have to store too many variables if we didn't use this trick in the vertex shader
+    float4 lowerAlbedo =    sampleAlbedo(LowerAlbedoSampler,    position.xy, LowerAlbedoTile.xy,    float2(0.0, 0.0), true);
+    float4 stratum0Albedo = sampleAlbedo(Stratum0AlbedoSampler, rotated_pos, inV.nearScales.xx,     float2(0.5, 0.0), true);
+    float4 stratum1Albedo = sampleAlbedo(Stratum1AlbedoSampler, position.xy, inV.nearScales.yy,     float2(0.0, 0.5), true);
+    float4 stratum4Albedo = sampleAlbedo(Stratum4AlbedoSampler, rotated_pos, Stratum4AlbedoTile.xy, float2(0.5, 0.0), false);
+    float4 stratum5Albedo = sampleAlbedo(Stratum5AlbedoSampler, position.xy, Stratum5AlbedoTile.xy, float2(0.0, 0.5), false);
+    float4 stratum6Albedo = sampleAlbedo(Stratum6AlbedoSampler, rotated_pos, Stratum6AlbedoTile.xy, float2(0.5, 0.5), false);
+
+    float stratum0Height = sampleHeight(rotated_pos, inV.nearScales.xx,     inV.farScales.xx,      float2(0.5, 0.0), true);
+    float stratum1Height = sampleHeight(position.xy, inV.nearScales.yy,     inV.farScales.yy,      float2(0.0, 0.5), true);
+    float stratum4Height = sampleHeight(rotated_pos, Stratum4AlbedoTile.xy, Stratum4NormalTile.xy, float2(0.5, 0.0), false);
+    float stratum5Height = sampleHeight(position.xy, Stratum5AlbedoTile.xy, Stratum5NormalTile.xy, float2(0.0, 0.5), false);
+    float stratum6Height = sampleHeight(rotated_pos, Stratum6AlbedoTile.xy, Stratum6NormalTile.xy, float2(0.5, 0.5), false);
+
+    TriplanarSelection triplanar = selectTriplanarProjections(position);
+    float2 stratum2UV = secondTriplanarUV(triplanar, rotated_pos);
+    float2 stratum3UV = secondTriplanarUV(triplanar, position.xy);
+
+    float4 stratum2AlbedoA = sampleAlbedo(Stratum2AlbedoSampler, triplanar.sideUV.xy, inV.nearScales.zz, float2(0.5, 0.5), true);
+    float4 stratum2AlbedoB = sampleAlbedo(Stratum2AlbedoSampler, stratum2UV,          inV.nearScales.zz, float2(0.5, 0.5), true);
+    float4 stratum2Albedo = stratum2AlbedoA * triplanar.weights.x + stratum2AlbedoB * triplanar.weights.y;
+    float4 stratum3AlbedoA = sampleAlbedo(Stratum3AlbedoSampler, triplanar.sideUV.xy, inV.nearScales.ww, float2(0.0, 0.0), false);
+    float4 stratum3AlbedoB = sampleAlbedo(Stratum3AlbedoSampler, stratum3UV,          inV.nearScales.ww, float2(0.0, 0.0), false);
+    float4 stratum3Albedo = stratum3AlbedoA * triplanar.weights.x + stratum3AlbedoB * triplanar.weights.y;
+
+    float stratum2Height = triplanar.weights.x * sampleHeight(triplanar.sideUV.xy, inV.nearScales.zz, inV.farScales.zz, float2(0.5, 0.5), true)
+                         + triplanar.weights.y * sampleHeight(stratum2UV,          inV.nearScales.zz, inV.farScales.zz, float2(0.5, 0.5), true);
+    float stratum3Height = triplanar.weights.x * sampleHeight(triplanar.sideUV.xy, inV.nearScales.ww, inV.farScales.ww, float2(0.0, 0.0), false)
+                         + triplanar.weights.y * sampleHeight(stratum3UV,          inV.nearScales.ww, inV.farScales.ww, float2(0.0, 0.0), false);
+
+    float4 albedo = lowerAlbedo;
+    albedo = splatLerp(albedo, stratum0Albedo, stratum0Height, mask0.x, SpecularColor.r);
+    albedo = splatLerp(albedo, stratum1Albedo, stratum1Height, mask0.y, SpecularColor.r);
+    albedo = splatLerp(albedo, stratum2Albedo, stratum2Height, mask0.z, SpecularColor.r);
+    albedo = splatLerp(albedo, stratum3Albedo, stratum3Height, mask0.w, SpecularColor.r);
+    albedo = splatLerp(albedo, stratum4Albedo, stratum4Height, mask1.x, SpecularColor.r);
+    albedo = splatLerp(albedo, stratum5Albedo, stratum5Height, mask1.y, SpecularColor.r);
+    albedo = splatLerp(albedo, stratum6Albedo, stratum6Height, mask1.z, SpecularColor.r);
+    albedo.rgb = blendMacrotexture(position.xy, macrotextureblend, albedo.rgb);
+
+    float waterDepth = tex2D(Stratum7AlbedoSampler, position).r;
+    float3 color = applyPbrShading(inV, waterDepth, albedo, normal, mask1.w);
+
+    return float4(color, 0.01f);
+}
+
+technique Terrain200TNormals
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RG )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(false);
+        PixelShader = compile ps_2_a Terrain200TNormalsPS(false);
+    }
+}
+
+technique Terrain200T <
+    string usage = "composite";
+    string normals = "Terrain200TNormals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain200TAlbedoPS(false, 0);
+    }
+}
+
+technique Terrain201T <
+    string usage = "composite";
+    string normals = "Terrain200TNormals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain200TAlbedoPS(false, 1);
+    }
+}
+
+technique Terrain202T <
+    string usage = "composite";
+    string normals = "Terrain200TNormals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain200TAlbedoPS(false, 2);
+    }
+}
+
+technique Terrain250TNormals
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RG )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(false);
+        PixelShader = compile ps_2_a Terrain200TNormalsPS(true);
+    }
+}
+
+technique Terrain250T <
+    string usage = "composite";
+    string normals = "Terrain250TNormals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain200TAlbedoPS(true, 0);
+    }
+}
+
+technique Terrain251T <
+    string usage = "composite";
+    string normals = "Terrain250TNormals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain200TAlbedoPS(true, 1);
+    }
+}
+
+technique Terrain252T <
+    string usage = "composite";
+    string normals = "Terrain250TNormals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain200TAlbedoPS(true, 2);
+    }
+}
+
 // ----------------------------------------------------------------------------
 //#region Terrain400
 
@@ -3502,7 +3745,7 @@ float2 secondTriplanarUV(TriplanarSelection selection, float2 topUV) {
 // a stratum of pebbles with 1 the macrotexture recedes exactly where a pebble wins and stays on the ground
 // between them.
 // The lower layer has a fixed height of 0.5: its albedo alpha stays the macrotexture's opacity.
-// In the T variants Stratum2 and Stratum3 use triplanar mapping (selectTriplanarProjections).
+// In the T variants Stratum2 and Stratum3 use triplanar mapping, as in Terrain200T.
 
 // Roughness (x) and macrotexture uncovering (y) of a layer from the atlas. It is always read from the top mip:
 // with ps_2_a's few registers there is no room for the gradient reads atlas2D() makes, and an
