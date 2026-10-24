@@ -61,7 +61,11 @@ end
 function Entity:AdjustHealth(instigator, delta)
 end
 
---- Attaches this entity to another entity, matching the bone position of `selfBone` and `bone`
+--- Attaches this entity to another entity, matching the bone position of `selfBone` and `bone`.
+--- The attached entity follows the parent one tick behind, and waits each tick until the parent has ticked. A parent that
+--- isn't attached and has no motor, such as a new Lua `Entity`, stops ticking after its first tick, so the attached entity stops
+--- updating. Give such a parent a motor with `FallDown` to keep it ticking
+---@see moho.entity_methods.FallDown # Keeps a plain entity ticking
 ---@param selfbone Bone
 ---@param entity moho.entity_methods
 ---@param bone Bone
@@ -77,7 +81,11 @@ end
 function Entity:AttachBoneToEntityBone(selfBone, other, otherBone, flag)
 end
 
---- Attaches this entity to another entity at a bone position on it
+--- Attaches this entity to another entity at a bone position on it.
+--- The attached entity follows the parent one tick behind, and waits each tick until the parent has ticked. A parent that
+--- isn't attached and has no motor, such as a new Lua `Entity`, stops ticking after its first tick, so the attached entity stops
+--- updating. Give such a parent a motor with `FallDown` to keep it ticking
+---@see moho.entity_methods.FallDown # Keeps a plain entity ticking
 ---@param entity moho.entity_methods
 ---@param bone Bone
 function Entity:AttachTo(entity, bone)
@@ -155,7 +163,9 @@ function Entity:EnableIntel(type)
 end
 
 --- Creates a MotorFallDown object that can be used to whack the entity about.
---- Used for falling trees.
+--- Used for falling trees. Until it is whacked, it doesn't move the entity, but keeps the entity ticking.
+--- A plain Lua `Entity` needs that to carry attached entities
+---@see moho.entity_methods.AttachTo # Why the parent must keep ticking
 ---@return moho.MotorFallDown
 function Entity:FallDown()
 end
