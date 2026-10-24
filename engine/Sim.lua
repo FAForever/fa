@@ -1120,13 +1120,20 @@ end
 function ListArmies()
 end
 
----@param instigator Unit
+--- Knocks units within `maxRadius` of `location` into the air without damaging them. Each unit is pushed away from `location`
+--- and upward, more steeply toward the center, at `amount` units per second at the center down to 75% of it at the edge.
+--- Air units only gain the speed. Other units fall in the `Ballistic` motion state with a random spin, which is smaller
+--- for units with more mass. Their mass is `AverageDensity` times their size, and FAF sets `AverageDensity` to `MaxHealth`.
+--- Skips dead units, units being built and units that can't move. Also skips allies of the instigator unless `damageFriendly`
+--- is true, and units in an enemy shield that the radius reaches but that doesn't contain `location`
+---@see moho.unit_methods.OnMotionStateChange # Called with `"Ballistic"` when the fall starts
+---@see moho.unit_methods.OnImpact # Called when a unit lands dead
+---@param instigator Unit | Projectile | nil
 ---@param location Vector
----@param maxRadius number
----@param amount number
----@param affectsCategory? EntityCategory
+---@param maxRadius number # Must be above 0
+---@param amount number # Must be above 0
+---@param affectsCategory CategoryName # A single category name, not an expression
 ---@param damageFriendly? boolean
----@deprecated
 function MetaImpact(instigator, location, maxRadius, amount, affectsCategory, damageFriendly)
 end
 
