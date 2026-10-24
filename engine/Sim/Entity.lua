@@ -10,6 +10,18 @@ local Entity = {}
 ---@field Min Vector
 
 
+--- Applies an impulse to the entity's physics body, like `AddWorldImpulse`, but with the impulse and the point in the
+--- entity's own frame
+---@see moho.entity_methods.AddWorldImpulse # World space variant, and what reads the physics body
+---@param Ix number
+---@param Iy number
+---@param Iz number
+---@param Px number
+---@param Py number
+---@param Pz number
+function Entity:AddLocalImpulse(Ix, Iy, Iz, Px, Py, Pz)
+end
+
 --- Attaches a manual scroller to an entity, animating the bottom sections of its textures.
 --- Only one texture scroller may be active at a time (the others being a tread scroller or
 --- ping-ping scroller).
@@ -45,7 +57,15 @@ end
 function Entity:AddThreadScroller(sideDist, scrollMult)
 end
 
----@unknown
+--- Applies the impulse `I` at the point `P`, both in world space, to the entity's physics body. Adds `I` divided by the mass
+--- to the body's velocity, and the cross product of `P` minus the body's center with `I` to its angular momentum, so a point
+--- off the center also spins the body. Does nothing to an entity without a physics body, such as a plain Lua `Entity`.
+--- Only the flight of air units reads the body's velocity, so the impulse pushes and spins flying air units until their
+--- flight control corrects it. A falling unit only reads the body's spin, and only while it has a random spin from `MetaImpact`.
+--- A unit's mass is `AverageDensity` times `SizeX`, `SizeY` and `SizeZ`, and FAF sets `AverageDensity` to `MaxHealth`, so scale
+--- the impulse by the mass
+---@see moho.entity_methods.AddLocalImpulse # Impulse and point in the entity's own frame
+---@see MetaImpact # Knocks units into the air
 ---@param Ix number
 ---@param Iy number
 ---@param Iz number
