@@ -3450,11 +3450,12 @@ struct TriplanarSelection {
 };
 
 TriplanarSelection selectTriplanarProjections(float3 position) {
-    // The choice reads two mip levels coarser than the shading does. Map normals baked at
-    // several pixels per unit carry detail that would flip the projections every unit or so,
-    // and each flip leaves a line where neighbouring pixels sample different planes and the
-    // GPU picks a far too small mip level. A bias of 3 overflows the constant registers of
-    // the 2XXT shaders under ps_2_a; 2 reuses a constant they already hold.
+    // The choice reads the map normal two mip levels coarser than the shading does, so small
+    // details in it cannot flip the projections from one pixel to the next: each flip leaves a
+    // line where neighbouring pixels sample different planes and the GPU picks a far too small
+    // mip level. On a map normal at heightmap resolution the choice follows 4 x 4 unit averages,
+    // so a ledge narrower than that can get the projection of its surroundings. A bias of 3 does
+    // not fit the constant registers of the Terrain200T shaders under ps_2_a.
     float2 terrainNormal = tex2Dbias(Stratum7NormalSampler, float4(position.xy, 0, 2)).ag * 2 - 1;
     float2 side = abs(terrainNormal);
     float up = sqrt(saturate(1 - dot(terrainNormal, terrainNormal)));
@@ -3469,8 +3470,7 @@ TriplanarSelection selectTriplanarProjections(float3 position) {
     selection.sideUV.zw = lerp(position.xz, position.yz, minorYZ);
     // 0.5773 is just below 1/sqrt(3), the smallest value the largest component of a unit
     // vector can have, so the weights never both become zero. No scaling to (0, 1) is
-    // needed as the weights are normalised, and leaving it out keeps the shader within
-    // the constant registers of ps_2_a.
+    // needed as the weights are normalised.
     selection.weights = max(float2(sideMax, lerp(up, sideMin, minorTop)) - 0.5773, 0);
     selection.weights = selection.weights / (selection.weights.x + selection.weights.y);
     selection.topSecond = 1 - minorTop;
@@ -3768,9 +3768,9 @@ float2 layerAtlas(float2 uv, uniform float2 offset, uniform bool firstBatch) {
 
 // Turns the masks into the weights of the lower layer and the seven strata
 void terrain400Weights(float4 mask0, float4 mask1, out float4 weightsA, out float4 weightsB) {
-    float strata = dot(mask0, 1) + dot(mask1.xyz, 1);
-    float scale = 1 / max(strata, 1);
-    weightsA = float4(saturate(1 - strata), mask0.xyz * scale);
+    float summedWeight = dot(mask0, 1) + dot(mask1.xyz, 1);
+    float scale = 1 / max(summedWeight, 1);
+    weightsA = float4(saturate(1 - summedWeight), mask0.xyz * scale);
     weightsB = float4(mask0.w, mask1.xyz) * scale;
 }
 
