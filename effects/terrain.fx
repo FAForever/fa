@@ -3747,11 +3747,22 @@ technique Terrain252T <
 // The lower layer has a fixed height of 0.5: its albedo alpha stays the macrotexture's opacity.
 // In the T variants Stratum2 and Stratum3 use triplanar mapping, as in Terrain200T.
 
-// Roughness (x) and macrotexture uncovering (y) of a layer from the atlas. It is always read from the top mip:
-// with ps_2_a's few registers there is no room for the gradient reads atlas2D() makes, and an
-// implicit mip would jump at every tile border, where frac() breaks the derivatives.
+// The atlas in the upper slot, read from the top mip only. ps_2_a has no room for the gradient reads
+// atlas2D() makes, an implicit mip would jump at every tile border where frac() breaks the derivatives,
+// and texldb only allows a bias of -3 to +3 there, so the sampler has no mip filter instead.
+sampler2D UpperAtlasSampler = sampler_state
+{
+    Texture   = <UpperAlbedoTexture>;
+    MipFilter = NONE;
+    MinFilter = LINEAR;
+    MagFilter = LINEAR;
+    AddressU  = WRAP;
+    AddressV  = WRAP;
+};
+
+// Roughness (x) and macrotexture uncovering (y) of a layer from the atlas
 float2 layerAtlas(float2 uv, uniform float2 offset, uniform bool firstBatch) {
-    float4 r = tex2Dbias(UpperAlbedoSampler, float4(frac(uv) / 4 + offset + 0.125, 0, -16));
+    float4 r = tex2D(UpperAtlasSampler, frac(uv) / 4 + offset + 0.125);
     return firstBatch ? r.xy : r.zw;
 }
 
