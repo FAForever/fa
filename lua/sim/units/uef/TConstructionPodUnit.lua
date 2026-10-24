@@ -5,7 +5,6 @@ local oldGetGuards = TConstructionUnit.GetGuards
 ---@field Pod string
 ---@field Parent? UEL0301 | UEL0001 # Only these two units set the parent properly
 ---@field guardCache table
----@field guardDummy Unit
 ---@field rebuildDrone boolean # If true, the parent should rebuild the pod. Caches script bit 1.
 TConstructionPodUnit = ClassUnit(TConstructionUnit) {
     Parent = nil,
@@ -13,9 +12,6 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
     ---@param self TConstructionPodUnit
     OnCreate = function(self)
         TConstructionUnit.OnCreate(self)
-        self.guardDummy = CreateUnitHPR('ZXA0003', self:GetArmy(), 0,0,0,0,0,0)
-        self.guardDummy:AttachTo(self, -1)
-        self.Trash:Add(self.guardDummy)
     end,
 
     ---@param self TConstructionPodUnit
@@ -40,20 +36,9 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
     ---@param transport Unit
     ---@param bone number
     OnAttachedToTransport = function(self, transport, bone)
-        local guards = self:GetGuards()
-        IssueClearCommands(guards)
-        IssueGuard(guards, self.guardDummy)
+        -- Removing the state allows guards to keep assisting the drone
+        self:SetUnitState("Attached", false)
         TConstructionUnit.OnAttachedToTransport(self, transport, bone)
-    end,
-
-    ---@param self TConstructionPodUnit
-    ---@param transport Unit
-    ---@param bone number
-    OnDetachedFromTransport = function(self, transport, bone)
-        TConstructionUnit.OnDetachedFromTransport(self, transport, bone)
-        local guards = self.guardDummy:GetGuards()
-        IssueClearCommands(guards)
-        IssueGuard(guards, self)
     end,
 
     ---@param self TConstructionPodUnit
@@ -95,7 +80,7 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
     ---@param target Unit|Prop
     OnStopReclaim = function(self, target)
         TConstructionUnit.OnStopReclaim(self, target)
-        -- Check if we finished our reclaim task and clear our cached commaand if so
+        -- Check if we finished our reclaim task and clear our cached command if so
         if self.guardCache and table.empty(target) then
             self.guardCache = nil
         end
