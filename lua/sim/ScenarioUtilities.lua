@@ -696,7 +696,7 @@ local function RevealCivilians()
 end
 
 --- Call this from the map script to set up skirmish game.
----@see InitializeScenarioArmies for starting a mission-like environment
+---@see InitializeScenarioArmies # For starting a mission-like environment
 function InitializeArmies()
     -- globals to locals
     local GetArmyBrain = GetArmyBrain
@@ -809,7 +809,7 @@ function InitializeArmies()
 end
 
 --- Call this from the map script to set up mission-like envvironment.
----@see InitializeArmies for starting a classic skirmish game
+---@see InitializeArmies # For starting a classic skirmish game
 function InitializeScenarioArmies()
     -- globals to locals
     local import = import

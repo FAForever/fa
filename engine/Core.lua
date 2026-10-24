@@ -263,7 +263,9 @@ end
 function IsAlly(army1, army2)
 end
 
---- Checks if the C-side of an object is destroyed / de-allocated
+--- Checks if the C-side of an object is destroyed / de-allocated. Sim entities are deallocated at
+--- the end of the tick they're destroyed in, so this stays false until then
+---@see moho.entity_methods.BeenDestroyed # True as soon as `Destroy()` is called
 ---@param entity? Destroyable
 ---@return boolean
 function IsDestroyed(entity)

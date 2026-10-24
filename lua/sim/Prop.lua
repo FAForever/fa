@@ -242,14 +242,14 @@ Prop = Class(moho.prop_methods) {
         end
     end,
 
-    ---@see prop.ApplyCachedCollisionExtents for applying the cached extents
+    ---@see Prop.ApplyCachedCollisionExtents # For applying the cached extents
     ---@param self Prop
     CacheAndRemoveCollisionExtents = function(self)
         self.Extents = self:GetCollisionExtents()
         self:SetCollisionShape('None')
     end,
 
-    ---@see prop.CacheAndRemoveCollisionExtents for caching the extents
+    ---@see Prop.CacheAndRemoveCollisionExtents # For caching the extents
     ---@param self Prop
     ApplyCachedCollisionExtents = function(self)
         if self.Extents then

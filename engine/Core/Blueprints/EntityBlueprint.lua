@@ -3,7 +3,9 @@
 ---@class EntityBlueprint : HitBox, Blueprint
 --- alternate Unit footprint
 ---@field AltFootprint? FootprintBlueprint
---- unit average density in tons / m^3 (default is 0.49). Affects the behavior of units when they bump into each other. Units with more weight push units with less weight.
+--- unit average density in tons / m^3 (default is 0.49). Affects the behavior of units when they bump into each other.
+--- Units with more weight push units with less weight. FAF sets it to `MaxHealth`, halved for hover units, when it loads
+--- unit blueprints. The mass is this times `SizeX`, `SizeY` and `SizeZ`, and also limits spin. See `InertiaTensorX`
 ---@field AverageDensity? number
 --- list of category names that this entity belongs to
 ---@field Categories CategoryName[]
@@ -19,12 +21,21 @@
 ---@field DesiredShooterCap number
 --- Unit footprint. If absent, uses the `SizeX` and `SizeZ` fields.
 ---@field Footprint? FootprintBlueprint
---- component X,X of inertia tensor
----@field InertiaTensorX number
---- component Y,Y of inertia tensor
----@field InertiaTensorY number
---- component Z,Z of inertia tensor
----@field InertiaTensorZ number
+--- Moment of inertia of a mobile unit about its X axis, per unit of mass. The engine multiplies it by the mass,
+--- `AverageDensity` times `SizeX`, `SizeY` and `SizeZ`, so the inertia grows with the unit's health in FAF.
+--- When any of the three components is 0 or missing, the engine uses a solid box of the unit's size for all three:
+--- `(SizeY^2 + SizeZ^2) / 12` for X, `(SizeX^2 + SizeZ^2) / 12` for Y and `(SizeX^2 + SizeY^2) / 12` for Z.
+--- No FAF blueprint sets them. Higher inertia means less spin when:
+--- - `MetaImpact` knocks the unit into the air: each axis gets a random angular acceleration in radians per second
+---   squared of up to `0.2 / (InertiaTensor * mass)`, capped at 2
+--- - an air unit falls after it dies: each axis gets one of up to `1 / (InertiaTensor * mass)`, kept between 0.25 and 4
+--- - `AddWorldImpulse` or `AddLocalImpulse` pushes a flying air unit off its center
+--- The spin keeps accelerating for the whole fall, so the angle grows with the square of the time in the air
+---@field InertiaTensorX? number
+--- Moment of inertia about the Y axis, per unit of mass. See `InertiaTensorX`
+---@field InertiaTensorY? number
+--- Moment of inertia about the Z axis, per unit of mass. See `InertiaTensorX`
+---@field InertiaTensorZ? number
 --- height of lifebar in OGrids
 ---@field LifeBarHeight number
 --- vertical offset of the lifebar from the entity

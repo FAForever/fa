@@ -154,7 +154,7 @@ end
 
 --- Creates a console output receiver that calls the given function on console output.
 ---
----@see RemoveConsoleOutputReciever Destroy the receiver and stop calling the function.
+---@see RemoveConsoleOutputReciever # Destroy the receiver and stop calling the function
 ---@param func fun(text: string)
 ---@return ConsoluteOutputReceiverHandle
 function AddConsoleOutputReciever(func)
@@ -165,7 +165,9 @@ end
 function AddInputCapture(control)
 end
 
----
+--- Adds the selectable units to the selection
+---@see SelectUnits # Replaces the selection
+---@see categories.SELECTABLE # Rules for which units are selectable
 ---@param selection UserUnit[]
 function AddSelectUnits(selection)
 end
@@ -237,7 +239,7 @@ end
 
 --- Gets the current time in seconds, counting from 0 at application start.
 --- This is wall-clock time and is unaffected by gameplay.
----@see GetSystemTimeSeconds Identical usage
+---@see GetSystemTimeSeconds # Identical usage
 ---@return number
 function CurrentTime()
 end
@@ -344,7 +346,9 @@ end
 function GetArmiesTable()
 end
 
---- Returns a table of avatar units for the army
+--- Returns the focus army's units whose blueprint `General.QuickSelectPriority` is positive, sorted by
+--- ascending priority
+---@see UnitBlueprintGeneral.QuickSelectPriority
 ---@return UserUnit[]
 function GetArmyAvatars()
 end
@@ -377,7 +381,7 @@ end
 --- disregarding if they start with `/` like other commandline options.
 ---
 --- Returns `false` if there are not `maxArgs` tokens after the `option`.
----@see GetCommandLineArgTable(option) for parsing key-values
+---@see GetCommandLineArgTable # For parsing key-values
 ---@param option string
 ---@param maxArgs number
 ---@return (string | number | integer)[] | false
@@ -409,7 +413,7 @@ end
 ---
 --- In the game options you can add a second adapter under the 'Video' tab.
 ---
----@see GetNumRootFrames to determine the number of root frames.
+---@see GetNumRootFrames # To determine the number of root frames
 ---
 --- See also the following modules that manage these frames:
 --- - Primary adapter: lua\ui\game\worldview.lua
@@ -468,16 +472,12 @@ function GetIsAutoSurfaceMode(units)
 end
 
 --- Sees if any units in the list are paused
+---@see GetIsPausedOfUnit # Single unit variant
 ---@param units UserUnit[]
 ---@return boolean
 function GetIsPaused(units)
 end
 
---- Returns a boolean that indicates the unit is paused
----@param unit UserUnit[]
----@return boolean
-function GetIsPausedOfUnit(unit)
-end
 
 --- Sees if any units in the list are submerged
 ---@param units UserUnit[]
@@ -610,7 +610,7 @@ function GetSystemTime()
 end
 
 --- Returns System time in seconds
----@see CurrentTime Identical usage
+---@see CurrentTime # Identical usage
 ---@return number
 function GetSystemTimeSeconds()
 end
@@ -628,7 +628,9 @@ end
 function GetUIControlsAlpha()
 end
 
---- Given a set of units, gets the union of orders and unit categories (for determining builds). You can use `GetUnitCommandFromCommandCap` to convert the toggles to unit commands
+--- Given a set of units, gets the union of orders and unit categories (for determining builds)
+---@see GetUnitCommandDataOfUnit # Single unit variant
+---@see GetUnitCommandFromCommandCap # Convert the orders to unit commands
 ---@param unitSet UserUnit[]
 ---@return EngineCommandCap[] orders
 ---@return EngineToggleCap[] availableToggles
@@ -636,13 +638,6 @@ end
 function GetUnitCommandData(unitSet)
 end
 
---- Retrieves the orders, toggles and buildable categories of the given unit. You can use `GetUnitCommandFromCommandCap` to convert the toggles to unit commands
----@param unit UserUnit
----@return EngineCommandCap[] orders
----@return EngineToggleCap[] availableToggles
----@return EntityCategory buildableCategories
-function GetUnitCommandDataOfUnit(unit)
-end
 
 --- Given a `RULEUCC` type command, return the equivalent `UNITCOMMAND` command or "None" otherwise.
 ---
@@ -852,6 +847,8 @@ function IsObserver(playerId)
 end
 
 --- Issue a factory build or upgrade command to your selection
+---@see IssueBlueprintCommandToUnits # Variant for the given units
+---@see IssueBlueprintCommandToUnit # Single unit variant
 ---@param command UserUnitBlueprintCommand
 ---@param blueprintid UnitId
 ---@param count number
@@ -859,33 +856,8 @@ end
 function IssueBlueprintCommand(command, blueprintid, count, clear)
 end
 
---- Issue a factory build or upgrade command to the given units
----@see IssueBlueprintCommand
----@param units UserUnit[]
----@param command UserUnitBlueprintCommand
----@param blueprintid UnitId
----@param count number
----@param clear boolean? defaults to false
-function IssueBlueprintCommandToUnits(units, command, blueprintid, count, clear)
-end
 
---- Issue a factory build or upgrade command to the given unit
----@see IssueBlueprintCommand
----@param unit UserUnit
----@param command UserUnitBlueprintCommand
----@param blueprintid UnitId
----@param count number
----@param clear boolean? defaults to false
-function IssueBlueprintCommandToUnit(unit, command, blueprintid, count, clear)
-end
 
---- Issue a command to a given unit
----@param unit UserUnit
----@param command UserUnitCommand # Will crash the game if not a valid command.
----@param luaParams? table | string | number | boolean # Will crash the game if the table contains non-serializable types.
----@param clear? boolean
-IssueUnitCommandToUnit = function(unit, command, luaParams, clear)
-end
 
 --- Issue a command to the current selection.
 ---@param command UserUnitCommand # Will crash the game if not a valid command.
@@ -895,11 +867,14 @@ function IssueCommand(command, luaParams, clear)
 end
 
 ---
+---@see moho.aibrain_methods.OnPlayNoStagingPlatformsVO # Called in the sim when the army has no air staging platform
+---@see moho.aibrain_methods.OnPlayBusyStagingPlatformsVO # Called in the sim when all air staging platforms are full
 ---@param clear boolean
 function IssueDockCommand(clear)
 end
 
 --- Issue a command to the given units.
+---@see IssueUnitCommandToUnit # Single unit variant
 ---@param unitList UserUnit[]
 ---@param command UserUnitCommand # Will crash the game if not a valid command.
 ---@param luaParams? table | string | number | boolean # Will crash the game if the table contains non-serializable types.
@@ -988,6 +963,9 @@ end
 
 --- Make `dragger` the active dragger from a particular frame.
 --- You can pass `nil` to cancel the current dragger.
+---@see moho.dragger_methods.OnMove # Called while the mouse moves
+---@see moho.dragger_methods.OnRelease # Called when the button is released
+---@see moho.dragger_methods.OnCancel # Called on the previous active dragger
 ---@param originFrame Frame
 ---@param keycode 'LBUTTON' | 'MBUTTON' | 'RBUTTON'
 ---@param dragger Dragger | nil
@@ -1003,7 +981,7 @@ function PrefetchSession(mapname, mods, hipri)
 end
 
 --- Destroys a console output receiver.
----@see AddConsoleOutputReciever To create receivers.
+---@see AddConsoleOutputReciever # To create receivers
 ---@param handle ConsoluteOutputReceiverHandle
 function RemoveConsoleOutputReciever(handle)
 end
@@ -1056,7 +1034,10 @@ end
 function SavePreferences()
 end
 
---- Select the specified units
+--- Select the specified units. Skips units that aren't selectable.
+--- For a unit that isn't selectable because it is in a transport, selects the transport instead
+---@see AddSelectUnits # Adds to the selection
+---@see categories.SELECTABLE # Rules for which units are selectable
 ---@param units UserUnit[]?
 function SelectUnits(units)
 end
@@ -1138,6 +1119,8 @@ function SetActiveBuildTemplate(template)
 end
 
 --- Set if anyone in the list is auto building or auto assisting
+---@see moho.unit_methods.OnAutoModeOn # Called in the sim when `mode` is true
+---@see moho.unit_methods.OnAutoModeOff # Called in the sim when `mode` is false
 ---@param units UserUnit[]
 ---@param mode boolean
 function SetAutoMode(units, mode)
@@ -1201,16 +1184,14 @@ function SetOverlayFilters(list)
 end
 
 --- Pause or unpause the given units
+---@see moho.unit_methods.OnPaused # Called in the sim when a unit pauses
+---@see moho.unit_methods.OnUnpaused # Called in the sim when a unit unpauses
+---@see SetPausedOfUnit # Single unit variant
 ---@param units UserUnit[]
 ---@param pause boolean
 function SetPaused(units, pause)
 end
 
---- Pause or unpause the given unit
----@param unit UserUnit
----@param pause boolean
-function SetPausedOfUnit(unit, pause)
-end
 
 --- Updates a value in the preference file. Updating the preference file on disk is delayed until the application exits.
 ---
@@ -1287,6 +1268,8 @@ function ToggleFireState(units, fireState)
 end
 
 ---
+---@see moho.unit_methods.OnScriptBitSet # Called in the sim when a bit turns on
+---@see moho.unit_methods.OnScriptBitClear # Called in the sim when a bit turns off
 ---@param units UserUnit[]
 ---@param bit number
 ---@param state boolean

@@ -7,23 +7,22 @@
 
 local CM = import("/lua/ui/game/commandmode.lua")
 
--- The user wants to issue an ability order in the current command mode. This
--- function validates the request. If the request is valid we set 
--- UserValidated to allow the order to be issued. If it's not valid we end the 
--- commandmode or do nothing depending on the context.
---
--- VerifyAbility should return a result table of the following format:
--- result = {
---    string AbilityName - What ability to execute
---    string TaskName - Which task class to execute (e.g. AbilityTask, SkillTask)
---    bool UserValidated - Whether or not this request has been validated
---    table AuthorizedUnits - List of units to issue the command to
--- }
+--- Parameters of a script order given with a target in command mode.
+--- Besides `TaskName`, the engine reads only these fields. Each task declares the other fields it reads in a subclass.
+--- These checks only run in the UI, so a UI mod or console command can send any values:
+--- the sim task must validate them
+---@class VerifiedScriptTaskParams : ScriptTaskParams
+---@field UserValidated boolean # The engine issues the order only when true. The sim task receives it too
+---@field AuthorizedUnits? UserUnit[] # Units the engine gives the order to, instead of the selection. Removed before the table goes to the sim
 
---- Called by the engine whenever a `RULEUCC_Script` order is issued with a target through command mode.
---- The return value overwrites the lua params table passed to the ScriptTask script sim-side, except for the field `AuthorizedUnits`, which is interpreted by the engine instead of being passed.
+--- Called by the engine when the player clicks in `RULEUCC_Script` command mode, on a unit or the ground.
+--- The returned table becomes the order's parameters, so `TaskName` picks the sim task.
+--- The engine issues the order only when `UserValidated` is true, and only to `AuthorizedUnits`.
+--- The sim drops units the player doesn't control. When this function errors, the engine logs it and issues nothing.
+--- `UserVerifyScript` in the command mode data replaces the default check, which authorizes every selected unit
+---@see CommandModeDataOrderScript
 ---@param data UserCommand
----@return { TaskName: string, UserValidated: boolean, Location: Vector, AuthorizedUnits: UserUnit[] } result
+---@return VerifiedScriptTaskParams result
 function VerifyScriptCommand(data)
     local mode = CM.GetCommandMode()
 

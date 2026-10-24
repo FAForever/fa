@@ -64,7 +64,10 @@ end
 function ArmyGetHandicap(army)
 end
 
---- initializes the prebuilt units of an army via `AIBrain:OnSpawnPreBuiltUnits()`
+--- Calls `OnSpawnPreBuiltUnits` on the brain of the army, if the brain defines it. Same as calling it on the brain directly.
+--- The engine reaches it through the Lua function `InitializePrebuiltUnits` in simInit.lua
+---@see moho.aibrain_methods.OnSpawnPreBuiltUnits # Called on the brain
+---@see InitializePrebuiltUnits # Lua entry point the engine calls
 ---@param army Army
 function ArmyInitializePrebuiltUnits(army)
 end
@@ -105,6 +108,8 @@ end
 --- Changes the army of a unit, returning the new unit and destroying the old one
 --- Modified by an engine patch to allow commanders to be given.
 --- `COMMAND` units are filtered out in SimHooks.lua for legacy compatibility.
+---@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the new army is at its unit cap
+---@see moho.aibrain_methods.OnFailedUnitTransfer # Called when the transfer fails for other reasons
 ---@param unit Unit
 ---@param army Army
 ---@param allowCommanders? boolean
@@ -152,8 +157,8 @@ function CreateAttachedBeam(object, bone, army, length, thickness, blueprint)
 end
 
 --- creates an emitter that is attached to an entity at a bone
----@see CreateEmitterAtBone(object, bone, army, blueprint) # to create the emitter at an entity's bone without attaching it there
----@see CreateEmitterAtEntity(object, bone, army, blueprint) # to create the emitter at an entity without attaching it there
+---@see CreateEmitterAtBone # To create the emitter at an entity's bone without attaching it there
+---@see CreateEmitterAtEntity # To create the emitter at an entity without attaching it there
 ---@param object BoneObject
 ---@param bone Bone
 ---@param army Army
@@ -163,8 +168,8 @@ function CreateAttachedEmitter(object, bone, army, blueprint)
 end
 
 --- creates a beam, which then needs to be attached to a bone
----@see AttachBeamToEntity(emitter, entity, bone, army) # to attach the beam to an entity bone
----@see CreateBeamEmitterOnEntity(object, tobone, army, blueprint) # to create an attached beam emitter at once
+---@see AttachBeamToEntity # To attach the beam to an entity bone
+---@see CreateBeamEmitterOnEntity # To create an attached beam emitter at once
 ---@param blueprint FileName
 ---@param army Army
 ---@return moho.IEffect
@@ -172,7 +177,7 @@ function CreateBeamEmitter(blueprint, army)
 end
 
 --- creates a beam and attaches it to an entity, usually used for weaponry
----@see CreateBeamEmitter(blueprint, army) # to create the beam without attaching it to anything
+---@see CreateBeamEmitter # To create the beam without attaching it to anything
 ---@param object BoneObject
 ---@param tobone Bone
 ---@param army Army
@@ -213,9 +218,13 @@ end
 function CreateBuilderArmController(unit, turretBone, barrelBone, aimBone)
 end
 
---- Creates a collision detection manipulator, calling the function
---- `self:OnAnimTerrainCollision(bone, x, y, z)`
---- when a bone that is being watched collides with the terrain
+--- Creates a collision detection manipulator for the bones it watches.
+--- By default it calls `OnAnimCollision` when a bone drops to the unit's ground level (footfalls).
+--- With the terrain check enabled, it instead calls `OnAnimTerrainCollision` and `OnNotAnimTerrainCollision`
+--- when a bone crosses the terrain or water surface
+---@see moho.unit_methods.OnAnimCollision
+---@see moho.unit_methods.OnAnimTerrainCollision
+---@see moho.CollisionManipulator.EnableTerrainCheck
 ---@param unit Unit
 ---@return moho.CollisionManipulator
 function CreateCollisionDetector(unit)
@@ -248,8 +257,8 @@ function CreateEconomyEvent(unit, totalEnergy, totalMass, timeInSeconds, callbac
 end
 
 --- creates an emitter at an entity's bone, but does not attach the emitter to it
----@see CreateEmitterAtEntity(object, army, blueprint) # for an at-object version
----@see CreateEmitterOnEntity(object, army, blueprint) # for an on-object version
+---@see CreateEmitterAtEntity # For an at-object version
+---@see CreateEmitterOnEntity # For an on-object version
 ---@param object BoneObject
 ---@param army Army
 ---@param blueprint FileName
@@ -258,8 +267,8 @@ function CreateEmitterAtBone(object, bone, army, blueprint)
 end
 
 --- creates an emitter at an entity, but does not attach the emitter to it
----@see CreateEmitterAtBone(object, bone, army, blueprint) # for an at-bone version
----@see CreateEmitterOnEntity(object, army, blueprint) # for an on-object version
+---@see CreateEmitterAtBone # For an at-bone version
+---@see CreateEmitterOnEntity # For an on-object version
 ---@param object BoneObject
 ---@param army Army
 ---@param blueprint FileName
@@ -268,8 +277,8 @@ function CreateEmitterAtEntity(object, army, blueprint)
 end
 
 --- creates an emitter on an object and attaches the emitter to it
----@see CreateEmitterAtBone(object, bone, army, blueprint) # for an at-bone version
----@see CreateEmitterAtEntity(object, army, blueprint) # for an at-object version
+---@see CreateEmitterAtBone # For an at-bone version
+---@see CreateEmitterAtEntity # For an at-object version
 ---@param object BoneObject
 ---@param army Army
 ---@param blueprint FileName
@@ -296,7 +305,7 @@ function CreateInitialArmyUnit(army, unitId)
 end
 
 --- Creates a light particle that provides vision, is often used in combination with effects
----@see CreateLightParticleIntel() # intel-giving version
+---@see CreateLightParticleIntel # Intel-giving version
 ---@param object BoneObject
 ---@param bone Bone
 ---@param army Army
@@ -309,7 +318,7 @@ function CreateLightParticle(object, bone, army, size, lifetime, texture, rampNa
 end
 
 --- Creates a light particle, is often used in combination with effects
----@see CreateLightParticle() # non intel-giving version
+---@see CreateLightParticle # Non intel-giving version
 ---@param object BoneObject
 ---@param bone Bone
 ---@param army Army
@@ -322,7 +331,7 @@ function CreateLightParticleIntel(object, bone, army, size, lifetime, texture, r
 end
 
 --- Spawns a prop, using the default orientation
----@see CreatePropHPR() # heading-pitch-roll version
+---@see CreatePropHPR # Heading-pitch-roll version
 ---@param location Vector
 ---@param blueprintId string
 ---@return Prop
@@ -330,7 +339,7 @@ function CreateProp(location, blueprintId)
 end
 
 --- Spawns a prop with control over orientation
----@see CreateProp() # simple version
+---@see CreateProp # Simple version
 ---@param blueprintPath string full path to the prop's blueprint
 ---@param x number
 ---@param y number
@@ -387,7 +396,7 @@ function CreateSlider(object, bone, goalX, goalY, goalZ, speed, worldSpace)
 end
 
 --- Adds a splat to the game at a position and heading
----@see CreateSplatOnBone() # adds the splat at an entity bone
+---@see CreateSplatOnBone # Adds the splat at an entity bone
 ---@param position Vector
 ---@param heading number
 ---@param texture string
@@ -401,7 +410,7 @@ function CreateSplat(position, heading, texture, sizeX, sizeZ, lodParam, duratio
 end
 
 --- Adds a splat to the game at an entity bone position and heading
----@see CreateSplatOnBone() # adds the splat at a position
+---@see CreateSplat # Adds the splat at a position
 ---@param object BoneObject
 ---@param offset Vector
 ---@param bone Bone
@@ -443,8 +452,9 @@ function CreateTrail(object, bone, army, trailBlueprint)
 end
 
 --- Creates a unit from a blueprint for an army, at a position with quaternion orientation
----@see CreateUnit2() # simple version
----@see CreateUnitHPR() # heading-pitch-roll version
+---@see CreateUnit2 # Simple version
+---@see CreateUnitHPR # Heading-pitch-roll version
+---@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the army is at its unit cap
 ---@param blueprintId string
 ---@param army Army
 ---@param x number
@@ -460,8 +470,9 @@ function CreateUnit(blueprintId, army, x, y, z, qx, qy, qz, qw, layer)
 end
 
 --- Creates a unit from a blueprint for an army, at an X-Z map point with a heading
----@see CreateUnit() # quaternion version
----@see CreateUnitHPR() # heading-pitch-roll version
+---@see CreateUnit # Quaternion version
+---@see CreateUnitHPR # Heading-pitch-roll version
+---@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the army is at its unit cap
 ---@param blueprintId string
 ---@param army Army
 ---@param layer Layer
@@ -473,8 +484,9 @@ function CreateUnit2(blueprintId, army, layer, x, z, heading)
 end
 
 --- Creates a unit from a blueprint for an army, at a position with heading, pitch, and roll
----@see CreateUnit() # quaternion version
----@see CreateUnit2() # simple version
+---@see CreateUnit # Quaternion version
+---@see CreateUnit2 # Simple version
+---@see moho.aibrain_methods.OnUnitCapLimitReached # Called when the army is at its unit cap
 ---@param blueprint UnitId
 ---@param army Army
 ---@param x number
@@ -752,8 +764,7 @@ function IsUnit(object)
 end
 
 --- Orders a group of units to attack-move to a target
----
----@see IssueToUnitAggressiveMove for single unit variant
+---@see IssueToUnitAggressiveMove # Single unit variant
 ---@param units Unit[]
 ---@param target Unit | Vector | Prop | Blip
 ---@return SimCommand
@@ -761,8 +772,7 @@ function IssueAggressiveMove(units, target)
 end
 
 --- Orders a group of units to attack a target
----
----@see IssueToUnitAttack for single unit variant
+---@see IssueToUnitAttack # Single unit variant
 ---@param units Unit[]
 ---@param target Unit | Vector | Prop | Blip
 ---@return SimCommand
@@ -771,9 +781,8 @@ end
 
 --- Orders factories to build a unit.
 --- Takes 1 tick to apply.
----
----@see IssueToUnitBuildFactory for single unit variant
----@see IssueBuildMobile to build a unit with engineers
+---@see IssueToUnitBuildFactory # Single unit variant
+---@see IssueBuildMobile # Builds the unit with engineers
 ---@param units Unit[]
 ---@param blueprintID string
 ---@param count integer
@@ -783,9 +792,8 @@ end
 
 --- Orders a group of units to build a unit, the nearest unit is given the order
 --- Takes some time to apply (at least 3 ticks).
----
----@see IssueToUnitBuildMobile for single unit variant
----@see IssueBuildFactory to produce a unit in a factory
+---@see IssueToUnitBuildMobile # Single unit variant
+---@see IssueBuildFactory # Builds the unit in a factory
 ---@param units Unit[]
 ---@param position Vector
 ---@param blueprintID string
@@ -803,16 +811,16 @@ function IssueBuildAllMobile(units, position, blueprintID, table)
 end
 
 --- Orders a group of units to capture a target, usually engineers
----
----@see IssueToUnitCapture for single unit variant
+---@see moho.unit_methods.OnStartCapture # Called when the capture starts
+---@see IssueToUnitCapture # Single unit variant
 ---@param units Unit[]
 ---@param target Unit
 ---@return SimCommand
 function IssueCapture(units, target)
 end
 
---- Clears out all commands issued on the group of units, this happens immediately.
----@see IssueToUnitClearCommands for single unit variant
+--- Clears out all commands issued on the group of units, this happens immediately
+---@see IssueToUnitClearCommands # Single unit variant
 ---@param units Unit[]
 ---@return SimCommand
 function IssueClearCommands(units)
@@ -820,33 +828,29 @@ end
 
 --- Clears out all commands issued on the group of factories without affecting
 --- the build queue, allows you to change the rally point
----
----@see IssueToUnitClearFactoryCommands for a single unit variant
+---@see IssueToUnitClearFactoryCommands # Single unit variant
 ---@param factories Unit[]
 ---@return SimCommand
 function IssueClearFactoryCommands(factories)
 end
 
 --- Orders a group of units to destroy themselves, doesn't leave a wreckage
----@see IssueKillSelf # an alternative that does leave a wreckage
----
----@see IssueToUnitDestroySelf for a single unit variant
+---@see IssueKillSelf # An alternative that does leave a wreckage
+---@see IssueToUnitDestroySelf # Single unit variant
 ---@param units Unit[]
 ---@return SimCommand
 function IssueDestroySelf(units)
 end
 
 --- Orders a group of units to dive
----
----@see IssueToUnitDive for a single unit variant
+---@see IssueToUnitDive # Single unit variant
 ---@param units Unit[]
 ---@return SimCommand
 function IssueDive(units)
 end
 
 --- Orders a group of factories to assist another factory
----
----@see IssueToUnitFactoryAssist for a single unit variant
+---@see IssueToUnitFactoryAssist # Single unit variant
 ---@param units Unit[]
 ---@param target Unit
 ---@return SimCommand
@@ -854,8 +858,7 @@ function IssueFactoryAssist(units, target)
 end
 
 --- Orders a group of factories to set their rally point
----
----@see IssueToUnitFactoryRallyPoint for a single unit variant
+---@see IssueToUnitFactoryRallyPoint # Single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
@@ -863,8 +866,8 @@ function IssueFactoryRallyPoint(units, position)
 end
 
 --- Orders a group of units to setup a ferry
----
----@see IssueToUnitFerry for a single unit variant
+---@see moho.unit_methods.OnFerryPointSet # Called on each unit
+---@see IssueToUnitFerry # Single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
@@ -909,8 +912,7 @@ function IssueFormPatrol(units, position, formation, degrees)
 end
 
 --- Orders a group of units to guard a target
----
----@see IssueToUnitGuard for a single unit variant
+---@see IssueToUnitGuard # Single unit variant
 ---@param units Unit[]
 ---@param target Unit | Vector
 ---@return SimCommand
@@ -918,26 +920,23 @@ function IssueGuard(units, target)
 end
 
 --- Orders a group of units to kill themselves
----@see IssueDestroySelf() # an alternative that does not leave a wreckage
----
----@see IssueToUnitKillSelf for a single unit variant
+---@see IssueDestroySelf # An alternative that does not leave a wreckage
+---@see IssueToUnitKillSelf # Single unit variant
 ---@param units Unit[]
 ---@return SimCommand
 function IssueKillSelf(units)
 end
 
---- Orders a group of units to move to a position. 
----
----@see IssueToUnitMove for a single unit variant
+--- Orders a group of units to move to a position
+---@see IssueToUnitMove # Single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
 function IssueMove(units, position)
 end
 
---- Orders a group of units to move off a factory build site.
----
----@see IssueToUnitMoveOffFactory for a single unit variant
+--- Orders a group of units to move off a factory build site
+---@see IssueToUnitMoveOffFactory # Single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
@@ -945,9 +944,9 @@ function IssueMoveOffFactory(units, position)
 end
 
 --- Orders a group of units to launch a strategic missile at a position
----@see IssueTactical # for tactical missiles
----
----@see IssueToUnitNuke for a single unit variant
+---@see IssueTactical # For tactical missiles
+---@see moho.unit_methods.OnNukeLaunched # Called when the order gives its target to the silo weapon
+---@see IssueToUnitNuke # Single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
@@ -955,8 +954,10 @@ function IssueNuke(units, position)
 end
 
 --- Orders a group of units to use Overcharge at a target
----
----@see IssueToUnitOverCharge for a single unit variant
+---@see moho.weapon_methods.OnEnableWeapon # Called when the order starts
+---@see moho.weapon_methods.OnDisableWeapon # Called when the order ends
+---@see moho.weapon_methods.CanWeaponFire # Called to check if the weapon may fire
+---@see IssueToUnitOverCharge # Single unit variant
 ---@param units Unit[]
 ---@param target Unit
 ---@return SimCommand
@@ -964,8 +965,7 @@ function IssueOverCharge(units, target)
 end
 
 --- Orders a group of units to patrol to a position
----
----@see IssueToUnitPatrol for a single unit variant
+---@see IssueToUnitPatrol # Single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
@@ -974,16 +974,16 @@ end
 
 --- Orders a group of units to pause building, upgrading, and other tasks.
 --- This pause order is put into the order queue, so it may not apply immediately.
----
----@see Unit.SetPaused to pause a unit in the middle of a task.
----@see IssueToUnitPause for a single unit variant
+--- Use `Unit:SetPaused` to pause a unit in the middle of a task.
+---@see moho.unit_methods.OnPaused # Called when the order pauses the unit
+---@see IssueToUnitPause # Single unit variant
 ---@param units Unit[]
 function IssuePause(units)
 end
 
 --- Orders a group of units to reclaim a target
----
----@see IssueToUnitReclaim for a single unit variant
+---@see moho.unit_methods.OnStartReclaim # Called when the reclaim starts
+---@see IssueToUnitReclaim # Single unit variant
 ---@param units Unit[]
 ---@param target ReclaimObject
 ---@return SimCommand
@@ -991,8 +991,7 @@ function IssueReclaim(units, target)
 end
 
 --- Orders a group of units to repair a target
----
----@see IssueToUnitRepair for a single unit variant
+---@see IssueToUnitRepair # Single unit variant
 ---@param units Unit[]
 ---@param target Unit
 ---@return SimCommand
@@ -1000,8 +999,8 @@ function IssueRepair(units, target)
 end
 
 --- Orders a group of units to sacrifice, yielding part of their build cost to a target
----
----@see IssueToUnitSacrifice for a single unit variant
+---@see moho.unit_methods.OnStartSacrifice # Called when the sacrifice starts
+---@see IssueToUnitSacrifice # Single unit variant
 ---@param units Unit[]
 ---@param target Unit
 ---@return SimCommand
@@ -1010,41 +1009,39 @@ end
 
 --- Orders a group of units to run a script sequence, as an example:
 --- `{ TaskName = "EnhanceTask", Enhancement = "AdvancedEngineering" }`
----
----@see IssueToUnitScript for a single unit variant
+---@see moho.ScriptTask_Methods.OnCreate # Called on the new task
+---@see IssueToUnitScript # Single unit variant
 ---@param units Unit[]
----@param order Task
+---@param order ScriptTaskParams
 ---@return ScriptTask
 function IssueScript(units, order)
 end
 
 --- Orders a group of units (SML or SMD) to build a nuke
----
----@see IssueToUnitSiloBuildNuke for a single unit variant
+---@see moho.unit_methods.OnSiloBuildStart # Called when the missile starts building
+---@see IssueToUnitSiloBuildNuke # Single unit variant
 ---@param units Unit[]
 ---@return SimCommand
 function IssueSiloBuildNuke(units)
 end
 
 --- Orders a group of units to build a tactical missile
----
----@see IssueToUnitSiloBuildTactical for a single unit variant
+---@see moho.unit_methods.OnSiloBuildStart # Called when the missile starts building
+---@see IssueToUnitSiloBuildTactical # Single unit variant
 ---@param units Unit[]
 ---@return SimCommand
 function IssueSiloBuildTactical(units)
 end
 
 --- Orders a group of units to stop, this happens immediately
----
----@see IssueToUnitStop for a single unit variant
+---@see IssueToUnitStop # Single unit variant
 ---@param units Unit[]
 function IssueStop(units)
 end
 
 --- Orders a group of units to launch a tactical missile
----@see IssueNuke() # for nuclear missiles
----
----@see IssueToUnitTactical for a single unit variant
+---@see IssueNuke # For nuclear missiles
+---@see IssueToUnitTactical # Single unit variant
 ---@param units Unit[]
 ---@param target Unit | Vector
 ---@return SimCommand
@@ -1052,25 +1049,28 @@ function IssueTactical(units, target)
 end
 
 --- Orders a group of units to teleport to a position
----
----@see IssueToUnitTeleport for a single unit variant
+---@see moho.unit_methods.OnTeleportUnit # Called when the order starts
+---@see moho.unit_methods.OnFailedTeleport # Called when the order ends before the teleport
+---@see IssueToUnitTeleport # Single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
 function IssueTeleport(units, position)
 end
 
----
----@see IssueToUnitTeleportToBeacon for a single unit variant
+--- Orders `TELEPORTATION` transports to unload onto `beacon`, which makes it their teleport beacon
+---@see moho.unit_methods.OnSetTeleportDest # Called on each transport
+---@see IssueToUnitTeleportToBeacon # Single unit variant
 ---@param units Unit[]
----@param beacon unknown
+---@param beacon Unit
 ---@return SimCommand
 function IssueTeleportToBeacon(units, beacon)
 end
 
 --- Orders a group of units to attach themselves to a transport
----
----@see IssueToUnitTransportLoad for a single unit variant
+---@see moho.unit_methods.OnTransportOrdered # Called on the transport
+---@see moho.aibrain_methods.OnTransportFull # Called when the transport or carrier is full
+---@see IssueToUnitTransportLoad # Single unit variant
 ---@param units Unit[]
 ---@param transport Unit
 ---@return SimCommand
@@ -1078,8 +1078,7 @@ function IssueTransportLoad(units, transport)
 end
 
 --- Orders a group of transports to unload their cargo at a position
----
----@see IssueToUnitTransportUnload for a single unit variant
+---@see IssueToUnitTransportUnload # Single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
@@ -1087,8 +1086,7 @@ function IssueTransportUnload(units, position)
 end
 
 --- Orders a group of ~~transports~~ or carriers to unload specific units by `categories`
----
----@see IssueToUnitTransportUnloadSpecific for a single unit variant
+---@see IssueToUnitTransportUnloadSpecific # Single unit variant
 ---@param units Unit[]
 ---@param category EntityCategory
 ---@param position Vector
@@ -1097,8 +1095,7 @@ function IssueTransportUnloadSpecific(units, category, position)
 end
 
 --- Orders a group of units to upgrade
----
----@see IssueToUnitUpgrade for a single unit variant
+---@see IssueToUnitUpgrade # Single unit variant
 ---@param units Unit[]
 ---@param blueprintID string
 ---@return SimCommand
@@ -1123,16 +1120,27 @@ end
 function ListArmies()
 end
 
----@param instigator Unit
+--- Knocks units within `maxRadius` of `location` into the air without damaging them. Each unit is pushed away from
+--- `location` at `amount` ogrids per second at the center, falling to 75% at the edge. The push is straight up at the
+--- center and more horizontal further out. Air units instead get the push as an impulse on their physics body, divided by
+--- their mass, and keep flying. Other units fall in the `Ballistic` motion state with a random spin, which is smaller for
+--- heavier and larger units.
+--- Skips dead units, units being built, units that can't move, and allies of the instigator unless `damageFriendly` is
+--- true. Also skips units inside an enemy shield that the radius overlaps, unless that shield contains `location`
+---@see moho.unit_methods.OnMotionStateChange # Called with `"Ballistic"` when the fall starts
+---@see EntityBlueprint.InertiaTensorX # How mass and size limit the spin
+---@see moho.unit_methods.OnImpact # Called when a unit lands dead
+---@param instigator Unit | Projectile | nil
 ---@param location Vector
----@param maxRadius number
----@param amount number
----@param affectsCategory? EntityCategory
+---@param maxRadius number # Must be above 0
+---@param amount number # Must be above 0
+---@param affectsCategory CategoryName # A single category name, not an expression
 ---@param damageFriendly? boolean
----@deprecated
 function MetaImpact(instigator, location, maxRadius, amount, affectsCategory, damageFriendly)
 end
 
+---@see moho.unit_methods.OnStartRepeatQueue # Called on `to` when repeat build turns on
+---@see moho.unit_methods.OnStopRepeatQueue # Called on `to` when repeat build turns off
 ---@param from Unit
 ---@param to Unit
 function NotifyUpgrade(from, to)
@@ -1168,7 +1176,7 @@ end
 --- Only returns a unit when called from the `SimLua` console command's thread.
 --- 
 ---@see DebugGetSelection # For multiple selected units, in any sim thread.
----@see __selected_unit The unit this function returns
+---@see __selected_unit # The unit this function returns
 ---@return Unit?
 function SelectedUnit()
 end
@@ -1266,13 +1274,6 @@ end
 function SetArmyUnitCap(army, unitCap)
 end
 
---- Sets the command source of an army to match another army's command source.
----@param targetArmyIndex number        # The target army that we're managing command sources for. This is a 0-based index, unlike army indices that are 1-based.
----@param sourceHumanIndex number       # The source index that is added or removed as a command source. This is a 0-based index, including only actual sources. Mimics the index of `GetClientSessions` in the UI.
----@param enable boolean                # Whether or not the source index is a command source for the target army
-function SetCommandSource(targetArmyIndex, sourceHumanIndex, enable)
-end
-
 --- sets an army to ignore unit cap
 ---@param army Army
 ---@param ignore boolean
@@ -1284,19 +1285,6 @@ end
 ---@param army Army
 ---@param ignore boolean
 function SetIgnorePlayableRect(army, ignore)
-end
-
---- Changes the distance at which the default navigator switches to a lower resolution
---- pathfinding grid (from "personal" per-unit waypoints to waypoints shared by many units),
---- typically resulting in units moving in columns over large distances instead of maintaining their formation.
----
---- Default engine value is 50.
----
---- Useful console commands for debugging: "dbg navwaypoints", "dbg navpath", "dbg navsteering"
----
---- Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/132
----@param distance number
-function SetNavigatorPersonalPosMaxDistance(distance)
 end
 
 --- sets the playable area of a map
@@ -1375,4 +1363,30 @@ end
 ---@param shield Shield
 ---@param spec UnitBlueprintDefenseShield
 function _c_CreateShield(shield, spec)
+end
+
+-- Added by FA-Binary-Patches
+
+--- Sets the command source of an army to match another army's command source.
+--- Removing the last command source doesn't call `AbandonedByPlayer`
+---
+--- Introduced by https://github.com/FAForever/FA-Binary-Patches/commit/e23e4ea9ad1aeed74b718aaf27eff6bd28742b95
+---@see moho.aibrain_methods.AbandonedByPlayer # Called when the last command source leaves the game
+---@param targetArmyIndex number        # The target army that we're managing command sources for. This is a 0-based index, unlike army indices that are 1-based.
+---@param sourceHumanIndex number       # The source index that is added or removed as a command source. This is a 0-based index, including only actual sources. Mimics the index of `GetClientSessions` in the UI.
+---@param enable boolean                # Whether or not the source index is a command source for the target army
+function SetCommandSource(targetArmyIndex, sourceHumanIndex, enable)
+end
+
+--- Changes the distance at which the default navigator switches to a lower resolution
+--- pathfinding grid (from "personal" per-unit waypoints to waypoints shared by many units),
+--- typically resulting in units moving in columns over large distances instead of maintaining their formation
+---
+--- Default engine value is 50
+---
+--- Useful console commands for debugging: "dbg navwaypoints", "dbg navpath", "dbg navsteering"
+---
+--- Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/132
+---@param distance number
+function SetNavigatorPersonalPosMaxDistance(distance)
 end
