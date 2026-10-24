@@ -131,7 +131,9 @@ end
 function Entity:DetachAll(bone, skipBallistic)
 end
 
---- Detaches all entities attached to this entity from it
+--- Detaches this entity from the entity it is attached to. A detached unit that can't fly falls in the `Ballistic` motion state
+--- with the velocity of its attach point over the last tick, unless `skipBallistic` is true
+---@see moho.unit_methods.OnImpact # Called when a falling unit lands dead
 ---@param skipBallistic? boolean
 function Entity:DetachFrom(skipBallistic)
 end
@@ -391,9 +393,11 @@ end
 function Entity:SetParentOffset(vector)
 end
 
+--- Sets the position of the entity. Without `immediate`, the position applies at the end of the tick, and the move counts
+--- as the entity's velocity. With `immediate`, it applies at once and the velocity is zero
 ---@see moho.entity_methods.SetOrientation # For setting the orientation
 ---@param vector Vector
----@param immediate? boolean
+---@param immediate boolean # Required: omitting it errors with "expected boolean"
 function Entity:SetPosition(vector, immediate)
 end
 
