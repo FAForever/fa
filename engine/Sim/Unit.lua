@@ -1002,7 +1002,19 @@ Unit.OnFerryPointSet = nil
 ---@type nil | fun(self: Unit)
 Unit.OnGotFuel = nil
 
---- Called by the engine when the falling unit hits the ground or the water
+--- Called by the engine when a dead unit in the `Ballistic` motion state lands, with `"Terrain"` on land and `"Water"` otherwise.
+--- A unit falls in that state when:
+--- - it is killed while in the air. An air unit killed after landing doesn't fall
+--- - it can't fly and is detached from its parent, unless `skipBallistic` is true
+--- - `MetaImpact` knocks it into the air
+--- A unit that is still alive when it lands is killed if it lands outside the playable area, tilted too far,
+--- or where its footprint doesn't fit, and then gets this call. Otherwise it gets no call.
+--- A unit attached to another entity doesn't fall, so it gets no call either.
+--- Lua also calls it on FAF air units: when their `ShieldCollider` projectile hits terrain or water, and from
+--- `OnAnimTerrainCollision` after a shield bounce attaches the unit to that projectile
+---@see moho.unit_methods.OnMotionStateChange # Called with `"Ballistic"` when the fall starts, and with `"Crashed"` after this
+---@see moho.entity_methods.DetachFrom # Starts the fall of a unit that can't fly
+---@see MetaImpact # Knocks units into the air
 ---@type nil | fun(self: Unit, with: "Terrain" | "Water")
 Unit.OnImpact = nil
 
