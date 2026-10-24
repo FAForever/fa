@@ -1120,13 +1120,15 @@ end
 function ListArmies()
 end
 
---- Knocks units within `maxRadius` of `location` into the air without damaging them. Each unit is pushed away from `location`
---- and upward, more steeply toward the center, at `amount` units per second at the center down to 75% of it at the edge.
---- Air units only gain the speed. Other units fall in the `Ballistic` motion state with a random spin, which is smaller
---- for units with more mass. Their mass is `AverageDensity` times their size, and FAF sets `AverageDensity` to `MaxHealth`.
---- Skips dead units, units being built and units that can't move. Also skips allies of the instigator unless `damageFriendly`
---- is true, and units in an enemy shield that the radius reaches but that doesn't contain `location`
+--- Knocks units within `maxRadius` of `location` into the air without damaging them. Each unit is pushed away from
+--- `location` at `amount` ogrids per second at the center, falling to 75% at the edge. The push is straight up at the
+--- center and more horizontal further out. Air units instead get the push as an impulse on their physics body, divided by
+--- their mass, and keep flying. Other units fall in the `Ballistic` motion state with a random spin, which is smaller for
+--- heavier and larger units.
+--- Skips dead units, units being built, units that can't move, and allies of the instigator unless `damageFriendly` is
+--- true. Also skips units inside an enemy shield that the radius overlaps, unless that shield contains `location`
 ---@see moho.unit_methods.OnMotionStateChange # Called with `"Ballistic"` when the fall starts
+---@see moho.entity_methods.AddWorldImpulse # How the engine calculates a unit's mass
 ---@see moho.unit_methods.OnImpact # Called when a unit lands dead
 ---@param instigator Unit | Projectile | nil
 ---@param location Vector
