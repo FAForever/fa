@@ -213,7 +213,7 @@ Merging includes workarounds for the limitations involving arrays and removing f
     of category names (strings) you want to add or remove.
   - To change weapon blueprints, use the `ModWeapon` table, which consists of weapon blueprints
     with special fields:
-    - `MergeLabel` merges the blueprint with the weapon blueprint that has the same `label`.
+    - `MergeLabel` merges the blueprint with all weapon blueprints that have the same `label`.
     - When a label is not found, `AddIndex` adds the weapon at the specified index.
         - This is mostly useful for adding a weapon to index 1, which is what controls unit AI.
     - Neither fields are necessary, as by default the blueprints in `ModWeapon` are added to
@@ -463,7 +463,7 @@ local _mod_cache = nil
 ---@param selectedMods? uidSet set of mod UID's
 function SetSelectedMods(selectedMods)
     if selectedMods then
-        LOG("Mod list set to:")
+        LOG(string.format("Mod list set to %d mods:", table.getsize(selectedMods)))
         for uid in selectedMods do
             local info = _mod_cache[uid]
             LOG(string.format('\t%-5s "%-30s v%02s (%-37s by %s'

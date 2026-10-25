@@ -1,0 +1,1 @@
+- Show the vision that scouts provide after they die while they fall to the ground (#7190).

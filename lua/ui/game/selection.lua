@@ -532,7 +532,7 @@ local function GetPrincipleComponents(units)
     return minor, major, cx, cz
 end
 
----@type UserUnit[][]
+---@type table<UserUnit, boolean>[][]
 local Grid = {
     { { {} }, { {} }, { {} }, { {} }, { {} }, { {} }, { {} } },
     { { {} }, { {} }, { {} }, { {} }, { {} }, { {} }, { {} } },

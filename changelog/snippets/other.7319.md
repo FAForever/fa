@@ -1,0 +1,1 @@
+- Add a benchmark for indexing `nil` that compares different implicit nil check usages of the behavior (#7319).

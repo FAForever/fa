@@ -214,7 +214,7 @@ local keyActionsDebug = {
         category = 'game',
     },
     ['debug_restart_session'] = {
-        action = 'UI_Lua RestartSession()',
+        action = "UI_Lua import('/lua/keymap/misckeyactions.lua').RestartSessionOrReplay()",
         category = 'debug',
     },
     ['debug_toggle_pannels'] = {
@@ -290,23 +290,23 @@ local keyActionsDebugAI = {
         category = 'ai'
     },
     ['create_build_template_02'] = {
-        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").AddUnitSelectionToEmptyChunkTemplate(2)',
+        action = 'UI_Lua import("/lua/ui/game/aibrains/AIBaseChunkUIUtils.lua").CreateBaseChunkFromUnitSelection(2)',
         category = 'ai'
     },
     ['create_build_template_04'] = {
-        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").AddUnitSelectionToEmptyChunkTemplate(4)',
+        action = 'UI_Lua import("/lua/ui/game/aibrains/AIBaseChunkUIUtils.lua").CreateBaseChunkFromUnitSelection(4)',
         category = 'ai'
     },
     ['create_build_template_08'] = {
-        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").AddUnitSelectionToEmptyChunkTemplate(8)',
+        action = 'UI_Lua import("/lua/ui/game/aibrains/AIBaseChunkUIUtils.lua").CreateBaseChunkFromUnitSelection(8)',
         category = 'ai'
     },
     ['create_build_template_16'] = {
-        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").AddUnitSelectionToEmptyChunkTemplate(16)',
+        action = 'UI_Lua import("/lua/ui/game/aibrains/AIBaseChunkUIUtils.lua").CreateBaseChunkFromUnitSelection(16)',
         category = 'ai'
     },
     ['create_build_template_32'] = {
-        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").AddUnitSelectionToEmptyChunkTemplate(32)',
+        action = 'UI_Lua import("/lua/ui/game/aibrains/AIBaseChunkUIUtils.lua").CreateBaseChunkFromUnitSelection(32)',
         category = 'ai'
     },
     ['create_title_announcement'] = {

@@ -296,12 +296,13 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     ---@param self Projectile
     ---@param instigator Unit
     ---@param type string
-    ---@param overkillRatio number
+    ---@param overkillRatio? number
     OnKilled = function(self, instigator, type, overkillRatio)
 
         -- callbacks for launcher to have an idea what is going on for AIs
         local launcher = self.Launcher
         if not IsDestroyed(launcher) then
+            ---@cast launcher -nil
             launcher:OnMissileIntercepted(self:GetCurrentTargetPosition(), instigator, self:GetPosition(), self)
 
             -- keep track of the number of intercepted missiles
@@ -623,7 +624,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     ---@param instigator Unit | Projectile # The launcher, and if it doesn't exist, the projectile itself
     ---@param DamageData WeaponDamageTable # passed by the weapon
     ---@param targetEntity Unit | Prop | nil # nil if hitting terrain
-    ---@param cachedPosition Vector # A cached position that is passed to prevent table allocations, can not be used in fork threads and / or after a yield statement
+    ---@param cachedPosition? Vector # A cached position that is passed to prevent table allocations, can not be used in fork threads and / or after a yield statement
     DoDamage = function(self, instigator, DamageData, targetEntity, cachedPosition)
 
         -- this may be a cached vector, we can not send this to threads or use after waiting statements!
@@ -631,6 +632,8 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
 
         local damage = DamageData.DamageAmount
         if damage > 0 then
+            local initialDamage = DamageData.InitialDamageAmount or 0
+            local impactDamage = DamageData.DoTDelayFirstPulse and initialDamage or damage + initialDamage
 
             -- deal damage in a radius
             local radius = DamageData.DamageRadius
@@ -658,7 +661,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                     instigator,
                     cachedPosition,
                     radius,
-                    damage + (DamageData.InitialDamageAmount or 0),
+                    impactDamage,
                     damageType,
                     damageFriendly,
                     damageSelf
@@ -667,8 +670,8 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                 -- check for and deal damage over time
                 local DoTTime = DamageData.DoTTime
                 if DoTTime > 0 then
-                    -- initial damage pulse was already dealt so subtract 1
-                    local DoTPulses = DamageData.DoTPulses - 1
+                    -- one pulse is consumed by the impact hit, unless DoTDelayFirstPulse defers all pulses
+                    local DoTPulses = DamageData.DoTDelayFirstPulse and DamageData.DoTPulses or DamageData.DoTPulses - 1
                     if DoTPulses >= 1 then
                         ForkThread(
                             AreaDoTThread,
@@ -705,15 +708,15 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                     instigator,
                     cachedPosition,
                     targetEntity,
-                    damage + (DamageData.InitialDamageAmount or 0),
+                    impactDamage,
                     damageType
                 )
 
                 -- check for and apply damage over time
                 local DoTTime = DamageData.DoTTime
                 if DoTTime > 0 then
-                    -- initial damage pulse was already dealt so subtract 1
-                    local DoTPulses = DamageData.DoTPulses - 1
+                    -- one pulse is consumed by the impact hit, unless DoTDelayFirstPulse defers all pulses
+                    local DoTPulses = DamageData.DoTDelayFirstPulse and DamageData.DoTPulses or DamageData.DoTPulses - 1
                     if DoTPulses >= 1 then
                         ForkThread(
                             UnitDoTThread,
@@ -838,7 +841,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
 
     --- Called by Lua to create the impact effects
     ---@param self Projectile
-    ---@param army number
+    ---@param army Army
     ---@param effectTable string[]
     ---@param effectScale? number
     CreateImpactEffects = function(self, army, effectTable, effectScale)
@@ -860,7 +863,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
 
     --- Called by Lua to create the terrain effects
     ---@param self  Projectile
-    ---@param army number
+    ---@param army Army
     ---@param effectTable string[]
     ---@param effectScale? number
     CreateTerrainEffects = function(self, army, effectTable, effectScale)

@@ -39,6 +39,7 @@ RecipientNotify = 'notify'
 ---@field Location?   UIChatEntryLocation # lightweight location hint from a sim-originated sender (AI brain, system message)
 ---@field Id?         string             # near-unique sender-stamped id (`tostring(msg)`); used to dedupe the `Sync.ChatMessages` replay/sim path against the live `SessionSendChatMessage` path
 ---@field WrappedText? string[]          # view-side cache: text wrapped to the current row width (populated by ChatInterface)
+---@field Type? ChatMessageType          # Handles resource/unit sharing mute options
 
 --- Reactive chat-state singleton: the single source of truth shared by every chat view.
 ---@class UIChatModel

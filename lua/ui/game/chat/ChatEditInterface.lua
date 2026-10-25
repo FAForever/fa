@@ -198,6 +198,14 @@ ChatEditInterface = ClassUI(Group) {
             end
         end
 
+        self.EditBox.OnKeyboardFocusChange = function(_)
+            self.HasKeyboardFocus = false
+        end
+
+        self.EditBox.OnLoseKeyboardFocus = function(_)
+            self.HasKeyboardFocus = false
+        end
+
         local model = ChatModel.GetSingleton()
         self.RecipientObserver = self.Trash:Add(LazyVarDerive(model.Recipient, function(lv)
             self:RefreshRecipient(lv())
@@ -445,12 +453,14 @@ ChatEditInterface = ClassUI(Group) {
     --- Gives keyboard focus to the edit box.
     ---@param self UIChatEditInterface
     AcquireFocus = function(self)
+        self.HasKeyboardFocus = true
         self.EditBox:AcquireFocus()
     end,
 
     --- Releases keyboard focus from the edit box.
     ---@param self UIChatEditInterface
     AbandonFocus = function(self)
+        self.HasKeyboardFocus = false
         self.EditBox:AbandonFocus()
     end,
 

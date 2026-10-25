@@ -146,7 +146,7 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
             if self.TarmacBag then
                 self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)
             else
-                self:CreateTarmac(true, true, true, false, false)
+                self:CreateTarmac(true, true, true)
             end
         end
     end,
@@ -314,7 +314,7 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
 
         -- tarmac is made once seraphim animation is complete
         if self.Blueprint.General.FactionName == "Seraphim" then
-            self:CreateTarmac(true, true, true, false, false)
+            self:CreateTarmac(true, true, true)
         end
 
         self:PlayActiveAnimation()
@@ -630,7 +630,7 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
                 for k, guard in guards do
                     if table.getn(guard:GetCommandQueue()) == 1 then
                         IssueToUnitClearCommands(guard)
-                        IssueGuard({guard}, self)
+                        IssueToUnitGuard(guard, self)
                     end
                 end
             end
@@ -886,9 +886,9 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
                 if progress < 0.99 then
                     self:StopSiloBuild()
                     if EntityCategoryContains(categories.STRATEGIC, self) then
-                        IssueSiloBuildNuke({ self })
+                        IssueToUnitSiloBuildNuke(self)
                     else
-                        IssueSiloBuildTactical({ self })
+                        IssueToUnitSiloBuildTactical(self)
                     end
 
                     self:GiveNukeSiloBlocks(progress)
@@ -929,7 +929,7 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
                 local progress = self:GetWorkProgress()
                 if progress < 0.99 then
                     self:StopSiloBuild()
-                    IssueSiloBuildTactical({ self })
+                    IssueToUnitSiloBuildTactical(self)
                     self:GiveNukeSiloBlocks(progress)
                     self:SetAutoMode(autoModeEnabled)
                 end

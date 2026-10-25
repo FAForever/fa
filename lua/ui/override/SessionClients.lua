@@ -29,11 +29,12 @@
 ---@field ping number
 ---@field quiet number
 ---@field uid string
+---@field maxSP integer # max sim speed
 
 local Prefs = import("/lua/user/prefs.lua")
 
 ---@type 'on' | 'allies-only' | 'off'
-OptionShowPlayerNames = Prefs.GetFromCurrentProfile('options.options_show_player_names') or 'on'
+OptionShowPlayerNames = Prefs.GetFromCurrentProfile('options.show_player_names') or 'on'
 
 ---@param clients Client[]
 ---@return Client[]
@@ -63,7 +64,7 @@ local GlobalGetSessionClients = _G.GetSessionClients
 --- Allows UI elements to be updated when the cache is updated by adding a callback via Observable:AddObserver()
 ---@type Client[]
 local Cached = PostprocessClients(GlobalGetSessionClients())
-
+---@type Observer<Client[]>
 Observable = import("/lua/shared/observable.lua").Create()
 Observable:Set(Cached)
 

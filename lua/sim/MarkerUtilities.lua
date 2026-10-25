@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local StringSplit = import("/lua/system/utils.lua").StringSplit
+local StringSplit = string.split
 local TableDeepCopy = table.deepcopy
 
 ---@alias MarkerType 'Mass' | 'Hydrocarbon' | 'Spawn' | 'Start Location' | 'Air Path Node' | 'Land Path Node' | 'Water Path Node' | 'Ampibious Path Node' | 'Transport Marker' | 'Naval Area' | 'Naval Link' | 'Rally Point' | 'Large Expansion Area' | 'Expansion Area' | 'Protected Experimental Construction'

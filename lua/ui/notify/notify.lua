@@ -263,9 +263,9 @@ function sendEnhancementMessage(messageTable)
     if trigger == 'started' then
         onStartEnhancement(id, army, category, source)
     elseif trigger == 'cancelled' then
-        onCancelledEnhancement(id, category, source)
+        onCancelledEnhancement(id, category, source, army)
     elseif trigger == 'completed' then
-        onCompletedEnhancement(id, category, source)
+        onCompletedEnhancement(id, category, source, army)
     end
 end
 
@@ -274,7 +274,8 @@ end
 ---@param category NotifyCategory
 ---@param source NotifySource
 function onStartEnhancement(id, army, category, source)
-    local msg = {to = 'notify', Chat = true, text = 'Starting ' .. messages()[category][source], data = {category = category, source = source, trigger = 'started'}}
+    ---@type ChatPayload
+    local msg = {notifyFrom = army, to = 'notify', Chat = true, text = 'Starting ' .. messages()[category][source], data = {category = category, source = source, trigger = 'started'}}
 
     -- Start by storing ACU IDs for future use
     if id and (focusArmy == -1 or army == focusArmy) then
@@ -297,8 +298,10 @@ end
 ---@param id EntityId?
 ---@param category NotifyCategory
 ---@param source NotifySource
-function onCancelledEnhancement(id, category, source)
-    local msg = {to = 'notify', Chat = true, text = messages()[category][source] .. ' cancelled', data = {category = category, source = source, trigger = 'cancelled'}}
+---@param army Army
+function onCancelledEnhancement(id, category, source, army)
+    ---@type ChatPayload
+    local msg = {notifyFrom = army, to = 'notify', Chat = true, text = messages()[category][source] .. ' cancelled', data = {category = category, source = source, trigger = 'cancelled'}}
 
     if id then
         local data = ACUs[id]
@@ -314,8 +317,10 @@ end
 ---@param id EntityId?
 ---@param category NotifyCategory
 ---@param source NotifySource
-function onCompletedEnhancement(id, category, source)
-    local msg = {to = 'notify', Chat = true, text = messages()[category][source] .. ' done!', data = {category = category, source = source, trigger = 'completed'}}
+---@param army Army
+function onCompletedEnhancement(id, category, source, army)
+    ---@type ChatPayload
+    local msg = {notifyFrom = army, to = 'notify', Chat = true, text = messages()[category][source] .. ' done!', data = {category = category, source = source, trigger = 'completed'}}
 
     if id then
         local data = ACUs[id]

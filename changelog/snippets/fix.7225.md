@@ -1,0 +1,1 @@
+- Fix displayed abilities for Aeon torpedo bomber and Aeon and Cybran hydrocarbon power plants (#7225).

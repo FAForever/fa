@@ -54,11 +54,11 @@ function AreaAttackOrder(units, target, radius)
 
     local b = MathRound(2 *MathSqrt(unitCount))
 
-    phi = (MathSqrt(5) + 1) / 2 -- golden ratio
+    local phi = (MathSqrt(5) + 1) / 2 -- golden ratio
     for k = 1, unitCount do
-        r = ComputeRadius(k, unitCount, b)
+        local r = ComputeRadius(k, unitCount, b)
 
-        theta = (2 * MathPi * k) / (phi * phi)
+        local theta = (2 * MathPi * k) / (phi * phi)
 
         local tx = target[1] + radius * r * MathCos(theta)
         local tz = target[3] + radius * r * MathSin(theta)
