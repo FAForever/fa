@@ -4,8 +4,7 @@ local ChatConfigModel = import("/lua/ui/game/chat/config/ChatConfigModel.lua")
 local ChatUtils = import("/lua/ui/game/chat/ChatUtils.lua")
 local ChatPayload = import("/lua/shared/ChatPayload.lua")
 
--------------------------------------------------------------------------------
--- Window visibility
+--#region Window visibility
 
 --- Shows the chat window.
 function OpenWindow()
@@ -23,8 +22,8 @@ function ToggleWindow()
     lv:Set(not lv())
 end
 
--------------------------------------------------------------------------------
--- Activity heartbeat
+--#endregion
+--#region Activity heartbeat
 
 --- Stamps `LastActivity` with the current system time. Call from any
 --- UI surface that counts as engagement.
@@ -41,8 +40,8 @@ function SetPinned(pinned)
     end
 end
 
--------------------------------------------------------------------------------
--- Recipient
+--#endregion
+--#region Recipient
 
 --- Sets the current send target.
 ---@param target UIChatRecipient
@@ -50,8 +49,8 @@ function SetRecipient(target)
     ChatModel.GetSingleton().Recipient:Set(target)
 end
 
--------------------------------------------------------------------------------
--- Messages
+--#endregion
+--#region Messages
 
 --- Appends an entry to the history log and stamps `LastActivity`. Used by
 --- the receive path and by locally-echoed outgoing messages.
@@ -78,8 +77,8 @@ function AppendLocalSystemMessage(text)
     }
 end
 
----------------------------------------------------------------------------
--- Filtering
+--#endregion
+--#region Filtering
 
 --- Whether an entry should be shown by chat interfaces according to options
 ---@param entry UIChatEntry
@@ -105,9 +104,8 @@ IsValidEntry = function(entry)
     return true
 end
 
-
--------------------------------------------------------------------------------
--- Slash commands
+--#endregion
+--#region Slash commands
 
 --- (Re-)registers every built-in chat command with the registry. Idempotent.
 function RegisterBuiltinCommands()
@@ -139,10 +137,10 @@ function RegisterBuiltinCommands()
     Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/Help.lua")
 end
 
--------------------------------------------------------------------------------
--- Address book
+--#endregion
+--#region Address book
 
----@param armiesTable table
+---@param armiesTable ArmyInfo[]
 ---@return number[]
 local function FindClientsAsObserver(armiesTable)
     local result = {}
@@ -218,10 +216,13 @@ function FindClients(armyID)
     return FindClientsAsPlayer(t.armiesTable, t.focusArmy, armyID)
 end
 
+---@class ArmyInfo
+---@field package ArmyID integer
+
 --- Looks up army data by army index (number) or nickname (string). For
 --- nickname lookups the returned table has `ArmyID` set to the matching index.
----@param army Army | string
----@return table | nil
+---@param army Army
+---@return ArmyInfo | nil
 local function GetArmyData(army)
     local armies = GetArmiesTable()
     if type(army) == 'number' then
@@ -238,13 +239,13 @@ end
 
 local ToStrings = ChatUtils.ToStrings
 
--------------------------------------------------------------------------------
--- Chat line construction
+--#endregion
+--#region Chat line construction
 
 ---@class ChatLineArgs
 ---@field Name string
 ---@field Text? string
----@field ArmyData? table
+---@field ArmyData? ArmyInfo
 ---@field IsObserver? boolean
 ---@field Recipient UIChatRecipient
 ---@field Camera? table
@@ -293,8 +294,8 @@ local function AppendChatLine(args)
     }
 end
 
--------------------------------------------------------------------------------
--- Receiving (network)
+--#endregion
+--#region Receiving (network)
 
 --- Returns true when `msg.Id` matches an entry already in history. The same
 --- chat message arrives via both delivery paths in live play (engine
@@ -342,6 +343,7 @@ function OnReceive(sender, msg)
     if not SessionIsGameOver() and msg.Observer and armyData then return end
 
     if msg.to == ChatModel.RecipientNotify then
+        ---@cast msg NotifyChatPayload
         -- ignore unwanted messages
         if not import("/lua/ui/notify/notify.lua").processIncomingMessage(sender, msg) then
             return
@@ -398,8 +400,8 @@ function OnSyncChatMessages(msgs)
     end
 end
 
--------------------------------------------------------------------------------
--- Echoing (local synthesis for outgoing privates)
+--#endregion
+--#region Echoing (local synthesis for outgoing privates)
 --
 -- The engine doesn't bounce private messages back to the sender, so we
 -- synthesise a "To <recipient>:" line locally instead.
@@ -421,8 +423,8 @@ local function OnEcho(senderData, recipientData, msg)
     }
 end
 
--------------------------------------------------------------------------------
--- Sending
+--#endregion
+--#region Sending
 
 --- Sends a chat message to the current recipient. Dispatches slash commands,
 --- drops all-whitespace bodies, short-circuits taunts, then routes the
@@ -525,12 +527,13 @@ function Send(text, attachCamera)
     end
 end
 
--------------------------------------------------------------------------------
--- Engine hotkey entry point
+--#endregion
+--#region Engine hotkey entry point
 
 --- Opens the chat window with the recipient forced to `allies` or `all`
 --- based on `send_type` and the Shift modifier. A specific-army recipient
---- (mid-private) is left alone.---@param modifiers? table  # engine-supplied modifier state ({Shift, Ctrl, ...})
+--- (mid-private) is left alone.
+---@param modifiers? KeyModifiers  # engine-supplied modifier state
 function ActivateChat(modifiers)
     -- The engine calls this via a top-level `ActivateChat` shim in
     -- `gamemain.lua` when the user presses Enter outside the edit box.
@@ -552,8 +555,8 @@ function ActivateChat(modifiers)
     end
 end
 
--------------------------------------------------------------------------------
--- Lifecycle
+--#endregion
+--#region Lifecycle
 
 --- Registers the receive handler with gamemain, populates the slash-command
 --- registry, and mounts the chat tree. Idempotent.
@@ -572,7 +575,7 @@ function Init()
     import("/lua/ui/game/chat/ChatInterface.lua").EnsureInstance()
 end
 
--------------------------------------------------------------------------------
+--#endregion
 --#region Debugging
 
 --- Hot-reload hook: re-runs `Init()` on the new module.
