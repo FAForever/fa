@@ -343,6 +343,7 @@ function OnReceive(sender, msg)
     if not SessionIsGameOver() and msg.Observer and armyData then return end
 
     if msg.to == ChatModel.RecipientNotify then
+        ---@cast msg NotifyChatPayload
         -- ignore unwanted messages
         if not import("/lua/ui/notify/notify.lua").processIncomingMessage(sender, msg) then
             return

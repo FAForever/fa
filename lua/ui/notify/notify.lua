@@ -278,7 +278,7 @@ end
 ---@param category NotifyCategory
 ---@param source NotifySource
 function onStartEnhancement(id, army, category, source)
-    ---@type ChatPayload
+    ---@type NotifyChatPayload
     local msg = {notifyFrom = army, to = 'notify', Chat = true, text = 'Starting ' .. messages()[category][source], data = {category = category, source = source, trigger = 'started'}}
 
     -- Start by storing ACU IDs for future use
@@ -304,7 +304,7 @@ end
 ---@param source NotifySource
 ---@param army Army
 function onCancelledEnhancement(id, category, source, army)
-    ---@type ChatPayload
+    ---@type NotifyChatPayload
     local msg = {notifyFrom = army, to = 'notify', Chat = true, text = messages()[category][source] .. ' cancelled', data = {category = category, source = source, trigger = 'cancelled'}}
 
     if id then
@@ -323,7 +323,7 @@ end
 ---@param source NotifySource
 ---@param army Army
 function onCompletedEnhancement(id, category, source, army)
-    ---@type ChatPayload
+    ---@type NotifyChatPayload
     local msg = {notifyFrom = army, to = 'notify', Chat = true, text = messages()[category][source] .. ' done!', data = {category = category, source = source, trigger = 'completed'}}
 
     if id then
