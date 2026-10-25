@@ -350,7 +350,9 @@ function StartBenchmark(module, benchmark)
     -- from the sim on stop to set to false. This is so that we can't send benchmark requests
     -- to the sim while one is running.
     local benchmarkState = State.Benchmarks
+    -- selecting the running benchmark again clears its count until the info arrives
     local params = benchmarkState.ParameterCount
+        or benchmarkState.ParameterCountCache[GetBenchmarkCacheKey(module, benchmark)]
     if not params then
         WARN("Missing debug function to start benchmark")
         -- nothing will come back from the sim, so don't wait on it
@@ -1245,6 +1247,8 @@ ProfilerBenchmarks = Class(Group) {
             StopBenchmark()
         end
         benchmarkState.SelectedBenchmark = index
+        -- the previous benchmark's, until this one's info arrives
+        benchmarkState.ParameterCount = nil
 
         self.benchmarkList:SetSelection(index - 1) -- to zero-index list
         if index > 0 then
@@ -1400,7 +1404,9 @@ ProfilerBenchmarks = Class(Group) {
     UpdateParametersLabel = function(self)
         local benchmarkState = State.Benchmarks
         local params = benchmarkState.ParameterCount
-        if params then
+        if not params then
+            self.parametersLabel:Hide()
+        else
             local label = self.parametersLabel
             label:Hide()
             label:DeleteAllItems()
@@ -1424,8 +1430,8 @@ ProfilerBenchmarks = Class(Group) {
     ---@param self ProfilerBenchmarks
     UpdateRunButtonState = function(self)
         local benchmarkState = State.Benchmarks
-        local disabled = benchmarkState.SelectedBenchmark == 0
         local running = benchmarkState.BenchmarkRunning
+        local disabled = benchmarkState.SelectedBenchmark == 0 or not (running or benchmarkState.ParameterCount)
         self:SetRunButtonState(disabled, running)
         self:UpdateTimerWarning()
     end,
@@ -1758,6 +1764,12 @@ ProfilerWindow = ClassUI(Window) {
     ---@param info RawFunctionDebugInfo
     ReceiveBenchmarkInfo = function(self, info)
         local benchmarkState = State.Benchmarks
+        -- the info of a benchmark that was selected before can still arrive
+        local module = benchmarkState.Modules[benchmarkState.SelectedModule]
+        local benchmark = module and module.benchmarks[benchmarkState.SelectedBenchmark]
+        if not benchmark or benchmark.name ~= info.info.name then
+            return
+        end
         benchmarkState.ParameterCount = info.bytecode.numparams
         self.Tabs.Benchmarks:UpdateBenchmarkInfo(info)
         self.Tabs.Benchmarks:OnBenchmarkInfoReady()
