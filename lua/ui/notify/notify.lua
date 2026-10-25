@@ -9,6 +9,9 @@
 
 ---@class NotifyChatPayload : ChatPayload
 ---@field data NotifyChatPayloadData
+--- FIXME: Notify messages are not relayed through sim, so they don't use this
+--- field, but they also don't show up in replays.
+---@field From nil
 
 local Prefs = import("/lua/user/prefs.lua")
 local FindClients = import("/lua/ui/game/chat/ChatController.lua").FindClients
