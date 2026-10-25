@@ -26,9 +26,9 @@ ModuleLoopCount = 200000
 BenchmarkData = {
     AddInsertGlobal = "Global table.insert",
     AddInsertLocal = "Local table.insert",
-    AddIndex = "Table index assignment",
-    AddCount = "Assign from Count",
-    AddCountAlt = "Assign from Head",
+    AddIndexReused = "Table index assignment",
+    AddIndexSize = "Assign from Count",
+    AddIndexHead = "Assign from Head",
 }
 
 function AddInsertGlobal(loop)
