@@ -83,7 +83,7 @@ function GlobalLuaVDist3OnLocals(loop)
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    for i=1, outerLoop do
+    for i=1, loop do
         local dx, dy, dz = pos1[1] - pos2[1]
             , pos1[2] - pos2[2]
             , pos1[3] - pos2[3]
