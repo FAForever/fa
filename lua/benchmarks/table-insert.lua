@@ -1,25 +1,28 @@
 
 -- Results with loop count 200000:
 --
--- |--------------------------|---------|---------|------------|-----------|--------|------|-----------|---------|---------|-------|
--- | Name                     | Samples | Mean ms | +/- 95% ms | +/- 95% % | Dev ms | CV % | Median ms |  Min ms |  Max ms |  Skew |
--- |--------------------------|---------|---------|------------|-----------|--------|------|-----------|---------|---------|-------|
--- | "Assign from Head"       |      30 |  2.8035 |     0.0260 |      0.93 | 0.0697 | 2.49 |    2.8076 |  2.6245 |  2.9907 | -0.14 |
--- | "Table index assignment" |      29 |  2.4393 |     0.0181 |      0.74 | 0.0475 | 1.95 |    2.4414 |  2.3804 |  2.5635 |  0.49 |
--- | "Assign from Count"      |      30 |  2.8442 |     0.0303 |      1.06 | 0.0811 | 2.85 |    2.8076 |  2.6855 |  2.9907 | -0.04 |
--- | "Global table.insert"    |      28 | 21.5977 |     0.0530 |      0.25 | 0.1367 | 0.63 |   21.6064 | 21.3623 | 21.8506 |  0.08 |
--- | "Local table.insert"     |      29 | 19.0030 |     0.0719 |      0.38 | 0.1890 | 0.99 |   18.9819 | 18.7378 | 19.4092 |  0.45 |
--- |--------------------------|---------|---------|------------|-----------|--------|------|-----------|---------|---------|-------|
--- | "Baseline, 1 parameter"  |     145 |  0.7547 |     0.0052 |      0.69 | 0.0320 | 4.24 |    0.7324 |  0.6714 |  0.7935 |  0.12 |
--- |--------------------------|---------|---------|------------|-----------|--------|------|-----------|---------|---------|-------|
+-- |-------------------------------|---------|----------|------------|-----------|--------|------|-----------|----------|----------|-------|
+-- | Name                          | Samples |  Mean ms | +/- 95% ms | +/- 95% % | Dev ms | CV % | Median ms |   Min ms |   Max ms |  Skew |
+-- |-------------------------------|---------|----------|------------|-----------|--------|------|-----------|----------|----------|-------|
+-- | "Assign from Head"            |      29 |   2.8476 |     0.0263 |      0.92 | 0.0693 | 2.43 |    2.8381 |   2.7466 |   2.9907 |  0.23 |
+-- | "Table index assignment"      |      28 |   2.4523 |     0.0191 |      0.78 | 0.0493 | 2.01 |    2.4719 |   2.3804 |   2.5635 |  0.45 |
+-- | "Assign from Count"           |      28 |   2.8730 |     0.0275 |      0.96 | 0.0708 | 2.47 |    2.8687 |   2.7466 |   3.0212 |  0.16 |
+-- | "Global table.insert"         |      30 |  22.1924 |     0.1441 |      0.65 | 0.3859 | 1.74 |   22.3389 |  21.6064 |  22.9187 | -0.07 |
+-- | "Local table.insert"          |      30 |  19.5811 |     0.1437 |      0.73 | 0.3850 | 1.97 |   19.6533 |  18.9209 |  20.3552 | -0.11 |
+-- | "Assign from Head (x50)"      |      28 | 140.6656 |     0.4414 |      0.31 | 1.1381 | 0.81 |  140.3847 | 138.6948 | 142.9901 |  0.52 |
+-- | "Assign from Count (x50)"     |      27 | 143.3190 |     0.3570 |      0.25 | 0.9023 | 0.63 |  143.1274 | 141.3879 | 144.9814 |  0.17 |
+-- |-------------------------------|---------|----------|------------|-----------|--------|------|-----------|----------|----------|-------|
+-- | "Baseline, 1 parameter"       |     122 |   0.7387 |     0.0037 |      0.51 | 0.0211 | 2.86 |    0.7324 |   0.7019 |   0.7629 | -0.29 |
+-- | "Baseline, 1 parameter (x50)" |      60 |  38.4118 |     0.2923 |      0.76 | 1.1321 | 2.95 |   38.5551 |  36.6592 |  40.7181 |  0.11 |
+-- |-------------------------------|---------|----------|------------|-----------|--------|------|-----------|----------|----------|-------|
 
 -- Conclusion: avoiding the table operations is always a benefit, especially when
--- you cache the function call directly to prevent the table operation. Assigning by index is 7.8x
--- faster than a local `table.insert`, and a global `table.insert` is 1.14x slower than a local one.
+-- you cache the function call directly to prevent the table operation. Assigning by index is 8x
+-- faster than a local `table.insert`, and a global `table.insert` is 1.13x slower than a local one.
 
--- "Assign from Count" (add, then use the count) and "Assign from Head" (use the head, then add) are
--- within 2% of each other, so the order doesn't matter. Older results suggested that using the value
--- before adding to it avoids a pipeline stall, but each Lua instruction costs far more than a stall.
+-- "Assign from Head" (use the head, then add) is 1.9% faster than "Assign from Count" (add, then use
+-- the count) with the x50 multiplier, about 0.3 ns or one CPU cycle per assignment. That fits a short
+-- stall from using a value right after computing it, but it is too small to matter.
 
 
 ModuleName = "Table Insert"
