@@ -20,6 +20,7 @@
 ---@diagnostic disable: discard-returns
 
 ModuleName = "Math Trigonometry"
+ModuleLoopCount = 100000
 BenchmarkData = {
     SinGlobal = "Global math.sin",
     SinUpvalue = "Upvalued math.sin",

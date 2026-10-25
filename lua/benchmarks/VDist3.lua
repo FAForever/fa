@@ -11,6 +11,7 @@
 -- Make sure to upvalue VDist3 for a significant performance boost
 
 ModuleName = "VDist3"
+ModuleLoopCount = 100000
 
 local pos1 = Vector(Random()*1000, Random()*1000, Random()*1000)
 local pos2 = Vector(Random()*1000, Random()*1000, Random()*1000)

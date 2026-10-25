@@ -19,6 +19,7 @@
 -- Conclusion: It is faster to access values in any way through lua instead of using CFuncs.
 
 ModuleName = "Value access"
+ModuleLoopCount = 500000
 BenchmarkData = {
     BrainGlobalAccess = "Global access",
     BrainUpvalueAccess = "Upvalue access",

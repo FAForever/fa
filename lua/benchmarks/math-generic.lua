@@ -24,6 +24,7 @@
 ---@diagnostic disable: discard-returns
 
 ModuleName = "Generic math"
+ModuleLoopCount = 200000
 BenchmarkData = {
     AbsGlobal = "Global math.abs",
     AbsUpvalue = "Upvalued math.abs",

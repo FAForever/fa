@@ -32,6 +32,7 @@
 
 
 ModuleName = "Table Array"
+ModuleLoopCount = 100000
 BenchmarkData = {
     Array01 = "Array - 1",
     Array02 = "Array - 2",

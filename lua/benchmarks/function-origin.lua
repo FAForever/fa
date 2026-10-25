@@ -15,6 +15,7 @@
 -- or setters should also be prevented - it is better to just get the member variable directly instead.
 
 ModuleName = "Function Origins"
+ModuleLoopCount = 200000
 BenchmarkData = {
     EngineCall = "Engine Call",
     LuaCall = "Lua Call",

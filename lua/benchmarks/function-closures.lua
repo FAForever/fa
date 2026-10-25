@@ -15,6 +15,7 @@
 -- appears to be within the Supreme Commander context.
 
 ModuleName = "Function Closures"
+ModuleLoopCount = 100000
 BenchmarkData = {
     ClosureA = "New closure per call",
     ClosureB = "Closure created once",

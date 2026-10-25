@@ -34,6 +34,7 @@
 -- are not worth caching. Instead, you may want to reduce the hierarchy.
 
 ModuleName = "Metatables"
+ModuleLoopCount = 200000
 BenchmarkData = {
     Depth1 = "Depth 1",
     Depth2 = "Depth 2",

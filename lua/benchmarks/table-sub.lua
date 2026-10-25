@@ -16,6 +16,7 @@
 -- Conclusion: preventing table operations (the '.') is quite the benefit in practice.
 
 ModuleName = "Table Subscript"
+ModuleLoopCount = 500000
 BenchmarkData = {
     BlueprintSubTables2 = "Chained access",
     BlueprintSubTables1 = "Localized Access",

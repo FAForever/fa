@@ -19,6 +19,7 @@
 -- call3 / inline3 are from /lua/utilities.lua.
 
 ModuleName = "Function Inlining"
+ModuleLoopCount = 200000
 BenchmarkData = {
     Call1 = "Call 1",
     Call2 = "Call 2",

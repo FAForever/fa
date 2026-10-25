@@ -17,6 +17,7 @@
 -- Conclusion: Lua is much faster, especially when skipping the square root (useful in distance comparisons).
 
 ModuleName = "VDist2"
+ModuleLoopCount = 200000
 
 function UpvaluedEngineVDist2OnLocals(loop)
     local p1 = Random()*1000

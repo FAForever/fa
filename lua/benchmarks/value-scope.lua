@@ -35,6 +35,7 @@
 --   between locals and upvalues.
 
 ModuleName = "Value Scope"
+ModuleLoopCount = 100000
 BenchmarkData = {
     AddGlobal = "Add Globals",
     AddUpval = "Add Upvalues",

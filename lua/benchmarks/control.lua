@@ -12,6 +12,7 @@
 
 ModuleName = "Control"
 ModuleSort = 1
+ModuleLoopCount = 500000
 BenchmarkData = {
     BaseLineLoop = {
         name = "Base Line Loop",

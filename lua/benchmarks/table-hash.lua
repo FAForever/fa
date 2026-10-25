@@ -44,6 +44,7 @@
 -- behavior with the array part of a table.
 
 ModuleName = "Table Hash"
+ModuleLoopCount = 100000
 BenchmarkData = {
     Hash01 = "Hash - 1",
     Hash02 = "Hash - 2",

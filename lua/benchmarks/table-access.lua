@@ -21,6 +21,7 @@
 
 
 ModuleName = "Table Access"
+ModuleLoopCount = 500000
 BenchmarkData = {
     EntriesBracketShort = "Entry using bracket (short)",
     EntriesBracketLong = "Entry using bracket (long)",

@@ -7,6 +7,7 @@
 -- AllocateVectorGetPositionXYZ:    680 ms
 
 ModuleName = "Memory"
+ModuleLoopCount = 100000
 BenchmarkData = {
     AllocateVectorGlobal = "Global Vector",
     AllocateVectorUpvalue = "Upvalued Vector",

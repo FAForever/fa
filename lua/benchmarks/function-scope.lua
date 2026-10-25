@@ -37,6 +37,7 @@
 
 
 ModuleName = "Function Scopes"
+ModuleLoopCount = 50000
 BenchmarkData = {
     GetPositionLocal01 = "GetPosition local - 1",
     GetPositionLocal02 = "GetPosition local - 2",

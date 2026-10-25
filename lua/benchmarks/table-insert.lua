@@ -22,6 +22,7 @@
 
 
 ModuleName = "Table Insert"
+ModuleLoopCount = 200000
 BenchmarkData = {
     AddInsertGlobal = "Global table.insert",
     AddInsertLocal = "Local table.insert",
