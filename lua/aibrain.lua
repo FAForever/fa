@@ -48,6 +48,9 @@ local AIChatBrainComponent = import("/lua/aibrains/components/ChatBrainComponent
 local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
 local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
 local CategoriesDummyUnit = categories.DUMMYUNIT
+--- Cached table for assigning a single unit to a platoon, to avoid creating a new table every time.
+---@type { [1]: Unit }
+local cachedPlatoonUnit = {}
 
 ---@class AIBrain: FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent, EnergyManagerBrainComponent, StorageManagerBrainComponent, AIChatBrainComponent, moho.aibrain_methods
 ---@field AI boolean
@@ -221,7 +224,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     end,
 
     ---@param self AIBrain
-    ---@param blip any the unit (could be fake) in question
+    ---@param blip Blip
     ---@param reconType ReconTypes
     ---@param val boolean
     OnIntelChange = function(self, blip, reconType, val)
@@ -254,7 +257,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
     ---@param self AIBrain
     ---@param key string
-    ---@param sound SoundHandle
+    ---@param sound? SoundHandle
     PlayVOSound = function(self, key, sound)
         if not self.VOSounds[key] then
             WARN("PlayVOSound: " .. key .. " not found")
@@ -644,6 +647,18 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
         -- retrieve units, excluding insignificant units
         return BrainGetListOfUnits(self, cats - CategoriesDummyUnit, needToBeIdle, requireBuilt)
+    end,
+
+    --- Assigns a single unit to a platoon
+    ---@param self AIBrain
+    ---@param platoon Platoon | string Either a reference to a platoon, or the unique name of the platoon
+    ---@param unit Unit
+    ---@param squad PlatoonSquadType
+    ---@param formation UnitFormations
+    ---@return UnitFormations #Returns the name of the formation
+    AssignUnitToPlatoon = function(self, platoon, unit, squad, formation)
+        cachedPlatoonUnit[1] = unit
+        return self:AssignUnitsToPlatoon(platoon, cachedPlatoonUnit, squad, formation)
     end,
 
     --#endregion

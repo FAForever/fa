@@ -326,6 +326,11 @@ Scenario = {
             'OST_BasicLandAttack_T3MixedHeavyBots', '',
             { 'xel0305', -1, 1, 'attack', 'AttackFormation' },
             { 'uel0303', -1, 1, 'attack', 'AttackFormation' },
+        },
+        ['OST_BasicLandAttack_T3MixedHeavyBots2'] = {
+            'OST_BasicLandAttack_T3MixedHeavyBots2', '',
+            { 'xel0305', -1, 1, 'attack', 'AttackFormation' },
+            { 'uel0303', -1, 1, 'attack', 'AttackFormation' },
             { 'uel0205', -1, 1, 'attack', 'AttackFormation' },
         },
         ['OST_BasicLandAttack_T3MixedHeavyBotsShields'] = {
@@ -1691,6 +1696,38 @@ Scenario = {
                     },
                     ['OSB_Child_BasicLandAttack_T3MixedHeavyBots'] =  {
                         PlatoonTemplate = 'OST_BasicLandAttack_T3MixedHeavyBots',
+                        Priority = 499,
+                        InstanceCount = 5,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Land',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_master'},
+                                {'default_master'}
+                            },
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                                {'default_master'},
+                                {'default_master'}
+                            },
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                                { 1 , 3, 4},
+                                { '1', '3', '4'}
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_BasicLandAttack'},
+                            }},
+                        },
+                        ChildrenType = {'HeavyBots', 'SiegeBots'},
+                    },
+                    ['OSB_Child_BasicLandAttack_T3MixedHeavyBots2'] =  {
+                        PlatoonTemplate = 'OST_BasicLandAttack_T3MixedHeavyBots2',
                         Priority = 499,
                         InstanceCount = 5,
                         LocationType = 'MAIN',

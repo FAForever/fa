@@ -105,6 +105,7 @@
 --]]
 
 ---@alias TerrainStyle
+---| "Default"
 ---| "Desert"
 ---| "Evergreen"
 ---| "Geothermal"
@@ -145,6 +146,8 @@
 
 local EmitterBasePath = '/effects/emitters/'
 
+-- The first `"Default"` terrain type is a fallback for effects loopup
+---@diagnostic disable: missing-fields
 
 --- Terrain type definitions
 ---@type TerrainType[]

@@ -81,7 +81,7 @@ TeleportCostFunction = function(unit, location)
         end
 
         if teleDelay then
-            energyCostMod = (time + teleDelay) / time
+            local energyCostMod = (time + teleDelay) / time
             time = time + teleDelay
             energyCost = energyCost * energyCostMod
         end

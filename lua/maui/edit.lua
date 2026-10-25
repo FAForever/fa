@@ -36,6 +36,7 @@ local ScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumber
 local LazyVarCreate = import("/lua/lazyvar.lua").Create
 
 ---@class Edit : moho.edit_methods, Control, InternalObject
+---@overload fun(parent: Control, debugname: string?): Edit
 Edit = ClassUI(moho.edit_methods, Control) {
 
     __init = function(self, parent, debugname)

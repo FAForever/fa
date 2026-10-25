@@ -75,7 +75,7 @@ end
 ---@param aiBrain AIBrain
 ---@param numReq number
 ---@param category EntityCategory
----@param area Area
+---@param area AreaName
 ---@return boolean
 function HaveLessThanUnitsWithCategoryInArea(aiBrain, numReq, category, area)
     local numUnits = ScenarioFramework.NumCatUnitsInArea(category, ScenarioUtils.AreaToRect(area), aiBrain)

@@ -1,1 +1,0 @@
-- Add optional dark mode to the changelog website (#7239).
