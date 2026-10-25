@@ -436,7 +436,7 @@ UnitBlueprint{
             ShieldRechargeTime = 100,
             ShieldRegenRate = 160,
             ShieldRegenStartTime = 3,
-            ShieldSize = 20,
+            ShieldSize = 22,
             ShieldSpillOverDamageMod = 0.3,
             ShieldVerticalOffset = -3,
             ShowBones = { "Jetpack" },
