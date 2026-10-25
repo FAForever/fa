@@ -2309,11 +2309,11 @@ Tooltips = {
         description = "<LOC profiler_0045>Keep running until the 95% confidence interval of the mean is within 5% of the mean",
     },
     profiler_benchmark_run_all_margin = {
-        title = "<LOC profiler_0053>Run all to 5% error",
+        title = "<LOC profiler_0053>Run module to 5% error",
         description = "<LOC profiler_0054>Run every benchmark in this module in turn until each is within 5% error",
     },
     profiler_benchmark_run_modules_margin = {
-        title = "<LOC profiler_0056>Run all modules to 5% error",
+        title = "<LOC profiler_0056>Run all to 5% error",
         description = "<LOC profiler_0057>Run every benchmark in every module in turn until each is within 5% error, then log the results",
     },
     profiler_benchmark_timer = {
@@ -2321,7 +2321,7 @@ Tooltips = {
         description = "<LOC profiler_0063>The game timer loses precision the longer the game has been running, and is now too coarse for this benchmark's samples. Raise the loop count or restart the game for accurate results.",
     },
     profiler_benchmark_log_modules = {
-        title = "<LOC profiler_0059>Log all modules",
+        title = "<LOC profiler_0059>Log all statistics",
         description = "<LOC profiler_0060>Print a table of statistics for every module with data to the log",
     },
     profiler_benchmark_log = {
@@ -2329,7 +2329,7 @@ Tooltips = {
         description = "<LOC profiler_0048>Print the statistics of the selected benchmark to the log",
     },
     profiler_benchmark_log_all = {
-        title = "<LOC profiler_0050>Log all statistics",
+        title = "<LOC profiler_0050>Log module statistics",
         description = "<LOC profiler_0051>Print a table of statistics for every benchmark in this module to the log",
     },
 }

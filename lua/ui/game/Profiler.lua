@@ -80,7 +80,7 @@ local State = {
         Parameters = {10000, 45},
         ---@type table<string, number>
         ParameterCountCache = {},
-        --- Set while "All to 5%" steps through the benchmarks of a module
+        --- Set while "Module to 5%" or "All to 5%" steps through the benchmarks
         ---@type { module: number, index: number, waiting: boolean, allModules: boolean } | false
         RunAll = false,
         SelectedBenchmark = 0,
@@ -559,11 +559,11 @@ ProfilerBenchmarks = Class(Group) {
         self.groupNavigation = Group(self.groupInput)
         self.groupActions = Group(self.groupInput)
         self.autoRunButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0043>Run to 5%"), 14, 2)
-        self.runAllButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0052>All to 5%"), 14, 2)
-        self.runModulesButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0055>Modules to 5%"), 14, 2)
-        self.logModulesButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0058>Log modules"), 14, 2)
+        self.runAllButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0052>Module to 5%"), 14, 2)
+        self.runModulesButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0055>All to 5%"), 14, 2)
+        self.logModulesButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0058>Log all"), 14, 2)
         self.logButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0046>Log"), 14, 2)
-        self.logAllButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0049>Log all"), 14, 2)
+        self.logAllButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0049>Log module"), 14, 2)
         self.runButton = UIUtil.CreateButtonStd(self.groupInteraction, "/widgets02/small", LOC("<LOC profiler_0006>Run"), 16, 2)
         self.parametersLabel = ItemList(self.groupInteraction, 0, 0)
         self.progressLabel = UIUtil.CreateText(self.groupInteraction, "", 10, UIUtil.bodyFont, true)
@@ -1338,7 +1338,7 @@ ProfilerBenchmarks = Class(Group) {
         else
             runAllButton:Disable()
         end
-        runAllButton.label:SetText(runningAll and LOC("<LOC profiler_0010>Stop") or LOC("<LOC profiler_0052>All to 5%"))
+        runAllButton.label:SetText(runningAll and LOC("<LOC profiler_0010>Stop") or LOC("<LOC profiler_0052>Module to 5%"))
 
         local runModulesButton = self.runModulesButton
         local runningModules = runAll and runAll.allModules
@@ -1347,7 +1347,7 @@ ProfilerBenchmarks = Class(Group) {
         else
             runModulesButton:Disable()
         end
-        runModulesButton.label:SetText(runningModules and LOC("<LOC profiler_0010>Stop") or LOC("<LOC profiler_0055>Modules to 5%"))
+        runModulesButton.label:SetText(runningModules and LOC("<LOC profiler_0010>Stop") or LOC("<LOC profiler_0055>All to 5%"))
 
         if GetBenchmarkStatCache() then
             self.logButton:Enable()
