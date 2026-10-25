@@ -20,8 +20,10 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
----@class ArmiesTable : EngineArmiesTable
+---@class ArmiesTable
 ---@field armiesTable ArmyInfo[]
+---@field numArmies number
+---@field focusArmy number
 
 ---@class ArmyInfo : EngineArmyInfo
 
@@ -30,7 +32,7 @@ local Prefs = import("/lua/user/prefs.lua")
 ---@type 'on' | 'allies-only' | 'off'
 OptionShowPlayerNames = Prefs.GetFromCurrentProfile('options.show_player_names') or 'on'
 
----@param armiesTable EngineArmiesTable
+---@param armiesTable ArmiesTable
 ---@return ArmiesTable
 local function PostprocessArmiesTable(armiesTable)
     local focusArmy = GetFocusArmy()
@@ -51,7 +53,7 @@ local function PostprocessArmiesTable(armiesTable)
         end
     end
 
-    return armiesTable --[[@as ArmiesTable]]
+    return armiesTable
 end
 
 -- keep a reference to the actual function
@@ -87,7 +89,6 @@ local function TickThread()
 end
 
 --- Override global function to return our cache
----@return ArmiesTable
 _G.GetArmiesTable = function()
     return Cached
 end

@@ -338,11 +338,6 @@ end
 function GetAntiAliasingOptions()
 end
 
----@class EngineArmiesTable
----@field armiesTable EngineArmyInfo[]
----@field numArmies number
----@field focusArmy number
-
 ---@class EngineArmyInfo
 ---@field authorizedCommandSources number[]
 ---@field civilian boolean
@@ -356,7 +351,7 @@ end
 ---@field showScore boolean
 
 --- Hooked by `/lua/ui/override/ArmiesTable.lua` to return a cached and processed `ArmiesTable`
----@return EngineArmiesTable
+---@return ArmiesTable
 function GetArmiesTable()
 end
 
