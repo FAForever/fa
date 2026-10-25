@@ -5,30 +5,31 @@
 -- This benchmark measures the cost of indexing nil, and compares implicit nil checks in access
 -- chains against explicit ones.
 
--- Loop parameter: 10000. ns/access includes about 3.2 ns of loop overhead (the missing root guards).
+-- Results with 10000 loops of 50, before the inner loop moved into the loop count of 500000. Each
+-- loop does 10 accesses. ns/access includes about 3.2 ns of loop overhead (the missing root guards).
 --
--- |---------------------------------------|---------------------------------|---------|---------|--------|-----------|
--- | Name                                  | Expression                      | Samples | Mean ms | Dev ms | ns/access |
--- |---------------------------------------|---------------------------------|---------|---------|--------|-----------|
--- | "Index table"                         | t.a                             |      28 |   18.80 |   0.23 |      3.76 |
--- | "Index nil"                           | t.a                             |      24 |   40.43 |   0.39 |      8.09 |
--- |---------------------------------------|---------------------------------|---------|---------|--------|-----------|
--- | "Chain, present"                      | t.a.b.c                         |      27 |   61.88 |   0.68 |     12.38 |
--- | "Chain, missing middle"               | t.a.b.c                         |      27 |   77.41 |   0.82 |     15.48 |
--- | "Chain, missing root"                 | t.a.b.c                         |      26 |  102.93 |   0.46 |     20.59 |
--- |---------------------------------------|---------------------------------|---------|---------|--------|-----------|
--- | "Guarded chain, present"              | t and t.a and t.a.b and t.a.b.c |      25 |  138.05 |   0.72 |     27.61 |
--- | "Guarded chain, missing middle"       | t and t.a and t.a.b and t.a.b.c |      26 |   90.17 |   0.75 |     18.03 |
--- | "Guarded chain, missing root"         | t and t.a and t.a.b and t.a.b.c |      25 |   16.07 |   0.32 |      3.21 |
--- |---------------------------------------|---------------------------------|---------|---------|--------|-----------|
--- | "Root guarded chain, present"         | t and t.a.b.c                   |      27 |   69.19 |   0.43 |     13.84 |
--- | "Root guarded chain, missing middle"  | t and t.a.b.c                   |      27 |   84.90 |   0.78 |     16.98 |
--- | "Root guarded chain, missing root"    | t and t.a.b.c                   |      26 |   15.87 |   0.07 |      3.17 |
--- |---------------------------------------|---------------------------------|---------|---------|--------|-----------|
--- | "Local guarded chain, present"        | if t then local a = t.a         |      24 |   86.24 |   0.62 |     17.25 |
--- | "Local guarded chain, missing middle" | if a then local b = a.b         |      26 |   73.05 |   0.87 |     14.61 |
--- | "Local guarded chain, missing root"   | if b then v = b.c               |      24 |   16.00 |   0.10 |      3.20 |
--- |---------------------------------------|---------------------------------|---------|---------|--------|-----------|
+-- |---------------------------------------|---------------------------------|---------|-----------|------------|-----------|---------|------|-----------|-----------|-----------|-------|-----------|
+-- | Name                                  | Expression                      | Samples |   Mean ms | +/- 95% ms | +/- 95% % |  Dev ms | CV % | Median ms |    Min ms |    Max ms |  Skew | ns/access |
+-- |---------------------------------------|---------------------------------|---------|-----------|------------|-----------|---------|------|-----------|-----------|-----------|-------|-----------|
+-- | "Index table"                         | t.a                             |      28 |  18.80210 |    0.08998 |      0.48 | 0.23202 | 1.23 |  18.76831 |  18.49365 |  19.28711 |  0.77 |      3.76 |
+-- | "Index nil"                           | t.a                             |      24 |  40.42943 |    0.16527 |      0.41 | 0.39133 | 0.97 |  40.51208 |  39.67285 |  41.10718 | -0.41 |      8.09 |
+-- |---------------------------------------|---------------------------------|---------|-----------|------------|-----------|---------|------|-----------|-----------|-----------|-------|-----------|
+-- | "Chain, present"                      | t.a.b.c                         |      27 |  61.87835 |    0.26894 |      0.43 | 0.67971 | 1.10 |  61.85913 |  60.86731 |  63.55286 |  0.48 |     12.38 |
+-- | "Chain, missing middle"               | t.a.b.c                         |      27 |  77.40614 |    0.32396 |      0.42 | 0.81874 | 1.06 |  77.48413 |  76.08032 |  78.97949 |  0.07 |     15.48 |
+-- | "Chain, missing root"                 | t.a.b.c                         |      26 | 102.92992 |    0.18457 |      0.18 | 0.45687 | 0.44 | 102.98157 | 102.09656 | 103.68347 | -0.23 |     20.59 |
+-- |---------------------------------------|---------------------------------|---------|-----------|------------|-----------|---------|------|-----------|-----------|-----------|-------|-----------|
+-- | "Guarded chain, present"              | t and t.a and t.a.b and t.a.b.c |      25 | 138.04810 |    0.29834 |      0.22 | 0.72272 | 0.52 | 138.06152 | 136.81030 | 139.43481 | -0.06 |     27.61 |
+-- | "Guarded chain, missing middle"       | t and t.a and t.a.b and t.a.b.c |      26 |  90.16712 |    0.30176 |      0.33 | 0.74693 | 0.83 |  90.22522 |  88.71460 |  91.52222 | -0.07 |     18.03 |
+-- | "Guarded chain, missing root"         | t and t.a and t.a.b and t.a.b.c |      25 |  16.06689 |    0.13178 |      0.82 | 0.31924 | 1.99 |  15.96069 |  15.68604 |  16.99829 |  1.33 |      3.21 |
+-- |---------------------------------------|---------------------------------|---------|-----------|------------|-----------|---------|------|-----------|-----------|-----------|-------|-----------|
+-- | "Root guarded chain, present"         | t and t.a.b.c                   |      27 |  69.19352 |    0.16928 |      0.24 | 0.42783 | 0.62 |  69.09180 |  68.45093 |  70.34302 |  0.72 |     13.84 |
+-- | "Root guarded chain, missing middle"  | t and t.a.b.c                   |      27 |  84.90329 |    0.31042 |      0.37 | 0.78453 | 0.92 |  84.93042 |  83.28247 |  86.18164 | -0.25 |     16.98 |
+-- | "Root guarded chain, missing root"    | t and t.a.b.c                   |      26 |  15.87149 |    0.02895 |      0.18 | 0.07166 | 0.45 |  15.86914 |  15.71655 |  15.99121 |  0.07 |      3.17 |
+-- |---------------------------------------|---------------------------------|---------|-----------|------------|-----------|---------|------|-----------|-----------|-----------|-------|-----------|
+-- | "Local guarded chain, present"        | if t then local a = t.a         |      24 |  86.23505 |    0.26354 |      0.31 | 0.62401 | 0.72 |  86.24268 |  85.29663 |  87.73804 |  0.61 |     17.25 |
+-- | "Local guarded chain, missing middle" | if a then local b = a.b         |      26 |  73.05204 |    0.35119 |      0.48 | 0.86929 | 1.19 |  73.01331 |  71.56372 |  74.67651 |  0.18 |     14.61 |
+-- | "Local guarded chain, missing root"   | if b then v = b.c               |      24 |  15.99503 |    0.04169 |      0.26 | 0.09871 | 0.62 |  15.99121 |  15.80811 |  16.20483 |  0.15 |      3.20 |
+-- |---------------------------------------|---------------------------------|---------|-----------|------------|-----------|---------|------|-----------|-----------|-----------|-------|-----------|
 --
 -- Analysis:
 -- - Indexing nil is 2.2x slower than indexing a table.
@@ -46,10 +47,11 @@
 -- - Write `if t.a.b then` when `t` is almost always present.
 -- - Write `if t and t.a.b then` when `t` is nil in more than about 8% of calls.
 
--- The access is repeated 10 times per inner iteration so the loop instructions are a smaller part
+-- The access is repeated 10 times per iteration so the loop instructions are a smaller part
 -- of each measurement.
 
 ModuleName = "Nil Indexing"
+ModuleLoopCount = 500000
 BenchmarkData = {
     IndexTable = "Index table",
     IndexNil = "Index nil",
@@ -74,18 +76,16 @@ function IndexTable(loop)
     local start = timer()
 
     for _ = 1, loop do
-        for _ = 1, 50 do
-            v = t.a
-            v = t.a
-            v = t.a
-            v = t.a
-            v = t.a
-            v = t.a
-            v = t.a
-            v = t.a
-            v = t.a
-            v = t.a
-        end
+        v = t.a
+        v = t.a
+        v = t.a
+        v = t.a
+        v = t.a
+        v = t.a
+        v = t.a
+        v = t.a
+        v = t.a
+        v = t.a
     end
 
     local final = timer()
@@ -99,18 +99,16 @@ function IndexNil(loop)
     local start = timer()
 
     for _ = 1, loop do
-        for _ = 1, 50 do
-            v = t.a
-            v = t.a
-            v = t.a
-            v = t.a
-            v = t.a
-            v = t.a
-            v = t.a
-            v = t.a
-            v = t.a
-            v = t.a
-        end
+        v = t.a
+        v = t.a
+        v = t.a
+        v = t.a
+        v = t.a
+        v = t.a
+        v = t.a
+        v = t.a
+        v = t.a
+        v = t.a
     end
 
     local final = timer()
@@ -124,18 +122,16 @@ function ChainPresent(loop)
     local start = timer()
 
     for _ = 1, loop do
-        for _ = 1, 50 do
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-        end
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
     end
 
     local final = timer()
@@ -149,18 +145,16 @@ function ChainMissingRoot(loop)
     local start = timer()
 
     for _ = 1, loop do
-        for _ = 1, 50 do
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-        end
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
     end
 
     local final = timer()
@@ -174,18 +168,16 @@ function ChainMissingMiddle(loop)
     local start = timer()
 
     for _ = 1, loop do
-        for _ = 1, 50 do
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-            v = t.a.b.c
-        end
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
+        v = t.a.b.c
     end
 
     local final = timer()
@@ -199,18 +191,16 @@ function GuardedPresent(loop)
     local start = timer()
 
     for _ = 1, loop do
-        for _ = 1, 50 do
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-        end
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
     end
 
     local final = timer()
@@ -224,18 +214,16 @@ function GuardedMissingRoot(loop)
     local start = timer()
 
     for _ = 1, loop do
-        for _ = 1, 50 do
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-        end
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
     end
 
     local final = timer()
@@ -249,18 +237,16 @@ function GuardedMissingMiddle(loop)
     local start = timer()
 
     for _ = 1, loop do
-        for _ = 1, 50 do
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-            v = t and t.a and t.a.b and t.a.b.c
-        end
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
+        v = t and t.a and t.a.b and t.a.b.c
     end
 
     local final = timer()
@@ -274,18 +260,16 @@ function RootGuardedPresent(loop)
     local start = timer()
 
     for _ = 1, loop do
-        for _ = 1, 50 do
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-        end
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
     end
 
     local final = timer()
@@ -299,18 +283,16 @@ function RootGuardedMissingRoot(loop)
     local start = timer()
 
     for _ = 1, loop do
-        for _ = 1, 50 do
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-        end
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
     end
 
     local final = timer()
@@ -324,18 +306,16 @@ function RootGuardedMissingMiddle(loop)
     local start = timer()
 
     for _ = 1, loop do
-        for _ = 1, 50 do
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-            v = t and t.a.b.c
-        end
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
+        v = t and t.a.b.c
     end
 
     local final = timer()
@@ -349,95 +329,93 @@ function LocalGuardedPresent(loop)
     local start = timer()
 
     for _ = 1, loop do
-        for _ = 1, 50 do
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
         end
@@ -454,95 +432,93 @@ function LocalGuardedMissingRoot(loop)
     local start = timer()
 
     for _ = 1, loop do
-        for _ = 1, 50 do
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
         end
@@ -559,95 +535,93 @@ function LocalGuardedMissingMiddle(loop)
     local start = timer()
 
     for _ = 1, loop do
-        for _ = 1, 50 do
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
-            if t then
-                local a = t.a
-                if a then
-                    local b = a.b
-                    if b then
-                        v = b.c
-                    end
+        end
+        if t then
+            local a = t.a
+            if a then
+                local b = a.b
+                if b then
+                    v = b.c
                 end
             end
         end
