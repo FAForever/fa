@@ -5,6 +5,7 @@
 ---@field category NotifyCategory
 ---@field source NotifySource
 ---@field trigger NotifyTrigger
+---@field time? number # Added by enhancements
 
 ---@class NotifyChatPayload : ChatPayload
 ---@field data NotifyChatPayloadData
