@@ -72,7 +72,7 @@ function SinLocal(loop)
 
     local MathSin = math.sin
     for _ = 1, loop do
-        MathSin(_)
+        MathSin(a)
     end
 
     local final = timer()
