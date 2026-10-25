@@ -1,7 +1,18 @@
--- UpvaluedEngineVDist2OnLocals:        0.043102264404297
--- UpvaluedEngineVDist2SqOnLocals:      0.040153503417969
--- UpvaluedLuaVDist2OnLocals:           0.029483795166016
--- UpvaluedLuaVDist2SqOnLocals:         0.014518737792969
+-- Results with parameters 10000:
+--
+-- |----------------------------------|---------|---------|------------|-----------|--------|-------|-----------|--------|--------|------|
+-- | Name                             | Samples | Mean ms | +/- 95% ms | +/- 95% % | Dev ms |  CV % | Median ms | Min ms | Max ms | Skew |
+-- |----------------------------------|---------|---------|------------|-----------|--------|-------|-----------|--------|--------|------|
+-- | "UpvaluedEngineVDist2OnLocals"   |      28 |  0.3466 |     0.0058 |      1.67 | 0.0149 |  4.30 |    0.3357 | 0.3357 | 0.3662 | 0.56 |
+-- | "UpvaluedEngineVDist2SqOnLocals" |      30 |  0.3459 |     0.0156 |      4.52 | 0.0419 | 12.11 |    0.3357 | 0.3052 | 0.5493 | 3.82 |
+-- | "UpvaluedLuaVDist2OnLocals"      |      19 |  0.2747 |     0.0000 |      0.00 | 0.0000 |  0.00 |    0.2747 | 0.2747 | 0.2747 | 0.00 |
+-- | "UpvaluedLuaVDist2SqOnLocals"    |      29 |  0.1326 |     0.0056 |      4.23 | 0.0148 | 11.13 |    0.1221 | 0.1221 | 0.1526 | 0.62 |
+-- |----------------------------------|---------|---------|------------|-----------|--------|-------|-----------|--------|--------|------|
+-- | "Baseline, 1 parameter"          |     120 |  0.0381 |     0.0024 |      6.29 | 0.0133 | 34.79 |    0.0305 | 0.0305 | 0.0610 | 1.14 |
+-- |----------------------------------|---------|---------|------------|-----------|--------|-------|-----------|--------|--------|------|
+--
+-- These are too short for the timer, so they mostly show its step: "UpvaluedEngineVDist2OnLocals",
+-- "UpvaluedEngineVDist2SqOnLocals", "UpvaluedLuaVDist2OnLocals", "UpvaluedLuaVDist2SqOnLocals".
 
 -- Conclusion: Lua is much faster, especially when skipping the square root (useful in distance comparisons).
 
