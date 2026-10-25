@@ -1,0 +1,1 @@
+- Fix clicking your own name on the echo line of a private message, and on notify messages while observing, selecting army 1 instead of the sender (#7349).
