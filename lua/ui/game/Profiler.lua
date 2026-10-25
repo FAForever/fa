@@ -304,14 +304,19 @@ end
 --- Gets the loop multiplier that makes a benchmark's samples long enough for the timer, or nil when
 --- they already are. Suggests the largest multiplier when none is enough.
 ---@param stats? { [integer]: number, n: integer }
+---@param baselines? { [integer]: number, n: integer } checked too, for the modes that divide by them
 ---@param multiplier number that the samples were taken with
 ---@return number? needed
 ---@return number resolution seconds
----@return number? mean seconds
-local function GetNeededMultiplier(stats, multiplier)
+---@return number? mean seconds, of the shorter samples
+local function GetNeededMultiplier(stats, baselines, multiplier)
     local resolution = TimestampResolution(GetSystemTimeSeconds())
     -- raw sample times, whatever the mode
     local mean = stats and stats.n > 0 and Mean(stats, stats.n)
+    -- baseline loops are shorter than their benchmark, so they lose precision first
+    if mean and baselines and baselines[1] ~= nil then
+        mean = math.min(mean, Mean(baselines, table.getn(baselines)))
+    end
     if not mean or not IsTimerTooCoarse(resolution, mean) then
         return nil, resolution, mean
     end
@@ -931,6 +936,11 @@ ProfilerBenchmarks = Class(Group) {
             WARN("Benchmark samples are all zero, the timer is too coarse to measure it")
             self:WarnCoarseTimer(module, benchmark)
             self:AdvanceRunAll()
+        elseif stats.n >= AutoRunMinSamples and (summary.n == 0 or summary.mean ~= summary.mean or summary.mean == math.huge) then
+            -- paired samples divided by zero baselines are all removed, and a ratio over them is infinite
+            WARN("Benchmark baselines are zero, the timer is too coarse to measure them")
+            self:WarnCoarseTimer(module, benchmark)
+            self:AdvanceRunAll()
         elseif margin and summary.n >= AutoRunMinSamples and margin <= AutoRunMargin then
             SPEW(("Benchmark reached +/-%.1f%% with %d samples"):format(margin * 100, summary.n))
             self:WarnCoarseTimer(module, benchmark)
@@ -1036,7 +1046,7 @@ ProfilerBenchmarks = Class(Group) {
     WarnCoarseTimer = function(self, module, benchmark)
         local benchmarkState = State.Benchmarks
         local multiplier = benchmarkState.LoopMultiplier
-        local needed, resolution, mean = GetNeededMultiplier(GetBenchmarkStatCache(module, benchmark), multiplier)
+        local needed, resolution, mean = self:GetNeededMultiplier(module, benchmark, multiplier)
         if not needed then
             return
         end
@@ -1054,6 +1064,22 @@ ProfilerBenchmarks = Class(Group) {
         if runAll then
             table.insert(runAll.coarse, text)
         end
+    end,
+
+    --- Gets the loop multiplier that a benchmark's samples need, see `GetNeededMultiplier`
+    ---@param self ProfilerBenchmarks
+    ---@param module? number
+    ---@param benchmark? number
+    ---@param multiplier number
+    ---@return number? needed
+    ---@return number resolution seconds
+    ---@return number? mean seconds
+    GetNeededMultiplier = function(self, module, benchmark, multiplier)
+        local stats, baselines = GetBenchmarkStatCache(module, benchmark)
+        if self.summary:GetMode() == "none" then
+            baselines = nil
+        end
+        return GetNeededMultiplier(stats, baselines, multiplier)
     end,
 
     --- Repeats the timer warnings of a module or all-module run at its end
@@ -1439,9 +1465,14 @@ ProfilerBenchmarks = Class(Group) {
     --- Shows the timer resolution when it is too coarse for the selected benchmark's samples
     ---@param self ProfilerBenchmarks
     UpdateTimerWarning = function(self)
-        local multiplier, resolution = GetNeededMultiplier(GetBenchmarkStatCache(), State.Benchmarks.LoopMultiplier)
+        local current = State.Benchmarks.LoopMultiplier
+        local multiplier, resolution = self:GetNeededMultiplier(nil, nil, current)
         if multiplier then
-            self.timerWarning:SetText(LOCF("<LOC profiler_0061>Timer resolution: %.3f ms, use x%d", resolution * 1000, multiplier))
+            if multiplier > current then
+                self.timerWarning:SetText(LOCF("<LOC profiler_0061>Timer resolution: %.3f ms, use x%d", resolution * 1000, multiplier))
+            else
+                self.timerWarning:SetText(LOCF("<LOC profiler_0066>Timer resolution: %.3f ms, restart the game", resolution * 1000))
+            end
             self.timerWarning:Show()
         else
             self.timerWarning:Hide()

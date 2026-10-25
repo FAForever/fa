@@ -8327,6 +8327,7 @@ profiler_0062="Coarse timer"
 profiler_0063="The game timer loses precision the longer the game has been running, and is now too coarse for this benchmark's samples. Raise the loop multiplier to the suggested value or restart the game for accurate results."
 profiler_0064="Loop multiplier"
 profiler_0065="Multiplies the module's loop count. Raise it when the timer is too coarse for a benchmark; runs take about this many times longer."
+profiler_0066="Timer resolution: %.3f ms, restart the game"
 
 lobui_resource_sharing_label="Overflow"
 lobui_resource_sharing_help="Set whether distribution of excess resources to allies is initially enabled or disabled. Players can toggle it through the diplomacy menu when teams are unlocked."
