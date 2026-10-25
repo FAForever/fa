@@ -157,8 +157,16 @@ function ConfidenceMargin95(deviation, n)
     return TCritical95(n - 1) * deviation / math.sqrt(n)
 end
 
---- Timer resolution in seconds above which short benchmarks can't be measured accurately
-CoarseTimerResolution = 0.001
+--- Timer resolution, as a fraction of a sample's time, above which rounding distorts the samples
+CoarseTimerFraction = 0.05
+
+--- Checks whether a timer resolution is too coarse to measure samples of a given duration
+---@param resolution number seconds
+---@param sampleTime number seconds
+---@return boolean
+function IsTimerTooCoarse(resolution, sampleTime)
+    return resolution > sampleTime * CoarseTimerFraction
+end
 
 --- Computes the precision of a timestamp stored as a 32-bit float, which shrinks as it grows
 ---@param timestamp number

@@ -26,7 +26,8 @@ local Window = import("/lua/maui/window.lua").Window
 
 local ObservableCreate = import("/lua/shared/observable.lua").Create
 local CreateEmptyProfilerTable = import("/lua/shared/profiler.lua").CreateEmptyProfilerTable
-local CoarseTimerResolution = import("/lua/shared/statistics.lua").CoarseTimerResolution
+local IsTimerTooCoarse = import("/lua/shared/statistics.lua").IsTimerTooCoarse
+local Mean = import("/lua/shared/statistics.lua").Mean
 local TimestampResolution = import("/lua/shared/statistics.lua").TimestampResolution
 local Layouter = LayoutHelpers.ReusedLayoutFor
 local Summarize = ProfilerElements.Summarize
@@ -1270,12 +1271,14 @@ ProfilerBenchmarks = Class(Group) {
         self:UpdateTimerWarning()
     end,
 
-    --- Shows the timer resolution when it is too coarse for short benchmarks
+    --- Shows the timer resolution when it is too coarse for the selected benchmark's samples
     ---@param self ProfilerBenchmarks
     UpdateTimerWarning = function(self)
         local resolution = TimestampResolution(GetSystemTimeSeconds())
-        if resolution > CoarseTimerResolution then
-            self.timerWarning:SetText(LOCF("<LOC profiler_0061>Timer resolution: %.2f ms", resolution * 1000))
+        -- raw sample times, whatever the mode
+        local stats = GetBenchmarkStatCache()
+        if stats and stats.n > 0 and IsTimerTooCoarse(resolution, Mean(stats, stats.n)) then
+            self.timerWarning:SetText(LOCF("<LOC profiler_0061>Timer resolution: %.3f ms", resolution * 1000))
             self.timerWarning:Show()
         else
             self.timerWarning:Hide()

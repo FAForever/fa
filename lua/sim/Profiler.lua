@@ -12,7 +12,7 @@ local SerializableDeepCopy = import("/lua/utilities.lua").SerializableDeepCopy
 local CollapseDebugInfo = import("/lua/shared/debugfunction.lua").CollapseDebugInfo
 local CreateEmptyProfilerTable = import("/lua/shared/profiler.lua").CreateEmptyProfilerTable
 local GetDebugFunctionInfo = import("/lua/shared/debugfunction.lua").GetDebugFunctionInfo
-local CoarseTimerResolution = import("/lua/shared/statistics.lua").CoarseTimerResolution
+local IsTimerTooCoarse = import("/lua/shared/statistics.lua").IsTimerTooCoarse
 local TimestampResolution = import("/lua/shared/statistics.lua").TimestampResolution
 
 
@@ -137,15 +137,23 @@ function StopBenchmark()
     benchmarkThread = false
 end
 
-local coarseTimerWarned = 0
+--- Timer resolution each benchmark was last warned about, by module file and benchmark name
+---@type table<string, number>
+local coarseTimerWarned = {}
 
---- Warns once per precision step when the timer is too coarse to measure short benchmarks
+--- Warns once per benchmark and precision step when the timer is too coarse for its samples
+---@param file FileName
+---@param name string
 ---@param timestamp number
-local function WarnCoarseTimer(timestamp)
+---@param sampleTime number
+local function WarnCoarseTimer(file, name, timestamp, sampleTime)
     local resolution = TimestampResolution(timestamp)
-    if resolution > CoarseTimerResolution and resolution > coarseTimerWarned then
-        coarseTimerWarned = resolution
-        WARN(("Timer resolution is %.2f ms because of long game uptime, restart the game for accurate benchmarks"):format(resolution * 1000))
+    local key = file .. ":" .. name
+    local warned = coarseTimerWarned[key]
+    if IsTimerTooCoarse(resolution, sampleTime) and (not warned or resolution > warned) then
+        coarseTimerWarned[key] = resolution
+        WARN(("Timer resolution of %.3f ms is too coarse for %s's %.3f ms samples in %s, raise its loop count or restart the game")
+            :format(resolution * 1000, name, sampleTime * 1000, file))
     end
 end
 
@@ -206,7 +214,6 @@ local function MeasureBenchmark(moduleIndex, benchmarkIndex, parameters)
 
     -- initial benchmark sample time to scale sample rate based on
     local startTime = GetSystemTimeSecondsOnlyForProfileUse()
-    WarnCoarseTimer(startTime)
     local ok, err = pcall(RunTest)
     if not ok then
         Fail(err)
@@ -219,6 +226,7 @@ local function MeasureBenchmark(moduleIndex, benchmarkIndex, parameters)
         benchmarkThread = false
         return
     end
+    WarnCoarseTimer(benchmarkModules[moduleIndex].file, benchmark.name, startTime, output[1])
     -- calculate how many at a time and for how many ticks we should sample the benchmark
     local ticks
     local atATime = 1
