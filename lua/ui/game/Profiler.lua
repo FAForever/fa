@@ -1144,8 +1144,12 @@ ProfilerBenchmarks = Class(Group) {
         end
 
         local mode = self.summary:GetMode()
-        local rows = {}
-        -- baselines by parameter count, since that picks the baseline loop, and by multiplier
+        -- rows grouped by multiplier, so higher multipliers come after the base loop count
+        local groups = {}
+        for i in LoopMultipliers do
+            groups[i] = {}
+        end
+        -- baselines by multiplier, and by parameter count since that picks the baseline loop
         ---@type { params: number, multiplier: number, samples: { [integer]: number, n: integer } }[]
         local pools = {}
         local hasData = false
@@ -1153,12 +1157,12 @@ ProfilerBenchmarks = Class(Group) {
             local name = GetBenchmarkName(moduleIndex, benchmarkIndex)
             local ran = false
             -- a row for each multiplier that has samples
-            for _, multiplier in ipairs(LoopMultipliers) do
+            for multiplierIndex, multiplier in ipairs(LoopMultipliers) do
                 local stats, baselines = GetBenchmarkStatCache(moduleIndex, benchmarkIndex, multiplier)
                 if stats then
                     ran = true
                     local params = benchmarkState.ParameterCountCache[GetBenchmarkCacheKey(moduleIndex, benchmarkIndex, multiplier)]
-                    table.insert(rows, {
+                    table.insert(groups[multiplierIndex], {
                         name = WithMultiplier(name, multiplier),
                         summary = Summarize(stats, baselines, mode),
                         params = params,
@@ -1186,18 +1190,24 @@ ProfilerBenchmarks = Class(Group) {
             if ran then
                 hasData = true
             else
-                table.insert(rows, {name = name})
+                table.insert(groups[1], {name = name})
             end
         end
         if not hasData then
             return false
         end
+        local rows = {}
+        for _, group in ipairs(groups) do
+            for _, row in ipairs(group) do
+                table.insert(rows, row)
+            end
+        end
 
         table.sort(pools, function(a, b)
-            if a.params ~= b.params then
-                return a.params < b.params
+            if a.multiplier ~= b.multiplier then
+                return a.multiplier < b.multiplier
             end
-            return a.multiplier < b.multiplier
+            return a.params < b.params
         end)
         local baselineRows = {}
         for _, pool in ipairs(pools) do
