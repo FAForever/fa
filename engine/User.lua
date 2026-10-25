@@ -848,7 +848,7 @@ end
 
 --- Returns true if the player's focus army is observing (-1 focus or no user army in-engine).
 ---@return boolean
-function IsObserver(playerId)
+function IsObserver()
 end
 
 --- Issue a factory build or upgrade command to your selection
