@@ -5124,7 +5124,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             ---| 'nuke'
             ---| 'arty'
 
-            ---@alias NotifyCategory 
+            ---@alias NotifyCategory
             ---| 'tech'
             ---| 'other'
             ---| 'experimentals'

@@ -99,7 +99,6 @@ end
 --#endregion
 --#region Recipient state
 
-
 --- Debug hotkey: forces the recipient back to "All".
 function SetRecipientAll()
     ChatController.SetRecipient(ChatModel.RecipientAll)
@@ -112,7 +111,6 @@ end
 
 --#endregion
 --#region History reset
-
 
 --- Debug hotkey: wipes the entire history log.
 function ClearHistory()
