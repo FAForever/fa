@@ -1,0 +1,1 @@
+- Add buttons to the profiler's benchmark tab that log results as tables and run benchmarks until their results are within 5%, plus per-module loop counts, a loop multiplier and warnings when the timer is too coarse. Update the benchmark results and conclusions from new runs (#7350).
