@@ -28,15 +28,15 @@
 -- | "Baseline, 1 parameter"        |     606 |  0.1902 |     0.0021 |      1.11 | 0.0265 | 13.92 |    0.1831 |  0.1526 |  0.7019 | 12.72 |
 -- |--------------------------------|---------|---------|------------|-----------|--------|-------|-----------|---------|---------|-------|
 
--- Using the self version of a function is the slowest approach. Having it as an upvalue 
--- (and manually adding in the self) has a significant difference: a 6% improvement.
+-- From two calls on, using the self version of a function is the slowest approach. Having it as an
+-- upvalue (and manually adding in the self) has a significant difference: a 6 to 8% improvement.
 
 -- When calling the function directly (without using :) it is still less efficient. I suspect
 -- this is because of the table operation that is hidden. Having GETUPVAL is cheaper than GETTABLE
 -- as an instruction, which is cheaper than SELF.
 
--- The local versions look up `GetPosition` in every iteration, which costs about 12 to 18 ns. So
--- they only catch up with the upvalue versions once that is spread over several calls.
+-- The local versions look up `GetPosition` in every iteration, which costs about 9 to 18 ns. So
+-- they are slower than the method versions with one call, and only overtake them from two calls.
 
 
 ModuleName = "Function Scopes"

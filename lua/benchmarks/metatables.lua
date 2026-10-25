@@ -24,7 +24,8 @@
 
 -- Each metatable level adds about 7 ns to finding the value. With `__index` functions instead of
 -- tables, depth 6 is 2.6x slower. On a unit, caching `ForkThread` on the instance makes reading it
--- 1.6x faster. Caching `Army` changes nothing, since it is already set on the instance.
+-- about 1.6x faster. Caching `Army` makes no measurable difference, since it is already set on the
+-- instance. These rows were too coarse for the timer, so the figures are rough.
 
 -- A few notes:
 -- - These tests assume that the value we're looking for is in the last metatable. If the value is found earlier then it is faster.

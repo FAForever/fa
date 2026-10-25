@@ -24,11 +24,11 @@
 --   11 ns longer. Locals cost about the same as constants.
 -- - In the circle benchmarks, upvaluing the functions is 11% faster than using them as globals.
 --   Making them locals and inlining `ComputePoint` is 15% faster. Precomputing the angle step is
---   13% faster, but it computes 31 points instead of 30, so per point it is 1.5% faster than the
+--   13% faster, but it computes 31 points instead of 30, so per point it is 1.4% faster than the
 --   local version. Replacing `table.insert` with a counter is 32% faster, and also replacing
 --   `math.cos` and `math.sin` with a recurrence (Chebyshev) 46%, both with 31 points. The
 --   Chebyshev version computed NaN points when these results were taken, so it needs a rerun.
--- - Each circle iteration allocates 31 tables, so longer runs collect more garbage. Per iteration,
+-- - Each circle iteration allocates 31 or 32 tables, so longer runs collect more garbage. Per iteration,
 --   they are about 20% slower with 200000 loops than with 10000.
 -- - Function-scope can't show the difference between locals and upvalues: its local versions look
 --   up `GetPosition` in every iteration, and the call costs far more than either access.

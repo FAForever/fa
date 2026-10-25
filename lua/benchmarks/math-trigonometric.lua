@@ -20,7 +20,7 @@
 -- | "Baseline, 1 parameter"        |     341 |  0.3775 |     0.0017 |      0.44 | 0.0157 | 4.15 |    0.3662 | 0.3357 | 0.3967 |  0.21 |
 -- |--------------------------------|---------|---------|------------|-----------|--------|------|-----------|--------|--------|-------|
 
--- Conclusion: each call costs about 30 to 40 ns without the loop, 2.5 to 3x as much as `math.abs`
+-- Conclusion: each call costs about 30 to 40 ns without the loop, 2.3 to 3x as much as `math.abs`
 -- (about 13 ns), so they are not as cheap as a lookup table. Upvaluing them saves 4 to 10 ns per
 -- call, like the other math functions.
 

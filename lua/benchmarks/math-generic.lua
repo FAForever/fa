@@ -16,7 +16,7 @@
 -- | "Baseline, 1 parameter"         |     244 |  0.7559 |     0.0072 |      0.95 | 0.0575 | 7.61 |    0.7324 |  0.6104 |  1.0986 |  1.73 |
 -- |---------------------------------|---------|---------|------------|-----------|--------|------|-----------|---------|---------|-------|
 
--- Conclusion: we should uplift these functions whenever possible. A global `math.abs` is 1.65x
+-- Conclusion: we should uplift these functions whenever possible. A global `math.abs` is 1.6x
 -- slower than a local or upvalued one, and a global `math.ceil` 1.1x. Localizing the function in
 -- each iteration is as slow as using the global, since it still looks it up every time.
 
