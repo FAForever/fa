@@ -34,6 +34,8 @@ local isProfiling = false
 --- Thread to keep the simulation synced with the UI
 local profilingThread
 local benchmarkThread
+--- Benchmark threads that are alive, which keep the call hook off
+local benchmarksRunning = 0
 --- Data that we send over to the UI
 local data = CreateEmptyProfilerTable()
 --- How many times each benchmark is run by default
@@ -102,8 +104,10 @@ function ToggleProfiler(forceEnable)
             profilingThread = ForkThread(SyncThread)
         end
 
-        -- Add a function to track
-        sethook(FunctionHook, "c") -- only track on function calls
+        -- Add a function to track, unless a benchmark is running and turns it on when done
+        if benchmarksRunning == 0 then
+            sethook(FunctionHook, "c") -- only track on function calls
+        end
     else
         isProfiling = false
         if profilingThread then
@@ -148,7 +152,7 @@ end
 ---@param moduleIndex number
 ---@param benchmarkIndex number
 ---@param parameters any[]
-function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
+local function MeasureBenchmark(moduleIndex, benchmarkIndex, parameters)
     -- the threshold time for a benchmark to start running more than once a tick
     local tickThreshold = 0.09
     local runGCEachTest = true
@@ -283,6 +287,22 @@ function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
 
     benchmarkThread = false
     SPEW("Done with benchmark")
+end
+
+--- Runs a benchmark with the profiler's call hook off, since the hook adds its own cost to every
+--- call the benchmark makes
+---@param moduleIndex number
+---@param benchmarkIndex number
+---@param parameters any[]
+function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
+    benchmarksRunning = benchmarksRunning + 1
+    sethook()
+    MeasureBenchmark(moduleIndex, benchmarkIndex, parameters)
+    -- a stopped benchmark can still be finishing its tick when the next one starts
+    benchmarksRunning = benchmarksRunning - 1
+    if isProfiling and benchmarksRunning == 0 then
+        sethook(FunctionHook, "c")
+    end
 end
 
 --- Starts the benchmark running thread
