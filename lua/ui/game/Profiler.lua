@@ -925,7 +925,7 @@ ProfilerBenchmarks = Class(Group) {
         -- cleared, or the selection (and its parameters) changed
         if not stats
             or module ~= benchmarkState.SelectedModule or benchmark ~= benchmarkState.SelectedBenchmark then
-            benchmarkState.RunAll = false
+            self:CancelRunAll()
             return
         end
 
@@ -962,11 +962,16 @@ ProfilerBenchmarks = Class(Group) {
         local benchmarkState = State.Benchmarks
         local runAll = benchmarkState.RunAll
         if runAll then
-            self:WarnCoarseTimers(runAll)
-            benchmarkState.RunAll = false
+            if runAll.stopping then
+                return
+            end
             benchmarkState.AutoRun = false
             if benchmarkState.BenchmarkRunning then
+                -- the summary waits for the stopped benchmark's own timer warning
+                runAll.stopping = true
                 StopBenchmark()
+            else
+                self:CancelRunAll()
             end
             self:UpdateRunButtonState()
             return
@@ -1082,6 +1087,17 @@ ProfilerBenchmarks = Class(Group) {
         return GetNeededMultiplier(stats, baselines, multiplier)
     end,
 
+    --- Ends a module or all-module run before it finishes
+    ---@param self ProfilerBenchmarks
+    CancelRunAll = function(self)
+        local benchmarkState = State.Benchmarks
+        local runAll = benchmarkState.RunAll
+        if runAll then
+            benchmarkState.RunAll = false
+            self:WarnCoarseTimers(runAll)
+        end
+    end,
+
     --- Repeats the timer warnings of a module or all-module run at its end
     ---@param self ProfilerBenchmarks
     ---@param runAll { coarse: string[] }
@@ -1107,7 +1123,7 @@ ProfilerBenchmarks = Class(Group) {
 
         runAll.waiting = false
         if runAll.module ~= benchmarkState.SelectedModule or runAll.index ~= benchmarkState.SelectedBenchmark then
-            benchmarkState.RunAll = false
+            self:CancelRunAll()
             self:UpdateRunButtonState()
             return
         end
@@ -1269,7 +1285,7 @@ ProfilerBenchmarks = Class(Group) {
         if benchmarkState.BenchmarkRunning and
             (benchmarkState.SelectedModule ~= benchmarkState.BenchmarkRunningMod or index ~= benchmarkState.BenchmarkRunningBen) then
             benchmarkState.AutoRun = false
-            benchmarkState.RunAll = false
+            self:CancelRunAll()
             StopBenchmark()
         end
         benchmarkState.SelectedBenchmark = index
@@ -1829,6 +1845,10 @@ ProfilerWindow = ClassUI(Window) {
         benchmarksTab:ContinueAutoRun(output)
         if output.success ~= nil and not autoRun then
             benchmarksTab:WarnCoarseTimer(benchmarkState.BenchmarkRunningMod, benchmarkState.BenchmarkRunningBen)
+            local runAll = benchmarkState.RunAll
+            if runAll and runAll.stopping then
+                benchmarksTab:CancelRunAll()
+            end
         end
         benchmarksTab:UpdateBenchmarkProgress()
         benchmarksTab:UpdateRunButtonState()
