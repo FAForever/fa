@@ -16,8 +16,8 @@
 -- |---------------------------------------|---------|---------|------------|-----------|--------|------|-----------|---------|---------|-------|
 
 -- Conclusion: on local vectors, calculating in Lua with an upvalued `math.sqrt` is 11% faster than an
--- upvalued VDist3. On vectors in upvalues, the upvalued VDist3 is 4% faster, thanks in part to an
--- engine patch that sped it up: https://github.com/FAForever/FA-Binary-Patches/pull/54
+-- upvalued VDist3. On vectors in upvalues, the upvalued VDist3 is 4% faster. An engine patch sped
+-- up VDist3: https://github.com/FAForever/FA-Binary-Patches/pull/54
 -- Upvaluing VDist3 makes it 7% faster.
 
 ModuleName = "VDist3"

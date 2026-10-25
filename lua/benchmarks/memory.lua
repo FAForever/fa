@@ -15,8 +15,8 @@
 -- |--------------------------------|---------|---------|------------|-----------|--------|-------|-----------|---------|---------|-------|
 
 -- Conclusion: allocating a vector costs about 140 to 150 ns, however `Vector` is looked up. Reusing
--- a cached vector is 7x faster. `GetPosition` and `GetPositionXYZ` into a vector cost about the
--- same as allocating one (about 122 ns).
+-- a cached vector is 7x faster. Writing `GetPositionXYZ` into a cached vector is no faster than
+-- `GetPosition`, which allocates a new vector, since the engine call takes about 120 ns either way.
 
 ModuleName = "Memory"
 ModuleLoopCount = 100000

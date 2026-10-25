@@ -23,8 +23,8 @@
 -- Meta", "ForkThread from Field".
 
 -- Each metatable level adds about 7 ns to finding the value. With `__index` functions instead of
--- tables, depth 6 is 2.6x slower. On a unit, reading `ForkThread` from its class takes 1.6x as long
--- as reading `Army`, which is found sooner.
+-- tables, depth 6 is 2.6x slower. On a unit, caching `ForkThread` on the instance makes reading it
+-- 1.6x faster. Caching `Army` changes nothing, since it is already set on the instance.
 
 -- A few notes:
 -- - These tests assume that the value we're looking for is in the last metatable. If the value is found earlier then it is faster.

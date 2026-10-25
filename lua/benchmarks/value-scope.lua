@@ -29,8 +29,8 @@
 --   `math.cos` and `math.sin` with a recurrence (Chebyshev) 46%, both with 31 points.
 -- - Each circle iteration allocates 31 tables, so longer runs collect more garbage. Per iteration,
 --   they are about 20% slower with 200000 loops than with 10000.
--- - This agrees with function-scope, where the cost of the call hides most of the difference
---   between locals and upvalues.
+-- - Function-scope can't show the difference between locals and upvalues: its local versions look
+--   up `GetPosition` in every iteration, and the call costs far more than either access.
 
 ModuleName = "Value Scope"
 ModuleLoopCount = 100000
