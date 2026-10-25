@@ -2320,6 +2320,10 @@ Tooltips = {
         title = "<LOC profiler_0062>Coarse timer",
         description = "<LOC profiler_0063>The game timer loses precision the longer the game has been running, and is now too coarse for this benchmark's samples. Raise the loop count or restart the game for accurate results.",
     },
+    profiler_benchmark_loop_multiplier = {
+        title = "<LOC profiler_0064>Loop multiplier",
+        description = "<LOC profiler_0065>Multiplies the module's loop count. Raise it when the timer is too coarse for a benchmark; runs take about this many times longer.",
+    },
     profiler_benchmark_log_modules = {
         title = "<LOC profiler_0059>Log all statistics",
         description = "<LOC profiler_0060>Print a table of statistics for every module with data to the log",

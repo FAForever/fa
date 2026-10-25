@@ -44,6 +44,8 @@ local benchmarkRuns = 30
 local benchmarkModules
 -- The target time for how we adjust to how many samples of a benchmark we run
 local benchmarkTargetTime = 0.5
+-- Loop count of modules that don't set `ModuleLoopCount`
+local defaultLoopCount = 10000
 -- A list of functions that set the baseline loop time for function's that have the same number of
 -- parameters as the index 
 local benchmarkBaselines
@@ -334,6 +336,7 @@ end
 ---@field LastBenchmarkSelected number
 ---@field path FileName
 ---@field faulty boolean
+---@field loopCount number base loop count, passed as the first parameter before the user's multiplier
 ---@field name string
 
 ---@class UserBenchmarkInfo
@@ -356,6 +359,7 @@ end
 ---@field descriptions table<string, string>
 ---@field excludeFunctions table<string, true>
 ---@field file string
+---@field loopCount number
 ---@field moduleDescription string
 ---@field moduleName string
 ---@field moduleSort number
@@ -497,6 +501,7 @@ BenchmarkModuleLoader = Class() {
                 file = file,
                 path = path,
                 faulty = true,
+                loopCount = metadata.loopCount or defaultLoopCount,
                 name = metadata.moduleName,
                 LastBenchmarkSelected = 0,
             }, {
@@ -511,6 +516,7 @@ BenchmarkModuleLoader = Class() {
             file = file,
             path = path,
             faulty = false,
+            loopCount = metadata.loopCount,
             name = metadata.moduleName,
             LastBenchmarkSelected = 0,
         }, {
@@ -529,6 +535,7 @@ BenchmarkModuleLoader = Class() {
         local moduleName = ""
         local moduleDesc = ""
         local moduleSort = 0
+        local loopCount = defaultLoopCount
         local sortOrder = {}
         local titles = {}
         -- can't just pull these values because it'll throw an error if they don't exist
@@ -557,6 +564,12 @@ BenchmarkModuleLoader = Class() {
             if k == "ModuleSort" then
                 if type(val) == "number" then
                     moduleSort = val
+                end
+                continue
+            end
+            if k == "ModuleLoopCount" then
+                if type(val) == "number" and val >= 1 then
+                    loopCount = math.floor(val)
                 end
                 continue
             end
@@ -612,6 +625,7 @@ BenchmarkModuleLoader = Class() {
         return {
             descriptions = descriptions,
             excludeFunctions = excludeFunctions,
+            loopCount = loopCount,
             moduleName = moduleName,
             moduleDescription = moduleDesc,
             moduleSort = moduleSort,

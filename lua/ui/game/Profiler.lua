@@ -37,6 +37,11 @@ local AutoRunMargin = 0.05
 local AutoRunMinSamples = 5
 local AutoRunMaxSamples = 1000
 
+-- Multiplies a module's loop count so short benchmarks take longer than the timer's resolution
+local LoopMultipliers = {1, 2, 5, 10, 20, 50, 100}
+-- Second parameter, for benchmarks with an inner loop
+local InnerLoopCount = 45
+
 local sessionInfo = SessionGetScenarioInfo()
 local data = CreateEmptyProfilerTable()
 
@@ -77,7 +82,7 @@ local State = {
         BenchmarkRuns = 0,
         ---@type UserBenchmarkModule[]
         Modules = false,
-        Parameters = {10000, 45},
+        LoopMultiplier = 1,
         ---@type table<string, number>
         ParameterCountCache = {},
         --- Set while "Module to 5%" or "All to 5%" steps through the benchmarks
@@ -180,7 +185,17 @@ local function GetBenchmarkCacheKey(modIndex, benIndex)
     local state = State.Benchmarks
     modIndex = modIndex or state.SelectedModule
     benIndex = benIndex or state.SelectedBenchmark
-    return tostring(modIndex) .. ',' .. tostring(benIndex)
+    -- each multiplier keeps its own samples, since it changes how long they take
+    return tostring(modIndex) .. ',' .. tostring(benIndex) .. ',x' .. tostring(state.LoopMultiplier)
+end
+
+--- Gets the parameters a module's benchmarks run with: its loop count times the multiplier, then the
+--- inner loop count. The baseline loops get the same parameters.
+---@param modIndex number
+---@return number[]
+local function GetBenchmarkParameters(modIndex)
+    local state = State.Benchmarks
+    return {state.Modules[modIndex].loopCount * state.LoopMultiplier, InnerLoopCount}
 end
 
 ---@param modIndex? number
@@ -307,7 +322,7 @@ function StartBenchmark(module, benchmark)
     benchmarkState.BenchmarkRunningBen = benchmark
     benchmarkState.ParameterCountCache[GetBenchmarkCacheKey(module, benchmark)] = params
     local parameters = {}
-    local benchmarkParams = benchmarkState.Parameters
+    local benchmarkParams = GetBenchmarkParameters(module)
     for i = 1, params do
         parameters[i] = benchmarkParams[i]
     end
@@ -539,6 +554,7 @@ ProfilerStamps = Class(Group) {
 ---@field logAllButton Button
 ---@field logButton Button
 ---@field logModulesButton Button
+---@field loopMultiplier Combo
 ---@field modulePicker Combo
 ---@field parametersLabel ItemList
 ---@field progressLabel Text
@@ -566,6 +582,7 @@ ProfilerBenchmarks = Class(Group) {
         self.logAllButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0049>Log module"), 14, 2)
         self.runButton = UIUtil.CreateButtonStd(self.groupInteraction, "/widgets02/small", LOC("<LOC profiler_0006>Run"), 16, 2)
         self.parametersLabel = ItemList(self.groupInteraction, 0, 0)
+        self.loopMultiplier = Combo(self.groupInteraction, 14, table.getn(LoopMultipliers))
         self.progressLabel = UIUtil.CreateText(self.groupInteraction, "", 10, UIUtil.bodyFont, true)
         self.fileText = UIUtil.CreateText(self.groupNavigation, LOC("<LOC profiler_0007>Benchmark Modules"), 16, UIUtil.bodyFont, true)
         self.modulePicker = Combo(self.groupNavigation, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
@@ -596,6 +613,17 @@ ProfilerBenchmarks = Class(Group) {
         end
         self.logAllButton.OnClick = function(button_self)
             self:OnClickLogAllButton()
+        end
+        local multiplierLabels = {}
+        for i, multiplier in LoopMultipliers do
+            multiplierLabels[i] = "x" .. multiplier
+        end
+        self.loopMultiplier:AddItems(multiplierLabels)
+        self.loopMultiplier.OnClick = function(combo_self, index)
+            State.Benchmarks.LoopMultiplier = LoopMultipliers[index]
+            self:UpdateParametersLabel()
+            self:UpdateBenchmarkStats()
+            self:UpdateRunButtonState()
         end
         self.modulePicker.OnClick = function(picker_self, index, text)
             -- index is already 1-indexed for Combo boxes
@@ -734,6 +762,13 @@ ProfilerBenchmarks = Class(Group) {
         Layouter(self.progressLabel)
             :CenteredRightOf(runButton)
             :End()
+
+        local loopMultiplier = Layouter(self.loopMultiplier)
+            :AtRightIn(groupInteraction, 10)
+            :AtVerticalCenterIn(groupInteraction)
+            :Width(60)
+            :End()
+        Tooltip.AddControlTooltip(loopMultiplier, "profiler_benchmark_loop_multiplier")
 
         -- Navigation components
 
@@ -976,8 +1011,9 @@ ProfilerBenchmarks = Class(Group) {
         local count = benchmarkState.ParameterCount
         if count and count > 0 then
             parameters = {}
+            local values = GetBenchmarkParameters(benchmarkState.SelectedModule)
             for i = 1, count do
-                parameters[i] = tostring(benchmarkState.Parameters[i])
+                parameters[i] = tostring(values[i])
             end
         end
         local baseline
@@ -1061,7 +1097,8 @@ ProfilerBenchmarks = Class(Group) {
             })
         end
 
-        LOG(('Benchmark statistics for "%s"'):format(module.name ~= "" and module.name or module.file))
+        LOG(('Benchmark statistics for "%s", loop count %d')
+            :format(module.name ~= "" and module.name or module.file, GetBenchmarkParameters(moduleIndex)[1]))
         LogLines(ProfilerReport.FormatTable(rows, baselineRows))
         return true
     end,
@@ -1247,7 +1284,7 @@ ProfilerBenchmarks = Class(Group) {
             label:DeleteAllItems()
             if params > 0 then
                 local paramFormatter = LOC("<LOC profiler_0008>Parameter %d: %s") --[[@as LocalizedString]]
-                local parameters = benchmarkState.Parameters
+                local parameters = GetBenchmarkParameters(benchmarkState.SelectedModule)
                 for i = 1, params do
                     label:AddItem(paramFormatter:format(i, tostring(parameters[i])))
                 end
@@ -1374,12 +1411,14 @@ ProfilerBenchmarks = Class(Group) {
             self.logModulesButton:Disable()
         end
 
-        -- clearing mid-run would pull the samples out from under it
+        -- clearing or switching samples mid-run would pull them out from under it
         local clearButton = self.summary.clearButton
         if running or runAll then
             clearButton:Disable()
+            self.loopMultiplier:Disable()
         else
             clearButton:Enable()
+            self.loopMultiplier:Enable()
         end
     end,
 
