@@ -87,7 +87,7 @@ local State = {
         ---@type table<string, number>
         ParameterCountCache = {},
         --- Set while "Module to 5%" or "All to 5%" steps through the benchmarks
-        ---@type { module: number, index: number, waiting: boolean, allModules: boolean } | false
+        ---@type { module: number, index: number, waiting: boolean, allModules: boolean, coarse: string[] } | false
         RunAll = false,
         SelectedBenchmark = 0,
         SelectedModule = 1,
@@ -299,6 +299,29 @@ local function ModuleHasData(modIndex)
         end
     end
     return false
+end
+
+--- Gets the loop multiplier that makes a benchmark's samples long enough for the timer, or nil when
+--- they already are. Suggests the largest multiplier when none is enough.
+---@param stats? { [integer]: number, n: integer }
+---@param multiplier number that the samples were taken with
+---@return number? needed
+---@return number resolution seconds
+---@return number? mean seconds
+local function GetNeededMultiplier(stats, multiplier)
+    local resolution = TimestampResolution(GetSystemTimeSeconds())
+    -- raw sample times, whatever the mode
+    local mean = stats and stats.n > 0 and Mean(stats, stats.n)
+    if not mean or not IsTimerTooCoarse(resolution, mean) then
+        return nil, resolution, mean
+    end
+    local needed = multiplier * CoarseTimerFactor(resolution, mean)
+    for _, option in ipairs(LoopMultipliers) do
+        if option >= needed then
+            return option, resolution, mean
+        end
+    end
+    return LoopMultipliers[table.getn(LoopMultipliers)], resolution, mean
 end
 
 ---@param lines string[]
@@ -886,6 +909,7 @@ ProfilerBenchmarks = Class(Group) {
         local benchmark = benchmarkState.BenchmarkRunningBen
         -- stopping clears `AutoRun` first, so a failure here is an error in the benchmark
         if not output.success then
+            self:WarnCoarseTimer(module, benchmark)
             self:AdvanceRunAll()
             return
         end
@@ -903,12 +927,15 @@ ProfilerBenchmarks = Class(Group) {
         -- a zero mean has no relative margin, but identical samples can't improve any further
         if summary.n >= AutoRunMinSamples and summary.mean == 0 and summary.margin == 0 then
             WARN("Benchmark samples are all zero, the timer is too coarse to measure it")
+            self:WarnCoarseTimer(module, benchmark)
             self:AdvanceRunAll()
         elseif margin and summary.n >= AutoRunMinSamples and margin <= AutoRunMargin then
             SPEW(("Benchmark reached +/-%.1f%% with %d samples"):format(margin * 100, summary.n))
+            self:WarnCoarseTimer(module, benchmark)
             self:AdvanceRunAll()
         elseif stats.n >= AutoRunMaxSamples then
             WARN(("Benchmark did not reach +/-%.0f%% within %d samples"):format(AutoRunMargin * 100, stats.n))
+            self:WarnCoarseTimer(module, benchmark)
             self:AdvanceRunAll()
         else
             benchmarkState.AutoRun = true
@@ -921,7 +948,9 @@ ProfilerBenchmarks = Class(Group) {
     ---@param allModules boolean
     OnClickRunAllButton = function(self, allModules)
         local benchmarkState = State.Benchmarks
-        if benchmarkState.RunAll then
+        local runAll = benchmarkState.RunAll
+        if runAll then
+            self:WarnCoarseTimers(runAll)
             benchmarkState.RunAll = false
             benchmarkState.AutoRun = false
             if benchmarkState.BenchmarkRunning then
@@ -942,7 +971,7 @@ ProfilerBenchmarks = Class(Group) {
                 return
             end
         end
-        benchmarkState.RunAll = {module = moduleIndex, index = 0, waiting = false, allModules = allModules}
+        benchmarkState.RunAll = {module = moduleIndex, index = 0, waiting = false, allModules = allModules, coarse = {}}
         self:AdvanceRunAll()
         self:UpdateRunButtonState()
     end,
@@ -977,6 +1006,7 @@ ProfilerBenchmarks = Class(Group) {
             if not nextModule then
                 benchmarkState.RunAll = false
                 SPEW("Finished running all benchmarks")
+                self:WarnCoarseTimers(runAll)
                 if runAll.allModules then
                     self:LogModules()
                 end
@@ -994,6 +1024,48 @@ ProfilerBenchmarks = Class(Group) {
         end
         runAll.waiting = true
         BenchmarkSelected:Set(runAll.index)
+    end,
+
+    --- Warns when the timer was too coarse for a benchmark's samples, and suggests a loop multiplier.
+    --- While running all, the warning is also kept for the summary at the end.
+    ---@param self ProfilerBenchmarks
+    ---@param module number
+    ---@param benchmark number
+    WarnCoarseTimer = function(self, module, benchmark)
+        local benchmarkState = State.Benchmarks
+        local multiplier = benchmarkState.LoopMultiplier
+        local needed, resolution, mean = GetNeededMultiplier(GetBenchmarkStatCache(module, benchmark), multiplier)
+        if not needed then
+            return
+        end
+        local moduleData = benchmarkState.Modules[module]
+        local advice = "restart the game"
+        if needed > multiplier then
+            advice = ("use the x%d loop multiplier or restart the game"):format(needed)
+        end
+        local text = ('"%s" in %s: the %.3f ms timer resolution is too coarse for its %.3f ms samples, %s'):format(
+            WithMultiplier(GetBenchmarkName(module, benchmark), multiplier),
+            moduleData.name ~= "" and moduleData.name or moduleData.file,
+            resolution * 1000, mean * 1000, advice)
+        WARN(text)
+        local runAll = benchmarkState.RunAll
+        if runAll then
+            table.insert(runAll.coarse, text)
+        end
+    end,
+
+    --- Repeats the timer warnings of a module or all-module run at its end
+    ---@param self ProfilerBenchmarks
+    ---@param runAll { coarse: string[] }
+    WarnCoarseTimers = function(self, runAll)
+        local count = table.getn(runAll.coarse)
+        if count == 0 then
+            return
+        end
+        WARN(("The timer was too coarse for %d benchmark%s:"):format(count, count == 1 and "" or "s"))
+        for _, text in ipairs(runAll.coarse) do
+            WARN("    " .. text)
+        end
     end,
 
     --- Starts the benchmark that `AdvanceRunAll` selected, once its parameter count is known
@@ -1351,20 +1423,8 @@ ProfilerBenchmarks = Class(Group) {
     --- Shows the timer resolution when it is too coarse for the selected benchmark's samples
     ---@param self ProfilerBenchmarks
     UpdateTimerWarning = function(self)
-        local resolution = TimestampResolution(GetSystemTimeSeconds())
-        -- raw sample times, whatever the mode
-        local stats = GetBenchmarkStatCache()
-        local mean = stats and stats.n > 0 and Mean(stats, stats.n)
-        if mean and IsTimerTooCoarse(resolution, mean) then
-            -- the smallest multiplier that makes the samples long enough, or the largest one
-            local needed = State.Benchmarks.LoopMultiplier * CoarseTimerFactor(resolution, mean)
-            local multiplier = LoopMultipliers[table.getn(LoopMultipliers)]
-            for _, option in ipairs(LoopMultipliers) do
-                if option >= needed then
-                    multiplier = option
-                    break
-                end
-            end
+        local multiplier, resolution = GetNeededMultiplier(GetBenchmarkStatCache(), State.Benchmarks.LoopMultiplier)
+        if multiplier then
             self.timerWarning:SetText(LOCF("<LOC profiler_0061>Timer resolution: %.3f ms, use x%d", resolution * 1000, multiplier))
             self.timerWarning:Show()
         else
@@ -1711,7 +1771,12 @@ ProfilerWindow = ClassUI(Window) {
             benchmarkState.BenchmarkProgress = benchmarkState.BenchmarkProgress + complete
         end
         benchmarksTab:AddBenchmarkStats(output.data, output.baselines)
+        -- an auto run warns about the timer itself once it stops repeating
+        local autoRun = benchmarkState.AutoRun
         benchmarksTab:ContinueAutoRun(output)
+        if output.success ~= nil and not autoRun then
+            benchmarksTab:WarnCoarseTimer(benchmarkState.BenchmarkRunningMod, benchmarkState.BenchmarkRunningBen)
+        end
         benchmarksTab:UpdateBenchmarkProgress()
         benchmarksTab:UpdateRunButtonState()
     end,
