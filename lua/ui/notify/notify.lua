@@ -1,6 +1,18 @@
 -- This file contains all functions governing the integrated Notify mod, which sends messages to allies
 -- when you order and complete ACU upgrades
 
+---@class NotifyChatPayloadData
+---@field category NotifyCategory
+---@field source NotifySource
+---@field trigger NotifyTrigger
+---@field time? number # Added by enhancements
+
+---@class NotifyChatPayload : ChatPayload
+---@field data NotifyChatPayloadData
+--- FIXME: Notify messages are not relayed through sim, so they don't use this
+--- field, but they also don't show up in replays.
+---@field From nil
+
 local Prefs = import("/lua/user/prefs.lua")
 local FindClients = import("/lua/ui/game/chat/ChatController.lua").FindClients
 local defaultMessages = import("/lua/ui/notify/defaultmessages.lua").defaultMessages
@@ -83,6 +95,11 @@ function setupStartDisables()
 end
 
 -- This function is called from chat.lua when a player receives a message from another player flagged as Notify = true. Generated below.
+--- Processes an incoming message according to player preferences and message limits.
+--- Returns false if the message should not be posted in chat.
+---@param sender string # sender player name
+---@param msg NotifyChatPayload
+---@return boolean postMessage
 function processIncomingMessage(sender, msg)
     local category = msg.data.category
     local source = msg.data.source
@@ -237,6 +254,7 @@ function sendMessage(msg)
 end
 
 -- This function processes messages sent from the sim from unit.lua and defaultunits.lua
+---@param messageTable NotifyMessageSyncData
 function sendEnhancementMessage(messageTable)
     local source = messageTable.source
     local category = messageTable.category
@@ -255,8 +273,12 @@ function sendEnhancementMessage(messageTable)
     end
 end
 
+---@param id EntityId?
+---@param army Army
+---@param category NotifyCategory
+---@param source NotifySource
 function onStartEnhancement(id, army, category, source)
-    ---@type ChatPayload
+    ---@type NotifyChatPayload
     local msg = {notifyFrom = army, to = 'notify', Chat = true, text = 'Starting ' .. messages()[category][source], data = {category = category, source = source, trigger = 'started'}}
 
     -- Start by storing ACU IDs for future use
@@ -277,8 +299,12 @@ function onStartEnhancement(id, army, category, source)
     sendMessage(msg)
 end
 
+---@param id EntityId?
+---@param category NotifyCategory
+---@param source NotifySource
+---@param army Army
 function onCancelledEnhancement(id, category, source, army)
-    ---@type ChatPayload
+    ---@type NotifyChatPayload
     local msg = {notifyFrom = army, to = 'notify', Chat = true, text = messages()[category][source] .. ' cancelled', data = {category = category, source = source, trigger = 'cancelled'}}
 
     if id then
@@ -292,8 +318,12 @@ function onCancelledEnhancement(id, category, source, army)
 end
 
 -- Called from the enhancement watcher
+---@param id EntityId?
+---@param category NotifyCategory
+---@param source NotifySource
+---@param army Army
 function onCompletedEnhancement(id, category, source, army)
-    ---@type ChatPayload
+    ---@type NotifyChatPayload
     local msg = {notifyFrom = army, to = 'notify', Chat = true, text = messages()[category][source] .. ' done!', data = {category = category, source = source, trigger = 'completed'}}
 
     if id then
@@ -317,6 +347,10 @@ function killWatcher(data)
     end
 end
 
+---@param id EntityId
+---@param text string
+---@param category NotifyCategory
+---@param source NotifySource
 function watchEnhancement(id, text, category, source)
     local overlayData = {}
     overlayData.unit = GetUnitById(id)
