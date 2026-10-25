@@ -13,8 +13,8 @@
 
 -- Performing engine calls are expensive and should be prevented in critical code. Calling getters
 -- or setters should also be prevented - it is better to just get the member variable directly instead.
--- The engine call is 3.1x slower than the Lua function call, which is 2.7x slower than reading the
--- field.
+-- The engine call is 3.1x slower than the Lua function call. "Lua Call" called `IsDead` without
+-- the unit when these results were taken, so it needs a rerun.
 
 ModuleName = "Function Origins"
 ModuleLoopCount = 200000
@@ -49,7 +49,7 @@ function LuaCall(loop)
     local start = timer()
 
     for _ = 1, loop do
-        isDead = unit.IsDead()
+        isDead = unit:IsDead()
     end
 
     local final = timer()
