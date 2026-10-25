@@ -167,7 +167,7 @@ ChatLineInterface = ClassUI(Group) {
         self.Text:SetColor(ResolveBodyColor(entry))
         self.TeamColor:SetSolidColor(entry.Color or '00000000')
 
-        -- Grey our own outgoing names. Re-applied every SetHeader because
+        -- Make our own names unclickable. Re-applied every SetHeader because
         -- pool slots get reused across entries from different armies.
         if entry.ArmyID == GetFocusArmy() then
             self.Name:Disable()

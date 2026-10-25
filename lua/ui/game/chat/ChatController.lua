@@ -219,14 +219,18 @@ end
 ---@class ArmyInfo
 ---@field package ArmyID integer
 
---- Looks up army data by army index (number) or nickname (string). For
---- nickname lookups the returned table has `ArmyID` set to the matching index.
+--- Looks up army data by army index (number) or nickname (string). The
+--- returned table has `ArmyID` set to the matching index.
 ---@param army Army
 ---@return ArmyInfo | nil
 local function GetArmyData(army)
     local armies = GetArmiesTable()
     if type(army) == 'number' then
-        return armies.armiesTable[army]
+        local data = armies.armiesTable[army]
+        if data then
+            data.ArmyID = army
+        end
+        return data
     elseif type(army) == 'string' then
         for i, v in armies.armiesTable do
             if v.nickname == army then
