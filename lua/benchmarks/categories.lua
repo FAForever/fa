@@ -1,6 +1,18 @@
 
--- Cached: 21 ms
--- Inline: 130 ms
+-- Results with loop count 10000, inner loop count 45:
+--
+-- |--------------------------|---------|---------|------------|-----------|--------|------|-----------|---------|---------|-------|
+-- | Name                     | Samples | Mean ms | +/- 95% ms | +/- 95% % | Dev ms | CV % | Median ms |  Min ms |  Max ms |  Skew |
+-- |--------------------------|---------|---------|------------|-----------|--------|------|-----------|---------|---------|-------|
+-- | "Cached function"        |      28 |  60.281 |      0.171 |      0.28 |  0.441 | 0.73 |    60.175 |  59.631 |  61.264 |  0.44 |
+-- | "Inline function"        |      28 | 452.957 |      1.956 |      0.43 |  5.044 | 1.11 |   453.302 | 442.719 | 463.436 |  0.25 |
+-- |--------------------------|---------|---------|------------|-----------|--------|------|-----------|---------|---------|-------|
+-- | "Baseline, 2 parameters" |      58 |   1.885 |      0.019 |      1.01 |  0.072 | 3.83 |     1.881 |   1.751 |   2.037 | -0.02 |
+-- |--------------------------|---------|---------|------------|-----------|--------|------|-----------|---------|---------|-------|
+
+-- The inline version is 7.5x slower than the cached one. The set operation cache in
+-- `/lua/system/categories.lua` narrows that to 2.1x (54.95 against 113.59 ms in a run with the
+-- cache), so these benchmarks put the engine's set operations back while they run.
 
 -- The performance of the cached version is faster when there is more than one
 -- inner loop, but typically (significantly) better than the inline version. 

@@ -1,14 +1,24 @@
--- GlobalEngineVDist3OnGlobals:         0.064697265625
--- GlobalEngineVDist3OnLocals:          0.06640625
--- GlobalLuaVDist3OnGlobals:            0.072998046875
--- GlobalLuaVDist3OnLocals:             0.067138671875
--- UpvaluedEngineVDist3OnGlobals:       0.059814453125
--- UpvaluedEngineVDist3OnLocals:        0.059814453125
--- UpvaluedLuaVDist3OnGlobals:          0.068359375
--- UpvaluedLuaVDist3OnLocals:           0.0615234375        # Sometimes this can be faster than `UpvaluedEngineVDist3OnLocals` in this benchmark but not often enough
+-- Results with loop count 100000:
+--
+-- |--------------------------------------|---------|---------|------------|-----------|--------|------|-----------|---------|---------|-------|
+-- | Name                                 | Samples | Mean ms | +/- 95% ms | +/- 95% % | Dev ms | CV % | Median ms |  Min ms |  Max ms |  Skew |
+-- |--------------------------------------|---------|---------|------------|-----------|--------|------|-----------|---------|---------|-------|
+-- | "GlobalEngineVDist3OnGlobals (x2)"   |      28 | 12.9046 |     0.0766 |      0.59 | 0.1976 | 1.53 |   12.8174 | 12.6953 | 13.3667 |  0.80 |
+-- | "GlobalEngineVDist3OnLocals (x2)"    |      29 | 12.9226 |     0.0614 |      0.47 | 0.1614 | 1.25 |   12.9395 | 12.6953 | 13.1836 |  0.03 |
+-- | "GlobalLuaVDist3OnGlobals (x2)"      |      27 | 14.6213 |     0.0420 |      0.29 | 0.1062 | 0.73 |   14.6484 | 14.4043 | 14.8315 | -0.09 |
+-- | "GlobalLuaVDist3OnLocals (x2)"       |      28 | 12.5558 |     0.0554 |      0.44 | 0.1428 | 1.14 |   12.5122 | 12.3291 | 12.8784 |  0.53 |
+-- | "UpvaluedEngineVDist3OnGlobals (x2)" |      28 | 12.0762 |     0.0494 |      0.41 | 0.1273 | 1.05 |   12.0544 | 11.8408 | 12.3291 |  0.18 |
+-- | "UpvaluedEngineVDist3OnLocals (x2)"  |      26 | 12.0028 |     0.0319 |      0.27 | 0.0790 | 0.66 |   12.0239 | 11.8408 | 12.1460 |  0.10 |
+-- | "UpvaluedLuaVDist3OnGlobals (x2)"    |      25 | 12.5903 |     0.1116 |      0.89 | 0.2704 | 2.15 |   12.5122 | 12.3291 | 13.1836 |  0.95 |
+-- | "UpvaluedLuaVDist3OnLocals (x2)"     |      26 | 10.6835 |     0.1332 |      1.25 | 0.3296 | 3.08 |   10.6201 | 10.2539 | 11.3525 |  0.57 |
+-- |--------------------------------------|---------|---------|------------|-----------|--------|------|-----------|---------|---------|-------|
+-- | "Baseline, 1 parameter (x2)"         |     221 |  0.7512 |     0.0046 |      0.62 | 0.0352 | 4.68 |    0.7324 |  0.6714 |  0.7935 | -0.14 |
+-- |--------------------------------------|---------|---------|------------|-----------|--------|------|-----------|---------|---------|-------|
 
--- Conclusion: Using VDist3 instead of calculating in Lua is faster due to an engine patch: https://github.com/FAForever/FA-Binary-Patches/pull/54
--- Make sure to upvalue VDist3 for a significant performance boost
+-- Conclusion: on local vectors, calculating in Lua with an upvalued `math.sqrt` is 11% faster than an
+-- upvalued VDist3. On vectors in upvalues (the "OnGlobals" benchmarks), the upvalued VDist3 is 4%
+-- faster, despite an engine patch that sped it up: https://github.com/FAForever/FA-Binary-Patches/pull/54
+-- Upvaluing VDist3 makes it 7% faster.
 
 ModuleName = "VDist3"
 ModuleLoopCount = 100000

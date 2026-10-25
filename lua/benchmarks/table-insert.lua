@@ -1,24 +1,25 @@
 
--- AddInsertGlobal:     46 ms
--- AddInsertLocal:      16.35 ms
--- AddIndex:            2.19 ms
--- AddGetnLocal:        34699.70 ms
--- AddGetnGlobal:       34751.95 ms
--- AddCount:            2.68 ms
--- AddCountAlt:         2.19 ms
+-- Results with loop count 200000:
+--
+-- |--------------------------|---------|---------|------------|-----------|--------|------|-----------|---------|---------|-------|
+-- | Name                     | Samples | Mean ms | +/- 95% ms | +/- 95% % | Dev ms | CV % | Median ms |  Min ms |  Max ms |  Skew |
+-- |--------------------------|---------|---------|------------|-----------|--------|------|-----------|---------|---------|-------|
+-- | "Assign from Head"       |      30 |  2.8035 |     0.0260 |      0.93 | 0.0697 | 2.49 |    2.8076 |  2.6245 |  2.9907 | -0.14 |
+-- | "Table index assignment" |      29 |  2.4393 |     0.0181 |      0.74 | 0.0475 | 1.95 |    2.4414 |  2.3804 |  2.5635 |  0.49 |
+-- | "Assign from Count"      |      30 |  2.8442 |     0.0303 |      1.06 | 0.0811 | 2.85 |    2.8076 |  2.6855 |  2.9907 | -0.04 |
+-- | "Global table.insert"    |      28 | 21.5977 |     0.0530 |      0.25 | 0.1367 | 0.63 |   21.6064 | 21.3623 | 21.8506 |  0.08 |
+-- | "Local table.insert"     |      29 | 19.0030 |     0.0719 |      0.38 | 0.1890 | 0.99 |   18.9819 | 18.7378 | 19.4092 |  0.45 |
+-- |--------------------------|---------|---------|------------|-----------|--------|------|-----------|---------|---------|-------|
+-- | "Baseline, 1 parameter"  |     145 |  0.7547 |     0.0052 |      0.69 | 0.0320 | 4.24 |    0.7324 |  0.6714 |  0.7935 |  0.12 |
+-- |--------------------------|---------|---------|------------|-----------|--------|------|-----------|---------|---------|-------|
 
 -- Conclusion: avoiding the table operations is always a benefit, especially when
--- you cache the function call directly to prevent the table operation. 
+-- you cache the function call directly to prevent the table operation. Assigning by index is 7.8x
+-- faster than a local `table.insert`, and a global `table.insert` is 1.14x slower than a local one.
 
--- The difference between AddCount and AddCountAlt can be explained by understanding
--- how the processor works. Internally the processor is one large pipeline, where
--- an instructions keep being fed on one side. It passes through various phases,
--- such as decoding and executing. However - if there is a functional dependency
--- then an instruction has to wait (stall the pipeline) because it needs the result
--- of the previous instruction to know what to do. 
-
--- That is what happens when we first add and then use the value, instead of using 
--- the value and then adding to it.
+-- "Assign from Count" (add, then use the count) and "Assign from Head" (use the head, then add) are
+-- within 2% of each other, so the order doesn't matter. Older results suggested that using the value
+-- before adding to it avoids a pipeline stall, but each Lua instruction costs far more than a stall.
 
 
 ModuleName = "Table Insert"

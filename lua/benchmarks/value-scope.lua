@@ -1,36 +1,34 @@
 
--- Results with parameters 10000:
+-- Results with loop count 100000:
 --
--- |---------------------------|---------|----------|------------|-----------|--------|-------|-----------|----------|----------|-------|
--- | Name                      | Samples |  Mean ms | +/- 95% ms | +/- 95% % | Dev ms |  CV % | Median ms |   Min ms |   Max ms |  Skew |
--- |---------------------------|---------|----------|------------|-----------|--------|-------|-----------|----------|----------|-------|
--- | "Add Constants"           |     210 |   0.0437 |     0.0021 |      4.69 | 0.0152 | 34.65 |    0.0305 |   0.0305 |   0.0610 |  0.27 |
--- | "Add Globals"             |      30 |   0.1811 |     0.0042 |      2.30 | 0.0111 |  6.15 |    0.1831 |   0.1526 |   0.2136 | -0.83 |
--- | "Add Locals"              |     182 |   0.0448 |     0.0022 |      4.95 | 0.0153 | 34.10 |    0.0305 |   0.0305 |   0.0610 |  0.13 |
--- | "Add Upvalues"            |      30 |   0.0977 |     0.0046 |      4.75 | 0.0124 | 12.71 |    0.0916 |   0.0916 |   0.1221 |  1.43 |
--- | "Circle Chebyshev"        |      28 |  53.6597 |     0.2177 |      0.41 | 0.5613 |  1.05 |   53.6957 |  52.5513 |  54.9622 |  0.07 |
--- | "Circle Global"           |      27 | 120.6846 |     0.3210 |      0.27 | 0.8113 |  0.67 |  120.6665 | 119.2322 | 122.5281 |  0.32 |
--- | "Circle Local"            |      28 | 105.8786 |     0.3375 |      0.32 | 0.8702 |  0.82 |  105.8655 | 104.4006 | 107.9102 |  0.38 |
--- | "Circle Local Precompute" |      29 | 104.8205 |     0.3783 |      0.36 | 0.9946 |  0.95 |  104.9194 | 103.3020 | 106.9031 |  0.48 |
--- | "Circle Optimal"          |      27 |  76.8026 |     0.2464 |      0.32 | 0.6228 |  0.81 |   76.6296 |  75.9888 |  78.1250 |  0.67 |
--- | "Circle Upvalued"         |      29 | 110.7956 |     0.4362 |      0.39 | 1.1471 |  1.04 |  110.8093 | 108.8257 | 113.2202 |  0.20 |
--- |---------------------------|---------|----------|------------|-----------|--------|-------|-----------|----------|----------|-------|
--- | "Baseline, 1 parameter"   |     630 |   0.0382 |     0.0010 |      2.71 | 0.0133 | 34.71 |    0.0305 |   0.0305 |   0.0610 |  1.14 |
--- |---------------------------|---------|----------|------------|-----------|--------|-------|-----------|----------|----------|-------|
---
--- These are too short for the timer, so they mostly show its step: "Add Constants", "Add Globals",
--- "Add Locals", "Add Upvalues".
+-- |--------------------------------|---------|-----------|------------|-----------|---------|------|-----------|-----------|-----------|-------|
+-- | Name                           | Samples |   Mean ms | +/- 95% ms | +/- 95% % |  Dev ms | CV % | Median ms |    Min ms |    Max ms |  Skew |
+-- |--------------------------------|---------|-----------|------------|-----------|---------|------|-----------|-----------|-----------|-------|
+-- | "Add Constants (x2)"           |      65 |    0.8831 |     0.0078 |      0.89 |  0.0319 | 3.61 |    0.8850 |    0.8240 |    0.9766 |  0.77 |
+-- | "Add Globals (x2)"             |      29 |    3.1675 |     0.0247 |      0.78 |  0.0649 | 2.05 |    3.1433 |    3.0518 |    3.3264 |  0.50 |
+-- | "Add Locals (x2)"              |      56 |    0.8768 |     0.0059 |      0.68 |  0.0222 | 2.53 |    0.8850 |    0.8545 |    0.9155 |  0.44 |
+-- | "Add Upvalues (x2)"            |      27 |    1.8876 |     0.0179 |      0.95 |  0.0453 | 2.40 |    1.8921 |    1.8005 |    1.9531 | -0.57 |
+-- | "Circle Chebyshev (x2)"        |       6 | 1584.2285 |    18.4631 |      1.17 | 17.5905 | 1.11 | 1577.9877 | 1570.6787 | 1618.3777 |  1.09 |
+-- | "Circle Global (x2)"           |       5 | 2920.2637 |    64.9416 |      2.22 | 52.3104 | 1.79 | 2899.4751 | 2872.8943 | 2996.4600 |  0.42 |
+-- | "Circle Local (x2)"            |       5 | 2494.0063 |    13.8598 |      0.56 | 11.1641 | 0.45 | 2499.5422 | 2478.6682 | 2504.1199 | -0.35 |
+-- | "Circle Local Precompute (x2)" |       5 | 2540.2161 |    12.1212 |      0.48 |  9.7637 | 0.38 | 2542.0532 | 2528.5950 | 2553.1311 |  0.05 |
+-- | "Circle Optimal (x2)"          |       5 | 1988.3179 |     5.7676 |      0.29 |  4.6458 | 0.23 | 1985.5347 | 1984.0088 | 1994.0796 |  0.28 |
+-- | "Circle Upvalued (x2)"         |       5 | 2606.7444 |    19.2576 |      0.74 | 15.5120 | 0.60 | 2603.5767 | 2589.7827 | 2628.1738 |  0.24 |
+-- |--------------------------------|---------|-----------|------------|-----------|---------|------|-----------|-----------|-----------|-------|
+-- | "Baseline, 1 parameter (x2)"   |     190 |    0.7530 |     0.0032 |      0.42 |  0.0222 | 2.94 |    0.7629 |    0.7324 |    0.7935 |  0.58 |
+-- |--------------------------------|---------|-----------|------------|-----------|---------|------|-----------|-----------|-----------|-------|
 
 -- Conclusion:
 -- - Locals are the fastest, then upvalues, then globals. Each "Add" iteration reads two values and
 --   writes one. With upvalues it takes about 5 ns longer than with locals, and with globals about
---   14 ns longer. Locals cost about the same as constants. These figures are rough, since the timer
---   was too coarse for the "Add" benchmarks.
--- - In the circle benchmarks, upvaluing the functions is 8% faster than using them as globals.
---   Making them locals and inlining `ComputePoint` is 12% faster, and also precomputing the angle
---   step 13%. Replacing `table.insert` with a counter is 36% faster, and also replacing `math.cos`
---   and `math.sin` with a recurrence (Chebyshev) 56%. The last three compute 31 points instead of
---   30, so they are slightly faster than shown.
+--   11 ns longer. Locals cost about the same as constants.
+-- - In the circle benchmarks, upvaluing the functions is 11% faster than using them as globals.
+--   Making them locals and inlining `ComputePoint` is 15% faster. Precomputing the angle step is
+--   13% faster, but it computes 31 points instead of 30, so per point it is 1.5% faster than the
+--   local version. Replacing `table.insert` with a counter is 32% faster, and also replacing
+--   `math.cos` and `math.sin` with a recurrence (Chebyshev) 46%, both with 31 points.
+-- - Each circle iteration allocates 31 tables, so longer runs collect more garbage. Per iteration,
+--   they are about 20% slower with 200000 loops than with 10000.
 -- - This agrees with function-scope, where the cost of the call hides most of the difference
 --   between locals and upvalues.
 

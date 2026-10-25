@@ -5,41 +5,41 @@
 -- This benchmark measures the cost of indexing nil, and compares implicit nil checks in access
 -- chains against explicit ones.
 
--- Results with 10000 loops of 50, before the inner loop moved into the loop count of 500000. Each
--- loop does 10 accesses. ns/access includes about 3.2 ns of loop overhead (the missing root guards).
+-- Results with loop count 500000, with 10 accesses per loop. ns/access includes about 3.1 ns of
+-- loop overhead (the missing root guards).
 --
 -- |---------------------------------------|---------------------------------|---------|-----------|------------|-----------|---------|------|-----------|-----------|-----------|-------|-----------|
 -- | Name                                  | Expression                      | Samples |   Mean ms | +/- 95% ms | +/- 95% % |  Dev ms | CV % | Median ms |    Min ms |    Max ms |  Skew | ns/access |
 -- |---------------------------------------|---------------------------------|---------|-----------|------------|-----------|---------|------|-----------|-----------|-----------|-------|-----------|
--- | "Index table"                         | t.a                             |      28 |  18.80210 |    0.08998 |      0.48 | 0.23202 | 1.23 |  18.76831 |  18.49365 |  19.28711 |  0.77 |      3.76 |
--- | "Index nil"                           | t.a                             |      24 |  40.42943 |    0.16527 |      0.41 | 0.39133 | 0.97 |  40.51208 |  39.67285 |  41.10718 | -0.41 |      8.09 |
+-- | "Index table"                         | t.a                             |      28 |        27 |    18.6898 |    0.1638 |    0.88 | 0.4139 |      2.21 |   18.7073 |   18.0359 | 19.6304 |      0.49 | 3.74 
+-- | "Index nil"                           | t.a                             |      24 |        26 |    40.7474 |    0.3031 |    0.74 | 0.7501 |      1.84 |   40.7295 |   39.1846 | 42.3584 |     -0.07 | 8.15 
 -- |---------------------------------------|---------------------------------|---------|-----------|------------|-----------|---------|------|-----------|-----------|-----------|-------|-----------|
--- | "Chain, present"                      | t.a.b.c                         |      27 |  61.87835 |    0.26894 |      0.43 | 0.67971 | 1.10 |  61.85913 |  60.86731 |  63.55286 |  0.48 |     12.38 |
--- | "Chain, missing middle"               | t.a.b.c                         |      27 |  77.40614 |    0.32396 |      0.42 | 0.81874 | 1.06 |  77.48413 |  76.08032 |  78.97949 |  0.07 |     15.48 |
--- | "Chain, missing root"                 | t.a.b.c                         |      26 | 102.92992 |    0.18457 |      0.18 | 0.45687 | 0.44 | 102.98157 | 102.09656 | 103.68347 | -0.23 |     20.59 |
+-- | "Chain, present"                      | t.a.b.c                         |      27 |        28 |    60.9491 |    0.4007 |    0.66 | 1.0334 |      1.70 |   60.9970 |   59.1812 | 63.1256 |      0.35 | 12.19 
+-- | "Chain, missing middle"               | t.a.b.c                         |      27 |        27 |    75.4864 |    0.2765 |    0.37 | 0.6988 |      0.93 |   75.4318 |   73.9746 | 76.9501 |     -0.09 | 15.10 
+-- | "Chain, missing root"                 | t.a.b.c                         |      26 |        28 |   101.2358 |    0.2719 |    0.27 | 0.7010 |      0.69 |  101.1658 |  100.1892 | 102.5009 |      0.04 | 20.25 
 -- |---------------------------------------|---------------------------------|---------|-----------|------------|-----------|---------|------|-----------|-----------|-----------|-------|-----------|
--- | "Guarded chain, present"              | t and t.a and t.a.b and t.a.b.c |      25 | 138.04810 |    0.29834 |      0.22 | 0.72272 | 0.52 | 138.06152 | 136.81030 | 139.43481 | -0.06 |     27.61 |
--- | "Guarded chain, missing middle"       | t and t.a and t.a.b and t.a.b.c |      26 |  90.16712 |    0.30176 |      0.33 | 0.74693 | 0.83 |  90.22522 |  88.71460 |  91.52222 | -0.07 |     18.03 |
--- | "Guarded chain, missing root"         | t and t.a and t.a.b and t.a.b.c |      25 |  16.06689 |    0.13178 |      0.82 | 0.31924 | 1.99 |  15.96069 |  15.68604 |  16.99829 |  1.33 |      3.21 |
+-- | "Guarded chain, present"              | t and t.a and t.a.b and t.a.b.c |      25 |        27 |   137.9700 |    0.2125 |    0.15 | 0.5371 |      0.39 |  137.8632 |  137.1460 | 139.3204 |      0.59 | 27.59 
+-- | "Guarded chain, missing middle"       | t and t.a and t.a.b and t.a.b.c |      26 |        26 |    89.0832 |    0.6866 |    0.77 | 1.6995 |      1.91 |   89.1380 |   86.0596 | 93.0862 |      0.25 | 17.82 
+-- | "Guarded chain, missing root"         | t and t.a and t.a.b and t.a.b.c |      25 |        27 |    15.7239 |    0.0798 |    0.51 | 0.2016 |      1.28 |   15.7318 |   15.3503 | 16.1285 |      0.18 | 3.14 
 -- |---------------------------------------|---------------------------------|---------|-----------|------------|-----------|---------|------|-----------|-----------|-----------|-------|-----------|
--- | "Root guarded chain, present"         | t and t.a.b.c                   |      27 |  69.19352 |    0.16928 |      0.24 | 0.42783 | 0.62 |  69.09180 |  68.45093 |  70.34302 |  0.72 |     13.84 |
--- | "Root guarded chain, missing middle"  | t and t.a.b.c                   |      27 |  84.90329 |    0.31042 |      0.37 | 0.78453 | 0.92 |  84.93042 |  83.28247 |  86.18164 | -0.25 |     16.98 |
--- | "Root guarded chain, missing root"    | t and t.a.b.c                   |      26 |  15.87149 |    0.02895 |      0.18 | 0.07166 | 0.45 |  15.86914 |  15.71655 |  15.99121 |  0.07 |      3.17 |
+-- | "Root guarded chain, present"         | t and t.a.b.c                   |      27 |        25 |    68.0365 |    0.1652 |    0.24 | 0.4002 |      0.59 |   68.0389 |   67.4744 | 69.1528 |      0.92 | 13.61 
+-- | "Root guarded chain, missing middle"  | t and t.a.b.c                   |      27 |        28 |    83.5555 |    0.3165 |    0.38 | 0.8162 |      0.98 |   83.7097 |   82.4127 | 85.2966 |      0.20 | 16.71 
+-- | "Root guarded chain, missing root"    | t and t.a.b.c                   |      26 |        26 |    15.4073 |    0.0831 |    0.54 | 0.2057 |      1.34 |   15.3809 |   14.9231 | 15.8997 |      0.38 | 3.08 
 -- |---------------------------------------|---------------------------------|---------|-----------|------------|-----------|---------|------|-----------|-----------|-----------|-------|-----------|
--- | "Local guarded chain, present"        | if t then local a = t.a         |      24 |  86.23505 |    0.26354 |      0.31 | 0.62401 | 0.72 |  86.24268 |  85.29663 |  87.73804 |  0.61 |     17.25 |
--- | "Local guarded chain, missing middle" | if a then local b = a.b         |      26 |  73.05204 |    0.35119 |      0.48 | 0.86929 | 1.19 |  73.01331 |  71.56372 |  74.67651 |  0.18 |     14.61 |
--- | "Local guarded chain, missing root"   | if b then v = b.c               |      24 |  15.99503 |    0.04169 |      0.26 | 0.09871 | 0.62 |  15.99121 |  15.80811 |  16.20483 |  0.15 |      3.20 |
+-- | "Local guarded chain, present"        | if t then local a = t.a         |      24 |        23 |    84.6233 |    0.3305 |    0.39 | 0.7642 |      0.90 |   84.6405 |   83.1451 | 86.6089 |      0.47 | 16.92 
+-- | "Local guarded chain, missing middle" | if a then local b = a.b         |      26 |        26 |    71.9701 |    0.2595 |    0.36 | 0.6422 |      0.89 |   71.7926 |   70.6711 | 73.1812 |      0.13 | 14.39 
+-- | "Local guarded chain, missing root"   | if b then v = b.c               |      24 |        30 |    15.4912 |    0.0666 |    0.43 | 0.1784 |      1.15 |   15.4648 |   15.2130 | 15.8157 |      0.17 | 3.10 
 -- |---------------------------------------|---------------------------------|---------|-----------|------------|-----------|---------|------|-----------|-----------|-----------|-------|-----------|
 --
 -- Analysis:
 -- - Indexing nil is 2.2x slower than indexing a table.
--- - Guarding every link with `and` re-reads `t.a` and `t.a.b` at each step. It is 2.2x slower than
+-- - Guarding every link with `and` re-reads `t.a` and `t.a.b` at each step. It is 2.3x slower than
 --   the unguarded chain when the chain is present and 1.2x slower when it breaks in the middle. It
 --   is only faster when `t` is nil, by 6.4x.
--- - Guarding only `t` is 1.1x slower than the unguarded chain when `t` exists and 6.5x faster when
+-- - Guarding only `t` is 1.1x slower than the unguarded chain when `t` exists and 6.6x faster when
 --   `t` is nil. It breaks even when `t` is nil in about 8% of calls.
 -- - Nested `if`s with a local per link are 1.2x slower than guarding only `t` when the chain is
---   present, and 1.06x faster than the unguarded chain when it breaks in the middle. The gain does
+--   present, and 1.05x faster than the unguarded chain when it breaks in the middle. The gain does
 --   not justify the harder to read code.
 --
 -- Conclusion:
