@@ -1,13 +1,38 @@
 
--- AddGlobal:               2.29 ms
--- AddUpval:                1.22 ms
--- AddLocal:                0.63 ms
+-- Results with parameters 10000:
+--
+-- |---------------------------|---------|----------|------------|-----------|--------|-------|-----------|----------|----------|-------|
+-- | Name                      | Samples |  Mean ms | +/- 95% ms | +/- 95% % | Dev ms |  CV % | Median ms |   Min ms |   Max ms |  Skew |
+-- |---------------------------|---------|----------|------------|-----------|--------|-------|-----------|----------|----------|-------|
+-- | "Add Constants"           |     210 |   0.0437 |     0.0021 |      4.69 | 0.0152 | 34.65 |    0.0305 |   0.0305 |   0.0610 |  0.27 |
+-- | "Add Globals"             |      30 |   0.1811 |     0.0042 |      2.30 | 0.0111 |  6.15 |    0.1831 |   0.1526 |   0.2136 | -0.83 |
+-- | "Add Locals"              |     182 |   0.0448 |     0.0022 |      4.95 | 0.0153 | 34.10 |    0.0305 |   0.0305 |   0.0610 |  0.13 |
+-- | "Add Upvalues"            |      30 |   0.0977 |     0.0046 |      4.75 | 0.0124 | 12.71 |    0.0916 |   0.0916 |   0.1221 |  1.43 |
+-- | "Circle Chebyshev"        |      28 |  53.6597 |     0.2177 |      0.41 | 0.5613 |  1.05 |   53.6957 |  52.5513 |  54.9622 |  0.07 |
+-- | "Circle Global"           |      27 | 120.6846 |     0.3210 |      0.27 | 0.8113 |  0.67 |  120.6665 | 119.2322 | 122.5281 |  0.32 |
+-- | "Circle Local"            |      28 | 105.8786 |     0.3375 |      0.32 | 0.8702 |  0.82 |  105.8655 | 104.4006 | 107.9102 |  0.38 |
+-- | "Circle Local Precompute" |      29 | 104.8205 |     0.3783 |      0.36 | 0.9946 |  0.95 |  104.9194 | 103.3020 | 106.9031 |  0.48 |
+-- | "Circle Optimal"          |      27 |  76.8026 |     0.2464 |      0.32 | 0.6228 |  0.81 |   76.6296 |  75.9888 |  78.1250 |  0.67 |
+-- | "Circle Upvalued"         |      29 | 110.7956 |     0.4362 |      0.39 | 1.1471 |  1.04 |  110.8093 | 108.8257 | 113.2202 |  0.20 |
+-- |---------------------------|---------|----------|------------|-----------|--------|-------|-----------|----------|----------|-------|
+-- | "Baseline, 1 parameter"   |     630 |   0.0382 |     0.0010 |      2.71 | 0.0133 | 34.71 |    0.0305 |   0.0305 |   0.0610 |  1.14 |
+-- |---------------------------|---------|----------|------------|-----------|--------|-------|-----------|----------|----------|-------|
+--
+-- These are too short for the timer, so they mostly show its step: "Add Constants", "Add Globals",
+-- "Add Locals", "Add Upvalues".
 
--- CircleGlobal:            2391.11 ms
--- CircleUpval:             2020.50 ms
--- CircleLocal:             2042.96 ms
--- CircleLocalPreCompute:   1985.35 ms
--- CircleOptimal:           1288.08 ms
+-- Conclusion:
+-- - Locals are the fastest, then upvalues, then globals. Each "Add" iteration reads two values and
+--   writes one. With upvalues it takes about 5 ns longer than with locals, and with globals about
+--   14 ns longer. Locals cost about the same as constants. These figures are rough, since the timer
+--   was too coarse for the "Add" benchmarks.
+-- - In the circle benchmarks, upvaluing the functions is 8% faster than using them as globals.
+--   Making them locals and inlining `ComputePoint` is 12% faster, and also precomputing the angle
+--   step 13%. Replacing `table.insert` with a counter is 36% faster, and also replacing `math.cos`
+--   and `math.sin` with a recurrence (Chebyshev) 56%. The last three compute 31 points instead of
+--   30, so they are slightly faster than shown.
+-- - This agrees with function-scope, where the cost of the call hides most of the difference
+--   between locals and upvalues.
 
 ModuleName = "Value Scope"
 BenchmarkData = {
