@@ -1,1 +1,1 @@
-- Fix clicking your own name on the echo line of a private message, and on notify messages while observing, selecting army 1 instead of the sender (#7349).
+- Fix chat treating the echo of a private message you send, and notify messages seen as an observer, as coming from army 1. This broke clicking the sender's name, greying out your own name and muting the sender (#7349).
