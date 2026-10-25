@@ -12,6 +12,7 @@ local SerializableDeepCopy = import("/lua/utilities.lua").SerializableDeepCopy
 local CollapseDebugInfo = import("/lua/shared/debugfunction.lua").CollapseDebugInfo
 local CreateEmptyProfilerTable = import("/lua/shared/profiler.lua").CreateEmptyProfilerTable
 local GetDebugFunctionInfo = import("/lua/shared/debugfunction.lua").GetDebugFunctionInfo
+local CoarseTimerFactor = import("/lua/shared/statistics.lua").CoarseTimerFactor
 local IsTimerTooCoarse = import("/lua/shared/statistics.lua").IsTimerTooCoarse
 local TimestampResolution = import("/lua/shared/statistics.lua").TimestampResolution
 
@@ -154,8 +155,8 @@ local function WarnCoarseTimer(file, name, timestamp, sampleTime)
     local warned = coarseTimerWarned[key]
     if IsTimerTooCoarse(resolution, sampleTime) and (not warned or resolution > warned) then
         coarseTimerWarned[key] = resolution
-        WARN(("Timer resolution of %.3f ms is too coarse for %s's %.3f ms samples in %s, raise its loop count or restart the game")
-            :format(resolution * 1000, name, sampleTime * 1000, file))
+        WARN(("Timer resolution of %.3f ms is too coarse for %s's %.3f ms samples in %s, raise the loop multiplier at least %dx or restart the game")
+            :format(resolution * 1000, name, sampleTime * 1000, file, math.ceil(CoarseTimerFactor(resolution, sampleTime))))
     end
 end
 

@@ -168,6 +168,16 @@ function IsTimerTooCoarse(resolution, sampleTime)
     return resolution > sampleTime * CoarseTimerFraction
 end
 
+--- Computes how many times longer samples need to be for a timer resolution to stop distorting them
+---@param resolution number seconds
+---@param sampleTime number seconds
+---@return number factor at least 1
+function CoarseTimerFactor(resolution, sampleTime)
+    -- a sample shorter than one step can read as zero, so assume it took half a step
+    sampleTime = math.max(sampleTime, resolution * 0.5)
+    return math.max(1, resolution / (sampleTime * CoarseTimerFraction))
+end
+
 --- Computes the precision of a timestamp stored as a 32-bit float, which shrinks as it grows
 ---@param timestamp number
 ---@return number

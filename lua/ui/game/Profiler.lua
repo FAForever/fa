@@ -26,6 +26,7 @@ local Window = import("/lua/maui/window.lua").Window
 
 local ObservableCreate = import("/lua/shared/observable.lua").Create
 local CreateEmptyProfilerTable = import("/lua/shared/profiler.lua").CreateEmptyProfilerTable
+local CoarseTimerFactor = import("/lua/shared/statistics.lua").CoarseTimerFactor
 local IsTimerTooCoarse = import("/lua/shared/statistics.lua").IsTimerTooCoarse
 local Mean = import("/lua/shared/statistics.lua").Mean
 local TimestampResolution = import("/lua/shared/statistics.lua").TimestampResolution
@@ -1314,8 +1315,18 @@ ProfilerBenchmarks = Class(Group) {
         local resolution = TimestampResolution(GetSystemTimeSeconds())
         -- raw sample times, whatever the mode
         local stats = GetBenchmarkStatCache()
-        if stats and stats.n > 0 and IsTimerTooCoarse(resolution, Mean(stats, stats.n)) then
-            self.timerWarning:SetText(LOCF("<LOC profiler_0061>Timer resolution: %.3f ms", resolution * 1000))
+        local mean = stats and stats.n > 0 and Mean(stats, stats.n)
+        if mean and IsTimerTooCoarse(resolution, mean) then
+            -- the smallest multiplier that makes the samples long enough, or the largest one
+            local needed = State.Benchmarks.LoopMultiplier * CoarseTimerFactor(resolution, mean)
+            local multiplier = LoopMultipliers[table.getn(LoopMultipliers)]
+            for _, option in ipairs(LoopMultipliers) do
+                if option >= needed then
+                    multiplier = option
+                    break
+                end
+            end
+            self.timerWarning:SetText(LOCF("<LOC profiler_0061>Timer resolution: %.3f ms, use x%d", resolution * 1000, multiplier))
             self.timerWarning:Show()
         else
             self.timerWarning:Hide()

@@ -8322,9 +8322,9 @@ profiler_0057="Run every benchmark in every module in turn until each is within 
 profiler_0058="Log all"
 profiler_0059="Log all statistics"
 profiler_0060="Print a table of statistics for every module with data to the log"
-profiler_0061="Timer resolution: %.3f ms"
+profiler_0061="Timer resolution: %.3f ms, use x%d"
 profiler_0062="Coarse timer"
-profiler_0063="The game timer loses precision the longer the game has been running, and is now too coarse for this benchmark's samples. Raise the loop count or restart the game for accurate results."
+profiler_0063="The game timer loses precision the longer the game has been running, and is now too coarse for this benchmark's samples. Raise the loop multiplier to the suggested value or restart the game for accurate results."
 profiler_0064="Loop multiplier"
 profiler_0065="Multiplies the module's loop count. Raise it when the timer is too coarse for a benchmark; runs take about this many times longer."
 

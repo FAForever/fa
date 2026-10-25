@@ -2318,7 +2318,7 @@ Tooltips = {
     },
     profiler_benchmark_timer = {
         title = "<LOC profiler_0062>Coarse timer",
-        description = "<LOC profiler_0063>The game timer loses precision the longer the game has been running, and is now too coarse for this benchmark's samples. Raise the loop count or restart the game for accurate results.",
+        description = "<LOC profiler_0063>The game timer loses precision the longer the game has been running, and is now too coarse for this benchmark's samples. Raise the loop multiplier to the suggested value or restart the game for accurate results.",
     },
     profiler_benchmark_loop_multiplier = {
         title = "<LOC profiler_0064>Loop multiplier",
