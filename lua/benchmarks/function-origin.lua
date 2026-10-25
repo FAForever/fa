@@ -25,7 +25,7 @@ BenchmarkData = {
 function EngineCall(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local isDead
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
@@ -42,7 +42,7 @@ end
 function LuaCall(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local isDead
     local start = timer()
 
@@ -59,7 +59,7 @@ end
 function CachedCall(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local isDead
     local start = timer()
 

@@ -23,7 +23,7 @@ BenchmarkData = {
 
 function BlueprintSubTables2(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
 
     local blueprint = unit:GetBlueprint()
 
@@ -41,7 +41,7 @@ end
 
 function BlueprintSubTables1(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
 
     local blueprint = unit:GetBlueprint()
 

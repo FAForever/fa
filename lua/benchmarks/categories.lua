@@ -55,7 +55,7 @@ end
 
 function Cached(outerLoop, innerLoop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local restore = UseEngineSetOperations()
     local start = timer()
 
@@ -74,7 +74,7 @@ end
 
 function Inline(outerLoop, innerLoop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local restore = UseEngineSetOperations()
     local start = timer()
 

@@ -21,8 +21,8 @@ function TableTest2(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local t = {
-        unit1 = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0),
-        unit2 = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0),
+        unit1 = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1),
+        unit2 = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1),
     }
 
     local start = timer()
@@ -48,8 +48,8 @@ function TableTest1(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local t = {
-        unit1 = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0),
-        unit2 = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0),
+        unit1 = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1),
+        unit2 = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1),
     }
 
     local start = timer()

@@ -64,7 +64,7 @@ BenchmarkData = {
 function GetPositionLocal01(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local start = timer()
 
     for _ = 1, loop do
@@ -80,7 +80,7 @@ end
 function GetPositionLocal02(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local start = timer()
 
     for _ = 1, loop do
@@ -97,7 +97,7 @@ end
 function GetPositionLocal04(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local start = timer()
 
     for _ = 1, loop do
@@ -116,7 +116,7 @@ end
 function GetPositionLocal08(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local start = timer()
 
     for _ = 1, loop do
@@ -140,7 +140,7 @@ end
 function GetPositionLocal16(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local start = timer()
 
     for _ = 1, loop do
@@ -178,7 +178,7 @@ local GetPosition = moho.entity_methods.GetPosition
 function GetPositionUpvalue01(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local start = timer()
 
     for _ = 1, loop do
@@ -193,7 +193,7 @@ end
 function GetPositionUpvalue02(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local start = timer()
 
     for _ = 1, loop do
@@ -209,7 +209,7 @@ end
 function GetPositionUpvalue04(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local start = timer()
 
     for _ = 1, loop do
@@ -227,7 +227,7 @@ end
 function GetPositionUpvalue08(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local start = timer()
 
     for _ = 1, loop do
@@ -250,7 +250,7 @@ end
 function GetPositionUpvalue16(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local start = timer()
 
     for _ = 1, loop do
@@ -284,7 +284,7 @@ end
 function GetPositionSelf01(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local start = timer()
 
     for _ = 1, loop do
@@ -299,7 +299,7 @@ end
 function GetPositionSelf02(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local start = timer()
 
     for _ = 1, loop do
@@ -315,7 +315,7 @@ end
 function GetPositionSelf04(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local start = timer()
 
     for _ = 1, loop do
@@ -334,7 +334,7 @@ end
 function GetPositionSelf08(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local start = timer()
 
     for _ = 1, loop do
@@ -357,7 +357,7 @@ end
 function GetPositionSelf16(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local start = timer()
 
     for _ = 1, loop do
@@ -391,7 +391,7 @@ end
 function GetPositionSelfManual01(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local start = timer()
 
     for _ = 1, loop do
@@ -406,7 +406,7 @@ end
 function GetPositionSelfManual02(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local start = timer()
 
     for _ = 1, loop do
@@ -422,7 +422,7 @@ end
 function GetPositionSelfManual04(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local start = timer()
 
     for _ = 1, loop do
@@ -440,7 +440,7 @@ end
 function GetPositionSelfManual08(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local start = timer()
 
     for _ = 1, loop do
@@ -463,7 +463,7 @@ end
 function GetPositionSelfManual16(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local start = timer()
 
     for _ = 1, loop do

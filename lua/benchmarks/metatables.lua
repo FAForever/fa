@@ -288,7 +288,7 @@ end
 
 function PracticalTestArmyMeta(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
-    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local data
     local start = timer()
 
@@ -303,7 +303,7 @@ end
 
 function PracticalTestArmyCached(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
-    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
 
     unit.Army = unit.Army
 
@@ -321,7 +321,7 @@ end
 
 function PracticalTestWeaponsMeta(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
-    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local data
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
@@ -336,7 +336,7 @@ end
 
 function PracticalTestWeaponsCached(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
-    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
 
     unit.ForkThread = unit.ForkThread
 

@@ -95,7 +95,7 @@ end
 function AllocateVectorGetPosition(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local vector
     local start = timer()
 
@@ -112,7 +112,7 @@ end
 function AllocateVectorGetPositionCached(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local vector = Vector(0, 0, 0)
     local start = timer()
 

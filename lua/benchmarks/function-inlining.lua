@@ -42,7 +42,7 @@ function Call1(loop)
     end
 
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local size
     local start = timer()
 
@@ -59,7 +59,7 @@ end
 function Inline1(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local size
     local start = timer()
 
