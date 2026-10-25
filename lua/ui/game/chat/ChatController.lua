@@ -140,14 +140,13 @@ end
 --#endregion
 --#region Address book
 
----@param armiesTable table
+---@param armiesTable ArmyInfo[]
 ---@return number[]
 local function FindClientsAsObserver(armiesTable)
     local result = {}
     for index, client in GetSessionClients() do
         if not client.connected then continue end
         local clientIsObserver = true
-        ---@param player ArmyInfo
         for _, player in armiesTable do
             if player.nickname == client.name then
                 if not (player.human and player.outOfGame) then
