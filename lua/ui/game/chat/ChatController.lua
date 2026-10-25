@@ -217,6 +217,9 @@ function FindClients(armyID)
     return FindClientsAsPlayer(t.armiesTable, t.focusArmy, armyID)
 end
 
+---@class ArmyInfo
+---@field package ArmyID integer
+
 --- Looks up army data by army index (number) or nickname (string). For
 --- nickname lookups the returned table has `ArmyID` set to the matching index.
 ---@param army Army
@@ -243,7 +246,7 @@ local ToStrings = ChatUtils.ToStrings
 ---@class ChatLineArgs
 ---@field Name string
 ---@field Text? string
----@field ArmyData? table
+---@field ArmyData? ArmyInfo
 ---@field IsObserver? boolean
 ---@field Recipient UIChatRecipient
 ---@field Camera? table
