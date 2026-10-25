@@ -35,7 +35,7 @@ function EachIterationString(loop)
     return final - start
 end
 
-function CallColon(innerLoop, outerLoop)
+function CallColon(outerLoop, innerLoop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
     local str = "str"
     local start = timer()
