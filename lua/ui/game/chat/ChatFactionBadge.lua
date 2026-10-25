@@ -17,7 +17,7 @@ local ObserverIcon = '/widgets/faction-icons-alpha_bmp/observer_ico.dds'
 ---@class ChatFactionBadge : Group
 ---@field Color Bitmap  # team-colour tile behind the icon
 ---@field Icon  Bitmap  # faction icon on top of the colour tile
----@overload fun(parent: Control, factionIndex?: number, color?: Color)
+---@overload fun(parent: Control, factionIndex?: number, color?: Color): ChatFactionBadge
 ChatFactionBadge = ClassUI(Group) {
 
     ---@param self ChatFactionBadge
