@@ -5,5 +5,3 @@ Increase the water speeds of Aeon and Seraphim hover flak so that they can play 
 - Water speed:
   - Ascendant: 2.7 -> 3.24
   - Iashavoh: 2.6 -> ~3.24
-
-Additionally, the Athanah and Zthuee scripts now support the `WaterSpeedMultiplier` blueprint field. The Zthuee's previously non-functional `WaterSpeedMultiplier` of `0.9` is removed.
