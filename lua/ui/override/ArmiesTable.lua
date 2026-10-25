@@ -25,17 +25,21 @@
 ---@field numArmies number
 ---@field focusArmy number
 
----@class ArmyInfo
+--- Army entry as created by the engine's `GetArmiesTable`
+---@class EngineArmyInfo
 ---@field authorizedCommandSources number[]
----@field armyIndex number
 ---@field civilian boolean
 ---@field color string
 ---@field faction number
 ---@field human boolean
+---@field iconColor string
 ---@field name string
 ---@field nickname string
 ---@field outOfGame boolean
 ---@field showScore boolean
+
+--- Army entry after processing by this module
+---@class ArmyInfo : EngineArmyInfo
 
 local Prefs = import("/lua/user/prefs.lua")
 
