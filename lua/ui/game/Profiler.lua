@@ -182,12 +182,15 @@ local function CanUseProfiler()
     return sessionInfo.Options.CheatsEnabled == "true"
 end
 
-local function GetBenchmarkCacheKey(modIndex, benIndex)
+---@param modIndex? number
+---@param benIndex? number
+---@param multiplier? number defaults to the selected loop multiplier
+local function GetBenchmarkCacheKey(modIndex, benIndex, multiplier)
     local state = State.Benchmarks
     modIndex = modIndex or state.SelectedModule
     benIndex = benIndex or state.SelectedBenchmark
     -- each multiplier keeps its own samples, since it changes how long they take
-    return tostring(modIndex) .. ',' .. tostring(benIndex) .. ',x' .. tostring(state.LoopMultiplier)
+    return tostring(modIndex) .. ',' .. tostring(benIndex) .. ',x' .. tostring(multiplier or state.LoopMultiplier)
 end
 
 --- Gets the parameters a module's benchmarks run with: its loop count times the multiplier, then the
@@ -201,10 +204,11 @@ end
 
 ---@param modIndex? number
 ---@param benIndex? number
+---@param multiplier? number defaults to the selected loop multiplier
 ---@return number[]?
 ---@return number[]?
-local function GetBenchmarkStatCache(modIndex, benIndex)
-    local key = GetBenchmarkCacheKey(modIndex, benIndex)
+local function GetBenchmarkStatCache(modIndex, benIndex, multiplier)
+    local key = GetBenchmarkCacheKey(modIndex, benIndex, multiplier)
     return State.Benchmarks.StatCache[key], State.Benchmarks.BaselineCache[key]
 end
 
@@ -271,14 +275,27 @@ local function GetBenchmarkName(modIndex, benIndex)
     return info.name
 end
 
---- Checks whether any benchmark of a module has statistics
+--- Adds the loop multiplier to a name, unless it is x1
+---@param name string
+---@param multiplier number
+---@return string
+local function WithMultiplier(name, multiplier)
+    if multiplier == 1 then
+        return name
+    end
+    return name .. " (x" .. multiplier .. ")"
+end
+
+--- Checks whether any benchmark of a module has statistics, with any loop multiplier
 ---@param modIndex number
 ---@return boolean
 local function ModuleHasData(modIndex)
     local benchmarks = State.Benchmarks.Modules[modIndex].benchmarks
     for benIndex = 1, table.getn(benchmarks or {}) do
-        if GetBenchmarkStatCache(modIndex, benIndex) then
-            return true
+        for _, multiplier in ipairs(LoopMultipliers) do
+            if GetBenchmarkStatCache(modIndex, benIndex, multiplier) then
+                return true
+            end
         end
     end
     return false
@@ -1021,8 +1038,8 @@ ProfilerBenchmarks = Class(Group) {
         if baselines and baselines[1] ~= nil then
             baseline = Summarize(baselines, nil, "none")
         end
-        LogLines(ProfilerReport.FormatSummary(
-            GetBenchmarkName(benchmarkState.SelectedModule, benchmarkState.SelectedBenchmark), summary, parameters, baseline))
+        local name = GetBenchmarkName(benchmarkState.SelectedModule, benchmarkState.SelectedBenchmark)
+        LogLines(ProfilerReport.FormatSummary(WithMultiplier(name, benchmarkState.LoopMultiplier), summary, parameters, baseline))
     end,
 
     ---@param self ProfilerBenchmarks
@@ -1056,50 +1073,72 @@ ProfilerBenchmarks = Class(Group) {
 
         local mode = self.summary:GetMode()
         local rows = {}
-        local pooledBaselines = {} -- by parameter count, since that picks the baseline loop
+        -- baselines by parameter count, since that picks the baseline loop, and by multiplier
+        ---@type { params: number, multiplier: number, samples: { [integer]: number, n: integer } }[]
+        local pools = {}
         local hasData = false
         for benchmarkIndex = 1, table.getn(module.benchmarks) do
-            local stats, baselines = GetBenchmarkStatCache(moduleIndex, benchmarkIndex)
-            local params = benchmarkState.ParameterCountCache[GetBenchmarkCacheKey(moduleIndex, benchmarkIndex)]
-            -- benchmarks that haven't been run get a blank row
-            table.insert(rows, {
-                name = GetBenchmarkName(moduleIndex, benchmarkIndex),
-                summary = stats and Summarize(stats, baselines, mode),
-                params = params,
-            })
-
-            if stats then
-                hasData = true
-                if params and baselines and baselines[1] ~= nil then
-                    local pool = pooledBaselines[params] or {n = 0}
-                    pooledBaselines[params] = pool
-                    for i = 1, baselines.n do
-                        pool.n = pool.n + 1
-                        pool[pool.n] = baselines[i]
+            local name = GetBenchmarkName(moduleIndex, benchmarkIndex)
+            local ran = false
+            -- a row for each multiplier that has samples
+            for _, multiplier in ipairs(LoopMultipliers) do
+                local stats, baselines = GetBenchmarkStatCache(moduleIndex, benchmarkIndex, multiplier)
+                if stats then
+                    ran = true
+                    local params = benchmarkState.ParameterCountCache[GetBenchmarkCacheKey(moduleIndex, benchmarkIndex, multiplier)]
+                    table.insert(rows, {
+                        name = WithMultiplier(name, multiplier),
+                        summary = Summarize(stats, baselines, mode),
+                        params = params,
+                    })
+                    if params and baselines and baselines[1] ~= nil then
+                        local pool
+                        for _, candidate in ipairs(pools) do
+                            if candidate.params == params and candidate.multiplier == multiplier then
+                                pool = candidate
+                            end
+                        end
+                        if not pool then
+                            pool = {params = params, multiplier = multiplier, samples = {n = 0}}
+                            table.insert(pools, pool)
+                        end
+                        local samples = pool.samples
+                        for i = 1, baselines.n do
+                            samples.n = samples.n + 1
+                            samples[samples.n] = baselines[i]
+                        end
                     end
                 end
+            end
+            -- benchmarks that haven't been run get a blank row
+            if ran then
+                hasData = true
+            else
+                table.insert(rows, {name = name})
             end
         end
         if not hasData then
             return false
         end
 
-        local paramCounts = {}
-        for params in pooledBaselines do
-            table.insert(paramCounts, params)
-        end
-        table.sort(paramCounts)
+        table.sort(pools, function(a, b)
+            if a.params ~= b.params then
+                return a.params < b.params
+            end
+            return a.multiplier < b.multiplier
+        end)
         local baselineRows = {}
-        for _, params in ipairs(paramCounts) do
+        for _, pool in ipairs(pools) do
+            local params = pool.params
             table.insert(baselineRows, {
-                name = ("Baseline, %d parameter%s"):format(params, params == 1 and "" or "s"),
-                summary = Summarize(pooledBaselines[params], nil, "none"),
+                name = WithMultiplier(("Baseline, %d parameter%s"):format(params, params == 1 and "" or "s"), pool.multiplier),
+                summary = Summarize(pool.samples, nil, "none"),
                 params = params,
             })
         end
 
         LOG(('Benchmark statistics for "%s", loop count %d')
-            :format(module.name ~= "" and module.name or module.file, GetBenchmarkParameters(moduleIndex)[1]))
+            :format(module.name ~= "" and module.name or module.file, module.loopCount))
         LogLines(ProfilerReport.FormatTable(rows, baselineRows))
         return true
     end,
