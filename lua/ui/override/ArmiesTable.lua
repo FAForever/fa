@@ -20,25 +20,9 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
----@class ArmiesTable
+---@class ArmiesTable : EngineArmiesTable
 ---@field armiesTable ArmyInfo[]
----@field numArmies number
----@field focusArmy number
 
---- Army entry as created by the engine's `GetArmiesTable`
----@class EngineArmyInfo
----@field authorizedCommandSources number[]
----@field civilian boolean
----@field color string
----@field faction number
----@field human boolean
----@field iconColor string
----@field name string
----@field nickname string
----@field outOfGame boolean
----@field showScore boolean
-
---- Army entry after processing by this module
 ---@class ArmyInfo : EngineArmyInfo
 
 local Prefs = import("/lua/user/prefs.lua")
@@ -46,7 +30,7 @@ local Prefs = import("/lua/user/prefs.lua")
 ---@type 'on' | 'allies-only' | 'off'
 OptionShowPlayerNames = Prefs.GetFromCurrentProfile('options.show_player_names') or 'on'
 
----@param armiesTable ArmiesTable
+---@param armiesTable EngineArmiesTable
 ---@return ArmiesTable
 local function PostprocessArmiesTable(armiesTable)
     local focusArmy = GetFocusArmy()
@@ -67,7 +51,7 @@ local function PostprocessArmiesTable(armiesTable)
         end
     end
 
-    return armiesTable
+    return armiesTable --[[@as ArmiesTable]]
 end
 
 -- keep a reference to the actual function
@@ -103,6 +87,7 @@ local function TickThread()
 end
 
 --- Override global function to return our cache
+---@return ArmiesTable
 _G.GetArmiesTable = function()
     return Cached
 end

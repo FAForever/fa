@@ -224,7 +224,7 @@ end
 ---@param army Army
 ---@return ArmyInfo | nil
 local function GetArmyData(army)
-    local armies = GetArmiesTable()
+    local armies = GetArmiesTable() --[[@as ArmiesTable]]
     if type(army) == 'number' then
         return armies.armiesTable[army]
     elseif type(army) == 'string' then

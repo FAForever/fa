@@ -338,9 +338,25 @@ end
 function GetAntiAliasingOptions()
 end
 
----
---- Note that this is cached by `/lua/ui/override/ArmiesTable.lua`
----@return ArmiesTable
+---@class EngineArmiesTable
+---@field armiesTable EngineArmyInfo[]
+---@field numArmies number
+---@field focusArmy number
+
+---@class EngineArmyInfo
+---@field authorizedCommandSources number[]
+---@field civilian boolean
+---@field color string
+---@field faction number
+---@field human boolean
+---@field iconColor string
+---@field name string
+---@field nickname string
+---@field outOfGame boolean
+---@field showScore boolean
+
+--- Hooked by `/lua/ui/override/ArmiesTable.lua` to return a cached and processed `ArmiesTable`
+---@return EngineArmiesTable
 function GetArmiesTable()
 end
 
