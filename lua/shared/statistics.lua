@@ -126,7 +126,7 @@ local TCritical95Table = {
     2.080, 2.074, 2.069, 2.064, 2.060, 2.056, 2.052, 2.048, 2.045, 2.042,
 }
 
---- Gets the two-sided 95% critical value of Student's t distribution. Rounds up to the next
+--- Gets the two-sided 95% critical value of Student's t distribution. Rounds down to the previous
 --- tabulated degrees of freedom, so it never understates the interval.
 ---@param df integer
 ---@return number
@@ -135,14 +135,14 @@ function TCritical95(df)
         return TCritical95Table[1]
     elseif df <= 30 then
         return TCritical95Table[df]
-    elseif df <= 40 then
+    elseif df < 40 then
+        return TCritical95Table[30]
+    elseif df < 60 then
         return 2.021
-    elseif df <= 60 then
+    elseif df < 120 then
         return 2.000
-    elseif df <= 120 then
-        return 1.980
     end
-    return 1.960
+    return 1.980
 end
 
 --- Computes the half-width of the 95% confidence interval of a mean, or nil when there are not
