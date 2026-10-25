@@ -26,7 +26,8 @@
 --   Making them locals and inlining `ComputePoint` is 15% faster. Precomputing the angle step is
 --   13% faster, but it computes 31 points instead of 30, so per point it is 1.5% faster than the
 --   local version. Replacing `table.insert` with a counter is 32% faster, and also replacing
---   `math.cos` and `math.sin` with a recurrence (Chebyshev) 46%, both with 31 points.
+--   `math.cos` and `math.sin` with a recurrence (Chebyshev) 46%, both with 31 points. The
+--   Chebyshev version computed NaN points when these results were taken, so it needs a rerun.
 -- - Each circle iteration allocates 31 tables, so longer runs collect more garbage. Per iteration,
 --   they are about 20% slower with 200000 loops than with 10000.
 -- - Function-scope can't show the difference between locals and upvalues: its local versions look
@@ -342,8 +343,9 @@ function CircleChebyshev(loop)
 
         local cosAng = MathCos(combined)
         local sinAng = MathSqrt(1 - cosAng*cosAng)
-        local cosInit = radius * MathCos(radianOffset)
-        local sinInit = radius * MathSqrt(1 - cosInit*cosInit)
+        local cosOffset = MathCos(radianOffset)
+        local cosInit = radius * cosOffset
+        local sinInit = radius * MathSqrt(1 - cosOffset*cosOffset)
         local doubCosAng = 2 * cosAng
 
         local cos2Ang = cosAng*cosAng - sinAng*sinAng
