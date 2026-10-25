@@ -78,6 +78,7 @@ UEF Support Armored Command Unit
     - Regen Rate: 150 -> 160 hp/s
     - Regen Delay: 1 -> 3 seconds
     - Spillover mult: 0.2 -> 0.3
+    - Size: 20 -> 22
 - C-D3 Engineering Drone:
   - Energy cost: 8700 -> 7700
   - Build time: 2500 -> 1000
@@ -98,13 +99,16 @@ UEF Support Armored Command Unit
   - Build time: 3360 -> 3370
 - Radar Jammer:
   - Merged into Enhanced Sensor System upgrade
-- Enhanced Sensor System:
+- Enhanced Sensor System (renamed to Intel Support System):
   - Mass cost: 600 -> 900
   - Energy cost: 20000 -> 28000 
   - Build time: 2520 -> 3520
+  - Vision radius: 45 -> 44 (visual change; vision must be a radius of 2)
+  - Energy maintenance cost: 0 -> 100
+  - Icon changed to the Radar Jammer icon
 - Presets:
-  - Shield preset: Added Energy Accelerator and Heavy Plasma Refractor upgrades
-  - Intel preset: Replaced Jammer with Shield Generator Field. The jammer still exists though because it was merged into the Enhanced Sensor System upgrade.
+  - Shield preset (renamed to Shield Rambo preset): Added Energy Accelerator and Heavy Plasma Refractor upgrades
+  - Intel preset (renamed to Sensor/Jamming Shield preset): Replaced Jammer with Shield Generator Field. The jammer still exists though because it was merged into the Enhanced Sensor System upgrade.
 
 {% unit URL0301 %}
 Cybran Support Armored Command Unit
@@ -180,17 +184,18 @@ Seraphim Support Armored Command Unit
   - Build time: 4200 -> 1350
   - Added buildpower: +42 -> +56
 - Nano-Repair System:
-  - Mass cost: 2300 -> 2500
-  - Energy cost: 74300 -> 141200 
-  - Build time: 5900 -> 11650
+  - Mass cost: 2300 -> 2700
+  - Energy cost: 74300 -> 149100
+  - Build time: 5900 -> 12630
 - Tactical Missile Launcher:
   - Mass cost: 1500 -> 1800
   - Energy cost: 46000 -> 68000 
   - Build time: 4200 -> 8450
 - Overcharge:
   - Mass cost: 4500 -> 3000
-  - Energy cost: 283500 -> 155000 
-  - Build time: 12600 -> 13800
+  - Energy cost: 283500 -> 155100
+  - Build time: 12600 -> 13700
+  - Auto overcharge is enabled by default for human players
 - Personal Shield Generator:
 
   The shield generator is being moved to the right arm to nerf teleport and enable a more useful Rambo preset.
