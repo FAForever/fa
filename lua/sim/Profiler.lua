@@ -297,6 +297,12 @@ end
 ---@param benchmarkIndex number
 ---@param parameters any[]
 function RunBenchmark(moduleIndex, benchmarkIndex, parameters)
+    -- an error in the thread would leave the hook off and the benchmark marked as running
+    if type(parameters) ~= "table" then
+        WARN("Benchmark parameters must be a table")
+        Sync.BenchmarkOutput = {success = false}
+        return
+    end
     if not benchmarkThread then
         local moduleData = benchmarkModules[moduleIndex]
         LOG("Running benchmark \"" .. tostring(moduleData.benchmarks[benchmarkIndex].name) .. "\" in file " .. tostring(moduleData.file))
