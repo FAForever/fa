@@ -268,6 +268,20 @@ local function KickUp(shell, targetType)
     end
 end
 
+--- A point of a vortex mote's spiral, relative to the core, and the tick the mote reaches it
+---@param mote table
+---@param k number  # 0 to Vortex.Segments, from where it appears to the core
+---@return number x
+---@return number y
+---@return number z
+---@return number tick
+local function SpiralPoint(mote, k)
+    local q = k / Vortex.Segments
+    local a = mote.angle + mote.turns * q * q
+    local r = mote.reach * (1 - q)
+    return r * MathCos(a), mote.height * (1 - q), r * MathSin(a), mote.appear + MathFloor(mote.flight * q + 0.5)
+end
+
 -- Aeon T3 Static Artillery Projectile : uab2302
 -- Hits, holds still, then hits again where it is held (see ReadHits for the timing). Held in a mobile
 -- unit or its shield, it rides along. If the first hit kills what it hit, the shell flies on and lodges,
@@ -683,67 +697,52 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
             CreateUprightEffects(self, EffectTemplate.ASonanceWeaponLodgeAir02, radius * Vortex.RippleRadius)
         end
 
-        -- plan[tick] lists the actions of that tick. Motes and puffs appear more often toward the end
-        -- (square root), and all arrive by the next hit
-        local plan = {}
-        local function Plan(tick, action)
-            plan[tick] = plan[tick] or {}
-            table.insert(plan[tick], action)
-        end
+        -- motes and dust puffs appear more often toward the end (square root), and all arrive by the next hit
         local first = MathMax(startTick, Vortex.FirstTick)
         local debrisStart = MathMax(first, holdTicks + 1 - Vortex.DebrisTicks)
-        Plan(debrisStart, { 'debris', holdTicks + 1 - debrisStart })
-        Plan(first, { 'distort', holdTicks + 1 - first })
+
+        -- waves count down to the last, which arrives with the next hit
+        local lastWave = holdTicks + 1 - Vortex.WaveTicks
+        local wave = -1
         if self.HeldOn == 'Water' then
-            -- the last wave arrives with the next hit
-            local lastWave = holdTicks + 1 - Vortex.WaveTicks
-            local k = 0
-            while lastWave - MathFloor(k * Vortex.WaveEvery) >= first do
-                Plan(lastWave - MathFloor(k * Vortex.WaveEvery), { 'wave' })
-                k = k + 1
+            while lastWave - MathFloor((wave + 1) * Vortex.WaveEvery) >= first do
+                wave = wave + 1
             end
-        elseif self.HeldOn == 'Terrain' then
+        end
+
+        local puffs = {}
+        if self.HeldOn == 'Terrain' then
             -- each turned by the golden angle from the last, to spread them evenly
             local turn = 2 * MathPi * Random()
             for p = 1, Vortex.DustPuffs do
                 local life = MathMin(RandomTicksIn(Vortex.DustLife), holdTicks + 1 - first)
-                local last = holdTicks + 1 - life
                 local progress = MathSqrt((p - Random()) / Vortex.DustPuffs)
-                local heading = turn + p * 2.39996 + Vortex.DustJitter * (Random() - 0.5)
-                Plan(first + MathFloor((last - first) * progress), { 'dust', life, progress, heading })
+                puffs[p] = {
+                    tick = first + MathFloor((holdTicks + 1 - life - first) * progress),
+                    life = life,
+                    progress = progress,
+                    heading = turn + p * 2.39996 + Vortex.DustJitter * (Random() - 0.5),
+                }
             end
         end
+
         local motes = {}
         for i = 1, Vortex.Count do
             local flight = MathMin(RandomTicksIn(Vortex.Flight), holdTicks + 1 - first)
             if flight >= Vortex.Segments then
                 local last = holdTicks + 1 - flight
                 local appear = first + MathFloor((last - first) * MathSqrt((i - Random()) / Vortex.Count))
-                local reach = radius * RandomIn(Vortex.Reach)
-                local height = radius * RandomIn(Vortex.Height)
-                local angle = 2 * MathPi * Random()
-                local turns = 2 * MathPi * RandomIn(Vortex.Turns)
-
-                -- the spiral relative to the core: { x, y, z, tick }
-                local points = {}
-                for k = 0, Vortex.Segments do
-                    local q = k / Vortex.Segments
-                    local a = angle + turns * q * q
-                    points[k] = { reach * (1 - q) * MathCos(a), height * (1 - q), reach * (1 - q) * MathSin(a), appear + MathFloor(flight * q + 0.5) }
-                end
-
-                local mote = { size = RandomIn(Vortex.MoteSize), from = points[0] }
-                motes[i] = mote
-                Plan(appear, { 'appear', mote })
-                for k = 0, Vortex.Segments - 1 do
-                    local a, b = points[k], points[k + 1]
-                    local time = 0.1 * (b[4] - a[4])
-                    Plan(a[4], { 'move', mote, (b[1] - a[1]) / time, (b[2] - a[2]) / time, (b[3] - a[3]) / time })
-                end
-                for f = 1, Vortex.FadeTicks do
-                    Plan(appear + f, { 'fade', mote, f / Vortex.FadeTicks })
-                end
-                Plan(appear + flight, { 'arrive', mote })
+                table.insert(motes, {
+                    appear = appear,
+                    flight = flight,
+                    reach = radius * RandomIn(Vortex.Reach),
+                    height = radius * RandomIn(Vortex.Height),
+                    angle = 2 * MathPi * Random(),
+                    turns = 2 * MathPi * RandomIn(Vortex.Turns),
+                    size = RandomIn(Vortex.MoteSize),
+                    segment = 0, -- the next straight stretch of the spiral, see SpiralPoint
+                    segmentTick = appear,
+                })
             end
         end
 
@@ -767,59 +766,75 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
                 effect:ScaleEmitter(self.FxTrailScale * swell)
             end
 
-            if plan[tick] then
-                for _, action in plan[tick] do
-                    local kind, mote = action[1], action[2]
-                    if kind == 'debris' then
-                        Emit(corePoint, army, EffectTemplate.ASonanceWeaponVortexDebris02)
-                            :ScaleEmitter(radius * Vortex.DebrisSize)
-                            :SetEmitterCurveParam('LIFETIME_CURVE', action[2], 0)
-                    elseif kind == 'distort' then
-                        Emit(corePoint, army, EffectTemplate.ASonanceWeaponVortexDistort02)
-                            :ScaleEmitter(radius * Vortex.DistortSize)
-                            :SetEmitterCurveParam('LIFETIME_CURVE', action[2], 0)
-                    elseif kind == 'wave' then
-                        CreateEmitterAtEntity(corePoint, army, EffectTemplate.ASonanceWeaponVortexWave02)
-                            :ScaleEmitter(radius * Vortex.WaveSize)
-                    elseif kind == 'dust' then
-                        -- starts sideways (s) and is pulled in by a constant acceleration (a) that reaches
-                        -- the core at the end of its life: p = s t + a t^2 / 2, per tick
-                        local life, progress, heading = action[2], action[3], action[4]
-                        local reach = radius * RandomIn(Vortex.DustReach)
-                        local dx, dz = reach * MathCos(heading), reach * MathSin(heading)
-                        local ground = GetSurfaceHeight(px + dx, pz + dz) + Vortex.DustLift
-                        local dy = cy - ground
-                        local around = Vortex.DustCurl * reach / life
-                        local sx, sz = -around * MathSin(heading), around * MathCos(heading)
-                        local ax = 2 * (-dx - sx * life) / (life * life)
-                        local ay = 2 * dy / (life * life)
-                        local az = 2 * (-dz - sz * life) / (life * life)
-                        local rate = Lerp(Vortex.DustRate, progress)
-                        local puff = CreatePoint(self, px + dx, ground, pz + dz)
-                        CreateEmitterAtEntity(puff, army, EffectTemplate.ASonanceWeaponVortexDust02)
-                            :SetEmitterCurveParam('XDIR_CURVE', sx / around, 0)
-                            :SetEmitterCurveParam('ZDIR_CURVE', sz / around, 0)
-                            :SetEmitterCurveParam('VELOCITY_CURVE', around, 0)
-                            :SetEmitterCurveParam('X_ACCEL_CURVE', ax, 0)
-                            :SetEmitterCurveParam('Y_ACCEL_CURVE', ay, 0)
-                            :SetEmitterCurveParam('Z_ACCEL_CURVE', az, 0)
-                            :SetEmitterCurveParam('LIFETIME_CURVE', life, 0)
-                            :SetEmitterCurveParam('EMITRATE_CURVE', rate, 0)
-                    elseif kind == 'appear' then
-                        local entity = self:CreateProjectile(Vortex.MoteBlueprint, 0, 0, 0, nil, nil, nil)
-                        Warp(entity, Vector(px + mote.from[1], cy + mote.from[2], pz + mote.from[3]))
-                        -- fully faded: the whole part of the draw scale is the fade, in tenths
-                        entity:SetDrawScale(10 + mote.size)
-                        self.Trash:Add(entity)
-                        mote.entity = entity
-                    elseif mote.entity and not IsDestroyed(mote.entity) then
-                        if kind == 'move' then
-                            mote.vx, mote.vy, mote.vz = action[3], action[4], action[5]
-                            mote.entity:SetVelocity(mote.vx + 10 * hvx, mote.vy + 10 * hvy, mote.vz + 10 * hvz)
-                        elseif kind == 'fade' then
-                            mote.entity:SetDrawScale(MathFloor(10 * (1 - action[3]) + 0.5) + mote.size)
-                        else
-                            mote.entity:Destroy()
+            if tick == first then
+                Emit(corePoint, army, EffectTemplate.ASonanceWeaponVortexDistort02)
+                    :ScaleEmitter(radius * Vortex.DistortSize)
+                    :SetEmitterCurveParam('LIFETIME_CURVE', holdTicks + 1 - first, 0)
+            end
+            if tick == debrisStart then
+                Emit(corePoint, army, EffectTemplate.ASonanceWeaponVortexDebris02)
+                    :ScaleEmitter(radius * Vortex.DebrisSize)
+                    :SetEmitterCurveParam('LIFETIME_CURVE', holdTicks + 1 - debrisStart, 0)
+            end
+            while wave >= 0 and tick == lastWave - MathFloor(wave * Vortex.WaveEvery) do
+                CreateEmitterAtEntity(corePoint, army, EffectTemplate.ASonanceWeaponVortexWave02)
+                    :ScaleEmitter(radius * Vortex.WaveSize)
+                wave = wave - 1
+            end
+
+            for _, puff in puffs do
+                if puff.tick == tick then
+                    -- starts sideways (s) and is pulled in by a constant acceleration (a) that reaches
+                    -- the core at the end of its life: p = s t + a t^2 / 2, per tick
+                    local life, heading = puff.life, puff.heading
+                    local reach = radius * RandomIn(Vortex.DustReach)
+                    local dx, dz = reach * MathCos(heading), reach * MathSin(heading)
+                    local ground = GetSurfaceHeight(px + dx, pz + dz) + Vortex.DustLift
+                    local dy = cy - ground
+                    local around = Vortex.DustCurl * reach / life
+                    local sx, sz = -around * MathSin(heading), around * MathCos(heading)
+                    local ax = 2 * (-dx - sx * life) / (life * life)
+                    local ay = 2 * dy / (life * life)
+                    local az = 2 * (-dz - sz * life) / (life * life)
+                    CreateEmitterAtEntity(CreatePoint(self, px + dx, ground, pz + dz), army, EffectTemplate.ASonanceWeaponVortexDust02)
+                        :SetEmitterCurveParam('XDIR_CURVE', sx / around, 0)
+                        :SetEmitterCurveParam('ZDIR_CURVE', sz / around, 0)
+                        :SetEmitterCurveParam('VELOCITY_CURVE', around, 0)
+                        :SetEmitterCurveParam('X_ACCEL_CURVE', ax, 0)
+                        :SetEmitterCurveParam('Y_ACCEL_CURVE', ay, 0)
+                        :SetEmitterCurveParam('Z_ACCEL_CURVE', az, 0)
+                        :SetEmitterCurveParam('LIFETIME_CURVE', life, 0)
+                        :SetEmitterCurveParam('EMITRATE_CURVE', Lerp(Vortex.DustRate, puff.progress), 0)
+                end
+            end
+
+            for _, mote in motes do
+                local age = tick - mote.appear
+                if age == 0 then
+                    local x, y, z = SpiralPoint(mote, 0)
+                    local entity = self:CreateProjectile(Vortex.MoteBlueprint, 0, 0, 0, nil, nil, nil)
+                    Warp(entity, Vector(px + x, cy + y, pz + z))
+                    -- fully faded: the whole part of the draw scale is the fade, in tenths
+                    entity:SetDrawScale(10 + mote.size)
+                    self.Trash:Add(entity)
+                    mote.entity = entity
+                end
+                local entity = mote.entity
+                if entity and not IsDestroyed(entity) then
+                    if age >= mote.flight then
+                        entity:Destroy()
+                    else
+                        if age > 0 and age <= Vortex.FadeTicks then
+                            entity:SetDrawScale(MathFloor(10 * (1 - age / Vortex.FadeTicks) + 0.5) + mote.size)
+                        end
+                        if tick == mote.segmentTick then
+                            local x0, y0, z0, t0 = SpiralPoint(mote, mote.segment)
+                            local x1, y1, z1, t1 = SpiralPoint(mote, mote.segment + 1)
+                            local time = 0.1 * (t1 - t0)
+                            mote.vx, mote.vy, mote.vz = (x1 - x0) / time, (y1 - y0) / time, (z1 - z0) / time
+                            entity:SetVelocity(mote.vx + 10 * hvx, mote.vy + 10 * hvy, mote.vz + 10 * hvz)
+                            mote.segment = mote.segment + 1
+                            mote.segmentTick = t1
                         end
                     end
                 end
