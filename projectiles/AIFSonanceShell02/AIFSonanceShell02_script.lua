@@ -103,68 +103,71 @@ local EmitterSetup = {
 -- Held in a shield, the shell drills: a streak grows back up its path (aeon_sonance_drill_thrust_01), and
 -- it pulses faster and harder. Each pulse sprays a cone of sparks back up the path and plays the shield's
 -- impact effect, without damage. On release it flashes and the air distorts
-local Drill = {}
-Drill.Tick = 3 -- hold tick the streak starts at
-Drill.ThrustBack = 0.6 -- the streak starts this far up the path, so none of it shows ahead of the shell
-Drill.PulseTicks = { 6, 13, 19, 24, 28, 31, 34, 36 } -- hold ticks of the pulses
--- { first pulse, last pulse }:
-Drill.BurstRate = { 20, 29 } -- sparks per tick of all jets together, for the 2 ticks of a burst
-Drill.BurstScale = { 1.1, 1.4 }
-Drill.SparkLife = { 9, 14 } -- ticks, +-40%
-Drill.SparkSpeed = 0.25 -- per tick, +-45%
-Drill.Jets = 16 -- around the cone
-Drill.Along = 0.87 -- cos and sin of the cone's half angle (30 degrees)
-Drill.Across = 0.5
-Drill.Spread = 0.08 -- of the jet directions, small to keep the sparks on the cone
-Drill.ConeScatter = 0.1 -- of the spark origins
-Drill.FlashScale = 2.5 -- of the release flash
-Drill.BreakBurst = 1 -- strength of the sparks left when a shield collapses, see SprayDrillSparks
+local Drill = {
+    Tick = 3, -- hold tick the streak starts at
+    ThrustBack = 0.6, -- the streak starts this far up the path, so none of it shows ahead of the shell
+    PulseTicks = { 6, 13, 19, 24, 28, 31, 34, 36 }, -- hold ticks of the pulses
+    -- { first pulse, last pulse }:
+    BurstRate = { 20, 29 }, -- sparks per tick of all jets together, for the 2 ticks of a burst
+    BurstScale = { 1.1, 1.4 },
+    SparkLife = { 9, 14 }, -- ticks, +-40%
+    SparkSpeed = 0.25, -- per tick, +-45%
+    Jets = 16, -- around the cone
+    Along = 0.87, -- cos and sin of the cone's half angle (30 degrees)
+    Across = 0.5,
+    Spread = 0.08, -- of the jet directions, small to keep the sparks on the cone
+    ConeScatter = 0.1, -- of the spark origins
+    FlashScale = 2.5, -- of the release flash
+    BreakBurst = 1, -- strength of the sparks left when a shield collapses, see SprayDrillSparks
+}
 
 -- both hits fling sparks out around the path
-local HitBurst = {}
-HitBurst.Strength = 0 -- see SprayDrillSparks: 40 sparks
-HitBurst.Along = 0.26 -- cos and sin of the angle from the path (75 degrees)
-HitBurst.Across = 0.97
+local HitBurst = {
+    Strength = 0, -- see SprayDrillSparks: 40 sparks
+    Along = 0.26, -- cos and sin of the angle from the path (75 degrees)
+    Across = 0.97,
+}
 
 -- Held in terrain, water or a unit, the shell swells like a bomb while motes spiral into it, thickening
 -- toward the second hit. Distortion closes in with them, dust curls in on the ground, waves roll in on the
 -- water, and debris collapses into it at the end. A lodged shell also kicks up dirt or a splash and a small
 -- air ripple. None of this looks like the explosion, which would read as damage. Motes are small
 -- projectiles, given a new velocity at each straight stretch of their spiral
-local Vortex = {}
-Vortex.MoteBlueprint = '/effects/Entities/AIFSonanceVortexMote01/AIFSonanceVortexMote01_proj.bp'
-Vortex.Count = 300
-Vortex.MoteSize = { 0.084, 0.21 } -- below 1: the whole part of the draw scale is the fade (SonanceFade in mesh.fx)
--- ranges are random per mote or puff
-Vortex.Reach = { 1.1, 1.32 } -- start distance in damage radii, outside the damage area
-Vortex.Height = { 0.02, 0.15 } -- start height above the core, in damage radii
-Vortex.Flight = { 8, 14 } -- ticks to reach the core
-Vortex.Turns = { 0.4, 0.8 } -- around the core, speeding up
-Vortex.Segments = 6 -- straight stretches of the spiral
-Vortex.FadeTicks = 8
-Vortex.FirstTick = 3 -- hold tick the first motes appear at
-Vortex.DebrisSize = 1 / 3 -- start radius in damage radii
-Vortex.DebrisTicks = 10 -- before the second hit
-Vortex.DistortSize = 0.6 -- start radius in damage radii
-Vortex.DustPuffs = 30 -- more of them toward the end
-Vortex.DustReach = { 0.7, 0.8 } -- start distance in damage radii: the puffs, about 2 across, reach its edge
-Vortex.DustJitter = 0.4 -- radians off evenly spaced
-Vortex.DustLife = { 6, 10 } -- ticks to reach the core
-Vortex.DustRate = { 1, 5 } -- particles per puff, first to last
-Vortex.DustLift = 1.2 -- start height above the ground
-Vortex.DustCurl = 1.0 -- sideways start speed, as a share of the speed straight in
-Vortex.CoreLift = 0.4 -- min height of the core above the surface: the shell stops a little into the ground
-Vortex.CoreSwell = 2.0 -- scale of the core at the second hit, relative to its scale in flight
-Vortex.DirtScale = 1.3
-Vortex.DirtLife = 15 -- ticks, +-30%
-Vortex.SplashScale = 1
--- waves: the crests of water_idle_ripples_03, running inward
-Vortex.WaveSize = 1.1 -- start radius in damage radii
-Vortex.WaveTicks = 12 -- to reach the core
-Vortex.WaveEvery = 1.5 -- ticks between waves, 1 and 2 alternating
-Vortex.WaveLift = 0.15 -- above the water: flat effects right on it can be drawn under it
-Vortex.WaveCopies = 2 -- overlapping copies of each wave, for strength
-Vortex.RippleRadius = 0.3 -- air ripple of a lodged shell, in damage radii
+local Vortex = {
+    MoteBlueprint = '/effects/Entities/AIFSonanceVortexMote01/AIFSonanceVortexMote01_proj.bp',
+    Count = 300,
+    MoteSize = { 0.084, 0.21 }, -- below 1: the whole part of the draw scale is the fade (SonanceFade in mesh.fx)
+    -- ranges are random per mote or puff
+    Reach = { 1.1, 1.32 },  -- start distance in damage radii, outside the damage area
+    Height = { 0.02, 0.15 }, -- start height above the core, in damage radii
+    Flight = { 8, 14 },     -- ticks to reach the core
+    Turns = { 0.4, 0.8 },   -- around the core, speeding up
+    Segments = 6,           -- straight stretches of the spiral
+    FadeTicks = 8,
+    FirstTick = 3,          -- hold tick the first motes appear at
+    DebrisSize = 1 / 3,     -- start radius in damage radii
+    DebrisTicks = 10,       -- before the second hit
+    DistortSize = 0.6,      -- start radius in damage radii
+    DustPuffs = 30,         -- more of them toward the end
+    DustReach = { 0.7, 0.8 }, -- start distance in damage radii: the puffs, about 2 across, reach its edge
+    DustJitter = 0.4,       -- radians off evenly spaced
+    DustLife = { 6, 10 },   -- ticks to reach the core
+    DustRate = { 1, 5 },    -- particles per puff, first to last
+    DustLift = 1.2,         -- start height above the ground
+    DustCurl = 1.0,         -- sideways start speed, as a share of the speed straight in
+    CoreLift = 0.4,         -- min height of the core above the surface: the shell stops a little into the ground
+    CoreSwell = 2.0,        -- scale of the core at the second hit, relative to its scale in flight
+    DirtScale = 1.3,
+    DirtLife = 15,          -- ticks, +-30%
+    SplashScale = 1,
+    -- waves: the crests of water_idle_ripples_03, running inward
+    WaveSize = 1.1, -- start radius in damage radii
+    WaveTicks = 12, -- to reach the core
+    WaveEvery = 1.5, -- ticks between waves, 1 and 2 alternating
+    WaveLift = 0.15, -- above the water: flat effects right on it can be drawn under it
+    WaveCopies = 2, -- overlapping copies of each wave, for strength
+    RippleRadius = 0.3, -- air ripple of a lodged shell, in damage radii
+}
 
 --- water_idle_ripples_03 as a single wave closing in from size 2 to 0.2, just above the water. Sizes are
 --- for scale 1
