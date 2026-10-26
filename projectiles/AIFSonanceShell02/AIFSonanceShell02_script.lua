@@ -149,8 +149,7 @@ HitBurst.Across = 0.97 -- from the path (75 degrees), so that it flies out nearl
 local Vortex = {}
 Vortex.MoteBlueprint = '/effects/Entities/AIFSonanceVortexMote01/AIFSonanceVortexMote01_proj.bp'
 Vortex.Count = 300
-Vortex.MoteSize = 0.21 -- full size of a mote, less than 1: the draw scale carries the fade as well (SonanceFade in mesh.fx)
-Vortex.SmallestSize = 0.4 -- of the full size of a mote, the size of each is random between
+Vortex.MoteSize = { 0.084, 0.21 } -- less than 1: the draw scale carries the fade as well (SonanceFade in mesh.fx)
 -- each mote, with its own random path. Ranges are { lowest, highest }:
 Vortex.Reach = { 1.1, 1.32 } -- of the damage radius, that it appears at: outside the edge of the damage area
 Vortex.Height = { 0.02, 0.15 } -- of the damage radius, above the core, that it appears at: flat, with some depth
@@ -260,14 +259,14 @@ local function MobileHost(targetType, entity)
     return nil
 end
 
---- A point for effects of the drill to come from. Not turned: projectiles are created turned like the
---- shell, and the directions of the effects of the drill are given in the world
+--- An invisible, unturned entity to create effects at. Emitters are offset and directed in the frame of
+--- the entity they are created at, and the shell itself stays turned the way it came in
 ---@param shell AIFSonanceShell02
 ---@param x number
 ---@param y number
 ---@param z number
 ---@return Projectile
-local function CreateDrillPoint(shell, x, y, z)
+local function CreatePoint(shell, x, y, z)
     local point = shell:CreateProjectile(AnchorBlueprint, 0, 0, 0, nil, nil, nil)
     Warp(point, Vector(x, y, z))
     point:SetOrientation(UnsafeQuaternion(0, 0, 0, 1), true)
@@ -306,11 +305,24 @@ local function SparkJet(source, army, scatter, dx, dy, dz, spread, rate, scale, 
         :ScaleEmitter(scale)
 end
 
---- A random number in a range
----@param range number[] # lowest, highest
+---@param range number[] # { from, to }
+---@param f number         # 0 to 1
+---@return number
+local function Lerp(range, f)
+    return range[1] + (range[2] - range[1]) * f
+end
+
+---@param range number[] # { lowest, highest }
 ---@return number
 local function RandomIn(range)
-    return range[1] + (range[2] - range[1]) * Random()
+    return Lerp(range, Random())
+end
+
+--- A random whole number, both ends included
+---@param range number[] # { lowest, highest }
+---@return number
+local function RandomTicksIn(range)
+    return range[1] + MathFloor((range[2] - range[1] + 1) * Random())
 end
 
 --- Sprays a burst of sparks of the drill from a point: jets evenly around a cone back up the path of the
@@ -334,12 +346,12 @@ local function SprayDrillSparks(point, army, ax, ay, az, f, along, across)
     end
     local nx, ny, nz = ay * sz, az * sx - ax * sz, -ay * sx
 
-    local jetRate = (Drill.BurstRate[1] + (Drill.BurstRate[2] - Drill.BurstRate[1]) * f) / Drill.Jets
-    local burstScale = Drill.BurstScale[1] + (Drill.BurstScale[2] - Drill.BurstScale[1]) * f
-    local life = Drill.SparkLife[1] + (Drill.SparkLife[2] - Drill.SparkLife[1]) * f
-    local turn = 6.2832 * Random()
+    local jetRate = Lerp(Drill.BurstRate, f) / Drill.Jets
+    local burstScale = Lerp(Drill.BurstScale, f)
+    local life = Lerp(Drill.SparkLife, f)
+    local turn = 2 * MathPi * Random()
     for jet = 1, Drill.Jets do
-        local angle = turn + 6.2832 * jet / Drill.Jets
+        local angle = turn + 2 * MathPi * jet / Drill.Jets
         local out, up = across * MathCos(angle), across * MathSin(angle)
         SparkJet(point, army, Drill.ConeScatter, along * ax + out * sx + up * nx, along * ay + up * ny,
             along * az + out * sz + up * nz, Drill.Spread, jetRate, burstScale, life, Drill.SparkSpeed)
@@ -355,10 +367,7 @@ end
 ---@param setup? fun(emitter: moho.IEffect)   # in place of the setup of EmitterSetup
 ---@return moho.IEffect[]
 local function CreateUprightEffects(shell, effects, scale, setup)
-    local x, y, z = shell:GetPositionXYZ()
-    local anchor = shell:CreateProjectile(AnchorBlueprint, 0, 0, 0, nil, nil, nil)
-    Warp(anchor, Vector(x, y, z))
-    anchor:SetOrientation(UnsafeQuaternion(0, 0, 0, 1), true)
+    local anchor = CreatePoint(shell, shell:GetPositionXYZ())
     local created = {}
     local width = 2 * shell.DamageData.DamageRadius
     for k, effect in effects do
@@ -553,7 +562,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         if host then
             local hx, hy, hz = host:GetPositionXYZ()
             local x, y, z = entity:GetPositionXYZ()
-            table.insert(self.Riders, { entity, x - hx, y - hy, z - hz })
+            table.insert(self.Riders, { entity = entity, dx = x - hx, dy = y - hy, dz = z - hz })
         end
     end,
 
@@ -581,11 +590,11 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
             self.Riders = nil
         end
         for _, rider in riders do
-            local entity = rider[1]
+            local entity = rider.entity
             if not IsDestroyed(entity) then
                 if hx then
                     local x, y, z = entity:GetPositionXYZ()
-                    entity:SetVelocity(10 * (hx + vx + rider[2] - x), 10 * (hy + vy + rider[3] - y), 10 * (hz + vz + rider[4] - z))
+                    entity:SetVelocity(10 * (hx + vx + rider.dx - x), 10 * (hy + vy + rider.dy - y), 10 * (hz + vz + rider.dz - z))
                 else
                     entity:SetVelocity(0, 0, 0)
                 end
@@ -625,32 +634,37 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         return vx, vy, vz, speed
     end,
 
-    --- A hit flings motes out around the path, see HitBurst
+    --- Sprays drill sparks from the shell, back up the path it came along
     ---@param self AIFSonanceShell02
-    BurstMotes = function(self)
-        local vx, vy, vz = self:GetVelocity()
+    ---@param vx number     # velocity of the shell, straight down if it has none
+    ---@param vy number
+    ---@param vz number
+    ---@param f number      # strength, see SprayDrillSparks
+    ---@param along number
+    ---@param across number
+    SprayBack = function(self, vx, vy, vz, f, along, across)
         local speed = MathSqrt(vx * vx + vy * vy + vz * vz)
         if speed < 0.001 then
             vx, vy, vz, speed = 0, -1, 0, 1
         end
         local x, y, z = self:GetPositionXYZ()
-        SprayDrillSparks(CreateDrillPoint(self, x, y, z), self.Army, -vx / speed, -vy / speed, -vz / speed,
-            HitBurst.Strength, HitBurst.Along, HitBurst.Across)
+        SprayDrillSparks(CreatePoint(self, x, y, z), self.Army, -vx / speed, -vy / speed, -vz / speed, f, along, across)
     end,
 
-    --- The first impact collapsed the shield it hit: a burst of sparks is left where the shell broke through
+    --- A hit flings motes out around the path, see HitBurst
+    ---@param self AIFSonanceShell02
+    BurstMotes = function(self)
+        local vx, vy, vz = self:GetVelocity()
+        self:SprayBack(vx, vy, vz, HitBurst.Strength, HitBurst.Along, HitBurst.Across)
+    end,
+
+    --- The shield the shell hit collapsed: sparks are left where it broke through
     ---@param self AIFSonanceShell02
     ---@param vx number     # velocity of the shell
     ---@param vy number
     ---@param vz number
     BreakThrough = function(self, vx, vy, vz)
-        local speed = MathSqrt(vx * vx + vy * vy + vz * vz)
-        if speed < 0.001 then
-            return
-        end
-        local x, y, z = self:GetPositionXYZ()
-        SprayDrillSparks(CreateDrillPoint(self, x, y, z), self.Army, -vx / speed, -vy / speed, -vz / speed,
-            Drill.BreakBurst, Drill.Along, Drill.Across)
+        self:SprayBack(vx, vy, vz, Drill.BreakBurst, Drill.Along, Drill.Across)
     end,
 
     --- The first impact killed what it hit: the shell flies on through it, to lodge in what it hits next.
@@ -730,7 +744,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         end
 
         -- the point the sparks come from
-        local conePoint = CreateDrillPoint(self, cx, cy, cz)
+        local conePoint = CreatePoint(self, cx, cy, cz)
         self:Ride(conePoint)
         local Emit = self.Host and CreateEmitterOnEntity or CreateEmitterAtEntity
         for tick = startTick, holdTicks do
@@ -749,7 +763,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
             end
             if not carrier and tick >= Drill.Tick then
                 local back = Drill.ThrustBack
-                carrier = CreateDrillPoint(self, cx + back * ax, cy + back * ay, cz + back * az)
+                carrier = CreatePoint(self, cx + back * ax, cy + back * ay, cz + back * az)
                 self:Ride(carrier)
                 Emit(carrier, army, EffectTemplate.ASonanceWeaponDrillThrust02)
                     :SetEmitterCurveParam('XDIR_CURVE', ax, 0)
@@ -802,7 +816,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         local px, py, pz = self:GetPositionXYZ()
         local surface = GetSurfaceHeight(px, pz)
         local cy = MathMax(py, surface + Vortex.CoreLift)
-        local corePoint = CreateDrillPoint(self, px, cy, pz)
+        local corePoint = CreatePoint(self, px, cy, pz)
         self:Ride(corePoint)
         local Emit = self.Host and CreateEmitterOnEntity or CreateEmitterAtEntity
         local core = {}
@@ -842,8 +856,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
             -- angle from the last, into the widest gap left, give or take a little
             local turn = 2 * MathPi * Random()
             for p = 1, Vortex.DustPuffs do
-                local life = Vortex.DustLife[1] + MathFloor((Vortex.DustLife[2] - Vortex.DustLife[1] + 1) * Random())
-                life = MathMin(life, holdTicks + 1 - first)
+                local life = MathMin(RandomTicksIn(Vortex.DustLife), holdTicks + 1 - first)
                 local last = holdTicks + 1 - life
                 local progress = MathSqrt((p - Random()) / Vortex.DustPuffs)
                 local heading = turn + p * 2.39996 + Vortex.DustJitter * (Random() - 0.5)
@@ -852,8 +865,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         end
         local motes = {}
         for i = 1, Vortex.Count do
-            local flight = Vortex.Flight[1] + MathFloor((Vortex.Flight[2] - Vortex.Flight[1] + 1) * Random())
-            flight = MathMin(flight, holdTicks + 1 - first)
+            local flight = MathMin(RandomTicksIn(Vortex.Flight), holdTicks + 1 - first)
             if flight >= Vortex.Segments then
                 local last = holdTicks + 1 - flight
                 local appear = first + MathFloor((last - first) * MathSqrt((i - Random()) / Vortex.Count))
@@ -870,7 +882,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
                     points[k] = { reach * (1 - q) * MathCos(a), height * (1 - q), reach * (1 - q) * MathSin(a), appear + MathFloor(flight * q + 0.5) }
                 end
 
-                local mote = { size = RandomIn({ Vortex.SmallestSize, 1 }), from = points[0] }
+                local mote = { size = RandomIn(Vortex.MoteSize), from = points[0] }
                 motes[i] = mote
                 Plan(appear, { 'appear', mote })
                 for k = 0, Vortex.Segments - 1 do
@@ -913,20 +925,20 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
                     if kind == 'debris' then
                         Emit(corePoint, army, EffectTemplate.ASonanceWeaponVortexDebris02)
                             :ScaleEmitter(radius * Vortex.DebrisSize)
-                            :SetEmitterCurveParam('LIFETIME_CURVE', mote, 0)
+                            :SetEmitterCurveParam('LIFETIME_CURVE', action[2], 0)
                     elseif kind == 'distort' then
                         Emit(corePoint, army, EffectTemplate.ASonanceWeaponVortexDistort02)
                             :ScaleEmitter(radius * Vortex.DistortSize)
-                            :SetEmitterCurveParam('LIFETIME_CURVE', mote, 0)
+                            :SetEmitterCurveParam('LIFETIME_CURVE', action[2], 0)
                     elseif kind == 'wave' then
                         local wave = CreateEmitterAtEntity(corePoint, army, EffectTemplate.ASonanceWeaponVortexWave02)
-                        SetUpWave(wave, mote)
+                        SetUpWave(wave, action[2])
                         wave:ScaleEmitter(radius * Vortex.WaveSize)
                     elseif kind == 'dust' then
                         -- a puff appearing above the ground around the core, curling into it: setting off around
                         -- it (s, the way the motes turn), pulled in by a steady acceleration (a) that brings it to
                         -- the core at the end of its life: from p = s t + a t^2 / 2. Distance per tick
-                        local life, progress, heading = mote, action[3], action[4]
+                        local life, progress, heading = action[2], action[3], action[4]
                         local reach = radius * RandomIn(Vortex.DustReach)
                         local dx, dz = reach * MathCos(heading), reach * MathSin(heading)
                         local ground = GetSurfaceHeight(px + dx, pz + dz) + Vortex.DustLift
@@ -936,8 +948,8 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
                         local ax = 2 * (-dx - sx * life) / (life * life)
                         local ay = 2 * dy / (life * life)
                         local az = 2 * (-dz - sz * life) / (life * life)
-                        local rate = Vortex.DustRate[1] + (Vortex.DustRate[2] - Vortex.DustRate[1]) * progress
-                        local puff = CreateDrillPoint(self, px + dx, ground, pz + dz)
+                        local rate = Lerp(Vortex.DustRate, progress)
+                        local puff = CreatePoint(self, px + dx, ground, pz + dz)
                         CreateEmitterAtEntity(puff, army, EffectTemplate.ASonanceWeaponVortexDust02)
                             :SetEmitterCurveParam('XDIR_CURVE', sx / around, 0)
                             :SetEmitterCurveParam('YDIR_CURVE', 0, 0)
@@ -952,8 +964,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
                         local entity = self:CreateProjectile(Vortex.MoteBlueprint, 0, 0, 0, nil, nil, nil)
                         Warp(entity, Vector(px + mote.from[1], cy + mote.from[2], pz + mote.from[3]))
                         -- faded out: the whole part of the draw scale is how far, in tenths
-                        mote.full = Vortex.MoteSize * mote.size
-                        entity:SetDrawScale(10 + mote.full)
+                        entity:SetDrawScale(10 + mote.size)
                         self.Trash:Add(entity)
                         mote.entity = entity
                     elseif mote.entity and not IsDestroyed(mote.entity) then
@@ -961,7 +972,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
                             mote.vx, mote.vy, mote.vz = action[3], action[4], action[5]
                             mote.entity:SetVelocity(mote.vx + 10 * hvx, mote.vy + 10 * hvy, mote.vz + 10 * hvz)
                         elseif kind == 'fade' then
-                            mote.entity:SetDrawScale(MathFloor(10 * (1 - action[3]) + 0.5) + mote.full)
+                            mote.entity:SetDrawScale(MathFloor(10 * (1 - action[3]) + 0.5) + mote.size)
                         else
                             mote.entity:Destroy()
                         end
