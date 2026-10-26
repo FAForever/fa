@@ -48,15 +48,15 @@ local EffectWidth = {
     ['/effects/emitters/aeon_sonance_hit_01_emit.bp'] = 10.1,
     ['/effects/emitters/aeon_sonance_hit_03_emit.bp'] = 7.6,
     ['/effects/emitters/quark_bomb_explosion_08_emit.bp'] = 8.4,
-    ['/effects/emitters/aeon_sonance_hit_04_soft_emit.bp'] = 10.1,
-    ['/effects/emitters/aeon_sonance_hit_01_elect_emit.bp'] = 12,
-    ['/effects/emitters/aeon_sonance_hit_05_emit.bp'] = 5.6, -- 25% outside
-    ['/effects/emitters/aeon_sonance_hit_06_emit.bp'] = 8,
+    ['/effects/emitters/aeon_sonance02_hit_flash_emit.bp'] = 10.1,
+    ['/effects/emitters/aeon_sonance02_hit_elect_emit.bp'] = 12,
+    ['/effects/emitters/aeon_sonance02_hit_rays_emit.bp'] = 5.6, -- 25% outside
+    ['/effects/emitters/aeon_sonance02_hit_glare_emit.bp'] = 8,
 }
 -- the base class scales its impact effects (ASonanceWeaponHit02Core) together: the widest of them
 local CoreWidth = 10.1
 
--- Held in a shield, the shell drills: a streak grows back up its path (aeon_sonance_drill_thrust_01), and
+-- Held in a shield, the shell drills: a streak grows back up its path (aeon_sonance02_drill_thrust), and
 -- it pulses faster and harder. Each pulse sprays a cone of sparks back up the path and plays the shield's
 -- impact effect, without damage. On release it flashes and the air distorts
 local Drill = {
@@ -71,7 +71,6 @@ local Drill = {
     Along = 0.87, -- cos and sin of the cone's half angle (30 degrees)
     Across = 0.5,
     Spread = 0.08, -- of the jet directions, small to keep the sparks on the cone
-    FlashScale = 2.5, -- of the release flash
     BreakBurst = 1, -- strength of the sparks left when a shield collapses, see SprayDrillSparks
 }
 
@@ -642,7 +641,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         self.Host = nil
         self:Follow()
         for _, effect in EffectTemplate.ASonanceWeaponRelease02 do
-            CreateEmitterAtEntity(self, army, effect):ScaleEmitter(Drill.FlashScale)
+            CreateEmitterAtEntity(self, army, effect)
         end
         CreateUprightEffects(self, EffectTemplate.ASonanceWeaponFinalDistort02, radius / ExplosionRadius)
         if carrier then
@@ -799,7 +798,6 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
                         local puff = CreatePoint(self, px + dx, ground, pz + dz)
                         CreateEmitterAtEntity(puff, army, EffectTemplate.ASonanceWeaponVortexDust02)
                             :SetEmitterCurveParam('XDIR_CURVE', sx / around, 0)
-                            :SetEmitterCurveParam('YDIR_CURVE', 0, 0)
                             :SetEmitterCurveParam('ZDIR_CURVE', sz / around, 0)
                             :SetEmitterCurveParam('VELOCITY_CURVE', around, 0)
                             :SetEmitterCurveParam('X_ACCEL_CURVE', ax, 0)

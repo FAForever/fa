@@ -1231,7 +1231,7 @@ ASonanceWeaponHit02Core = { -- the sparkles of the explosion, played by the proj
 ASonanceWeaponHit02Final = { -- the rest of the explosion: with the core, ASonanceWeaponHit02
     EmtBpPath .. 'aeon_sonance_hit_02_emit.bp',
     EmtBpPath .. 'aeon_sonance02_hit_ring_distort_emit.bp',
-    EmtBpPath .. 'aeon_sonance_hit_04_soft_emit.bp', -- the flash (hit_04), at half the brightness
+    EmtBpPath .. 'aeon_sonance02_hit_flash_emit.bp', -- the flash (hit_04), at half the brightness
 }
 ASonanceWeaponDrillSparks02 = EmtBpPath .. 'aeon_sonance02_drill_spark_emit.bp' -- sparks flung out by both hits and by the drill
 ASonanceWeaponLodgeDirt02 = { -- hitting the ground, directly or lodging: a puff of dust and a few clods
@@ -1244,23 +1244,23 @@ ASonanceWeaponLodgeWater02 = { -- hitting the water: a splash
     EmtBpPath .. 'aeon_sonance02_splash_pie_emit.bp',
 }
 -- held by a shield: the drill
-ASonanceWeaponDrillThrust02 = EmtBpPath .. 'aeon_sonance_drill_thrust_01_emit.bp' -- the streak of the trail of the shell, growing back up its path
+ASonanceWeaponDrillThrust02 = EmtBpPath .. 'aeon_sonance02_drill_thrust_emit.bp' -- the streak of the trail of the shell, growing back up its path
 ASonanceWeaponRelease02 = { -- the drill flashes as the shell is released
-    EmtBpPath .. 'aeon_sonance_release_flash_01_emit.bp',
+    EmtBpPath .. 'aeon_sonance02_release_flash_emit.bp',
 }
 -- held in terrain or a unit: the shell sits like a bomb while air swirls into it
 ASonanceWeaponLodgeAir02 = { -- a weak ripple of air, lodging after passing on
     EmtBpPath .. 'aeon_sonance02_lodge_ripple_emit.bp',
 }
-ASonanceWeaponVortexDistort02 = EmtBpPath .. 'aeon_sonance_vortex_distort_01_emit.bp' -- the air distorted by debris, closing in with the swirling motes
-ASonanceWeaponVortexDust02 = EmtBpPath .. 'aeon_sonance_vortex_dust_01_emit.bp' -- a puff of dust curling into the shell
+ASonanceWeaponVortexDistort02 = EmtBpPath .. 'aeon_sonance02_vortex_distort_emit.bp' -- the air distorted by debris, closing in with the swirling motes
+ASonanceWeaponVortexDust02 = EmtBpPath .. 'aeon_sonance02_vortex_dust_emit.bp' -- a puff of dust curling into the shell
 ASonanceWeaponVortexWave02 = EmtBpPath .. 'aeon_sonance02_vortex_wave_emit.bp' -- on the water, a wave rolling into the shell
-ASonanceWeaponVortexDebris02 = EmtBpPath .. 'aeon_sonance_vortex_debris_01_emit.bp' -- tiny bits of debris collapsing into the shell, as on the impact of the Salvation
+ASonanceWeaponVortexDebris02 = EmtBpPath .. 'aeon_sonance02_vortex_debris_emit.bp' -- tiny bits of debris collapsing into the shell, as on the impact of the Salvation
 ASonanceWeaponVortexFinal02 = { -- added to the explosion of the second hit: electricity, distortion, dark rays
-    EmtBpPath .. 'aeon_sonance_hit_01_elect_emit.bp',
+    EmtBpPath .. 'aeon_sonance02_hit_elect_emit.bp',
     EmtBpPath .. 'aeon_sonance02_final_distort_emit.bp',
-    EmtBpPath .. 'aeon_sonance_hit_05_emit.bp',
-    EmtBpPath .. 'aeon_sonance_hit_06_emit.bp',
+    EmtBpPath .. 'aeon_sonance02_hit_rays_emit.bp',
+    EmtBpPath .. 'aeon_sonance02_hit_glare_emit.bp',
 }
 -- the second hit
 ASonanceWeaponFinalDistort02 = { -- a burst of distortion, as the drill finishes on a shield

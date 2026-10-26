@@ -1,6 +1,6 @@
 -- used by uab2302 : the streak of the trail of the shell, growing back up the path of the held shell
 EmitterBlueprint {
-	BlueprintId = 'aeon_sonance_drill_thrust_01',
+	BlueprintId = 'aeon_sonance02_drill_thrust',
 	Lifetime = 35.00,
 	Repeattime = 35.00,
 	TextureFramecount = 1.00,

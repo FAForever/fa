@@ -1,18 +1,17 @@
--- used by uab2302 : the flash of the explosion (aeon_sonance_hit_04) at half the brightness: on ramp_white_14, ramp_white_07 at half alpha
--- used by uab2302
+-- used by uab2302 : tiny bits of debris drawn into the held shell with the swirling motes
 EmitterBlueprint {
-	BlueprintId = 'aeon_sonance_hit_04_soft',
+	BlueprintId = 'aeon_sonance02_vortex_debris',
 	Lifetime = 1.00,
 	Repeattime = 1.00,
 	TextureFramecount = 1.00,
-	Blendmode = 3.00,
+	Blendmode = 1.00,
 	LocalVelocity = false,
 	LocalAcceleration = false,
 	Gravity = false,
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = true,
-	LODCutoff = -1.00, -- t3 / t4 artillery
+	LODCutoff = 400.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
@@ -25,8 +24,8 @@ EmitterBlueprint {
 	LowFidelity = true,
 	MedFidelity = true,
 	HighFidelity = true,
-	Texture = '/textures/particles/flare_lens_add_02.dds',
-	RampTexture = '/textures/particles/ramp_white_14.dds',
+	Texture = '/textures/particles/molecular_01.dds',
+	RampTexture = '/textures/particles/aeon_sonance_ramp_debris_01.dds',
 	XDirectionCurve = {
 		XRange = 1.00,
 		Keys = {
@@ -48,13 +47,13 @@ EmitterBlueprint {
 	EmitRateCurve = {
 		XRange = 1.00,
 		Keys = {
-			{ x=0.500,y=1.000,z=0.000 },
+			{ x=0.500,y=3.000,z=0.000 },
 		},
 	},
 	LifetimeCurve = {
 		XRange = 1.00,
 		Keys = {
-			{ x=0.500,y=8.000,z=0.000 },
+			{ x=0.500,y=10.000,z=0.000 },
 		},
 	},
 	VelocityCurve = {
@@ -102,7 +101,7 @@ EmitterBlueprint {
 	YPosCurve = {
 		XRange = 1.00,
 		Keys = {
-			{ x=0.500,y=0.300,z=0.000 },
+			{ x=0.500,y=0.000,z=0.000 },
 		},
 	},
 	ZPosCurve = {
@@ -114,13 +113,13 @@ EmitterBlueprint {
 	StartSizeCurve = {
 		XRange = 1.00,
 		Keys = {
-			{ x=0.500,y=10.000,z=0.000 },
+			{ x=0.500,y=2.000,z=0.300 },
 		},
 	},
 	EndSizeCurve = {
 		XRange = 1.00,
 		Keys = {
-			{ x=0.500,y=10.000,z=0.100 },
+			{ x=0.500,y=0.400,z=0.000 },
 		},
 	},
 	InitialRotationCurve = {
@@ -132,7 +131,7 @@ EmitterBlueprint {
 	RotationRateCurve = {
 		XRange = 1.00,
 		Keys = {
-			{ x=0.500,y=0.000,z=10.000 },
+			{ x=0.500,y=10.000,z=0.000 },
 		},
 	},
 	FrameRateCurve = {
@@ -150,8 +149,7 @@ EmitterBlueprint {
 	RampSelectionCurve = {
 		XRange = 1.00,
 		Keys = {
-			{ x=0.500,y=0.000,z=0.000 },
+			{ x=0.500,y=0.500,z=1.000 },
 		},
 	},
 }
-

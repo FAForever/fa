@@ -1,6 +1,6 @@
 -- used by uab2302 : a glow of electricity on the final explosion of the held shell
 EmitterBlueprint {
-	BlueprintId = 'aeon_sonance_hit_01_elect',
+	BlueprintId = 'aeon_sonance02_hit_elect',
 	Lifetime = 1.00,
 	Repeattime = 1.00,
 	TextureFramecount = 1.00,

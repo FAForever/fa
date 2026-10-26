@@ -1,6 +1,6 @@
 -- used by uab2302 : dim flash as the shell is released
 EmitterBlueprint {
-	BlueprintId = 'aeon_sonance_release_flash_01',
+	BlueprintId = 'aeon_sonance02_release_flash',
 	Lifetime = 1.00,
 	Repeattime = 1.00,
 	TextureFramecount = 1.00,
@@ -35,7 +35,7 @@ EmitterBlueprint {
 	YDirectionCurve = {
 		XRange = 1.00,
 		Keys = {
-			{ x=0.500,y=0.500,z=0.000 },
+			{ x=0.500,y=1.250,z=0.000 },
 		},
 	},
 	ZDirectionCurve = {
@@ -113,13 +113,13 @@ EmitterBlueprint {
 	StartSizeCurve = {
 		XRange = 1.00,
 		Keys = {
-			{ x=0.500,y=3.000,z=0.000 },
+			{ x=0.500,y=7.500,z=0.000 },
 		},
 	},
 	EndSizeCurve = {
 		XRange = 1.00,
 		Keys = {
-			{ x=0.500,y=1.000,z=0.000 },
+			{ x=0.500,y=2.500,z=0.000 },
 		},
 	},
 	InitialRotationCurve = {

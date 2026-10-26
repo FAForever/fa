@@ -1,6 +1,6 @@
 -- used by uab2302 : a flash on the final explosion of the held shell
 EmitterBlueprint {
-	BlueprintId = 'aeon_sonance_hit_06',
+	BlueprintId = 'aeon_sonance02_hit_glare',
 	Lifetime = 0.20,
 	Repeattime = 0.20,
 	TextureFramecount = 1.00,
