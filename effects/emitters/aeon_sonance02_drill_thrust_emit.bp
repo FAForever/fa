@@ -25,7 +25,7 @@ EmitterBlueprint {
 	MedFidelity = true,
 	HighFidelity = true,
 	Texture = '/textures/particles/muzzle_flash_add_03.dds',
-	RampTexture = '/textures/particles/aeon_sonance_ramp_thrust_01.dds',
+	RampTexture = '/textures/particles/aeon_sonance02_ramp_thrust.dds',
 	XDirectionCurve = {
 		XRange = 35.00,
 		Keys = {

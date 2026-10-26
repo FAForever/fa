@@ -9,7 +9,7 @@ ProjectileBlueprint{
                 {
                     LODCutoff = 400,
                     ShaderName = "SonanceFade",
-                    MeshName = "/effects/Entities/AIFSonanceVortexMote01/AIFSonanceVortexMote01_lod0.scm",
+                    MeshName = "/effects/Entities/AIFSonance02VortexMote/AIFSonance02VortexMote_lod0.scm",
                     AlbedoName = "/textures/particles/glow_02.dds",
                 },
             },

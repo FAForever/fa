@@ -87,7 +87,7 @@ local HitBurst = {
 -- air ripple. None of this looks like the explosion, which would read as damage. Motes are small
 -- projectiles, given a new velocity at each straight stretch of their spiral
 local Vortex = {
-    MoteBlueprint = '/effects/Entities/AIFSonanceVortexMote01/AIFSonanceVortexMote01_proj.bp',
+    MoteBlueprint = '/effects/Entities/AIFSonance02VortexMote/AIFSonance02VortexMote_proj.bp',
     Count = 300,
     MoteSize = { 0.084, 0.21 }, -- below 1: the whole part of the draw scale is the fade (SonanceFade in mesh.fx)
     -- ranges are random per mote or puff
@@ -118,7 +118,7 @@ local Vortex = {
 }
 
 -- invisible entity to create effects at, see CreatePoint
-local AnchorBlueprint = '/effects/Entities/AIFSonanceAnchor01/AIFSonanceAnchor01_proj.bp'
+local AnchorBlueprint = '/effects/Entities/AIFSonance02Anchor/AIFSonance02Anchor_proj.bp'
 
 -- the engine default, which the weapon targeting expects
 local BallisticAcceleration = -4.9

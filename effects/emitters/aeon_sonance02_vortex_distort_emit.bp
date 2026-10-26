@@ -24,7 +24,7 @@ EmitterBlueprint {
 	LowFidelity = true,
 	MedFidelity = true,
 	HighFidelity = true,
-	Texture = '/textures/particles/aeon_sonance_debris_distort_01.dds',
+	Texture = '/textures/particles/aeon_sonance02_debris_distort.dds',
 	RampTexture = '/textures/particles/ramp_blue_08.dds',
 	XDirectionCurve = {
 		XRange = 1.00,
