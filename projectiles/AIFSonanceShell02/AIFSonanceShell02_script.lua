@@ -34,34 +34,31 @@ local MathPi = math.pi
 local MathMax = math.max
 local MathMin = math.min
 
--- radius of the original Sonance explosion at scale 1, taken from its ring (aeon_sonance_hit_02,
--- end size 5). Both explosions are scaled up from this to match the damage radius
+-- radius of the stock Sonance explosion's ring at scale 1 (aeon_sonance_hit_02, end size 5). Both
+-- explosions are scaled from it to the damage radius
 local ExplosionRadius = 2.5
 
--- the widest each effect of the explosions gets at scale 1, with how far its particles fly: none is
--- scaled up beyond the width of the damage area, so that none looks bigger than the damage it does
+-- width of each explosion emitter at scale 1, particle travel included. None is scaled wider than the
+-- damage area
 local EffectWidth = {
-    -- the big circle and its distortion still spread as they fade out: kept a tenth inside
+    -- these two keep spreading as they fade: kept 10% inside
     ['/effects/emitters/aeon_sonance_hit_02_emit.bp'] = 5.6,
     ['/effects/emitters/_Mercy_distort.bp'] = 5.5,
-    ['/effects/emitters/czar_splash_01_emit.bp'] = 6.9, -- the burst of distortion: a fifth smaller still
+    ['/effects/emitters/czar_splash_01_emit.bp'] = 6.9, -- 20% inside
     ['/effects/emitters/aeon_sonance_hit_01_emit.bp'] = 10.1,
     ['/effects/emitters/aeon_sonance_hit_03_emit.bp'] = 7.6,
     ['/effects/emitters/quark_bomb_explosion_08_emit.bp'] = 8.4,
     ['/effects/emitters/aeon_sonance_hit_04_soft_emit.bp'] = 10.1,
     ['/effects/emitters/aeon_sonance_hit_01_elect_emit.bp'] = 12,
-    ['/effects/emitters/aeon_sonance_hit_05_emit.bp'] = 5.6, -- the dark rays: a quarter larger than the rest
+    ['/effects/emitters/aeon_sonance_hit_05_emit.bp'] = 5.6, -- 25% outside
     ['/effects/emitters/aeon_sonance_hit_06_emit.bp'] = 8,
 }
--- the effects the base class plays on the first impact (ASonanceWeaponHit02Core) can only be scaled
--- together: the widest of them
+-- the base class scales its impact effects (ASonanceWeaponHit02Core) together: the widest of them
 local CoreWidth = 10.1
 
--- stock emitters used for effects of their own: how each is set, wherever it is created (before it is
--- scaled). Sizes are for scale 1
+-- changes to stock emitters, applied wherever they are created, before scaling
 local EmitterSetup = {
-    -- the distortion of the Mercy, as a single ring of distortion spreading with the big circle of the
-    -- explosion (aeon_sonance_hit_02: 10 ticks, size 2 to 5, 0.3 up)
+    -- a single ring spreading with aeon_sonance_hit_02 (10 ticks, size 2 to 5, 0.3 up)
     ['/effects/emitters/_Mercy_distort.bp'] = function(emitter)
         emitter:SetEmitterParam('LIFETIME', 1)
         emitter:SetEmitterCurveParam('EMITRATE_CURVE', 1, 0)
@@ -72,15 +69,14 @@ local EmitterSetup = {
         emitter:SetEmitterCurveParam('BEGINSIZE_CURVE', 2, 0)
         emitter:SetEmitterCurveParam('ENDSIZE_CURVE', 5, 0)
     end,
-    -- the splash of distortion of the Czar, as a burst of distortion: quicker, smaller, staying put
+    -- quicker, smaller and staying put
     ['/effects/emitters/czar_splash_01_emit.bp'] = function(emitter)
         emitter:SetEmitterCurveParam('LIFETIME_CURVE', 4, 0)
         emitter:SetEmitterCurveParam('YDIR_CURVE', 0, 0)
         emitter:SetEmitterCurveParam('Y_POSITION_CURVE', 0.2, 0)
         emitter:SetEmitterCurveParam('ENDSIZE_CURVE', 5, 0)
     end,
-    -- the splash of small units destroyed on the water (ExplosionSmallWater), as a single burst from one
-    -- point: they repeat every 5s, and the column and the spray are scattered around where they start
+    -- ExplosionSmallWater as a single burst from one point: it repeats every 5s and scatters
     ['/effects/emitters/Watertower_s.bp'] = function(emitter)
         emitter:SetEmitterParam('LIFETIME', 1)
         emitter:SetEmitterParam('REPEATTIME', 1)
@@ -98,106 +94,82 @@ local EmitterSetup = {
         emitter:SetEmitterParam('REPEATTIME', 1)
         emitter:SetEmitterCurveParam('LIFETIME_CURVE', 20, 0)
     end,
-    -- the slow rings of the impact of the Salvation, all spreading as far, to 9
+    -- all rings end at the same size
     ['/effects/emitters/aeon_quanticcluster_hit_08_emit.bp'] = function(emitter)
         emitter:SetEmitterCurveParam('ENDSIZE_CURVE', 9, 0)
     end,
 }
 
--- held by a shield, the shell drills. The streak of its trail grows back up its path, as if from a thruster
--- pushing harder and harder (aeon_sonance_drill_thrust_01, which lasts until the shell is released). And it
--- pulses, faster and harder as the drill goes on: with each pulse a burst of energy orbs sprays back up the
--- path like the sparks of a drill, in a cone around it (jets evenly around the cone, turned by a random
--- angle with each burst), flying further pulse by pulse, and the shield flares as if hit: only the effect,
--- no damage is dealt. When the shell is released it flashes and the air distorts
+-- Held in a shield, the shell drills: a streak grows back up its path (aeon_sonance_drill_thrust_01), and
+-- it pulses faster and harder. Each pulse sprays a cone of sparks back up the path and plays the shield's
+-- impact effect, without damage. On release it flashes and the air distorts
 local Drill = {}
-Drill.Tick = 3 -- tick of the hold the streak starts at
-Drill.ThrustBack = 0.6 -- distance up the path from the shell that the streak starts at, so none of it shows ahead
-Drill.PulseTicks = { 6, 13, 19, 24, 28, 31, 34, 36 } -- ticks of the hold the shell pulses at
--- from the first pulse to the last:
-Drill.BurstRate = { 20, 29 } -- orbs per tick of the jets around the cone together, for the two ticks of a burst
-Drill.BurstScale = { 1.1, 1.4 } -- of the orbs
-Drill.SparkLife = { 9, 14 } -- ticks the orbs live, give or take 40%: with their speed, how far they fly
-Drill.SparkSpeed = 0.25 -- of the orbs, per tick, give or take 45%
-Drill.Jets = 16 -- around the cone, close enough together to draw its surface
-Drill.Along = 0.87 -- direction of the jets, up the path and out from it: cos and sin of half the
-Drill.Across = 0.5 -- angle of the cone (60 degrees)
-Drill.Spread = 0.08 -- random spread of the direction of the jets, small so that the orbs keep to the surface of the cone
-Drill.ConeScatter = 0.1 -- random offset of where the orbs of the cone come from
-Drill.FlashScale = 2.5 -- of the release flash, as the drill flashes
--- strength of the burst of sparks left where the shell broke through a shield, as a pulse from first (0)
--- to last (1)
-Drill.BreakBurst = 1
+Drill.Tick = 3 -- hold tick the streak starts at
+Drill.ThrustBack = 0.6 -- the streak starts this far up the path, so none of it shows ahead of the shell
+Drill.PulseTicks = { 6, 13, 19, 24, 28, 31, 34, 36 } -- hold ticks of the pulses
+-- { first pulse, last pulse }:
+Drill.BurstRate = { 20, 29 } -- sparks per tick of all jets together, for the 2 ticks of a burst
+Drill.BurstScale = { 1.1, 1.4 }
+Drill.SparkLife = { 9, 14 } -- ticks, +-40%
+Drill.SparkSpeed = 0.25 -- per tick, +-45%
+Drill.Jets = 16 -- around the cone
+Drill.Along = 0.87 -- cos and sin of the cone's half angle (30 degrees)
+Drill.Across = 0.5
+Drill.Spread = 0.08 -- of the jet directions, small to keep the sparks on the cone
+Drill.ConeScatter = 0.1 -- of the spark origins
+Drill.FlashScale = 2.5 -- of the release flash
+Drill.BreakBurst = 1 -- strength of the sparks left when a shield collapses, see SprayDrillSparks
 
--- both hits fling motes out around the path, about as many as the sparkles of the explosion (some 45)
+-- both hits fling sparks out around the path
 local HitBurst = {}
-HitBurst.Strength = 0 -- as a pulse of the drill from first (0, 40 motes) to last (1, 58)
-HitBurst.Along = 0.26 -- direction of the burst, back up the path and out from it: cos and sin of the angle
-HitBurst.Across = 0.97 -- from the path (75 degrees), so that it flies out nearly square to it
+HitBurst.Strength = 0 -- see SprayDrillSparks: 40 sparks
+HitBurst.Along = 0.26 -- cos and sin of the angle from the path (75 degrees)
+HitBurst.Across = 0.97
 
--- held in terrain or a unit, the shell does not drill: it sits like a bomb, swelling, while air swirls into
--- it as into a vortex. Motes fade in just outside the damage area and spiral flat into the core, turning
--- faster as they close in, in a stream that thickens toward the second hit. From the start the air distorts
--- in a circle closing in with them, and on the ground puffs of dust appear evenly around and curl in, more
--- and thicker toward the end, or on the water waves roll in. In the last moments a faint layer of tiny bits of debris collapses into it
--- (as on the impact of the Salvation). The second hit adds the slow rings of the Salvation, a flash of
--- dark rays, electricity and a burst of distortion to the explosion. A shell that lodged after passing on,
--- where nothing exploded, kicks up dirt or a splash and a weak ripple of air as it lands. On the water the
--- shell is held on the surface as on the ground, and both hits splash. Nothing here is the energy
--- of the explosion: that would read as damage. Each mote is a small projectile drawn as a glowing point,
--- set moving a few times
+-- Held in terrain, water or a unit, the shell swells like a bomb while motes spiral into it, thickening
+-- toward the second hit. Distortion closes in with them, dust curls in on the ground, waves roll in on the
+-- water, and debris collapses into it at the end. A lodged shell also kicks up dirt or a splash and a small
+-- air ripple. None of this looks like the explosion, which would read as damage. Motes are small
+-- projectiles, given a new velocity at each straight stretch of their spiral
 local Vortex = {}
 Vortex.MoteBlueprint = '/effects/Entities/AIFSonanceVortexMote01/AIFSonanceVortexMote01_proj.bp'
 Vortex.Count = 300
-Vortex.MoteSize = { 0.084, 0.21 } -- less than 1: the draw scale carries the fade as well (SonanceFade in mesh.fx)
--- each mote, with its own random path. Ranges are { lowest, highest }:
-Vortex.Reach = { 1.1, 1.32 } -- of the damage radius, that it appears at: outside the edge of the damage area
-Vortex.Height = { 0.02, 0.15 } -- of the damage radius, above the core, that it appears at: flat, with some depth
-Vortex.Flight = { 8, 14 } -- ticks it takes to spiral in
-Vortex.Turns = { 0.4, 0.8 } -- around the core on the way, faster and faster
-Vortex.Segments = 6 -- straight stretches it flies its spiral in
-Vortex.FadeTicks = 8 -- that it fades in over
-Vortex.FirstTick = 3 -- tick of the hold the first motes appear at, after the explosion
-Vortex.DebrisSize = 1 / 3 -- of the damage radius: the radius of the layer of debris as it appears
-Vortex.DebrisTicks = 10 -- before the second hit, that the debris appears and collapses over
-Vortex.DistortSize = 0.6 -- of the damage radius: the radius of the distorted air as it appears
--- with the motes, on the ground puffs of dust are picked up around the core and drawn into it. Each is a
--- few faint overlapping particles: the more, the thicker
-Vortex.DustPuffs = 30 -- more and more of them toward the end
--- of the damage radius, where each appears: a puff (about 2 across) reaching the edge of the damage area
-Vortex.DustReach = { 0.7, 0.8 }
-Vortex.DustJitter = 0.4 -- radians, how far each strays from evenly around
-Vortex.DustLife = { 6, 10 } -- ticks each takes to reach the core
-Vortex.DustRate = { 1, 5 } -- particles in each, from the first to the last
-Vortex.DustLift = 1.2 -- above the ground that each appears, fading in: more than half the width of a puff
--- each curls in: it sets off around the core, the way the motes turn, and is pulled into it, arriving on
--- time. How fast it sets off around, as a share of the speed it would fly straight in at
-Vortex.DustCurl = 1.0
--- the core sits where the shell stopped: its glow and sparkles, as in flight, at least this far above
--- the surface, as the shell stops a little into the ground
-Vortex.CoreLift = 0.4
--- the core swells as it charges, until it explodes. Scale of its glow and sparkles, as a multiple of
--- their scale in flight
-Vortex.CoreSwell = 2.0 -- by the end of the hold, growing faster and faster
-Vortex.DirtScale = 1.3 -- of the dirt kicked up as the shell hits the ground, directly or lodging
-Vortex.SplashScale = 1 -- of the splash as the shell hits the water
--- on the water, waves roll in instead of the dust: the crests of the ripples of idle units on the water
--- (water_idle_ripples_03), running inward
-Vortex.WaveSize = 1.1 -- of the damage radius: the radius of each wave as it starts
-Vortex.WaveTicks = 12 -- that each takes to roll into the core
-Vortex.WaveEvery = 1.5 -- ticks between them, on average: whole ticks, 1 and 2 by turns
+Vortex.MoteSize = { 0.084, 0.21 } -- below 1: the whole part of the draw scale is the fade (SonanceFade in mesh.fx)
+-- ranges are random per mote or puff
+Vortex.Reach = { 1.1, 1.32 } -- start distance in damage radii, outside the damage area
+Vortex.Height = { 0.02, 0.15 } -- start height above the core, in damage radii
+Vortex.Flight = { 8, 14 } -- ticks to reach the core
+Vortex.Turns = { 0.4, 0.8 } -- around the core, speeding up
+Vortex.Segments = 6 -- straight stretches of the spiral
+Vortex.FadeTicks = 8
+Vortex.FirstTick = 3 -- hold tick the first motes appear at
+Vortex.DebrisSize = 1 / 3 -- start radius in damage radii
+Vortex.DebrisTicks = 10 -- before the second hit
+Vortex.DistortSize = 0.6 -- start radius in damage radii
+Vortex.DustPuffs = 30 -- more of them toward the end
+Vortex.DustReach = { 0.7, 0.8 } -- start distance in damage radii: the puffs, about 2 across, reach its edge
+Vortex.DustJitter = 0.4 -- radians off evenly spaced
+Vortex.DustLife = { 6, 10 } -- ticks to reach the core
+Vortex.DustRate = { 1, 5 } -- particles per puff, first to last
+Vortex.DustLift = 1.2 -- start height above the ground
+Vortex.DustCurl = 1.0 -- sideways start speed, as a share of the speed straight in
+Vortex.CoreLift = 0.4 -- min height of the core above the surface: the shell stops a little into the ground
+Vortex.CoreSwell = 2.0 -- scale of the core at the second hit, relative to its scale in flight
+Vortex.DirtScale = 1.3
+Vortex.DirtLife = 15 -- ticks, +-30%
+Vortex.SplashScale = 1
+-- waves: the crests of water_idle_ripples_03, running inward
+Vortex.WaveSize = 1.1 -- start radius in damage radii
+Vortex.WaveTicks = 12 -- to reach the core
+Vortex.WaveEvery = 1.5 -- ticks between waves, 1 and 2 alternating
 Vortex.WaveLift = 0.15 -- above the water: flat effects right on it can be drawn under it
-Vortex.WaveCopies = 2 -- of each wave, overlapping: more for a stronger wave
-Vortex.DirtLife = 15 -- ticks the dirt lasts, give or take 30%
-Vortex.RippleRadius = 0.3 -- of the ripple of air of a shell that lodged, as a fraction of the damage radius
+Vortex.WaveCopies = 2 -- overlapping copies of each wave, for strength
+Vortex.RippleRadius = 0.3 -- air ripple of a lodged shell, in damage radii
 
-
---- A wave rolling in over the water to the shell: the crest of the ripples of idle units on the water
---- (water_idle_ripples_03, emitting without end, scattered a little), as a single wave closing in from 2 to
---- 0.2, just above the water (the core it is created at is higher), so that it is not drawn under it.
---- Sizes are for scale 1
+--- water_idle_ripples_03 as a single wave closing in from size 2 to 0.2, just above the water. Sizes are
+--- for scale 1
 ---@param emitter moho.IEffect
----@param ticks number  # that it takes to roll in
+---@param ticks number  # to reach the core
 local function SetUpWave(emitter, ticks)
     emitter:SetEmitterParam('LIFETIME', 1)
     emitter:SetEmitterCurveParam('EMITRATE_CURVE', Vortex.WaveCopies, 0)
@@ -210,8 +182,7 @@ local function SetUpWave(emitter, ticks)
     emitter:SetEmitterCurveParam('ENDSIZE_CURVE', 0.2, 0)
 end
 
---- The ripple of air of a shell that lodged: the distortion of the Mercy, small and quick (8 ticks, size
---- 0.1 to 2)
+--- _Mercy_distort as the small, quick air ripple of a lodged shell (8 ticks, size 0.1 to 2)
 ---@param emitter moho.IEffect
 local function SetUpRipple(emitter)
     emitter:SetEmitterParam('LIFETIME', 1)
@@ -224,23 +195,20 @@ local function SetUpRipple(emitter)
     emitter:SetEmitterCurveParam('ENDSIZE_CURVE', 2, 0)
 end
 
--- the flat effects of the explosion are created from an anchor that stands upright on the shell, see
--- CreateUprightEffects
+-- invisible entity to create effects at, see CreatePoint
 local AnchorBlueprint = '/effects/Entities/AIFSonanceAnchor01/AIFSonanceAnchor01_proj.bp'
 
 -- the engine default, which the weapon targeting expects
 local BallisticAcceleration = -4.9
 
---- Whether the first impact killed what it hit, for the shell to pass on through it: dead units and
---- collapsed shields no longer take collisions
+--- Dead units and collapsed shields no longer take collisions
 ---@param entity? Entity
 ---@return boolean
 local function IsKilled(entity)
     return entity ~= nil and (IsDestroyed(entity) or entity.DisallowCollisions == true)
 end
 
---- The mobile unit the shell rides along with while it is held in it, or in its shield: nil for anything
---- that does not move
+--- The unit the shell rides along with: the unit it is held in or the owner of the shield, if it is mobile
 ---@param targetType string
 ---@param entity? Unit|Prop|Shield
 ---@return Unit?
@@ -274,19 +242,18 @@ local function CreatePoint(shell, x, y, z)
     return point
 end
 
---- Sprays a burst of sparks of the drill from an entity, in a direction: the motes of the firing of the
---- Emissary (aeon_sonance_muzzle_03), as a burst of two ticks. Their directions are its own (LocalVelocity),
---- the entity is not turned
+--- A 2-tick burst of drill sparks (the motes of aeon_sonance_muzzle_03) in one direction. The direction
+--- is local to the source, so the source must not be turned
 ---@param source Projectile
 ---@param army number
----@param scatter number    # random offset of where the orbs come from
+---@param scatter number    # random offset of the spark origins
 ---@param dx number
 ---@param dy number
 ---@param dz number
 ---@param spread number
----@param rate number   # orbs per tick
+---@param rate number   # sparks per tick
 ---@param scale number
----@param life number   # ticks the orbs live
+---@param life number   # ticks
 ---@param speed number  # distance per tick
 local function SparkJet(source, army, scatter, dx, dy, dz, spread, rate, scale, life, speed)
     CreateEmitterAtEntity(source, army, EffectTemplate.ASonanceWeaponDrillSparks02)
@@ -325,18 +292,17 @@ local function RandomTicksIn(range)
     return range[1] + MathFloor((range[2] - range[1] + 1) * Random())
 end
 
---- Sprays a burst of sparks of the drill from a point: jets evenly around a cone back up the path of the
---- shell, turned by a random angle
+--- Sprays drill sparks in jets evenly around a cone back up the shell's path, at a random turn
 ---@param point Projectile
 ---@param army number
----@param ax number     # back up the path of the shell
+---@param ax number     # unit vector back up the path
 ---@param ay number
 ---@param az number
----@param f number      # strength, as a pulse of the drill from first (0) to last (1)
----@param along number  # cone: cos and sin of the angle from the path
+---@param f number      # strength, from the first drill pulse (0) to the last (1)
+---@param along number  # cos and sin of the cone's half angle
 ---@param across number
 local function SprayDrillSparks(point, army, ax, ay, az, f, along, across)
-    -- around the path: s level, n square to both
+    -- s: level and square to the path, n: square to both
     local sx, sz = az, -ax
     local side = MathSqrt(sx * sx + sz * sz)
     if side > 0.001 then
@@ -358,13 +324,11 @@ local function SprayDrillSparks(point, army, ax, ay, az, f, along, across)
     end
 end
 
---- Creates effects where the shell is, standing upright. Emitters are offset in the frame of the entity
---- they are created at, and the shell keeps the angle it came in at: flat effects that are lifted off
---- the ground would be shifted sideways instead. The anchor is only needed while they are created
+--- Creates effects at the shell, upright, scaled no wider than the damage area (see EffectWidth)
 ---@param shell AIFSonanceShell02
 ---@param effects FileName[]
 ---@param scale number
----@param setup? fun(emitter: moho.IEffect)   # in place of the setup of EmitterSetup
+---@param setup? fun(emitter: moho.IEffect)   # replaces the EmitterSetup entry
 ---@return moho.IEffect[]
 local function CreateUprightEffects(shell, effects, scale, setup)
     local anchor = CreatePoint(shell, shell:GetPositionXYZ())
@@ -386,8 +350,7 @@ local function CreateUprightEffects(shell, effects, scale, setup)
     return created
 end
 
---- Kicks up dirt where the shell hits the ground, only as it hits, or a splash where it hits the water,
---- see Vortex
+--- Dirt where the shell hits the ground, or a splash where it hits the water
 ---@param shell AIFSonanceShell02
 ---@param targetType string
 local function KickUp(shell, targetType)
@@ -403,23 +366,21 @@ local function KickUp(shell, targetType)
 end
 
 -- Aeon T3 Static Artillery Projectile : uab2302
--- Hits, holds in place, then hits again for the same damage where it is held, 3.8s after the first. In a
--- mobile unit (or its shield) the shell rides along with it until then. When the first impact kills what
--- it hit (a unit, or a shield that collapses), the shell passes on through it instead, lodges in whatever
--- it hits next without damaging it, and the second hit comes when the 3.8s are up. The hits and the time
--- between them are the weapon's damage over time in its blueprint, see ReadHits
+-- Hits, holds still, then hits again where it is held (see ReadHits for the timing). Held in a mobile
+-- unit or its shield, it rides along. If the first hit kills what it hit, the shell flies on and lodges,
+-- without damage, in what it hits next
 ---@class AIFSonanceShell02 : AArtilleryProjectile
----@field HitsLeft? number          # hits still to deal, this one included, see ReadHits
----@field HoldTicks? number         # ticks between hits, see ReadHits
+---@field HitsLeft? number          # including the next one
+---@field HoldTicks? number         # between hits
 ---@field FirstImpactTick? number
----@field Passing? boolean          # passing on after killing what it first hit, to lodge in what it hits next
+---@field Passing? boolean          # flying on after the first hit killed its target
 ---@field TrailStreak? moho.IEffect
----@field HeldOn? string            # the type of what the shell is held in: what it hit first, or lodged in
----@field HeldIn? Unit|Prop|Shield  # what the shell is held in, nil for terrain and water
+---@field HeldOn? string            # impact type of what the shell is held in
+---@field HeldIn? Unit|Prop|Shield  # nil for terrain and water
 ---@field Host? Unit                # the mobile unit the shell rides along with, see Follow
----@field Riders? table             # what rides along with it: the shell and the points its effects come from
+---@field Riders? table             # entities that ride along: the shell and its effect points
 AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
-    -- created by the shell itself, see CreateTrails
+    -- see CreateTrails
     FxTrails = {},
     FxImpactUnit = EffectTemplate.ASonanceWeaponHit02Core,
     FxImpactProp = EffectTemplate.ASonanceWeaponHit02Core,
@@ -434,9 +395,8 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         self:CreateTrails()
     end,
 
-    --- The trail of the shell in flight. Its streak (the first of the trail emitters) is kept, so that it
-    --- can be stopped while the shell is held: it would pile up on the shell and point ahead of it. The
-    --- glow and sparkles are what is seen of the shell itself, they stay
+    --- The streak (the first trail emitter) is kept, to stop it while the shell is held: it would pile up
+    --- on the shell. The glow and sparkles are the shell itself, and stay
     ---@param self AIFSonanceShell02
     ---@param streakOnly? boolean
     CreateTrails = function(self, streakOnly)
@@ -455,8 +415,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
     ---@param targetType string
     ---@param targetEntity? Unit|Prop|Shield   # nil for terrain and water
     OnImpact = function(self, targetType, targetEntity)
-        -- dead units and collapsed shields, see Projectile.OnImpact. Checked here as well, so that the
-        -- shell does not lodge in what it just killed
+        -- as in Projectile.OnImpact, before lodging, so the shell does not lodge in what it just killed
         if targetEntity and targetEntity.DisallowCollisions then
             return
         end
@@ -468,8 +427,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
             self:ReadHits()
         end
 
-        -- both impacts deal the same damage and explode alike: the shared impact effects are played
-        -- by the base class, scale them to the damage radius, within the damage area (see EffectWidth)
+        -- the base class plays the impact effects: scale them to the damage area, see EffectWidth
         local radius = self.DamageData.DamageRadius
         local scale = MathMin(radius / ExplosionRadius, 2 * radius / CoreWidth)
         self.FxLandHitScale = scale
@@ -486,12 +444,12 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
     ---@param targetType string
     ---@param targetEntity? Unit|Prop|Shield   # nil for terrain and water
     OnImpactDestroy = function(self, targetType, targetEntity)
-        -- the rest of the original explosion, on both impacts
+        -- the rest of the stock explosion
         CreateUprightEffects(self, EffectTemplate.ASonanceWeaponHit02Final, self.DamageData.DamageRadius / ExplosionRadius)
         self:ShakeCamera(25, 3, 0, 1.5)
 
         if self.HitsLeft <= 1 then
-            -- the final explosion: the slow rings of the Salvation, at their own size, and a splash on the water
+            -- the last hit
             CreateUprightEffects(self, EffectTemplate.ASonanceWeaponFinalRings02, 1)
             if targetType == 'Water' then
                 KickUp(self, targetType)
@@ -507,8 +465,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         KickUp(self, targetType)
         self:BurstMotes()
 
-        -- it killed what it hit: not destroying the shell is enough for it to fly on, as the railgun of
-        -- the Seadragon in BlackOps Unleashed (XCannon01) does
+        -- not destroying the shell is enough for it to fly on (as BlackOps Unleashed's XCannon01 does)
         if IsKilled(targetEntity) then
             if targetType == 'Shield' then
                 self:BreakThrough(self:GetVelocity())
@@ -522,10 +479,9 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         self.Trash:Add(ForkThread(self.HoldThread, self, vx, vy, vz, speed, 1))
     end,
 
-    --- Reads the hits from the weapon blueprint: its damage over time, `DoTPulses` hits of the full `Damage`,
-    --- `DoTTime / (DoTPulses - 1)` seconds apart, as the engine deals it. The shell deals each hit itself,
-    --- where it is when the time is up, so the engine's own damage over time is switched off for it (in its
-    --- own damage table, not the weapon's)
+    --- The weapon's damage over time gives the hits: `DoTPulses` hits of `Damage`, `DoTTime / (DoTPulses - 1)`
+    --- seconds apart, as the engine would deal them. The shell deals them itself, so the engine's damage
+    --- over time is turned off in the shell's own damage table
     ---@param self AIFSonanceShell02
     ReadHits = function(self)
         local data = self.DamageData
@@ -542,7 +498,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         data.DoTTime = 0
     end,
 
-    --- Remembers what the shell is held in, for the second hit, and rides along with it if it moves
+    --- Remembers what the shell is held in for the next hit, and rides along with it if it moves
     ---@param self AIFSonanceShell02
     ---@param targetType string
     ---@param targetEntity? Unit|Prop|Shield
@@ -553,8 +509,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         self:Ride(self)
     end,
 
-    --- Makes an entity ride along with the unit the shell is held in, keeping its place relative to it.
-    --- Not turned with it: the place is kept in the world's directions
+    --- Makes an entity keep its offset from the host. The offset is in world axes: it does not turn with it
     ---@param self AIFSonanceShell02
     ---@param entity Projectile
     Ride = function(self, entity)
@@ -566,11 +521,11 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         end
     end,
 
-    --- Keeps what rides along with the unit the shell is held in with it, for the next tick: each is given
-    --- the velocity that takes it to its place by then. When the unit dies, all stop where they are
+    --- Sets each rider's velocity to reach its place by the host's next tick. With no host (left, or
+    --- dead), all riders stop
     ---@param self AIFSonanceShell02
-    ---@param motes? table    # flying motes of the vortex: they get the velocity of the unit on top of their own
-    ---@return number vx      # velocity of the unit, distance per tick
+    ---@param motes? table    # flying vortex motes: they get the host's velocity added to their own
+    ---@return number vx      # of the host, per tick
     ---@return number vy
     ---@return number vz
     Follow = function(self, motes)
@@ -585,7 +540,6 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
             vx, vy, vz = host:GetVelocity()
             hx, hy, hz = host:GetPositionXYZ()
         else
-            -- nothing to ride along with (any more): all stop
             self.Host = nil
             self.Riders = nil
         end
@@ -612,7 +566,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
 
     --- Stops the shell where it is
     ---@param self AIFSonanceShell02
-    ---@return number vx    # velocity it had, in distance per tick
+    ---@return number vx    # velocity it had, per tick
     ---@return number vy
     ---@return number vz
     ---@return number speed
@@ -634,7 +588,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         return vx, vy, vz, speed
     end,
 
-    --- Sprays drill sparks from the shell, back up the path it came along
+    --- Sprays drill sparks from the shell, back up its path
     ---@param self AIFSonanceShell02
     ---@param vx number     # velocity of the shell, straight down if it has none
     ---@param vy number
@@ -667,8 +621,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         self:SprayBack(vx, vy, vz, Drill.BreakBurst, Drill.Along, Drill.Across)
     end,
 
-    --- The first impact killed what it hit: the shell flies on through it, to lodge in what it hits next.
-    --- Should it hit nothing in time, it explodes where it is when the time is up
+    --- Flies on, to lodge in what it hits next, or hit in the air if it hits nothing in time
     ---@param self AIFSonanceShell02
     StartPassing = function(self)
         self.Passing = true
@@ -676,9 +629,9 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         self.Trash:Add(ForkThread(self.PassTimeoutThread, self))
     end,
 
-    --- As StartPassing, for a shell that was already held: it is set moving again first
+    --- StartPassing for a shell that is held
     ---@param self AIFSonanceShell02
-    ---@param vx number     # velocity to fly on with, in distance per tick
+    ---@param vx number     # per tick
     ---@param vy number
     ---@param vz number
     PassOn = function(self, vx, vy, vz)
@@ -701,8 +654,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         end
     end,
 
-    --- Having passed on, the shell lodges in what it hits, without damaging it, and holds there for the rest
-    --- of the time before the second hit
+    --- Holds in what the passing shell hit, without damage, until the next hit is due
     ---@param self AIFSonanceShell02
     ---@param targetType string
     ---@param targetEntity? Unit|Prop|Shield
@@ -715,21 +667,20 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         self.Trash:Add(ForkThread(self.HoldThread, self, vx, vy, vz, speed, startTick))
     end,
 
-    --- Holds the shell until the second hit: drilling into a shield, or as a bomb, see VortexThread
+    --- Holds the shell until the next hit: drills into a shield, see Drill, or else see VortexThread
     ---@param self AIFSonanceShell02
-    ---@param vx number     # velocity at the first impact, in distance per tick
+    ---@param vx number     # at the impact, per tick
     ---@param vy number
     ---@param vz number
     ---@param speed number
-    ---@param startTick number  # tick of the hold to start at, later when the shell lodged after passing on
+    ---@param startTick number  # hold tick to start at: later than 1 when the shell lodged
     HoldThread = function(self, vx, vy, vz, speed, startTick)
         if self.HeldOn ~= 'Shield' then
             self:VortexThread(vx, vy, vz, startTick)
             return
         end
 
-        -- the drill: the sparks spray back up the path (a) and out from it, the streak back up it, from a
-        -- little up the path. Pulse by pulse, f goes from 0 to 1
+        -- a: back up the path
         local ax, ay, az = -vx / speed, -vy / speed, -vz / speed
         local cx, cy, cz = self:GetPositionXYZ()
         local shield = self.HeldIn
@@ -743,15 +694,13 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
             pulse = pulse + 1
         end
 
-        -- the point the sparks come from
         local conePoint = CreatePoint(self, cx, cy, cz)
         self:Ride(conePoint)
         local Emit = self.Host and CreateEmitterOnEntity or CreateEmitterAtEntity
         for tick = startTick, holdTicks do
-            -- riding along with a mobile shield: the drill keeps to where the shell is now
             self:Follow()
             cx, cy, cz = self:GetPositionXYZ()
-            -- the first impact killed what it hit after all, when the damage only lands a tick later
+            -- units can die, and shields collapse, a tick after the hit
             if tick == 2 and IsKilled(shield) then
                 if carrier then
                     carrier:Destroy()
@@ -777,7 +726,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
                 SprayDrillSparks(conePoint, army, ax, ay, az, f, Drill.Along, Drill.Across)
 
                 if shield and not IsDestroyed(shield) and shield:IsUp() then
-                    -- as for an impact: from the point of impact to the centre of the shield
+                    -- from the impact to the shield's centre, as for a real impact
                     local hx, hy, hz = shield:GetPositionXYZ()
                     ForkThread(shield.CreateImpactEffect, shield, Vector(hx - cx, hy - cy, hz - cz))
                 end
@@ -785,8 +734,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
             WaitTicks(1)
         end
 
-        -- the drill flashes and is gone as the shell is released, the air distorting as when the bomb
-        -- goes off
+        -- stop riding
         self.Host = nil
         self:Follow()
         for _, effect in EffectTemplate.ASonanceWeaponRelease02 do
@@ -800,19 +748,19 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         self:Release()
     end,
 
-    --- Held in terrain or a unit: the shell sits like a bomb while air swirls into it, see Vortex
+    --- See Vortex
     ---@param self AIFSonanceShell02
-    ---@param vx number     # velocity at the impact, in distance per tick
+    ---@param vx number     # at the impact, per tick
     ---@param vy number
     ---@param vz number
-    ---@param startTick number  # tick of the hold to start at, later when the shell lodged after passing on
+    ---@param startTick number  # hold tick to start at: later than 1 when the shell lodged
     VortexThread = function(self, vx, vy, vz, startTick)
         local radius = self.DamageData.DamageRadius
         local holdTicks = self.HoldTicks
         local scale = radius / ExplosionRadius
         local army = self.Army
 
-        -- the core, sitting on the surface
+        -- the core: the shell's flight glow and sparkles, above the surface
         local px, py, pz = self:GetPositionXYZ()
         local surface = GetSurfaceHeight(px, pz)
         local cy = MathMax(py, surface + Vortex.CoreLift)
@@ -826,14 +774,14 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
             end
         end
 
-        -- landing after passing on: dirt in the ground or a splash in the water, a ripple of air
+        -- lodged
         if startTick > 1 then
             KickUp(self, self.HeldOn)
             CreateUprightEffects(self, EffectTemplate.ASonanceWeaponLodgeAir02, radius * Vortex.RippleRadius, SetUpRipple)
         end
 
-        -- plan the motes: on each tick, what to do with which. Appearing later and later, more of them
-        -- toward the end (the square root), each arriving in the core by the second hit
+        -- plan[tick] lists the actions of that tick. Motes and puffs appear more often toward the end
+        -- (square root), and all arrive by the next hit
         local plan = {}
         local function Plan(tick, action)
             plan[tick] = plan[tick] or {}
@@ -844,7 +792,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         Plan(debrisStart, { 'debris', holdTicks + 1 - debrisStart })
         Plan(first, { 'distort', holdTicks + 1 - first })
         if self.HeldOn == 'Water' then
-            -- the waves: the last rolls into the core as the second hit explodes
+            -- the last wave arrives with the next hit
             local lastWave = holdTicks + 1 - Vortex.WaveTicks
             local k = 0
             while lastWave - MathFloor(k * Vortex.WaveEvery) >= first do
@@ -852,8 +800,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
                 k = k + 1
             end
         elseif self.HeldOn == 'Terrain' then
-            -- coming in evenly from all around: each, in the order they appear, turned on by the golden
-            -- angle from the last, into the widest gap left, give or take a little
+            -- each turned by the golden angle from the last, to spread them evenly
             local turn = 2 * MathPi * Random()
             for p = 1, Vortex.DustPuffs do
                 local life = MathMin(RandomTicksIn(Vortex.DustLife), holdTicks + 1 - first)
@@ -874,7 +821,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
                 local angle = 2 * MathPi * Random()
                 local turns = 2 * MathPi * RandomIn(Vortex.Turns)
 
-                -- the spiral, as points relative to the core
+                -- the spiral relative to the core: { x, y, z, tick }
                 local points = {}
                 for k = 0, Vortex.Segments do
                     local q = k / Vortex.Segments
@@ -898,7 +845,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         end
 
         for tick = startTick, holdTicks do
-            -- the first impact killed what it hit after all, when the damage only lands a tick later
+            -- units can die a tick after the hit
             if tick == 2 and IsKilled(self.HeldIn) then
                 for _, mote in motes do
                     if mote.entity then
@@ -909,10 +856,8 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
                 self:PassOn(vx, vy, vz)
                 return
             end
-            -- riding along with a mobile unit: the motes come in to where the core is now
             local hvx, hvy, hvz = self:Follow(motes)
             px, cy, pz = corePoint:GetPositionXYZ()
-            -- the core swelling
             local q = tick / holdTicks
             local swell = 1 + (Vortex.CoreSwell - 1) * q * q
             for _, effect in core do
@@ -935,9 +880,8 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
                         SetUpWave(wave, action[2])
                         wave:ScaleEmitter(radius * Vortex.WaveSize)
                     elseif kind == 'dust' then
-                        -- a puff appearing above the ground around the core, curling into it: setting off around
-                        -- it (s, the way the motes turn), pulled in by a steady acceleration (a) that brings it to
-                        -- the core at the end of its life: from p = s t + a t^2 / 2. Distance per tick
+                        -- starts sideways (s) and is pulled in by a constant acceleration (a) that reaches
+                        -- the core at the end of its life: p = s t + a t^2 / 2, per tick
                         local life, progress, heading = action[2], action[3], action[4]
                         local reach = radius * RandomIn(Vortex.DustReach)
                         local dx, dz = reach * MathCos(heading), reach * MathSin(heading)
@@ -963,7 +907,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
                     elseif kind == 'appear' then
                         local entity = self:CreateProjectile(Vortex.MoteBlueprint, 0, 0, 0, nil, nil, nil)
                         Warp(entity, Vector(px + mote.from[1], cy + mote.from[2], pz + mote.from[3]))
-                        -- faded out: the whole part of the draw scale is how far, in tenths
+                        -- fully faded: the whole part of the draw scale is the fade, in tenths
                         entity:SetDrawScale(10 + mote.size)
                         self.Trash:Add(entity)
                         mote.entity = entity
@@ -982,6 +926,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
             WaitTicks(1)
         end
 
+        -- stop riding
         self.Host = nil
         self:Follow()
         for _, mote in motes do
@@ -994,7 +939,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         self:Release()
     end,
 
-    --- The second hit, where the shell is held: on what it is held in if that is still there, else in the air
+    --- The next hit: on what the shell is held in, or in the air if that is gone
     ---@param self AIFSonanceShell02
     Release = function(self)
         local targetType, targetEntity = self.HeldOn, self.HeldIn
