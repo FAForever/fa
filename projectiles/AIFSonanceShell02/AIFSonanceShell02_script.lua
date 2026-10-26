@@ -232,12 +232,6 @@ local AnchorBlueprint = '/effects/Entities/AIFSonanceAnchor01/AIFSonanceAnchor01
 -- the engine default, which the weapon targeting expects
 local BallisticAcceleration = -4.9
 
--- impacts that end the shell immediately. Water is held on as the ground is
-local FinalImpactTypes = {
-    Underwater = true,
-    UnitUnderwater = true,
-}
-
 --- Whether the first impact killed what it hit, for the shell to pass on through it: dead units and
 --- collapsed shields no longer take collisions
 ---@param entity? Entity
@@ -408,8 +402,6 @@ end
 ---@class AIFSonanceShell02 : AArtilleryProjectile
 ---@field HitsLeft? number          # hits still to deal, this one included, see ReadHits
 ---@field HoldTicks? number         # ticks between hits, see ReadHits
----@field HeldBy? Shield            # the shield the shell is held by, if any
----@field FirstTarget? Unit|Prop|Shield # what the first impact hit, while the shell holds in it
 ---@field FirstImpactTick? number
 ---@field Passing? boolean          # passing on after killing what it first hit, to lodge in what it hits next
 ---@field TrailStreak? moho.IEffect
@@ -459,11 +451,10 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         if targetEntity and targetEntity.DisallowCollisions then
             return
         end
-        if self.Passing and not FinalImpactTypes[targetType] then
+        if self.Passing then
             self:Lodge(targetType, targetEntity)
             return
         end
-        self.Passing = nil
         if not self.HitsLeft then
             self:ReadHits()
         end
@@ -478,9 +469,6 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         self.FxWaterHitScale = scale
         self.FxAirUnitHitScale = scale
         self.FxNoneHitScale = scale
-        if targetType == 'Shield' and self.HitsLeft > 1 then
-            self.HeldBy = targetEntity
-        end
         AArtilleryProjectileOnImpact(self, targetType, targetEntity)
     end,
 
@@ -493,7 +481,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         CreateUprightEffects(self, EffectTemplate.ASonanceWeaponHit02Final, self.DamageData.DamageRadius / ExplosionRadius)
         self:ShakeCamera(25, 3, 0, 1.5)
 
-        if self.HitsLeft <= 1 or FinalImpactTypes[targetType] then
+        if self.HitsLeft <= 1 then
             -- the final explosion: the slow rings of the Salvation, at their own size, and a splash on the water
             CreateUprightEffects(self, EffectTemplate.ASonanceWeaponFinalRings02, 1)
             if targetType == 'Water' then
@@ -521,7 +509,6 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         end
 
         local vx, vy, vz, speed = self:Freeze()
-        self.FirstTarget = targetEntity
         self:HoldIn(targetType, targetEntity)
         self.Trash:Add(ForkThread(self.HoldThread, self, vx, vy, vz, speed, 1))
     end,
@@ -671,8 +658,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
     ---@param self AIFSonanceShell02
     StartPassing = function(self)
         self.Passing = true
-        self.FirstTarget = nil
-        self.HeldBy = nil
+        self.HeldIn = nil
         self.Trash:Add(ForkThread(self.PassTimeoutThread, self))
     end,
 
@@ -709,9 +695,6 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
     Lodge = function(self, targetType, targetEntity)
         self.Passing = nil
         self.HeldOn = targetType
-        if targetType == 'Shield' then
-            self.HeldBy = targetEntity
-        end
         local vx, vy, vz, speed = self:Freeze()
         self:HoldIn(targetType, targetEntity)
         local startTick = GetGameTick() - self.FirstImpactTick + 1
@@ -726,8 +709,8 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
     ---@param speed number
     ---@param startTick number  # tick of the hold to start at, later when the shell lodged after passing on
     HoldThread = function(self, vx, vy, vz, speed, startTick)
-        if not self.HeldBy then
-            self:VortexThread(vx, vy, vz, speed, startTick)
+        if self.HeldOn ~= 'Shield' then
+            self:VortexThread(vx, vy, vz, startTick)
             return
         end
 
@@ -735,7 +718,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         -- little up the path. Pulse by pulse, f goes from 0 to 1
         local ax, ay, az = -vx / speed, -vy / speed, -vz / speed
         local cx, cy, cz = self:GetPositionXYZ()
-        local shield = self.HeldBy
+        local shield = self.HeldIn
         local army = self.Army
         local radius = self.DamageData.DamageRadius
         local holdTicks = self.HoldTicks
@@ -755,7 +738,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
             self:Follow()
             cx, cy, cz = self:GetPositionXYZ()
             -- the first impact killed what it hit after all, when the damage only lands a tick later
-            if tick == 2 and IsKilled(self.FirstTarget) then
+            if tick == 2 and IsKilled(shield) then
                 if carrier then
                     carrier:Destroy()
                 end
@@ -808,9 +791,8 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
     ---@param vx number     # velocity at the impact, in distance per tick
     ---@param vy number
     ---@param vz number
-    ---@param speed number
     ---@param startTick number  # tick of the hold to start at, later when the shell lodged after passing on
-    VortexThread = function(self, vx, vy, vz, speed, startTick)
+    VortexThread = function(self, vx, vy, vz, startTick)
         local radius = self.DamageData.DamageRadius
         local holdTicks = self.HoldTicks
         local scale = radius / ExplosionRadius
@@ -905,7 +887,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
 
         for tick = startTick, holdTicks do
             -- the first impact killed what it hit after all, when the damage only lands a tick later
-            if tick == 2 and IsKilled(self.FirstTarget) then
+            if tick == 2 and IsKilled(self.HeldIn) then
                 for _, mote in motes do
                     if mote.entity then
                         mote.entity:Destroy()
@@ -1005,9 +987,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
     ---@param self AIFSonanceShell02
     Release = function(self)
         local targetType, targetEntity = self.HeldOn, self.HeldIn
-        self.FirstTarget = nil
-        self.HeldIn = nil
-        if targetEntity and IsKilled(targetEntity) then
+        if IsKilled(targetEntity) then
             targetType, targetEntity = 'Air', nil
         end
         self:OnImpact(targetType, targetEntity)
