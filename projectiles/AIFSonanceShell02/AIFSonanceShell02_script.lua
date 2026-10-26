@@ -43,8 +43,8 @@ local ExplosionRadius = 2.5
 local EffectWidth = {
     -- these two keep spreading as they fade: kept 10% inside
     ['/effects/emitters/aeon_sonance_hit_02_emit.bp'] = 5.6,
-    ['/effects/emitters/_Mercy_distort.bp'] = 5.5,
-    ['/effects/emitters/czar_splash_01_emit.bp'] = 6.9, -- 20% inside
+    ['/effects/emitters/aeon_sonance02_hit_ring_distort_emit.bp'] = 5.5,
+    ['/effects/emitters/aeon_sonance02_final_distort_emit.bp'] = 6.9, -- 20% inside
     ['/effects/emitters/aeon_sonance_hit_01_emit.bp'] = 10.1,
     ['/effects/emitters/aeon_sonance_hit_03_emit.bp'] = 7.6,
     ['/effects/emitters/quark_bomb_explosion_08_emit.bp'] = 8.4,
@@ -55,50 +55,6 @@ local EffectWidth = {
 }
 -- the base class scales its impact effects (ASonanceWeaponHit02Core) together: the widest of them
 local CoreWidth = 10.1
-
--- changes to stock emitters, applied wherever they are created, before scaling
-local EmitterSetup = {
-    -- a single ring spreading with aeon_sonance_hit_02 (10 ticks, size 2 to 5, 0.3 up)
-    ['/effects/emitters/_Mercy_distort.bp'] = function(emitter)
-        emitter:SetEmitterParam('LIFETIME', 1)
-        emitter:SetEmitterCurveParam('EMITRATE_CURVE', 1, 0)
-        emitter:SetEmitterCurveParam('LIFETIME_CURVE', 10, 0)
-        emitter:SetEmitterCurveParam('VELOCITY_CURVE', 0, 0)
-        emitter:SetEmitterCurveParam('ROTATION_RATE_CURVE', 0, 0)
-        emitter:SetEmitterCurveParam('Y_POSITION_CURVE', 0.3, 0)
-        emitter:SetEmitterCurveParam('BEGINSIZE_CURVE', 2, 0)
-        emitter:SetEmitterCurveParam('ENDSIZE_CURVE', 5, 0)
-    end,
-    -- quicker, smaller and staying put
-    ['/effects/emitters/czar_splash_01_emit.bp'] = function(emitter)
-        emitter:SetEmitterCurveParam('LIFETIME_CURVE', 4, 0)
-        emitter:SetEmitterCurveParam('YDIR_CURVE', 0, 0)
-        emitter:SetEmitterCurveParam('Y_POSITION_CURVE', 0.2, 0)
-        emitter:SetEmitterCurveParam('ENDSIZE_CURVE', 5, 0)
-    end,
-    -- ExplosionSmallWater as a single burst from one point: it repeats every 5s and scatters
-    ['/effects/emitters/Watertower_s.bp'] = function(emitter)
-        emitter:SetEmitterParam('LIFETIME', 1)
-        emitter:SetEmitterParam('REPEATTIME', 1)
-        emitter:SetEmitterCurveParam('EMITRATE_CURVE', 6, 0)
-        emitter:SetEmitterCurveParam('SIZE_CURVE', 0, 0)
-    end,
-    ['/effects/emitters/Watersplash_s.bp'] = function(emitter)
-        emitter:SetEmitterParam('LIFETIME', 1)
-        emitter:SetEmitterParam('REPEATTIME', 1)
-        emitter:SetEmitterCurveParam('EMITRATE_CURVE', 10, 0)
-        emitter:SetEmitterCurveParam('SIZE_CURVE', 0, 0)
-    end,
-    ['/effects/emitters/Water_pie_s.bp'] = function(emitter)
-        emitter:SetEmitterParam('LIFETIME', 1)
-        emitter:SetEmitterParam('REPEATTIME', 1)
-        emitter:SetEmitterCurveParam('LIFETIME_CURVE', 20, 0)
-    end,
-    -- all rings end at the same size
-    ['/effects/emitters/aeon_quanticcluster_hit_08_emit.bp'] = function(emitter)
-        emitter:SetEmitterCurveParam('ENDSIZE_CURVE', 9, 0)
-    end,
-}
 
 -- Held in a shield, the shell drills: a streak grows back up its path (aeon_sonance_drill_thrust_01), and
 -- it pulses faster and harder. Each pulse sprays a cone of sparks back up the path and plays the shield's
@@ -111,12 +67,10 @@ local Drill = {
     BurstRate = { 20, 29 }, -- sparks per tick of all jets together, for the 2 ticks of a burst
     BurstScale = { 1.1, 1.4 },
     SparkLife = { 9, 14 }, -- ticks, +-40%
-    SparkSpeed = 0.25, -- per tick, +-45%
     Jets = 16, -- around the cone
     Along = 0.87, -- cos and sin of the cone's half angle (30 degrees)
     Across = 0.5,
     Spread = 0.08, -- of the jet directions, small to keep the sparks on the cone
-    ConeScatter = 0.1, -- of the spark origins
     FlashScale = 2.5, -- of the release flash
     BreakBurst = 1, -- strength of the sparks left when a shield collapses, see SprayDrillSparks
 }
@@ -157,46 +111,12 @@ local Vortex = {
     DustCurl = 1.0,         -- sideways start speed, as a share of the speed straight in
     CoreLift = 0.4,         -- min height of the core above the surface: the shell stops a little into the ground
     CoreSwell = 2.0,        -- scale of the core at the second hit, relative to its scale in flight
-    DirtScale = 1.3,
-    DirtLife = 15,          -- ticks, +-30%
-    SplashScale = 1,
     -- waves: the crests of water_idle_ripples_03, running inward
     WaveSize = 1.1, -- start radius in damage radii
-    WaveTicks = 12, -- to reach the core
+    WaveTicks = 12, -- to reach the core: the LifetimeCurve of aeon_sonance02_vortex_wave_emit.bp
     WaveEvery = 1.5, -- ticks between waves, 1 and 2 alternating
-    WaveLift = 0.15, -- above the water: flat effects right on it can be drawn under it
-    WaveCopies = 2, -- overlapping copies of each wave, for strength
     RippleRadius = 0.3, -- air ripple of a lodged shell, in damage radii
 }
-
---- water_idle_ripples_03 as a single wave closing in from size 2 to 0.2, just above the water. Sizes are
---- for scale 1
----@param emitter moho.IEffect
----@param ticks number  # to reach the core
-local function SetUpWave(emitter, ticks)
-    emitter:SetEmitterParam('LIFETIME', 1)
-    emitter:SetEmitterCurveParam('EMITRATE_CURVE', Vortex.WaveCopies, 0)
-    emitter:SetEmitterCurveParam('LIFETIME_CURVE', ticks, 0)
-    emitter:SetEmitterCurveParam('VELOCITY_CURVE', 0, 0)
-    emitter:SetEmitterCurveParam('X_POSITION_CURVE', 0, 0)
-    emitter:SetEmitterCurveParam('Z_POSITION_CURVE', 0, 0)
-    emitter:SetEmitterCurveParam('Y_POSITION_CURVE', Vortex.WaveLift - Vortex.CoreLift, 0)
-    emitter:SetEmitterCurveParam('BEGINSIZE_CURVE', 2, 0)
-    emitter:SetEmitterCurveParam('ENDSIZE_CURVE', 0.2, 0)
-end
-
---- _Mercy_distort as the small, quick air ripple of a lodged shell (8 ticks, size 0.1 to 2)
----@param emitter moho.IEffect
-local function SetUpRipple(emitter)
-    emitter:SetEmitterParam('LIFETIME', 1)
-    emitter:SetEmitterCurveParam('EMITRATE_CURVE', 1, 0)
-    emitter:SetEmitterCurveParam('LIFETIME_CURVE', 8, 0)
-    emitter:SetEmitterCurveParam('VELOCITY_CURVE', 0, 0)
-    emitter:SetEmitterCurveParam('ROTATION_RATE_CURVE', 0, 0)
-    emitter:SetEmitterCurveParam('Y_POSITION_CURVE', 0, 0)
-    emitter:SetEmitterCurveParam('BEGINSIZE_CURVE', 0.1, 0)
-    emitter:SetEmitterCurveParam('ENDSIZE_CURVE', 2, 0)
-end
 
 -- invisible entity to create effects at, see CreatePoint
 local AnchorBlueprint = '/effects/Entities/AIFSonanceAnchor01/AIFSonanceAnchor01_proj.bp'
@@ -247,11 +167,10 @@ local function CreatePoint(shell, x, y, z)
     return point
 end
 
---- A 2-tick burst of drill sparks (the motes of aeon_sonance_muzzle_03) in one direction. The direction
---- is local to the source, so the source must not be turned
+--- A burst of drill sparks in one direction. The direction is local to the source, so the source must not
+--- be turned
 ---@param source Projectile
 ---@param army number
----@param scatter number    # random offset of the spark origins
 ---@param dx number
 ---@param dy number
 ---@param dz number
@@ -259,21 +178,13 @@ end
 ---@param rate number   # sparks per tick
 ---@param scale number
 ---@param life number   # ticks
----@param speed number  # distance per tick
-local function SparkJet(source, army, scatter, dx, dy, dz, spread, rate, scale, life, speed)
+local function SparkJet(source, army, dx, dy, dz, spread, rate, scale, life)
     CreateEmitterAtEntity(source, army, EffectTemplate.ASonanceWeaponDrillSparks02)
-        :SetEmitterParam('LIFETIME', 2)
-        :SetEmitterCurveParam('BEGINSIZE_CURVE', 0.55, 0.3)
-        :SetEmitterCurveParam('ENDSIZE_CURVE', 0.1, 0.1)
-        :SetEmitterCurveParam('X_POSITION_CURVE', 0, scatter)
-        :SetEmitterCurveParam('Y_POSITION_CURVE', 0, scatter)
-        :SetEmitterCurveParam('Z_POSITION_CURVE', 0, scatter)
         :SetEmitterCurveParam('XDIR_CURVE', dx, spread)
         :SetEmitterCurveParam('YDIR_CURVE', dy, spread)
         :SetEmitterCurveParam('ZDIR_CURVE', dz, spread)
         :SetEmitterCurveParam('EMITRATE_CURVE', rate, 0)
         :SetEmitterCurveParam('LIFETIME_CURVE', life, 0.4 * life)
-        :SetEmitterCurveParam('VELOCITY_CURVE', speed, 0.45 * speed)
         :ScaleEmitter(scale)
 end
 
@@ -324,8 +235,8 @@ local function SprayDrillSparks(point, army, ax, ay, az, f, along, across)
     for jet = 1, Drill.Jets do
         local angle = turn + 2 * MathPi * jet / Drill.Jets
         local out, up = across * MathCos(angle), across * MathSin(angle)
-        SparkJet(point, army, Drill.ConeScatter, along * ax + out * sx + up * nx, along * ay + up * ny,
-            along * az + out * sz + up * nz, Drill.Spread, jetRate, burstScale, life, Drill.SparkSpeed)
+        SparkJet(point, army, along * ax + out * sx + up * nx, along * ay + up * ny, along * az + out * sz + up * nz,
+            Drill.Spread, jetRate, burstScale, life)
     end
 end
 
@@ -333,26 +244,18 @@ end
 ---@param shell AIFSonanceShell02
 ---@param effects FileName[]
 ---@param scale number
----@param setup? fun(emitter: moho.IEffect)   # replaces the EmitterSetup entry
----@return moho.IEffect[]
-local function CreateUprightEffects(shell, effects, scale, setup)
+local function CreateUprightEffects(shell, effects, scale)
     local anchor = CreatePoint(shell, shell:GetPositionXYZ())
-    local created = {}
     local width = 2 * shell.DamageData.DamageRadius
-    for k, effect in effects do
-        created[k] = CreateEmitterAtEntity(anchor, shell.Army, effect)
-        local setUp = setup or EmitterSetup[effect]
-        if setUp then
-            setUp(created[k])
-        end
+    for _, effect in effects do
+        local emitter = CreateEmitterAtEntity(anchor, shell.Army, effect)
         if EffectWidth[effect] then
-            created[k]:ScaleEmitter(MathMin(scale, width / EffectWidth[effect]))
+            emitter:ScaleEmitter(MathMin(scale, width / EffectWidth[effect]))
         else
-            created[k]:ScaleEmitter(scale)
+            emitter:ScaleEmitter(scale)
         end
     end
     anchor:Destroy()
-    return created
 end
 
 --- Dirt where the shell hits the ground, or a splash where it hits the water
@@ -360,13 +263,9 @@ end
 ---@param targetType string
 local function KickUp(shell, targetType)
     if targetType == 'Terrain' then
-        local dirt = CreateUprightEffects(shell, EffectTemplate.ASonanceWeaponLodgeDirt02, Vortex.DirtScale)
-        for _, effect in dirt do
-            effect:SetEmitterParam('LIFETIME', 1)
-            effect:SetEmitterCurveParam('LIFETIME_CURVE', Vortex.DirtLife, 0.3 * Vortex.DirtLife)
-        end
+        CreateUprightEffects(shell, EffectTemplate.ASonanceWeaponLodgeDirt02, 1)
     elseif targetType == 'Water' then
-        CreateUprightEffects(shell, EffectTemplate.ASonanceWeaponLodgeWater02, Vortex.SplashScale)
+        CreateUprightEffects(shell, EffectTemplate.ASonanceWeaponLodgeWater02, 1)
     end
 end
 
@@ -782,7 +681,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         -- lodged
         if startTick > 1 then
             KickUp(self, self.HeldOn)
-            CreateUprightEffects(self, EffectTemplate.ASonanceWeaponLodgeAir02, radius * Vortex.RippleRadius, SetUpRipple)
+            CreateUprightEffects(self, EffectTemplate.ASonanceWeaponLodgeAir02, radius * Vortex.RippleRadius)
         end
 
         -- plan[tick] lists the actions of that tick. Motes and puffs appear more often toward the end
@@ -801,7 +700,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
             local lastWave = holdTicks + 1 - Vortex.WaveTicks
             local k = 0
             while lastWave - MathFloor(k * Vortex.WaveEvery) >= first do
-                Plan(lastWave - MathFloor(k * Vortex.WaveEvery), { 'wave', Vortex.WaveTicks })
+                Plan(lastWave - MathFloor(k * Vortex.WaveEvery), { 'wave' })
                 k = k + 1
             end
         elseif self.HeldOn == 'Terrain' then
@@ -881,9 +780,8 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
                             :ScaleEmitter(radius * Vortex.DistortSize)
                             :SetEmitterCurveParam('LIFETIME_CURVE', action[2], 0)
                     elseif kind == 'wave' then
-                        local wave = CreateEmitterAtEntity(corePoint, army, EffectTemplate.ASonanceWeaponVortexWave02)
-                        SetUpWave(wave, action[2])
-                        wave:ScaleEmitter(radius * Vortex.WaveSize)
+                        CreateEmitterAtEntity(corePoint, army, EffectTemplate.ASonanceWeaponVortexWave02)
+                            :ScaleEmitter(radius * Vortex.WaveSize)
                     elseif kind == 'dust' then
                         -- starts sideways (s) and is pulled in by a constant acceleration (a) that reaches
                         -- the core at the end of its life: p = s t + a t^2 / 2, per tick
