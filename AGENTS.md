@@ -32,6 +32,7 @@ GPG-modified **LuaPlus 5.0**, not 5.1+. [Details](docs/development-start-here/lu
 - `{&h &a}` pre-allocates hash and array slots ([performance.md](performance.md#allocations)).
 - **Indexing `nil` returns `nil`.** `t.a.b` is `nil` when `t.a` is missing, and the repo relies on this. Don't add `and` guards or treat such chains as bugs. Calling `nil` and `t[nil] = v` still error.
 - `io` and `os` exist only in the init context. No `require` or C modules.
+- A thread can't yield inside `pcall` or a metamethod. `WaitSeconds` and the other waits there fail with "attempt to yield across metamethod/C-call boundary". Wait outside the `pcall`.
 
 ### Runtime changes to Lua behavior
 
