@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 -- File     :  /data/projectiles/SBOOhwalliBombEffect01/SBOOhwalliBombEffect01_script.lua
 -- Author(s):  Greg Kohne, Gordon Duclos
--- Summary  :  Ohwalli Strategic Bomb effect script, non-damaging
+-- Summary  :  Ohwalli Strategic Bomb effect script, deals area damage on impact
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------
 
@@ -12,7 +12,10 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 
 local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
---- Ohwalli Strategic Bomb effect script, non-damaging
+local PlumeDamage = 300
+local PlumeDamageRadius = 3
+
+--- Ohwalli Strategic Bomb effect script, deals area damage on impact
 ---@class SBOOhwalliBombEffect01 : EmitterProjectile
 SBOOhwalliBombEffect01 = Class(EmitterProjectile) {
 	FxTrails = EffectTemplate.SOhwalliBombPlumeFxTrails01,
@@ -40,7 +43,7 @@ SBOOhwalliBombEffect01 = Class(EmitterProjectile) {
 		DamageArea(self, position, 3, 1, "TreeFire", false)
 		DamageArea(self, position, 2, 1, "TreeForce", false)
 		DamageArea(self, position, 1, 1, 'Disintegrate', false)
-		DamageArea(self, position, 3, 300, "Normal", false)
+		DamageArea(self, position, PlumeDamageRadius, PlumeDamage, "Normal", false)
 	end,
 }
 TypeClass = SBOOhwalliBombEffect01

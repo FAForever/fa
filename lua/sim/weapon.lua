@@ -29,6 +29,7 @@ local DebugWeaponComponent = import("/lua/sim/weapons/components/debugweaponcomp
 ---@field CollideFriendly boolean       # weaponBlueprint.CollideFriendly or false
 ---@field DoTTime number                # weaponBlueprint.DoTTime
 ---@field DoTPulses number              # weaponBlueprint.DoTPulses
+---@field DoTDelayFirstPulse boolean      # weaponBlueprint.DoTDelayFirstPulse
 ---@field MetaImpactAmount any          # weaponBlueprint.MetaImpactAmount
 ---@field MetaImpactRadius any          # weaponBlueprint.MetaImpactRadius
 ---@field ArtilleryShieldBlocks boolean # weaponBlueprint.ArtilleryShieldBlocks
@@ -71,6 +72,7 @@ local WeaponMethods = moho.weapon_methods
 
 ---@class Weapon : moho.weapon_methods, InternalObject, DebugWeaponComponent
 ---@field AimControl? moho.AimManipulator
+---@field AimControlEnabled? boolean # last value passed to `AimManipulatorSetEnabled`, as the aim controller can not be queried for it
 ---@field AimLeft? moho.AimManipulator
 ---@field AimRight? moho.AimManipulator
 ---@field Army Army
@@ -304,6 +306,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     ---@param self Weapon
     ---@param enabled boolean
     AimManipulatorSetEnabled = function(self, enabled)
+        self.AimControlEnabled = enabled
         local aimControl = self.AimControl
         if aimControl then
             aimControl:SetEnabled(enabled)
@@ -490,6 +493,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
             CollideFriendly = weaponBlueprint.CollideFriendly or false,
             DoTTime = weaponBlueprint.DoTTime,
             DoTPulses = weaponBlueprint.DoTPulses,
+            DoTDelayFirstPulse = weaponBlueprint.DoTDelayFirstPulse,
             MetaImpactAmount = weaponBlueprint.MetaImpactAmount,
             MetaImpactRadius = weaponBlueprint.MetaImpactRadius,
             ArtilleryShieldBlocks = weaponBlueprint.ArtilleryShieldBlocks,
