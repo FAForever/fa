@@ -205,7 +205,7 @@ local AnchorBlueprint = '/effects/Entities/AIFSonanceAnchor01/AIFSonanceAnchor01
 local BallisticAcceleration = -4.9
 
 --- Dead units and collapsed shields no longer take collisions
----@param entity? Entity
+---@param entity? Unit|Prop|Shield
 ---@return boolean
 local function IsKilled(entity)
     return entity ~= nil and (IsDestroyed(entity) or entity.DisallowCollisions == true)
@@ -220,10 +220,12 @@ local function MobileHost(targetType, entity)
         return nil
     end
     if targetType == 'Shield' then
+        ---@cast entity Shield
         entity = entity.Owner
     elseif targetType ~= 'Unit' and targetType ~= 'UnitAir' then
         return nil
     end
+    ---@cast entity Unit
     if entity and not IsDestroyed(entity) and entity.Blueprint.CategoriesHash['MOBILE'] then
         return entity
     end
@@ -686,7 +688,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         -- a: back up the path
         local ax, ay, az = -vx / speed, -vy / speed, -vz / speed
         local cx, cy, cz = self:GetPositionXYZ()
-        local shield = self.HeldIn
+        local shield = self.HeldIn --[[@as Shield ]] -- HeldOn above confirms
         local army = self.Army
         local radius = self.DamageData.DamageRadius
         local holdTicks = self.HoldTicks
@@ -946,6 +948,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
     ---@param self AIFSonanceShell02
     Release = function(self)
         local targetType, targetEntity = self.HeldOn, self.HeldIn
+        ---@cast targetType -nil # only called on next hit
         if IsKilled(targetEntity) then
             targetType, targetEntity = 'Air', nil
         end
