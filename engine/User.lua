@@ -338,8 +338,19 @@ end
 function GetAntiAliasingOptions()
 end
 
----
---- Note that this is cached by `/lua/ui/override/ArmiesTable.lua`
+---@class EngineArmyInfo
+---@field authorizedCommandSources number[]
+---@field civilian boolean
+---@field color string
+---@field faction number
+---@field human boolean
+---@field iconColor string
+---@field name string
+---@field nickname string
+---@field outOfGame boolean
+---@field showScore boolean
+
+--- Hooked by `/lua/ui/override/ArmiesTable.lua` to return a cached and processed `ArmiesTable`
 ---@return ArmiesTable
 function GetArmiesTable()
 end
@@ -550,8 +561,9 @@ end
 function GetScriptBit(units, bit)
 end
 
---- Returns a table of the currently selected units
----@return UserUnit[]
+--- Returns a table of the currently selected units. 
+--- Returns nil with no selection.
+---@return UserUnit[]?
 function GetSelectedUnits()
 end
 
@@ -845,9 +857,9 @@ end
 function IsKeyDown(keyCode)
 end
 
----@param playerId? string  # if not provided, will return whether the local player is an observer
+--- Returns true if the player's focus army is observing (-1 focus or no user army in-engine).
 ---@return boolean
-function IsObserver(playerId)
+function IsObserver()
 end
 
 --- Issue a factory build or upgrade command to your selection

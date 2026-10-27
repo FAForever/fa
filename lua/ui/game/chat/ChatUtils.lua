@@ -2,8 +2,7 @@
 local MauiWrapText = import("/lua/maui/text.lua").WrapText
 local ChatPayload = import("/lua/shared/ChatPayload.lua")
 
--------------------------------------------------------------------------------
--- Shared, view-agnostic helpers for the chat tree.
+--#region Shared, view-agnostic helpers for the chat tree.
 
 --- Re-export of the chat-message length cap. Source of truth is
 --- `/lua/shared/ChatPayload.lua` so the sim relay and the UI can't drift.
@@ -70,7 +69,7 @@ function WrapEntry(entry, measureLine)
     entry.WrappedText = lines
 end
 
--------------------------------------------------------------------------------
+--#endregion
 --#region Debugging
 
 --- Hot-reload hook: re-imports this module on save.
