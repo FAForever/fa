@@ -282,6 +282,7 @@ local localPlayerName = ""
 local gameName = ""
 local hostID
 local singlePlayer = false
+local launchInProgress = false
 ---@type Group
 local GUI
 local localPlayerID
@@ -2140,6 +2141,10 @@ function UpdateAvailableSlots(numAvailStartSpots, scenario)
 end
 
 local function TryLaunch(skipNoObserversCheck)
+    if launchInProgress then
+        return
+    end
+
     if not singlePlayer then
         local notReady = GetPlayersNotReady()
         if notReady then
@@ -2222,9 +2227,19 @@ local function TryLaunch(skipNoObserversCheck)
         end
 
         if anyOtherObservers and not skipNoObserversCheck then
+            if GUI and not IsDestroyed(GUI.launchGameButton) then
+                GUI.launchGameButton:Disable()
+            end
+            local function OnCancel()
+                if HostUtils and HostUtils.RefreshButtonEnabledness then
+                    HostUtils.RefreshButtonEnabledness()
+                elseif GUI and not IsDestroyed(GUI.launchGameButton) then
+                    GUI.launchGameButton:Enable()
+                end
+            end
             UIUtil.QuickDialog(GUI, "<LOC lobui_0278>Launching will kick observers because \"allow observers\" is disabled.  Continue?",
                                     "<LOC _Yes>", function() TryLaunch(true) end,
-                                    "<LOC _No>", nil, nil, nil, true,
+                                    "<LOC _No>", OnCancel, nil, nil, true,
                                     {worldCover = false, enterButton = 1, escapeButton = 2})
             return
         end
@@ -2232,7 +2247,21 @@ local function TryLaunch(skipNoObserversCheck)
         HostUtils.KickObservers("GameLaunched")
     end
 
+    if launchInProgress then
+        return
+    end
+    launchInProgress = true
+    if GUI and not IsDestroyed(GUI.launchGameButton) then
+        GUI.launchGameButton:Disable()
+    end
+
     if not EveryoneHasEstablishedConnections(gameInfo.GameOptions.AllowObservers) then
+        launchInProgress = false
+        if HostUtils and HostUtils.RefreshButtonEnabledness then
+            HostUtils.RefreshButtonEnabledness()
+        elseif GUI and not IsDestroyed(GUI.launchGameButton) then
+            GUI.launchGameButton:Enable()
+        end
         return
     end
 
@@ -3135,6 +3164,7 @@ end
 
 -- create UI won't typically be called directly by another module
 function CreateUI(maxPlayers)
+    launchInProgress = false
     local ResourceMapPreview = import("/lua/ui/controls/resmappreview.lua").ResourceMapPreview
     local ItemList = import("/lua/maui/itemlist.lua").ItemList
     local Prefs = import("/lua/user/prefs.lua")
@@ -5683,6 +5713,12 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     end
 
     lobbyComm.LaunchFailed = function(self,reasonKey)
+        launchInProgress = false
+        if HostUtils and HostUtils.RefreshButtonEnabledness then
+            HostUtils.RefreshButtonEnabledness()
+        elseif GUI and not IsDestroyed(GUI.launchGameButton) then
+            GUI.launchGameButton:Enable()
+        end
         AddChatText(LOC(Strings[reasonKey] or reasonKey))
     end
 
