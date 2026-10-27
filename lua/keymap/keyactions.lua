@@ -1849,7 +1849,7 @@ local keyActionsGame = {
         category = 'game',
     },
     ['reset_game_speed'] = {
-        action = 'WLD_ResetSimRate',
+        action = 'UI_Lua import("/lua/ui/uimain.lua").ResetGameSpeed()',
         category = 'game',
     },
     ['quick_save'] = {
