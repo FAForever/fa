@@ -371,7 +371,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
             if targetType == 'Water' then
                 KickUp(self, targetType)
             end
-            self:BurstMotes()
+            self:BurstSparks()
             self:Destroy()
             return
         end
@@ -380,7 +380,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         self.HeldOn = targetType
         self.FirstImpactTick = GetGameTick()
         KickUp(self, targetType)
-        self:BurstMotes()
+        self:BurstSparks()
 
         -- not destroying the shell is enough for it to fly on (as BlackOps Unleashed's XCannon01 does)
         if IsKilled(targetEntity) then
@@ -393,7 +393,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
 
         local vx, vy, vz, speed = self:Freeze()
         self:HoldIn(targetType, targetEntity)
-        self.Trash:Add(ForkThread(self.HoldThread, self, vx, vy, vz, speed, 1))
+        self.Trash:Add(ForkThread(self.HoldThread, self, vx, vy, vz, speed, 1, false))
     end,
 
     --- The weapon's damage over time gives the hits: `DoTPulses` hits of `Damage`, `DoTTime / (DoTPulses - 1)`
@@ -422,7 +422,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
     HoldIn = function(self, targetType, targetEntity)
         self.HeldIn = targetEntity
         self.Host = MobileHost(targetType, targetEntity)
-        self.Riders = {}
+        self.Riders = self.Host and {} or nil
         self:Ride(self)
     end,
 
@@ -522,9 +522,9 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         SprayDrillSparks(CreatePoint(self, x, y, z), self.Army, -vx / speed, -vy / speed, -vz / speed, f, along, across)
     end,
 
-    --- A hit flings motes out around the path, see HitBurst
+    --- A hit flings sparks out around the path, see HitBurst
     ---@param self AIFSonanceShell02
-    BurstMotes = function(self)
+    BurstSparks = function(self)
         local vx, vy, vz = self:GetVelocity()
         self:SprayBack(vx, vy, vz, HitBurst.Strength, HitBurst.Along, HitBurst.Across)
     end,
@@ -583,7 +583,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         local vx, vy, vz, speed = self:Freeze()
         self:HoldIn(targetType, targetEntity)
         local startTick = GetGameTick() - self.FirstImpactTick + 1
-        self.Trash:Add(ForkThread(self.HoldThread, self, vx, vy, vz, speed, startTick))
+        self.Trash:Add(ForkThread(self.HoldThread, self, vx, vy, vz, speed, startTick, true))
     end,
 
     --- Holds the shell until the next hit: drills into a shield, see Drill, or else see VortexThread
@@ -592,10 +592,11 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
     ---@param vy number
     ---@param vz number
     ---@param speed number
-    ---@param startTick number  # hold tick to start at: later than 1 when the shell lodged
-    HoldThread = function(self, vx, vy, vz, speed, startTick)
+    ---@param startTick number  # hold tick to start at: later when the shell lodged
+    ---@param lodged boolean    # after passing on, see Lodge
+    HoldThread = function(self, vx, vy, vz, speed, startTick, lodged)
         if self.HeldOn ~= 'Shield' then
-            self:VortexThread(vx, vy, vz, startTick)
+            self:VortexThread(vx, vy, vz, startTick, lodged)
             return
         end
 
@@ -673,8 +674,9 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
     ---@param vx number     # at the impact, per tick
     ---@param vy number
     ---@param vz number
-    ---@param startTick number  # hold tick to start at: later than 1 when the shell lodged
-    VortexThread = function(self, vx, vy, vz, startTick)
+    ---@param startTick number  # hold tick to start at: later when the shell lodged
+    ---@param lodged boolean    # after passing on, see Lodge
+    VortexThread = function(self, vx, vy, vz, startTick, lodged)
         local radius = self.DamageData.DamageRadius
         local holdTicks = self.HoldTicks
         local scale = radius / ExplosionRadius
@@ -694,8 +696,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
             end
         end
 
-        -- lodged
-        if startTick > 1 then
+        if lodged then
             KickUp(self, self.HeldOn)
             CreateUprightEffects(self, EffectTemplate.ASonanceWeaponLodgeAir02, radius * Vortex.RippleRadius)
         end
@@ -832,6 +833,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
                 if entity and not IsDestroyed(entity) then
                     if age >= mote.flight then
                         entity:Destroy()
+                        mote.entity = nil
                     else
                         if age > 0 and age <= Vortex.FadeTicks then
                             entity:SetDrawScale(MathFloor(10 * (1 - age / Vortex.FadeTicks) + 0.5) + mote.size)
