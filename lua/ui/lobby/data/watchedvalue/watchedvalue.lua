@@ -3,8 +3,8 @@
 --- the time)
 --- This also destroys the dependency system used by LazyVar. A WatchedValue cannot induce an `OnDirty`
 --- on another WatchedValue (except explicitly in the caller's `OnDirty` handler).
----@class WatchedValue : Destroyable, OnDirtyListener
----@operator call: any
+---@class WatchedValue<V> : Destroyable, OnDirtyListener
+---@operator call: V
 local WatchedValueMetaTable = {}
 
 WatchedValueMetaTable.__index = WatchedValueMetaTable

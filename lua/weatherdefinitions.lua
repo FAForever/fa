@@ -240,7 +240,7 @@ MapWeatherList = {
         CirrusMedium4096 = CirrusMedium4096Definition,
         CirrusHeavy4096 = CirrusHeavy4096Definition,
     },
-    Redrock = {
+    RedRock = {
         LightStratus = {
             {
                 EmitterBasePath .. 'weather_stratus_09_emit.bp',	-- 40x40		Med

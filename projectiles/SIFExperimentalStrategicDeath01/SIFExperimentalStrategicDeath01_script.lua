@@ -29,7 +29,7 @@ SIFExperimentalStrategicDeath01 = ClassProjectile(NullShell) {
     end,
 
     ---@param self SIFExperimentalStrategicDeath01
-    ---@param army number
+    ---@param army Army
     ShakeAndBurnMe = function(self, army)
         self:ShakeCamera(75, 3, 0, 10)
         WaitTicks(6)

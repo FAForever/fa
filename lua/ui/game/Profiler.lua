@@ -79,11 +79,11 @@ local State = {
     Options = {},
 }
 
-local BenchmarkModuleSelected = ObservableCreate()
-local BenchmarkSelected = ObservableCreate()
-local BenchmarkModulesReceived = ObservableCreate()
-local BenchmarkInfoReceived = ObservableCreate()
-local BenchmarkOutputReceived = ObservableCreate()
+local BenchmarkModuleSelected = ObservableCreate() ---@type Observer<integer>
+local BenchmarkSelected = ObservableCreate() ---@type Observer<integer>
+local BenchmarkModulesReceived = ObservableCreate() ---@type Observer<UserBenchmarkModule[]>
+local BenchmarkInfoReceived = ObservableCreate() ---@type Observer<RawFunctionDebugInfo>
+local BenchmarkOutputReceived = ObservableCreate() ---@type Observer<BenchmarkOutput>
 
 
 --- Received data from the sim about function calls

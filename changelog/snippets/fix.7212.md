@@ -1,0 +1,1 @@
+- Fix assisting to upgrade T2 radars not checking for any adjacent pgens to be built first (#7212).

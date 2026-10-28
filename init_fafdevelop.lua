@@ -173,6 +173,9 @@ deprecatedMods["SmartReclaimSupport"] = "3"
 deprecatedMods["DrimsUIPack"] = "3"
 deprecatedMods["Rheclaim"] = "2"
 
+-- as per #7098 the chat window is completely overhauled
+deprecatedMods["Emojies"] = "5"
+
 -- convert all mod folder name keys to lower case to prevent typos
 deprecatedMods = LowerHashTable(deprecatedMods)
 

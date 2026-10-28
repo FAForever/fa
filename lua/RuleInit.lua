@@ -10,7 +10,6 @@
 `BlueprintId` for units  
 `FileName` for projectiles and meshes (meshes have the file extension stripped)]]
 ---@type table<number | BlueprintId | FileName, UnitBlueprint | ProjectileBlueprint | MeshBlueprint>
----@diagnostic disable-next-line: lowercase-global
 __blueprints = {}
 
 doscript '/lua/system/config.lua'
@@ -21,7 +20,12 @@ doscript '/lua/system/debug.lua'
 
 LOG('Active game mods for blueprint loading:')
 for _, mod in __active_mods do
-    LOG(string.format('\t"%-30s v%02d (%-37s by %s', tostring(mod.name) .. '"', tostring(mod.version), tostring(mod.uid) .. ')', tostring(mod.author)))
+    LOG(string.format('\t"%-30s v%02s (%-37s by %s'
+        , tostring(mod.name) .. '"'
+        , tostring(mod.version)
+        , tostring(mod.uid) .. ')'
+        , tostring(mod.author)
+    ))
 end
 
 doscript '/lua/footprints.lua'

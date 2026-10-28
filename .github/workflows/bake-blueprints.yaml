@@ -57,14 +57,14 @@ jobs:
     steps:
       # Checkout the wiki generator that we use to bake blueprints
       - name: Checkout Brewlan Wikigen Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
               repository: The-Balthazar/BrewWikiGen
               path: ./brew-wiki-gen
 
       # Checkout the FA repository
       - name: Checkout FAF Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.reference }}
           ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}

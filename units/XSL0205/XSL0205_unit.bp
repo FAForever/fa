@@ -1,5 +1,5 @@
 UnitBlueprint{
-    Description = "<LOC xsl0205_desc>Mobile Anti-Air Cannon",
+    Description = "<LOC xsl0205_desc>Mobile AA Flak Artillery",
     Audio = {
         AmbientMove        = Sound { Bank = 'XSL',            Cue = 'XSL0205_Move_Loop',       LodCutoff = 'UnitMove_LodCutoff' },
         Destroyed          = Sound { Bank = 'XSL_Destroy',    Cue = 'XSL_Destroy_Land_Med',    LodCutoff = 'UnitMove_LodCutoff' },
@@ -168,7 +168,7 @@ UnitBlueprint{
         TurnFacingRate = 180,
         TurnRadius = 0,
         TurnRate = 120,
-        WaterSpeedMultiplier = 1,
+        WaterSpeedMultiplier = 1.246,
         WobbleFactor = 0,
         WobbleSpeed = 0,
     },
