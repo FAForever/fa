@@ -252,7 +252,7 @@ UnitBlueprint{
         BackUpDistance = 10,
         CatchUpAcc = 10,
         DragCoefficient = 0.2,
-        LandSpeedMultiplier = 0.5,
+        LandSpeedMultiplier = 0.4795,
         LayerChangeOffsetHeight = -1,
         LayerTransitionDuration = 4,
         MaxAcceleration = 5,
