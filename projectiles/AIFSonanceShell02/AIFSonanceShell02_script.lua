@@ -552,6 +552,8 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
     ---@param vy number
     ---@param vz number
     PassOn = function(self, vx, vy, vz)
+        self.Host = nil
+        self.Riders = nil
         self:SetBallisticAcceleration(BallisticAcceleration)
         self:SetVelocity(10 * vx, 10 * vy, 10 * vz)
         self:SetCollideSurface(true)
@@ -605,7 +607,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         local radius = self.DamageData.DamageRadius
         local holdTicks = self.HoldTicks
         local pulseCount = table.getn(Drill.PulseTicks)
-        local carrier
+        local carrier, thrust
         local pulse = 1
         while Drill.PulseTicks[pulse] and Drill.PulseTicks[pulse] < startTick do
             pulse = pulse + 1
@@ -617,9 +619,10 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         for tick = startTick, holdTicks do
             self:Follow()
             cx, cy, cz = self:GetPositionXYZ()
-            -- units can die, and shields collapse, a tick after the hit
-            if tick == 2 and IsKilled(shield) then
+            -- the shield collapsed: from this hit a tick later, or from other damage
+            if IsKilled(shield) then
                 if carrier then
+                    thrust:Destroy()
                     carrier:Destroy()
                 end
                 conePoint:Destroy()
@@ -631,7 +634,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
                 local back = Drill.ThrustBack
                 carrier = CreatePoint(self, cx + back * ax, cy + back * ay, cz + back * az)
                 self:Ride(carrier)
-                Emit(carrier, army, EffectTemplate.ASonanceWeaponDrillThrust02)
+                thrust = Emit(carrier, army, EffectTemplate.ASonanceWeaponDrillThrust02)
                     :SetEmitterCurveParam('XDIR_CURVE', ax, 0)
                     :SetEmitterCurveParam('YDIR_CURVE', ay, 0)
                     :SetEmitterCurveParam('ZDIR_CURVE', az, 0)
@@ -726,6 +729,9 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
             end
         end
 
+        -- distortion, debris and waves closing in on the core
+        local inward = {}
+
         local motes = {}
         for i = 1, Vortex.Count do
             local flight = MathMin(RandomTicksIn(Vortex.Flight), holdTicks + 1 - first)
@@ -747,12 +753,15 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         end
 
         for tick = startTick, holdTicks do
-            -- units can die a tick after the hit
-            if tick == 2 and IsKilled(self.HeldIn) then
+            -- what the shell is held in died: from this hit a tick later, or from other damage
+            if IsKilled(self.HeldIn) then
                 for _, mote in motes do
                     if mote.entity then
                         mote.entity:Destroy()
                     end
+                end
+                for _, effect in inward do
+                    effect:Destroy()
                 end
                 corePoint:Destroy()
                 self:PassOn(vx, vy, vz)
@@ -767,18 +776,18 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
             end
 
             if tick == first then
-                Emit(corePoint, army, EffectTemplate.ASonanceWeaponVortexDistort02)
+                table.insert(inward, Emit(corePoint, army, EffectTemplate.ASonanceWeaponVortexDistort02)
                     :ScaleEmitter(radius * Vortex.DistortSize)
-                    :SetEmitterCurveParam('LIFETIME_CURVE', holdTicks + 1 - first, 0)
+                    :SetEmitterCurveParam('LIFETIME_CURVE', holdTicks + 1 - first, 0))
             end
             if tick == debrisStart then
-                Emit(corePoint, army, EffectTemplate.ASonanceWeaponVortexDebris02)
+                table.insert(inward, Emit(corePoint, army, EffectTemplate.ASonanceWeaponVortexDebris02)
                     :ScaleEmitter(radius * Vortex.DebrisSize)
-                    :SetEmitterCurveParam('LIFETIME_CURVE', holdTicks + 1 - debrisStart, 0)
+                    :SetEmitterCurveParam('LIFETIME_CURVE', holdTicks + 1 - debrisStart, 0))
             end
             while wave >= 0 and tick == lastWave - MathFloor(wave * Vortex.WaveEvery) do
-                CreateEmitterAtEntity(corePoint, army, EffectTemplate.ASonanceWeaponVortexWave02)
-                    :ScaleEmitter(radius * Vortex.WaveSize)
+                table.insert(inward, CreateEmitterAtEntity(corePoint, army, EffectTemplate.ASonanceWeaponVortexWave02)
+                    :ScaleEmitter(radius * Vortex.WaveSize))
                 wave = wave - 1
             end
 
