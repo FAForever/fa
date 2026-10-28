@@ -631,11 +631,15 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
                 self:PassOn(vx, vy, vz)
                 return
             end
-            if not carrier and tick >= Drill.Tick then
+            if not carrier and tick >= Drill.Tick and tick < holdTicks then
                 local back = Drill.ThrustBack
                 carrier = CreatePoint(self, cx + back * ax, cy + back * ay, cz + back * az)
                 self:Ride(carrier)
+                -- streams until the release, growing all the while: a shell that lodged has less time left
+                local ticksLeft = holdTicks - tick
                 thrust = Emit(carrier, army, EffectTemplate.ASonanceWeaponDrillThrust02)
+                    :SetEmitterParam('LIFETIME', ticksLeft)
+                    :ResizeEmitterCurve('VELOCITY_CURVE', ticksLeft)
                     :SetEmitterCurveParam('XDIR_CURVE', ax, 0)
                     :SetEmitterCurveParam('YDIR_CURVE', ay, 0)
                     :SetEmitterCurveParam('ZDIR_CURVE', az, 0)
@@ -663,6 +667,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         end
         CreateUprightEffects(self, EffectTemplate.ASonanceWeaponFinalDistort02, radius / ExplosionRadius)
         if carrier then
+            thrust:Destroy()
             carrier:Destroy()
         end
         conePoint:Destroy()
