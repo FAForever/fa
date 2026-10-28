@@ -1,0 +1,1 @@
+- Fix chat treating the echo of a private message you send, and notify messages seen as an observer, as coming from army 1. This broke clicking the sender's name, greying out your own name and muting the sender (#7349).
