@@ -168,7 +168,7 @@ end
 ---@param clientIndex number
 ---@param newSpeed number
 function NoteGameSpeedChanged(clientIndex, newSpeed)
-    if (GetFocusArmy() == clientIndex) then
+    if (SessionGetLocalCommandSource()== clientIndex) then
         SessionSendChatMessage(import('/lua/ui/game/clientutils.lua').GetAll(), {
             ConsoleOutput = LOCF("<LOC Engine0006>%s: adjusting game speed to %+d", "", newSpeed),
         })
