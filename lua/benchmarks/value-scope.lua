@@ -22,12 +22,13 @@
 -- - Locals are the fastest, then upvalues, then globals. Each "Add" iteration reads two values and
 --   writes one. With upvalues it takes about 5 ns longer than with locals, and with globals about
 --   11 ns longer. Locals cost about the same as constants.
--- - In the circle benchmarks, upvaluing the functions is 11% faster than using them as globals.
---   Making them locals and inlining `ComputePoint` is 15% faster. Precomputing the angle step is
---   13% faster, but it computes 31 points instead of 30, so per point it is 1.4% faster than the
---   local version. Replacing `table.insert` with a counter is 32% faster, and also replacing
---   `math.cos` and `math.sin` with a recurrence (Chebyshev) 46%, both with 31 points. The
---   Chebyshev version computed NaN points when these results were taken, so it needs a rerun.
+-- - Compared with "Circle Global", upvaluing the functions is 11% faster, and making them locals
+--   and inlining `ComputePoint` 15% faster. Also precomputing the angle step is 13% faster, but it
+--   computes 31 points instead of 30, so per point it is 1.4% faster than "Circle Local". Also
+--   replacing `table.insert` with a counter ("Circle Optimal") is 22% faster than "Circle Local
+--   Precompute", which computes the same 31 points.
+-- - "Circle Chebyshev" also replaces `math.cos` and `math.sin` with a recurrence. It computed NaN
+--   points when these results were taken, so it needs a rerun.
 -- - Each circle iteration allocates 31 or 32 tables, so longer runs collect more garbage. Per iteration,
 --   they are about 20% slower with 200000 loops than with 10000.
 -- - Function-scope can't show the difference between locals and upvalues: its local versions look
