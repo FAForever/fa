@@ -112,7 +112,13 @@ BaseTransport = ClassSimple {
 
             -- Kill the contents of a transport in a transport, however that happened
             if EntityCategoryContains(categories.TRANSPORTATION, unit) then
-                cargoMass = cargoMass + unit:KillCargo(instigator, cargoDamageType, true)
+                -- Mods can use TRANSPORTATION for non-transport aircraft, for example water landing.
+                -- Retain custom cleanup methods, falling back to the component only when absent.
+                local killCargo = unit.KillCargo
+                if killCargo == nil then
+                    killCargo = BaseTransport.KillCargo
+                end
+                cargoMass = cargoMass + killCargo(unit, instigator, cargoDamageType, true)
             end
 
             -- cache the cargo so we can impact it later (if needed)
