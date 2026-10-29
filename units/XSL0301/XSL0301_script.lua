@@ -101,6 +101,29 @@ XSL0301 = ClassUnit(CommandUnit) {
 
     ---@param self XSL0301
     ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementResourceAllocation = function(self, bp)
+        local bpEcon = self.Blueprint.Economy
+        self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy or 0) + (bpEcon.ProductionPerSecondEnergy or 0))
+        self:SetProductionPerSecondMass((bp.ProductionPerSecondMass or 0) + (bpEcon.ProductionPerSecondMass or 0))
+
+        local deathNuke = self:GetWeaponByLabel("DeathWeapon") --[[@as SCUDeathWeapon]]
+        deathNuke:AddDamageMod(bp.DeathWeaponDamageAdd)
+    end,
+
+    ---@param self XSL0301
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementResourceAllocationRemove = function(self, bp)
+        local bpEcon = self.Blueprint.Economy
+        self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
+        self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
+
+        local deathNuke = self:GetWeaponByLabel("DeathWeapon") --[[@as SCUDeathWeapon]]
+        local baseBp = self.Blueprint.Enhancements["ResourceAllocation"]
+        deathNuke:AddDamageMod(-baseBp.DeathWeaponDamageAdd)
+    end,
+
+    ---@param self XSL0301
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementShield = function(self, bp)
         self:AddToggleCap('RULEUTC_ShieldToggle')
         self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
@@ -122,6 +145,9 @@ XSL0301 = ClassUnit(CommandUnit) {
         self:AddCommandCap('RULEUCC_Overcharge')
         self:GetWeaponByLabel('OverCharge').NeedsUpgrade = false
         self:GetWeaponByLabel('AutoOverCharge').NeedsUpgrade = false
+        if self.Brain.Human then
+            self:SetAutoOvercharge(true)
+        end
     end,
 
     ---@param self XSL0301

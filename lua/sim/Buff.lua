@@ -467,6 +467,25 @@ BuffEffects = {
         unit:SetBuildRate(val)
     end,
 
+    --- Energy maint override buff to keep track of cumulative changes
+    ---@param buffDefinition BlueprintBuff
+    ---@param buffValues BlueprintBuffAffect
+    ---@param unit Unit
+    ---@param buffName BuffName
+    EnergyMaintenanceOverride = function(buffDefinition, buffValues, unit, buffName)
+        local val = BuffCalculate(unit, buffName, 'EnergyMaintenanceOverride', 0)
+        unit:SetEnergyMaintenanceConsumptionOverride(val)
+        if val > 0 then
+            if unit.MaintenanceConsumption then
+                unit:UpdateConsumptionValues()
+            else
+                unit:SetMaintenanceConsumptionActive()
+            end
+        else
+            unit:SetMaintenanceConsumptionInactive()
+        end
+    end,
+
     --#region Adjacency Buffs
 
     ---@param buffDefinition BlueprintBuff

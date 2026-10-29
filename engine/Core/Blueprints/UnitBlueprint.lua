@@ -853,7 +853,10 @@
 ---@field BuildTime number
 --- Adds buildable enhancements to the unit
 ---@field BuildableCategoryAdds string
---- Unit icon to use for the enhancement
+--- Unit icon to use for the enhancement.
+---
+--- Also determines the enhancement's description with the format
+--- `<BlueprintId>_<Icon>` in `unitdescription.lua`
 ---@field Icon string
 --- Name of the enhancement
 ---@field Name string|number
@@ -971,7 +974,9 @@
 ---@field RegenPerSecond number
 --- Which unit categories are buffed by the aura
 ---@field UnitCategory UnparsedCategory
-
+---
+--- Used by RAS SACU to add damage to their death weapon
+---@field DeathWeaponDamageAdd number
 
 
 
