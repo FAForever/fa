@@ -33,11 +33,6 @@ In addition, there is an [extensive guide](./setup/setup-english.md) to help you
 - [Campaign/co-op featured mod](https://github.com/FAForever/fa-coop)
 - [Campaign/co-op maps](https://github.com/FAForever/faf-coop-maps)
 
-### Lua plugin
-
- - [FA Lua intellisense extension](https://github.com/FAForever/fa-lua-vscode-extension)
- - [FA Lua intellisense language server](https://github.com/FAForever/fa-lua-language-server)
-
 ### Assembly patches
 
  - [Executable patcher](https://github.com/FAForever/FA_Patcher)
