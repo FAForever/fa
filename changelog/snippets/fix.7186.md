@@ -1,0 +1,1 @@
+- Fix selections done within `selection.lua`'s `Hidden` wrapper not being ignored in `EndCommandMode` (#7186).
