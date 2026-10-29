@@ -14,7 +14,7 @@ ModuleLoopCount = 500000
 BenchmarkData = {
     BaseLineLoop = {
         name = "Base Line Loop",
-        desc = "Runs an empty loop for",
+        desc = "Runs an empty loop",
         __loop_baseline = 1,
     },
     BaseLineLoop2 = {
