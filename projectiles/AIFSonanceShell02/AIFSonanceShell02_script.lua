@@ -564,7 +564,11 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
 
     ---@param self AIFSonanceShell02
     PassTimeoutThread = function(self)
-        WaitTicks(self.HoldTicks - (GetGameTick() - self.FirstImpactTick))
+        -- WaitTicks(n) waits n - 1 ticks for n >= 2, and a thread started by an impact first runs a tick later
+        local releaseTick = self.FirstImpactTick + self.HoldTicks
+        while GetGameTick() < releaseTick do
+            WaitTicks(1)
+        end
         if self.Passing then
             self.Passing = nil
             self:SetBallisticAcceleration(0)
@@ -617,7 +621,8 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
         local conePoint = CreatePoint(self, cx, cy, cz)
         self:Ride(conePoint)
         local Emit = self.Host and CreateEmitterOnEntity or CreateEmitterAtEntity
-        for tick = startTick, holdTicks do
+        -- hold tick n is n ticks after the first hit, and the next hit is at hold tick holdTicks
+        for tick = startTick, holdTicks - 1 do
             self:Follow()
             cx, cy, cz = self:GetPositionXYZ()
             -- the shield collapsed: from this hit a tick later, or from other damage
@@ -631,7 +636,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
                 self:PassOn(vx, vy, vz)
                 return
             end
-            if not carrier and tick >= Drill.Tick and tick < holdTicks then
+            if not carrier and tick >= Drill.Tick then
                 local back = Drill.ThrustBack
                 carrier = CreatePoint(self, cx + back * ax, cy + back * ay, cz + back * az)
                 self:Ride(carrier)
@@ -708,10 +713,10 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
 
         -- motes and dust puffs appear more often toward the end (square root), and all arrive by the next hit
         local first = MathMax(startTick, Vortex.FirstTick)
-        local debrisStart = MathMax(first, holdTicks + 1 - Vortex.DebrisTicks)
+        local debrisStart = MathMax(first, holdTicks - Vortex.DebrisTicks)
 
         -- waves count down to the last, which arrives with the next hit
-        local lastWave = holdTicks + 1 - Vortex.WaveTicks
+        local lastWave = holdTicks - Vortex.WaveTicks
         local wave = -1
         if self.HeldOn == 'Water' then
             while lastWave - MathFloor((wave + 1) * Vortex.WaveEvery) >= first do
@@ -724,10 +729,10 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
             -- each turned by the golden angle from the last, to spread them evenly
             local turn = 2 * MathPi * Random()
             for p = 1, Vortex.DustPuffs do
-                local life = MathMin(RandomTicksIn(Vortex.DustLife), holdTicks + 1 - first)
+                local life = MathMin(RandomTicksIn(Vortex.DustLife), holdTicks - first)
                 local progress = MathSqrt((p - Random()) / Vortex.DustPuffs)
                 puffs[p] = {
-                    tick = first + MathFloor((holdTicks + 1 - life - first) * progress),
+                    tick = first + MathFloor((holdTicks - life - first) * progress),
                     life = life,
                     progress = progress,
                     heading = turn + p * 2.39996 + Vortex.DustJitter * (Random() - 0.5),
@@ -740,9 +745,9 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
 
         local motes = {}
         for i = 1, Vortex.Count do
-            local flight = MathMin(RandomTicksIn(Vortex.Flight), holdTicks + 1 - first)
+            local flight = MathMin(RandomTicksIn(Vortex.Flight), holdTicks - first)
             if flight >= Vortex.Segments then
-                local last = holdTicks + 1 - flight
+                local last = holdTicks - flight
                 local appear = first + MathFloor((last - first) * MathSqrt((i - Random()) / Vortex.Count))
                 table.insert(motes, {
                     appear = appear,
@@ -758,7 +763,7 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
             end
         end
 
-        for tick = startTick, holdTicks do
+        for tick = startTick, holdTicks - 1 do
             -- what the shell is held in died: from this hit a tick later, or from other damage
             if IsKilled(self.HeldIn) then
                 for _, mote in motes do
@@ -784,12 +789,12 @@ AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
             if tick == first then
                 table.insert(inward, Emit(corePoint, army, EffectTemplate.ASonanceWeaponVortexDistort02)
                     :ScaleEmitter(radius * Vortex.DistortSize)
-                    :SetEmitterCurveParam('LIFETIME_CURVE', holdTicks + 1 - first, 0))
+                    :SetEmitterCurveParam('LIFETIME_CURVE', holdTicks - first, 0))
             end
             if tick == debrisStart then
                 table.insert(inward, Emit(corePoint, army, EffectTemplate.ASonanceWeaponVortexDebris02)
                     :ScaleEmitter(radius * Vortex.DebrisSize)
-                    :SetEmitterCurveParam('LIFETIME_CURVE', holdTicks + 1 - debrisStart, 0))
+                    :SetEmitterCurveParam('LIFETIME_CURVE', holdTicks - debrisStart, 0))
             end
             while wave >= 0 and tick == lastWave - MathFloor(wave * Vortex.WaveEvery) do
                 table.insert(inward, CreateEmitterAtEntity(corePoint, army, EffectTemplate.ASonanceWeaponVortexWave02)
