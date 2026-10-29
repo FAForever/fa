@@ -8254,7 +8254,7 @@ chat_send_type_description="활성화하면 Enter로 동맹에게, Shift+Enter�
 
 replay_id="리플레이 ID"
 map_version="맵 버전"
-fullshare_announcement="%s\'의 유닛이 귀하에게 이전되었습니다"
+fullshare_announcement="%s의 유닛이 귀하에게 이전되었습니다"
 
 ChangelogDescriptionIdentifier="설명"
 
