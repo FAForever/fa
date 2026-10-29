@@ -7963,8 +7963,8 @@ notify_0032="세부 설정은 유지한 채 알림 기능 전체를 켜거나 �
 notify_0033="알림"
 
 notify_starting="시작 중: "
-notify_cancelled="취소됨"
-notify_done="완료!"
+notify_cancelled=" 취소됨"
+notify_done=" 완료!"
 notify_abnormal="비정상적인 작업 실행 중: "
 
 adaptive_dynamic_spawn_label = "자원 동적 생성"
