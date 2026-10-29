@@ -194,6 +194,7 @@ UnitBlueprint{
         SelectionCenterOffsetZ = 4,
         SelectionSizeX = 3,
         SelectionSizeZ = 3,
+        UISelection = Sound { Bank = 'Interface', Cue = 'Aeon_Select_Factory', LodCutoff = 'UnitMove_LodCutoff' },
     },
     General = {
         CommandCaps = {

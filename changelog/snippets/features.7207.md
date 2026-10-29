@@ -1,0 +1,1 @@
+- Give external factories their respective factory's UI selection sound (#7207).

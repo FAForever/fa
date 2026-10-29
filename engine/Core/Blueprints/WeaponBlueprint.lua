@@ -21,6 +21,7 @@
 
 ---@class WeaponBlueprint: Blueprint
 --- During blueprint loading, which Label to look for when merging into a weapon blueprint.
+--- If the original weapon has multiple weapons with that label, they are all merged into.
 ---@field MergeLabel? string
 --- During blueprint loading, if `MergeLabel` is not found, which index the weapon should be added at.  
 --- For example, index 1 controls the unit's weapon AI. Defaults to adding to the end of the `Weapon` table.
@@ -107,6 +108,9 @@
 --- Name of the weapon. Used for lobby restrictions and for debugging:
 --- `dbg weapons` in the console shows the weapon names.
 ---@field DisplayName string
+--- if true, the impact deals only `InitialDamage` and no DoT pulse is consumed at impact:
+--- all `DoTPulses` are dealt over `DoTTime`. Projectile weapons only, ignored by beams.
+---@field DoTDelayFirstPulse? boolean
 --- number of times the Damage over Time damage will be dealt
 ---@field DoTPulses number
 --- duration that the Damage over Time will last in seconds

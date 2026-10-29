@@ -52,8 +52,7 @@ local CheckboxDefs = {
     { Key = ChatConfigModel.KeyMuteSharedResources, Text = "Mute resource sharing messages", Tooltip = nil },
 }
 
--------------------------------------------------------------------------------
---  Window class
+--#region  Window class
 
 --- One label-plus-bitmap-combo row in the colour section; `Key` is the option this row writes.
 ---@class UIChatConfigColorRow
@@ -91,6 +90,7 @@ local CheckboxDefs = {
 ---@field DragBR         Bitmap                  # decorative bottom-right corner grip
 ---@field PendingObserver LazyVar<UIChatOptions>  # derived from ChatConfigModel.Pending
 ---@field DebugBG?       Bitmap                  # semi-transparent overlay shown when `Debug` is true
+---@overload fun(parent: Control): UIChatConfigInterface
 local ChatConfigInterface = ClassUI(Window) {
 
     ---@param self UIChatConfigInterface
@@ -433,8 +433,8 @@ local ChatConfigInterface = ClassUI(Window) {
     end,
 }
 
--------------------------------------------------------------------------------
---  Module-level singleton and standalone entry points
+--#endregion
+--#region  Module-level singleton and standalone entry points
 
 --- Singleton handle; nil until `Open` builds the dialog for the first time.
 ---@type UIChatConfigInterface | nil
@@ -477,7 +477,7 @@ function Toggle()
     end
 end
 
--------------------------------------------------------------------------------
+--#endregion
 --#region Debugging
 
 --- Hot-reload hook: reopens the dialog on the freshly loaded module if it was open.

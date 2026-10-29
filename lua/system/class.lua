@@ -123,6 +123,7 @@ end
 ---@operator call(...): table
 ---@field __init? fun(self, ...)
 ---@field __post_init? fun(self, ...)
+---@field __name MohoExportedClassName
 
 ---@class State
 ---@field __base table
@@ -412,7 +413,7 @@ local Seen = { }
 
 --- Constructs a class or state, referring to the paragraphs of text at the top of this file
 ---@generic Base: table, T:table
----@param bases Base
+---@param bases? Base
 ---@param specs T
 ---@return T
 function ConstructClass(bases, specs)
@@ -910,6 +911,8 @@ Factory = {
 
 --- Converts a C class into a simplified Lua class with no bases. This must adjust the cclass in place as the reference
 -- to the table appears to be hardcoded in the engine.
+---@param cclass table<string, function>
+---@param name MohoExportedClassName
 function ConvertCClassToLuaSimplifiedClass(cclass, name)
     local seen = {}
     local flatten = {}

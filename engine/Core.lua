@@ -42,6 +42,14 @@
 ---@field x1 number
 ---@field y1 number
 
+---@class PointVector
+---@field px number
+---@field py number
+---@field pz number
+---@field vx number
+---@field vy number
+---@field vz number
+
 ---@alias Color string `EnumColor` or hexcode like `'RrGgBb'`, or `'AaRrGgBb'` with transparency
 ---@alias Bone string | number
 ---@alias Army string | integer
@@ -49,6 +57,30 @@
 
 -- note that these object span both the sim and user states
 ---@alias GoalObject moho.manipulator_methods | EconomyEvent | Camera
+
+---@class FileInfo
+---@field IsFolder boolean
+---@field ReadOnly boolean
+---@field SizeBytes integer
+---@field TimeStamp string # unsigned 64 bit int in lowercase hexadecimal
+---@field WriteTime FileInfo.WriteTime
+
+---@class FileInfo.WriteTime
+---@field year integer
+---@field month integer
+---@field mday integer # month day
+---@field wday integer # week day
+---@field hour integer
+---@field minute integer
+---@field second integer
+
+--- `Action` from [FILE_NOTIFY_INFORMATION structure (winnt.h)](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-file_notify_information)
+---@alias FileAction
+---| 1 # FILE_ACTION_ADDED - The file was added to the directory.
+---| 2 # FILE_ACTION_REMOVED - The file was removed from the directory.
+---| 3 # FILE_ACTION_MODIFIED - The file was modified. This can be a change in the time stamp or attributes.
+---| 4 # FILE_ACTION_RENAMED_OLD_NAME - The file was renamed and this is the old name.
+---| 5 # FILE_ACTION_RENAMED_NEW_NAME - The file was renamed and this is the new name.
 
 ---@unknown
 function AITarget()
@@ -101,7 +133,7 @@ end
 
 --- returns a table of information for the given file, or `false` if the file doesn't exist
 ---@param filename FileName
----@return table | false
+---@return FileInfo | false
 function DiskGetFileInfo(filename)
 end
 
@@ -138,7 +170,7 @@ end
 
 ---@overload fun(category: EntityCategory, units: UserUnit[]): UserUnit[]
 ---@overload fun(category: EntityCategory, unitIds: UnitId[]): UnitId[]       
---- filters a list of (user) units or unit ids to only those that match the given category.
+--- filters a list of (user) units or unit blueprint ids to only those that match the given category.
 ---@param category EntityCategory
 ---@param units Unit[]
 ---@return Unit[]
@@ -313,15 +345,14 @@ function ParseEntityCategory(cat)
 end
 
 --- Creates a point vector
----@alternative Not used, better off allocating a separate position and vector
+---@deprecated Not used, better off allocating a separate position and vector
 ---@param px number
 ---@param py number
 ---@param pz number
 ---@param vx number
 ---@param vy number
 ---@param vz number
----@return Vector position
----@return Vector velocity
+---@return PointVector
 function PointVector(px, py, pz, vx, vy, vz)
 end
 
@@ -385,7 +416,7 @@ function RegisterUnitBlueprint(spec)
 end
 
 --- Resumes the thread after suspending it, does nothing if the thread wasn't suspended
----@see # Counterpart of SuspendCurrentThread
+---@see SuspendCurrentThread # Counterpart of SuspendCurrentThread
 ---@param thread thread
 function ResumeThread(thread)
 end

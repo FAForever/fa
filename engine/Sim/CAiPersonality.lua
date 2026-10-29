@@ -3,179 +3,148 @@
 ---@class moho.aipersonality_methods
 local CAiPersonality = {}
 
----
----@param a number
----@param b number
+--- returns `floor(a + (1 - difficulty) * a * b)`
+---@param a integer
+---@param b integer
+---@return integer delay
 function CAiPersonality:AdjustDelay(a, b)
 end
 
----
---  CAiPersonality:GetAirUnitsEmphasis()
+---@return number
 function CAiPersonality:GetAirUnitsEmphasis()
 end
 
----
---  CAiPersonality:GetArmySize()
+---@return number
 function CAiPersonality:GetArmySize()
 end
 
----
---  CAiPersonality:GetAttackFrequency()
+---@return number
 function CAiPersonality:GetAttackFrequency()
 end
 
----
---  CAiPersonality:GetBotUnitsEmphasis()
+---@return number
 function CAiPersonality:GetBotUnitsEmphasis()
 end
 
----
---  CAiPersonality:GetChatFrequency()
+---@return number
 function CAiPersonality:GetChatFrequency()
 end
 
----
---  CAiPersonality:GetChatPersonality()
+---@return string
 function CAiPersonality:GetChatPersonality()
 end
 
----
---  CAiPersonality:GetCoordinatedAttacks()
+---@return number
 function CAiPersonality:GetCoordinatedAttacks()
 end
 
----
---  CAiPersonality:GetCounterForces()
+---@return number
 function CAiPersonality:GetCounterForces()
 end
 
----
---  CAiPersonality:GetDefenseDriven()
+---@return number
 function CAiPersonality:GetDefenseDriven()
 end
 
----
---  CAiPersonality:GetDifficulty()
+--- The difficulty value is in [0, 1] interpolating all other values between
+--- their min and max definitions in the personality.
+---@return number
 function CAiPersonality:GetDifficulty()
 end
 
----
---  CAiPersonality:GetDirectDamageEmphasis()
+---@return number
 function CAiPersonality:GetDirectDamageEmphasis()
 end
 
----
---  CAiPersonality:GetEconomyDriven()
+---@return number
 function CAiPersonality:GetEconomyDriven()
 end
 
----
---  CAiPersonality:GetExpansionDriven()
+---@return number
 function CAiPersonality:GetExpansionDriven()
 end
 
----
---  CAiPersonality:GetFactoryTycoon()
+---@return number
 function CAiPersonality:GetFactoryTycoon()
 end
 
----
---  CAiPersonality:GetFavouriteStructures()
+---@return string[]
 function CAiPersonality:GetFavouriteStructures()
 end
 
----
---  CAiPersonality:GetFavouriteUnits()
+---@return string[]
 function CAiPersonality:GetFavouriteUnits()
 end
 
----
---  CAiPersonality:GetFormationUse()
+---@return number
 function CAiPersonality:GetFormationUse()
 end
 
----
---  CAiPersonality:GetInDirectDamageEmphasis()
+---@return number
 function CAiPersonality:GetInDirectDamageEmphasis()
 end
 
----
---  CAiPersonality:GetIntelBuildingTycoon()
+---@return number
 function CAiPersonality:GetIntelBuildingTycoon()
 end
 
----
---  CAiPersonality:GetIntelGathering()
+---@return number
 function CAiPersonality:GetIntelGathering()
 end
 
----
---  CAiPersonality:GetPersonalityName()
+---@return string
 function CAiPersonality:GetPersonalityName()
 end
 
----
----@return integer
+---@return number
 function CAiPersonality:GetPlatoonSize()
 end
 
----
---  CAiPersonality:GetQuittingTendency()
+---@return number
 function CAiPersonality:GetQuittingTendency()
 end
 
----
---  CAiPersonality:GetRepeatAttackFrequency()
+---@return number
 function CAiPersonality:GetRepeatAttackFrequency()
 end
 
----
---  CAiPersonality:GetSeaUnitsEmphasis()
+---@return number
 function CAiPersonality:GetSeaUnitsEmphasis()
 end
 
----
---  CAiPersonality:GetSpecialtyForcesEmphasis()
+---@return number
 function CAiPersonality:GetSpecialtyForcesEmphasis()
 end
 
----
---  CAiPersonality:GetSuperWeaponTendency()
+---@return number
 function CAiPersonality:GetSuperWeaponTendency()
 end
 
----
---  CAiPersonality:GetSupportUnitsEmphasis()
+---@return number
 function CAiPersonality:GetSupportUnitsEmphasis()
 end
 
----
---  CAiPersonality:GetSurvivalEmphasis()
+---@return number
 function CAiPersonality:GetSurvivalEmphasis()
 end
 
----
---  CAiPersonality:GetTankUnitsEmphasis()
+---@return number
 function CAiPersonality:GetTankUnitsEmphasis()
 end
 
----
---  CAiPersonality:GetTargetSpread()
+---@return number
 function CAiPersonality:GetTargetSpread()
 end
 
----
---  CAiPersonality:GetTeamSupport()
+---@return number
 function CAiPersonality:GetTeamSupport()
 end
 
----
---  CAiPersonality:GetTechAdvancement()
+---@return number
 function CAiPersonality:GetTechAdvancement()
 end
 
----
---  CAiPersonality:GetUpgradesDriven()
+---@return number
 function CAiPersonality:GetUpgradesDriven()
 end
 

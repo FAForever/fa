@@ -22,13 +22,33 @@ name: Pull Request preparation
 
 on:
   pull_request:
-    types: [opened]
+    types:
+      - opened
+
+permissions:
+  pull-requests: write
 
 jobs:
+  greetings:
+    name: Greet first-time contributors
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post welcome comment
+        uses: actions/first-interaction@v1.3.0
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-message: |
+            Hello,
+            it seems this is your first contribution.
+            Please read our [contribution guidelines](CONTRIBUTING.md) to understand how to proceed.
+
   prepare_pr:
     name: Prepare pull request
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v6
@@ -40,17 +60,7 @@ jobs:
         working-directory: changelog/snippets
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          # Priority order as documented in /docs/development-changelog.md
-          IS_GRAPHICS: "${{ contains(github.event.pull_request.labels.*.name, 'area: graphics') }}"
-          IS_AI: "${{ contains(github.event.pull_request.labels.*.name, 'area: AI') }}"
-          # Performance snippet category - no associated label
-          IS_BALANCE: "${{ contains(github.event.pull_request.labels.*.name, 'area: balance idea') }}"
-          # Features snippet category - no associated label
-          IS_OTHER: > 
-            "${{ contains(github.event.pull_request.labels.*.name, 'area: documentation') 
-                || contains(github.event.pull_request.labels.*.name, 'area: tooling') 
-              }}"
-          IS_FIX: "${{ contains(github.event.pull_request.labels.*.name, 'type: bug') }}"
+          LABELS: "${{ toJson(github.event.pull_request.labels.*.name) }}"
         run: |
           # Configure git
           git config user.email "github@faforever.com"
@@ -58,18 +68,20 @@ jobs:
 
           category="category"
           template="sections/template-snippet.md"
-          if [ "$IS_GRAPHICS" = "true" ]; then
+
+          if echo "$LABELS" | grep -q 'area: graphics'; then
             category="graphics"
-          elif [ "$IS_AI" = "true" ]; then
+          elif echo "$LABELS" | grep -q 'area: AI'; then
             category="ai"
-          elif [ "$IS_BALANCE" = "true" ]; then
+          elif echo "$LABELS" | grep -q 'area: balance idea'; then
             category="balance"
             template="sections/template-snippet-balance.md"
-          elif [ "$IS_OTHER" = "true" ]; then
+          elif echo "$LABELS" | grep -q -E 'area: documentation|area: tooling'; then
             category="other"
-          elif [ "$IS_FIX" = "true" ]; then
+          elif echo "$LABELS" | grep -q 'type: bug'; then
             category="fix"
           fi
+
           file="${category}.${PR_NUMBER}.md"
           cp "$template" "$file"
           sed -i "s/PR_NUMBER/${PR_NUMBER}/g" "$file"

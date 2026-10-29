@@ -1507,6 +1507,10 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/ui/game/construction.lua").ToggleUnitPause()',
         category = 'orders',
     },
+    ['shift_pause_unit'] = {
+        action = 'UI_Lua import("/lua/ui/game/construction.lua").ToggleUnitPause()',
+        category = 'orders',
+    },
     ['pause_unit_all'] = {
         action = 'UI_Lua import("/lua/ui/game/construction.lua").ToggleUnitPauseAll()',
         category = 'orders',
@@ -1575,6 +1579,10 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").ToggleRepeatBuild()',
         category = 'orders',
     },
+    ['shift_toggle_repeat_build'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").ToggleRepeatBuild()',
+        category = 'orders',
+    },
     ['toggle_cloakjammingstealth'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").toggleCloakJammingStealthScript()',
         category = 'orders',
@@ -1636,6 +1644,16 @@ local keyActionsOrdersAdvanced = {
         category = 'ordersAdvanced',
         wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#filter-engineers'
     },
+    ['filter_support_units_and_assist'] = {
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-assisters.lua").DistributeAssisters()',
+        category = 'ordersAdvanced',
+        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#distribute-assisters'
+    },
+    ['shift_filter_support_units_and_assist'] = {
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-assisters.lua").DistributeAssisters()',
+        category = 'ordersAdvanced',
+        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#distribute-assisters'
+    },
     ['abort_navigation'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").AbortNavigation()',
         category = 'ordersAdvanced',
@@ -1653,7 +1671,11 @@ local keyActionsOrdersAdvanced = {
     ['shift_discharge'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DischargeShields()',
         category = 'ordersAdvanced',
-    }
+    },
+    ['temporary_template_use_or_create'] = {
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/temporary-templates.lua").UseOrCreateTemporaryTemplate()',
+        category = 'ordersAdvanced',
+    },
 }
 
 local keyActionsOrdersQueueBased = {
