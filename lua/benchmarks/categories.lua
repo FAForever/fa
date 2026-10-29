@@ -53,10 +53,30 @@ local function UseEngineSetOperations()
     end
 end
 
-function Cached(outerLoop, innerLoop)
-    local timer = GetSystemTimeSecondsOnlyForProfileUse
+--- Runs a timed loop with the engine's set operations, and puts the cached ones back even when the
+--- loop fails. The loop gets its parameters as arguments, so they stay locals inside it.
+---@param loop fun(outerLoop: number, innerLoop: number, unit: Unit): number
+---@param outerLoop number
+---@param innerLoop number
+---@return number
+local function RunWithEngineSetOperations(loop, outerLoop, innerLoop)
     local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local restore = UseEngineSetOperations()
+    local ok, result = pcall(loop, outerLoop, innerLoop, unit)
+    restore()
+    unit:Destroy()
+    if not ok then
+        error(result, 0)
+    end
+    return result
+end
+
+---@param outerLoop number
+---@param innerLoop number
+---@param unit Unit
+---@return number
+local function CachedLoop(outerLoop, innerLoop, unit)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
     local start = timer()
 
     for _ = 1, outerLoop do
@@ -67,25 +87,31 @@ function Cached(outerLoop, innerLoop)
     end
 
     local final = timer()
-    restore()
-    unit:Destroy()
     return final - start
 end
 
-function Inline(outerLoop, innerLoop)
+---@param outerLoop number
+---@param innerLoop number
+---@param unit Unit
+---@return number
+local function InlineLoop(outerLoop, innerLoop, unit)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
-    local restore = UseEngineSetOperations()
     local start = timer()
 
-    for _ = 1, outerLoop do 
-        for _ = 1, innerLoop do 
+    for _ = 1, outerLoop do
+        for _ = 1, innerLoop do
             EntityCategoryContains((categories.AIR * categories.TECH3) + categories.EXPERIMENTAL, unit)
         end
     end
 
     local final = timer()
-    restore()
-    unit:Destroy()
     return final - start
+end
+
+function Cached(outerLoop, innerLoop)
+    return RunWithEngineSetOperations(CachedLoop, outerLoop, innerLoop)
+end
+
+function Inline(outerLoop, innerLoop)
+    return RunWithEngineSetOperations(InlineLoop, outerLoop, innerLoop)
 end
