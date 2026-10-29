@@ -299,6 +299,7 @@ function PracticalTestArmyMeta(loop)
 
     local final = timer()
     unit:Destroy()
+    unit = nil
     return final - start
 end
 
@@ -317,6 +318,7 @@ function PracticalTestArmyCached(loop)
 
     local final = timer()
     unit:Destroy()
+    unit = nil
     return final - start
 end
 
@@ -332,6 +334,7 @@ function PracticalTestWeaponsMeta(loop)
 
     local final = timer()
     unit:Destroy()
+    unit = nil
     return final - start
 end
 
@@ -350,5 +353,6 @@ function PracticalTestWeaponsCached(loop)
 
     local final = timer()
     unit:Destroy()
+    unit = nil
     return final - start
 end
