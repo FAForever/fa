@@ -1,0 +1,1 @@
+- Fix error with UEF build beam projectile being destroyed when setting its velocity (#7300).
