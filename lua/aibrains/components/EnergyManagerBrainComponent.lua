@@ -257,7 +257,7 @@ EnergyManagerBrainComponent = ClassSimple {
         end
     end,
 
-    --- Handles the energy manager's own army stat triggers. Called by `AIBrain.OnStatsTrigger`
+    --- Handles the energy manager's army stat triggers
     ---@param self AIBrain
     ---@param triggerName string
     OnStatsTrigger = function(self, triggerName)

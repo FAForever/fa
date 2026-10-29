@@ -676,7 +676,10 @@ CAiBrain.OnSpawnPreBuiltUnits = nil
 
 --- Called by the engine when all conditions of a stat trigger of the army are met.
 --- Each `SetArmyStatsTrigger` call adds a condition to the trigger with that name.
---- The engine removes the trigger when it fires
+--- The engine removes the trigger when it fires.
+--- It checks the triggers in each army's tick, after the economy update. That is before the beat's Lua threads and
+--- entity ticks, so a thread forked from this callback runs until its first wait before units and projectiles move
+--- in the same beat
 ---@see moho.aibrain_methods.SetArmyStatsTrigger # Adds a condition to a trigger
 ---@see moho.aibrain_methods.RemoveArmyStatsTrigger # Removes a trigger
 ---@type nil | fun(self: AIBrain, triggerName: string)

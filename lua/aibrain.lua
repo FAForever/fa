@@ -39,9 +39,9 @@ local AIChatBrainComponent = import("/lua/aibrains/components/ChatBrainComponent
 ---@field TaggedBy Unit
 
 ---@class AIBrainStatTriggerCallback
----@field Name string # Name of the army stat trigger
----@field CallbackFunction fun(object: AIBrain | Entity) # Called with `CallingObject` if set, otherwise with the brain
----@field CallingObject? Entity # Skips the callback when destroyed
+---@field Name string
+---@field CallbackFunction fun(object: AIBrain | Entity) # Called with `CallingObject`, or the brain without it
+---@field CallingObject? Entity
 
 ---@alias AIResult "defeat" | "draw" | "victor"
 ---@alias BrainState "Defeat" | "Draw" | "InProgress" | "Recalled" | "Victory"
@@ -66,7 +66,7 @@ local cachedPlatoonUnit = {}
 ---@field Civilian boolean
 ---@field Trash TrashBag
 ---@field UnitBuiltTriggerList table
----@field TriggerList AIBrainStatTriggerCallback[] # Callbacks of army stat triggers, called by `OnStatsTrigger`
+---@field TriggerList AIBrainStatTriggerCallback[] # Called by `OnStatsTrigger`
 ---@field PingCallbackList { CallbackFunction: fun(pingData: any), PingType: string }[]
 ---@field BrainType 'Human' | 'AI'
 ---@field CustomUnits { [string]: EntityId[] }
@@ -314,13 +314,8 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         self.VOTable[key] = nil
     end,
 
-    --- Called by the engine when all conditions of an army stat trigger are met. Passes the trigger to the energy manager,
-    --- then calls and removes the callbacks in `TriggerList` with that name, as the engine removes the trigger itself.
-    --- `ScenarioTriggers.CreateArmyStatTrigger` and the `TriggerManager` stat triggers add those callbacks.
-    --- All of them share one namespace of trigger names with the energy manager's `EnergyDepleted`, `EnergyViable` and
-    --- `SwitchEnergyViableTrigger`
+    --- Runs the energy manager's triggers, then calls and removes the `TriggerList` callbacks with that name
     ---@see moho.aibrain_methods.OnStatsTrigger # Engine callback
-    ---@see moho.aibrain_methods.SetArmyStatsTrigger # Adds a condition to a trigger
     ---@param self AIBrain
     ---@param triggerName string
     OnStatsTrigger = function(self, triggerName)
@@ -340,8 +335,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         end
     end,
 
-    --- Removes the callbacks in `TriggerList` with that name. The engine trigger stays, so remove it with
-    --- `RemoveArmyStatsTrigger` as well
+    --- Removes the `TriggerList` callbacks with that name, but not the engine trigger
     ---@param self AIBrain
     ---@param triggerName string
     RemoveEconomyTrigger = function(self, triggerName)
