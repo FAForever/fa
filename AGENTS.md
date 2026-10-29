@@ -78,8 +78,8 @@ Large games run thousands of units, and UI code often runs every frame. Upvalue 
 
 ## Code style
 
-- Annotate everything new ([annotation.md](annotation.md)): a `---` description, typed `@param`/`@return`, `---@field` for every class field.
-- Comments: declarative, succinct, no period at the end, no em-dashes.
+- Annotate everything new ([annotation.md](annotation.md)): typed `@param`/`@return`, `---@field` for every class field, and a `---` description unless it would only repeat the name.
+- Comments only say what the code doesn't show: engine behavior, non-obvious reasons, easy mistakes, hooks. Don't repeat names or code, list callers, or describe the change. Keep them short and declarative, with no period at the end and no em-dashes. Before finishing, reread your comments and cut them ([details](annotation.md#comment-style)).
 - 4-space indentation. Match the surrounding code, and don't reformat code you aren't changing.
 
 ## Testing and verification
