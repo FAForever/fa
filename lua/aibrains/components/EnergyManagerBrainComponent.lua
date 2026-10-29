@@ -257,6 +257,9 @@ EnergyManagerBrainComponent = ClassSimple {
         end
     end,
 
+    --- Handles the energy manager's own army stat triggers. Called by `AIBrain.OnStatsTrigger`
+    ---@param self AIBrain
+    ---@param triggerName string
     OnStatsTrigger = function(self, triggerName)
         if triggerName == "EnergyDepleted" or triggerName == "EnergyViable" or triggerName == "SwitchEnergyViableTrigger" then
             self:OnEnergyTrigger(triggerName)
