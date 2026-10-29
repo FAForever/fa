@@ -958,8 +958,12 @@ function ModBlueprints(all_bps)
             bp.Defense = bp.Defense or {}
             bp.General = bp.General or {}
             bp.Physics = bp.Physics or {}
-            bp.Enhancements = bp.Enhancements or {}
             bp.Weapon = bp.Weapon or {}
+
+            -- Preserve missing Enhancements table on USEBUILDPRESETS units so PostModBlueprints can reject invalid presets
+            if not (bp.CategoriesHash and bp.CategoriesHash.USEBUILDPRESETS) then
+                bp.Enhancements = bp.Enhancements or {}
+            end
         end
     end
     if all_bps and all_bps.Projectile then
