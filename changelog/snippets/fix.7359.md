@@ -1,0 +1,1 @@
+- Fix carrier cargo cleanup failing when mod aircraft have the TRANSPORTATION category but no KillCargo method (#7359).
