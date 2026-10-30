@@ -647,3 +647,10 @@ MountDirectory(fa_path .. "/fonts", '/fonts')
 
 -- Allows developers to embed code to debug a replay
 table.insert(path, 1, { dir = InitFileDir .. '\\..\\Debug', mountpoint = '/' })
+
+ConExecute("net_MaxSendRate 1048576")
+ConExecute("net_MaxBacklog 262144")
+ConExecute("net_AckDelay 5")
+ConExecute("net_SendDelay 2")
+ConExecute("net_MinResendDelay 30")
+ConExecute("net_ResendDelayBias 10")
