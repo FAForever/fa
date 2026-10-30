@@ -223,7 +223,7 @@ function UnitWeapon:SetTargetingPriorities(priorities)
 end
 
 --- Sets the per-weapon engine fire lock.
---- While busy the weapon itself cannot fire, unlike `Unit.SetBusy` this does not affect sibling weapons of the unit.
+--- While busy the weapon itself cannot fire.
 ---@param busy boolean
 function UnitWeapon:SetWeaponBusy(busy)
 end

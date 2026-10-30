@@ -732,10 +732,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             self:AimManipulatorSetEnabled(false)
         end
 
-        -- per-weapon fire lock: a Fire dispatch that lands in a live salvo
-        -- state is silently dropped (its OnFire is empty); block it at the
-        -- engine gate instead - per weapon, so sibling weapons do not pay
-        -- for this salvo through the unit busy flag
+        -- nil-safe: states without the field map to false
         self:SetWeaponBusy(self.WeaponWantBusy == true)
     end,
 
