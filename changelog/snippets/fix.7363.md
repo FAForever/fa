@@ -1,0 +1,3 @@
+- Fix one weapon firing a salvo locking all sibling weapons of the unit (#7363, [FA-Binary-Patches#179](https://github.com/FAForever/FA-Binary-Patches/pull/179)):
+  - Weapons now hold their own fire lock while cycling a salvo, so the turrets of a multi-weapon unit fire concurrently instead of waiting for each other.
+  - Aircraft carriers no longer hold fire while constructing aircraft.
