@@ -731,6 +731,12 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             self.WeaponAimIsEnabled = false
             self:AimManipulatorSetEnabled(false)
         end
+
+        -- per-weapon fire lock: a Fire dispatch that lands in a live salvo
+        -- state is silently dropped (its OnFire is empty); block it at the
+        -- engine gate instead - per weapon, so sibling weapons do not pay
+        -- for this salvo through the unit busy flag
+        self:SetWeaponBusy(self.WeaponWantBusy == true)
     end,
 
     -- Weapon States
@@ -828,6 +834,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
+        WeaponWantBusy = true,
 
         ---@param self DefaultProjectileWeapon_RackSalvoChargeState
         Main = function(self)
@@ -951,6 +958,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
+        WeaponWantBusy = true,
 
         -- Render the fire recharge bar
         ---@param self DefaultProjectileWeapon_RackSalvoFiringState
@@ -1238,6 +1246,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
+        WeaponWantBusy = true,
 
         ---@param self DefaultProjectileWeapon_RackSalvoReloadState
         Main = function(self)
@@ -1297,6 +1306,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         WeaponWantEnabled = false,
         WeaponAimWantEnabled = false,
+        WeaponWantBusy = true,
 
         ---@param self DefaultProjectileWeapon_WeaponUnpackingState
         Main = function(self)
@@ -1330,6 +1340,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
+        WeaponWantBusy = true,
 
         ---@param self DefaultProjectileWeapon_WeaponPackingState
         Main = function(self)
