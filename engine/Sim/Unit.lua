@@ -832,6 +832,7 @@ Unit.GetMassBuildAdjMod = nil
 --- Only called when the wreck's `AssociatedBP` is in the structure's `Economy.RebuildBonusIds`.
 --- Returns the rebuild bonus at full wreck health: the engine multiplies it by the wreck's fraction complete.
 --- The engine destroys the wreck when construction starts
+---@see Wreckage.AssociatedBP # How the engine finds the wreck
 ---@type nil | fun(self: Unit, blueprint: UnitBlueprint): number
 Unit.GetRebuildBonus = nil
 
