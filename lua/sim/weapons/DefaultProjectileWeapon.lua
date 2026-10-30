@@ -732,8 +732,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             self:AimManipulatorSetEnabled(false)
         end
 
-        -- nil-safe: states without the field map to false
-        self:SetWeaponBusy(self.WeaponWantBusy == true)
+        self:SetWeaponBusy(self.WeaponWantBusy)
     end,
 
     -- Weapon States
