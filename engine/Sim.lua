@@ -1313,7 +1313,12 @@ end
 function ShouldCreateInitialArmyUnits()
 end
 
---- performs a console command
+--- Runs a console command on the sim thread for every client immediately. 
+--- Almost nothing is safe to run because console commands are meant for the main thread:
+--- - Setting console variables is probably harmless.
+--- - `UI_Lua` and `SimLua` will crash the game eventually.
+--- 
+--- Use `/lua/utilities.lua` `UserConRequest` or a custom `Sync` field to run UI code.
 ---@param command string
 function SimConExecute(command)
 end

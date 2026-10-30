@@ -435,7 +435,7 @@ function GetAngleCCW(base, direction)
     return (180 / math.pi) * rads
 end
 
---- adds a string to `Sync.UserConRequests`
+--- Queues a console command for the UI to issue on the next beat.
 ---@param string string
 function UserConRequest(string)
     if not Sync.UserConRequests then
