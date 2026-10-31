@@ -1,5 +1,6 @@
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local ProfilerReport = import("/lua/ui/game/profilerreport.lua")
 local Statistics = import("/lua/shared/statistics.lua")
 local Tooltip = import("/lua/ui/game/tooltip.lua")
 
@@ -194,6 +195,82 @@ function DoStats(stats, baselines, mode, removeOutliers)
         skewness = skewness * mean
     end
     return sn, mean, deviation, skewness
+end
+
+---@class BenchmarkSummary
+---@field mode ProfilerElementMode mode actually used, falls back to `none` without baselines
+---@field total integer samples before outlier removal
+---@field n integer samples after outlier removal
+---@field mean number
+---@field deviation number
+---@field skewness number
+---@field margin? number half-width of the 95% confidence interval of the mean
+---@field relativeMargin? number `margin` as a fraction of the mean
+---@field cv? number deviation as a fraction of the mean
+---@field min? number
+---@field q1? number
+---@field median? number
+---@field q3? number
+---@field max? number
+
+--- Summarizes benchmark samples with the statistics used for judging a benchmark
+---@param stats { [integer]: number, n: integer }
+---@param baselines? { [integer]: number, n: integer }
+---@param mode ProfilerElementMode
+---@return BenchmarkSummary
+function Summarize(stats, baselines, mode)
+    baselines = baselines or {n = 0}
+    -- the cache can report a baseline count with nothing stored, so check for an entry
+    if mode ~= "none" and (baselines[1] == nil or (mode == "paired" and baselines.n < stats.n)) then
+        mode = "none"
+    end
+
+    local n, mean, deviation, skewness = DoStats(stats, baselines, mode, true)
+
+    -- order statistics come from the same outlier-trimmed samples that DoStats used
+    local samples = stats
+    if mode == "paired" then
+        samples = {}
+        for k = 1, stats.n do
+            samples[k] = stats[k] / baselines[k]
+        end
+    end
+    local trimmed, count = Statistics.RemoveOutliers(samples, stats.n)
+    -- a ratio's order statistics are the raw ones divided by the baseline's mean
+    local scale = 1
+    if mode == "ratio" then
+        -- all-zero samples (coarse timer) have no scale to carry over, and their order statistics are zero
+        local rawMean = Statistics.Mean(trimmed, count)
+        if rawMean ~= 0 then
+            scale = mean / rawMean
+        end
+        -- DoStats' propagated skewness isn't a shape measure, so use the raw samples' instead
+        skewness = Statistics.Skewness(trimmed, count)
+    end
+    local min, q1, median, q3, max = Statistics.GetQuartiles(trimmed, count)
+
+    local margin = Statistics.ConfidenceMargin95(deviation, n)
+    local summary = {
+        mode = mode,
+        total = stats.n,
+        n = n,
+        mean = mean,
+        deviation = deviation,
+        skewness = skewness,
+        margin = margin,
+    }
+    if mean ~= 0 then
+        summary.cv = deviation / math.abs(mean)
+        summary.relativeMargin = margin and margin / math.abs(mean)
+    end
+    if min then
+        summary.min = min * scale
+        summary.q1 = q1 * scale
+        summary.median = median * scale
+        summary.q3 = q3 * scale
+        summary.max = max * scale
+    end
+    return summary
 end
 
 ---@class ProfilerScrollArea : Group
@@ -522,6 +599,13 @@ StatisticSummary = Class(Group) {
         self:SetStats()
     end,
 
+    ---@param self StatisticSummary
+    ---@return ProfilerElementMode
+    GetMode = function(self)
+        local _, mode = self.mode:GetItem()
+        return mode
+    end,
+
     ---@overload fun(self: StatisticSummary, nil: nil, nil: nil) # Clear stats
     ---@param self StatisticSummary
     ---@param stats { [integer]: number, n: integer }
@@ -530,8 +614,13 @@ StatisticSummary = Class(Group) {
         if stats then
             self.stats = stats
             self.baselines = baselines
-            local _, mode = self.mode:GetItem()--[[@as ProfilerElementMode]]
+            local mode = self:GetMode()
             local samples, mean, deviation, skewness = DoStats(stats, baselines, mode, true)
+            -- raw times are in seconds, ratios are unitless
+            if mode == "none" then
+                mean = ProfilerReport.FormatMilliseconds(mean, 4)
+                deviation = ProfilerReport.FormatMilliseconds(deviation, 4)
+            end
             self.samples:SetText(samples)
             self.mean:SetText(mean)
             self.deviation:SetText(deviation)

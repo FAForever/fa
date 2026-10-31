@@ -32,6 +32,8 @@ local isProfiling = false
 --- Thread to keep the simulation synced with the UI
 local profilingThread
 local benchmarkThread
+--- Benchmark threads that are alive, which keep the call hook off
+local benchmarksRunning = 0
 --- Data that we send over to the UI
 local data = CreateEmptyProfilerTable()
 --- How many times each benchmark is run by default
@@ -40,6 +42,8 @@ local benchmarkRuns = 30
 local benchmarkModules
 -- The target time for how we adjust to how many samples of a benchmark we run
 local benchmarkTargetTime = 0.5
+-- Loop count of modules that don't set `ModuleLoopCount`
+local defaultLoopCount = 10000
 -- A list of functions that set the baseline loop time for function's that have the same number of
 -- parameters as the index 
 local benchmarkBaselines
@@ -100,8 +104,10 @@ function ToggleProfiler(forceEnable)
             profilingThread = ForkThread(SyncThread)
         end
 
-        -- Add a function to track
-        sethook(FunctionHook, "c") -- only track on function calls
+        -- Add a function to track, unless a benchmark is running and turns it on when done
+        if benchmarksRunning == 0 then
+            sethook(FunctionHook, "c") -- only track on function calls
+        end
     else
         isProfiling = false
         if profilingThread then
@@ -134,7 +140,7 @@ end
 ---@param moduleIndex number
 ---@param benchmarkIndex number
 ---@param parameters any[]
-function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
+local function MeasureBenchmark(moduleIndex, benchmarkIndex, parameters)
     -- the threshold time for a benchmark to start running more than once a tick
     local tickThreshold = 0.09
     local runGCEachTest = true
@@ -145,6 +151,7 @@ function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
     if benchmark == nil then
         WARN("Can't find benchmark " .. tostring(moduleIndex) .. "," .. tostring(benchmarkIndex))
         Sync.BenchmarkOutput = {success = false}
+        benchmarkThread = false
         return
     end
     local test = benchmark.fn
@@ -171,6 +178,14 @@ function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
         output[testNumber] = test(unpack(parameters))
     end
 
+    -- Errors have to be caught here since a dead thread can't tell the UI the benchmark is over.
+    -- This can't wrap the whole thread because it yields between ticks.
+    local function Fail(reason)
+        WARN("Benchmark failed: " .. tostring(reason))
+        Sync.BenchmarkOutput = {success = false}
+        benchmarkThread = false
+    end
+
     testNumber = 0
     if baselineLoop then
         baselines = {}
@@ -179,11 +194,16 @@ function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
 
     -- initial benchmark sample time to scale sample rate based on
     local startTime = GetSystemTimeSecondsOnlyForProfileUse()
-    RunTest()
+    local ok, err = pcall(RunTest)
+    if not ok then
+        Fail(err)
+        return
+    end
     local time = GetSystemTimeSecondsOnlyForProfileUse() - startTime
     if type(output[1]) ~= "number" then
         SPEW("Bad benchmark: expected total time output")
         Sync.BenchmarkOutput = {success = false}
+        benchmarkThread = false
         return
     end
     -- calculate how many at a time and for how many ticks we should sample the benchmark
@@ -203,7 +223,11 @@ function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
 
     -- run the rest of the samples this tick
     for _ = 2, atATime do
-        RunTest()
+        ok, err = pcall(RunTest)
+        if not ok then
+            Fail(err)
+            return
+        end
     end
 
     SPEW("Running benchmark " .. atATime .. " at a time for " .. ticks .. " ticks")
@@ -234,7 +258,11 @@ function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
         end
         output = {}
         for _ = 1, atATime do
-            RunTest()
+            ok, err = pcall(RunTest)
+            if not ok then
+                Fail(err)
+                return
+            end
         end
 
         Sync.BenchmarkOutput = {
@@ -248,12 +276,34 @@ function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
     SPEW("Done with benchmark")
 end
 
+--- Runs a benchmark with the profiler's call hook off, since the hook adds its own cost to every
+--- call the benchmark makes
+---@param moduleIndex number
+---@param benchmarkIndex number
+---@param parameters any[]
+function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
+    benchmarksRunning = benchmarksRunning + 1
+    sethook()
+    MeasureBenchmark(moduleIndex, benchmarkIndex, parameters)
+    -- a stopped benchmark can still be finishing its tick when the next one starts
+    benchmarksRunning = benchmarksRunning - 1
+    if isProfiling and benchmarksRunning == 0 then
+        sethook(FunctionHook, "c")
+    end
+end
+
 --- Starts the benchmark running thread
 ---@param moduleIndex number
 ---@param benchmarkIndex number
 ---@param parameters any[]
 function RunBenchmark(moduleIndex, benchmarkIndex, parameters)
     if not benchmarkThread then
+        -- an error in the thread would leave the hook off and the benchmark marked as running
+        if type(parameters) ~= "table" then
+            WARN("Benchmark parameters must be a table")
+            Sync.BenchmarkOutput = {success = false}
+            return
+        end
         local moduleData = benchmarkModules[moduleIndex]
         LOG("Running benchmark \"" .. tostring(moduleData.benchmarks[benchmarkIndex].name) .. "\" in file " .. tostring(moduleData.file))
         benchmarkThread = ForkThread(RunBenchmarkThread, moduleIndex, benchmarkIndex, parameters)
@@ -269,6 +319,7 @@ end
 ---@field LastBenchmarkSelected number
 ---@field path FileName
 ---@field faulty boolean
+---@field loopCount number base loop count, passed as the first parameter before the user's multiplier
 ---@field name string
 
 ---@class UserBenchmarkInfo
@@ -291,6 +342,7 @@ end
 ---@field descriptions table<string, string>
 ---@field excludeFunctions table<string, true>
 ---@field file string
+---@field loopCount number
 ---@field moduleDescription string
 ---@field moduleName string
 ---@field moduleSort number
@@ -432,6 +484,7 @@ BenchmarkModuleLoader = Class() {
                 file = file,
                 path = path,
                 faulty = true,
+                loopCount = metadata.loopCount or defaultLoopCount,
                 name = metadata.moduleName,
                 LastBenchmarkSelected = 0,
             }, {
@@ -446,6 +499,7 @@ BenchmarkModuleLoader = Class() {
             file = file,
             path = path,
             faulty = false,
+            loopCount = metadata.loopCount,
             name = metadata.moduleName,
             LastBenchmarkSelected = 0,
         }, {
@@ -464,6 +518,7 @@ BenchmarkModuleLoader = Class() {
         local moduleName = ""
         local moduleDesc = ""
         local moduleSort = 0
+        local loopCount = defaultLoopCount
         local sortOrder = {}
         local titles = {}
         -- can't just pull these values because it'll throw an error if they don't exist
@@ -492,6 +547,12 @@ BenchmarkModuleLoader = Class() {
             if k == "ModuleSort" then
                 if type(val) == "number" then
                     moduleSort = val
+                end
+                continue
+            end
+            if k == "ModuleLoopCount" then
+                if type(val) == "number" and val >= 1 then
+                    loopCount = math.floor(val)
                 end
                 continue
             end
@@ -547,6 +608,7 @@ BenchmarkModuleLoader = Class() {
         return {
             descriptions = descriptions,
             excludeFunctions = excludeFunctions,
+            loopCount = loopCount,
             moduleName = moduleName,
             moduleDescription = moduleDesc,
             moduleSort = moduleSort,

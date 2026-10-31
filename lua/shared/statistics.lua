@@ -119,6 +119,76 @@ function Skewness(t, n, m, d)
     end
 end
 
+-- Two-sided 95% critical values of Student's t, indexed by degrees of freedom
+local TCritical95Table = {
+    12.706, 4.303, 3.182, 2.776, 2.571, 2.447, 2.365, 2.306, 2.262, 2.228,
+    2.201, 2.179, 2.160, 2.145, 2.131, 2.120, 2.110, 2.101, 2.093, 2.086,
+    2.080, 2.074, 2.069, 2.064, 2.060, 2.056, 2.052, 2.048, 2.045, 2.042,
+}
+
+--- Gets the two-sided 95% critical value of Student's t distribution. Rounds down to the previous
+--- tabulated degrees of freedom, so it never understates the interval.
+---@param df integer
+---@return number
+function TCritical95(df)
+    if df < 1 then
+        return TCritical95Table[1]
+    elseif df <= 30 then
+        return TCritical95Table[df]
+    elseif df < 40 then
+        return TCritical95Table[30]
+    elseif df < 60 then
+        return 2.021
+    elseif df < 120 then
+        return 2.000
+    end
+    return 1.980
+end
+
+--- Computes the half-width of the 95% confidence interval of a mean, or nil when there are not
+--- enough samples
+---@param deviation number
+---@param n integer
+---@return number?
+function ConfidenceMargin95(deviation, n)
+    if n < 2 then
+        return nil
+    end
+    return TCritical95(n - 1) * deviation / math.sqrt(n)
+end
+
+--- Timer resolution, as a fraction of a sample's time, above which rounding distorts the samples
+CoarseTimerFraction = 0.05
+
+--- Checks whether a timer resolution is too coarse to measure samples of a given duration
+---@param resolution number seconds
+---@param sampleTime number seconds
+---@return boolean
+function IsTimerTooCoarse(resolution, sampleTime)
+    return resolution > sampleTime * CoarseTimerFraction
+end
+
+--- Computes how many times longer samples need to be for a timer resolution to stop distorting them
+---@param resolution number seconds
+---@param sampleTime number seconds
+---@return number factor at least 1
+function CoarseTimerFactor(resolution, sampleTime)
+    -- a sample shorter than one step can read as zero, so assume it took half a step
+    sampleTime = math.max(sampleTime, resolution * 0.5)
+    return math.max(1, resolution / (sampleTime * CoarseTimerFraction))
+end
+
+--- Computes the precision of a timestamp stored as a 32-bit float, which shrinks as it grows
+---@param timestamp number
+---@return number
+function TimestampResolution(timestamp)
+    local power = 1
+    while power * 2 <= timestamp do
+        power = power * 2
+    end
+    return power / 8388608 -- 2^23 mantissa bits, written out because ^ is XOR in LuaPlus
+end
+
 --- Computes the quartiles of a data set (needs at least 5 elements)
 ---@param t number[]
 ---@param n? integer
@@ -162,7 +232,7 @@ function GetQuartiles(t, n)
 end
 
 --- Removes items that are more than 1.5 times the interquartile range away from
---- the median into a new table
+--- the median into a new table. Keeps everything when the interquartile range is zero.
 ---@param t number[]
 ---@param n? integer
 ---@return number[] trimmed
@@ -179,6 +249,14 @@ function RemoveOutliers(t, n)
     else
         local _, q1, q2, q3, _ = GetQuartiles(t, n)
         local iqr15 = (q3 - q1) * 1.5
+
+        -- a zero range (coarse timer) would reject everything that is not the median
+        if iqr15 == 0 then
+            for i = 1, n do
+                trimmed[i] = t[i]
+            end
+            return trimmed, n
+        end
 
         local size = 0
         for i = 1, n do
