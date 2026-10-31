@@ -32,6 +32,15 @@ end
 -- Compute a string describing each unique footprint.
 -- We'll use the strings as keys in a table, so we can easily identify unique ones
 --
+-- Each line is a `MotionType` and the square size its units ask for. The engine matches a ground
+-- unit to the spec in `/lua/footprints.lua` with the caps of its `MotionType` and the closest size
+-- (see `EntityBlueprint.Footprint` in `/engine/Core/Blueprints/EntityBlueprint.lua`). So every
+-- line needs a spec with those caps, and a size close enough to it. This is an approximation:
+-- - Motion types with the same caps share specs (Land and Biped, Hover and AmphibiousFloating)
+-- - The engine uses `Footprint.SizeX`/`SizeZ` when the blueprint sets them, and compares X and Z
+--   separately instead of using the larger of the two
+-- - Air units never match a spec, and units with `Physics.MaxSpeed` 0 resolve as structures
+--
 all_footprints = {}
 for i,bp in all_blueprints do
     if bp.Physics.MotionType!=nil and bp.Physics.MotionType!='RULEUMT_None' then
