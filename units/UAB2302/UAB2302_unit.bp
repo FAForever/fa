@@ -156,8 +156,8 @@ UnitBlueprint{
             DamageRadius = 5,
             DamageType = "Normal",
             DisplayName = "Sonance Artillery",
-            DoTPulses = 2,
-            DoTTime = 1,
+            DoTPulses = 2, -- two hits of the full damage, 3.8s apart: dealt by the projectile (AIFSonanceShell02)
+            DoTTime = 3.8,
             EnergyDrainPerSecond = 4250,
             EnergyRequired = 17000,
             FireTargetLayerCapsTable = {
