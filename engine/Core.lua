@@ -82,6 +82,10 @@
 ---| 4 # FILE_ACTION_RENAMED_OLD_NAME - The file was renamed and this is the old name.
 ---| 5 # FILE_ACTION_RENAMED_NEW_NAME - The file was renamed and this is the new name.
 
+--- Global table for disk change callbacks
+---@type fun(name: FileName, why: FileAction)[]
+__diskwatch = nil
+
 ---@unknown
 function AITarget()
 end
