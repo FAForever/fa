@@ -1,0 +1,1 @@
+- Annotate functions and objects related to the new chat modules (#7236).

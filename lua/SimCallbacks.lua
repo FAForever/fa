@@ -19,6 +19,7 @@ local SimTriggers = import("/lua/scenariotriggers.lua")
 local SUtils = import("/lua/ai/sorianutilities.lua")
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 local UnitQueueDataToCommand = import("/lua/sim/commands/shared.lua").UnitQueueDataToCommand
+local FilterOutInvalidTargets = import("/lua/shared/commands/distribute-assisters.lua").FilterOutInvalidTargets
 
 -- upvalue table operations for performance
 local TableInsert = table.insert
@@ -195,9 +196,9 @@ Callbacks.ToggleSelfDestruct = function(data, units)
         return
     end
 
-    -- moderation rule: if you self destruct with one or more ACUs in the selection when playing full 
-    -- share, then you only self destruct the ACUs. This does not make it impossible to abuse, but it 
-    -- does introduce a simple guardrail. 
+    -- moderation rule: if you self destruct with one or more ACUs in the selection when playing full
+    -- share, then you only self destruct the ACUs. This does not make it impossible to abuse, but it
+    -- does introduce a simple guardrail.
     if ScenarioInfo.Options.Share == "FullShare" then
         local commandUnits = EntityCategoryFilterDown(categories.COMMAND, SecureUnits(units))
         if table.getn(commandUnits) > 0 then
@@ -532,6 +533,34 @@ Callbacks.SelectHighestEngineerAndAssist = function(data, selection)
         IssueClearCommands(noACU)
         IssueGuard(noACU, target)
     end
+end
+
+---@param data DistributeAssistersData
+Callbacks.DistributeAssisters = function(data)
+    local assisters = SecureUnits(data.AssisterIds)
+    local targets = SecureUnits(data.TargetIds)
+
+    if not assisters[1] or not targets[1] then
+        return
+    end
+    targets = FilterOutInvalidTargets(targets) --[[@as Unit[] ]]
+
+    local sourceAssister = assisters[1]
+    IssueToUnitClearCommands(sourceAssister)
+    for i = 1, TableGetn(targets) do
+        local target = targets[i]
+        local targetCats = target.Blueprint.CategoriesHash
+        local parent = target:GetParent()
+        if not target.Dead
+            and not target:IsUnitState('UnSelectable')
+            and not target:IsUnitState('Attached')
+            and not (parent and parent:GetBlueprint().CategoriesHash['CARRIER'])
+        then
+            IssueToUnitGuard(sourceAssister, targets[i])
+        end
+    end
+
+    import("/lua/sim/commands/distribute-queue.lua").DistributeOrders(assisters, sourceAssister, true, false)
 end
 
 do

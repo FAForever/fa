@@ -396,6 +396,9 @@ local function CreatePlayerGroup(parent, panelFilename, titleLoc, titleColor, co
 end
 
 
+---@class ArmyInfo
+---@field package armyIndex integer
+
 function BuildPlayerLines()
     local sessionOptions = SessionGetScenarioInfo().Options
     local focusArmy = GetFocusArmy()
