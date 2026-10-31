@@ -1,8 +1,8 @@
 # Chat — Refactoring Guide
 
-This directory contains the refactored in-game chat. The goal is to replace the monolithic legacy `/lua/ui/game/chat.lua` with a clean MVC structure where the **model** is reactive (LazyVar-based), the **view** is dumb (reads from the model, never writes), and the **controller** is the only place that sends or receives messages.
+`lua/ui/game/chat/` contains the refactored in-game chat. The goal is to replace the monolithic legacy `/lua/ui/game/chat.lua` with a clean MVC structure where the **model** is reactive (LazyVar-based), the **view** is dumb (reads from the model, never writes), and the **controller** is the only place that sends or receives messages.
 
-> **Read first:** [`/lua/ui/AGENTS.md`](/lua/ui/AGENTS.md) covers project-wide UI patterns — `__init` vs `__post_init`, LazyVars and `Derive`, `TrashBag`, layout, skinning, debug overlays, hot-reload. This doc is chat-specific and assumes those rules. Class field annotation conventions live in [`annotation.md`](annotation.md).
+> **Read first:** [ui.md](ui.md) covers project-wide UI patterns — `__init` vs `__post_init`, LazyVars and `Derive`, `TrashBag`, layout, skinning, debug overlays, hot-reload. This doc is chat-specific and assumes those rules. Class field annotation conventions live in [`annotation.md`](../annotation.md).
 
 ---
 
@@ -28,44 +28,43 @@ The chat tree splits one feature into many small files so each `*Interface` is r
 
 | File | Responsibility |
 |------|----------------|
-| [ChatModel.lua](ChatModel.lua) | `UIChatModel` singleton + `UIChatEntry` / `UIChatEntryLocation` shapes; recipient + history + window-visible + last-activity + pin LazyVars |
-| [ChatController.lua](ChatController.lua) | Send / receive pipelines, slash-command dispatch, activity heartbeat, recipient routing — the only file allowed to call `SessionSendChatMessage` or write to the model |
-| [ChatInterface.lua](ChatInterface.lua) | `UIChatInterface : Window` — main draggable, resizable chat window; owns drag handles, idle/fade `OnFrame` timer, `win_alpha` cascade, standalone-invocation entry points |
-| [ChatLinesInterface.lua](ChatLinesInterface.lua) | `UIChatLinesInterface : Group` — line pool, scrollbar, wrap/rebuild on resize, observes `model.History` + `ChatConfigModel.Committed` |
-| [ChatLineInterface.lua](ChatLineInterface.lua) | `UIChatLineInterface : Group` — single message row: faction badge, sender name (clickable), body text (clickable when camera/location-tagged) |
-| [ChatEditInterface.lua](ChatEditInterface.lua) | `UIChatEditInterface : Group` — edit box, recipient label, recipient-picker dropdown, camera-attach checkbox, command-hint popup, command history ring, Tab completion |
-| [ChatFeedInterface.lua](ChatFeedInterface.lua) | `UIChatFeedInterface : Group` — sibling feed shown while the window is closed; per-row age timer fades old lines |
-| [ChatListInterface.lua](ChatListInterface.lua) | `UIChatListInterface : Group` — popup recipient picker (all / allies / per-player) |
-| [ChatCommandHintInterface.lua](ChatCommandHintInterface.lua) | `UIChatCommandHintInterface : Group` — slash-command auto-suggest popup anchored to the edit box |
-| [ChatFactionBadge.lua](ChatFactionBadge.lua) | `ChatFactionBadge : Group` — faction icon with tooltip; rendered on every line |
-| [ChatCompletion.lua](ChatCompletion.lua) | Tab-completion cycle state (no UI; consumed by `ChatEditInterface`) |
-| [ChatUtils.lua](ChatUtils.lua) | Module-level helpers (max message length, etc.) |
-| [ChatDebug.lua](ChatDebug.lua) | Debug helpers — not part of the production tree |
+| [ChatModel.lua](../lua/ui/game/chat/ChatModel.lua) | `UIChatModel` singleton + `UIChatEntry` / `UIChatEntryLocation` shapes; recipient + history + window-visible + last-activity + pin LazyVars |
+| [ChatController.lua](../lua/ui/game/chat/ChatController.lua) | Send / receive pipelines, slash-command dispatch, activity heartbeat, recipient routing — the only file allowed to call `SessionSendChatMessage` or write to the model |
+| [ChatInterface.lua](../lua/ui/game/chat/ChatInterface.lua) | `UIChatInterface : Window` — main draggable, resizable chat window; owns drag handles, idle/fade `OnFrame` timer, `win_alpha` cascade, standalone-invocation entry points |
+| [ChatLinesInterface.lua](../lua/ui/game/chat/ChatLinesInterface.lua) | `UIChatLinesInterface : Group` — line pool, scrollbar, wrap/rebuild on resize, observes `model.History` + `ChatConfigModel.Committed` |
+| [ChatLineInterface.lua](../lua/ui/game/chat/ChatLineInterface.lua) | `UIChatLineInterface : Group` — single message row: faction badge, sender name (clickable), body text (clickable when camera/location-tagged) |
+| [ChatEditInterface.lua](../lua/ui/game/chat/ChatEditInterface.lua) | `UIChatEditInterface : Group` — edit box, recipient label, recipient-picker dropdown, camera-attach checkbox, command-hint popup, command history ring, Tab completion |
+| [ChatFeedInterface.lua](../lua/ui/game/chat/ChatFeedInterface.lua) | `UIChatFeedInterface : Group` — sibling feed shown while the window is closed; per-row age timer fades old lines |
+| [ChatListInterface.lua](../lua/ui/game/chat/ChatListInterface.lua) | `UIChatListInterface : Group` — popup recipient picker (all / allies / per-player) |
+| [ChatCommandHintInterface.lua](../lua/ui/game/chat/ChatCommandHintInterface.lua) | `UIChatCommandHintInterface : Group` — slash-command auto-suggest popup anchored to the edit box |
+| [ChatFactionBadge.lua](../lua/ui/game/chat/ChatFactionBadge.lua) | `ChatFactionBadge : Group` — faction icon with tooltip; rendered on every line |
+| [ChatCompletion.lua](../lua/ui/game/chat/ChatCompletion.lua) | Tab-completion cycle state (no UI; consumed by `ChatEditInterface`) |
+| [ChatUtils.lua](../lua/ui/game/chat/ChatUtils.lua) | Module-level helpers (max message length, etc.) |
+| [ChatDebug.lua](../lua/ui/game/chat/ChatDebug.lua) | Debug helpers — not part of the production tree |
 
 ### `config/`
 
 | File | Responsibility |
 |------|----------------|
-| [config/ChatConfigModel.lua](config/ChatConfigModel.lua) | `UIChatConfigModel` singleton + `UIChatOptions` schema + slider ranges; `Committed` (active) and `Pending` (draft) options LazyVars |
-| [config/ChatConfigController.lua](config/ChatConfigController.lua) | Apply / Reset / Cancel / SetOption — the only writer to `ChatConfigModel` |
-| [config/ChatConfigInterface.lua](config/ChatConfigInterface.lua) | `UIChatConfigInterface : Window` — options dialog; observes `Pending` to sync controls |
+| [config/ChatConfigModel.lua](../lua/ui/game/chat/config/ChatConfigModel.lua) | `UIChatConfigModel` singleton + `UIChatOptions` schema + slider ranges; `Committed` (active) and `Pending` (draft) options LazyVars |
+| [config/ChatConfigController.lua](../lua/ui/game/chat/config/ChatConfigController.lua) | Apply / Reset / Cancel / SetOption — the only writer to `ChatConfigModel` |
+| [config/ChatConfigInterface.lua](../lua/ui/game/chat/config/ChatConfigInterface.lua) | `UIChatConfigInterface : Window` — options dialog; observes `Pending` to sync controls |
 
 ### `commands/`
 
 | File | Responsibility |
 |------|----------------|
-| [commands/ChatCommandRegistry.lua](commands/ChatCommandRegistry.lua) | Registry, tokenizer, dispatcher; legacy fallback to `/lua/ui/notify/commands.lua` |
-| [commands/ChatCommandTypes.lua](commands/ChatCommandTypes.lua) | Parameter resolvers: `Recipient`, `Player`, `Int`, `String`, `Rest` |
-| [commands/builtin/*.lua](commands/builtin/) | One file per built-in command (`/all`, `/allies`, `/whisper`, `/help`, …); each exports a `Command` table |
-| [commands/design.md](commands/design.md) | Slash-command system design — read before adding a command |
+| [commands/ChatCommandRegistry.lua](../lua/ui/game/chat/commands/ChatCommandRegistry.lua) | Registry, tokenizer, dispatcher; legacy fallback to `/lua/ui/notify/commands.lua` |
+| [commands/ChatCommandTypes.lua](../lua/ui/game/chat/commands/ChatCommandTypes.lua) | Parameter resolvers: `Recipient`, `Player`, `Int`, `String`, `Rest` |
+| [commands/builtin/*.lua](../lua/ui/game/chat/commands/builtin/) | One file per built-in command (`/all`, `/allies`, `/whisper`, `/help`, …); each exports a `Command` table |
 
-To add a slash command, follow the [`add-chat-command`](../../../../.claude/skills/add-chat-command/SKILL.md) skill.
+To add a slash command, follow the [`add-chat-command`](../.claude/skills/add-chat-command/SKILL.md) skill.
 
 ---
 
 ## Model
 
-### `UIChatModel` ([ChatModel.lua](ChatModel.lua))
+### `UIChatModel` ([ChatModel.lua](../lua/ui/game/chat/ChatModel.lua))
 
 ```lua
 ---@class UIChatModel
@@ -98,7 +97,7 @@ To add a slash command, follow the [`add-chat-command`](../../../../.claude/skil
 
 Display-lifecycle state (per-row `time` / `visible` flags, fade alpha) lives on the **view**, not on entries. `WrappedText` is the one exception — the wrap cache attaches to the entry because it depends on the entry's text and the current row width, and avoids re-wrapping every frame.
 
-### `UIChatConfigModel` ([config/ChatConfigModel.lua](config/ChatConfigModel.lua))
+### `UIChatConfigModel` ([config/ChatConfigModel.lua](../lua/ui/game/chat/config/ChatConfigModel.lua))
 
 ```lua
 ---@class UIChatConfigModel
@@ -178,18 +177,18 @@ Every public function on `ChatController` either reads input, writes the model, 
 
 ## Views
 
-Every `*Interface` file follows the rules in [`/lua/ui/AGENTS.md`](../../AGENTS.md) — `__init` for state and children, `__post_init` for layout, observers via `Derive`, cleanup via `TrashBag`. The chat-specific bits are which model fields each interface observes and which controller calls it makes.
+Every `*Interface` file follows the rules in [`ui.md`](ui.md) — `__init` for state and children, `__post_init` for layout, observers via `Derive`, cleanup via `TrashBag`. The chat-specific bits are which model fields each interface observes and which controller calls it makes.
 
 | Interface | Observes | Calls into controller |
 |-----------|----------|-----------------------|
-| `UIChatInterface` ([ChatInterface.lua](ChatInterface.lua)) | `model.WindowVisible`, `model.Pinned`, `ChatConfigModel.Committed.win_alpha` | `CloseWindow`, `SetPinned`, `NotifyActivity` |
-| `UIChatLinesInterface` ([ChatLinesInterface.lua](ChatLinesInterface.lua)) | `model.History`, `ChatConfigModel.Committed` (font, palette, mute, links) | (read-only; click forwarders handed in by parent) |
-| `UIChatLineInterface` ([ChatLineInterface.lua](ChatLineInterface.lua)) | (per-row; populated by `ChatLinesInterface`) | row click → `SetRecipient`, camera click → `WorldCamera:RestoreSettings` |
-| `UIChatEditInterface` ([ChatEditInterface.lua](ChatEditInterface.lua)) | `model.Recipient` | `Send`, `SetRecipient`, `NotifyActivity`, `CloseWindow` |
-| `UIChatFeedInterface` ([ChatFeedInterface.lua](ChatFeedInterface.lua)) | `model.History`, `ChatConfigModel.Committed` (palette, fade, feed_background) | (read-only) |
-| `UIChatListInterface` ([ChatListInterface.lua](ChatListInterface.lua)) | (driven by edit dropdown) | `SetRecipient` |
-| `UIChatCommandHintInterface` ([ChatCommandHintInterface.lua](ChatCommandHintInterface.lua)) | (driven by edit text) | (no controller calls; hint UI only) |
-| `UIChatConfigInterface` ([config/ChatConfigInterface.lua](config/ChatConfigInterface.lua)) | `ChatConfigModel.Pending` | `ChatConfigController.SetOption` / `Apply` / `Reset` / `Cancel` |
+| `UIChatInterface` ([ChatInterface.lua](../lua/ui/game/chat/ChatInterface.lua)) | `model.WindowVisible`, `model.Pinned`, `ChatConfigModel.Committed.win_alpha` | `CloseWindow`, `SetPinned`, `NotifyActivity` |
+| `UIChatLinesInterface` ([ChatLinesInterface.lua](../lua/ui/game/chat/ChatLinesInterface.lua)) | `model.History`, `ChatConfigModel.Committed` (font, palette, mute, links) | (read-only; click forwarders handed in by parent) |
+| `UIChatLineInterface` ([ChatLineInterface.lua](../lua/ui/game/chat/ChatLineInterface.lua)) | (per-row; populated by `ChatLinesInterface`) | row click → `SetRecipient`, camera click → `WorldCamera:RestoreSettings` |
+| `UIChatEditInterface` ([ChatEditInterface.lua](../lua/ui/game/chat/ChatEditInterface.lua)) | `model.Recipient` | `Send`, `SetRecipient`, `NotifyActivity`, `CloseWindow` |
+| `UIChatFeedInterface` ([ChatFeedInterface.lua](../lua/ui/game/chat/ChatFeedInterface.lua)) | `model.History`, `ChatConfigModel.Committed` (palette, fade, feed_background) | (read-only) |
+| `UIChatListInterface` ([ChatListInterface.lua](../lua/ui/game/chat/ChatListInterface.lua)) | (driven by edit dropdown) | `SetRecipient` |
+| `UIChatCommandHintInterface` ([ChatCommandHintInterface.lua](../lua/ui/game/chat/ChatCommandHintInterface.lua)) | (driven by edit text) | (no controller calls; hint UI only) |
+| `UIChatConfigInterface` ([config/ChatConfigInterface.lua](../lua/ui/game/chat/config/ChatConfigInterface.lua)) | `ChatConfigModel.Pending` | `ChatConfigController.SetOption` / `Apply` / `Reset` / `Cancel` |
 
 ### Imports vs callbacks
 
@@ -209,15 +208,15 @@ This keeps dependencies visible at the top of the file and avoids the autolobby'
 
 | Element | File | Parent |
 |---------|------|--------|
-| Chat window (title bar + drag handles) | [ChatInterface.lua](ChatInterface.lua) | `GetFrame(0)` |
-| Line pool + scrollbar | [ChatLinesInterface.lua](ChatLinesInterface.lua) | chat window's client area |
-| Single message row | [ChatLineInterface.lua](ChatLineInterface.lua) | line pool |
-| Sibling feed (window-hidden mode) | [ChatFeedInterface.lua](ChatFeedInterface.lua) | `GetFrame(0)` (anchored to chat window's lines rect) |
-| Edit box, recipient label, recipient picker, camera checkbox | [ChatEditInterface.lua](ChatEditInterface.lua) | chat window's client area |
-| Recipient-picker popup | [ChatListInterface.lua](ChatListInterface.lua) | edit interface |
-| Slash-command hint popup | [ChatCommandHintInterface.lua](ChatCommandHintInterface.lua) | edit interface |
-| Faction icon (per row) | [ChatFactionBadge.lua](ChatFactionBadge.lua) | line interface |
-| Options dialog | [config/ChatConfigInterface.lua](config/ChatConfigInterface.lua) | `GetFrame(0)` |
+| Chat window (title bar + drag handles) | [ChatInterface.lua](../lua/ui/game/chat/ChatInterface.lua) | `GetFrame(0)` |
+| Line pool + scrollbar | [ChatLinesInterface.lua](../lua/ui/game/chat/ChatLinesInterface.lua) | chat window's client area |
+| Single message row | [ChatLineInterface.lua](../lua/ui/game/chat/ChatLineInterface.lua) | line pool |
+| Sibling feed (window-hidden mode) | [ChatFeedInterface.lua](../lua/ui/game/chat/ChatFeedInterface.lua) | `GetFrame(0)` (anchored to chat window's lines rect) |
+| Edit box, recipient label, recipient picker, camera checkbox | [ChatEditInterface.lua](../lua/ui/game/chat/ChatEditInterface.lua) | chat window's client area |
+| Recipient-picker popup | [ChatListInterface.lua](../lua/ui/game/chat/ChatListInterface.lua) | edit interface |
+| Slash-command hint popup | [ChatCommandHintInterface.lua](../lua/ui/game/chat/ChatCommandHintInterface.lua) | edit interface |
+| Faction icon (per row) | [ChatFactionBadge.lua](../lua/ui/game/chat/ChatFactionBadge.lua) | line interface |
+| Options dialog | [config/ChatConfigInterface.lua](../lua/ui/game/chat/config/ChatConfigInterface.lua) | `GetFrame(0)` |
 
 ---
 
@@ -228,9 +227,9 @@ Every complete UI component in this system (chat window, options dialog, edit ar
 1. **Debugging** — any component can be opened in isolation without launching the full game flow.
 2. **Separation of concerns** — if a component requires another component to exist before it can be opened, that is a design smell indicating hidden coupling.
 
-Each top-level view module exports module-level `Toggle()` / `Open()` / `Close()` and an `Instance` local. Bind `chat_toggle` and `chat_config` actions in `keyactions.lua` to `UI_Lua import("/lua/ui/game/chat/ChatInterface.lua").Toggle()` and the corresponding config call. The same `Toggle()` is also what the hot-reload `__moduleinfo.OnReload` block reopens after a save — see [`/lua/ui/AGENTS.md § 7.2`](../../AGENTS.md).
+Each top-level view module exports module-level `Toggle()` / `Open()` / `Close()` and an `Instance` local. Bind `chat_toggle` and `chat_config` actions in `keyactions.lua` to `UI_Lua import("/lua/ui/game/chat/ChatInterface.lua").Toggle()` and the corresponding config call. The same `Toggle()` is also what the hot-reload `__moduleinfo.OnReload` block reopens after a save — see [`ui.md § 7.2`](ui.md).
 
-> This convention is currently chat-specific but is a candidate to lift into [`/lua/ui/AGENTS.md`](../../AGENTS.md). Until it does, treat this as the reference for any other top-level UI module.
+> This convention is currently chat-specific but is a candidate to lift into [`ui.md`](ui.md). Until it does, treat this as the reference for any other top-level UI module.
 
 ---
 
@@ -239,6 +238,6 @@ Each top-level view module exports module-level `Toggle()` / `Open()` / `Close()
 - **Don't store UI references in the model.** The model must be constructable with no UI present (and is — see the model singleton's hot-reload hook, which rebuilds without touching the view tree).
 - **Don't write to the model from a view.** Views call into the controller; the controller writes.
 - **Don't call `SessionSendChatMessage` or `gamemain.RegisterChatFunc` from anywhere but `ChatController`.** Network and sim-side traffic is funnelled through that file precisely so legacy/notify/script paths don't fork.
-- **Don't mutate `model.History` (or any LazyVar's table) in place.** Build a new table and `Set` it; otherwise dependents never go dirty. See [`/lua/ui/AGENTS.md § 2 Reactivity rules`](../../AGENTS.md).
+- **Don't mutate `model.History` (or any LazyVar's table) in place.** Build a new table and `Set` it; otherwise dependents never go dirty. See [`ui.md § 2 Reactivity rules`](ui.md).
 - **Don't replicate the autolobby's drilling pattern.** State is on the model; views import and subscribe — no parent needs to push updates into children.
-- **Don't add a slash command by editing the registry directly.** Drop a file in [`commands/builtin/`](commands/builtin/) and add one `Registry.RegisterFromPath` line in `ChatController.RegisterBuiltinCommands` — see the [`add-chat-command`](../../../../.claude/skills/add-chat-command/SKILL.md) skill.
+- **Don't add a slash command by editing the registry directly.** Drop a file in [`commands/builtin/`](../lua/ui/game/chat/commands/builtin/) and add one `Registry.RegisterFromPath` line in `ChatController.RegisterBuiltinCommands` — see the [`add-chat-command`](../.claude/skills/add-chat-command/SKILL.md) skill.

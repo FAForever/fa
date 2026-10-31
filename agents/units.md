@@ -6,7 +6,7 @@ Unit blueprints and unit scripts. Read the root [AGENTS.md](../AGENTS.md) first:
 
 - `units/<ID>/<ID>_unit.bp`: the unit blueprint. The unit ID is the lowercased file name without `_unit.bp` (`SetShortId` in [Blueprints.lua](../lua/system/Blueprints.lua)).
 - `units/<ID>/<ID>_script.lua`: the unit class.
-- Meshes, animations and textures are here only when FAF adds or changes them. The rest come from the mounted `units.scd` archive (see root [Gotchas](../AGENTS.md#gotchas)).
+- Meshes, animations and textures are in the unit folder only when FAF adds or changes them. The rest come from the mounted `units.scd` archive (see root [Gotchas](../AGENTS.md#gotchas)).
 - Folder names are uppercase, and some file names vary in case (`XRL0302_Script.lua`). The engine's filesystem is case-insensitive.
 
 ## Unit IDs
@@ -63,11 +63,11 @@ TypeClass = URL0107
 
 - Inherit from the faction class libraries: `terranunits.lua`, `aeonunits.lua`, `cybranunits.lua`, `seraphimunits.lua` (or [defaultunits.lua](../lua/defaultunits.lua)), with weapons from the matching `*weapons.lua`.
 - Keys of `Weapons` are blueprint weapon `Label`s. A blueprint weapon without a matching entry uses the base `Weapon` class (`GetWeaponClass` in [Unit.lua](../lua/sim/Unit.lua)).
-- [UAB1103_script.lua](UAB1103/UAB1103_script.lua) shows the current style: cached fields and upvalued engine functions ([performance.md](../performance.md)).
+- [UAB1103_script.lua](../units/UAB1103/UAB1103_script.lua) shows the current style: cached fields and upvalued engine functions ([performance.md](performance.md)).
 
 ## Balance and fix changes
 
-A blueprint or script change can be a balance change, a bug fix, or both. A fix that changes gameplay noticeably (for example, how shields repair) gets a changelog snippet in both the `balance` and `fix` sections, so competitive players see it ([Branches, PRs, changelog](../AGENTS.md#branches-prs-changelog)). Put behavior shared by several units on their lowest common class ([lua/sim/AGENTS.md](../lua/sim/AGENTS.md#class-chains)).
+A blueprint or script change can be a balance change, a bug fix, or both. A fix that changes gameplay noticeably (for example, how shields repair) gets a changelog snippet in both the `balance` and `fix` sections, so competitive players see it ([Branches, PRs, changelog](../AGENTS.md#branches-prs-changelog)). Put behavior shared by several units on their lowest common class ([sim.md](sim.md#class-chains)).
 
 ## Tests
 

@@ -1,4 +1,4 @@
-"""Generates units/unit-names.md, a table of unit IDs and names, from units/*/*_unit.bp.
+"""Generates agents/unit-names.md, a table of unit IDs and names, from units/*/*_unit.bp.
 
 Run from the repository root: python scripts/generate-unit-names.py
 """
@@ -7,7 +7,7 @@ import pathlib
 import re
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-OUTPUT = ROOT / "units" / "unit-names.md"
+OUTPUT = ROOT / "agents" / "unit-names.md"
 
 TECH = {
     "TECH1": "T1",

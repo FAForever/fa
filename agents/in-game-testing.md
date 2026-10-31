@@ -64,7 +64,7 @@ Leave out who tested; the PR comment already shows that.
 
 Snippets can do more than spawn units. Use them to set up state, run the test and log the result, so the tester compares numbers instead of judging by eye:
 
-- Console commands from [lua/keymap/debugKeyActions.lua](lua/keymap/debugKeyActions.lua) can go in a snippet with `ConExecute`, e.g. `dbg Collision` to draw hitboxes, `dbg weapons` for weapon ranges and `Nodamage`. `wld_RunWithTheWind 1` runs the sim as fast as possible for long tests, and `0` turns it off.
+- Console commands from [lua/keymap/debugKeyActions.lua](../lua/keymap/debugKeyActions.lua) can go in a snippet with `ConExecute`, e.g. `dbg Collision` to draw hitboxes, `dbg weapons` for weapon ranges and `Nodamage`. `wld_RunWithTheWind 1` runs the sim as fast as possible for long tests, and `0` turns it off.
 - A test that waits for an outcome runs entirely in the sim: spawn the units, set them up, speed up the sim, and fork a thread that waits for the outcome, logs it and cleans up. Template, with the test-specific parts as comments:
 
   ```lua
@@ -111,7 +111,7 @@ Tests of an army's stored resources, income, trend or storage ([#7374](https://g
 
 ## Testing in live games
 
-FAForever organization members can deploy a branch to the `FAF Beta Balance` or `FAF Develop` game types without merging it. They force-push it to `staging/fafbeta` or `staging/fafdevelop`, then run the matching deploy workflow ([deploy-fafbeta.yaml](.github/workflows/deploy-fafbeta.yaml), [deploy-fafdevelop.yaml](.github/workflows/deploy-fafdevelop.yaml)). The staging branches are reset from `develop` on a schedule, so the deploy is temporary. Force-pushing shared branches is outward-facing: only do it when the user explicitly asks. See [docs/deployment.md](docs/deployment.md).
+FAForever organization members can deploy a branch to the `FAF Beta Balance` or `FAF Develop` game types without merging it. They force-push it to `staging/fafbeta` or `staging/fafdevelop`, then run the matching deploy workflow ([deploy-fafbeta.yaml](../.github/workflows/deploy-fafbeta.yaml), [deploy-fafdevelop.yaml](../.github/workflows/deploy-fafdevelop.yaml)). The staging branches are reset from `develop` on a schedule, so the deploy is temporary. Force-pushing shared branches is outward-facing: only do it when the user explicitly asks. See [docs/deployment.md](../docs/deployment.md).
 
 ## Variants by change type
 
@@ -121,8 +121,8 @@ Most PRs fit one of these. A PR that spans several uses the steps of each.
 - **Bug fix:** the first step reproduces the bug on `develop` with exact steps, and the next step runs the same steps on the branch. Then regression checks. Leave out UI checks unless the fix changes the UI.
 - **Balance and blueprint values:** expected results are numbers worked out from the change (damage per second, time to kill, range, build time). Measure them with a snippet that logs them, and compare them with `develop`. Skip the log check for value-only changes.
 - **Performance:** only test performance when the changed code does many table operations or engine calls relative to how often it runs (every frame, every tick, for every unit). Judge that from how much similar code nearby avoids those operations (cached upvalues, preallocated tables). Time the code in a test commit, on `develop` and on the branch, and give both numbers.
-- **Lobby and menus:** there are no units and no sim, so spawns and `SimLua` snippets don't apply; the steps are UI actions. Behavior between players needs several instances from [scripts/LaunchFAInstances.ps1](scripts/LaunchFAInstances.ps1).
-- **UI that feeds the sim:** when UI code decides what gets sent to the sim (sim callbacks, orders built from local UI state), test with a host and a client from [scripts/LaunchFAInstances.ps1](scripts/LaunchFAInstances.ps1): do the action on one instance and check that the game doesn't desync. Other changes don't need this.
+- **Lobby and menus:** there are no units and no sim, so spawns and `SimLua` snippets don't apply; the steps are UI actions. Behavior between players needs several instances from [scripts/LaunchFAInstances.ps1](../scripts/LaunchFAInstances.ps1).
+- **UI that feeds the sim:** when UI code decides what gets sent to the sim (sim callbacks, orders built from local UI state), test with a host and a client from [scripts/LaunchFAInstances.ps1](../scripts/LaunchFAInstances.ps1): do the action on one instance and check that the game doesn't desync. Other changes don't need this.
 
 ## After testing
 
