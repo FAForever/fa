@@ -166,6 +166,7 @@ Every public function on `ChatController` either reads input, writes the model, 
 | `AppendEntry(entry)` | Append to `model.History` + stamp activity |
 | `AppendLocalSystemMessage(text)` | Synthesize a local-only system line (used by command errors) |
 | `Send(text, attachCamera?)` | Slash dispatch / taunt / network send pipeline |
+| `SendThroughSim(msg)` | Stamp the dedupe `Id`, record the message for replay parsers, and relay it via `Sync.ChatMessages` (also used by Notify) |
 | `ActivateChat(modifiers?)` | Engine hotkey entry: open window with default recipient layered with Shift |
 | `RegisterBuiltinCommands` | Re-runs the registry population; idempotent and safe under hot reload |
 | `Init` | Registers `OnReceive` with gamemain, populates the registry, ensures the chat tree is mounted |
