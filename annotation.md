@@ -7,7 +7,7 @@ All future contributions should be properly annotated. With it [our Lua extensio
 In general the following conventions apply:
 
 - All comments should be in the declarative mood
-- All comments should be as extensive as required, but not needlessly descriptive. They should atleast define the default value (if applicable)
+- The description of an optional parameter states its default value
 - All functions should at least be annotated with `@param` for parameters, `@return` for return values, `@see` for similar alternatives (if applicable) and `@deprecated` if a better alternative exists
 - All annotations with `@param` and `@return` require their type to be defined
 - The annotation order is the description and then: `@deprecation`, `@see`, `@param` and at last `@return` if they are applicable
@@ -26,7 +26,7 @@ Comments say what a reader can't get from the code in a few seconds. Write them 
 ### Rules
 
 1. Every function and class gets typed `@param`, `@return` and `---@field` annotations. Its `---` description can be left out when it would only repeat the name.
-2. The `---` description is what the language server shows on hover. It says what the function does and what a caller needs to know. Rationale and implementation details go in the body, at the top, before any logic.
+2. The `---` description is what the language server shows on hover. It says what the function does and what a caller needs to know. Rationale and implementation details go in the body, at the top, before any logic. For a module-level value, they go in a `--` comment above it.
 3. Comments are declarative. State the fact, not the reasoning around the fact.
 4. Use exact identifiers (`CAPTURABLE`, not "capturable units") and common words, not new terms.
 5. Put a fact where it applies: engine behavior in the `engine/` stub, Lua behavior in the Lua file. Repeating a fact in a `---` description is fine when the hover needs it.
@@ -35,9 +35,9 @@ Comments say what a reader can't get from the code in a few seconds. Write them 
 ### Leave out
 
 - What the name or the code already says.
-- Lists of callers ("Used by the receive path and..."). They go out of date.
+- Lists of callers in the repo ("Used by the receive path and..."). They go out of date.
 - The history of the change ("now", "instead of", "no longer", "previously"). That goes in the commit message.
-- Section banners (`--------` lines with a heading).
+- Section banners (`--------` lines with a heading). `--#region` markers are fine: editors fold them.
 - Standard Lua behavior, and rules the guides already state.
 - What the type in `@param` or `@return` already says.
 - Numbers that the code or a benchmark result already holds. State the comparison, as a multiple.
@@ -46,6 +46,7 @@ Comments say what a reader can't get from the code in a few seconds. Write them 
 
 - Engine behavior, and mistakes that are easy to make.
 - Why a non-obvious construct exists, such as an unrolled loop or an intentional space in a string.
+- Entry points called by the engine, a hook or a keymap action, such as a `RegisterChatFunc` handler. The code doesn't show who calls them.
 - Hooks and behavior in other files that the code doesn't show.
 - When to use an optional parameter.
 - `@see` links between functions that send and receive the same data, so a reader can jump over the engine.

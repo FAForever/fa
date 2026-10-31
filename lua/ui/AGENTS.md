@@ -8,7 +8,7 @@ The patterns described here came out of refactoring the in-game chat in 2026. So
 
 ## 1. Class Construction — `__init` vs `__post_init`
 
-Every UI class built with `ClassUI(...)` has two construction hooks. The factory in [class.lua:582-589](../system/class.lua#L582-L589) calls them in order, with the same arguments, on a freshly metatabled instance. **Both run before the constructor returns**, so callers see a fully initialized control either way — the split exists for ordering inside the class.
+Every UI class built with `ClassUI(...)` has two construction hooks. The class factory (`__call` in [class.lua](../system/class.lua)) calls them in order, with the same arguments, on a freshly metatabled instance. **Both run before the constructor returns**, so callers see a fully initialized control either way — the split exists for ordering inside the class.
 
 | Hook | Purpose |
 |------|---------|
@@ -17,7 +17,7 @@ Every UI class built with `ClassUI(...)` has two construction hooks. The factory
 
 ### Why the split exists
 
-MAUI controls don't have concrete pixel positions — `Left`, `Right`, `Top`, `Bottom`, `Width`, `Height` are LazyVars whose compute functions reference each other (see `Control.ResetLayout` in [control.lua:35-42](../maui/control.lua#L35-L42)). Reading any one of them runs the chain. If a child has no anchor against a parent yet, that chain is **circular**, so calling `child.Width()` returns 0 (or worse, errors).
+MAUI controls don't have concrete pixel positions — `Left`, `Right`, `Top`, `Bottom`, `Width`, `Height` are LazyVars whose compute functions reference each other (see `Control.ResetLayout` in [control.lua](../maui/control.lua)). Reading any one of them runs the chain. If a child has no anchor against a parent yet, that chain is **circular**, so calling `child.Width()` returns 0 (or worse, errors).
 
 In `__init`, the parent hasn't been anchored against *its* parent yet either. So:
 
@@ -68,7 +68,7 @@ local MyPanel = ClassUI(Group) {
 
 ### Three-phase init: when even `__post_init` is too early
 
-If a control's layout depends on the **parent** sizing it (e.g. building a fixed-count pool from a `Height()` evaluation), `__post_init` still fires before the parent has laid the child out. The fix is a public `Initialize()` (or similarly named) method the parent calls *after* anchoring. Real example in [game/chat/ChatLinesInterface.lua:180-191](game/chat/ChatLinesInterface.lua#L180-L191): the pool's `OptionsObserver` is wired in `Initialize`, not `__post_init`, because its first fire reads `Pool.Height()`.
+If a control's layout depends on the **parent** sizing it (e.g. building a fixed-count pool from a `Height()` evaluation), `__post_init` still fires before the parent has laid the child out. The fix is a public `Initialize()` (or similarly named) method the parent calls *after* anchoring. Real example in `Initialize` and `RebuildPool` of [ChatLinesInterface.lua](game/chat/ChatLinesInterface.lua): the pool's `OptionsObserver` is wired in `Initialize`, not `__post_init`, because its first fire reads `Pool.Height()`.
 
 Reach for this only when needed — most controls are happy with the two-phase split.
 
@@ -76,7 +76,7 @@ Reach for this only when needed — most controls are happy with the two-phase s
 
 - **Always call the parent class's `__init` first** in your own `__init`. It creates the C-side control; without it nothing else works.
 - **Never read concrete layout values (`child.Width()`, `Height()`, …) in `__init`.** They return zero or trip the circular-evaluation guard. Defer to `__post_init` or a later method.
-- **Never apply layout in `__init`.** The exception is when something downstream forces an early read — e.g. `SetupEditStd` reads bounds before `__post_init` runs. In that case, set placeholder values in `__init` and replace them in `__post_init`. See [game/chat/ChatEditInterface.lua:108-113](game/chat/ChatEditInterface.lua#L108-L113).
+- **Never apply layout in `__init`.** The exception is when something downstream forces an early read — e.g. `SetupEditStd` reads bounds before `__post_init` runs. In that case, set placeholder values in `__init` and replace them in `__post_init`. See `__init` in [ChatEditInterface.lua](game/chat/ChatEditInterface.lua).
 - **Always declare every `self.X` field on the class.** Every field assigned in `__init` / `__post_init` gets a matching `---@field` immediately above `ClassUI(...)`. See [annotation.md](../../annotation.md) for the project-wide annotation conventions.
 
 ---
@@ -146,7 +146,7 @@ Reading the value into a local at the top of the handler is the convention even 
 
 Why this matters: an `OnFrame` poll runs every frame even when nothing changed; a LazyVar dependency only re-runs when an input is `Set`. With dozens of UI controls, the difference is real frame budget.
 
-When you do need `OnFrame`, remember it is gated by `SetNeedsFrameUpdate(true)` — controls don't tick by default. Toggle it with the visibility/enabled state of the work it drives so you don't pay for an idle timer (chat does this in [game/chat/ChatInterface.lua:140-145, 369-377](game/chat/ChatInterface.lua#L369-L377)).
+When you do need `OnFrame`, remember it is gated by `SetNeedsFrameUpdate(true)` — controls don't tick by default. Toggle it with the visibility/enabled state of the work it drives so you don't pay for an idle timer (chat does this in `WindowVisibleObserver` and `OnFrame` of [ChatInterface.lua](game/chat/ChatInterface.lua)).
 
 ### Reactivity rules at a glance
 
@@ -182,7 +182,7 @@ OnDestroy = function(self)
 end,
 ```
 
-`TrashBag` is a weak table for values, so an item already destroyed elsewhere drops out automatically — `Destroy()` should always be idempotent. See [trashbag.lua:30-50](../system/trashbag.lua#L1-L50) for the contract.
+`TrashBag` is a weak table for values, so an item already destroyed elsewhere drops out automatically — `Destroy()` should always be idempotent. See [trashbag.lua](../system/trashbag.lua) for the contract.
 
 ---
 
@@ -249,7 +249,7 @@ local WindowTextures = {
 }
 ```
 
-Real example: [game/chat/ChatInterface.lua:31-42](game/chat/ChatInterface.lua#L31-L42).
+Real example: `WindowTextures` in [ChatInterface.lua](game/chat/ChatInterface.lua).
 
 **Do not** use string paths or `UIFile` for skinnable assets. They freeze at module-load time, so the texture is whatever the skin was when the file was first imported — even if the user changes skin afterwards. Switching to `SkinnableFile` is usually a one-line fix.
 
@@ -347,7 +347,6 @@ Top-level UI modules (the ones invoked from a hotkey) can hook into the engine's
 
 ```lua
 
--------------------------------------------------------------------------------
 --#region Debugging
 
 --- Called by the module manager when this module is reloaded.
