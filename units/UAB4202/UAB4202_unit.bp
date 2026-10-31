@@ -52,8 +52,8 @@ UnitBlueprint{
             ShieldSize = 20,
             ShieldVerticalOffset = -3,
             RegenPerBuildRate = 2.30,
-            AssistCostEnergyPerBuildRate = 4.55,
-            AssistCostMassPerBuildRate = 0.379,
+            AssistCostEnergyPerBuildRate = 4.60,
+            AssistCostMassPerBuildRate = 0.380,
         },
     },
     Display = {
