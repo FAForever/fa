@@ -32,6 +32,7 @@ GPG-modified **LuaPlus 5.0**, not 5.1+. [Details](docs/development-start-here/lu
 - `{&h &a}` pre-allocates hash and array slots ([performance.md](performance.md#allocations)).
 - **Indexing `nil` returns `nil`.** `t.a.b` is `nil` when `t.a` is missing, and the repo relies on this. Don't add `and` guards or treat such chains as bugs. Calling `nil` and `t[nil] = v` still error.
 - `io` and `os` exist only in the init context. No `require` or C modules.
+- A thread can't yield inside `pcall` or a metamethod. `WaitSeconds` and the other waits there fail with "attempt to yield across metamethod/C-call boundary". Wait outside the `pcall`.
 
 ### Runtime changes to Lua behavior
 
@@ -77,8 +78,8 @@ Large games run thousands of units, and UI code often runs every frame. Upvalue 
 
 ## Code style
 
-- Annotate everything new ([annotation.md](annotation.md)): a `---` description, typed `@param`/`@return`, `---@field` for every class field.
-- Comments: declarative, succinct, no period at the end, no em-dashes.
+- Annotate everything new ([annotation.md](annotation.md)): typed `@param`/`@return`, `---@field` for every class field, and a `---` description unless it would only repeat the name.
+- Comments only say what the code doesn't show: engine behavior, non-obvious reasons, easy mistakes, hooks. Don't repeat names or code, list callers, or describe the change. Keep them short and declarative, with no period at the end and no em-dashes. Before finishing, reread your comments and cut them ([details](annotation.md#comment-style)).
 - 4-space indentation. Match the surrounding code, and don't reformat code you aren't changing.
 
 ## Testing and verification
@@ -99,7 +100,7 @@ Real verification means running the game ([setup](docs/development/setup.md)): c
 
 - PRs target **`develop`**. Commit subjects: imperative, under 80 characters, no trailing period.
 - Keep refactors and each functional change in separate commits or PRs, and propose commits to the user that way.
-- Every PR needs `changelog/snippets/<category>.<PR number>.md`, written for players. Categories: `graphics`, `ai`, `performance`, `balance`, `features`, `fix`, `other` ([details](docs/development-changelog.md)).
+- Every PR needs `changelog/snippets/<category>.<PR number>.md`, written for players. Categories: `graphics`, `ai`, `performance`, `balance`, `features`, `fix`, `other` ([details](docs/development-changelog.md)). Snippets reference only PR numbers. Link issues in the PR description with a closing keyword (`Fixes #1234`).
 - Balance changes need balance team sign-off, and features need discussion first ([CONTRIBUTING.md](CONTRIBUTING.md)).
 - Force-pushing shared branches, including the `staging/*` test deploys ([in-game-testing.md](in-game-testing.md#testing-in-live-games)), only when the user asks.
 
