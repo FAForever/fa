@@ -3,15 +3,15 @@ Stationary Shields
 {% endunit %}
 Make shield assist consistent across stationary shields. Assisting a shield used to cost 75% of the shield's build cost rate, so the cost of restoring shield HP came from unrelated buildtime and cost values, ranging from 0.165 to 0.304 mass per HP. Shield HP restored per build power also varied a lot, from 0.75 for ED1 to 2.8 for the Seraphim T3 shield.
 
-Stationary shields now have dedicated assist costs per HP restored, with separate values for T2 and T3 shields. Within each tier, costs are within 10% of each other: Aeon and Seraphim shields are the cheapest to assist and Cybran shields are the most expensive, as before. ED1-ED3 use T2 values, ED5 uses T3 values, and ED4 sits between them, closer to T3. Shield HP restored per build power is now between 2.5 and 2.8: Seraphim 2.8, Aeon 2.7, UEF 2.6, Cybran 2.5 (#7365).
+Stationary shields now have dedicated assist costs per HP restored, with separate values for T2 and T3 shields. Within each tier, costs are within 10% of each other: Aeon and Seraphim shields are the cheapest to assist and Cybran shields are the most expensive, as before. ED1-ED3 use T2 values, ED5 uses T3 values, and ED4 sits between them, closer to T3. Shield HP restored per build power is now between 2.5 and 2.8, with T2 shields 0.2 lower than T3 shields as before. T3 shields: Seraphim 2.8, Aeon 2.77, UEF 2.73, Cybran 2.7. T2 shields: Seraphim 2.6, Aeon 2.57, UEF 2.53, Cybran 2.5. ED4 restores 2.65 (#7365).
 - Aeon T2 Shield:
-  - Shield HP restored per build power: 2.3 -> 2.7
+  - Shield HP restored per build power: 2.3 -> 2.57
   - Assist cost per HP: 0.165 M, 1.98 E -> 0.165 M, 1.80 E
 - Seraphim T2 Shield:
-  - Shield HP restored per build power: 2.55 -> 2.8
+  - Shield HP restored per build power: 2.55 -> 2.6
   - Assist cost per HP: 0.165 M, 1.65 E -> 0.165 M, 1.80 E
 - UEF T2 Shield:
-  - Shield HP restored per build power: 2.0 -> 2.6
+  - Shield HP restored per build power: 2.0 -> 2.53
   - Assist cost per HP: 0.196 M, 1.96 E -> 0.173 M, 1.89 E
 - ED1:
   - Shield HP restored per build power: 0.75 -> 2.5
@@ -23,18 +23,18 @@ Stationary shields now have dedicated assist costs per HP restored, with separat
   - Shield HP restored per build power: 1.87 -> 2.5
   - Assist cost per HP: 0.230 M, 3.10 E -> 0.180 M, 1.96 E
 - ED4:
-  - Shield HP restored per build power: 2.17 -> 2.5
+  - Shield HP restored per build power: 2.17 -> 2.65
   - Assist cost per HP: 0.242 M, 4.04 E -> 0.184 M, 2.94 E
 - Aeon T3 Shield:
-  - Shield HP restored per build power: 2.5 -> 2.7
+  - Shield HP restored per build power: 2.5 -> 2.77
   - Assist cost per HP: 0.176 M, 3.22 E -> 0.170 M, 3.00 E
 - Seraphim T3 Shield:
   - Assist cost per HP: 0.166 M, 2.77 E -> 0.170 M, 3.00 E
 - UEF T3 Shield:
-  - Shield HP restored per build power: 2.18 -> 2.6
+  - Shield HP restored per build power: 2.18 -> 2.73
   - Assist cost per HP: 0.227 M, 3.78 E -> 0.178 M, 3.15 E
 - ED5:
-  - Shield HP restored per build power: 2.33 -> 2.5
+  - Shield HP restored per build power: 2.33 -> 2.7
   - Assist cost per HP: 0.193 M, 3.06 E -> 0.185 M, 3.27 E
 
 {% unit URB4207 %}
