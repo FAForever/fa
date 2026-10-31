@@ -731,6 +731,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             self.WeaponAimIsEnabled = false
             self:AimManipulatorSetEnabled(false)
         end
+
+        self:SetWeaponBusy(self.WeaponWantBusy)
     end,
 
     -- Weapon States
@@ -828,6 +830,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
+        WeaponWantBusy = true,
 
         ---@param self DefaultProjectileWeapon_RackSalvoChargeState
         Main = function(self)
@@ -951,6 +954,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
+        WeaponWantBusy = true,
 
         -- Render the fire recharge bar
         ---@param self DefaultProjectileWeapon_RackSalvoFiringState
@@ -1238,6 +1242,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
+        WeaponWantBusy = true,
 
         ---@param self DefaultProjectileWeapon_RackSalvoReloadState
         Main = function(self)
@@ -1297,6 +1302,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         WeaponWantEnabled = false,
         WeaponAimWantEnabled = false,
+        WeaponWantBusy = true,
 
         ---@param self DefaultProjectileWeapon_WeaponUnpackingState
         Main = function(self)
@@ -1330,6 +1336,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
+        WeaponWantBusy = true,
 
         ---@param self DefaultProjectileWeapon_WeaponPackingState
         Main = function(self)

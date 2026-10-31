@@ -36,8 +36,10 @@ UEB4302 = ClassUnit(TStructureUnit) {
                     
                     self:ForkThread(function()
                         self.unit:SetBusy(true)
+                        self:SetWeaponBusy(true)
                         WaitSeconds(1/self.unit:GetBlueprint().Weapon[1].RateOfFire + .2)
                         self.unit:SetBusy(false)
+                        self:SetWeaponBusy(false)
                     end)
                 end,
             },    

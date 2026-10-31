@@ -1,0 +1,1 @@
+- Multi-weapon units no longer have random rate of fire drops on their weapons (#7363, [FA-Binary-Patches#179](https://github.com/FAForever/FA-Binary-Patches/pull/179)).
