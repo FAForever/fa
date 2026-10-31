@@ -58,7 +58,7 @@ local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 --- (or `nil` if none, due to `lessThan`).
 --- If `name` is supplied, then the callback is called with TriggerManager and the name as arguments
 --- before the triggering unit / group.
----@see CreateMutlipleAreaTrigger() to pass in multiple areas
+---@see CreateMultipleAreaTrigger # To pass in multiple areas
 ---@param callback NamedAreaTriggerCallback | AreaTriggerCallback
 ---@param area AreaName | Rectangle
 ---@param category EntityCategory
@@ -75,7 +75,7 @@ end
 
 --- Same as `CreateAreaTrigger` except you supply the function with a table of areas for if
 --- you have an odd shaped area as an area trigger
----@see CreateAreaTrigger() to pass in a single area and information regarding arguments
+---@see CreateAreaTrigger # To pass in a single area and information regarding arguments
 ---@param callback NamedAreaTriggerCallback | AreaTriggerCallback
 ---@param areas (AreaName | Rectangle)[]
 ---@param category EntityCategory

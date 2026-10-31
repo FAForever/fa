@@ -126,7 +126,7 @@ end
 
 --- Gets all units in a sphere that have a different army from a given unit. Note that, despite the
 --- name, this also includes ally and civilian units.
----@see GetTrueEnemyUnitsInSphere(unit, position, radius, categories) # to truly only get enemy units
+---@see GetTrueEnemyUnitsInSphere # To truly only get enemy units
 ---@param unit Unit
 ---@param position Vector
 ---@param radius number
@@ -196,7 +196,7 @@ function GetTrueEnemyUnitsInSphere(allyUnit, position, radius, categories)
     return unitsInRadius
 end
 
----@see GetDistanceBetweenTwoPoints2(x1, z1, x2, z2) # for a 2D option
+---@see GetDistanceBetweenTwoPoints2 # For a 2D option
 ---@param x1 number
 ---@param y1 number
 ---@param z1 number
@@ -211,8 +211,8 @@ function GetDistanceBetweenTwoPoints(x1, y1, z1, x2, y2, z2)
     return MathSqrt(dx*dx + dy*dy + dz*dz)
 end
 
----@see GetDistanceBetweenTwoPoints(x1, y1, z1, x2, y2, z2) # for a 3D option
----@see XZDistanceTwoVectors(v1, v2) # for a vector option
+---@see GetDistanceBetweenTwoPoints # For a 3D option
+---@see XZDistanceTwoVectors # For a vector option
 ---@param x1 number
 ---@param z1 number
 ---@param x2 number
@@ -227,7 +227,7 @@ end
 GetDistanceBetweenTwoVectors = VDist3
 
 --- Returns the squared distance between two vectors
----@see XZDistanceTwoVectorsSquared(v1, v2) # for horizontal distance option
+---@see XZDistanceTwoVectorsSquared # For horizontal distance option
 ---@param v1 Vector
 ---@param v2 Vector
 function GetDistanceBetweenTwoVectorsSquared(v1, v2)
@@ -246,7 +246,7 @@ function XZDistanceTwoVectors(v1, v2)
 end
 
 --- Returns the horizontal distance between two vectors without considering the y-axis
----@see GetDistanceBetweenTwoVectorsSquared(v1, v2) # for 3D option
+---@see GetDistanceBetweenTwoVectorsSquared # For 3D option
 ---@param v1 Vector
 ---@param v2 Vector
 ---@return number
@@ -281,7 +281,7 @@ end
 GetDifferenceVector = VDiff
 
 --- Gets the direction vector from `v1` to `v2`
----@see GetScaledDirectionVector(v1, v2, len) # for a vector given length
+---@see GetScaledDirectionVector # For a vector given length
 ---@param v1 Vector
 ---@param v2 Vector
 ---@return Vector
@@ -290,7 +290,7 @@ function GetDirectionVector(v1, v2)
 end
 
 --- Gets the vector `v1` to `v2` with a certain length
----@see GetDirectionVector(v1, v2) # for unit length
+---@see GetDirectionVector # For unit length
 ---@param v1 Vector
 ---@param v2 Vector
 ---@param len number
@@ -336,7 +336,7 @@ end
 
 --- Returns a random offset given bounds where the X and Z components are in the range
 --- `[-1.5*v, 0.5*v)`, and Y is in `[-v, v)`. Everything is multiplied by the scalar.
----@see GetRandomOffset(sx, sy, sz, scalar) # for a size version
+---@see GetRandomOffset # For a size version
 ---@param sx number
 ---@param sy number
 ---@param sz number
@@ -435,7 +435,7 @@ function GetAngleCCW(base, direction)
     return (180 / math.pi) * rads
 end
 
---- adds a string to `Sync.UserConRequests`
+--- Queues a console command for the UI to issue on the next beat.
 ---@param string string
 function UserConRequest(string)
     if not Sync.UserConRequests then

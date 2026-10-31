@@ -89,7 +89,7 @@ local PositionCache = { 0, 0, 0 }
 VisionMarkerOpti = Class(Entity) {
 
     --- Update all intel types
-    ---@see VisionMarkerOpti.UpdateIntel if you intend to apply only one intel type
+    ---@see VisionMarkerOpti.UpdateIntel # If you intend to apply only one intel type
     ---@param self VisionMarkerOpti
     ---@param lifetime number?      # Duration of the intel, if set to -1 it lasts indefinitely
     ---@param army Army             # Army that we're creating intel for

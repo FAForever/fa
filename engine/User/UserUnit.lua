@@ -273,6 +273,17 @@ end
 function UserUnit:IsStunned()
 end
 
+--- Sends a setting change for this unit to the sim
+---@see moho.unit_methods.OnAutoModeOn # Called in the sim for `SetAutoMode` when `value` is true
+---@see moho.unit_methods.OnAutoModeOff # Called in the sim for `SetAutoMode` when `value` is false
+---@see moho.unit_methods.OnPaused # Called in the sim for `SetPaused` when `value` is true
+---@see moho.unit_methods.OnUnpaused # Called in the sim for `SetPaused` when `value` is false
+---@see moho.unit_methods.OnStartRepeatQueue # Called in the sim for `SetRepeatQueue` when `value` is true
+---@see moho.unit_methods.OnStopRepeatQueue # Called in the sim for `SetRepeatQueue` when `value` is false
+---@see moho.unit_methods.OnScriptBitSet # Called in the sim for `ToggleScriptBit` when the bit turns on
+---@see moho.unit_methods.OnScriptBitClear # Called in the sim for `ToggleScriptBit` when the bit turns off
+---@see moho.aibrain_methods.OnPlayNoStagingPlatformsVO # Called in the sim for `PlayNoStagingPlatformsVO`
+---@see moho.aibrain_methods.OnPlayBusyStagingPlatformsVO # Called in the sim for `PlayBusyStagingPlatformsVO`
 ---@param command 'SetAutoMode' | 'SetFireState' | 'SetAutoSurfaceMode' | 'SetRepeatQueue' | 'SetPaused' | 'CustomName' | 'ToggleScriptBit' | 'PlayNoStagingPlatformsVO' | 'PlayBusyStagingPlatformsVO' 
 ---@param value boolean | string
 function UserUnit:ProcessInfo(command, value)

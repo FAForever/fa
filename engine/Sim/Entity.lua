@@ -10,6 +10,18 @@ local Entity = {}
 ---@field Min Vector
 
 
+--- Applies an impulse to the entity's physics body, like `AddWorldImpulse`, but with the impulse and the point in the
+--- entity's own frame
+---@see moho.entity_methods.AddWorldImpulse # World space variant, and what reads the physics body
+---@param Ix number
+---@param Iy number
+---@param Iz number
+---@param Px number
+---@param Py number
+---@param Pz number
+function Entity:AddLocalImpulse(Ix, Iy, Iz, Px, Py, Pz)
+end
+
 --- Attaches a manual scroller to an entity, animating the bottom sections of its textures.
 --- Only one texture scroller may be active at a time (the others being a tread scroller or
 --- ping-ping scroller).
@@ -45,7 +57,17 @@ end
 function Entity:AddThreadScroller(sideDist, scrollMult)
 end
 
----@unknown
+--- Applies the impulse `I` at the point `P`, both in world space, to the entity's physics body. Adds `I` divided by the
+--- mass to the body's velocity, and the cross product of the offset from the body's center to `P` with `I` to its angular
+--- momentum, so a point off the center also spins the body.
+--- Only mobile units have a physics body, so this does nothing on structures, props, projectiles and plain Lua entities.
+--- Flying air units read the body's velocity and spin, so the impulse pushes and spins them until their flight control
+--- corrects it. A falling unit reads only the spin, and only while it has a random spin from `MetaImpact`. Other units
+--- ignore the body.
+--- A unit's mass is `AverageDensity` times `SizeX`, `SizeY` and `SizeZ`, and FAF sets `AverageDensity` to `MaxHealth`,
+--- so scale the impulse by the mass
+---@see moho.entity_methods.AddLocalImpulse # Impulse and point in the entity's own frame
+---@see MetaImpact # Knocks units into the air
 ---@param Ix number
 ---@param Iy number
 ---@param Iz number
@@ -61,7 +83,9 @@ end
 function Entity:AdjustHealth(instigator, delta)
 end
 
---- Attaches this entity to another entity, matching the bone position of `selfBone` and `bone`
+--- Attaches this entity to another entity, matching the bone position of `selfBone` and `bone`.
+--- The parent must keep ticking, as for `AttachTo`
+---@see moho.entity_methods.AttachTo # How an attached entity follows its parent
 ---@param selfbone Bone
 ---@param entity moho.entity_methods
 ---@param bone Bone
@@ -77,15 +101,21 @@ end
 function Entity:AttachBoneToEntityBone(selfBone, other, otherBone, flag)
 end
 
---- Attaches this entity to another entity at a bone position on it
+--- Attaches this entity to another entity at a bone position on it.
+--- The attached entity follows the parent one tick behind, and waits each tick until the parent has ticked. A parent that
+--- isn't attached and has no motor, such as a new Lua `Entity`, stops ticking after its first tick, and the attached entity
+--- stops updating with it. Give such a parent a motor with `FallDown` to keep it ticking
+---@see moho.entity_methods.FallDown # Keeps a plain entity ticking
 ---@param entity moho.entity_methods
 ---@param bone Bone
 function Entity:AttachTo(entity, bone)
 end
 
 
---- Returns whether the engine-side C object of this entity has been destroyed
----@see IsDestroyed(entity) as an alternative
+--- Returns true once `Destroy()` has been called on the entity. Unlike other methods, it can still be
+--- called after the engine deletes the entity at the end of the tick
+---@see IsDestroyed # True only after the deletion, and accepts `nil`
+---@see moho.unit_methods.SetDead # Sets `Dead` at the end of the tick for units destroyed without `Kill`
 ---@return boolean
 function Entity:BeenDestroyed()
 end
@@ -129,7 +159,9 @@ end
 function Entity:DetachAll(bone, skipBallistic)
 end
 
---- Detaches all entities attached to this entity from it
+--- Detaches this entity from the entity it is attached to. Unless `skipBallistic` is true, a unit that can't fly then falls
+--- in the `Ballistic` motion state, with the velocity its attach point had over the last tick
+---@see moho.unit_methods.OnImpact # Called when a falling unit lands dead
 ---@param skipBallistic? boolean
 function Entity:DetachFrom(skipBallistic)
 end
@@ -151,7 +183,9 @@ function Entity:EnableIntel(type)
 end
 
 --- Creates a MotorFallDown object that can be used to whack the entity about.
---- Used for falling trees.
+--- Used for falling trees. Until it is whacked, it doesn't move the entity but keeps it ticking, which a plain Lua `Entity`
+--- needs to carry attached entities
+---@see moho.entity_methods.AttachTo # Why the parent must keep ticking
 ---@return moho.MotorFallDown
 function Entity:FallDown()
 end
@@ -212,7 +246,7 @@ function Entity:GetHeading()
 end
 
 --- Returns the amount of health this entity has
----@see entity.GetMaxHealth for the maximum possible health
+---@see moho.entity_methods.GetMaxHealth # For the maximum possible health
 ---@return number
 function Entity:GetHealth()
 end
@@ -228,7 +262,7 @@ end
 
 --- Returns the maximum amount of health this entity can have. Note that this may not be the same
 --- value as the original one in the entity's blueprint.
----@see entity.GetHealth for the current amount of health
+---@see moho.entity_methods.GetHealth # For the current amount of health
 ---@return number
 function Entity:GetMaxHealth()
 end
@@ -286,6 +320,9 @@ end
 function Entity:IsValidBone(bone, allowNil)
 end
 
+---@see moho.unit_methods.CheckCanBeKilled # Called first on units
+---@see moho.unit_methods.SetDead # Called before `OnKilled`
+---@see moho.unit_methods.OnKilled
 ---@overload fun()
 ---@param instigator Unit
 ---@param damageType DamageType
@@ -376,7 +413,7 @@ function Entity:SetMesh(meshBp, keepActor)
 end
 
 --- Defines the orientation of the entity
----@see entity:SetPosition(vector, immediate) for setting the position
+---@see moho.entity_methods.SetPosition # For setting the position
 ---@param orientation Quaternion
 ---@param immediately boolean
 function Entity:SetOrientation(orientation, immediately)
@@ -386,9 +423,12 @@ end
 function Entity:SetParentOffset(vector)
 end
 
----@see entity:SetOrientation(vector, immediate) for setting the orientation
+--- Sets the position of the entity. Without `immediate`, the position applies at the end of the tick, and the move becomes
+--- the entity's velocity, which units attached to it keep when detached. With `immediate`, it applies at once and leaves the
+--- velocity at zero
+---@see moho.entity_methods.SetOrientation # For setting the orientation
 ---@param vector Vector
----@param immediate? boolean
+---@param immediate boolean # Required, the engine errors without it
 function Entity:SetPosition(vector, immediate)
 end
 
@@ -433,5 +473,46 @@ end
 ---@param dy number
 function Entity:SinkAway(dy)
 end
+
+--- Called by the engine when an entity attached to this one is destroyed
+---@type nil | fun(self: Entity, attached: Entity)
+Entity.OnAttachedDestroyed = nil
+
+--- Called by the engine when an entity attached to this one is killed
+---@type nil | fun(self: Entity, attached: Entity)
+Entity.OnAttachedKilled = nil
+
+--- Called by the engine when a projectile is about to hit this entity. Return true to let the
+--- projectile collide with it. Without this callback, projectiles pass through
+---@type nil | fun(self: Entity, other: Projectile): boolean
+Entity.OnCollisionCheck = nil
+
+--- Called by the engine when the beam of a beam weapon passes through this entity. Return true to
+--- let the beam hit it. Without this callback, beams pass through
+---@type nil | fun(self: Entity, firingWeapon: Weapon): boolean
+Entity.OnCollisionCheckWeapon = nil
+
+--- Called by the engine when the entity takes damage from `Damage` or `DamageArea`, with the
+--- amount left after armor. Not called when that amount is 0. The engine does not change the
+--- entity's health itself
+---@type nil | fun(self: Entity, instigator: Unit | Projectile | Entity | nil, amount: number, vector: Vector, damageType: DamageType)
+Entity.OnDamage = nil
+
+--- Called by the engine when the health of the entity crosses a 25% threshold, with the new and the
+--- old threshold as fractions of its max health
+---@type nil | fun(self: Entity, new: 0 | 0.25 | 0.5 | 0.75 | 1, old: 0 | 0.25 | 0.5 | 0.75 | 1)
+Entity.OnHealthChanged = nil
+
+--- Called by the engine when the entity changes layer
+---@type nil | fun(self: Entity, new: Layer, old: Layer)
+Entity.OnLayerChange = nil
+
+--- Called by the engine when the entity this one is attached to is destroyed
+---@type nil | fun(self: Entity, parent: Entity)
+Entity.OnParentDestroyed = nil
+
+--- Called by the engine when the entity this one is attached to is killed
+---@type nil | fun(self: Entity, parent: Entity)
+Entity.OnParentKilled = nil
 
 return Entity
