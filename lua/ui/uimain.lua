@@ -165,14 +165,14 @@ function UpdateDisconnectDialog()
     module.Update()
 end
 
+---@param clientIndex number
+---@param newSpeed number
 function NoteGameSpeedChanged(clientIndex, newSpeed)
-    local clients = GetSessionClients()
-    local client = clients[clientIndex]
-    -- Note: this string has an Engine loc tag because it was
-    -- originally in the engine.  If we were not already past the loc
-    -- deadline, I'd change to to be some UI loc tag.  But we are, so
-    -- I'm not going to change it and risk the wrath of the producers.
-    print(LOCF("<LOC Engine0006>%s: adjusting game speed to %+d", client.name, newSpeed))
+    if (SessionGetLocalCommandSource()== clientIndex) then
+        SessionSendChatMessage(import('/lua/ui/game/clientutils.lua').GetAll(), {
+            ConsoleOutput = LOCF("<LOC Engine0006>%s: adjusting game speed to %+d", "", newSpeed),
+        })
+    end
     import("/lua/ui/game/score.lua").NoteGameSpeedChanged(newSpeed)
     import('/lua/ui/game/objectives2.lua').NoteGameSpeedChanged(newSpeed)
 end
@@ -294,6 +294,12 @@ end
 function DecreaseGameSpeed()
     if not WorldIsLoading() and (import("/lua/ui/game/gamemain.lua").supressExitDialog != true) then
         ConExecute('WLD_DecreaseSimRate')
+    end
+end
+
+function ResetGameSpeed()
+    if not WorldIsLoading() and (import("/lua/ui/game/gamemain.lua").supressExitDialog != true) then
+        ConExecute('WLD_ResetSimRate')
     end    
 end
 
