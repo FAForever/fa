@@ -25,7 +25,7 @@
 --- 
 --- Engine changes for this field:
 --- - Mobile surface units their footprint replaced by a footprint registered by `SpecFootprints`,
----   whose `OccupancyCaps` fits their `Physics.MotionType`, and whose size is the closest by the
+---   whose `Caps` fits their `Physics.MotionType`, and whose size is the closest by the
 ---   larger of the X and Z differences. Ties go to the footprint that was defined first.
 --- - Footprint `SizeX`/`SizeZ` defaults to the `ceil` of the entity's `SizeX`/`SizeZ`
 --- - Structures' footprints have `OccupancyCaps` replaced by their `Physics.BuildOnLayerCaps`
