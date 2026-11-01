@@ -5,6 +5,7 @@
 --- - It is only matched when `Footprint` resolves to ground caps
 --- - Without a match it copies the resolved `Footprint`
 --- - Without an `AltMotionType` it is the resolved `Footprint`
+---@see EntityBlueprint.Footprint
 ---@field AltFootprint? FootprintBlueprint
 --- unit average density in tons / m^3 (default is 0.49). Affects the behavior of units when they bump into each other. Units with more weight push units with less weight.
 ---@field AverageDensity? number
@@ -20,14 +21,15 @@
 ---@field CollisionShape CollisionShape
 --- the desired maximum number of shooters taking shots at the entity
 ---@field DesiredShooterCap number
---- Cells this entity occupies for pathfinding. Derived from the engine's `RUnitBlueprintPhysics::ComputeDerivedQuantities` (faf-re decompilation)
---- - Footprint specs are registered by `SpecFootprints` in `lua/footprints.lua`, which `lua/RuleInit.lua` runs before blueprints load
---- - A missing or 0 `SizeX`/`SizeZ` defaults to the `ceil` of the entity's `SizeX`/`SizeZ`
---- - A unit with `Physics.MaxSpeed` 0 is treated as a structure
---- - Structures keep their own footprint, except that `OccupancyCaps` is replaced by `Physics.BuildOnLayerCaps`
---- - Mobile units derive occupancy caps from `Physics.MotionType` and ignore `OccupancyCaps`. Ground units then use the spec with exactly those caps whose size is closest, by the larger of the X and Z differences. Ties go to the first spec in `footprints.lua`. The whole spec (size, `MaxSlope`, water depths, flags) replaces the footprint. Air units are not matched
---- - The skirt size is then raised to at least the footprint size
---- - Example: an amphibious ACU with `SizeX` 1.2 gets size 2, which ties between `Amphibious1x1` and `Amphibious3x3`, so it uses `Amphibious1x1`
+--- Cells this entity occupies for pathfinding.
+--- 
+--- Engine changes for this field:
+--- - Mobile surface units their footprint replaced by a footprint registered by `SpecFootprints`,
+---   whose `OccupancyCaps` fits their `Physics.MotionType`, and whose size is the closest by the
+---   larger of the X and Z differences. Ties go to the footprint that was defined first.
+--- - Footprint `SizeX`/`SizeZ` defaults to the `ceil` of the entity's `SizeX`/`SizeZ`
+--- - Structures' footprints have `OccupancyCaps` replaced by their `Physics.BuildOnLayerCaps`
+---   - A unit with `Physics.MaxSpeed` 0 is treated as a structure
 ---@field Footprint? FootprintBlueprint
 --- component X,X of inertia tensor
 ---@field InertiaTensorX number

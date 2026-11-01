@@ -472,7 +472,8 @@ end
 function Sound(sound)
 end
 
---- Defines the footprint specs for pathfinding. Only has an effect during rule init, where `lua/footprints.lua` calls it (from `lua/RuleInit.lua`)
+--- Defines the footprint specs for pathfinding. Only has an effect during rule init.
+---
 --- Specs with a duplicate `Name` are skipped with a warning
 ---@param specs FootprintSpec[]
 function SpecFootprints(specs)

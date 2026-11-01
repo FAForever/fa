@@ -1201,9 +1201,9 @@
 ---@field SkirtOffsetX number
 --- offset of top edge of skirt from left edge of footprint
 ---@field SkirtOffsetZ number
---- unit construction pad Size X for building
+--- unit construction pad Size X for building. Must be at least as large as the unit's footprint.
 ---@field SkirtSizeX number
---- unit construction pad Size Z for building
+--- unit construction pad Size Z for building. Must be at least as large as the unit's footprint.
 ---@field SkirtSizeZ number
 --- Stands upright regardless of terrain
 ---@field StandUpright boolean
