@@ -1,5 +1,6 @@
 require 'testutils.lua'
 
+---@type UnitBlueprint[]
 all_blueprints = {}
 current_filename = nil
 
@@ -35,10 +36,11 @@ end
 ---@see EntityBlueprint.Footprint # For engine behavior defining unit footprints
 
 all_footprints = {}
-for i,bp in all_blueprints do
-    if bp.Physics.MotionType!=nil and bp.Physics.MotionType!='RULEUMT_None' then
+for i, bp in all_blueprints do
+    if bp.Physics.MotionType != nil and bp.Physics.MotionType != 'RULEUMT_None' then
+        local largest = math.ceil(math.max(bp.Footprint.SizeX or bp.SizeX or 0, bp.Footprint.SizeZ or bp.SizeZ or 0))
         local x = math.ceil(math.max(bp.SizeX or 0, bp.SizeZ or 0))
-        local str = bp.Physics.MotionType .. string.format("%3d",x)
+        local str = bp.Physics.MotionType .. string.format("%3d", x)
         all_footprints[str] = 1
     end
 end
