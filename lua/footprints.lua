@@ -8,9 +8,9 @@ ORBIT = 0x20
 
 ---@class FootprintSpec : FootprintBlueprint
 ---@field Name string
----@field Caps integer
+---@field Caps FootprintLayerCap
 ---@field MaxWaterDepth? number
----@field Flags? number
+---@field Flags? FootprintFlag
 
 -- Flags
 IgnoreStructures = 0x01

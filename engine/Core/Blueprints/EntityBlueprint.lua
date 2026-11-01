@@ -96,10 +96,10 @@
 --- Pathfinding footprint of an entity. See `EntityBlueprint.Footprint` for how units resolve it
 --- Blueprints cannot set a maximum water depth. Only footprint specs (`FootprintSpec`) have one
 ---@class FootprintBlueprint
----@field Flags? integer # footprint flags. `0x01` is `IgnoreStructures` (see `lua/footprints.lua`)
+---@field Flags? FootprintFlag
 ---@field MaxSlope? number
 ---@field MinWaterDepth? number
----@field OccupancyCaps? number
+---@field OccupancyCaps? FootprintLayerCap
 ---@field SizeX? integer # defaults to the `ceil` of the entity's `SizeX`
 ---@field SizeZ? integer # defaults to the `ceil` of the entity's `SizeZ`
 ---@field SizeMax? integer # Added by unit blueprint postprocessing. Defaults to 1.
