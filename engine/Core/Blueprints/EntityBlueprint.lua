@@ -93,7 +93,9 @@
 ---@field SizeY number
 ---@field SizeZ number
 
---- Pathfinding footprint of an entity. See `EntityBlueprint.Footprint` for how units resolve it
+--- Pathfinding footprint of an entity.
+---@see EntityBlueprint.Footprint # For engine behavior defining unit footprints
+---
 --- Blueprints cannot set a maximum water depth. Only footprint specs (`FootprintSpec`) have one
 ---@class FootprintBlueprint
 ---@field Flags? FootprintFlag
