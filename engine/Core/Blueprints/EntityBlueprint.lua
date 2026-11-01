@@ -28,7 +28,7 @@
 ---   whose `Caps` fits their `Physics.MotionType`, and whose size is the closest by the
 ---   larger of the X and Z differences. Ties go to the footprint that was defined first.
 --- - Footprint `SizeX`/`SizeZ` defaults to the `ceil` of the entity's `SizeX`/`SizeZ`
---- - Structures' footprints have `OccupancyCaps` replaced by their `Physics.BuildOnLayerCaps`
+--- - Structures derive their footprint's `OccupancyCaps` from their `Physics.BuildOnLayerCaps`
 ---   - A unit with `Physics.MaxSpeed` 0 is treated as a structure
 ---@field Footprint? FootprintBlueprint
 --- component X,X of inertia tensor
