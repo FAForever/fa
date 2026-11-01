@@ -8,9 +8,9 @@ ORBIT = 0x20
 
 ---@class FootprintSpec : FootprintBlueprint
 ---@field Name string
----@field Caps integer
+---@field Caps FootprintLayerCap
 ---@field MaxWaterDepth? number
----@field Flags? number
+---@field Flags? FootprintFlag
 
 -- Flags
 IgnoreStructures = 0x01
@@ -19,8 +19,11 @@ IgnoreStructures = 0x01
 -- with that footprint, so keep the number of entries here down to the bare minimum we actually
 -- need.
 --
--- The script "data/lua/tests/dump_footprints.lua" can be used to figure out what footprint shapes
+-- The script "/lua/tests/dump_footprints.lua" can be used to figure out what footprint shapes
 -- the blueprints are currently expecting.
+--
+-- The engine matches each surface unit to one of these specs
+---@see EntityBlueprint.Footprint # For the matching behavior details
 
 SpecFootprints {
 
