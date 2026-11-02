@@ -206,7 +206,7 @@ UnitBlueprint{
             RateOfFire = 10/1, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 35,
-            TargetCheckInterval = 1,
+            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 "TECH4",
                 "TECH3 STRUCTURE",
