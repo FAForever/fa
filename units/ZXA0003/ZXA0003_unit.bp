@@ -15,5 +15,7 @@ UnitBlueprint{
     Physics = {
         MotionType = "RULEUMT_None",
     },
+    SizeX = 0,
+    SizeZ = 0,
     CollisionShape = "None"
 }
