@@ -1,0 +1,1 @@
+- Remove the no-op `/RunWithTheWind` command line switch from the development documentation; only the `wld_RunWithTheWind` console variable speeds up the simulation (#7367).

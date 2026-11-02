@@ -480,7 +480,9 @@ end
 function Sound(sound)
 end
 
---- Define the footprint types for pathfinding, only works in `blueprints.lua`
+--- Defines the footprint specs for pathfinding. Only has an effect during rule init.
+---
+--- Specs with a duplicate `Name` are skipped with a warning
 ---@param specs FootprintSpec[]
 function SpecFootprints(specs)
 end
