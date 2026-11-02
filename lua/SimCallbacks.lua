@@ -51,7 +51,7 @@ local GetCurrentCommandSourceArmy = SimUtils.GetCurrentCommandSourceArmy
 
 -- upvalue categories for performance
 local CategoriesTransportation = categories.TRANSPORTATION
-local CategoriesTech1Tech2MassExtraction = categories.MASSEXTRACTION * (categories.TECH1 + categories.TECH2)
+local CategoriesMassExtraction = categories.MASSEXTRACTION
 
 --- List of callbacks that is being populated throughout this file
 ---@type table<string, fun(data: table, units?: Unit[])>
@@ -152,7 +152,7 @@ local function UpgradeAndPauseExtractor(extractor, preference)
 end
 
 --- Redirects a guard order on a completed mass storage to its adjacent extractor.
----@param data { CommandId: number, Target: EntityId, UpgradePreference: string }
+---@param data { CommandId: number, Target: EntityId, UpgradePreference: string, RingStorages: boolean }
 Callbacks.ValidateMassStorageAssist = function(data, units)
     local target = data and GetEntityById(data.Target)
     if IsEntity(target)
@@ -166,7 +166,7 @@ Callbacks.ValidateMassStorageAssist = function(data, units)
         for _, adjacentUnit in target.AdjacentUnits or {} do
             if IsEntity(adjacentUnit)
                 and not adjacentUnit.Dead
-                and EntityCategoryContains(CategoriesTech1Tech2MassExtraction, adjacentUnit)
+                and EntityCategoryContains(CategoriesMassExtraction, adjacentUnit)
                 and (not extractor or adjacentUnit.EntityId < extractor.EntityId)
             then
                 extractor = adjacentUnit
@@ -202,6 +202,13 @@ Callbacks.ValidateMassStorageAssist = function(data, units)
             end
 
             IssueGuard(assistingUnits, extractor)
+
+            if data.RingStorages then
+                local engineers = EntityCategoryFilterDown(categories.ENGINEER, assistingUnits)
+                if not TableEmpty(engineers) then
+                    import("/lua/sim/commands/ringing/ring-with-storages.lua").RingExtractor(extractor, engineers)
+                end
+            end
 
             Sync.MassStorageAssistRedirects = Sync.MassStorageAssistRedirects or {}
             TableInsert(Sync.MassStorageAssistRedirects, {

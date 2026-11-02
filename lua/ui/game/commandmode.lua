@@ -592,6 +592,7 @@ local function OnGuardIssued(command)
                         CommandId = commandId,
                         Target = command.Target.EntityId,
                         UpgradePreference = Prefs.GetFieldFromCurrentProfile('options').assist_to_upgrade,
+                        RingStorages = Prefs.GetFieldFromCurrentProfile('options').structure_capping_feature_01 == 'on',
                     },
                 }, true)
             end
