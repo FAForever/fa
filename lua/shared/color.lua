@@ -15,6 +15,8 @@
 -- note the lack of the `__ENV = {} ... return __ENV` module idiom due to use of Moho's `import`
 -- function, so this will need to be adapted for use with `require`
 
+--- Table to give case insensitive support for color enums in lua utilities, just like the engine
+EnumColorsUpper = {}
 
 --- Returns the RGBA components of color string. Note that alpha is only returned if specified
 --- in the color. The components are all floating-point numbers `0.0` to `1.0`. The supported colors
@@ -46,7 +48,7 @@ function ParseColor(color)
     if color == "transparent" then
         return 0, 0, 0, 0
     end
-    color = EnumColors[color]
+    color = EnumColorsUpper[string.upper(color)]
     if not color then
         return false
     end
@@ -57,6 +59,30 @@ function ParseColor(color)
     return r / 255, g / 255, b / 255
 end
 
+--- Returns the alpha component of a color string if present, `1.0` otherwise.
+---@param color Color
+---@return number alpha
+function GetAlpha(color)
+    color = EnumColorsUpper[string.upper(color)] or color
+    if color:sub(7,8) == "" then
+        return 0
+    else
+        return tonumber(color:sub(1,2), 16) / 255
+    end
+end
+
+--- Returns the color with its alpha multiplied by a number
+---@param color Color
+---@param mult number
+---@return Color
+function MultiplyAlpha(color, mult)
+    color = EnumColorsUpper[string.upper(color)] or color
+    if color:sub(7, 8) == "" then
+        return string.format("%02X", math.clamp(255 * mult, 0, 255)) .. color:sub(1, 6)
+    else
+        return string.format("%02X", math.clamp(tonumber(color:sub(1, 2), 16) * mult, 0, 255)) .. color:sub(3, 8)
+    end
+end
 
 ----------------------------------------
 -- Color Conversions
@@ -724,3 +750,6 @@ EnumColors = {
     YellowGreen = "9CCF31",
     transparent = "00000000",
 }
+for enum, color in EnumColors do
+    EnumColorsUpper[string.upper(enum)] = color
+end

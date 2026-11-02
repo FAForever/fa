@@ -86,7 +86,11 @@ UnitBlueprint{
     LifeBarSize = 1.25,
     Physics = {
         BuildOnLayerCaps = {
+            LAYER_Air = false,
             LAYER_Land = true,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
             LAYER_Water = true,
         },
         DragCoefficient = 0.2,
@@ -133,7 +137,7 @@ UnitBlueprint{
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 120,
             ProjectileId = "/projectiles/TDPhalanx01/TDPhalanx01_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 2,
+            ProjectileLifetimeUsesMultiplier = 2.5,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {

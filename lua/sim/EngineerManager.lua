@@ -10,6 +10,7 @@ local AIUtils = import("/lua/ai/aiutilities.lua")
 local Builder = import("/lua/sim/builder.lua")
 
 local TableGetn = table.getn
+local WaitTicks = WaitTicks
 
 ---@class EngineerManager : BuilderManager
 ---@field Location Vector
@@ -35,12 +36,8 @@ EngineerManager = Class(BuilderManager) {
         self.LocationType = self.LocationType or lType
 
         self.ConsumptionUnits = {
-            Engineers = { Category = categories.ENGINEER, Units = {}, UnitsList = {}, Count = 0, },
-
-
-
-
-            
+            Engineers = { Category = categories.ENGINEER - categories.ENGINEERSTATION, Units = {}, UnitsList = {}, Count = 0, },
+            EngineerStations = { Category = categories.ENGINEERSTATION, Units = {}, UnitsList = {}, Count = 0, },
             Fabricators = { Category = categories.MASSFABRICATION * categories.STRUCTURE, Units = {}, UnitsList = {}, Count = 0, },
             Shields = { Category = categories.SHIELD * categories.STRUCTURE, Units = {}, UnitsList = {}, Count = 0, },
             MobileShields = { Category = categories.SHIELD * categories.MOBILE, Units = {}, UnitsList = {}, Count = 0, },
@@ -164,7 +161,7 @@ EngineerManager = Class(BuilderManager) {
 
     ---@param self EngineerManager
     LowMassRepeatThread = function(self)
-        coroutine.yield(30)
+        WaitTicks(30)
         if self.Brain.LowMassMode then
             self:LowMass()
         end
@@ -293,7 +290,7 @@ EngineerManager = Class(BuilderManager) {
 
     ---@param self EngineerManager
     LowEnergyRepeatThread = function(self)
-        coroutine.yield(30)
+        WaitTicks(30)
         if self.Brain.LowEnergyMode then
             self:LowEnergy()
         end
@@ -674,7 +671,8 @@ EngineerManager = Class(BuilderManager) {
             self.Brain.BuilderManagers[self.LocationType].FactoryManager:AddFactory(finishedUnit)
         end
         if finishedUnit:GetAIBrain():GetArmyIndex() == self.Brain:GetArmyIndex() then
-            self:AddUnit(finishedUnit)
+            local dontAssign = not EntityCategoryContains(categories.ENGINEER - categories.ENGINEERSTATION, finishedUnit)
+            self:AddUnit(finishedUnit, dontAssign)
         end
     end,
 
@@ -734,7 +732,7 @@ EngineerManager = Class(BuilderManager) {
     ---@param manager EngineerManager
     ---@param ticks integer
     Wait = function(unit, manager, ticks)
-        coroutine.yield(ticks)
+        WaitTicks(ticks)
         if not unit.Dead then
             manager:AssignEngineerTask(unit)
         end
@@ -743,7 +741,7 @@ EngineerManager = Class(BuilderManager) {
     ---@param manager EngineerManager
     ---@param unit Unit
     EngineerWaiting = function(manager, unit)
-        coroutine.yield(50)
+        WaitTicks(50)
         if not unit.Dead then
             manager:AssignEngineerTask(unit)
         end
@@ -774,7 +772,7 @@ EngineerManager = Class(BuilderManager) {
             -- Fork off the platoon here
             local template = self:GetEngineerPlatoonTemplate(builder:GetPlatoonTemplate())
             local hndl = self.Brain:MakePlatoon(template[1], template[2])
-            self.Brain:AssignUnitsToPlatoon(hndl, {unit}, 'support', 'none')
+            self.Brain:AssignUnitToPlatoon(hndl, unit, 'support', 'none')
             unit.PlatoonHandle = hndl
 
             --if EntityCategoryContains(categories.COMMAND, unit) then

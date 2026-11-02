@@ -15,7 +15,7 @@
 -- local _c_CreateEntity = _c_CreateEntity
 
 --- TODO
----@alias EntitySpec number
+---@alias EntitySpec table
 
 ---@class Entity : moho.entity_methods, InternalObject
 Entity = Class(moho.entity_methods) {
@@ -38,7 +38,7 @@ Entity = Class(moho.entity_methods) {
 
     -- kept for backwards compatibility with mods
     ---@param self Entity
-    ---@param spec EntitySpec
+    ---@param spec? EntitySpec
     OnCreate = function(self, spec) end,
 
     ---@param self Entity

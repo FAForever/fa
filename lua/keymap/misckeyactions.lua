@@ -51,7 +51,9 @@ function ToggleRepeatBuild()
     for _, v in selection do
         v:ProcessInfo('SetRepeatQueue', isRepeatBuild)
         if EntityCategoryContains(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, v) then
-            v:GetCreator():ProcessInfo('SetRepeatQueue', isRepeatBuild)
+            if v:GetFractionComplete() == 1 then
+                v:GetCreator():ProcessInfo('SetRepeatQueue', isRepeatBuild)
+            end
         end
     end
 end
@@ -380,9 +382,9 @@ function CreateTemplateFactory()
 end
 
 --- Creates a sim callback to set the priorities of the selected units
----@param prioritiesString string A string of categories
----@param name string Name of the priority set, used when printing on screen
----@param exclusive boolean ??
+---@param prioritiesString string | any unparsed category expressions split by commas in order of decreasing priority. Non-string values reset priorities to bluperint spec.
+---@param name string Name of the priority set, used when printing on screen, and synced in unit data `WepPriority` field
+---@param exclusive? boolean If exclusively the given priorities are used, or the default priorities are added underneath
 function SetWeaponPriorities(prioritiesString, name, exclusive)
     local priotable
     if type(prioritiesString) == 'string' then
@@ -395,8 +397,11 @@ function SetWeaponPriorities(prioritiesString, name, exclusive)
         table.insert(unitIds, unit:GetEntityId())
     end
 
-    SimCallback({ Func = 'WeaponPriorities',
-        Args = { SelectedUnits = unitIds, prioritiesTable = priotable, name = name, exclusive = exclusive or false } })
+    SimCallback({
+        Func = 'WeaponPriorities',
+        ---@type UIWeaponPriorityData
+        Args = { SelectedUnits = unitIds, prioritiesTable = priotable, name = name, exclusive = exclusive or false }
+    })
 end
 
 --- Sets selected units to target the unit (and similar units) that is hovered over
@@ -688,5 +693,19 @@ SelectCommander = function(zoomTo)
         end
     elseif zoomTo then
         UIZoomTo(selectedUnits, 0)
+    end
+end
+
+function RestartSessionOrReplay()
+    if SessionIsReplay() then
+        local ok = LaunchReplaySession(GetFrontEndData('replay_filename'))
+        if not ok then
+            local filename = tostring(GetFrontEndData('replay_filename'))
+            local msg = string.format('Issue starting replay "%s"', filename)
+            print(msg)
+            WARN(msg)
+        end
+    elseif SessionIsActive() and SessionCanRestart() then
+        RestartSession()
     end
 end

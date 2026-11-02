@@ -1,4 +1,5 @@
 local Prefs = import("/lua/user/prefs.lua")
+local gameMainSetIgnoreSelection = import("/lua/ui/game/gamemain.lua").SetIgnoreSelection
 
 ---@alias SelectionSetDoubleTapBehavior
 --- | 'none'                        # When you double tap it will have no effect
@@ -45,19 +46,24 @@ function IsHidden()
 end
 
 function Hidden(callback)
-    local CM = import("/lua/ui/game/commandmode.lua")
-    local current_command = CM.GetCommandMode()
-    local old_selection = GetSelectedUnits() or {}
+    local commandMode = import("/lua/ui/game/commandmode.lua")
 
+    commandMode.CacheAndClearCommandMode()
     hidden_select = true
-    callback()
-    SelectUnits(old_selection)
-    CM.StartCommandMode(current_command[1], current_command[2])
+    gameMainSetIgnoreSelection(true)
+    local oldSelection = GetSelectedUnits()
+    local ok, msg = pcall(callback)
+    SelectUnits(oldSelection)
     hidden_select = false
+    gameMainSetIgnoreSelection(false)
+    commandMode.RestoreCommandMode(true)
+    if not ok then
+        error(msg)
+    end
 end
 
 --- Registers a callback that is called when a selection is set (flag set to false) and when it is used (flag set to true)
----@param func function<UserUnit[], boolean>
+---@param func fun(units: UserUnit[], applied: boolean)
 function RegisterSelectionSetCallback(func)
     -- see if this function is already in here
     for i, v in selectionSetCallbacks do
@@ -70,7 +76,7 @@ function RegisterSelectionSetCallback(func)
 end
 
 --- Removes a callback that is called when a selection is set
----@param func function<UserUnit[], boolean>
+---@param func fun(units: UserUnit[], applied: boolean)
 function WithdrawSelectionSetCallback(func)
     for i, v in selectionSetCallbacks do
         if v == func then
@@ -532,7 +538,7 @@ local function GetPrincipleComponents(units)
     return minor, major, cx, cz
 end
 
----@type UserUnit[][]
+---@type table<UserUnit, boolean>[][]
 local Grid = {
     { { {} }, { {} }, { {} }, { {} }, { {} }, { {} }, { {} } },
     { { {} }, { {} }, { {} }, { {} }, { {} }, { {} }, { {} } },

@@ -25,7 +25,7 @@ UEB0103 = ClassUnit(TSeaFactoryUnit) {
         TSeaFactoryUnit.MovingArmsThread(self)
         while true do
             if not self.ArmSlider then return end
-            self.ArmSlider:SetGoal(0, 0, 40)
+            self.ArmSlider:SetGoal(40, 0, 0)
             self.ArmSlider:SetSpeed(40)
             WaitFor(self.ArmSlider)
             self.ArmSlider:SetGoal(0, 0, 0)

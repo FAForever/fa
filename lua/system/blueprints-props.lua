@@ -105,33 +105,37 @@ end
 --- See also:
 --- - https://github.com/FAForever/fa/pull/3662
 --- - https://github.com/FAForever/fa/pull/4675
----@param prop any
+---@param prop PropBlueprint
 local function ProcessLOD(prop)
-
-    local sx = prop.SizeX or 1
-    local sy = prop.SizeY or 1
-    local sz = prop.SizeZ or 1
-
-    -- give more emphasis to the x / z value as that is easier to see in the average camera angle
-    local weighted = 0.40 * sx + 0.2 * sy + 0.4 * sz
-    if prop.ScriptClass == 'Tree' or prop.ScriptClass == 'TreeGroup' then
-        weighted = 2.6
-    end
-
-    -- https://www.desmos.com/calculator (0.9 * sqrt(100 * 500 * x))
-    local lod = 0.9 * MathSqrt(100 * 500 * weighted)
-
     if prop.Display and prop.Display.Mesh and prop.Display.Mesh.LODs then
-        local n = TableGetn(prop.Display.Mesh.LODs)
-        for k = 1, n do
-            local data = prop.Display.Mesh.LODs[k]
 
-            -- https://www.desmos.com/calculator (x * x)
-            local factor = (k / n) * (k / n)
-            local LODCutoff = factor * lod
+        local sx = prop.SizeX or 1
+        local sy = prop.SizeY or 1
+        local sz = prop.SizeZ or 1
 
-            -- sanitize the value
-            data.LODCutoff = MathFloor(LODCutoff / 10 + 1) * 10
+        -- give more emphasis to the x / z value as that is easier to see in the average camera angle
+        local weightedLodSize = MathSqrt(sx * sx + 0.5 * sy * sy + sz * sz)
+        local maxLod = 180 * weightedLodSize
+
+        if (prop.ScriptClass == 'Tree' or prop.ScriptClass == 'TreeGroup')
+          then
+            if TableGetn(prop.Display.Mesh.LODs) == 3 then
+                prop.Display.Mesh.LODs[1].LODCutoff = 40
+                prop.Display.Mesh.LODs[2].LODCutoff = 165
+                prop.Display.Mesh.LODs[3].LODCutoff = 640
+                return
+            end
+            maxLod = 640
+        end
+
+        local levels = TableGetn(prop.Display.Mesh.LODs)
+        for n = 1, levels do
+            local data = prop.Display.Mesh.LODs[n]
+            local factor = (n / levels)
+            local LODCutoff = factor * maxLod
+
+            -- round the value
+            data.LODCutoff = MathFloor((LODCutoff + 5) / 10) * 10
         end
     end
 end
@@ -148,9 +152,10 @@ function PostProcessProps(props)
     end
 end
 
---- Batch process all props
+--- Post-processing that is used by the bake workflow. All changes are baked into the blueprints. For more information, see the following file:
+--- - .github\workflows\bake-blueprints.yaml
 ---@param blueprints BlueprintsTable
-function BatchProcessProps(blueprints)
+function BakePropBlueprints(blueprints)
     if blueprints.Prop then
         for _, prop in pairs(blueprints.Prop) do
             ProcessInvulnerability(prop)

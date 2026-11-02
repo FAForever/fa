@@ -5,35 +5,35 @@
 ------------------------------------------------------------------------------
 
 --- Aeon UNITS Files
-AFactoryUnit = import('/lua/sim/units/aeon/AFactoryUnit.lua').AFactoryUnit
-AAirFactoryUnit = import('/lua/sim/units/aeon/AAirFactoryUnit.lua').AAirFactoryUnit
-AAirUnit = import('/lua/sim/units/aeon/AAirUnit.lua').AAirUnit
-AAirStagingPlatformUnit = import('/lua/sim/units/aeon/AAirStagingPlatformUnit.lua').AAirStagingPlatformUnit
-AConcreteStructureUnit = import('/lua/sim/units/aeon/AConcreteStructureUnit.lua').AConcreteStructureUnit
-AConstructionUnit = import('/lua/sim/units/aeon/AConstructionUnit.lua').AConstructionUnit
-AEnergyCreationUnit = import('/lua/sim/units/aeon/AEnergyCreationUnit.lua').AEnergyCreationUnit
-AEnergyStorageUnit = import('/lua/sim/units/aeon/AEnergyStorageUnit.lua').AEnergyStorageUnit
-AHoverLandUnit = import('/lua/sim/units/aeon/AHoverLandUnit.lua').AHoverLandUnit
-ALandFactoryUnit = import('/lua/sim/units/aeon/ALandFactoryUnit.lua').ALandFactoryUnit
-ALandUnit = import('/lua/sim/units/aeon/ALandUnit.lua').ALandUnit
-AMassCollectionUnit = import('/lua/sim/units/aeon/AMassCollectionUnit.lua').AMassCollectionUnit
-AMassFabricationUnit = import('/lua/sim/units/aeon/AMassFabricationUnit.lua').AMassFabricationUnit
-AMassStorageUnit = import('/lua/sim/units/aeon/AMassStorageUnit.lua').AMassStorageUnit
-ARadarUnit = import('/lua/sim/units/aeon/ARadarUnit.lua').ARadarUnit
-ASonarUnit = import('/lua/sim/units/aeon/ASonarUnit.lua').ASonarUnit
-ASeaFactoryUnit = import('/lua/sim/units/aeon/ASeaFactoryUnit.lua').ASeaFactoryUnit
-ASeaUnit = import('/lua/sim/units/aeon/ASeaUnit.lua').ASeaUnit
-AShieldHoverLandUnit = import('/lua/sim/units/aeon/AShieldHoverLandUnit.lua').AShieldHoverLandUnit
-AShieldLandUnit = import('/lua/sim/units/aeon/AShieldLandUnit.lua').AShieldLandUnit
-AShieldStructureUnit = import('/lua/sim/units/aeon/AShieldStructureUnit.lua').AShieldStructureUnit
-AStructureUnit = import('/lua/sim/units/aeon/AStructureUnit.lua').AStructureUnit
-ASubUnit = import('/lua/sim/units/aeon/ASubUnit.lua').ASubUnit
-ATransportBeaconUnit = import('/lua/sim/units/aeon/ATransportBeaconUnit.lua').ATransportBeaconUnit
-AWalkingLandUnit = import('/lua/sim/units/aeon/AWalkingLandUnit.lua').AWalkingLandUnit
-AWallStructureUnit = import('/lua/sim/units/aeon/AWallStructureUnit.lua').AWallStructureUnit
-ACivilianStructureUnit = import('/lua/sim/units/aeon/ACivilianStructureUnit.lua').ACivilianStructureUnit
-AQuantumGateUnit = import('/lua/sim/units/aeon/AQuantumGateUnit.lua').AQuantumGateUnit
-ARadarJammerUnit = import('/lua/sim/units/aeon/ARadarJammerUnit.lua').ARadarJammerUnit
+AFactoryUnit = import('/lua/sim/units/aeon/afactoryunit.lua').AFactoryUnit
+AAirFactoryUnit = import('/lua/sim/units/aeon/aairfactoryunit.lua').AAirFactoryUnit
+AAirUnit = import('/lua/sim/units/aeon/aairunit.lua').AAirUnit
+AAirStagingPlatformUnit = import('/lua/sim/units/aeon/aairstagingplatformunit.lua').AAirStagingPlatformUnit
+AConcreteStructureUnit = import('/lua/sim/units/aeon/aconcretestructureunit.lua').AConcreteStructureUnit
+AConstructionUnit = import('/lua/sim/units/aeon/aconstructionunit.lua').AConstructionUnit
+AEnergyCreationUnit = import('/lua/sim/units/aeon/aenergycreationunit.lua').AEnergyCreationUnit
+AEnergyStorageUnit = import('/lua/sim/units/aeon/aenergystorageunit.lua').AEnergyStorageUnit
+AHoverLandUnit = import('/lua/sim/units/aeon/ahoverlandunit.lua').AHoverLandUnit
+ALandFactoryUnit = import('/lua/sim/units/aeon/alandfactoryunit.lua').ALandFactoryUnit
+ALandUnit = import('/lua/sim/units/aeon/alandunit.lua').ALandUnit
+AMassCollectionUnit = import('/lua/sim/units/aeon/amasscollectionunit.lua').AMassCollectionUnit
+AMassFabricationUnit = import('/lua/sim/units/aeon/amassfabricationunit.lua').AMassFabricationUnit
+AMassStorageUnit = import('/lua/sim/units/aeon/amassstorageunit.lua').AMassStorageUnit
+ARadarUnit = import('/lua/sim/units/aeon/aradarunit.lua').ARadarUnit
+ASonarUnit = import('/lua/sim/units/aeon/asonarunit.lua').ASonarUnit
+ASeaFactoryUnit = import('/lua/sim/units/aeon/aseafactoryunit.lua').ASeaFactoryUnit
+ASeaUnit = import('/lua/sim/units/aeon/aseaunit.lua').ASeaUnit
+AShieldHoverLandUnit = import('/lua/sim/units/aeon/ashieldhoverlandunit.lua').AShieldHoverLandUnit
+AShieldLandUnit = import('/lua/sim/units/aeon/ashieldlandunit.lua').AShieldLandUnit
+AShieldStructureUnit = import('/lua/sim/units/aeon/ashieldstructureunit.lua').AShieldStructureUnit
+AStructureUnit = import('/lua/sim/units/aeon/astructureunit.lua').AStructureUnit
+ASubUnit = import('/lua/sim/units/aeon/asubunit.lua').ASubUnit
+ATransportBeaconUnit = import('/lua/sim/units/aeon/atransportbeaconunit.lua').ATransportBeaconUnit
+AWalkingLandUnit = import('/lua/sim/units/aeon/awalkinglandunit.lua').AWalkingLandUnit
+AWallStructureUnit = import('/lua/sim/units/aeon/awallstructureunit.lua').AWallStructureUnit
+ACivilianStructureUnit = import('/lua/sim/units/aeon/acivilianstructureunit.lua').ACivilianStructureUnit
+AQuantumGateUnit = import('/lua/sim/units/aeon/aquantumgateunit.lua').AQuantumGateUnit
+ARadarJammerUnit = import('/lua/sim/units/aeon/aradarjammerunit.lua').ARadarJammerUnit
 
 --- Kept for backwards compatibility
 local DefaultUnitsFile = import("/lua/defaultunits.lua")

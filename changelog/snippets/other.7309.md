@@ -1,0 +1,3 @@
+- Fixes annotations of table.find (#7309)
+- Added table.findCustom function (#7309)
+- Added table.has function (#7309)

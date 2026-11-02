@@ -1,1 +1,0 @@
-- (#6609) Fix drones meant to rebuild unbuilt units during unit transfer not being cleaned up when rebuilding fails.

@@ -24,7 +24,7 @@ end
 metacleanup(nil)
 metacleanup(false)
 metacleanup(0)
-metacleanup('')
+--metacleanup('') -- string is cleaned up after the library is extended in `/lua/system/utils.lua`
 
 --====================================================================================
 -- Set up a metatable for coroutines (a.k.a. threads)

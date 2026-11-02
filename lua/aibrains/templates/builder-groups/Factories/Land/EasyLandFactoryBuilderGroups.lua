@@ -5,16 +5,16 @@ DefaultLandFactory = AIBuilderGroupTemplate {
     BuilderGroupManager = 'FactoryManager',
     BuilderGroupType = 'LAND',
     BuilderTemplates = {
-        import('/lua/aibrains/templates/builders/Factories/Shared/EasySharedFactoryBuilders.lua').DefaultEngineersTech1,
-        import('/lua/aibrains/templates/builders/Factories/Shared/EasySharedFactoryBuilders.lua').DefaultEngineersTech2,
-        import('/lua/aibrains/templates/builders/Factories/Shared/EasySharedFactoryBuilders.lua').DefaultEngineersTech3,
+        import('/lua/aibrains/templates/builders/factories/shared/easysharedfactorybuilders.lua').DefaultEngineersTech1,
+        import('/lua/aibrains/templates/builders/factories/shared/easysharedfactorybuilders.lua').DefaultEngineersTech2,
+        import('/lua/aibrains/templates/builders/factories/shared/easysharedfactorybuilders.lua').DefaultEngineersTech3,
 
-        import('/lua/aibrains/templates/builders/Factories/Land/EasyLandFactoryBuilders.lua').DefaultAntiAirTech1,
-        import('/lua/aibrains/templates/builders/Factories/Land/EasyLandFactoryBuilders.lua').DefaultAntiAirTech2,
-        import('/lua/aibrains/templates/builders/Factories/Land/EasyLandFactoryBuilders.lua').DefaultAntiAirTech3,
-        import('/lua/aibrains/templates/builders/Factories/Land/EasyLandFactoryBuilders.lua').DefaultDirectFireTech1,
-        import('/lua/aibrains/templates/builders/Factories/Land/EasyLandFactoryBuilders.lua').DefaultDirectFireTech2,
-        import('/lua/aibrains/templates/builders/Factories/Land/EasyLandFactoryBuilders.lua').DefaultDirectFireTech3,
+        import('/lua/aibrains/templates/builders/factories/land/easylandfactorybuilders.lua').DefaultAntiAirTech1,
+        import('/lua/aibrains/templates/builders/factories/land/easylandfactorybuilders.lua').DefaultAntiAirTech2,
+        import('/lua/aibrains/templates/builders/factories/land/easylandfactorybuilders.lua').DefaultAntiAirTech3,
+        import('/lua/aibrains/templates/builders/factories/land/easylandfactorybuilders.lua').DefaultDirectFireTech1,
+        import('/lua/aibrains/templates/builders/factories/land/easylandfactorybuilders.lua').DefaultDirectFireTech2,
+        import('/lua/aibrains/templates/builders/factories/land/easylandfactorybuilders.lua').DefaultDirectFireTech3,
     }
 }
 

@@ -10,8 +10,15 @@
   "Lua.telemetry.enable": false,
   "Lua.workspace.checkThirdParty": false,
   "Lua.runtime.path": ["/?"],
-  "Lua.runtime.plugin": ".vscode/fa-plugin.lua",
-  "Lua.workspace.ignoreDir": [".vscode", "loc", "*.bp"],
+  "Lua.runtime.plugin": "./lua-ls-addon/plugin.lua",
+  "Lua.workspace.ignoreDir": [
+    ".vscode/",
+    "lua-ls-addon/",
+    "loc/",
+    "*.bp",
+    "lua/ui/lobby/changelog/generated/",
+    "*_save.lua"
+  ],
   "[lua]": {
     "editor.wordBasedSuggestions": "off"
   },
@@ -23,9 +30,20 @@
   "Lua.runtime.pathStrict": false,
   "Lua.runtime.exportEnvDefault": true,
   "Lua.completion.autoRequire": false,
-  "Lua.diagnostics.globals": ["ScenarioInfo"],
+  "Lua.diagnostics.globals": [
+    "ScenarioInfo",
+    "Scenario",
+    "__moduleinfo",
+    "__diskwatch",
+    "__language",
+    "__installedlanguages",
+    "__blueprints"
+  ],
   "Lua.format.defaultConfig": {
-    "max_line_length": "unset",
+    "max_line_length": "unset"
+  },
+  "[markdown]": {
+    "editor.tabSize": 2
   },
 
   // used for grammar checks of changelog
@@ -467,5 +485,9 @@
     "ZockyZock",
     "zthuee",
     "Zulip"
+  ],
+  "Lua.diagnostics.disable": [
+    "inject-field",
+    "unsupport-symbol"
   ]
 }

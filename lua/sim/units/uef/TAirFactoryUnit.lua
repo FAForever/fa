@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local CreateDefaultBuildBeams = import('/lua/EffectUtilities.lua').CreateDefaultBuildBeams
+local CreateDefaultBuildBeams = import('/lua/effectutilities.lua').CreateDefaultBuildBeams
 
 local AirFactoryUnit = import('/lua/defaultunits.lua').AirFactoryUnit
 local AirFactoryUnitOnPaused = AirFactoryUnit.OnPaused

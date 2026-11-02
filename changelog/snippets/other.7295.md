@@ -1,0 +1,1 @@
+- Annotate basic Scenario data types (#7295).

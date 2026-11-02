@@ -1,1 +1,0 @@
-- (#6706) Make additional information available when an ACU dies.

@@ -12,6 +12,7 @@ local signs = {
     ["Period"] = ".",
     ["Slash"] = "/",
     ["Backslash"] = "\\",
+    ["Minus"] = "-",
     ["NumPlus"] = "+",
     ["NumMinus"] = "-",
     ["NumStar"] = "*",

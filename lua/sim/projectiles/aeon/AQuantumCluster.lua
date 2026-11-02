@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local ABaseTempProjectile = import("/lua/sim/projectiles/aeon/ABaseTempProjectile.lua").ABaseTempProjectile
+local ABaseTempProjectile = import("/lua/sim/projectiles/aeon/abasetempprojectile.lua").ABaseTempProjectile
 
 --- AEON QUANTUM CLUSTER
 ---@class AQuantumCluster : ABaseTempProjectile

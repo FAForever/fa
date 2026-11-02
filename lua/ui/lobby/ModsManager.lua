@@ -92,11 +92,11 @@ local mods = {
 }
 
 local modSortConfigurations = {
-    { id = 'status', name = 'Status', tooltip = 'sorts mods by activation status' },
-    { id = 'type', name = 'Type', tooltip = 'sorts mods by type and name' },
-    { id = 'title', name = 'Name', tooltip = 'sorts mods by name' },
-    { id = 'author', name = 'Author', tooltip = 'sorts mods by author and name' },
-    { id = 'version', name = 'Version', tooltip = 'sorts mods by version and name' },
+    { id = 'status', name = LOC('<LOC uiunitmanager_29>Status'), tooltip = LOC('<LOC uiunitmanager_30>sorts mods by activation status') },
+    { id = 'type', name = LOC('<LOC uiunitmanager_31>Type'), tooltip = LOC('<LOC uiunitmanager_32>sorts mods by type and name') },
+    { id = 'title', name = LOC('<LOC uiunitmanager_33>Name'), tooltip = LOC('<LOC uiunitmanager_34>sorts mods by name') },
+    { id = 'author', name = LOC('<LOC uiunitmanager_35>Author'), tooltip = LOC('<LOC uiunitmanager_36>sorts mods by author and name') },
+    { id = 'version', name = LOC('<LOC uiunitmanager_37>Version'), tooltip = LOC('<LOC uiunitmanager_38>sorts mods by version and name') },
 }
 
 -- Maps uids to the output of Mods.GetDependencies(uid)
@@ -243,11 +243,8 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
         end
         return true
     end
-    AddTooltip(favoriteModsToggle, 'Activate Favorite Mods', 
-    'Activate mods that you marked as your favorite mods. \n' .. 
-    'For host player, left click activates your favorite UI mods and GAME mods. \n' ..
-    'For other players, left click activates only your favorite UI mods. \n\n' ..
-    'For any player, right click clears the list of your favorite mods.', 480)
+    AddTooltip(favoriteModsToggle, "<LOC uiunitmanager_20>Activate Favorite Mods", 
+    "<LOC uiunitmanager_21>Activate mods that you marked as your favorite mods. \nFor host player, left click activates your favorite UI mods and GAME mods. \nFor other players, left click activates only your favorite UI mods. \n\nFor any player, right click clears the list of your favorite mods.", 480)
 
     local listExpander = Bitmap(dialogContent, GUI.modListExpandedIcon) 
     listExpander:EnableHitTest()
@@ -273,7 +270,7 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
         end
     end
     listExpander:Update()
-    AddTooltip(listExpander, 'Toggle Mod List', "Toggle visibility of mod icons and descriptions in the list below")
+    AddTooltip(listExpander, "<LOC uiunitmanager_22>Toggle Mod List", "<LOC uiunitmanager_23>Toggle visibility of mod icons and descriptions in the list below")
 
     -- Save button
     local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _OK>OK", -1)
@@ -297,8 +294,6 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
                 end
             )
             mods.sim.active = SetUtils.Subtract(mods.activated, mods.ui.active)
-            table.print(mods.sim.active, 'mods.sim.active')
-            table.print(mods.ui.active, 'mods.ui.active')
 
             callback(mods.sim.active, mods.ui.active)
         else
@@ -566,7 +561,7 @@ function GetModNameVersion(mod)
 
     -- remove old mod version from mod name
     name = string.gsub(name, '[%[%<%{%(%s]+[vV]+%s*%d+[%.%d]*[%]%>%}%)%s]*', '')
-    name = StringCapitalize(name)
+    name = string.capitalize(name)
     name = name:gsub("-", "", 1)
 
     -- append new mod version to mod name
@@ -581,9 +576,9 @@ function GetModNameVersion(mod)
         local ver = mod.version
         -- correct mod version (e.g. 1.1.1 --> 1.11)
         if string.find(ver, "%d%.%d%.%d") then
-            ver = StringReverse(ver)
+            ver = string.reverse(ver)
             ver = ver:gsub("%.", "", 1)
-            ver = StringReverse(ver)
+            ver = string.reverse(ver)
         elseif not string.find(ver, "%.") then
             ver = ver .. '.0'
         end
@@ -604,9 +599,9 @@ function GetModAuthor(mod)
         if string.len(mod.author) < 20 then
             author = mod.author
         elseif string.find(mod.author, ",") then
-            author = StringSplit(mod.author, ',')[1]
+            author = string.split(mod.author, ',')[1]
         elseif string.find(mod.author, " ") then
-            author = StringSplit(mod.author, ' ')[1]
+            author = string.split(mod.author, ' ')[1]
         end
     end
     author = author:gsub("_", "", 1)
@@ -861,8 +856,8 @@ function LoadMods()
 end
 
 function StringReplace(str, remove, add)
-    local words = StringSplit(str, remove)
-    return StringJoin(words, add)
+    local words = string.split(str, remove)
+    return string.join(words, add)
 end
 
 -- refresh the mod list UI based on mods filtering and sorting
@@ -1172,7 +1167,7 @@ function CreateListElement(parent, mod, index)
         group.desc.Bottom:Set(function() return group.check.Bottom() - LayoutHelpers.ScaleNumber(8) end)
         group.desc.Height:Set(function() return group.desc.Bottom() - group.desc.Top() end)
 
-        local lines = StringSplit(mod.description, '\n')
+        local lines = string.split(mod.description, '\n')
         if (table.getsize(lines) > 3) then
             group.desc:SetText(lines[1] .. '\n' .. lines[2] .. '\n' .. lines[3])
         elseif string.len(mod.description) > modInfoDesciptionMax then
@@ -1336,8 +1331,8 @@ function CreateFavoriteButton(parent, iconSize, isCentered, isChecked)
     toggle.isChecked = isChecked
     toggle.isCheckable = true 
     toggle.uncheckColor = 'ff434343' -- #ff434343
-    toggle.checkedTooltip = 'Remove this mod from the list of favorite mods'
-    toggle.uncheckTooltip = 'Add this mod to the list of favorite mods that you can later activate by clicking on the Star button located in top left corner of this dialog'
+    toggle.checkedTooltip = "<LOC uiunitmanager_24>Remove this mod from the list of favorite mods"
+    toggle.uncheckTooltip = "<LOC uiunitmanager_25>Add this mod to the list of favorite mods that you can later activate by clicking on the Star button located in top left corner of this dialog"
 
     if UIUtil.GetCurrentSkinName() == 'random' then
        toggle.checkedColor = 'FFFFFF' -- #FFFFFF
@@ -1382,10 +1377,10 @@ function CreateFavoriteButton(parent, iconSize, isCentered, isChecked)
         if self.isCheckable then
             if self.isChecked then
                 self.Fill:SetSolidColor(self.checkedColor) 
-                AddTooltip(self, 'Toggle Favorite Mod', self.checkedTooltip)
+                AddTooltip(self, "<LOC uiunitmanager_26>Toggle Favorite Mod", self.checkedTooltip)
             else 
                 self.Fill:SetSolidColor(self.uncheckColor) 
-                AddTooltip(self, 'Toggle Favorite Mod', self.uncheckTooltip)
+                AddTooltip(self, "<LOC uiunitmanager_26>Toggle Favorite Mod", self.uncheckTooltip)
             end
         else
             self.Fill:SetSolidColor(self.uncheckColor)
@@ -1423,9 +1418,9 @@ function CreateSortComboBox()
     end
 
     sortCombo:AddItems(sortCombo.itemNames, 1)
-    AddTooltip(sortCombo, 'Sort Mod List', sortCombo.tooltip, 375, nil, nil, 'right')
+    AddTooltip(sortCombo, "<LOC uiunitmanager_27>Sort Mod List", sortCombo.tooltip, 375, nil, nil, 'right')
 
-    local sortByLabel = UIUtil.CreateText(dialogContent, ' Sort mods by ', 14, UIUtil.bodyFont)
+    local sortByLabel = UIUtil.CreateText(dialogContent, "<LOC uiunitmanager_28>Sort mods by", 14, UIUtil.bodyFont)
     sortByLabel:SetColor('B9BFB9')
     sortByLabel:SetDropShadow(true) 
     LayoutHelpers.LeftOf(sortByLabel, sortCombo, 5)

@@ -84,7 +84,7 @@ SeraphimNukeEffectController01 = Class(NullShell) {
 
         -- Create explosion effects
         for k, v in EffectTemplate.SIFExperimentalStrategicMissileHit01 do
-            emit = CreateEmitterAtEntity(self, self.Army, v)
+            CreateEmitterAtEntity(self, self.Army, v)
         end
         
         WaitSeconds(3.0)
@@ -94,7 +94,7 @@ SeraphimNukeEffectController01 = Class(NullShell) {
 
         -- Create detonate effects
         for k, v in EffectTemplate.SIFExperimentalStrategicMissileDetonate01 do
-            emit = CreateEmitterAtEntity(self, self.Army, v)
+            CreateEmitterAtEntity(self, self.Army, v)
         end
 
         -- Create ground decals

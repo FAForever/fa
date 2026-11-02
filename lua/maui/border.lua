@@ -13,7 +13,7 @@
 -- border textures.
 
 local Control = import("/lua/maui/control.lua").Control
-
+local LazyVarCreate = import("/lua/lazyvar.lua").Create
 ---@class MauiBorder : moho.border_methods, Control, InternalObject
 ---@field BorderWidth LazyVar
 ---@field BorderHeight LazyVar
@@ -25,33 +25,32 @@ Border = ClassUI(moho.border_methods, Control) {
             self:SetName(debugname)
         end
 
-        local LazyVar = import("/lua/lazyvar.lua")
-        self._v = LazyVar.Create()
+        self._v = LazyVarCreate()
         self._v.OnDirty = function(var)
             self:SetNewTextures(var(), nil, nil, nil, nil, nil)
         end
 
-        self._h = LazyVar.Create()
+        self._h = LazyVarCreate()
         self._h.OnDirty = function(var)
             self:SetNewTextures(nil, var(), nil, nil, nil, nil)
         end
 
-        self._ul = LazyVar.Create()
+        self._ul = LazyVarCreate()
         self._ul.OnDirty = function(var)
             self:SetNewTextures(nil, nil, var(), nil, nil, nil)
         end
 
-        self._ur = LazyVar.Create()
+        self._ur = LazyVarCreate()
         self._ur.OnDirty = function(var)
             self:SetNewTextures(nil, nil, nil, var(), nil, nil)
         end
 
-        self._ll = LazyVar.Create()
+        self._ll = LazyVarCreate()
         self._ll.OnDirty = function(var)
             self:SetNewTextures(nil, nil, nil, nil, var(), nil)
         end
 
-        self._lr = LazyVar.Create()
+        self._lr = LazyVarCreate()
         self._lr.OnDirty = function(var)
             self:SetNewTextures(nil, nil, nil, nil, nil, var())
         end

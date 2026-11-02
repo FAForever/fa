@@ -9,7 +9,7 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 10,
+                    LODCutoff = 0,
                     ShaderName = "Unit",
                     SpecName = "cybranadjacencynodetwo_SpecTeam.dds",
                     AlbedoName = "cybranadjacencynodetwo_Albedo.dds",

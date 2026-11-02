@@ -12,7 +12,7 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 400,
+                    LODCutoff = 1090,
                     ShaderName = "NormalMappedTerrain",
                 },
             },

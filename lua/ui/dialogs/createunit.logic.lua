@@ -115,17 +115,38 @@ end
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 
-local FactionData = {
-    { color = 'ff00c1ff', name = 'UEF', icon = UIUtil.UIFile(UIUtil.GetFactionIcon(0)) },
-    { color = 'ff89d300', name = 'AEON', icon = UIUtil.UIFile(UIUtil.GetFactionIcon(1)) },
-    { color = 'ffff0000', name = 'CYBRAN', icon = UIUtil.UIFile(UIUtil.GetFactionIcon(2)) },
-    { color = 'FFFFBF00', name = 'SERAPHIM', icon = UIUtil.UIFile(UIUtil.GetFactionIcon(3)) },
-}
+---@class UICreateUnitDialog_FactionData
+---@field name FactionCategory
+---@field icon FileName
+---@field color Color
 
+---@type UICreateUnitDialog_FactionData[]?
+local FactionDataCache
+---@return UICreateUnitDialog_FactionData[]
+local function GetFactionColorsAndIcons()
+    if not FactionDataCache then
+        local Factions = import('/lua/factions.lua').GetFactions()
+        local skins = import("/lua/skins/skins.lua").skins
+
+        FactionDataCache = {}
+        for i, faction in Factions do
+            FactionDataCache[i] = {
+                name = faction.Category,
+                icon = UIUtil.UIFile(faction.Icon),
+                color = skins[faction.Key].factionTextColor
+            }
+        end
+    end
+
+    return FactionDataCache
+end
+
+---@param id UnitId
+---@return UICreateUnitDialog_FactionData | { color: false, icon: false }
 function GetUnitFactionInfo(id)
     local bp = __blueprints[id]
     if bp and bp.CategoriesHash and IsUnitPlayable(id) then
-        for k, faction in FactionData do
+        for _, faction in GetFactionColorsAndIcons() do
             if bp.CategoriesHash[faction.name] then return faction end
         end
     end

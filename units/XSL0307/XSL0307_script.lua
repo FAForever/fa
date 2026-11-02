@@ -4,6 +4,7 @@
 -----------------------------------------------------------------
 local SShieldHoverLandUnit = import("/lua/seraphimunits.lua").SShieldHoverLandUnit
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
+local SlowHover = import("/lua/defaultunits.lua").SlowHoverLandUnit
 local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
 
 ---@class XSL0307 : SShieldHoverLandUnit, ShieldEffectsComponent
@@ -47,11 +48,13 @@ XSL0307 = ClassUnit(SShieldHoverLandUnit, ShieldEffectsComponent) {
 
     ---@param self XSL0307
     DisablePointer = function(self)
-        self.TargetPointer:SetFireTargetLayerCaps('None')
+        if not IsDestroyed(self.TargetPointer) then
+            self.TargetPointer:SetFireTargetLayerCaps('None')
 
-        local thread = ForkThread(self.PointerRestart, self)
-        self.Trash:Add(thread)
-        self.PointerRestartThread = thread
+            local thread = ForkThread(self.PointerRestart, self)
+            self.Trash:Add(thread)
+            self.PointerRestartThread = thread
+        end
     end,
 
     ---@param self XSL0307
@@ -70,7 +73,12 @@ XSL0307 = ClassUnit(SShieldHoverLandUnit, ShieldEffectsComponent) {
 
     ---@param self XSL0307
     OnLayerChange = function(self, new, old)
-        SShieldHoverLandUnit.OnLayerChange(self, new, old)
+        local physics = (self.Blueprint or self:GetBlueprint()).Physics
+        if physics.WaterSpeedMultiplier then
+            SlowHover.OnLayerChange(self, new, old)
+        else
+            SShieldHoverLandUnit.OnLayerChange(self, new, old)
+        end
         if not IsDestroyed(self.TargetPointer) then
             if self.PointerEnabled == false then
                 self.TargetPointer:SetFireTargetLayerCaps('None')

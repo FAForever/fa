@@ -2,7 +2,7 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local Util = import("/lua/utilities.lua")
 
 local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
-local SCCollisionBeam = import("/lua/sim/collisionBeams/SCCollisionBeam.lua").SCCollisionBeam
+local SCCollisionBeam = import("/lua/sim/collisionbeams/sccollisionbeam.lua").SCCollisionBeam
 
 -- Used by Seraphim T2 Point Defense XSB2301's SDFUltraChromaticBeamGenerator
 -- Also is the base class for Seraphim Destroyer's beam generators' collision beam

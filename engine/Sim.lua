@@ -7,7 +7,6 @@
 ---@alias Task table
 ---@alias CSimSoundManager any
 ---@alias EconomyEvent moho.EconomyEvent
----@alias ArmyPlans any
 
 ---@alias Faction
 ---| 0 # UEF
@@ -15,6 +14,13 @@
 ---| 2 # Cybran
 ---| 3 # Seraphim
 ---| 4 # (Nomads if enabled)
+
+---@alias FactionIdxOffset
+---| 1 # UEF
+---| 2 # Aeon
+---| 3 # Cybran
+---| 4 # Seraphim
+---| 5 # (Nomads if enabled)
 
 ---@alias ResourceDepositType "Mass" | "Hydrocarbon"
 ---@alias ResourceType "MASS" | "ENERGY"
@@ -31,8 +37,18 @@
 
 ---@alias Object Blip | CollisionBeam | moho.entity_methods | moho.prop_methods | moho.projectile_methods | moho.unit_methods
 ---@alias BoneObject moho.entity_methods | moho.prop_methods | moho.projectile_methods | moho.unit_methods
----@alias ReclaimObject moho.prop_methods | moho.unit_methods
+---@alias ReclaimObject Prop | Unit
 ---@alias TargetObject moho.prop_methods | moho.unit_methods | moho.projectile_methods
+
+---@type AIBrain[]
+ArmyBrains = {}
+
+--- Global automatically set by the engine in the thread of a `SimLua` console command
+---
+---@see DebugGetSelection # For multiple selected units, in any sim thread
+---@see SelectedUnit # Proper interface to get this value
+---@type Unit?
+__selected_unit = {}
 
 --- restricts the army from building the unit category
 ---@param army Army
@@ -40,7 +56,9 @@
 function AddBuildRestriction(army, category)
 end
 
---- it is unknown what this function does or where it gets its value from
+--- it is unknown what this function fully does or where it gets its value from
+--- 
+--- Reduces damage dealt by this army after armor by dividing by `1 + handicap`.
 ---@param army Army
 ---@deprecated
 function ArmyGetHandicap(army)
@@ -84,13 +102,14 @@ end
 function AttachBeamToEntity(emitter, entity, bone, army)
 end
 
--- engine patched to allow commanders to be able to be shared
-
---- changes the army of a unit, returning the new unit and destroying the old one
+--- Changes the army of a unit, returning the new unit and destroying the old one
+--- Modified by an engine patch to allow commanders to be given.
+--- `COMMAND` units are filtered out in SimHooks.lua for legacy compatibility.
 ---@param unit Unit
 ---@param army Army
----@return Unit
-function ChangeUnitArmy(unit, army)
+---@param allowCommanders? boolean
+---@return Unit|nil
+function ChangeUnitArmy(unit, army, allowCommanders)
 end
 
 --- returns true if cheats are enabled and logs the cheat attempt no matter what
@@ -103,14 +122,15 @@ end
 function CoordinateAttacks()
 end
 
---- Creates a bone manipulator for a weapon, allowing it to aim at a target
+--- Creates a bone manipulator for a weapon, allowing it to aim at a target  
+--- At least one bone must be defined.
 ---@param weapon Weapon
 ---@param label string
----@param turretBone Bone
----@param barrelBone? Bone
+---@param yawBone? Bone # turret bone
+---@param pitchBone? Bone # barrel bone
 ---@param muzzleBone? Bone
 ---@return moho.AimManipulator
-function CreateAimController(weapon, label, turretBone, barrelBone, muzzleBone)
+function CreateAimController(weapon, label, yawBone, pitchBone, muzzleBone)
 end
 
 --- Creates a bone manipulator for a unit, allowing it to be animated
@@ -595,9 +615,13 @@ end
 function GetArmyUnitCostTotal(army)
 end
 
---- Returns the currently active command source in the sim state. This number is the army index
---- of the army that sent the command.
----@return number
+--- Returns the currently active command source in the sim state. This is the index of the client
+--- that issued the command, which is from a list including players (human armies) and observers.
+--- The list is in the order of the lobby slots, with observers at the end.
+---
+--- Use `GetCurrentCommandSourceArmy` from `SimUtils.lua` to reliably get the army index of the 
+--- current command source.
+---@return integer
 function GetCurrentCommandSource()
 end
 
@@ -615,7 +639,7 @@ end
 
 --- Gets the current game time in ticks.
 --- The game time is the simulation time, that stops when the game is paused.
----@return number
+---@return integer
 function GetGameTick()
 end
 
@@ -727,30 +751,41 @@ end
 function IsUnit(object)
 end
 
---- Orders a group of units to attack-move to a position
+--- Orders a group of units to attack-move to a target
+---
+---@see IssueToUnitAggressiveMove for single unit variant
 ---@param units Unit[]
----@param position Vector
+---@param target Unit | Vector | Prop | Blip
 ---@return SimCommand
-function IssueAggressiveMove(units, position)
+function IssueAggressiveMove(units, target)
 end
 
 --- Orders a group of units to attack a target
+---
+---@see IssueToUnitAttack for single unit variant
 ---@param units Unit[]
 ---@param target Unit | Vector | Prop | Blip
 ---@return SimCommand
 function IssueAttack(units, target)
 end
 
---- Orders a group of units to build a unit
+--- Orders factories to build a unit.
+--- Takes 1 tick to apply.
+---
+---@see IssueToUnitBuildFactory for single unit variant
+---@see IssueBuildMobile to build a unit with engineers
 ---@param units Unit[]
 ---@param blueprintID string
----@param count number
+---@param count integer
 ---@return SimCommand
 function IssueBuildFactory(units, blueprintID, count)
 end
 
 --- Orders a group of units to build a unit, the nearest unit is given the order
 --- Takes some time to apply (at least 3 ticks).
+---
+---@see IssueToUnitBuildMobile for single unit variant
+---@see IssueBuildFactory to produce a unit in a factory
 ---@param units Unit[]
 ---@param position Vector
 ---@param blueprintID string
@@ -768,13 +803,16 @@ function IssueBuildAllMobile(units, position, blueprintID, table)
 end
 
 --- Orders a group of units to capture a target, usually engineers
+---
+---@see IssueToUnitCapture for single unit variant
 ---@param units Unit[]
 ---@param target Unit
 ---@return SimCommand
 function IssueCapture(units, target)
 end
 
---- Clears out all commands issued on the group of units, this happens immediately. See `IssueToUnitClearCommands` when you want to computationally efficiently apply it to a single unit 
+--- Clears out all commands issued on the group of units, this happens immediately.
+---@see IssueToUnitClearCommands for single unit variant
 ---@param units Unit[]
 ---@return SimCommand
 function IssueClearCommands(units)
@@ -782,25 +820,33 @@ end
 
 --- Clears out all commands issued on the group of factories without affecting
 --- the build queue, allows you to change the rally point
+---
+---@see IssueToUnitClearFactoryCommands for a single unit variant
 ---@param factories Unit[]
 ---@return SimCommand
 function IssueClearFactoryCommands(factories)
 end
 
 --- Orders a group of units to destroy themselves, doesn't leave a wreckage
----@see IssueKillSelf() # an alternative that does leave a wreckage
+---@see IssueKillSelf # an alternative that does leave a wreckage
+---
+---@see IssueToUnitDestroySelf for a single unit variant
 ---@param units Unit[]
 ---@return SimCommand
 function IssueDestroySelf(units)
 end
 
 --- Orders a group of units to dive
+---
+---@see IssueToUnitDive for a single unit variant
 ---@param units Unit[]
 ---@return SimCommand
 function IssueDive(units)
 end
 
 --- Orders a group of factories to assist another factory
+---
+---@see IssueToUnitFactoryAssist for a single unit variant
 ---@param units Unit[]
 ---@param target Unit
 ---@return SimCommand
@@ -808,6 +854,8 @@ function IssueFactoryAssist(units, target)
 end
 
 --- Orders a group of factories to set their rally point
+---
+---@see IssueToUnitFactoryRallyPoint for a single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
@@ -815,6 +863,8 @@ function IssueFactoryRallyPoint(units, position)
 end
 
 --- Orders a group of units to setup a ferry
+---
+---@see IssueToUnitFerry for a single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
@@ -849,15 +899,18 @@ function IssueFormMove(units, position, formation, degrees)
 end
 
 --- Orders a group of units to patrol to a position in formation
+---
+--- Does NOT return `SimCommand`
 --- @param units Unit[]
 --- @param position Vector
 --- @param formation UnitFormations     # Unit formation to use as defined in `formations.lua`
 --- @param degrees number               # Orientation the platoon takes when it reaches the position. South is 0 degrees, east is 90 degrees, etc.
---- @return SimCommand
 function IssueFormPatrol(units, position, formation, degrees)
 end
 
 --- Orders a group of units to guard a target
+---
+---@see IssueToUnitGuard for a single unit variant
 ---@param units Unit[]
 ---@param target Unit | Vector
 ---@return SimCommand
@@ -866,19 +919,25 @@ end
 
 --- Orders a group of units to kill themselves
 ---@see IssueDestroySelf() # an alternative that does not leave a wreckage
+---
+---@see IssueToUnitKillSelf for a single unit variant
 ---@param units Unit[]
 ---@return SimCommand
 function IssueKillSelf(units)
 end
 
---- Orders a group of units to move to a position.  See `IssueToUnitMove` when you want to computationally efficiently apply it to a single unit 
+--- Orders a group of units to move to a position. 
+---
+---@see IssueToUnitMove for a single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
 function IssueMove(units, position)
 end
 
---- Orders a group of units to move off a factory build site. See `IssueToUnitMoveOffFactory` when you want to computationally efficiently apply it to a single unit
+--- Orders a group of units to move off a factory build site.
+---
+---@see IssueToUnitMoveOffFactory for a single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
@@ -886,7 +945,9 @@ function IssueMoveOffFactory(units, position)
 end
 
 --- Orders a group of units to launch a strategic missile at a position
----@see IssueTactical() # for tactical missiles
+---@see IssueTactical # for tactical missiles
+---
+---@see IssueToUnitNuke for a single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
@@ -894,6 +955,8 @@ function IssueNuke(units, position)
 end
 
 --- Orders a group of units to use Overcharge at a target
+---
+---@see IssueToUnitOverCharge for a single unit variant
 ---@param units Unit[]
 ---@param target Unit
 ---@return SimCommand
@@ -901,18 +964,26 @@ function IssueOverCharge(units, target)
 end
 
 --- Orders a group of units to patrol to a position
+---
+---@see IssueToUnitPatrol for a single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
 function IssuePatrol(units, position)
 end
 
---- Orders a unit to pause, this happens immediately
----@param unit Unit
-function IssuePause(unit)
+--- Orders a group of units to pause building, upgrading, and other tasks.
+--- This pause order is put into the order queue, so it may not apply immediately.
+---
+---@see Unit.SetPaused to pause a unit in the middle of a task.
+---@see IssueToUnitPause for a single unit variant
+---@param units Unit[]
+function IssuePause(units)
 end
 
 --- Orders a group of units to reclaim a target
+---
+---@see IssueToUnitReclaim for a single unit variant
 ---@param units Unit[]
 ---@param target ReclaimObject
 ---@return SimCommand
@@ -920,6 +991,8 @@ function IssueReclaim(units, target)
 end
 
 --- Orders a group of units to repair a target
+---
+---@see IssueToUnitRepair for a single unit variant
 ---@param units Unit[]
 ---@param target Unit
 ---@return SimCommand
@@ -927,39 +1000,51 @@ function IssueRepair(units, target)
 end
 
 --- Orders a group of units to sacrifice, yielding part of their build cost to a target
----@param tblUnits Unit[]
+---
+---@see IssueToUnitSacrifice for a single unit variant
+---@param units Unit[]
 ---@param target Unit
 ---@return SimCommand
-function IssueSacrifice(tblUnits, target)
+function IssueSacrifice(units, target)
 end
 
 --- Orders a group of units to run a script sequence, as an example:
 --- `{ TaskName = "EnhanceTask", Enhancement = "AdvancedEngineering" }`
----@param tblUnits Unit[]
+---
+---@see IssueToUnitScript for a single unit variant
+---@param units Unit[]
 ---@param order Task
 ---@return ScriptTask
-function IssueScript(tblUnits, order)
+function IssueScript(units, order)
 end
 
 --- Orders a group of units (SML or SMD) to build a nuke
+---
+---@see IssueToUnitSiloBuildNuke for a single unit variant
 ---@param units Unit[]
 ---@return SimCommand
 function IssueSiloBuildNuke(units)
 end
 
 --- Orders a group of units to build a tactical missile
+---
+---@see IssueToUnitSiloBuildTactical for a single unit variant
 ---@param units Unit[]
 ---@return SimCommand
 function IssueSiloBuildTactical(units)
 end
 
 --- Orders a group of units to stop, this happens immediately
+---
+---@see IssueToUnitStop for a single unit variant
 ---@param units Unit[]
 function IssueStop(units)
 end
 
 --- Orders a group of units to launch a tactical missile
 ---@see IssueNuke() # for nuclear missiles
+---
+---@see IssueToUnitTactical for a single unit variant
 ---@param units Unit[]
 ---@param target Unit | Vector
 ---@return SimCommand
@@ -967,12 +1052,16 @@ function IssueTactical(units, target)
 end
 
 --- Orders a group of units to teleport to a position
+---
+---@see IssueToUnitTeleport for a single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
 function IssueTeleport(units, position)
 end
 
+---
+---@see IssueToUnitTeleportToBeacon for a single unit variant
 ---@param units Unit[]
 ---@param beacon unknown
 ---@return SimCommand
@@ -980,6 +1069,8 @@ function IssueTeleportToBeacon(units, beacon)
 end
 
 --- Orders a group of units to attach themselves to a transport
+---
+---@see IssueToUnitTransportLoad for a single unit variant
 ---@param units Unit[]
 ---@param transport Unit
 ---@return SimCommand
@@ -987,22 +1078,27 @@ function IssueTransportLoad(units, transport)
 end
 
 --- Orders a group of transports to unload their cargo at a position
+---
+---@see IssueToUnitTransportUnload for a single unit variant
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
 function IssueTransportUnload(units, position)
 end
 
---- Orders a group of ~~transports~~ or carriers to unload specific units,
---- appears to work only for carriers
+--- Orders a group of ~~transports~~ or carriers to unload specific units by `categories`
+---
+---@see IssueToUnitTransportUnloadSpecific for a single unit variant
 ---@param units Unit[]
----@param position Vector
 ---@param category EntityCategory
+---@param position Vector
 ---@return SimCommand
 function IssueTransportUnloadSpecific(units, category, position)
 end
 
 --- Orders a group of units to upgrade
+---
+---@see IssueToUnitUpgrade for a single unit variant
 ---@param units Unit[]
 ---@param blueprintID string
 ---@return SimCommand
@@ -1067,8 +1163,13 @@ end
 function RemoveEconomyEvent(unit, event)
 end
 
---- Returns the currently selected unit. For use at the lua console, so you can call Lua methods on a unit
----@return Unit
+--- Returns the currently selected unit.
+--- 
+--- Only returns a unit when called from the `SimLua` console command's thread.
+--- 
+---@see DebugGetSelection # For multiple selected units, in any sim thread.
+---@see __selected_unit The unit this function returns
+---@return Unit?
 function SelectedUnit()
 end
 
@@ -1121,6 +1222,8 @@ function SetArmyEconomy(army, mass, energy)
 end
 
 --- Sets faction for the given army
+---
+---@see AIBrain.GetFactionIndex # to get the faction index of an army represented by a brain
 ---@param army Army
 ---@param index Faction
 function SetArmyFactionIndex(army, index)
@@ -1131,10 +1234,9 @@ end
 function SetArmyOutOfGame(army)
 end
 
---- Unfinished function related to AI, is not used
----@deprecated
+--- Sets a file with army plans the AI will use to run
 ---@param army Army
----@param plans ArmyPlans
+---@param plans FileName # Path to the file with army plans
 function SetArmyPlans(army, plans)
 end
 
@@ -1145,6 +1247,8 @@ function SetArmyShowScore(army, show)
 end
 
 --- Sets the army starting position for the initial unit.
+--- 
+---@see AIBrain.GetArmyStartPos
 ---@param army Army
 ---@param x number
 ---@param z number
@@ -1163,9 +1267,9 @@ function SetArmyUnitCap(army, unitCap)
 end
 
 --- Sets the command source of an army to match another army's command source.
----@param targetArmyIndex number
----@param sourceHumanIndex number
----@param enable boolean
+---@param targetArmyIndex number        # The target army that we're managing command sources for. This is a 0-based index, unlike army indices that are 1-based.
+---@param sourceHumanIndex number       # The source index that is added or removed as a command source. This is a 0-based index, including only actual sources. Mimics the index of `GetClientSessions` in the UI.
+---@param enable boolean                # Whether or not the source index is a command source for the target army
 function SetCommandSource(targetArmyIndex, sourceHumanIndex, enable)
 end
 
@@ -1180,6 +1284,19 @@ end
 ---@param army Army
 ---@param ignore boolean
 function SetIgnorePlayableRect(army, ignore)
+end
+
+--- Changes the distance at which the default navigator switches to a lower resolution
+--- pathfinding grid (from "personal" per-unit waypoints to waypoints shared by many units),
+--- typically resulting in units moving in columns over large distances instead of maintaining their formation.
+---
+--- Default engine value is 50.
+---
+--- Useful console commands for debugging: "dbg navwaypoints", "dbg navpath", "dbg navsteering"
+---
+--- Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/132
+---@param distance number
+function SetNavigatorPersonalPosMaxDistance(distance)
 end
 
 --- sets the playable area of a map
@@ -1203,6 +1320,7 @@ end
 function SetTerrainTypeRect(rect, type)
 end
 
+--- Determined by the `/noinitialunits` command line arg
 ---@return boolean createInitial
 function ShouldCreateInitialArmyUnits()
 end

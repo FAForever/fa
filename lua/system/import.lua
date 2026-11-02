@@ -100,7 +100,7 @@ local __lazyimport_metatable = {
 local indent = 0
 
 ---The global import function used to keep track of modules
----@param name FileName path to the module to load
+---@param name FileName # path to the module to load. Lowercase paths are more performant.
 ---@param isLazy boolean?
 ---@return Module
 function import(name, isLazy)
@@ -180,6 +180,8 @@ end
 
 -- Clear out a module from the table of loaded modules, so that on the next import attempt it will
 -- get reloaded from scratch
+---@param name FileName
+---@param why FileAction? # nil when this module's dependency is dirtied
 function dirty_module(name, why)
     local modules = __modules
     local module = modules[name]

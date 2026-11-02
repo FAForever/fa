@@ -145,6 +145,9 @@ PlatoonTemplate {
         Seraphim = {
             { 'xsb4202', 0, 1, 'attack', 'None' }
         },
+        Aeon = {
+            { 'uab4202', 0, 1, 'support', 'None' }
+        },
     }
 }
 

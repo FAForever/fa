@@ -1,1 +1,0 @@
-- (#6689) Fix units being dragged in the build queue getting visually stuck when a unit moves directly behind another unit of the same type as a result of the dragging.

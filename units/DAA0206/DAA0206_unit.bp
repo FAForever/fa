@@ -53,8 +53,8 @@ UnitBlueprint{
     Defense = {
         ArmorType = "Light",
         EconomyThreatLevel = 80000,
-        Health = 90,
-        MaxHealth = 90,
+        Health = 10,
+        MaxHealth = 10,
     },
     Display = {
         Abilities = { "<LOC ability_suicideweapon>Suicide Weapon" },
@@ -105,9 +105,9 @@ UnitBlueprint{
         UniformScale = 0.15,
     },
     Economy = {
-        BuildCostEnergy = 4600,
-        BuildCostMass = 230,
-        BuildTime = 1200,
+        BuildCostEnergy = 8850,
+        BuildCostMass = 270,
+        BuildTime = 1600,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -164,13 +164,13 @@ UnitBlueprint{
             },
             BallicsticArc = "RULEUBA_None",
             CollideFriendly = true,
-            Damage = 50,
+            Damage = 350,
             DamageFriendly = true,
-            DamageRadius = 7.5,
+            DamageRadius = 3.5,
             DamageType = "Normal",
             DisplayName = "Kamikaze",
-            DoTPulses = 20,
-            DoTTime = 9.5,
+            DoTPulses = 6,
+            DoTTime = 4,
             EffectiveRadius = 0,
             FireTargetLayerCapsTable = {
                 Air = "Land|Seabed|Water",

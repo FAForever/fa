@@ -22,7 +22,7 @@
 --******************************************************************************************************
 
 local Stack = import("/lua/sim/navdatastructures.lua").Stack
-local NavUtils = import("/lua/sim/NavUtils.lua")
+local NavUtils = import("/lua/sim/navutils.lua")
 
 local Generated = false
 

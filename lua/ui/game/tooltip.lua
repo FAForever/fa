@@ -21,7 +21,7 @@ local mouseoverDisplay = false
 local createThread = false
 
 -- creates a tooltip box from ID table and with optional parameters
----@param ID table e.g. { text = 'tooltip header', body = 'tooltip description' } 
+---@param ID table | string e.g. { text = 'tooltip header', body = 'tooltip description' } 
 ---@param delay? number minimum delay compared against the prefs `tooltip_delay` option
 ---@param extended? boolean indicates whether to just create tooltip header or also tooltip description
 ---@param width? number is optional width of tooltip or it is auto calculated based on length of header/description

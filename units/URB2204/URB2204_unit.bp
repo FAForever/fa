@@ -105,7 +105,11 @@ UnitBlueprint{
     LifeBarSize = 1.1,
     Physics = {
         BuildOnLayerCaps = {
+            LAYER_Air = false,
             LAYER_Land = true,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
             LAYER_Water = true,
         },
         DragCoefficient = 0.2,
@@ -204,7 +208,7 @@ UnitBlueprint{
             TurretBoneYaw = "Turret",
             TurretDualManipulators = false,
             TurretPitch = 35,
-            TurretPitchRange = 40,
+            TurretPitchRange = 55,
             TurretPitchSpeed = 180,
             TurretYaw = 0,
             TurretYawRange = 180,

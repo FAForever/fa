@@ -3,18 +3,15 @@ local oldGetGuards = TConstructionUnit.GetGuards
 
 ---@class TConstructionPodUnit : TConstructionUnit
 ---@field Pod string
----@field Parent Unit
+---@field Parent? UEL0301 | UEL0001 # Only these two units set the parent properly
 ---@field guardCache table
----@field guardDummy Unit
+---@field rebuildDrone boolean # If true, the parent should rebuild the pod. Caches script bit 1.
 TConstructionPodUnit = ClassUnit(TConstructionUnit) {
     Parent = nil,
 
     ---@param self TConstructionPodUnit
     OnCreate = function(self)
         TConstructionUnit.OnCreate(self)
-        self.guardDummy = CreateUnitHPR('ZXA0003', self:GetArmy(), 0,0,0,0,0,0)
-        self.guardDummy:AttachTo(self, -1)
-        self.Trash:Add(self.guardDummy)
     end,
 
     ---@param self TConstructionPodUnit
@@ -39,24 +36,13 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
     ---@param transport Unit
     ---@param bone number
     OnAttachedToTransport = function(self, transport, bone)
-        local guards = self:GetGuards()
-        IssueClearCommands(guards)
-        IssueGuard(guards, self.guardDummy)
+        -- Removing the state allows guards to keep assisting the drone
+        self:SetUnitState("Attached", false)
         TConstructionUnit.OnAttachedToTransport(self, transport, bone)
     end,
 
     ---@param self TConstructionPodUnit
-    ---@param transport Unit
-    ---@param bone number
-    OnDetachedFromTransport = function(self, transport, bone)
-        TConstructionUnit.OnDetachedFromTransport(self, transport, bone)
-        local guards = self.guardDummy:GetGuards()
-        IssueClearCommands(guards)
-        IssueGuard(guards, self)
-    end,
-
-    ---@param self TConstructionPodUnit
-    ---@param parent Unit
+    ---@param parent UEL0301 | UEL0001 # Only these two implement the function `NotifyOfPodDeath`
     ---@param podName string
     SetParent = function(self, parent, podName)
         self.Parent = parent
@@ -94,7 +80,7 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
     ---@param target Unit|Prop
     OnStopReclaim = function(self, target)
         TConstructionUnit.OnStopReclaim(self, target)
-        -- Check if we finished our reclaim task and clear our cached commaand if so
+        -- Check if we finished our reclaim task and clear our cached command if so
         if self.guardCache and table.empty(target) then
             self.guardCache = nil
         end
@@ -154,7 +140,6 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
         local engineerGuards = EntityCategoryFilterDown(categories.ENGINEER, self:GetGuards())
         IssueClearCommands(engineerGuards)
         if self.guardCache then
-            LOG('We have a guard cache')
             self.guardCache.command(engineerGuards, self.guardCache.target)
         end
         IssueGuard(engineerGuards, self)
@@ -177,9 +162,6 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
                 end
             end
         end
-        if count > 0 then
-            print(string.format('Found %d cached guards', count))
-        end
         return guards
     end,
 
@@ -188,8 +170,11 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
     ---@param type string
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
-        self.Parent:NotifyOfPodDeath(self.Pod, self.rebuildDrone)
-        self.Parent = nil
+        local parent = self.Parent
+        if parent then
+            parent:NotifyOfPodDeath(self.Pod, self.rebuildDrone)
+            self.Parent = nil
+        end
         TConstructionUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
 

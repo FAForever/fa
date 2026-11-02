@@ -4,36 +4,36 @@
 -- Summary  : Units for Seraphim
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-SFactoryUnit = import('/lua/sim/units/seraphim/SFactoryUnit.lua').SFactoryUnit
-SAirFactoryUnit = import('/lua/sim/units/seraphim/SAirFactoryUnit.lua').SAirFactoryUnit
-SAirUnit = import('/lua/sim/units/seraphim/SAirUnit.lua').SAirUnit
-SAirStagingPlatformUnit = import('/lua/sim/units/seraphim/SAirStagingPlatformUnit.lua').SAirStagingPlatformUnit
-SConcreteStructureUnit = import('/lua/sim/units/seraphim/SConcreteStructureUnit.lua').SConcreteStructureUnit
-SConstructionUnit = import('/lua/sim/units/seraphim/SConstructionUnit.lua').SConstructionUnit
-SEnergyCreationUnit = import('/lua/sim/units/seraphim/SEnergyCreationUnit.lua').SEnergyCreationUnit
-SEnergyStorageUnit = import('/lua/sim/units/seraphim/SEnergyStorageUnit.lua').SEnergyStorageUnit
-SHoverLandUnit = import('/lua/sim/units/seraphim/SHoverLandUnit.lua').SHoverLandUnit
-SLandFactoryUnit = import('/lua/sim/units/seraphim/SLandFactoryUnit.lua').SLandFactoryUnit
-SLandUnit = import('/lua/sim/units/seraphim/SLandUnit.lua').SLandUnit
-SMassCollectionUnit = import('/lua/sim/units/seraphim/SMassCollectionUnit.lua').SMassCollectionUnit
-SMassFabricationUnit = import('/lua/sim/units/seraphim/SMassFabricationUnit.lua').SMassFabricationUnit
-SMassStorageUnit = import('/lua/sim/units/seraphim/SMassStorageUnit.lua').SMassStorageUnit
-SRadarUnit = import('/lua/sim/units/seraphim/SRadarUnit.lua').SRadarUnit
-SSeaFactoryUnit = import('/lua/sim/units/seraphim/SSeaFactoryUnit.lua').SSeaFactoryUnit
-SSeaUnit = import('/lua/sim/units/seraphim/SSeaUnit.lua').SSeaUnit
-SShieldHoverLandUnit = import('/lua/sim/units/seraphim/SShieldHoverLandUnit.lua').SShieldHoverLandUnit
-SShieldLandUnit = import('/lua/sim/units/seraphim/SShieldLandUnit.lua').SShieldLandUnit
-SShieldStructureUnit = import('/lua/sim/units/seraphim/SShieldStructureUnit.lua').SShieldStructureUnit
-SStructureUnit = import('/lua/sim/units/seraphim/SStructureUnit.lua').SStructureUnit
-SSubUnit = import('/lua/sim/units/seraphim/SSubUnit.lua').SSubUnit
-STransportBeaconUnit = import('/lua/sim/units/seraphim/STransportBeaconUnit.lua').STransportBeaconUnit
-SWalkingLandUnit = import('/lua/sim/units/seraphim/SWalkingLandUnit.lua').SWalkingLandUnit
-SWallStructureUnit = import('/lua/sim/units/seraphim/SWallStructureUnit.lua').SWallStructureUnit
-SCivilianStructureUnit = import('/lua/sim/units/seraphim/SCivilianStructureUnit.lua').SCivilianStructureUnit
-SQuantumGateUnit = import('/lua/sim/units/seraphim/SQuantumGateUnit.lua').SQuantumGateUnit
-SRadarJammerUnit = import('/lua/sim/units/seraphim/SRadarJammerUnit.lua').SRadarJammerUnit
-SEnergyBallUnit = import('/lua/sim/units/seraphim/SEnergyBallUnit.lua').SEnergyBallUnit
-SSonarUnit = import('/lua/sim/units/seraphim/SSonarUnit.lua').SSonarUnit
+SFactoryUnit = import('/lua/sim/units/seraphim/sfactoryunit.lua').SFactoryUnit
+SAirFactoryUnit = import('/lua/sim/units/seraphim/sairfactoryunit.lua').SAirFactoryUnit
+SAirUnit = import('/lua/sim/units/seraphim/sairunit.lua').SAirUnit
+SAirStagingPlatformUnit = import('/lua/sim/units/seraphim/sairstagingplatformunit.lua').SAirStagingPlatformUnit
+SConcreteStructureUnit = import('/lua/sim/units/seraphim/sconcretestructureunit.lua').SConcreteStructureUnit
+SConstructionUnit = import('/lua/sim/units/seraphim/sconstructionunit.lua').SConstructionUnit
+SEnergyCreationUnit = import('/lua/sim/units/seraphim/senergycreationunit.lua').SEnergyCreationUnit
+SEnergyStorageUnit = import('/lua/sim/units/seraphim/senergystorageunit.lua').SEnergyStorageUnit
+SHoverLandUnit = import('/lua/sim/units/seraphim/shoverlandunit.lua').SHoverLandUnit
+SLandFactoryUnit = import('/lua/sim/units/seraphim/slandfactoryunit.lua').SLandFactoryUnit
+SLandUnit = import('/lua/sim/units/seraphim/slandunit.lua').SLandUnit
+SMassCollectionUnit = import('/lua/sim/units/seraphim/smasscollectionunit.lua').SMassCollectionUnit
+SMassFabricationUnit = import('/lua/sim/units/seraphim/smassfabricationunit.lua').SMassFabricationUnit
+SMassStorageUnit = import('/lua/sim/units/seraphim/smassstorageunit.lua').SMassStorageUnit
+SRadarUnit = import('/lua/sim/units/seraphim/sradarunit.lua').SRadarUnit
+SSeaFactoryUnit = import('/lua/sim/units/seraphim/sseafactoryunit.lua').SSeaFactoryUnit
+SSeaUnit = import('/lua/sim/units/seraphim/sseaunit.lua').SSeaUnit
+SShieldHoverLandUnit = import('/lua/sim/units/seraphim/sshieldhoverlandunit.lua').SShieldHoverLandUnit
+SShieldLandUnit = import('/lua/sim/units/seraphim/sshieldlandunit.lua').SShieldLandUnit
+SShieldStructureUnit = import('/lua/sim/units/seraphim/sshieldstructureunit.lua').SShieldStructureUnit
+SStructureUnit = import('/lua/sim/units/seraphim/sstructureunit.lua').SStructureUnit
+SSubUnit = import('/lua/sim/units/seraphim/ssubunit.lua').SSubUnit
+STransportBeaconUnit = import('/lua/sim/units/seraphim/stransportbeaconunit.lua').STransportBeaconUnit
+SWalkingLandUnit = import('/lua/sim/units/seraphim/swalkinglandunit.lua').SWalkingLandUnit
+SWallStructureUnit = import('/lua/sim/units/seraphim/swallstructureunit.lua').SWallStructureUnit
+SCivilianStructureUnit = import('/lua/sim/units/seraphim/scivilianstructureunit.lua').SCivilianStructureUnit
+SQuantumGateUnit = import('/lua/sim/units/seraphim/squantumgateunit.lua').SQuantumGateUnit
+SRadarJammerUnit = import('/lua/sim/units/seraphim/sradarjammerunit.lua').SRadarJammerUnit
+SEnergyBallUnit = import('/lua/sim/units/seraphim/senergyballunit.lua').SEnergyBallUnit
+SSonarUnit = import('/lua/sim/units/seraphim/ssonarunit.lua').SSonarUnit
 
 --- Kept for backwards compatibility
 local DefaultUnitsFile = import("/lua/defaultunits.lua")

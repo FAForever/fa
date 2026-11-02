@@ -5,6 +5,10 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
+-- About dragging command graph nodes:
+-- If the target of an order is a unit/blip, its node will snap to units/blips in the same army.
+-- If the target of an order is a prop, its node cannot be dragged.
+
 local UIUtil = import("/lua/ui/uiutil.lua")
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
@@ -15,6 +19,8 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local trashBtn = nil
 local dragging = false
 
+--- Called by the engine when the command graph is shown by pressing the shift key.
+---@param show boolean
 function OnCommandGraphShow(show)
 
     import("/lua/ui/game/reclaim.lua").OnCommandGraphShow(show)
@@ -55,6 +61,7 @@ function OnCommandGraphShow(show)
 --    end
 end
 
+--- Called by the engine when the user begins dragging a command graph node in the world view.
 function OnCommandDragBegin()
 --    local worldView = import("/lua/ui/game/worldview.lua").view
 --    worldView:OnCommandDragBegin()
@@ -62,6 +69,7 @@ function OnCommandDragBegin()
 --    dragging = true
 end
 
+--- Called by the engine when the user stops dragging a command graph node in the world view.
 function OnCommandDragEnd(event,cmdId)
 --    local worldView = import("/lua/ui/game/worldview.lua").view
 --    worldView:OnCommandDragEnd()

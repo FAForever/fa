@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local AirUnit = import('/lua/sim/units/AirUnit.lua').AirUnit
+local AirUnit = import('/lua/sim/units/airunit.lua').AirUnit
 
 ---@class AAirUnit : AirUnit
 AAirUnit = ClassUnit(AirUnit) {}

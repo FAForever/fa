@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
+local DebugComponent = import("/lua/shared/components/debugcomponent.lua").DebugComponent
 
 ---@class DebugProjectileComponent: DebugComponent
 DebugProjectileComponent = Class(DebugComponent) {
@@ -33,7 +33,7 @@ DebugProjectileComponent = Class(DebugComponent) {
         end
 
         local launcher = self.Launcher
-        if launcher and IsUnit(launcher) and (not IsDestroyed(launcher)) then
+        if launcher and (not IsDestroyed(launcher)) and IsUnit(launcher) then
             -- allows the developer to track down the launcher
             launcher:SetCustomName(launcher.EntityId or 'unknown')
             self:DebugDraw('gray')
@@ -50,7 +50,7 @@ DebugProjectileComponent = Class(DebugComponent) {
         end
 
         local launcher = self.Launcher
-        if launcher and IsUnit(launcher) and (not IsDestroyed(launcher)) then
+        if launcher and (not IsDestroyed(launcher)) and IsUnit(launcher) then
             -- allows the developer to track down the launcher
             launcher:SetCustomName(launcher.EntityId or 'unknown')
             self:DebugDraw('white')
@@ -67,7 +67,7 @@ DebugProjectileComponent = Class(DebugComponent) {
         end
 
         local launcher = self.Launcher
-        if launcher and IsUnit(launcher) and (not IsDestroyed(launcher)) then
+        if launcher and (not IsDestroyed(launcher)) and IsUnit(launcher) then
             -- allows the developer to track down the launcher
             launcher:SetCustomName(launcher.EntityId or 'unknown')
             self:DebugDraw('orange')
@@ -84,7 +84,7 @@ DebugProjectileComponent = Class(DebugComponent) {
         end
 
         local launcher = self.Launcher
-        if launcher and IsUnit(launcher) and (not IsDestroyed(launcher)) then
+        if launcher and (not IsDestroyed(launcher)) and IsUnit(launcher) then
             -- allows the developer to track down the launcher
             launcher:SetCustomName(launcher.EntityId or 'unknown')
             self:DebugDraw('red')

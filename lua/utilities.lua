@@ -211,7 +211,7 @@ function GetDistanceBetweenTwoPoints(x1, y1, z1, x2, y2, z2)
     return MathSqrt(dx*dx + dy*dy + dz*dz)
 end
 
----@see GetDistanceBetweenTwoPoints(x1, z1, x2, z2) # for a 3D option
+---@see GetDistanceBetweenTwoPoints(x1, y1, z1, x2, y2, z2) # for a 3D option
 ---@see XZDistanceTwoVectors(v1, v2) # for a vector option
 ---@param x1 number
 ---@param z1 number
@@ -568,4 +568,64 @@ function RotateVectorXYZByQuat(vX, vY, vZ, q)
     return  vX * qW + vW * qX - vZ * qY + vY * qZ,
             vY * qW + vZ * qX + vW * qY - vX * qZ,
             vZ * qW - vY * qX + vX * qY + vW * qZ
+end
+
+--- These are the types that the engine can send across the ui-sim boundary.
+--- Tables have to be handled for loops and unserializable keys/values.
+SERIALIZABLE_TYPES = {
+    number = true,
+    string = true,
+    boolean = true,
+    ["nil"] = true,
+}
+local serializableTypes = SERIALIZABLE_TYPES
+
+--- Returns a deep copy with unserializable values converted using `tostring` 
+--- and cyclic references converted to strings referencing the `_seenTableId` key.
+--- The result can be sent across the ui-sim boundary.
+---@generic T
+---@param t T
+---@return T
+function SerializableDeepCopy(t)
+    local st = serializableTypes
+    local type_t = type(t)
+    if type_t ~= 'table' then
+        if st[type_t] then
+            return t
+        else
+            return tostring(t)
+        end
+    end
+
+    local backrefs = {}
+    local function CreateSerializableAny(_t)
+        local type_t = type(_t)
+        if type_t ~= 'table' then
+            if st[type_t] then
+                return _t
+            else
+                return tostring(_t)
+            end
+        end
+
+        local b = backrefs[_t]
+        if b then
+            -- store table id since table `tostring` uses memory location which won't be the same between Sim and UI
+            if not b._seenTableId then
+                b._seenTableId = tostring(_t)
+            end
+            -- format makes it easy to find in repr output
+            return '_seenTableId = "' .. b._seenTableId .. '"'
+        end
+
+        local r = {}
+        backrefs[_t] = r
+        for k, v in _t do
+            r[CreateSerializableAny(k)] = CreateSerializableAny(v)
+        end
+
+        return r
+    end
+
+    return CreateSerializableAny(t)
 end

@@ -193,8 +193,15 @@ function StartCommandMode(newCommandMode, data)
 end
 
 --- Called when the command mode ends and deconstructs all the data.
----@param isCancel boolean # set when we're at the end of (a sequence of) order(s), is usually always true. False when the mode is ended with right click, except for "ping" mode.
+---@param isCancel? boolean # set when we're at the end of (a sequence of) order(s), is usually always true.
 function EndCommandMode(isCancel)
+    -- isCancel = false when:
+    -- - the mode is ended with right click, except for "ping" mode.
+    -- - new mode with same name is started by console command
+    -- - when the selection changes
+    -- - unit is removed from extra select list
+    -- - lua calls it with false
+
     if ignoreSelection then
         return
     end
@@ -204,10 +211,7 @@ function EndCommandMode(isCancel)
         -- add information to modeData for end behavior
         modeData.isCancel = isCancel or false
 
-        -- ???
-        if modeData.isCancel then
-            ClearBuildTemplates()
-        end
+        ClearBuildTemplates()
 
         -- regain selection if we were cheating in units
         if modeData.cheat and modeData.selection then
@@ -249,11 +253,19 @@ function RestoreCommandMode(ignorePreviousCommands)
     end
 end
 
+---@class CommandModeTable
+---@field [1] CommandMode
+---@field [2] CommandModeData
+
 -- allocate the table once for performance
+---@type CommandModeTable
 local commandModeTable = {}
 
 --- Retrieves the current command mode information.
----@return { [1]: CommandModeDataOrder, [2]: CommandModeData }
+--- 
+--- Called by the engine for worldview right click action, left click action, and
+--- engine worldview HandleEvent.
+---@return CommandModeTable
 function GetCommandMode()
     commandModeTable[1] = commandMode
     commandModeTable[2] = modeData
@@ -377,12 +389,14 @@ local function UpgradeUnit(unit)
     -- inform the user
     print("Upgrade unit")
 
-    -- pause it
+    -- wait one tick for the upgrade to start
     WaitTicks(5)
+
     if IsDestroyed(unit) then
         return
     end
 
+    -- pause the unit (again)
     SetPaused(units, true)
 end
 
@@ -404,7 +418,7 @@ local function OnGuardUpgrade(guardees, unit)
 
     if upgradeRadarTech2 and
         EntityCategoryContains(categories.STRUCTURE * categories.RADAR * categories.TECH2, unit) and
-        unitBlueprint.Economy.ConsumptionPerSecondEnergy > unit:GetEconData().energyConsumed -- check for any adjacency
+        unitBlueprint.Economy.MaintenanceConsumptionPerSecondEnergy > unit:GetEconData().energyConsumed -- check for any adjacency
     then
         ForkThread(UpgradeUnit, unit)
         return
@@ -623,24 +637,8 @@ end
 local function OnScriptIssued(command)
     if command.LuaParams then
         if command.LuaParams.TaskName == 'AttackMove' then
-            local avgPoint = { 0, 0 }
-            for _, unit in command.Units do
-                avgPoint[1] = avgPoint[1] + unit:GetPosition()[1]
-                avgPoint[2] = avgPoint[2] + unit:GetPosition()[3]
-            end
-            avgPoint[1] = avgPoint[1] / TableGetN(command.Units)
-            avgPoint[2] = avgPoint[2] / TableGetN(command.Units)
-
-            avgPoint[1] = command.Target.Position[1] - avgPoint[1]
-            avgPoint[2] = command.Target.Position[3] - avgPoint[2]
-
-            local rotation = MathAtan(avgPoint[1] / avgPoint[2])
-            rotation = rotation * 180 / MathPi
-            if avgPoint[2] < 0 then
-                rotation = rotation + 180
-            end
-            local cb = { Func = "AttackMove", Args = { Target = command.Target.Position, Rotation = rotation,
-                Clear = command.Clear } }
+            ---@type SimCallback
+            local cb = { Func = "AttackMove", Args = { Clear = command.Clear } }
             SimCallback(cb, true)
         elseif command.LuaParams.Enhancement then
             EnhancementQueueFile.enqueueEnhancement(command.Units, command.LuaParams.Enhancement)

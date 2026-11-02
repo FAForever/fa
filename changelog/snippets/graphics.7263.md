@@ -1,0 +1,1 @@
+- Double the resolution of the shield dome mesh and clean up the shader code (#7263).

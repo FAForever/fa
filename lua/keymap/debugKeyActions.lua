@@ -214,7 +214,7 @@ local keyActionsDebug = {
         category = 'game',
     },
     ['debug_restart_session'] = {
-        action = 'UI_Lua RestartSession()',
+        action = "UI_Lua import('/lua/keymap/misckeyactions.lua').RestartSessionOrReplay()",
         category = 'debug',
     },
     ['debug_toggle_pannels'] = {
@@ -222,7 +222,7 @@ local keyActionsDebug = {
         category = 'debug',
     },
     ['debug_connectivity'] = {
-        action = 'UI_Lua import("/lua/ui/dialogs/connection/ConnectionDialog.lua").ToggleDialog()',
+        action = 'UI_Lua import("/lua/ui/dialogs/connection/connectiondialog.lua").ToggleDialog()',
         category = 'ui'
     },
 }
@@ -234,23 +234,23 @@ local keyActionsDebugAI = {
         category = 'ai'
     },
     ['toggle_ai_nav_directions_from'] = {
-        action = 'UI_Lua import("/lua/ui/game/NavDebug/DirectionsFrom.lua").OpenWindow()',
+        action = 'UI_Lua import("/lua/ui/game/navdebug/directionsfrom.lua").OpenWindow()',
         category = 'ai'
     },
     ['toggle_ai_nav_random_direction_from'] = {
-        action = 'UI_Lua import("/lua/ui/game/NavDebug/RandomDirectionFrom.lua").OpenWindow()',
+        action = 'UI_Lua import("/lua/ui/game/navdebug/randomdirectionfrom.lua").OpenWindow()',
         category = 'ai'
     },
     ['toggle_ai_nav_retreat_direction_from'] = {
-        action = 'UI_Lua import("/lua/ui/game/NavDebug/RetreatDirectionFrom.lua").OpenWindow()',
+        action = 'UI_Lua import("/lua/ui/game/navdebug/retreatdirectionfrom.lua").OpenWindow()',
         category = 'ai'
     },
     ['toggle_ai_nav_direction_to'] = {
-        action = 'UI_Lua import("/lua/ui/game/NavDebug/DirectionTo.lua").OpenWindow()',
+        action = 'UI_Lua import("/lua/ui/game/navdebug/directionto.lua").OpenWindow()',
         category = 'ai'
     },
     ['toggle_ai_nav_get_positions_in_radius'] = {
-        action = 'UI_Lua import("/lua/ui/game/NavDebug/GetPositionsInRadius.lua").OpenWindow()',
+        action = 'UI_Lua import("/lua/ui/game/navdebug/getpositionsinradius.lua").OpenWindow()',
         category = 'ai'
     },
     ['toggle_ai_base_ui'] = {
@@ -274,7 +274,7 @@ local keyActionsDebugAI = {
         category = 'ai'
     },
     ['toggle_ai_economy_ui'] = {
-        action = 'UI_Lua import("/lua/ui/game/AIBrainEconomyData.lua").OpenWindow()',
+        action = 'UI_Lua import("/lua/ui/game/aibraineconomydata.lua").OpenWindow()',
         category = 'ai'
     },
     ['toggle_platoon_behavior_silo'] = {
@@ -290,29 +290,85 @@ local keyActionsDebugAI = {
         category = 'ai'
     },
     ['create_build_template_02'] = {
-        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").AddUnitSelectionToEmptyChunkTemplate(2)',
+        action = 'UI_Lua import("/lua/ui/game/aibrains/AIBaseChunkUIUtils.lua").CreateBaseChunkFromUnitSelection(2)',
         category = 'ai'
     },
     ['create_build_template_04'] = {
-        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").AddUnitSelectionToEmptyChunkTemplate(4)',
+        action = 'UI_Lua import("/lua/ui/game/aibrains/AIBaseChunkUIUtils.lua").CreateBaseChunkFromUnitSelection(4)',
         category = 'ai'
     },
     ['create_build_template_08'] = {
-        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").AddUnitSelectionToEmptyChunkTemplate(8)',
+        action = 'UI_Lua import("/lua/ui/game/aibrains/AIBaseChunkUIUtils.lua").CreateBaseChunkFromUnitSelection(8)',
         category = 'ai'
     },
     ['create_build_template_16'] = {
-        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").AddUnitSelectionToEmptyChunkTemplate(16)',
+        action = 'UI_Lua import("/lua/ui/game/aibrains/AIBaseChunkUIUtils.lua").CreateBaseChunkFromUnitSelection(16)',
         category = 'ai'
     },
     ['create_build_template_32'] = {
-        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").AddUnitSelectionToEmptyChunkTemplate(32)',
+        action = 'UI_Lua import("/lua/ui/game/aibrains/AIBaseChunkUIUtils.lua").CreateBaseChunkFromUnitSelection(32)',
         category = 'ai'
+    },
+    ['create_title_announcement'] = {
+        action = 'UI_Lua import("/lua/ui/game/announcement.lua").DebugTitleAnnouncement()',
+        category = 'debug'
+    },
+    ['create_title_text_announcement'] = {
+        action = 'UI_Lua import("/lua/ui/game/announcement.lua").DebugTitleTextAnnouncement()',
+        category = 'debug'
+    },
+}
+
+--- Bindings that exercise the in-game chat. Filed under the `chat` category
+--- (rather than `debug`) so the keybindings dialog groups them with the
+--- regular chat actions — they're harmless to bind in normal play.
+---@type table<string, UIKeyAction>
+local keyActionsDebugChat = {
+    ['debug_chat_window'] = {
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatInterface.lua").Toggle()',
+        category = 'chat',
+    },
+    ['debug_chat_config'] = {
+        action = 'UI_Lua import("/lua/ui/game/chat/config/ChatConfigInterface.lua").Toggle()',
+        category = 'chat',
+    },
+    ['debug_chat_append_system_message'] = {
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatDebug.lua").AppendSystemMessage()',
+        category = 'chat',
+    },
+    ['debug_chat_append_short_message'] = {
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatDebug.lua").AppendShortMessage()',
+        category = 'chat',
+    },
+    ['debug_chat_append_long_message'] = {
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatDebug.lua").AppendLongMessage()',
+        category = 'chat',
+    },
+    ['debug_chat_append_burst'] = {
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatDebug.lua").AppendBurst()',
+        category = 'chat',
+    },
+    ['debug_chat_append_camera_message'] = {
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatDebug.lua").AppendCameraMessage()',
+        category = 'chat',
+    },
+    ['debug_chat_set_recipient_all'] = {
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatDebug.lua").SetRecipientAll()',
+        category = 'chat',
+    },
+    ['debug_chat_set_recipient_allies'] = {
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatDebug.lua").SetRecipientAllies()',
+        category = 'chat',
+    },
+    ['debug_chat_clear_history'] = {
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatDebug.lua").ClearHistory()',
+        category = 'chat',
     },
 }
 
 ---@type table<string, UIKeyAction>
 debugKeyActions = table.combine(
     keyActionsDebug,
-    keyActionsDebugAI
+    keyActionsDebugAI,
+    keyActionsDebugChat
 )

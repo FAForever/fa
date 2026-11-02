@@ -4,7 +4,7 @@
 local CAiBrain = {}
 
 ---@alias BrainArcType 'high' | 'low' | 'none'
----@alias BrainThreatType 'Overall' | 'OverallNotAssigned' | 'StructuresNotMex' | 'Structures' | 'Naval' | 'Air' | 'Land' | 'Experimental' | 'Commander' | 'Artillery' | 'AntiAir' | 'AntiSurface' | 'AntiSub' | 'Economy' | 'Unknown'
+---@alias BrainThreatType 'Overall' | 'OverallNotAssigned' | 'StructuresNotMex' | 'Surface' | 'Structures' | 'Naval' | 'Air' | 'Land' | 'Experimental' | 'Commander' | 'Artillery' | 'AntiAir' | 'AntiSurface' | 'AntiSub' | 'Economy' | 'Unknown'
 
 ---@class BrainPositionThreat
 ---@field [1] number x
@@ -22,22 +22,23 @@ local CAiBrain = {}
 ---@param position Vector
 ---@param threat number
 ---@param decay number
----@param threatType BrainThreatType
+---@param threatType? BrainThreatType
 function CAiBrain:AssignThreatAtPosition(position, threat, decay, threatType)
 end
 
---- Assigns a unit to a platoon
+--- Assigns units to a platoon
 ---@param platoon moho.platoon_methods | string Either a reference to a platoon, or the unique name of the platoon
----@param unit Unit
----@param squad PlatoonSquads
+---@param units Unit[]
+---@param squad PlatoonSquadType
 ---@param formation UnitFormations
-function CAiBrain:AssignUnitsToPlatoon(platoon, unit, squad, formation)
+---@return UnitFormations #Returns the name of the formation
+function CAiBrain:AssignUnitsToPlatoon(platoon, units, squad, formation)
 end
 
 --- Orders factories to build a platoon.
--- @param template Format: {name, plan, {bpID, min, max, squad, formation}, {...}, ...} .
--- @param factories Table of units-factories to build the platoon.
--- @param count How many times to built it.
+---@param template table # Format: {name, plan, {bpID, min, max, squad, formation}, {...}, ...} .
+---@param factories Unit[] # Table of units-factories to build the platoon.
+---@param count number # How many times to built it.
 function CAiBrain:BuildPlatoon(template, factories, count)
 end
 
@@ -56,11 +57,11 @@ end
 function CAiBrain:BuildUnit(builder, unitToBuild, count)
 end
 
---- Filteres factories that can build the platoon and returns them.
+--- Filters factories that can build the platoon and returns them.
 -- Usually passed table with only one factory as AI picks the highest tech factory as a primary and others are assisting.
--- @param tempate Platoon's template.
--- @param factories Table containing units-factories.
--- @return tblUnits Table containing units-factories.
+---@param template PlatoonTemplate # Platoon's template.
+---@param factories FactoryUnit[] # containing units-factories.
+---@return FactoryUnit[]? tblUnits # containing units-factories.
 function CAiBrain:CanBuildPlatoon(template, factories)
 end
 
@@ -95,13 +96,15 @@ function CAiBrain:CreateUnitNearSpot(blueprintID, posX, posY)
 end
 
 --- Returns UnitID for buildingType
--- @param builder Unit-engineer to build with.
--- @param buildingType Type of building (T1LandFactory, T4AirExperimental1, T1HydroCarbon etc)
--- @param buildingTemplate Table for each faction to get the UnitID for a buildingType
+---@param builder Unit # engineer to build with.
+---@param buildingType string # Type of building (T1LandFactory, T4AirExperimental1, T1HydroCarbon etc)
+---@param buildingTemplate table # table for each faction to get the UnitID for a buildingType
 function CAiBrain:DecideWhatToBuild(builder, buildingType, buildingTemplate)
 end
 
---- Disbands the platoon
+---Destroys the platoon **without** destroying its units.
+---
+---@see moho.platoon_methods.Destroy # for destroying the platoon with its units.
 ---@param platoon Platoon
 function CAiBrain:DisbandPlatoon(platoon)
 end
@@ -114,7 +117,7 @@ end
 ---@unknown
 function CAiBrain:FindClosestArmyWithBase()
 end
- 
+
 --- Takes a builder and returns the closest point that the structure can be
 --- built at in the list of building templates with matching builder types.
 ---
@@ -137,14 +140,14 @@ end
 --- structure blueprint has the `"HYDROCARBON"` category) are queried and no
 --- points in the template are used.
 ---
----@param type          string
+---@param type string
 ---@param structureName FileName # blueprint file
 ---@param buildingTypes BuildingTemplate[]
----@param relative      boolean
----@param builder       Unit
----@param optIgnoreAlliance?   AllianceType | nil # defaults to `nil`
----@param optOverridePosX?     number  # defaults to 0.0; ignored if `optOverridePosZ` is absent
----@param optOverridePosZ?     number  # defaults to 0.0
+---@param relative boolean
+---@param builder Unit
+---@param optIgnoreAlliance? AllianceType # defaults to `nil`
+---@param optOverridePosX? number # defaults to 0.0; ignored if `optOverridePosZ` is absent
+---@param optOverridePosZ? number # defaults to 0.0
 ---@param optIgnoreThreatOver? integer # defaults to 0 (accept all)
 ---@return Vector2 location # a new table of `{x, z, 0}` for resource builder types, the actual point otherwise
 function CAiBrain:FindPlaceToBuild(type, structureName, buildingTypes, relative, builder, optIgnoreAlliance, optOverridePosX, optOverridePosZ, optIgnoreThreatOver)
@@ -158,26 +161,24 @@ function CAiBrain:FindUnit(category, needToBeIdle)
 end
 
 --- Return a unit and it's upgrade blueprint.
--- TODO untested.
--- @param upgradeList Table, see '/lua/upgradetemplates.lua'.
--- @return TODO.
-
----@unknown
+--- TODO untested.
+---@param upgradeList UnitUpgradeTemplates # Table, see '/lua/upgradetemplates.lua'.
+---@return any # TODO.
 function CAiBrain:FindUnitToUpgrade(upgradeList)
 end
 
 --- Return an upgrade blueprint for the unit passed in.
--- @param unitName Blueprint ID of the unit to upgrade, example 'ueb0101'.
--- @param upgradeList Table, see '/lua/upgradetemplates.lua'.
--- @return BlueprintID, example 'ueb0201'
+---@param unitName UnitId # ID of the unit to upgrade, example 'ueb0101'.
+---@param upgradeList table # Table, see '/lua/upgradetemplates.lua'.
+---@return UnitId # example 'ueb0201'
 function CAiBrain:FindUpgradeBP(unitName, upgradeList)
 end
 
 --- Returns the ArmyIndex of the army represented by this brain.
--- @return Number.
+---@return number
 
 --- Returns the army index
----@return number
+---@return integer
 function CAiBrain:GetArmyIndex()
 end
 
@@ -185,22 +186,19 @@ end
 -- return x, z
 
 --- Returns the army start position
----@return number X coordinate
----@return number Z coordinate
+---
+---@see SetArmyStart
+---@return number Xcoordinate
+---@return number Zcoordinate
 function CAiBrain:GetArmyStartPos()
 end
-
---- Returns the relevant stat or default value.
--- @param statName String, name of the stats to get.
--- @param defaultValue Ff the stat doesn't exists, it creates it and returns this value.
--- @return Number.
 
 ---@alias AIBrainBlueprintStatEconomy
 --- | 'Economy_TotalProduced_Energy'
 --- | 'Economy_TotalConsumed_Energy'
---- | 'Economy_Income_Energy' 
---- | 'Economy_Output_Energy' 
---- | 'Economy_Stored_Energy' 
+--- | 'Economy_Income_Energy'
+--- | 'Economy_Output_Energy'
+--- | 'Economy_Stored_Energy'
 --- | 'Economy_Reclaimed_Energy'
 --- | 'Economy_Ratio_Energy'
 --- | 'Economy_MaxStorage_Energy'
@@ -217,37 +215,55 @@ end
 --- | 'Economy_Trend_Mass'
 --- | 'Economy_PeakStorage_Mass'
 
+---@class AIBrainEconomyStat
+---@field Name string
+---@field Type "float"
+---@field Value number
+
+---@class AIBrainArmyStat
+---@field Name string
+---@field Type "integer"
+---@field Value integer
+---@field Blueprints? table<BlueprintId, integer> # `nil` when Value is 0
+
 --- Returns the statistic of the army, if it doesn't exist it creates it and returns the default value
----@see CAiBrain:GetBlueprintStat(...) for army related statistics
+---@see moho.aibrain_methods.GetBlueprintStat # for army related statistics
+---@see moho.aibrain_methods.SetArmyStat # to update the stat
 ---@param statName AIBrainBlueprintStatEconomy
----@param defaultValue number | string | table
+---@param defaultValue number
+---@return AIBrainArmyStat | AIBrainEconomyStat
 function CAiBrain:GetArmyStat(statName, defaultValue)
 end
 
----@unknown
+---@return PointVector[]
 function CAiBrain:GetAttackVectors()
 end
 
---- Returns a list of factories at a location
----@param location? table table with location, it's not a position but location created by PBMAddBuildLocation function
----@param radius? number
+--- Returns a list of all available factories
 ---@return FactoryUnit[]
-function CAiBrain:GetAvailableFactories(location, radius)
+function CAiBrain:GetAvailableFactories()
 end
 
----@alias AIBrainBlueprintStatUnits 
+--- Returns a list of available factories, filtered by distance from `position`.
+---@param position Vector
+---@param radius number
+---@return FactoryUnit[]
+function CAiBrain:GetAvailableFactories(position, radius)
+end
+
+---@alias AIBrainBlueprintStatUnits
 --- | 'Units_History'
 --- | 'Units_Killed'
---- | 'Units_BeingBuilt' 
---- | 'Units_Active' 
---- | 'Units_TotalDamageDealt' 
+--- | 'Units_BeingBuilt'
+--- | 'Units_Active'
+--- | 'Units_TotalDamageDealt'
 --- | 'Units_TotalDamageReceive'
 
 ---@alias AIBrainBlueprintStatEnemies
 --- | 'Enemies_Killed'
 --- | 'Enemies_MassValue_Destroyed'
---- | 'Enemies_EnergyValue_Destroyed' 
---- | 'Enemies_Commanders_Destroyed' 
+--- | 'Enemies_EnergyValue_Destroyed'
+--- | 'Enemies_Commanders_Destroyed'
 
 ---@alias AIBrainBlueprintStatDamage
 --- | 'DamageStats_TotalDamageReceived'
@@ -261,14 +277,12 @@ end
 function CAiBrain:GetBlueprintStat(statName, category)
 end
 
---- Return this brain's current enemy.
----@return number -- target army's number
+--- Return this brain's current enemy
+---
+---@see AIBrain.SetCurrentEnemy # to set the enemy
+---@return AIBrain? -- target army brain
 function CAiBrain:GetCurrentEnemy()
 end
-
---- Return how many units of the given categories exist.
--- @param category Unit's category, example: categories.TECH2 .
--- @return Number.
 
 --- Returns the number of units of the given categories
 ---@param category EntityCategory
@@ -276,55 +290,56 @@ end
 function CAiBrain:GetCurrentUnits(category)
 end
 
---- Returns current resource income.
----@param resource 'ENERGY'|'MASS'.
--- @return Number.
+--- Returns current income per tick of the resouce.
+---@param resource 'ENERGY'|'MASS'
+---@return number
 function CAiBrain:GetEconomyIncome(resource)
 end
 
---- Return how much of the resource the brains wants to use.
--- This is used for calculating Paragon's production.
----@param resource 'ENERGY'|'MASS'.
--- @return Number.
+--- Returns how much of the resource the brain wants to use per tick.
+--- This is used for calculating Paragon's production.
+---@param resource 'ENERGY'|'MASS'
+---@return number
 function CAiBrain:GetEconomyRequested(resource)
 end
 
 --- Return current resource amout in storage.
----@param resource 'ENERGY'|'MASS'.
--- @return Number.
+---@param resource 'ENERGY'|'MASS'
+---@return number
 function CAiBrain:GetEconomyStored(resource)
 end
 
 --- Returns the ratio between resource in storage to maximum storage amout.
----@param resource  'ENERGY' | 'MASS'.
+---@param resource ResourceType
 ---@return number
 function CAiBrain:GetEconomyStoredRatio(resource)
 end
 
 --- Returns the relative resource income. (production - usage)
----@param resource 'ENERGY'|'MASS'.
+---@param resource 'ENERGY'|'MASS'
 ---@return number  (0.1 = 1)
 function CAiBrain:GetEconomyTrend(resource)
 end
 
 --- Returns current resource usage.
 -- When stalling, this number is same as the current income.
----@param resource 'ENERGY' | 'MASS'
+---@param resource ResourceType
 ---@return number
 function CAiBrain:GetEconomyUsage(resource)
 end
 
 --- Returns the faction of the army represented by this brain.
--- 1 UEF, 2 Aeon, 3 Cybran, 4 Seraphim. 5 custom faction like Nomads
----@return number
+---
+---@see SetArmyFactionIndex # to set an army's faction index
+---@return FactionIdxOffset
 function CAiBrain:GetFactionIndex()
 end
 
 --- Returns a position with highest threat and the threat value.
 --- Always reports a threatvalue of zero for Allies or self.
 --- threatType and armyIndex are not required.
---- @param ring number 1 or 2
---- 1 = Single, 2 = With surrounding IMPA blocks 
+----@param ring number 1 or 2
+--- 1 = Single, 2 = With surrounding IMPA blocks
 --- ..........   ..........
 --- ..........   ....xxx...
 --- .....X....   ....xXx...
@@ -343,13 +358,13 @@ end
 --- This function does **not** take into account intel.
 ---@param category EntityCategory
 ---@param needToBeIdle boolean
----@param requireBuilt boolean Appears to be not functional
+---@param requireBuilt? boolean # Appears to be not functional
 ---@return Unit[]
 function CAiBrain:GetListOfUnits(category, needToBeIdle, requireBuilt)
 end
 
 --- Returns a ratio between water and land.
----@return number 0.0 - 1.0
+---@return number # 0.0 - 1.0
 function CAiBrain:GetMapWaterRatio()
 end
 
@@ -358,23 +373,29 @@ end
 function CAiBrain:GetNoRushTicks()
 end
 
---- TODO.
--- Probably has to do something with first param of MakePlatoon().
----@return number
-function CAiBrain:GetNumPlatoonsTemplateNamed()
+--- Returns a number of active platoons with `name`
+---@see moho.aibrain_methods.MakePlatoon
+---@param name string
+---@return integer
+function CAiBrain:GetNumPlatoonsTemplateNamed(name)
 end
 
---- TODO.
----@return number
-function CAiBrain:GetNumPlatoonsWithAI()
+--- TODO: The name is most likely the AI Plan passed when making the platoon
+---
+---@see moho.aibrain_methods.MakePlatoon
+---@param name string
+---@return integer
+function CAiBrain:GetNumPlatoonsWithAI(name)
 end
 
---- Returns the number of units around a position that match the categories
+--- Returns the number of units in `radius` from `position` that match the `category` and `alliance`.
+---
+--- Based on intel.
 ---@param category EntityCategory
 ---@param position Vector
 ---@param radius number
 ---@param alliance AllianceStatus
----@return number
+---@return integer
 function CAiBrain:GetNumUnitsAroundPoint(category, position, radius, alliance)
 end
 
@@ -384,13 +405,21 @@ function CAiBrain:GetPersonality()
 end
 
 --- Returns platoon by unique name.
----@param name string unique platoon's name set by platoon:UniquelyNamePlatoon(name) function.
+---
+---@see moho.platoon_methods.UniquelyNamePlatoon # To set the name.
+---@param name string
+---@return Platoon?
+function CAiBrain:GetPlatoonUniquelyNamed(name)
+end
+
+--- `ArmyPool` is created by engine and contains all units for the army
+---@param name 'ArmyPool'
 ---@return Platoon
 function CAiBrain:GetPlatoonUniquelyNamed(name)
 end
 
 --- Returns brain's platoons
--- @return tblPlatoons Table containing platoons.
+---@return Platoon[]
 function CAiBrain:GetPlatoonsList()
 end
 
@@ -442,14 +471,14 @@ function CAiBrain:GetUnitsAroundPoint(category, position, radius, alliance)
 end
 
 --- Gives resources to brain.
--- @param type 'Energy', 'Mass'.
--- @param amout Number, how much to give.
+---@param type ResourceType
+---@param amount number
 function CAiBrain:GiveResource(type, amount)
 end
 
 --- Gives storage to brain.
--- @param type 'Energy', 'Mass'.
--- @param amout Number, how much to give.
+---@param type ResourceType
+---@param amount number
 function CAiBrain:GiveStorage(type, amount)
 end
 
@@ -459,14 +488,20 @@ end
 function CAiBrain:IsAnyEngineerBuilding(category)
 end
 
+---@deprecated not used in faf
 --- Returns true if opponent AI should be running.
--- @return true/false (not used in FAF)
+---@return boolean
 function CAiBrain:IsOpponentAIRunning()
 end
 
 --- Creates a new platoon.
----@param name string   # unique name for platoon
----@param aiPlan string # to follow for this platoon or '', the function for the plan is in '/lua/platoon.lua'.
+---
+---@see moho.aibrain_methods.GetNumPlatoonsTemplateNamed # To get number of platoons with `name`.
+---@see moho.aibrain_methods.GetPlatoonsList # To get all platoons
+---@see moho.aibrain_methods.GetPlatoonUniquelyNamed # To get platoon by a unique name.
+---@see moho.platoon_methods.UniquelyNamePlatoon # To set platoon's unique name.
+---@param name string # Name of the platoon. Can be shared by more platoons.
+---@param aiPlan string # plan to follow for this platoon or `''`, the function for the plan is in '/lua/platoon.lua'.
 ---@return Platoon
 function CAiBrain:MakePlatoon(name, aiPlan)
 end
@@ -478,18 +513,31 @@ end
 function CAiBrain:NumCurrentlyBuilding(entityCategoryOfBuildee, entityCategoryOfBuilder)
 end
 
----TODO.
+--- TODO.
 ---@param platoon Platoon
----@param squad PlatoonSquads
+---@param squad PlatoonSquadType
 ---@param alliance AllianceType
+---@param compareType 'LeastDefended'|'Closest'|'Furthest'|'HighestValue'
 ---@param category EntityCategory
----@param compareType any
----@return Vector
-function CAiBrain:PickBestAttackVector(platoon, squad, alliance, category, compareType)
+---@return Vector?
+function CAiBrain:PickBestAttackVector(platoon, squad, alliance, compareType, category)
+end
+
+--- TODO.
+---@param platoon Platoon
+---@param squad PlatoonSquadType
+---@param alliance AllianceType
+---@param compareType 'LeastDefended'|'Closest'|'Furthest'|'HighestValue'
+---@param category EntityCategory
+---@param file FileName
+---@param callbackName string # `fun(n1, n2, n3, n4): boolean`
+---@return Vector?
+function CAiBrain:PickBestAttackVector(platoon, squad, alliance, compareType, category, file, callbackName)
 end
 
 --- Returns true if platoon exists.
--- @return true/false.
+---@param platoon Platoon
+---@return boolean
 function CAiBrain:PlatoonExists(platoon)
 end
 
@@ -517,13 +565,15 @@ end
 ---@param triggerName string # unique name of the trigger. See `RemoveArmyStatsTrigger` to remove occupied names.
 ---@param compareType ComparatorString # available types: `LessThan`, `LessThanOrEqual`, `GreaterThan`, `GreaterThanOrEqual`, `Equal`
 ---@param value number #
----@param category EntityCategory? # 
+---@param category EntityCategory? #
 function CAiBrain:SetArmyStatsTrigger(statName, triggerName, compareType, value, category)
 end
 
---- Set the current enemy for this brain to attack.
--- @param armyIndex Target's army number.
-function CAiBrain:SetCurrentEnemy(armyIndex)
+--- Set the current enemy for this brain to attack
+---
+---@see AIBrain.GetCurrentEnemy # to get the current enemy
+---@param aiBrain AIBrain
+function CAiBrain:SetCurrentEnemy(aiBrain)
 end
 
 --- Set the current plan for this brain to run.
@@ -541,13 +591,24 @@ function CAiBrain:SetResourceSharing(bool)
 end
 
 --- TODO.
+---@see AIBrain.SetCurrentEnemy # To set the the target army
+---@param category? EntityCategory # Unit types to set up attack vectors for. Defaults to `STRUCTURE - MOBILE`
 function CAiBrain:SetUpAttackVectorsToArmy(category)
 end
 
 --- Removes resources from brain.
--- @param type 'Energy', 'Mass'.
--- @param amout Number, how much to take.
+---@param type ResourceType
+---@param amount number # how much to take.
+---@return number # actual amount taken
 function CAiBrain:TakeResource(type, amount)
 end
+
+--- Called by the engine when a unit fails unit transfer due to issues other than unit cap.
+---@type fun(self: moho.aibrain_methods)
+CAiBrain.OnFailedUnitTransfer = nil
+
+--- Called by the engine when a unit fails to create due to unit cap.
+---@type fun(self: moho.aibrain_methods)
+CAiBrain.OnUnitCapLimitReached = nil
 
 return CAiBrain

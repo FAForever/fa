@@ -12,7 +12,7 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 370,
+                    LODCutoff = 1020,
                     ShaderName = "VertexNormal",
                     AlbedoName = "/env/geothermal/props/rocks/GeoRockGroup01_albedo.dds",
                 },

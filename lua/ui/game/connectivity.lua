@@ -104,7 +104,7 @@ function CreateUI()
 
     GUI.group.wc = UIUtil.CreateWorldCover(GUI.group)
 
-    GUI.border = CreateBorder(GUI.group)
+    GUI.border = UIUtil.CreateSCXMenuPanelBorder(GUI.group)
     GUI.brackets = UIUtil.CreateDialogBrackets(GUI.group, 106, 110, 110, 108, true)
 
     GUI.title = UIUtil.CreateText(GUI.border.tm, '<LOC _Connectivity>', 20)
@@ -190,55 +190,4 @@ function CloseWindow()
     GUI.group:Destroy()
     GUI.group = false
     ConExecute('ren_shownetworkstats false')
-end
-
-function CreateBorder(parent)
-    local tbl = {}
-    tbl.tl = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_ul.dds'))
-    tbl.tm = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_horz_um.dds'))
-    tbl.tr = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_ur.dds'))
-    tbl.l = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_vert_l.dds'))
-    tbl.r = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_vert_r.dds'))
-    tbl.bl = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_ll.dds'))
-    tbl.bm = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_lm.dds'))
-    tbl.br = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_lr.dds'))
-
-    tbl.tl.Bottom:Set(parent.Top)
-    tbl.tl.Right:Set(parent.Left)
-
-    tbl.tr.Bottom:Set(parent.Top)
-    tbl.tr.Left:Set(parent.Right)
-
-    tbl.tm.Bottom:Set(parent.Top)
-    tbl.tm.Right:Set(parent.Right)
-    tbl.tm.Left:Set(parent.Left)
-
-    tbl.l.Bottom:Set(parent.Bottom)
-    tbl.l.Top:Set(parent.Top)
-    tbl.l.Right:Set(parent.Left)
-
-    tbl.r.Bottom:Set(parent.Bottom)
-    tbl.r.Top:Set(parent.Top)
-    tbl.r.Left:Set(parent.Right)
-
-    tbl.bl.Top:Set(parent.Bottom)
-    tbl.bl.Right:Set(parent.Left)
-
-    tbl.br.Top:Set(parent.Bottom)
-    tbl.br.Left:Set(parent.Right)
-
-    tbl.bm.Top:Set(parent.Bottom)
-    tbl.bm.Right:Set(parent.Right)
-    tbl.bm.Left:Set(parent.Left)
-
-    tbl.tl.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.tm.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.tr.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.l.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.r.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.bl.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.bm.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.br.Depth:Set(function() return parent.Depth() - 1 end)
-
-    return tbl
 end

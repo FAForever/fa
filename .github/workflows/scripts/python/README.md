@@ -29,3 +29,4 @@ python script_name.py
 
 # Deactivate the Virtual Environment
 deactivate
+```

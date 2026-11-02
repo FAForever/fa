@@ -585,7 +585,7 @@ function BuildContent(contentID)
         return
     end
     import("/lua/ui/game/multifunction.lua").CloseMapDialog()
-    import("/lua/ui/game/chat.lua").CloseChatConfig()
+    import("/lua/ui/game/chat/config/ChatConfigInterface.lua").Close()
     activeTab = contentID
     for _, tab in controls.tabs do
         if tab.Data.content == contentID then
@@ -1200,6 +1200,15 @@ function RemoveModeText(modeID)
     UpdateModeDisplay()
 end
 
+function ClearModeText()
+    local keys = table.keys(modes, false)
+    for k = 1, table.getn(keys) do
+        modes[keys[k]] = nil
+    end
+
+    UpdateModeDisplay()
+end
+
 function UpdateModeDisplay()
     if controls.modeDisplay then
         controls.modeDisplay:Destroy()
@@ -1258,5 +1267,12 @@ function UpdateModeDisplay()
         controls.modeDisplay:DisableHitTest()
         controls.modeDisplay.minCap:DisableHitTest()
         controls.modeDisplay.maxCap:DisableHitTest()
+    end
+end
+
+FocusArmyChanged = function()
+    -- Avoid clearing the score screen button at the end of the game due to being switched to observer.
+    if not SessionIsGameOver() then
+        ClearModeText()
     end
 end

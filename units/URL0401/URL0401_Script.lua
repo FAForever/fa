@@ -6,7 +6,9 @@
 local CLandUnit = import("/lua/cybranunits.lua").CLandUnit
 local CIFArtilleryWeapon = import("/lua/cybranweapons.lua").CIFArtilleryWeapon
 local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectUtil = import("/lua/effectutilities.lua")
 local Util = import("/lua/utilities.lua")
+
 local barrelBones = { 'Turret_Barrel_F_B01', 'Turret_Barrel_E_B01', 'Turret_Barrel_D_B01', 'Turret_Barrel_C_B01',
     'Turret_Barrel_B_B01', 'Turret_Barrel_A_B01' }
 local recoilBones = { 'Turret_Barrel_F_B02', 'Turret_Barrel_E_B02', 'Turret_Barrel_D_B02', 'Turret_Barrel_C_B02',
@@ -160,6 +162,55 @@ URL0401 = ClassUnit(CLandUnit) {
             end,
         },
     },
+
+    IntelEffects = {
+        {
+            Bones = {
+                'URL0401',
+            },
+            Offset = {
+                1.05,
+                2.2,
+                -4.05,
+            },
+            Scale = 0.4,
+            Type = 'Jammer01',
+        },
+        {
+            Bones = {
+                'URL0401',
+            },
+            Offset = {
+                -1.05,
+                2.2,
+                -4.05,
+            },
+            Scale = 0.4,
+            Type = 'Jammer01',
+        },
+    },
+
+    OnStopBeingBuilt = function(self, builder, layer)
+        CLandUnit.OnStopBeingBuilt(self, builder, layer)
+        self:SetMaintenanceConsumptionActive()
+    end,
+
+    ---@param self RadarJammerUnit
+    OnIntelEnabled = function(self)
+        CLandUnit.OnIntelEnabled(self)
+        if self.IntelEffects and not self.IntelFxOn then
+            self.IntelEffectsBag = {}
+            self:CreateTerrainTypeEffects(self.IntelEffects, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
+            self.IntelFxOn = true
+        end
+    end,
+
+    ---@param self RadarJammerUnit
+    OnIntelDisabled = function(self)
+        CLandUnit.OnIntelDisabled(self)
+        EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
+        self.IntelFxOn = false
+    end,
 }
 
 TypeClass = URL0401

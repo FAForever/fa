@@ -1,0 +1,2 @@
+- Unified objective logic under a new class (#7273)
+- Improved ObjectiveGroup (#7273)

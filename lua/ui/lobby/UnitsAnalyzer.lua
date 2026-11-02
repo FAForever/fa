@@ -71,14 +71,11 @@ CategoriesSkipped  = {
     ["xec9001"] = true,    -- Wall Segment Extra
     ["xec9002"] = true,    -- Wall Segment Extra
     ["xec9003"] = true,    -- Wall Segment Extra
-    ["xec9002"] = true,    -- Wall Segment Extra
     ["xec9004"] = true,    -- Wall Segment Extra
     ["xec9005"] = true,    -- Wall Segment Extra
     ["xec9006"] = true,    -- Wall Segment Extra
     ["xec9007"] = true,    -- Wall Segment Extra
     ["xec9008"] = true,    -- Wall Segment Extra
-    ["xec9009"] = true,    -- Wall Segment Extra
-    ["xec9009"] = true,    -- Wall Segment Extra
     ["xec9009"] = true,    -- Wall Segment Extra
     ["xec9010"] = true,    -- Wall Segment Extra
     ["xec9011"] = true,    -- Wall Segment Extra
@@ -90,7 +87,6 @@ CategoriesSkipped  = {
     ["brngrnd2"] = true,
     ["brogrnd1"] = true,
     ["brogrnd2"] = true,
-    ["rip0001"] = true,
 }
 
 -- Blueprints with these categories will be hidden in tooltips
@@ -143,7 +139,6 @@ CategoriesHidden  = {
     ["CAPTURE"] = true,
     ["CANNOTUSEAIRSTAGING"] = true,
     ["CANTRANSPORTCOMMANDER"] = true,
-    ["CANNOTUSEAIRSTAGING"] = true,
     ["CONSTRUCTION"] = true,
     ["CONSTRUCTIONSORTDOWN"] = true,
     ["DRAGBUILD"] = true,
@@ -712,11 +707,11 @@ function GetUnitsCategories(bp, showAll)
             end
             -- Ensures name of enhancements are nicely formatted
             if cached.Enhancements[category] then
-                category = 'UPGRADE ' .. StringSplitCamel(category)
+                category = 'UPGRADE ' .. string.splitCamelCase(category)
             end
             if not CategoriesHidden[category] and
-               not StringStarts(category, 'BUILTBY') and
-               not StringStarts(category, 'DUMMY') then
+               not string.startsWith(category, 'BUILTBY') and
+               not string.startsWith(category, 'DUMMY') then
                 -- Ensures all categories have the same case
                 ret[string.upper(category)] = true
             end
@@ -1061,7 +1056,7 @@ local function CacheEnhancement(key, bp, name, enh)
     enh.Key = key
     enh.Faction = bp.Faction
     enh.Source = bp.Source
-    enh.SourceID = StringExtract(bp.Source, '/', '_unit.bp', true)
+    enh.SourceID = string.extractBetween(bp.Source, '/', '_unit.bp', true)
 
     enh.Name = enh.Name or name
     enh.Type = 'UPGRADE'
@@ -1159,7 +1154,7 @@ local function CacheUnit(bp)
             -- and other enhancements have different stats and icons
             -- depending on faction or whether they are for ACU or SCU
             -- so store each enhancement with unique key:
-            local id = StringExtract(bp.Source, '/', '_unit.bp', true)
+            local id = string.extractBetween(bp.Source, '/', '_unit.bp', true)
             local key = bp.Faction ..'_' .. id .. '_' .. name
 
             CacheEnhancement(key, bp, name, enh)

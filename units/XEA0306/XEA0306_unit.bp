@@ -218,7 +218,7 @@ UnitBlueprint{
     Footprint = {
         MaxSlope = 0.25,
         SizeX = 4,
-        SizeZ = 8,
+        SizeZ = 7,
     },
     General = {
         CommandCaps = {

@@ -25,10 +25,10 @@ local Window = import("/lua/maui/window.lua").Window
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
-local UIConnectionDialogDot = import("/lua/ui/dialogs/connection/ConnectionDialogDot.lua").UIConnectionDialogDot
+local UIConnectionDialogDot = import("/lua/ui/dialogs/connection/connectiondialogdot.lua").UIConnectionDialogDot
 local SessionClientsOverride = import("/lua/ui/override/sessionclients.lua")
 
-local ConnectionDialogData = import("/lua/ui/dialogs/connection/ConnectionDialogData.lua")
+local ConnectionDialogData = import("/lua/ui/dialogs/connection/connectiondialogdata.lua")
 
 ---@class UIConnectionDialogMessage : number[]
 ---@field Identifier string

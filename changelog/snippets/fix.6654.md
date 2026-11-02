@@ -1,1 +1,0 @@
-- (#6654) Fix order button tooltips not disappearing when the mouse is moved off the order button.

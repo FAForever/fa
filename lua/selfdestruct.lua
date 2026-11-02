@@ -5,6 +5,10 @@ local CancelCountdown = CancelCountdown
 local ForkThread = ForkThread
 local KillThread = KillThread
 
+---@class ToggleSelfDestructData
+---@field owner number
+---@field noDelay boolean
+
 -- prevent magic numbers
 local countdownDuration = 5
 
@@ -20,12 +24,15 @@ local function SelfDestructThread(unit)
 end
 
 --- Toggles the destruction of the units
----@param data { owner: number, noDelay: boolean }
----@param units Unit[]
+---@param data ToggleSelfDestructData
+---@param units? Unit[]
 function ToggleSelfDestruct(data, units)
 
     -- suppress self destruct in tutorial missions as they screw up the mission end
-    if ScenarioInfo.tutorial and ScenarioInfo.tutorial == true then
+    if ScenarioInfo.tutorial and ScenarioInfo.tutorial == true
+        -- handle call with empty selection
+        or not units
+    then
         return
     end
 
