@@ -83,11 +83,8 @@ Useful extensions if you intent to work with shaders:
 
 Setup the FA Lua Extension
 ----------------
-Releases can be found [here](https://github.com/FAForever/fa-lua-vscode-extension/releases). 
-
-To setup you will want to download the `.vsix` file and install it in VS Code. Follow the steps in the image and you will be able to select the extension file downloaded.  
+Install the official Lua Language Server extension from the VS Code extension marketplace.  
 ![Extension install](/images/setup/extension-install.png)
-> Note: Whenever there is a new version of the extension you will have to download it and install it again
 
 Once you have it installed you're good to go for the FAF repo. For mod/map folders will be a different setup process (TODO, write guide for maps/mods).
 

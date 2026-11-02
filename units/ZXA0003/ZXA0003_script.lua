@@ -24,17 +24,6 @@ local DummyUnit = import('/lua/sim/unit.lua').DummyUnit
 
 ---@class ZXA0003 : DummyUnit
 ZXA0003 = ClassUnit(DummyUnit) {
-
-    OnCreate = function (self)
-        self:HideBone(0, true)
-        -- do not allow the unit to be killed or to take damage
-        self.CanTakeDamage = false
-
-        -- do not allow the unit to be reclaimed or targeted by weapons
-        self:SetReclaimable(false)
-        self:SetDoNotTarget(true)
-    end,
-
     DetachFrom = function(self)
     end,
 }
