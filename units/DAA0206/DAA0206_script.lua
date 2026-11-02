@@ -33,7 +33,7 @@ DAA0206 = ClassUnit(AAirUnit) {
     ---@param self DAA0206
     ---@param weapon DefaultProjectileWeapon
     DisableWeaponThread = function(self, weapon)
-        local interval = weapon.Blueprint.TargetCheckInterval / 10 + 1
+        local interval = weapon.Blueprint.TargetCheckInterval * 10 + 1
         while not self.Dead do
             -- only let weapon fire when it makes sense
             if -- we're trying to attack
