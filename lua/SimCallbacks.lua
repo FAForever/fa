@@ -736,21 +736,14 @@ Callbacks.AbortNavigationOfFactoryAssisters = function(data, selection)
         return
     end
 
-    local engineers = EntityCategoryFilterDown(CategoriesEngineers, selection)
+    local engineers = EntityCategoryFilterDown(CategoriesEngineers, selection) --[[@as Unit[] ]]
     if TableEmpty(engineers) then
         return
     end
 
-    -- verify the target
-    local targetId = data.Target
-    if type(targetId) ~= 'string' then
-        return
-    end
-
-    local target = GetUnitById(targetId) --[[@as Unit]]
-    if (not target) or
-        IsDestroyed(target) or
-        (not EntityCategoryContains(CategoriesFactories, target))
+    local target = engineers[1]:GetCommandQueue()[1].target
+    if not target or IsDestroyed(target) or not IsUnit(target)
+        or not EntityCategoryContains(CategoriesFactories, target)
     then
         return
     end
