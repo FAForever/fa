@@ -13,7 +13,8 @@ UnitBlueprint{
     },
     Intel = { VisionRadius = 0 },
     Physics = {
-        MotionType = "RULEUMT_None",
+        MotionType = "RULEUMT_Air",
+        MaxSpeed = 0.001,
     },
     SizeX = 0,
     SizeZ = 0,
