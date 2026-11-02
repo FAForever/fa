@@ -66,6 +66,7 @@ function IsValidPayload(msg)
     if msg.camera   ~= nil and type(msg.camera)   ~= 'table' then return false end
     if msg.location ~= nil and type(msg.location) ~= 'table' then return false end
     if msg.Args     ~= nil and type(msg.Args)     ~= 'table' then return false end
+    if msg.to  == 'notify' and type(msg.data)     ~= 'table' then return false end
 
     return true
 end
