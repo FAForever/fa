@@ -27,8 +27,6 @@ local ForkThread = ForkThread
 local WaitTicks = WaitTicks
 local IsDestroyed = IsDestroyed
 local TableGetn = table.getn
-local MathMax = math.max
-local MathCeil = math.ceil
 
 local UnitIsUnitState = moho.unit_methods.IsUnitState
 local UnitGetGuardedUnit = moho.unit_methods.GetGuardedUnit
@@ -37,20 +35,6 @@ local EntityGetPositionXYZ = moho.entity_methods.GetPositionXYZ
 
 --- Number of passes, one per tick, that look for engineers that started their assist move
 local MaximumPasses = 3
-
---- Returns the size of the factory that is used for the build range check
----@param blueprint UnitBlueprint
----@return number
-local function GetFactorySize(blueprint)
-    -- naval factories have no footprint size. The engine then uses the rounded up unit size
-    local footprint = blueprint.Footprint
-    local sizeX, sizeZ = footprint.SizeX, footprint.SizeZ
-    if sizeX and sizeZ then
-        return MathMax(sizeX, sizeZ)
-    end
-
-    return MathMax(MathCeil(blueprint.SizeX or 1), MathCeil(blueprint.SizeZ or 1))
-end
 
 --- Aborts the initial assist move of the engineers that are in build range of the factory
 ---@param engineers Unit[]  # modified in place
@@ -63,7 +47,7 @@ local function AbortNavigationOfFactoryAssistersThread(engineers, factory)
     -- The range uses footprints, which is more conservative than the engine's skirt based check. An aborted engineer
     -- that is out of range walks straight into range instead of to its reserved spot
     local fx, _, fz = EntityGetPositionXYZ(factory)
-    local factorySize = GetFactorySize(factory.Blueprint)
+    local factorySize = factory.Blueprint.Footprint.SizeMax
     local pendingCount = TableGetn(engineers)
 
     for pass = 1, MaximumPasses do
