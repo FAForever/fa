@@ -427,8 +427,9 @@ categories = {
     --- Lua-side (`lua/ui/dialogs/createunit.logic.lua`): hides the unit from the create unit (cheat spawn) dialog
     UNSPAWNABLE = categoryValue,
     --- Engine (UI) selection: when the unit is not also `SELECTABLE`, the cursor can't hover it, so it can't be targeted by orders.
-    --- See `SELECTABLE`.
+    ---@see categories.SELECTABLE
     --- Engine (UI): excludes it from `GetIdleEngineers`
+    --- Lua-side: Most unit weapons have this category as a disallowed target
     UNTARGETABLE = categoryValue,
     --- Engine: an immobile unit in this category doesn't occupy ground when created.
     --- A unit in this category attached to a transport doesn't count as cargo. No FAF unit has it
