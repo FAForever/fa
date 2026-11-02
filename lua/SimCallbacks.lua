@@ -731,12 +731,12 @@ Callbacks.AbortNavigationOfFactoryAssisters = function(data, selection)
     -- no anti-automation guard: this only skips the assist move of engineers in range of the factory they assist
 
     selection = SecureUnits(selection)
-    if TableEmpty(selection) then
+    if not selection[1] then
         return
     end
 
     local engineers = EntityCategoryFilterDown(CategoriesEngineers, selection) --[[@as Unit[] ]]
-    if TableEmpty(engineers) then
+    if not engineers[1] then
         return
     end
 
