@@ -77,7 +77,7 @@
 ---@field TurnRate number
 --- random variation around `TurnRate`
 ---@field TurnRateRange number
---- number of seconds before the projectile is destroyed
+--- number of seconds before the projectile is destroyed. Defaults to 15
 ---@field Lifetime number
 --- random variation around `Lifetime`
 ---@field LifetimeRange number

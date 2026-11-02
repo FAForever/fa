@@ -7,6 +7,7 @@ local NavUtils = import('/lua/sim/navutils.lua')
 local TableInsert = table.insert
 local TableGetn = table.getn
 local TableCopy = table.copy
+local WaitTicks = WaitTicks
 
 local ALLBPS = __blueprints
 
@@ -41,7 +42,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                 if eng:IsUnitState('Attached') then
                     if aiBrain:GetNumUnitsAroundPoint(categories.TRANSPORTFOCUS, eng:GetPosition(), 10, 'Ally') > 0 then
                         eng:DetachFrom()
-                        coroutine.yield(20)
+                        WaitTicks(20)
                     end
                 end
                 self.eng = eng
@@ -82,7 +83,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                 self:LogDebug(string.format('PreAllocatedTask detected, task is '..tostring(data.Task)))
                 if data.Task == 'Reclaim' then
                     local plat = aiBrain:MakePlatoon('', '')
-                    aiBrain:AssignUnitsToPlatoon(plat, {unit}, 'support', 'None')
+                    aiBrain:AssignUnitToPlatoon(plat, unit, 'support', 'None')
                     import("/lua/aibrains/platoons/platoon-adaptive-reclaim.lua").AssignToUnitsMachine({ }, self, self:GetPlatoonUnits())
                     return
                 elseif data.Task == 'ReclaimStructure' then
@@ -142,7 +143,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                     else
                         self.StateMachineTimeout = self.StateMachineTimeout + 1
                         self.BuilderData = {}
-                        coroutine.yield(10)
+                        WaitTicks(10)
                         if self.StateMachineTimeout > 5 then
                             self:ExitStateMachine()
                         else
@@ -179,7 +180,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                         end
                     else
                         self.BuilderData = {}
-                        coroutine.yield(10)
+                        WaitTicks(10)
                         self:ChangeState(self.DecideWhatToDo)
                         return
                     end
@@ -189,7 +190,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                     local assistData = self.PlatoonData.Assist
                     local engineerManager = aiBrain.BuilderManagers[assistData.AssistLocation].EngineerManager
                     if not engineerManager then
-                        coroutine.yield(10)
+                        WaitTicks(10)
                         WARN('* AI: FinishStructure StateMachine cant find engineer manager' )
                         self:ExitStateMachine()
                         return
@@ -226,7 +227,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                     else
                         self.StateMachineTimeout = self.StateMachineTimeout + 1
                         self.BuilderData = {}
-                        coroutine.yield(10)
+                        WaitTicks(10)
                         if self.StateMachineTimeout > 5 then
                             self:ExitStateMachine()
                         else
@@ -239,13 +240,13 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                     local assistData = data.Assist
                     if not assistData.AssistLocation then
                         WARN('*AI WARNING: Builder '..repr(self.BuilderName)..' is missing AssistLocation')
-                        coroutine.yield(10)
+                        WaitTicks(10)
                         self:ExitStateMachine()
                         return
                     end
                     if not assistData.AssisteeType then
                         WARN('*AI WARNING: Builder '..repr(self.BuilderName)..' is missing AssisteeType')
-                        coroutine.yield(10)
+                        WaitTicks(10)
                         self:ExitStateMachine()
                         return
                     end
@@ -336,12 +337,12 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                         TransportWait = self.PlatoonData.TransportWait,
                         Construction = self.PlatoonData.Construction
                     }
-                    coroutine.yield(10)
+                    WaitTicks(10)
                     self:ChangeState(self.SetTaskData)
                     return
                 end
             end
-            coroutine.yield(10)
+            WaitTicks(10)
             self:ChangeState(self.DecideWhatToDo)
             return
         end,
@@ -395,13 +396,13 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
 
                 if bUsedTransports then
                     self:LogDebug(string.format('Used a transport'))
-                    coroutine.yield(10)
+                    WaitTicks(10)
                     self:ChangeState(self.Constructing)
                     return
                 elseif VDist2Sq(pos[1], pos[3], builderData.Position[1], builderData.Position[3]) > 512 * 512 then
                     -- If over 512 and no transports dont try and walk!
                     self:LogDebug(string.format('No transport available and distance is greater than 512, decide what to do'))
-                    coroutine.yield(10)
+                    WaitTicks(10)
                     self:ChangeState(self.DecideWhatToDo)
                     return
                 end
@@ -417,10 +418,10 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                     self:LogDebug(string.format('Path length is '..tostring(pathLength)))
                     local brokenPathMovement = false
                     local currentPathNode = 1
-                    IssueClearCommands({eng})
+                    IssueToUnitClearCommands(eng)
                     for i=currentPathNode, pathLength do
                         self:LogDebug(string.format('We are issuing the move command to path node '..tostring(i)))
-                        IssueMove({eng}, path[i])
+                        IssueToUnitMove(eng, path[i])
                     end
                     while not IsDestroyed(eng) do
                         local reclaimed
@@ -432,7 +433,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                                 for k, v in eng.EngineerBuildQueue do
                                     if v.PathPoint and (v.PathPoint == i or i > v.PathPoint and not queuePointTaken[k]) then
                                         if eng.EngineerBuildQueue[k][5] then
-                                            IssueBuildMobile({eng}, {eng.EngineerBuildQueue[k][2][1], 0, eng.EngineerBuildQueue[k][2][2]}, eng.EngineerBuildQueue[k][1], {})
+                                            IssueToUnitBuildMobile(eng, {eng.EngineerBuildQueue[k][2][1], 0, eng.EngineerBuildQueue[k][2][2]}, eng.EngineerBuildQueue[k][1], {})
                                         else
                                             aiBrain:BuildStructure(eng, eng.EngineerBuildQueue[k][1], {eng.EngineerBuildQueue[k][2][1], eng.EngineerBuildQueue[k][2][2], 0}, eng.EngineerBuildQueue[k][3])
                                         end
@@ -441,7 +442,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                                     end
                                 end
                                 if not skipPath then
-                                    IssueMove({eng}, path[i])
+                                    IssueToUnitMove(eng, path[i])
                                 end
                                 skipPath = false
                             end
@@ -450,13 +451,13 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                                     continue
                                 end
                                 if eng.EngineerBuildQueue[k][5] then
-                                    IssueBuildMobile({eng}, {eng.EngineerBuildQueue[k][2][1], 0, eng.EngineerBuildQueue[k][2][2]}, eng.EngineerBuildQueue[k][1], {})
+                                    IssueToUnitBuildMobile(eng, {eng.EngineerBuildQueue[k][2][1], 0, eng.EngineerBuildQueue[k][2][2]}, eng.EngineerBuildQueue[k][1], {})
                                 else
                                     aiBrain:BuildStructure(eng, eng.EngineerBuildQueue[k][1], {eng.EngineerBuildQueue[k][2][1], eng.EngineerBuildQueue[k][2][2], 0}, eng.EngineerBuildQueue[k][3])
                                 end
                             end
                             if reclaimed then
-                                coroutine.yield(20)
+                                WaitTicks(20)
                             end
                             reclaimed = false
                             brokenPathMovement = false
@@ -472,7 +473,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                             self:LogDebug(string.format('We are within 60 units of destination, break from while loop'))
                             break
                         end
-                        coroutine.yield(15)
+                        WaitTicks(15)
                         if eng:IsIdleState() then
                             self:LogDebug(string.format('We are idle for some reason, go back to decide what to do'))
                           self:ChangeState(self.DecideWhatToDo)
@@ -493,16 +494,16 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                     LOG('reason during GenerateSafePath was '..tostring(reason))
                     if reason == 'TooMuchThreat' then
                         LOG('Engineer Utility StateMachine threat too high along path, exit and look for another task')
-                        coroutine.yield(30)
+                        WaitTicks(30)
                         self:ExitStateMachine()
                         return
                     end
-                    IssueMove({eng}, builderData.Position)
+                    IssueToUnitMove(eng, builderData.Position)
                 end
                 if IsDestroyed(self) then
                     return
                 end
-                coroutine.yield(10)
+                WaitTicks(10)
                 self:LogDebug(string.format('Set to constructing state'))
                 self:ChangeState(self.Constructing)
                 return
@@ -531,8 +532,8 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                     if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 144 then
                         if unit and not IsDestroyed(unit) and unit:GetFractionComplete() == 1 then
                             if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 156 then
-                                IssueClearCommands({ eng })
-                                IssueReclaim({ eng }, unit)
+                                IssueToUnitClearCommands(eng)
+                                IssueToUnitReclaim(eng, unit)
                                 action = true
                                 break
                             end
@@ -542,16 +543,16 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                     if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 81 then
                         if unit and not IsDestroyed(unit) and unit:GetFractionComplete() == 1 then
                             if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 156 then
-                                IssueClearCommands({ eng })
-                                IssueReclaim({ eng }, unit)
+                                IssueToUnitClearCommands(eng)
+                                IssueToUnitReclaim(eng, unit)
                                 action = true
                                 break
                             end
                         end
                     else
-                        IssueClearCommands({ eng })
-                        IssueMove({ eng }, AIUtils.ShiftPosition(enemyUnitPos, engPos, 50, false))
-                        coroutine.yield(60)
+                        IssueToUnitClearCommands(eng)
+                        IssueToUnitMove(eng, AIUtils.ShiftPosition(enemyUnitPos, engPos, 50, false))
+                        WaitTicks(60)
                         action = true
                     end
                 end
@@ -658,7 +659,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                             buildFunction(aiBrain, eng, v.Unit, whatToBuild, closeToBuilder, relative, buildingTmpl, baseListData, reference, cons)
                         else
                             if aiBrain:PlatoonExists(self) then
-                                coroutine.yield(1)
+                                WaitTicks(1)
                                 self:ExitStateMachine()
                                 return
                             end
@@ -672,7 +673,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                 return
             end
             self.BuilderData = {}
-            coroutine.yield(5)
+            WaitTicks(5)
             self:ChangeState(self.DecideWhatToDo)
             return
         end,
@@ -698,7 +699,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                         self:ChangeState(self.CaptureUnit)
                         return
                     else
-                        coroutine.yield(10)
+                        WaitTicks(10)
                         self:ChangeState(self.NavigateToTaskLocation)
                         return
                     end
@@ -712,7 +713,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                         self:ChangeState(self.FinishUnit)
                         return
                     else
-                        coroutine.yield(10)
+                        WaitTicks(10)
                         self:ChangeState(self.NavigateToTaskLocation)
                         return
                     end
@@ -726,7 +727,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                         self:ChangeState(self.ReclaimStructure)
                         return
                     else
-                        coroutine.yield(10)
+                        WaitTicks(10)
                         self:ChangeState(self.NavigateToTaskLocation)
                         return
                     end
@@ -740,14 +741,14 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                         self:ChangeState(self.EngineerAssist)
                         return
                     else
-                        coroutine.yield(10)
+                        WaitTicks(10)
                         self:ChangeState(self.NavigateToTaskLocation)
                         return
                     end
                 end
             end
             self.BuilderData = {}
-            coroutine.yield(5)
+            WaitTicks(5)
             self:ChangeState(self.DecideWhatToDo)
             return
         end,
@@ -781,7 +782,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                 local engPos = eng:GetPosition()
                 local movementRequired = true
                 eng.PerformingBuildTask = true
-                IssueClearCommands({eng})
+                IssueToUnitClearCommands(eng)
 
                 if VDist3Sq(engPos, buildLocation) < 225 then
                     LOG('Movement Required being set to false')
@@ -795,7 +796,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                         return
                     end
                     if borderWarning then
-                        IssueBuildMobile({eng}, buildLocation, whatToBuild, {})
+                        IssueToUnitBuildMobile(eng, buildLocation, whatToBuild, {})
                     else
                         LOG('IssueBuildStructure')
                         aiBrain:BuildStructure(eng, whatToBuild, {buildLocation[1], buildLocation[3], 0}, buildRelative)
@@ -826,7 +827,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                         if eng.Upgrading or eng.Combat or eng.Active then
                             return
                         end
-                        coroutine.yield(7)
+                        WaitTicks(7)
                     end
                     if not eng or eng.Dead or not eng.PlatoonHandle or not aiBrain:PlatoonExists(eng.PlatoonHandle) then
                         if eng then eng.ProcessBuild = nil end
@@ -846,29 +847,29 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                         end
                     end
                     if movementRequired then
-                        IssueClearCommands({eng})
+                        IssueToUnitClearCommands(eng)
                     -- check to see if we need to reclaim or capture...
                         AIUtils.EngineerTryReclaimCaptureArea(aiBrain, eng, buildLocation, 10)
                             -- check to see if we can repair
                             AIUtils.EngineerTryRepair(aiBrain, eng, whatToBuild, buildLocation)
                                 -- otherwise, go ahead and build the next structure there
                         if borderWarning then
-                            IssueBuildMobile({eng}, buildLocation, whatToBuild, {})
+                            IssueToUnitBuildMobile(eng, buildLocation, whatToBuild, {})
                         else
                             aiBrain:BuildStructure(eng, whatToBuild, {buildLocation[1], buildLocation[3], 0}, buildRelative)
                         end
                     end
-                    coroutine.yield(5)
+                    WaitTicks(5)
                     self:ChangeState(self.Constructing)
                     return
                 else
                     -- we can't move there, so remove it from our build queue
                     table.remove(eng.EngineerBuildQueue, 1)
                 end
-                coroutine.yield(2)
+                WaitTicks(2)
             end
             self.BuilderData = {}
-            coroutine.yield(5)
+            WaitTicks(5)
             self:ExitStateMachine()
             return
         end,
@@ -910,15 +911,15 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
             end
             if captureUnit and not IsDestroyed(captureUnit) then
                 import('/lua/scenariotriggers.lua').CreateUnitCapturedTrigger(nil, captureUnitCallback, captureUnit)
-                IssueClearCommands({eng})
-                IssueCapture({eng}, captureUnit)
+                IssueToUnitClearCommands(eng)
+                IssueToUnitCapture(eng, captureUnit)
                 while aiBrain:PlatoonExists(self) and not eng.CaptureComplete do
-                    coroutine.yield(30)
+                    WaitTicks(30)
                 end
                 eng.CaptureComplete = nil
             end
             self.BuilderData = {}
-            coroutine.yield(5)
+            WaitTicks(5)
             self:ChangeState(self.DecideWhatToDo)
             return
         end,
@@ -938,11 +939,11 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
             local pos = eng:GetPosition()
             if finishUnit and not IsDestroyed(finishUnit) then
                 LOG('Engineer FinishUnit StateMachine issuing repair')
-                IssueClearCommands({eng})
+                IssueToUnitClearCommands(eng)
                 IssueRepair(self:GetPlatoonUnits(), finishUnit)
                 local count = 0
                 while count < 90 do
-                    coroutine.yield(30)
+                    WaitTicks(30)
                     if finishUnit and not finishUnit.Dead and not IsDestroyed(finishUnit) and finishUnit:GetFractionComplete() == 1 then
                         break
                     end
@@ -951,7 +952,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                 end
             end
             self.BuilderData = {}
-            coroutine.yield(5)
+            WaitTicks(5)
             self:ExitStateMachine()
             return
         end,
@@ -1008,17 +1009,17 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                     unitDestroyed = true
                     
                     IssueMove(engineers, reclaimUnitPos )
-                    coroutine.yield(10)
+                    WaitTicks(10)
                 end
                 if unitDestroyed then
                     local reclaimTimeout = 0
                     while VDist3Sq(self:GetPlatoonPosition() ,reclaimUnitPos) > 25 do
-                        coroutine.yield(1)
+                        WaitTicks(1)
                         reclaimTimeout = reclaimTimeout + 1
                         if reclaimTimeout > 20 then
                             break
                         end
-                        coroutine.yield(10)
+                        WaitTicks(10)
                     end
                 else
                     LOG('Reclaim Structure Engineer initiated reclaim (should be a pgen)')
@@ -1026,7 +1027,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                 end
                 LOG('Reclaim Structure Engineer entering loop to wait for unit reclaim')
                 repeat
-                    coroutine.yield(30)
+                    WaitTicks(30)
                     if IsDestroyed(self) then
                         return
                     end
@@ -1047,13 +1048,13 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
             end
             if self.ReclaimCount < builderData.ReclaimMax then
                 LOG('Reclaim Structure Engineer has not hit max, rechecking for another')
-                coroutine.yield(5)
+                WaitTicks(5)
                 self.BuilderData = {}
                 self:ChangeState(self.DecideWhatToDo)
                 return
             end
             LOG('Reclaim Structure Engineer has completed, exiting state machine')
-            coroutine.yield(5)
+            WaitTicks(5)
             self:ExitStateMachine()
             return
         end,
@@ -1079,9 +1080,9 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                 eng.UnitBeingAssist = builderData.AssistUnit.UnitBeingBuilt or builderData.AssistUnit.UnitBeingAssist or builderData.AssistUnit
             end
             if builderData.SacrificeUnit then
-                IssueSacrifice({eng}, eng.UnitBeingAssist)
+                IssueToUnitSacrifice(eng, eng.UnitBeingAssist)
             else
-                IssueGuard({eng}, eng.UnitBeingAssist)
+                IssueToUnitGuard(eng, eng.UnitBeingAssist)
             end
             if builderData.AssistUntilFinished then
                 local guardedUnit
@@ -1091,20 +1092,20 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                     guardedUnit = eng:GetGuardedUnit()
                 end
                 while eng and not IsDestroyed(eng) and not eng:IsIdleState() do
-                    coroutine.yield(1)
+                    WaitTicks(1)
                     if not guardedUnit or guardedUnit.Dead or guardedUnit:BeenDestroyed() then
                         break
                     end
                     if guardedUnit:GetFractionComplete() == 1 and not guardedUnit:IsUnitState('Upgrading') then
                         break
                     end
-                    coroutine.yield(30)
+                    WaitTicks(30)
                 end
             else
                 local assistTime = builderData.AssistTime or 60
                 local assistCount = 0
                 while assistCount < (assistTime / 10) do
-                    coroutine.yield(100)
+                    WaitTicks(100)
                     assistCount = assistCount + 1
                     if aiBrain:GetEconomyStored('ENERGY') < 200 then
                         break
@@ -1120,7 +1121,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                 eng.Active = false
             end
             self.BuilderData = {}
-            coroutine.yield(5)
+            WaitTicks(5)
             self:ExitStateMachine()
             return
         end,
@@ -1137,7 +1138,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
             local aiBrain = self:GetBrain()
 
             while not IsDestroyed(eng) and (0<TableGetn(eng:GetCommandQueue()) or eng:IsUnitState('Building') or eng:IsUnitState("Moving")) do
-                coroutine.yield(1)
+                WaitTicks(1)
                 local platPos = self:GetPlatoonPosition()
                 if eng:IsUnitState("Moving") or eng:IsUnitState("Capturing") then
                     if aiBrain:GetNumUnitsAroundPoint(categories.LAND * categories.MOBILE, platPos, 30, 'Enemy') > 0 then
@@ -1149,18 +1150,18 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                                 if EntityCategoryContains(categories.SCOUT + categories.ENGINEER * (categories.TECH1 + categories.TECH2) - categories.COMMAND, unit) then
                                     if unit and not unit.Dead and unit:GetFractionComplete() == 1 then
                                         if VDist3Sq(platPos, enemyUnitPos) < 156 then
-                                            IssueClearCommands({eng})
-                                            IssueReclaim({eng}, unit)
-                                            coroutine.yield(60)
+                                            IssueToUnitClearCommands(eng)
+                                            IssueToUnitReclaim(eng, unit)
+                                            WaitTicks(60)
                                             self:ChangeState(self.PerformBuildTask)
                                             return
                                         end
                                     end
                                 elseif EntityCategoryContains(categories.LAND * categories.MOBILE - categories.SCOUT, unit) then
                                     if VDist3Sq(platPos, enemyUnitPos) < 156 and unit and not unit.Dead and unit:GetFractionComplete() == 1 then
-                                        IssueClearCommands({eng})
-                                        IssueReclaim({eng}, unit)
-                                        coroutine.yield(60)
+                                        IssueToUnitClearCommands(eng)
+                                        IssueToUnitReclaim(eng, unit)
+                                        WaitTicks(60)
                                         self:ChangeState(self.PerformBuildTask)
                                         return
                                     else
@@ -1172,9 +1173,9 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                         end
                     end
                 end
-                coroutine.yield(20)
+                WaitTicks(20)
             end
-            coroutine.yield(5)
+            WaitTicks(5)
             LOG('Contructing is exiting to complete build '..self.BuilderName)
             self:ChangeState(self.CompleteBuild)
             return
@@ -1196,11 +1197,11 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                 self:ExitStateMachine()
             end
             if eng:IsIdleState() then
-                coroutine.yield(2)
+                WaitTicks(2)
                 self:ChangeState(self.PerformBuildTask)
                 return
             else
-                coroutine.yield(2)
+                WaitTicks(2)
                 self:ChangeState(self.Constructing)
                 return
             end
@@ -1217,19 +1218,19 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
             local eng = self.eng
             local unit = self.BuilderData.Unit
 
-            coroutine.yield(5)
+            WaitTicks(5)
             LOG('Trigger DiscardCurrentBuild')
             LOG('Unit to attempt to reclaim is '..tostring(unit.UnitId))
             if unit and not IsDestroyed(unit) then
-                IssueClearCommands({eng})
+                IssueToUnitClearCommands(eng)
                 unit.ReclaimInProgress = true
-                IssueReclaim({eng}, unit)
+                IssueToUnitReclaim(eng, unit)
                 unit.EngineerBuildQueue = {}
             end
             while TableGetn(eng:GetCommandQueue()) > 0 do
-                coroutine.yield(20)
+                WaitTicks(20)
             end
-            coroutine.yield(2)
+            WaitTicks(2)
             self:ExitStateMachine()
             return
         end,
@@ -1249,7 +1250,7 @@ AssignToUnitsMachine = function(data, platoon, units)
         local platoonUnits = platoon:GetPlatoonUnits()
         if platoonUnits then
             for _, unit in platoonUnits do
-                IssueClearCommands({unit})
+                IssueToUnitClearCommands(unit)
                 unit.PlatoonHandle = platoon
                 if not unit.Dead and unit:TestToggleCaps('RULEUTC_StealthToggle') then
                     unit:SetScriptBit('RULEUTC_StealthToggle', false)

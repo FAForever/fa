@@ -304,12 +304,21 @@ BuffEffects = {
         val = math.round(val)
 
         local oldmax = unit:GetMaxHealth()
-        local difference = oldmax - unit:GetHealth()
+        local health = unit:GetHealth()
+        local difference = oldmax - health
 
         unit:SetMaxHealth(val)
 
-        if not buffValues.DoNotFill and not unit.IsBeingTransferred then
-            unit:SetHealth(unit, unit:GetMaxHealth() - difference)
+        if not unit.IsBeingTransferred then
+            if not buffValues.DoNotFill then
+                unit:SetHealth(unit, unit:GetMaxHealth() - difference)
+            elseif val < health then
+                -- Set health because it stays above max health until the next AdjustHealth call
+                -- this causes AdjustHealth to be fully absorbed 
+                -- this causes air units to get stuck repairing in air staging
+                -- it also makes DoNotFill buffs seemingly fill HP if the buff was removed and re-applied
+                unit:SetHealth(unit, val)
+            end
         end
     end,
 

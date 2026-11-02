@@ -305,7 +305,7 @@ function DoHackyLogic(buildingType, builder)
                 if unitInstance then
                     TriggerFile.CreateUnitStopBeingBuiltTrigger(function(unitBeingBuilt)
                         local newPlatoon = aiBrain:MakePlatoon('', '')
-                        aiBrain:AssignUnitsToPlatoon(newPlatoon, {unitBeingBuilt}, 'Attack', 'None')
+                        aiBrain:AssignUnitToPlatoon(newPlatoon, unitBeingBuilt, 'Attack', 'None')
                         newPlatoon:StopAI()
                         newPlatoon:ForkAIThread(newPlatoon.TacticalAI)
                     end, unitInstance)
@@ -365,7 +365,6 @@ function AIBuildBaseTemplateFromLocation(baseTemplate, location)
                     baseT[templateNum][rowNum] = {}
                     baseT[templateNum][rowNum][1] = math.floor(rowData[1] + location[1]) + 0.5
                     baseT[templateNum][rowNum][2] = math.floor(rowData[2] + location[3]) + 0.5
-                    baseT[templateNum][rowNum][3] = 0
                 else
                     baseT[templateNum][rowNum] = template[rowNum]
                 end
@@ -828,7 +827,7 @@ function AIMaintainBuildList(aiBrain, builder, buildingTemplate, brainBaseTempla
                         for m,location in type do
                             if m > 1 then
                                 if aiBrain:CanBuildStructureAt(v.StructureCategory, BuildToNormalLocation(location)) then
-                                    IssueStop({builder})
+                                    IssueToUnitStop(builder)
                                     IssueToUnitClearCommands(builder)
                                     aiBrain:BuildStructure(builder, v.StructureCategory, location, false)
                                     return true
@@ -838,7 +837,7 @@ function AIMaintainBuildList(aiBrain, builder, buildingTemplate, brainBaseTempla
                     end
                 end
             elseif aiBrain:FindPlaceToBuild(v.StructureType, v.StructureCategory,  brainBaseTemplate.Template, false, v.CloseToBuilder) then
-                IssueStop({builder})
+                IssueToUnitStop(builder)
                 IssueToUnitClearCommands(builder)
                 if AIExecuteBuildStructure(aiBrain, builder, v.StructureType , v.CloseToBuilder, false, buildingTemplate, brainBaseTemplate.Template) then
                     return true

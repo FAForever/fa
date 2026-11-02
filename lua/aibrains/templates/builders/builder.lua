@@ -5,10 +5,6 @@ local unpack = unpack
 
 local TableDeepCopy = table.deepcopy
 
----@class AIBuilderCondition
----@field [1] function
----@field [2] table
-
 ---@class AIBuilder
 ---@field BuilderConditions AIBuilderCondition[]       # Converted conditions from the builder template
 ---@field BuilderData AIBuilderData                            # Converted data from the builder template

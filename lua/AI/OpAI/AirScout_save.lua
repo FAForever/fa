@@ -106,14 +106,14 @@ Scenario = {
                         },
                         BuildConditions = {
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','OSB_Master_AirScout'},
-                                {'default_brain','OSB_Master_AirScout'}
+                                {'OSB_Master_AirScout'},
+                                {'OSB_Master_AirScout'}
                             },
                         },
                         PlatoonBuildCallbacks = {
                             {'/lua/ai/opai/airscout_editorfunctions.lua', 'AirScoutDeath',
-                                {'default_brain','default_platoon'},
-                                {'default_brain','default_platoon'}
+                                {'default_platoon'},
+                                {'default_platoon'}
                             },
                         },
                         PlatoonAddFunctions = {
@@ -137,8 +137,8 @@ Scenario = {
                         RequiresConstruction = true,
                         BuildConditions = {
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {
@@ -157,8 +157,8 @@ Scenario = {
                         RequiresConstruction = true,
                         BuildConditions = {
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData = {

@@ -113,7 +113,7 @@ end
 ---@deprecated
 --- Creates all effects in a table, with an offset from an entity
 ---@param obj BoneObject
----@param army number
+---@param army Army
 ---@param effectTable FileName[] Emitter blueprint names
 ---@param x number
 ---@param y number
@@ -130,7 +130,7 @@ end
 ---@deprecated
 --- Creates all effects in a table, with random offsets from an entity
 ---@param obj BoneObject
----@param army number
+---@param army Army
 ---@param effectTable FileName[] Emitter blueprint names
 ---@param xRange number
 ---@param yRange number
@@ -148,7 +148,7 @@ end
 --- Creates all effects in a table at an entity's bone
 ---@param obj BoneObject
 ---@param bone Bone
----@param army number
+---@param army Army
 ---@param effectTable FileName[] Emitter blueprint names
 ---@return moho.IEffect[] emitters
 function CreateBoneEffects(obj, bone, army, effectTable)
@@ -163,7 +163,7 @@ end
 --- Creates all effects in a table at an entity's bone, with offset
 ---@param obj BoneObject
 ---@param bone Bone
----@param army number
+---@param army Army
 ---@param effectTable FileName[] Emitter blueprint names
 ---@param x number
 ---@param y number
@@ -180,7 +180,7 @@ end
 --- Creates all effects in a table at each bone in a table for an entity
 ---@param obj BoneObject
 ---@param boneTable Bone[]
----@param army number
+---@param army Army
 ---@param effectTable FileName[] Emitter blueprint names
 function CreateBoneTableEffects(obj, boneTable, army, effectTable)
     for _, bone in boneTable do
@@ -194,7 +194,7 @@ end
 ---@param obj BoneObject
 ---@param boneTable Bone[]
 ---@param effectTable FileName[] Emitter blueprint names
----@param army number
+---@param army Army
 ---@param min number
 ---@param max number
 function CreateBoneTableRangedScaleEffects(obj, boneTable, effectTable, army, min, max)
@@ -208,7 +208,7 @@ end
 ---@deprecated
 --- Creates a number of random effects out of a table at an entity
 ---@param obj BoneObject
----@param army number
+---@param army Army
 ---@param effectTable FileName[] Emitter blueprint names
 ---@param numEffects integer
 ---@return moho.IEffect[] emitters
@@ -1152,7 +1152,7 @@ end
 
 --- Gets the teleport location, based on the terrain height and terrain type offset
 ---@param loc Vector
----@return table|nil
+---@return Vector
 function TeleportLocationToSurface(loc)
     -- Takes the given location, adjust the Y value to the surface height on that location
     local pos = TableCopy(loc)
@@ -1380,7 +1380,7 @@ function PlayTeleportInEffects(unit, effectsBag)
 
             local fn = function(unit)
                 CreateLightParticle(unit, -1, unitArmy, 4, 10, 'glow_03', 'ramp_yellow_01')
-                DamageArea(unit, unit:GetPosition(), 9, 1, 'Force', true)
+                DamageArea(unit, unit:GetPosition(), 9, 1, 'TreeForce', true)
 
                 unit.TeleportFx_IsInvisible = true
                 unit:HideBone(0, true)
@@ -1407,7 +1407,7 @@ function PlayTeleportInEffects(unit, effectsBag)
             end
 
             CreateLightParticle(unit.TeleportCybranSphere, -1, unitArmy, 4, 10, 'glow_02', 'ramp_white_01')
-            DamageArea(unit, unit:GetPosition(), 9, 1, 'Force', true)
+            DamageArea(unit, unit:GetPosition(), 9, 1, 'TreeForce', true)
 
             CreateDecal(unit:GetPosition(), decalOrient, 'Scorch_generic_002_albedo', '', 'Albedo', 7, 7, 200, 300, unitArmy)
 
@@ -1444,7 +1444,7 @@ function PlayTeleportInEffects(unit, effectsBag)
                 end
 
                 CreateLightParticle(unit, -1, unitArmy, 4, 15, 'glow_05', 'ramp_jammer_01')
-                DamageArea(unit, unit:GetPosition(), 9, 1, 'Force', true)
+                DamageArea(unit, unit:GetPosition(), 9, 1, 'TreeForce', true)
 
                 local decalOrient = UtilGetRandomFloat(0, mathTau)
                 CreateDecal(unit:GetPosition(), decalOrient, 'crater01_albedo', '', 'Albedo', 4, 4, 200, 300, unitArmy)
@@ -1472,7 +1472,7 @@ function PlayTeleportInEffects(unit, effectsBag)
                 IEffectOffsetEmitter(CreateEmitterAtEntity(unit, unitArmy, effect), 0, offsetY, 0)
             end
 
-            DamageArea(unit, unit:GetPosition(), 9, 1, 'Force', true)
+            DamageArea(unit, unit:GetPosition(), 9, 1, 'TreeForce', true)
             CreateDecal(unit:GetPosition(), decalOrient, 'Scorch_generic_002_albedo', '', 'Albedo', 7, 7, 200, 300, unitArmy)
             CreateTeleSteamFX(unit)
         end

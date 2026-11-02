@@ -33,7 +33,7 @@ function CCollisionBeamEntity:SetBeamFx(beamEmitter,  checkCollision)
 end
 
 ---@param spec CollisionBeamSpec
----@return moho.CollisionBeamEntity
+---@return self
 function CCollisionBeamEntity:__init(spec)
 end
 

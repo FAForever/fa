@@ -1,7 +1,11 @@
 ---@meta
 
 ---@class EntityBlueprint : HitBox, Blueprint
---- alternate Unit footprint
+--- Alternate unit footprint for `Physics.AltMotionType`. Resolved like `Footprint`, using `AltMotionType`
+--- - It is only matched when `Footprint` resolves to ground caps
+--- - Without a match it copies the resolved `Footprint`
+--- - Without an `AltMotionType` it is the resolved `Footprint`
+---@see EntityBlueprint.Footprint
 ---@field AltFootprint? FootprintBlueprint
 --- unit average density in tons / m^3 (default is 0.49). Affects the behavior of units when they bump into each other. Units with more weight push units with less weight.
 ---@field AverageDensity? number
@@ -17,7 +21,15 @@
 ---@field CollisionShape CollisionShape
 --- the desired maximum number of shooters taking shots at the entity
 ---@field DesiredShooterCap number
---- Unit footprint. If absent, uses the `SizeX` and `SizeZ` fields.
+--- Cells this entity occupies for pathfinding.
+--- 
+--- Engine changes for this field:
+--- - Mobile surface units their footprint replaced by a footprint registered by `SpecFootprints`,
+---   whose `Caps` fits their `Physics.MotionType`, and whose size is the closest by the
+---   larger of the X and Z differences. Ties go to the footprint that was defined first.
+--- - Footprint `SizeX`/`SizeZ` defaults to the `ceil` of the entity's `SizeX`/`SizeZ`
+--- - Structures derive their footprint's `OccupancyCaps` from their `Physics.BuildOnLayerCaps`
+---   - A unit with `Physics.MaxSpeed` 0 is treated as a structure
 ---@field Footprint? FootprintBlueprint
 --- component X,X of inertia tensor
 ---@field InertiaTensorX number
@@ -81,9 +93,15 @@
 ---@field SizeY number
 ---@field SizeZ number
 
+--- Pathfinding footprint of an entity.
+---@see EntityBlueprint.Footprint # For engine behavior defining unit footprints
+---
+--- Blueprints cannot set a maximum water depth. Only footprint specs (`FootprintSpec`) have one
 ---@class FootprintBlueprint
+---@field Flags? FootprintFlag
 ---@field MaxSlope? number
 ---@field MinWaterDepth? number
----@field OccupancyCaps? number
----@field SizeX? number
----@field SizeZ? number
+---@field OccupancyCaps? FootprintLayerCap
+---@field SizeX? integer # defaults to the `ceil` of the entity's `SizeX`
+---@field SizeZ? integer # defaults to the `ceil` of the entity's `SizeZ`
+---@field SizeMax? integer # Added by unit blueprint postprocessing. Defaults to 1.

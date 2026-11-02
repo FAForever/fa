@@ -114,6 +114,9 @@ Buffs = {}
 ---@field Effects? FileName[]
 ---@field EffectsScale? number
 ---@field Icon? boolean # Syncs the buff name to UnitData when it affects a unit so that the UI can display an icon
+---@field TargetAllow? UnparsedCategory
+---@field TargetDisallow? UnparsedCategory
+---@field Radius? number # Used by "STUN" buff types
 BuffDefMeta = {}
 BuffDefMeta.__index = BuffDefMeta
 BuffDefMeta.__call = function(...)

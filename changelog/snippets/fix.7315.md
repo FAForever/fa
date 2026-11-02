@@ -1,0 +1,1 @@
+- Fix the UEF ACU's gun, OverCharge and AutoOverCharge firing from the tip of the original barrel after the Zephyr Amplifier is built, instead of from the longer upgraded barrel (#7315).

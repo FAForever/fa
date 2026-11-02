@@ -211,7 +211,7 @@ function GetDistanceBetweenTwoPoints(x1, y1, z1, x2, y2, z2)
     return MathSqrt(dx*dx + dy*dy + dz*dz)
 end
 
----@see GetDistanceBetweenTwoPoints(x1, z1, x2, z2) # for a 3D option
+---@see GetDistanceBetweenTwoPoints(x1, y1, z1, x2, y2, z2) # for a 3D option
 ---@see XZDistanceTwoVectors(v1, v2) # for a vector option
 ---@param x1 number
 ---@param z1 number

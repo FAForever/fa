@@ -19,6 +19,11 @@ local SyncAnnouncement = import("/lua/simdiplomacy.lua").SyncAnnouncement
 ---| "vote"
 ---| "observer"
 
+---@class AIBrain
+---@field package LastRecallRequestTime number
+---@field package LastRecallVoteTime number
+---@field package RecallVote boolean
+
 function init()
     -- setup sim recall state in the brains
     local playerCooldown = PlayerGateCooldown - PlayerRequestCooldown
@@ -120,7 +125,7 @@ function ArmyRecallRequestCooldown(army)
     if brain:IsDefeated() then
         return "observer"
     end
-    if ScenarioInfo.RecallDisabled then
+    if ScenarioInfo.RecallDisabled or not ScenarioInfo.TeamGame then
         return "scenario"
     end
     if brain.RecallVote ~= nil then
@@ -226,7 +231,7 @@ local function RecallVotingThread(requestingArmy)
     requestingBrain.recallVotingThread = nil
 end
 
----@param army number
+---@param army Army
 ---@param vote boolean
 ---@param lastVote boolean
 ---@return boolean # if further user sync should happen
@@ -259,7 +264,7 @@ local function ArmyVoteRecall(army, vote, lastVote)
     return true
 end
 
----@param army number
+---@param army Army
 ---@param teammates number
 local function ArmyRequestRecall(army, teammates)
     local brain = GetArmyBrain(army)
@@ -455,7 +460,7 @@ function SyncRecallVote(vote)
 end
 
 ---@param teamSize number
----@param army number
+---@param army Army
 function SyncOpenRecallVote(teamSize, army)
     local sync = GetRecallSyncTable()
     local focus = GetFocusArmy()
@@ -484,7 +489,7 @@ local function SyncRecallStatusThread()
 end
 
 function SyncRecallStatus()
-    if UserRecallStatusThread then
+    if not IsDestroyed(UserRecallStatusThread) then
         ResumeThread(UserRecallStatusThread) -- force update the existing thread
     else
         UserRecallStatusThread = ForkThread(SyncRecallStatusThread)

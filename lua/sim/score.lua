@@ -3,6 +3,8 @@ scoreInterval = 2
 alliesScore = true
 
 local GameIsOver = false
+---@alias GameScoreData table<integer, ArmyScoreData>
+---@type GameScoreData
 local ArmyScore = {}
 local scoreOption = ScenarioInfo.Options.Score or "no"
 scoreData = {interval = historyInterval, current = ArmyScore, history = {}, focusArmyIndex = 0}
@@ -164,6 +166,7 @@ end
 local function ScoreThread()
     for index, brain in ArmyBrains do
         if ArmyIsCivilian(index) then continue end
+        ---@class ArmyScoreData
         ArmyScore[index] = {
             faction = brain:GetFactionIndex(),
             name = brain.Nickname,

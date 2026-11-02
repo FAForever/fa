@@ -8,9 +8,9 @@ ORBIT = 0x20
 
 ---@class FootprintSpec : FootprintBlueprint
 ---@field Name string
----@field Caps integer
+---@field Caps FootprintLayerCap
 ---@field MaxWaterDepth? number
----@field Flags? number
+---@field Flags? FootprintFlag
 
 -- Flags
 IgnoreStructures = 0x01
@@ -19,8 +19,11 @@ IgnoreStructures = 0x01
 -- with that footprint, so keep the number of entries here down to the bare minimum we actually
 -- need.
 --
--- The script "data/lua/tests/dump_footprints.lua" can be used to figure out what footprint shapes
+-- The script "/lua/tests/dump_footprints.lua" can be used to figure out what footprint shapes
 -- the blueprints are currently expecting.
+--
+-- The engine matches each surface unit to one of these specs
+---@see EntityBlueprint.Footprint # For the matching behavior details
 
 SpecFootprints {
 
@@ -35,7 +38,7 @@ SpecFootprints {
     { Name = 'WaterLand1x1',   SizeX=1,  SizeZ=1,  Caps=LAND|WATER, MaxWaterDepth=1, MinWaterDepth=0.1, MaxSlope=0.75, Flags=0 },
     { Name = 'WaterLand2x2',   SizeX=2,  SizeZ=2,  Caps=LAND|WATER, MaxWaterDepth=1, MinWaterDepth=0.1, MaxSlope=0.75, Flags=0 },
     { Name = 'WaterLand3x3',   SizeX=3,  SizeZ=3,  Caps=LAND|WATER, MaxWaterDepth=5, MinWaterDepth=0, MaxSlope=0.75, Flags=0 },
-    { Name = 'WaterLand5x5',   SizeX=5,  SizeZ=5,  Caps=LAND|WATER, MaxWaterDepth=5, MinWaterDepth=0, MaxSlope=0.75, Flags=0 },
+    { Name = 'WaterLand4x4',   SizeX=4,  SizeZ=4,  Caps=LAND|WATER, MaxWaterDepth=5, MinWaterDepth=0, MaxSlope=0.75, Flags=0 },
 
     { Name = 'SurfacingSub2x2',   SizeX=2,  SizeZ=2,  Caps=SUB|WATER, MinWaterDepth=1.5, Flags=0 },
     { Name = 'SurfacingSub3x3',   SizeX=3,  SizeZ=3,  Caps=SUB|WATER, MinWaterDepth=1.5, Flags=0 },

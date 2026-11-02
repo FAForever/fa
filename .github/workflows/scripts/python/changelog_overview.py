@@ -37,13 +37,14 @@ def extract_yaml_front_matter(content: str) -> Tuple[str, str]:
             return yaml_content, rest_of_content
     return '', content
 
-def process_markdown_file(markdown_file: Path) -> Optional[Tuple[str, date]]:
+def process_markdown_file(markdown_file: Path) -> Optional[Tuple[str, date, int]]:
     logging.info(f"Processing file: {markdown_file.name}")
 
     file_name_parts = markdown_file.stem.split('-')
     if len(file_name_parts) == 4:
         date_str = '-'.join(file_name_parts[:3])
         version = file_name_parts[3]
+        url = version
         try:
             parsed_date = datetime.strptime(date_str, "%Y-%m-%d").date()
         except ValueError:
@@ -53,7 +54,8 @@ def process_markdown_file(markdown_file: Path) -> Optional[Tuple[str, date]]:
         logging.warning(f"Unexpected filename format: {markdown_file.name}")
         parsed_date = date.today()
         date_str = parsed_date.isoformat()
-        version = markdown_file.stem
+        version = 1
+        url = markdown_file.stem
 
     try:
         yaml_content, _ = extract_yaml_front_matter(markdown_file.read_text())
@@ -67,17 +69,17 @@ def process_markdown_file(markdown_file: Path) -> Optional[Tuple[str, date]]:
             Version = {version},
             Name = "{name}",
             Date = "{date_str}",
-            URL = "http://faforever.github.io/fa/changelog/{version}",
+            URL = "http://faforever.github.io/fa/changelog/{url}",
             Path = "/lua/ui/lobby/changelog/generated/{markdown_file.stem}.lua"
         }},"""
-        return entry, parsed_date
+        return entry, parsed_date, int(version)
 
     except Exception as e:
         raise RuntimeError(f"Failed to process {markdown_file.name}") from e
 
 def create_overview_file(input_dir: Path, output_file: Path):
     """Creates an overview Lua file listing all changelogs with metadata."""
-    entries: list[Tuple[str, date]] = []
+    entries: list[Tuple[str, date, int]] = []
 
     logging.info(f"Scanning directory: {input_dir}")
     for markdown_file in input_dir.glob("*.md"):
@@ -89,7 +91,8 @@ def create_overview_file(input_dir: Path, output_file: Path):
         logging.warning("No valid changelog entries found.")
         return
 
-    entries.sort(key=lambda pair: pair[1], reverse=True)
+    # Sort by date and then by version
+    entries.sort(key=lambda pair: (pair[1], pair[2]), reverse=True)
 
     logging.info("Generating overview Lua content...")
     overview_content = OVERVIEW_HEADER + """
@@ -97,7 +100,7 @@ def create_overview_file(input_dir: Path, output_file: Path):
 Overview = {
     Changelogs = {
 """
-    overview_content += "\n".join(entry for entry, _ in entries)
+    overview_content += "\n".join(entry for entry, _, _ in entries)
     overview_content += "\n    }\n}\n"
 
     output_file.write_text(overview_content)

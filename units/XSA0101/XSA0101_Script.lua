@@ -15,8 +15,7 @@ XSA0101 = ClassUnit(SAirUnit) {
     OnImpact = function(self, with, other)
         SAirUnit.OnImpact(self, with, other)
 
-        ---@type VisionMarkerOpti
-        local entity = VisionMarker({Owner = self})
+        local entity = VisionMarker()
 
         local px, py, pz = self:GetPositionXYZ()
         entity:UpdatePosition(px, pz)

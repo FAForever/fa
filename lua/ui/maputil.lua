@@ -6,21 +6,13 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
---- A basic area defined in the scenario.
----@class UIScenarioArea
----@field [1] number    # x0
----@field [2] number    # z0
----@field [3] number    # x1
----@field [4] number    # z1
----@field type 'RECTANGLE'
-
 --- A marker defined in the scenario.
 ---@class UIScenarioMarker
 ---@field color string
 ---@field type string
 ---@field prop BlueprintId  # path to blueprint
----@field orientation Vector
----@field position Vector
+---@field orientation ScenarioVector
+---@field position ScenarioVector
 
 --- A chain of markers defined in the scenario.
 ---@class UIScenarioChain
@@ -35,11 +27,12 @@
 ---@field Economy { mass: number, energy: number }
 ---@field Alliances table
 ---@field PlatoonBuilders { Builders: table }
+---@field Units ScenarioUnitGroup
 
 --- Scenario entities of a map that defines all areas, (resource) markers, marker chains and armies as defined in the average _save file.
 ---@class UIScenarioSaveFile
 ---@field Props table       # Unknown
----@field Areas table<string, { rectangle: UIScenarioArea }>
+---@field Areas table<string, { rectangle: ScenarioArea }>
 ---@field MasterChain { _MASTERCHAIN_ : table<string, UIScenarioMarker> }
 ---@field Chains table<string, UIScenarioChain>
 ---@field Orders table      # Unknown
@@ -145,7 +138,7 @@ end
 ---@param pathToScenarioInfo any
 ---@return string
 local function GetPathToFolder(pathToScenarioInfo)
-    local splits = StringSplit(pathToScenarioInfo, "/")
+    local splits = string.split(pathToScenarioInfo, "/")
     -- Remove the length of the last token (filename), and the slash character before it.
     return string.sub(pathToScenarioInfo, 1, string.len(pathToScenarioInfo) - string.len(splits[table.getn(splits)]) - 1)
 end
@@ -346,7 +339,7 @@ end
 -- I've made this function so it works with the old data format and the new
 -- Returning an empty table means scenario data was ill formed
 ---@param scenario UIScenarioInfoFile
----@return Vector2[]
+---@return ScenarioVector2[]
 function GetStartPositions(scenario)
     local saveData = {}
     doscript('/lua/dataInit.lua', saveData)
@@ -556,7 +549,7 @@ end
 --- Retrieves all the starting positions for a scenario. Allocates and returns new tables on each call.
 ---@param scenarioInfo UIScenarioInfoFile
 ---@param scenarioSave UIScenarioSaveFile
----@return Vector2[]?
+---@return ScenarioVector2[]?
 function GetStartPositionsFromScenario(scenarioInfo, scenarioSave)
     local armies = GetArmiesFromScenario(scenarioInfo)
     if not armies then
@@ -584,6 +577,62 @@ function GetStartPositionsFromScenario(scenarioInfo, scenarioSave)
     end
 
     return output
+end
+
+---Returns all units' (leaf nodes) positions under the specified group.
+---@param tblNode? ScenarioUnitGroup
+---@param positions? ScenarioVector[]
+---@return ScenarioVector[]
+local function extractUnitPositions(tblNode, positions)
+    positions = positions or {}
+    if not tblNode then return positions end
+
+    for strName, tblData in pairs(tblNode.Units) do
+        if tblData.type == 'GROUP' then
+            ---@cast tblData ScenarioUnitGroup
+            positions = extractUnitPositions(tblData, positions)
+        else
+            table.insert(positions, tblData.Position)
+        end
+    end
+
+    return positions
+end
+
+---Extracts wreckage positions from all groups that contain `"wreck"` in their name.
+---@param tblNode? ScenarioUnitGroup
+---@param positions? ScenarioVector[]
+---@return ScenarioVector[]
+local function extractPositionsFromWreckageGroups(tblNode, positions)
+    positions = positions or {}
+    if not tblNode then return positions end
+
+    for strName, tblData in pairs(tblNode.Units) do
+        if tblData.type == 'GROUP' then
+            ---@cast tblData ScenarioUnitGroup
+            if string.find(string.lower(strName), "wreck") then
+                positions = extractUnitPositions(tblData, positions)
+            else
+                positions = extractPositionsFromWreckageGroups(tblData, positions)
+            end
+        end
+    end
+
+    return positions
+end
+
+---Returns all unit wreckage positions. Extracted from army groups that contain `"wreck"` in their name.
+---@param scenario UIScenarioSaveFile
+---@return ScenarioVector[]
+function GetWreckagePositions(scenario)
+    ---@type ScenarioVector[]
+    local positions = {}
+
+    for _, army in pairs(scenario.Armies) do
+        positions = extractPositionsFromWreckageGroups(army.Units, positions)
+    end
+
+    return positions
 end
 
 --#endregion

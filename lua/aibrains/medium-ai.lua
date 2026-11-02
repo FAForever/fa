@@ -21,15 +21,6 @@ local TableGetn = table.getn
 ---@field EngineerManager AIEngineerManager
 ---@field StructureManager AIStructureManager
 
----@class TriggerSpec
----@field Callback function
----@field ReconTypes ReconTypes
----@field Blip boolean
----@field Value boolean
----@field Category EntityCategory
----@field OnceOnly boolean
----@field TargetAIBrain AIBrain
-
 ---@class MediumAIBrain: AIBrain, AIBrainEconomyComponent
 ---@field GridReclaim AIGridReclaim
 ---@field GridBrain AIGridBrain
@@ -343,10 +334,8 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
 
         -- TURNING OFF AI POOL PLATOON, I MAY JUST REMOVE THAT PLATOON FUNCTIONALITY LATER
         local poolPlatoon = self:GetPlatoonUniquelyNamed('ArmyPool')
-        if poolPlatoon then
-            poolPlatoon.ArmyPool = true
-            poolPlatoon:TurnOffPoolAI()
-        end
+        poolPlatoon.ArmyPool = true
+        poolPlatoon:TurnOffPoolAI()
 
         -- Stores handles to all builders for quick iteration and updates to all
         self.BuilderHandles = {}

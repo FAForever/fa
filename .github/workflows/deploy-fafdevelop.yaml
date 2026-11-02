@@ -35,18 +35,38 @@ on:
 jobs:
   test:
     uses: ./.github/workflows/tests.yaml
-  update:
+
+  changelog:
+    name: Create changelog of FAF Develop
+    uses: ./.github/workflows/docs-generate-changelog.yaml
+    with:
+      branch: staging/fafdevelop
+
+  changelog-lua:
+    name: Convert changelog to Lua
+    needs: [changelog]
+    uses: ./.github/workflows/docs-convert-changelog.yaml
+    with:
+      branch: staging/fafdevelop
+      additional-changelog: fafdevelop
+
+  deploy:
     name: Update FAF Develop
-    needs: [test]
+    needs: [test, changelog-lua]
     runs-on: ubuntu-latest
     steps:
-      # https://github.com/actions/checkout/tree/v4/
+      # https://github.com/actions/checkout/tree/v6/
       - name: Checkout FA repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
-          repository: FAForever/fa
           ref: staging/fafdevelop
+
+      - name: Setup Git configuration
+        run: |
+          # Configure git
+          git config user.email "github@faforever.com"
+          git config user.name "FAForever Machine User"
 
       # Allows us to better understand the game version and the specific commit hash when we receive a log
       - name: Update version references
@@ -59,7 +79,6 @@ jobs:
           cat lua/version.lua
 
       # Disable debugging statements
-      #
       # You can overwrite these adjustments by setting up a `Debug` folder
       - name: Overwrite debug references
         run: |
@@ -68,15 +87,29 @@ jobs:
           # debugging
           cat lua/shared/components/DebugComponent.lua
 
-      # Create a commit with the changes of the workflow in it
-      - name: Create a commit
+      - name: Commit the changes
         run: |
-          # Configure git
-          git config user.email "github@faforever.com"
-          git config user.name "FAForever Machine User"
-
-          git add .
+          git stage .
           git commit -m "Post-process deployment"
+
+      - name: Delete old lua changelogs
+        run: rm -f lua/ui/lobby/changelog/generated/*
+
+      - name: Retrieve generated lua changelog
+        uses: actions/download-artifact@v7
+        with:
+          name: lua_changelog
+          path: lua/ui/lobby/changelog/generated
+
+      - name: Commit lua changelog
+        run: |
+          # Check if there are any changes
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No changes to deploy"
+            exit 0
+          fi
+          git stage lua/ui/lobby/changelog/generated
+          git commit -m "Add changelog"
 
       # Update the deploy/fafdevelop branch, we force push here because
       # we're not interested in fixing conflicts

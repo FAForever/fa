@@ -1,1 +1,0 @@
-- (#7041) Fix the normals of rotated texture layers (Only affects maps that use the Terrain200 shader). 

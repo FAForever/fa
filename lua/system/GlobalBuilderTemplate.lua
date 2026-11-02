@@ -16,21 +16,16 @@
 ---@alias FunctionReference string
 ---@alias FunctionParameters table
 
----@class BuilderCondition
----@field [1] FileReference
----@field [2] FunctionReference
----@field [3] FunctionParameters
-
 ---@alias BuilderType 'Any' | 'Land' | 'Air' | 'Sea' | 'Gate' 
 
 ---@class BuilderSpec
 ---@field BuilderName BuilderNames
 ---@field BuilderType BuilderType
----@field BuilderData table
+---@field BuilderData? table
 ---@field PlatoonTemplate string
 ---@field Priority number
----@field InstanceCount number
----@field BuilderConditions BuilderCondition[]
+---@field InstanceCount? number
+---@field BuilderConditions? AIBuilderTemplateCondition[]
 
 -- Global list of all builders found in the game
 ---@type table<string, BuilderSpec>
@@ -38,7 +33,7 @@ Builders = {}
 
 --- Register a base builder template, or override an existing base builder template
 ---@param spec BuilderSpec
----@return string
+---@return string?
 Builder = function(spec)
     -- it should be a table
     if type(spec) ~= 'table' then
