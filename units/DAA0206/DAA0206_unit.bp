@@ -215,7 +215,6 @@ UnitBlueprint{
                 "(ALLUNITS - SPECIALLOWPRI)",
             },
             TargetRestrictDisallow = "UNTARGETABLE",
-            TrackingRadius = 1.1,
             TurretBoneMuzzle = "DAA0206",
             TurretBonePitch = "DAA0206",
             TurretBoneYaw = "DAA0206",
