@@ -1,6 +1,6 @@
 # Annotating
 
-All future contributions should be properly annotated. With it [our Lua extension](https://github.com/FAForever/fa-lua-vscode-extension) is able to provide intellisense support for our game, mod and campaign developers. You can find all the supported annotations on the [official repository](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations). Note that the annotations supports markdown.
+All future contributions should be properly annotated. With it [our Lua extension](https://github.com/FAForever/fa-lua-vscode-extension) is able to provide intellisense support for our game, mod and campaign developers. You can find all the supported annotations on the [LuaLS annotation reference](https://luals.github.io/wiki/annotations/). Note that the annotations supports markdown.
 
 ## Conventions
 
@@ -21,61 +21,107 @@ And a few specifics:
 
 ## Comment style
 
-Comments explain intent and engine behavior. Anything readable straight from the code does not need a comment.
+Comments say what a reader can't get from the code in a few seconds. Write them like a technical writer: short, plain words, and one line where possible.
 
 ### Rules
 
-1. Every `@class`, `@type`, `@alias`, and other top-level annotation has a `---` description directly above it.
-2. Every function has a `---` description. The description tells a consumer what the function does and anything they need to know before calling it. Implementation details and rationale go inside the function body, at the very top, before any logic.
-3. Comments are succinct and declarative. Short sentences. State the fact, not the reasoning around the fact.
-4. Do not use em-dashes (`—`) or similar joining punctuation. Split into separate sentences, or use a colon, a comma, or parentheses.
+1. Every function and class gets typed `@param`, `@return` and `---@field` annotations. Its `---` description can be left out when it would only repeat the name.
+2. The `---` description is what the language server shows on hover. It says what the function does and what a caller needs to know. Rationale and implementation details go in the body, at the top, before any logic.
+3. Comments are declarative. State the fact, not the reasoning around the fact.
+4. Use exact identifiers (`CAPTURABLE`, not "capturable units") and common words, not new terms.
+5. Put a fact where it applies: engine behavior in the `engine/` stub, Lua behavior in the Lua file. Repeating a fact in a `---` description is fine when the hover needs it.
+6. No period after the last sentence, and no em-dashes (`—`). Split into separate sentences, or use a colon, a comma or parentheses.
 
-### Why the function-level vs. body split
+### Leave out
 
-The `---` block is what the language server shows on hover. It is the public face of the function and should read as a contract. Implementation rationale belongs with the implementation, where future maintainers will read it.
+- What the name or the code already says.
+- Lists of callers ("Used by the receive path and..."). They go out of date.
+- The history of the change ("now", "instead of", "no longer", "previously"). That goes in the commit message.
+- Section banners (`--------` lines with a heading).
+- Standard Lua behavior, and rules the guides already state.
+- What the type in `@param` or `@return` already says.
+- Numbers that the code or a benchmark result already holds. State the comparison, as a multiple.
 
-### Good
+### Keep
+
+- Engine behavior, and mistakes that are easy to make.
+- Why a non-obvious construct exists, such as an unrolled loop or an intentional space in a string.
+- Hooks and behavior in other files that the code doesn't show.
+- When to use an optional parameter.
+- `@see` links between functions that send and receive the same data, so a reader can jump over the engine.
+
+### Before finishing
+
+Reread every comment you wrote. Delete each one whose removal loses nothing a reader gets from the code in a few seconds, and shorten the rest.
+
+### Examples
+
+The description repeats the name:
 
 ```lua
---- Returns the army index that authored the current command, or nil
---- outside a command-source context.
----@return integer?
-function GetCurrentCommandSourceArmy()
-    -- The engine clears the source between command dispatches, so nil
-    -- is normal during idle ticks.
-    ...
-end
+-- before
+--- Shows the chat window.
+function OpenWindow()
+
+-- after
+function OpenWindow()
 ```
 
+The description lists callers and explains the implementation:
+
 ```lua
---- Wire-format chat payload. Travels through both the live engine
---- broadcast and the sim-routed sync stream.
----@class ChatPayload
+-- before
+--- Appends a local-only system line. Used by the slash-command dispatcher
+--- to surface parse/accept errors without sending over the network.
+---@param text string
+function AppendLocalSystemMessage(text)
+
+-- after
+--- Shows a system line to the local player only
+---@param text string
+function AppendLocalSystemMessage(text)
 ```
 
+The comment repeats the code below it, so it is removed:
+
 ```lua
---- A known channel constant, or an army index for a private whisper.
----@alias UIChatRecipient 'all' | 'allies' | number
+-- before
+IsValidEntry = function(entry)
+    -- Gates on the per-army mute map and the `links` option. Camera
+    -- or Location both qualify as "link" messages: either surfaces
+    -- the camera-link affordance on the row.
+    if entry == nil then return false end
+    local options = ChatConfigModel.GetOptions()
+    if options.muted and entry.ArmyID and options.muted[entry.ArmyID] then
 ```
 
-### Not good
-
-The rationale leaks into the consumer-facing doc, and an em-dash joins what should be two sentences:
+Inline comments explain more than the value needs:
 
 ```lua
+-- before
+Drill.SparkLife = { 9, 14 } -- ticks the orbs live, give or take 40%: with their speed, how far they fly
+Drill.Jets = 16 -- around the cone, close enough together to draw its surface
+
+-- after
+Drill.SparkLife = { 9, 14 } -- ticks, +-40%
+Drill.Jets = 16 -- around the cone
+```
+
+Rationale in the hover, joined with an em-dash:
+
+```lua
+-- before
 --- Returns the army index that authored the current command — the engine
 --- clears the source between command dispatches so a nil is normal during
 --- idle ticks. Returns nil if there is no source.
 ---@return integer?
 function GetCurrentCommandSourceArmy()
-    ...
-end
-```
 
-The class is annotated but has no description, so the hover tooltip is empty:
-
-```lua
----@class ChatPayload
+-- after
+--- Returns the army that issued the current command, or `nil` outside a command
+---@return integer?
+function GetCurrentCommandSourceArmy()
+    -- the engine clears the source between commands, so `nil` is normal during idle ticks
 ```
 
 ## Examples
