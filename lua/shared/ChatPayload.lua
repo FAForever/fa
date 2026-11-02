@@ -67,6 +67,8 @@ function IsValidPayload(msg)
     if msg.location ~= nil and type(msg.location) ~= 'table' then return false end
     if msg.Args     ~= nil and type(msg.Args)     ~= 'table' then return false end
     if msg.to  == 'notify' and type(msg.data)     ~= 'table' then return false end
+    -- Notify uses the trigger as a table key when counting messages.
+    if msg.to  == 'notify' and type(msg.data.trigger) ~= 'string' then return false end
 
     return true
 end

@@ -301,6 +301,12 @@ end
 --#endregion
 --#region Receiving (network)
 
+--- Ids of Notify messages already counted by `processIncomingMessage`.
+--- Notify messages arrive through both delivery paths, and a copy the
+--- message limit rejects never reaches history for `IsDuplicateMessage`.
+---@type table<string, true>
+local processedNotifyIds = {}
+
 --- Returns true when `msg.Id` matches an entry already in history. The same
 --- chat message arrives via both delivery paths in live play (engine
 --- `SessionSendChatMessage` and sim `Sync.ChatMessages`), so whichever lands
@@ -348,6 +354,10 @@ function OnReceive(sender, msg)
 
     if msg.to == ChatModel.RecipientNotify then
         ---@cast msg NotifyChatPayload
+        if msg.Id then
+            if processedNotifyIds[msg.Id] then return end
+            processedNotifyIds[msg.Id] = true
+        end
         -- ignore unwanted messages
         if not import("/lua/ui/notify/notify.lua").processIncomingMessage(sender, msg) then
             return
