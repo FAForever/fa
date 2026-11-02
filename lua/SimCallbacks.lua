@@ -730,7 +730,6 @@ end
 Callbacks.AbortNavigationOfFactoryAssisters = function(data, selection)
     -- no anti-automation guard: this only skips the assist move of engineers in range of the factory they assist
 
-    -- verify selection
     selection = SecureUnits(selection)
     if TableEmpty(selection) then
         return
@@ -748,7 +747,8 @@ Callbacks.AbortNavigationOfFactoryAssisters = function(data, selection)
         return
     end
 
-    import("/lua/sim/commands/abort-factory-assist-navigation.lua").AbortNavigationOfFactoryAssisters(engineers, target)
+    -- fork call so guard order can tick first
+    ForkThread(import("/lua/sim/commands/abort-factory-assist-navigation.lua").AbortNavigationOfFactoryAssisters, engineers, target)
 end
 
 do

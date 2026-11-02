@@ -23,87 +23,51 @@
 -- Based on the InstantAssist UI mod by 4z0t (FAF-UI-Mods, MIT)
 
 -- upvalue scope for performance
-local ForkThread = ForkThread
-local WaitTicks = WaitTicks
 local IsDestroyed = IsDestroyed
 local TableGetn = table.getn
+local MathMax = math.max
 
 local UnitIsUnitState = moho.unit_methods.IsUnitState
 local UnitGetGuardedUnit = moho.unit_methods.GetGuardedUnit
 local UnitGetNavigator = moho.unit_methods.GetNavigator
 local EntityGetPositionXYZ = moho.entity_methods.GetPositionXYZ
 
---- Number of passes, one per tick, that look for engineers that started their assist move
-local MaximumPasses = 3
-
 --- Aborts the initial assist move of the engineers that are in build range of the factory
----@param engineers Unit[]  # modified in place
+---@param engineers Unit[] # modified in place
 ---@param factory Unit
-local function AbortNavigationOfFactoryAssistersThread(engineers, factory)
-    -- An engineer that guards a factory first moves to a reserved spot around it, even when it is in range. The guard
-    -- task sets the navigator goal in the unit command stage of a tick, before sim Lua threads run, so the first pass
-    -- runs in the same tick. The repair task's own move into range sets GuardBusy and is never aborted
-
-    -- The range uses footprints, which is more conservative than the engine's skirt based check. An aborted engineer
-    -- that is out of range walks straight into range instead of to its reserved spot
+function AbortNavigationOfFactoryAssisters(engineers, factory)
     local fx, _, fz = EntityGetPositionXYZ(factory)
-    local factorySize = factory.Blueprint.Footprint.SizeMax
-    local pendingCount = TableGetn(engineers)
+    local facPhysics = factory.Blueprint.Physics
+    local factorySize = MathMax(facPhysics.SkirtSizeX, facPhysics.SkirtSizeZ)
 
-    for pass = 1, MaximumPasses do
-        if pass > 1 then
-            WaitTicks(1)
-            if IsDestroyed(factory) then
-                return
-            end
-        end
-
-        local collected = nil
-        local collectedCount = 0
-        local remaining = 0
-        for k = 1, pendingCount do
-            local engineer = engineers[k]
-            engineers[k] = nil
-            if (not IsDestroyed(engineer)) and UnitGetNavigator(engineer) then
-                local guarded = UnitGetGuardedUnit(engineer)
-                if guarded == factory and
-                    UnitIsUnitState(engineer, 'Guarding') and
-                    UnitIsUnitState(engineer, 'Moving') and
-                    not UnitIsUnitState(engineer, 'GuardBusy')
-                then
-                    local blueprint = engineer.Blueprint
-                    local range = (blueprint.Economy.MaxBuildDistance or 5) + blueprint.Footprint.SizeMax + factorySize
-                    local ex, _, ez = EntityGetPositionXYZ(engineer)
-                    local dx = ex - fx
-                    local dz = ez - fz
-                    if dx * dx + dz * dz <= range * range then
-                        collected = collected or {}
-                        collectedCount = collectedCount + 1
-                        collected[collectedCount] = engineer
-                    end
-                elseif (not guarded) or guarded == factory then
-                    -- the guard task has not started its move yet
-                    remaining = remaining + 1
-                    engineers[remaining] = engineer
+    local nEngis = TableGetn(engineers)
+    local i = 1
+    while i < nEngis do
+        local engineer = engineers[i]
+        if not IsDestroyed(engineer) then
+            local guarded = UnitGetGuardedUnit(engineer)
+            if guarded == factory
+                and UnitIsUnitState(engineer, 'Guarding')
+                and UnitIsUnitState(engineer, 'Moving')
+                and not UnitIsUnitState(engineer, 'GuardBusy')
+            then
+                local blueprint = engineer.Blueprint
+                local range = blueprint.Economy.MaxBuildDistance + blueprint.Footprint.SizeMax + factorySize
+                local ex, _, ez = EntityGetPositionXYZ(engineer)
+                local dx = ex - fx
+                local dz = ez - fz
+                if dx * dx + dz * dz <= range * range then
+                    i = i + 1
+                    continue
                 end
             end
         end
-        pendingCount = remaining
-
-        if collected then
-            import("/lua/sim/commands/abort-navigation.lua").AbortNavigation(collected, false)
-        end
-
-        if pendingCount == 0 then
-            return
-        end
+        engineers[i] = engineers[nEngis]
+        engineers[nEngis] = nil
+        nEngis = nEngis - 1
     end
-end
 
---- Aborts the initial assist move of the engineers that are in build range of the factory. Checks for a few ticks, as
---- the guard order may start a tick after this is called
----@param engineers Unit[]  # modified in place
----@param factory Unit
-function AbortNavigationOfFactoryAssisters(engineers, factory)
-    ForkThread(AbortNavigationOfFactoryAssistersThread, engineers, factory)
+    if nEngis > 0 then
+        import("/lua/sim/commands/abort-navigation.lua").AbortNavigation(engineers, true)
+    end
 end
