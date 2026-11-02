@@ -742,6 +742,7 @@ Callbacks.AbortNavigationOfFactoryAssisters = function(data, selection)
 
     local target = engineers[1]:GetCommandQueue()[1].target
     if not target or IsDestroyed(target) or not IsUnit(target)
+        ---@cast target Unit
         or not EntityCategoryContains(CategoriesFactories, target)
     then
         return
