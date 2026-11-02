@@ -447,6 +447,7 @@ Platoon = Class(moho.platoon_methods) {
             IssueToUnitClearCommands(unit)
             for k,v in data.Enhancement do
                 if not unit:HasEnhancement(v) then
+                    ---@type EnhanceTaskParams
                     local order = {
                         TaskName = "EnhanceTask",
                         Enhancement = v

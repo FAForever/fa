@@ -11,7 +11,10 @@ local Prop = import("/lua/sim/prop.lua").Prop
 local CreateProp = CreateProp
 
 ---@class Wreckage : Prop
----@field AssociatedBP BlueprintId BlueprintID of the unit
+--- Blueprint ID of the unit, or its `Wreckage.IdHook`. Read by the engine when a mobile builder starts a structure: if the
+--- nearest `OBSTRUCTSBUILDING` prop to the builder in the footprint has an `AssociatedBP` in the structure's
+--- `Economy.RebuildBonusIds`, ignoring case, and sits exactly at the build position, the engine calls `GetRebuildBonus`
+---@field AssociatedBP BlueprintId
 Wreckage = Class(Prop) {
 
     IsWreckage = true,
@@ -163,7 +166,7 @@ function CreateWreckage(bp, position, orientation, mass, energy, timeMult, death
         prop:SetMesh(bp.Display.MeshBlueprintWrecked, true)
     end
 
-    -- This field cannot be renamed or the magical native code that detects rebuild bonuses breaks.
+    -- The engine reads this field by name for rebuild bonuses
     prop.AssociatedBP = bp.Wreckage.IdHook or bp.BlueprintId
 
     return prop

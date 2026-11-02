@@ -117,8 +117,12 @@ local MathAtan = math.atan
 ---@class CommandModeDataBuildAnchored : CommandModeDataBase
 ---@field name string # blueprint id of the unit being built
 
----@class CommandModeDataOrderScript : CommandModeDataOrder
----@field TaskName string
+--- Command mode data of a script order given with a target. `VerifyScriptCommand` turns it into the order's parameters
+---@see VerifyScriptCommand
+---@class CommandModeDataOrderScript : CommandModeDataOrder, ScriptTaskParams
+---@field name 'RULEUCC_Script'
+---@field AbilityName? string # Name of the ability button that started the command mode
+---@field UserVerifyScript? string # Module whose `VerifyScriptCommand(data, result)` validates the order instead of authorizing every selected unit
 
 ---@alias CommandModeData CommandModeDataOrder | CommandModeDataOrderScript | CommandModeDataBuild | CommandModeDataBuildAnchored | false
 

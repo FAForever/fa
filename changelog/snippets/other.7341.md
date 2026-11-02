@@ -1,0 +1,1 @@
+- Annotate engine callbacks and the categories the engine reads, and correct engine annotations (#7341).

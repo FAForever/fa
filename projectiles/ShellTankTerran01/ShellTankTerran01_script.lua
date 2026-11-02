@@ -39,7 +39,7 @@ ShellTankTerran01 = ClassProjectile(Projectile) {
             WaitTicks(Random(3,4))
 
             local x, y, z = unpack(self:GetPosition())
-            MetaImpact(self, Vector(x, y, z), 2, 2)
+            MetaImpact(self, Vector(x, y, z), 2, 2, 'ALLUNITS')
             local army = self.Army
             for k, v in self.FxMeta do
                 CreateEmitterAtEntity(self,army,v):ScaleEmitter(0.4)

@@ -46,8 +46,8 @@
 --- every field is meaningful for every event Type, so MouseX/Y are -1
 --- on key events and WheelDelta/Rotation are 0 outside wheel events.
 ---
---- For `Edit.OnNonTextKeyPressed` the function gets `(self, keycode, event)`
---- — `keycode` is the raw VK_* code (compare against `UIUtil.VK_*`) and
+--- For `Edit.OnNonTextKeyPressed` the function gets `(self, keycode, event)`.
+--- `keycode` is a Windows virtual-key code (see `VK_KeyCode`) and
 --- `event.Modifiers` is the modifier state at the time of the press.
 ---@class KeyEvent
 ---@field Type           KeyEventType   # "Char" / "KeyDown" / "ButtonPress" / "MouseEnter" / "MouseExit" / "WheelRotation" / ...
@@ -72,6 +72,7 @@ function CMauiEdit:AcquireFocus()
 end
 
 ---
+---@see moho.edit_methods.OnTextChanged # Called with the new and the previous text
 function CMauiEdit:ClearText()
 end
 
@@ -202,6 +203,7 @@ function CMauiEdit:SetNewHighlightForegroundColor(color)
 end
 
 ---
+---@see moho.edit_methods.OnTextChanged # Called with the new and the previous text
 ---@param text string
 function CMauiEdit:SetText(text)
 end
@@ -216,32 +218,43 @@ end
 function CMauiEdit:ShowCaret(show)
 end
 
---- Called when the text has changed in the text box. Passes in the newly changed text
---- and the previous text.
----@type fun(self: Edit, newText: string, oldText: string)
-CMauiEdit.OnTextChanged = nil
-
---- Called when the user presses the enter key. Passes in the current contents of the text box.
----@type fun(self: Edit, text: string)
-CMauiEdit.OnEnterPressed = nil
-
---- Called when non-text keys are pressed. If the key already affected the text, such as with `Backspace`
---- or `Delete`, then the event has already been handled and won't propagate down.
--- @param keycode number Windows VK keycode
----@type fun(self: Edit, keycode: number, event: KeyEvent)
-CMauiEdit.OnNonTextKeyPressed = nil
-
---- Called when a character key is pressed, before it is entered in to the dialog. If the function
---- returns `true` (indicating the char is handled) then the character is not inserted in the dialog.
----@type fun(self: Edit, charcode: number): boolean
-CMauiEdit.OnCharPressed = nil
-
---- Called when the `escape` key is pressed. Return `true` to prevent the text box from clearing.
----@type fun(self: Edit, text: string): boolean
-CMauiEdit.OnEscPressed = nil
-
---- Engine does not call HandleEvent for Edit controls.
+--- Engine does not call HandleEvent for Edit controls
 ---@type nil
 CMauiEdit.HandleEvent = nil
+
+--- Called by the engine when a character key is pressed, before the character is inserted.
+--- `charcode` is the character code, which includes `Tab` (9) and `Space` (32). Return `true` to
+--- handle the character yourself, so the engine doesn't insert it
+---@type nil | fun(self: Edit, charcode: integer): boolean?
+CMauiEdit.OnCharPressed = nil
+
+--- Called by the engine when the user presses `Enter`. `currentText` is the text in the edit when
+--- the key is pressed. Return `true` to keep the text; otherwise the engine clears it
+---@type nil | fun(self: Edit, currentText: string): boolean?
+CMauiEdit.OnEnterPressed = nil
+
+--- Called by the engine when the user presses `Escape`. `currentText` is the text in the edit when
+--- the key is pressed. Return `true` to keep the text and focus; otherwise the engine clears the
+--- text, or abandons keyboard focus if the text is already empty
+---@type nil | fun(self: Edit, currentText: string): boolean?
+CMauiEdit.OnEscPressed = nil
+
+--- Called by the engine when a key that doesn't type a character is pressed, with its Windows
+--- virtual-key code. `event.KeyCode` holds the wxWidgets code of the same key instead. These keys
+--- don't reach this callback:
+--- - `Enter` and `Escape`.
+--- - Keys the engine uses for editing: `Backspace`, `Delete`, `Insert`, `Home`, `End`, `Left` and
+---   `Right`.
+---
+--- `Up`, `Down`, `Page Up` and `Page Down` do reach it
+---@see VK_KeyCode # The codes, and the `UIUtil.VK_*` constants
+---@type nil | fun(self: Edit, keycode: VK_KeyCode, event: KeyEvent)
+CMauiEdit.OnNonTextKeyPressed = nil
+
+--- Called by the engine when the text changes, with the new and the previous text
+---@see moho.edit_methods.SetText # Changes the text
+---@see moho.edit_methods.ClearText # Clears the text
+---@type nil | fun(self: Edit, newText: string, oldText: string)
+CMauiEdit.OnTextChanged = nil
 
 return CMauiEdit

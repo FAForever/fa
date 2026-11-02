@@ -68,12 +68,12 @@ AIRESULT = {
 }
 
 ---@class ScriptTask : moho.ScriptTask_Methods
----@field CommandData { TaskName: string } | table # LuaParams table from the user side. This table is shared by all units ordered the task from one command.
+---@field CommandData ScriptTaskParams
 ScriptTask = Class(moho.ScriptTask_Methods) {
 
     --- Called immediately when task is created
     ---@param self ScriptTask
-    ---@param commandData { TaskName: string } | table # LuaParams table from the user side. This table is shared by all units ordered the task from one command.
+    ---@param commandData ScriptTaskParams
     OnCreate = function(self, commandData)
         self.CommandData = commandData
     end,

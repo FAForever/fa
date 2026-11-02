@@ -1295,6 +1295,7 @@ function OrderEnhancement(item, clean, destroy)
         local unitSel = {unit}
         SelectUnits(unitSel)
         for _, order in orders do
+            ---@type EnhanceTaskParams
             orderTable = {TaskName = 'EnhanceTask', Enhancement = order}
             IssueCommand("UNITCOMMAND_Script", orderTable, cleanOrder)
             if cleanOrder then

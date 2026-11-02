@@ -69,7 +69,7 @@ end
 --- Destroys the platoon and its units, if no `squad` is specified
 ---
 --- In both cases, the units are destroyed after they complete their orders.
----@see moho.aibrain_methods.DisbandPlatoon For removing the platoon without destroying it's units.
+---@see moho.aibrain_methods.DisbandPlatoon # For removing the platoon without destroying its units
 ---@param squad? PlatoonSquadType If specified only the squad units are destroyed. The platoon itself is **NOT** destroyed.
 function CPlatoon:Destroy(squad)
 end
@@ -199,8 +199,8 @@ end
 
 --- Returns platoon's unique name if it has it.
 ---
----@see moho.platoon_methods.UniquelyNamePlatoon To set the name
----@see moho.aibrain_methods.GetPlatoonUniquelyNamed To get the platoon by the unique name.
+---@see moho.platoon_methods.UniquelyNamePlatoon # To set the name
+---@see moho.aibrain_methods.GetPlatoonUniquelyNamed # To get the platoon by the unique name
 ---@return string uniqueName Defaults to empty string
 function CPlatoon:GetPlatoonUniqueName()
 end
@@ -338,6 +338,7 @@ function CPlatoon:Stop(squad)
 end
 
 --- Runs Platoon's `OnDestroy` then runs `OnCreate` with the new plan.
+---@see moho.platoon_methods.OnCreate # Called with the new plan
 ---@param plan string
 ---@return string
 function CPlatoon:SwitchAIPlan(plan)
@@ -345,8 +346,8 @@ end
 
 --- Gives a unique name to the platoon.
 ---
----@see moho.platoon_methods.GetPlatoonUniqueName to get the name of the platoon.
----@see moho.aibrain_methods.GetPlatoonUniquelyNamed To get the platoon by the unique name.
+---@see moho.platoon_methods.GetPlatoonUniqueName # To get the name of the platoon
+---@see moho.aibrain_methods.GetPlatoonUniquelyNamed # To get the platoon by the unique name
 ---@param name string
 function CPlatoon:UniquelyNamePlatoon(name)
 end
@@ -367,7 +368,7 @@ end
 
 --- Orders the units to use the ferry beacon
 ---
----@see moho.platoon_methods.GetFerryBeacons To get list of available beacons to use.
+---@see moho.platoon_methods.GetFerryBeacons # To get list of available beacons to use
 ---@param category EntityCategory
 ---@param beacon TransportBeaconUnit
 ---@return PlatoonCommand
@@ -380,7 +381,15 @@ end
 function CPlatoon:UseTeleporter(gameObject, squad)
 end
 
----@type fun(self: Platoon, plan: string)
+--- Called by the engine after the platoon is created, and after `OnDestroy` when its AI plan changes
+---@see moho.aibrain_methods.MakePlatoon # Creates a platoon
+---@see moho.platoon_methods.SwitchAIPlan # Changes the AI plan
+---@type nil | fun(self: Platoon, plan: string)
 CPlatoon.OnCreate = nil
+
+--- Called by the engine when `AssignUnitsToPlatoon` adds units to the platoon
+---@see moho.aibrain_methods.AssignUnitsToPlatoon # Adds units
+---@type nil | fun(self: Platoon)
+CPlatoon.OnUnitsAddedToPlatoon = nil
 
 return CPlatoon

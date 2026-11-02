@@ -8,14 +8,18 @@ local ScriptTask = import("/lua/sim/scripttask.lua").ScriptTask
 local TASKSTATUS = import("/lua/sim/scripttask.lua").TASKSTATUS
 local AIRESULT = import("/lua/sim/scripttask.lua").AIRESULT
 
+---@class TargetLocationTaskParams : VerifiedScriptTaskParams
+---@field TaskName "TargetLocation"
+---@field Location Vector # The clicked position, or the clicked unit's position at the time. Set by the UI, so it can be any value
+
 ---@class TargetLocationTask : ScriptTask
----@field CommandData { TaskName: "TargetLocation", UserValidated: boolean, Location: Vector } # LuaParams table from `UserScriptCommand`. This table is shared by all units ordered the task from one command.
+---@field CommandData TargetLocationTaskParams
 ---@field GetUnit fun(self: TargetLocationTask): RemoteViewingUnit
 TargetLocation = Class(ScriptTask) {
 
     --- Called immediately when task is created
     ---@param self TargetLocationTask
-    ---@param commandData { TaskName: "TargetLocation", UserValidated: boolean, Location: Vector } # LuaParams table from `UserScriptCommand`. This table is shared by all units ordered the task from one command.
+    ---@param commandData TargetLocationTaskParams
     OnCreate = function(self, commandData)
         ScriptTask.OnCreate(self, commandData)
         self:GetUnit():OnTargetLocation(commandData.Location)

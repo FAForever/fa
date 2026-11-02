@@ -10,7 +10,7 @@ function CAimManipulator:GetHeadingPitch()
 end
 
 --- Returns true when the manipulator is considered to be on target.
---  AimManipulator:OnTarget()
+---@return boolean
 function CAimManipulator:OnTarget()
 end
 

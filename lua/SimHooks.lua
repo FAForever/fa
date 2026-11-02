@@ -38,6 +38,8 @@ do
 end
 
 do
+    -- Engine patch allows ChangeUnitArmy to transfer COMMAND units: https://github.com/FAForever/FA-Binary-Patches/commit/fd7b0893d0efb72ed015b0736fee058576d0bcd7
+
     -- do not allow command units to be given
     local oldChangeUnitArmy = _G.ChangeUnitArmy
     _G.ChangeUnitArmy = function(unit, army, noRestrictions)

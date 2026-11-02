@@ -36,7 +36,7 @@ __fenv = {}
 --- Returns a to the power of b.
 ---
 --- Note: this is not the ^ operator, which is XOR, this is a separate function.
----@see math.pow Identical function.
+---@see math.pow # Identical function
 ---@param a number
 ---@param b number
 ---@return integer
@@ -68,7 +68,7 @@ end
 
 --- Print a message to the moho logger, this shouldn't be used in production code
 --- 
----@see _ALERT To not add a prefix for newlines.
+---@see _ALERT # To not add a prefix for newlines
 ---@param out any
 ---@param ... any
 function LOG(out, ...)

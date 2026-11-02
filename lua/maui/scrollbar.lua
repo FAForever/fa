@@ -1,8 +1,8 @@
 -- Class methods:
 -- Scrollbar:SetScrollable(scrollable) - set the scrollable item this controls
 -- Scrollbar:SetNewTextures(background, thumbMiddle, thumbTop, thumbBottom)
--- ScrollBar:ScrollLines(float lines)
--- ScrollBar:ScrollPages(float pages)
+-- Scrollbar:DoScrollLines(float lines)
+-- Scrollbar:DoScrollPages(float pages)
 
 local Control = import("/lua/maui/control.lua").Control
 local LazyVarCreate = import("/lua/lazyvar.lua").Create

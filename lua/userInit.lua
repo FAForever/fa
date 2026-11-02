@@ -350,6 +350,10 @@ do
     ---@type { [1]: UserUnit }
     local UnitsCache = {}
 
+    --- Pause or unpause the given unit
+    ---@see SetPaused # Variant for a list of units
+    ---@see moho.unit_methods.OnPaused # Called in the sim when the unit pauses
+    ---@see moho.unit_methods.OnUnpaused # Called in the sim when the unit unpauses
     ---@param unit UserUnit
     ---@param pause boolean
     _G.SetPausedOfUnit = function(unit, pause)
@@ -357,6 +361,8 @@ do
         return SetPaused(UnitsCache, pause)
     end
 
+    --- Returns whether the unit is paused
+    ---@see GetIsPaused # Variant for a list of units
     ---@param unit UserUnit
     ---@return boolean
     _G.GetIsPausedOfUnit = function(unit)
@@ -364,15 +370,20 @@ do
         return GetIsPaused(UnitsCache)
     end
 
+    --- Retrieves the orders, toggles and buildable categories of the given unit
+    ---@see GetUnitCommandData # Variant for a list of units
+    ---@see GetUnitCommandFromCommandCap # Convert the orders to unit commands
     ---@param unit UserUnit
-    ---@return string[] orders
-    ---@return CommandCap[] availableToggles
+    ---@return EngineCommandCap[] orders
+    ---@return EngineToggleCap[] availableToggles
     ---@return EntityCategory buildableCategories
     _G.GetUnitCommandDataOfUnit = function(unit)
         UnitsCache[1] = unit
         return GetUnitCommandData(UnitsCache)
     end
 
+    --- Issue a factory build or upgrade command to the given units
+    ---@see IssueBlueprintCommand # Variant for the selection
     ---@param units UserUnit[]
     ---@param command UserUnitBlueprintCommand
     ---@param blueprintid UnitId
@@ -393,6 +404,8 @@ do
         commandMode.RestoreCommandMode(true)
     end
 
+    --- Issue a factory build or upgrade command to the given unit
+    ---@see IssueBlueprintCommand # Variant for the selection
     ---@param unit UserUnit
     ---@param command UserUnitBlueprintCommand
     ---@param blueprintid UnitId
@@ -404,6 +417,7 @@ do
     end
 
     --- Issue a command to a given unit
+    ---@see IssueUnitCommand # Variant for a list of units
     ---@param unit UserUnit
     ---@param command UserUnitCommand # Will crash the game if not a valid command.
     ---@param luaParams? table | string | number | boolean # Will crash the game if the table contains non-serializable types.

@@ -1000,14 +1000,14 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ---A random platoon will be picked from all platoons that have the same (highest) priority and are passing build conditions.
-    ---@see CampaignAIBrain:PBMDisableRandomSamePriority()
+    ---@see CampaignAIBrain.PBMDisableRandomSamePriority
     ---@param self CampaignAIBrain
     PBMEnableRandomSamePriority = function(self)
         self.PBM.RandomSamePriority = true
     end,
 
     ---First highest priority platoon with passing build conditions will be built.
-    ---@see CampaignAIBrain:PBMEnableRandomSamePriority()
+    ---@see CampaignAIBrain.PBMEnableRandomSamePriority
     ---@param self CampaignAIBrain
     PBMDisableRandomSamePriority = function(self)
         self.PBM.RandomSamePriority = false

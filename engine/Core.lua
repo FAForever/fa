@@ -82,6 +82,10 @@
 ---| 4 # FILE_ACTION_RENAMED_OLD_NAME - The file was renamed and this is the old name.
 ---| 5 # FILE_ACTION_RENAMED_NEW_NAME - The file was renamed and this is the new name.
 
+--- Global table for disk change callbacks
+---@type fun(name: FileName, why: FileAction)[]
+__diskwatch = nil
+
 ---@unknown
 function AITarget()
 end
@@ -271,7 +275,9 @@ end
 function IsAlly(army1, army2)
 end
 
---- Checks if the C-side of an object is destroyed / de-allocated
+--- Checks if the C-side of an object is destroyed / de-allocated. Sim entities are deallocated at
+--- the end of the tick they're destroyed in, so this stays false until then
+---@see moho.entity_methods.BeenDestroyed # True as soon as `Destroy()` is called
 ---@param entity? Destroyable
 ---@return boolean
 function IsDestroyed(entity)
