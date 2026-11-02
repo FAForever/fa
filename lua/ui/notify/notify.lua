@@ -246,12 +246,14 @@ function focusArmyChanged()
 end
 
 function sendMessage(msg)
-    -- Replays show the players' own messages recorded through `SendThroughSim`
-    if replay then return end
+    -- Replays show the players' own chat messages recorded through `SendThroughSim`
+    if replay and msg.Chat then return end
     if observer then
         SessionSendChatMessage(localClient, msg)
     else
-        SendThroughSim(msg)
+        if msg.Chat then
+            SendThroughSim(msg)
+        end
         SessionSendChatMessage(FindClients(), msg)
     end
 end
