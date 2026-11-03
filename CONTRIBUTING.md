@@ -26,7 +26,7 @@ Useful tooling:
 
 Each PR needs a [snippet](https://faforever.github.io/fa/development/changelog) for the changelog file of the release.
 We have an automatic workflow that adds a snippet template and tries to guess the category based on the PR tags. It also converts the PR to a draft.
-When you have made all the changes you intended to do and have updated the snippet text, you can mark the PR as ready for review by removing the draft status from the PR.
+When you have made all the changes you intended to do and have updated the snippet text, you can mark the PR as ready for review by removing the draft status from the PR. While your PR is still in draft state, other people will assume that you still want to make changes and will not review it.
 You can request reviews from people who are knowledgable in the domains of the code you changed (See below).
 
 ## About reviews
@@ -85,7 +85,6 @@ These are people knowledgeable of the indicated areas, that are good candidates 
 @4z0t  
 @Basilisk3  
 @lL1l1  
-@Garanas  
 @Hdt80bro  
 @clyfordv  
 @speed2CZ  
@@ -94,7 +93,6 @@ These are people knowledgeable of the indicated areas, that are good candidates 
 @lL1l1  
 @4z0t  
 @Basilisk3  
-@Garanas  
 @Hdt80bro  
 @clyfordv  
 @speed2CZ  
@@ -102,11 +100,9 @@ These are people knowledgeable of the indicated areas, that are good candidates 
 
 **AI**  
 @relent0r  
-@Garanas  
 
 **blueprints**  
 @Basilisk3  
-@Garanas  
 @Hdt80bro  
 @lL1l1  
 @The-Balthazar  
@@ -121,8 +117,16 @@ These are people knowledgeable of the indicated areas, that are good candidates 
 
 **graphics**  
 @BlackYps  
-@Garanas  
 
 **binary patches**  
 @4z0t  
 @Hdt80bro  
+
+## FAQ
+
+### Help my Pull Request is being ignored and not being reviewed
+Make sure that:
+- it is not a draft
+- the feature is greenlighted (See the About Reviews section) and you ticked the box. This is important because the status of this tixkbox shows up in the PR overview list. If it is not set people will likely assume that it is missing and ignore the PR
+- you have actually requested people for review
+If you did all that and still have no luck, feel free to ask about it in the game development channel in discord.
