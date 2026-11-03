@@ -18,7 +18,7 @@
 ---@alias SCUEnhancementBuffType
 ---| AeonSCUEnhancementBuffType
 ---| CybranSCUEnhancementBuffType
---| UEFSCUEnhancementBuffType # there are none
+---| UEFSCUEnhancementBuffType
 ---| SeraphimSCUEnhancementBuffType
 
 -- These buffs are only created when needed
@@ -33,7 +33,7 @@
 ---@alias SCUEnhancementBuffName
 ---| AeonSCUEnhancementBuffName
 ---| CybranSCUEnhancementBuffName
---| UEFSCUEnhancementBuffName # there are none
+---| UEFSCUEnhancementBuffName
 ---| SeraphimSCUEnhancementBuffName
 
 ---@type EnhancementSyncTable

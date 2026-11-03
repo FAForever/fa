@@ -51,6 +51,7 @@ Buffs = {}
 --| "StunAlt" # upcoming
 ---| "VisionRadius"
 ---| "WeaponsEnable"
+---| 'EnergyMaintenanceOverride'
 
 ---@alias BuffStackType "ALWAYS" | "REPLACE" | "IGNORE"
 
