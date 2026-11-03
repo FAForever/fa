@@ -41,13 +41,26 @@ function PushEscapeHandler(handler)
     table.insert(escapeHandlers, handler)
 end
 
---- Remove the current escape handler and restore the previous one pushed.
-function PopEscapeHandler()
+--- Removes the current escape handler and restores the previous one pushed.
+--- If a specific handler is passed, removes that specific handler from the stack regardless of its position
+---@param handler? function
+function PopEscapeHandler(handler)
     if table.empty(escapeHandlers) then
         LOG("Error popping escape handler, stack is empty")
         LOG(repr(debug.traceback()))
         return
     end
+
+    if handler then
+        for i = table.getn(escapeHandlers), 1, -1 do
+            if escapeHandlers[i] == handler then
+                table.remove(escapeHandlers, i)
+                return
+            end
+        end
+        return
+    end
+
     table.remove(escapeHandlers)
 end
 
