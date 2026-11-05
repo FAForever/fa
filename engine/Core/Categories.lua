@@ -82,7 +82,8 @@ categories = {
     --- Engine: the unit uses the carrier tasks to load, launch and dock aircraft.
     --- Unlike units in other transports, units attached to it accept move, patrol, attack-move and guard orders.
     --- Engine (UI) selection: units attached to it can't be hovered, so they can't be click-selected or targeted by orders.
-    --- Box selection, shift-box selection and Lua selection still pick them when they are selectable. See `SELECTABLE`
+    --- Box selection, shift-box selection and Lua selection still pick them when they are selectable.
+    ---@see categories.SELECTABLE
     CARRIER = categoryValue,
     CIVILIAN = categoryValue,
     CIVILLIAN = categoryValue,
@@ -142,15 +143,17 @@ categories = {
     --- A factory can only guard factories.
     --- A unit given a transport-load order onto a factory waits there for a ferry.
     --- Counted in the army stats.
-    --- Engine (UI) selection: the unit is selectable while it is being built. See `SELECTABLE`.
+    --- Engine (UI) selection: the unit is selectable while it is being built.
     --- Engine (UI): with `STRUCTURE`, it counts for `GetIdleFactories`
+    ---@see categories.SELECTABLE
     FACTORY = categoryValue,
     --- Engine: when the unit and all its destinations are on water, its path requests use its `AltFootprint`, so the path stays on water.
     --- Every other `FAVORSWATER` unit in the same order must also be on water with destinations on water.
     --- Otherwise it paths with its normal footprint.
     FAVORSWATER = categoryValue,
     --- Engine: marks a ferry beacon, the target of ferry orders.
-    --- Engine (UI) selection: can be hovered even when `UNTARGETABLE`. See `SELECTABLE`
+    --- Engine (UI) selection: can be hovered even when `UNTARGETABLE`.
+    ---@see categories.SELECTABLE
     FERRYBEACON = categoryValue,
     FIELDENGINEER = categoryValue,
     FRIGATE = categoryValue,
@@ -253,8 +256,9 @@ categories = {
     --- It helps its creator's work, or docks on its creator when that is `PODSTAGINGPLATFORM`.
     --- While docked, it accepts move, patrol, attack-move, guard, reclaim, capture and repair orders, which units in other transports reject.
     --- It accepts build orders.
-    --- Engine (UI) selection: the unit stays selectable while docked, which units in other transports aren't. See `SELECTABLE`.
+    --- Engine (UI) selection: the unit stays selectable while docked, which units in other transports aren't.
     --- Engine (UI): an unload drag with only pods selected in the transport gives them a move order
+    ---@see categories.SELECTABLE
     POD = categoryValue,
     --- Engine: the unit rejects transport load and dock orders, as units already in a transport do. No FAF unit has it
     PODS = categoryValue,
@@ -422,14 +426,15 @@ categories = {
     TRANSPORTFOCUS = categoryValue,
     UEF = categoryValue,
     --- Not read by the engine or by Lua.
-    --- Engine (UI) selection: remove `SELECTABLE` or use `Unit:SetUnSelectable` to make a unit unselectable. See `SELECTABLE`
+    --- Engine (UI) selection: remove `SELECTABLE` or use `Unit:SetUnSelectable` to make a unit unselectable.
+    ---@see categories.SELECTABLE
     UNSELECTABLE = categoryValue,
     --- Lua-side (`lua/ui/dialogs/createunit.logic.lua`): hides the unit from the create unit (cheat spawn) dialog
     UNSPAWNABLE = categoryValue,
     --- Engine (UI) selection: when the unit is not also `SELECTABLE`, the cursor can't hover it, so it can't be targeted by orders.
-    ---@see categories.SELECTABLE
     --- Engine (UI): excludes it from `GetIdleEngineers`
     --- Lua-side: Most unit weapons have this category as a disallowed target
+    ---@see categories.SELECTABLE
     UNTARGETABLE = categoryValue,
     --- Engine: an immobile unit in this category doesn't occupy ground when created.
     --- A unit in this category attached to a transport doesn't count as cargo. No FAF unit has it
@@ -475,12 +480,13 @@ categories = {
     --- Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/20
     CANLANDONWATER = categoryValue,
     --- Engine: the unit accepts orders while it is being built, which the base engine allows only for `FACTORY` units, so upgrades can be queued on it.
-    --- Engine (UI) selection: the unit is selectable while it is being built. See `SELECTABLE`.
+    --- Engine (UI) selection: the unit is selectable while it is being built.
     --- Introduced by https://github.com/FAForever/FA-Binary-Patches/commit/e23e4ea9ad1aeed74b718aaf27eff6bd28742b95
+    ---@see categories.SELECTABLE
     CQUEMOV = categoryValue,
     --- Engine (UI) selection: box selection without shift gives an unfinished unit in this category the lowest selection priority.
-    --- See `SELECTABLE`.
     --- Introduced by https://github.com/FAForever/FA-Binary-Patches/commit/e23e4ea9ad1aeed74b718aaf27eff6bd28742b95
+    ---@see categories.SELECTABLE
     LOWSELECTPRIO = categoryValue,
     --- Engine: a structure can't be built on top of a prop in this category.
     --- Lua-side (`lua/sim/units/StructureUnit.lua`): the prop is not cleared when a structure starts building on top of it.
@@ -491,9 +497,10 @@ categories = {
     --- The patch renames the engine's `SUBCOMMANDER` check to this category, and `lua/system/blueprints-units.lua` adds it to every `SUBCOMMANDER` unit.
     --- Introduced by https://github.com/FAForever/FA-Binary-Patches/pull/13
     SACU_BEHAVIOR = categoryValue,
-    --- Engine (UI) selection: double-click selection works on walls, which the base engine prevents. See `SELECTABLE`.
+    --- Engine (UI) selection: double-click selection works on walls, which the base engine prevents.
     --- The `select_all_units_of_same_type` hotkey (`UI_ExpandCurrentSelection`) still skips walls.
     --- Introduced by https://github.com/FAForever/FA-Binary-Patches/commit/e23e4ea9ad1aeed74b718aaf27eff6bd28742b95
+    ---@see categories.SELECTABLE
     WALL = categoryValue,
 }
 
