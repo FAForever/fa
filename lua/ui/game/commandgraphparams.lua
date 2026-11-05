@@ -46,6 +46,7 @@ CommandGraphParams = {
     UNITCOMMAND_Retaliate = {inherit_from = 'UNITCOMMAND_Attack'},
     UNITCOMMAND_FormAttack = {inherit_from = 'UNITCOMMAND_Attack'},
     UNITCOMMAND_Tactical = {inherit_from = 'UNITCOMMAND_Attack'},
+    -- not displayed: the engine skips script orders when building the command graph
     UNITCOMMAND_Script = {inherit_from = 'UNITCOMMAND_Attack'},
     UNITCOMMAND_AggressiveMove = {
         inherit_from = 'default_AttackColors',
