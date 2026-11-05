@@ -1,1 +1,1 @@
-- Your explanation here... [Don't forget to change the category in the filename] (#7370).
+- Re-add missing utils import in `smartSelection.lua`, which was used by the mod "Advanced Selection Extension" (#7370).
