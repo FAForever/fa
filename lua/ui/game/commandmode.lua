@@ -348,6 +348,7 @@ end
 
 -- cached category strings for performance
 local categoriesFactories = categories.STRUCTURE * categories.FACTORY
+local categoriesEngineers = categories.ENGINEER + categories.COMMAND
 local categoriesShields = categories.MOBILE * categories.SHIELD
 local categoriesStructure = categories.STRUCTURE
 
@@ -534,6 +535,18 @@ local function OnGuardCopy(guardees, unit)
     end
 end
 
+--- Skips the initial assist move of the engineers that are already in build range of the factory
+---@param command UserCommand
+local function OnGuardFactoryInstantly(command)
+    -- Control inverts the option. Control only copies queues when assisting engineers, so it is free for factories
+    local prefs = Prefs.GetFieldFromCurrentProfile('options').assist_factory_instantly
+    if (prefs == 'On') ~= IsKeyDown('Control') and
+        EntityCategoryFilterDown(categoriesEngineers, command.Units)[1]
+    then
+        SimCallback({ Func = 'AbortNavigationOfFactoryAssisters', Args = { Target = command.Target.EntityId } }, true)
+    end
+end
+
 ---@param command UserCommand
 local function OnGuardIssued(command)
     if command.Target.EntityId then
@@ -552,6 +565,11 @@ local function OnGuardIssued(command)
                 local cb = { Func = 'ValidateAssist', Args = { target = command.Target.EntityId } }
                 SimCallback(cb, true)
             end
+        end
+
+        -- queued assists do not start immediately
+        if command.Clear and EntityCategoryContains(categoriesFactories, command.Blueprint) then
+            OnGuardFactoryInstantly(command)
         end
 
         -- validate shields

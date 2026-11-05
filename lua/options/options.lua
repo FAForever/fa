@@ -561,6 +561,19 @@ options = {
             },
 
             {
+                title = "<LOC ASSIST_FACTORY_INSTANTLY>Assist factories in range instantly",
+                key = 'assist_factory_instantly',
+                type = 'toggle',
+                default = 'Off',
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>Off", key = 'Off' },
+                        { text = "<LOC _On>On", key = 'On' },
+                    },
+                },
+            },
+
+            {
                 title = "<LOC structure_ringing_extractor_title>Assist to cap extractors with storages",
                 key = 'structure_capping_feature_01',
                 type = 'toggle',
