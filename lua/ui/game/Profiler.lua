@@ -11,6 +11,7 @@
 
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local ProfilerElements = import("/lua/ui/game/profilerelements.lua")
+local ProfilerReport = import("/lua/ui/game/profilerreport.lua")
 local ProfilerUtilities = import("/lua/ui/game/profilerutilities.lua")
 local Tooltip = import("/lua/ui/game/tooltip.lua")
 local UIUtil = import("/lua/ui/uiutil.lua")
@@ -25,9 +26,22 @@ local Window = import("/lua/maui/window.lua").Window
 
 local ObservableCreate = import("/lua/shared/observable.lua").Create
 local CreateEmptyProfilerTable = import("/lua/shared/profiler.lua").CreateEmptyProfilerTable
+local CoarseTimerFactor = import("/lua/shared/statistics.lua").CoarseTimerFactor
+local IsTimerTooCoarse = import("/lua/shared/statistics.lua").IsTimerTooCoarse
+local Mean = import("/lua/shared/statistics.lua").Mean
+local TimestampResolution = import("/lua/shared/statistics.lua").TimestampResolution
 local Layouter = LayoutHelpers.ReusedLayoutFor
+local Summarize = ProfilerElements.Summarize
 
+-- "Run to 5%" repeats the benchmark until the 95% confidence interval of the mean is this narrow
+local AutoRunMargin = 0.05
+local AutoRunMinSamples = 5
+local AutoRunMaxSamples = 1000
 
+-- Multiplies a module's loop count so short benchmarks take longer than the timer's resolution
+local LoopMultipliers = {1, 2, 5, 10, 20, 50, 100}
+-- Second parameter, for benchmarks with an inner loop
+local InnerLoopCount = 45
 
 local sessionInfo = SessionGetScenarioInfo()
 local data = CreateEmptyProfilerTable()
@@ -59,6 +73,7 @@ local State = {
     Samples = {},
     Stamps = {},
     Benchmarks = {
+        AutoRun = false,
         BenchmarkProgress = 0,
         BenchmarkRunning = false,
         ---@type number
@@ -68,7 +83,12 @@ local State = {
         BenchmarkRuns = 0,
         ---@type UserBenchmarkModule[]
         Modules = false,
-        Parameters = {10000, 45},
+        LoopMultiplier = 1,
+        ---@type table<string, number>
+        ParameterCountCache = {},
+        --- Set while "Module to 5%" or "All to 5%" steps through the benchmarks
+        ---@type { module: number, index: number, waiting: boolean, allModules: boolean, coarse: string[] } | false
+        RunAll = false,
         SelectedBenchmark = 0,
         SelectedModule = 1,
         ---@type table<string, number[]>
@@ -162,19 +182,33 @@ local function CanUseProfiler()
     return sessionInfo.Options.CheatsEnabled == "true"
 end
 
-local function GetBenchmarkCacheKey(modIndex, benIndex)
+---@param modIndex? number
+---@param benIndex? number
+---@param multiplier? number defaults to the selected loop multiplier
+local function GetBenchmarkCacheKey(modIndex, benIndex, multiplier)
     local state = State.Benchmarks
     modIndex = modIndex or state.SelectedModule
     benIndex = benIndex or state.SelectedBenchmark
-    return tostring(modIndex) .. ',' .. tostring(benIndex)
+    -- each multiplier keeps its own samples, since it changes how long they take
+    return tostring(modIndex) .. ',' .. tostring(benIndex) .. ',x' .. tostring(multiplier or state.LoopMultiplier)
+end
+
+--- Gets the parameters a module's benchmarks run with: its loop count times the multiplier, then the
+--- inner loop count. The baseline loops get the same parameters.
+---@param modIndex number
+---@return number[]
+local function GetBenchmarkParameters(modIndex)
+    local state = State.Benchmarks
+    return {state.Modules[modIndex].loopCount * state.LoopMultiplier, InnerLoopCount}
 end
 
 ---@param modIndex? number
 ---@param benIndex? number
+---@param multiplier? number defaults to the selected loop multiplier
 ---@return number[]?
 ---@return number[]?
-local function GetBenchmarkStatCache(modIndex, benIndex)
-    local key = GetBenchmarkCacheKey(modIndex, benIndex)
+local function GetBenchmarkStatCache(modIndex, benIndex, multiplier)
+    local key = GetBenchmarkCacheKey(modIndex, benIndex, multiplier)
     return State.Benchmarks.StatCache[key], State.Benchmarks.BaselineCache[key]
 end
 
@@ -229,6 +263,79 @@ local function AddBenchmarkStatCache(data, baselines, modIndex, benIndex)
     return sCache, bCache
 end
 
+--- Gets the title of a benchmark, or its function name when it has no title
+---@param modIndex number
+---@param benIndex number
+---@return string
+local function GetBenchmarkName(modIndex, benIndex)
+    local info = State.Benchmarks.Modules[modIndex].benchmarks[benIndex]
+    if info.title ~= "" then
+        return info.title
+    end
+    return info.name
+end
+
+--- Adds the loop multiplier to a name, unless it is x1
+---@param name string
+---@param multiplier number
+---@return string
+local function WithMultiplier(name, multiplier)
+    if multiplier == 1 then
+        return name
+    end
+    return name .. " (x" .. multiplier .. ")"
+end
+
+--- Checks whether any benchmark of a module has statistics, with any loop multiplier
+---@param modIndex number
+---@return boolean
+local function ModuleHasData(modIndex)
+    local benchmarks = State.Benchmarks.Modules[modIndex].benchmarks
+    for benIndex = 1, table.getn(benchmarks or {}) do
+        for _, multiplier in ipairs(LoopMultipliers) do
+            if GetBenchmarkStatCache(modIndex, benIndex, multiplier) then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+--- Gets the loop multiplier that makes a benchmark's samples long enough for the timer, or nil when
+--- they already are. Suggests the largest multiplier when none is enough.
+---@param stats? { [integer]: number, n: integer }
+---@param baselines? { [integer]: number, n: integer } checked too, for the modes that divide by them
+---@param multiplier number that the samples were taken with
+---@return number? needed
+---@return number resolution seconds
+---@return number? mean seconds, of the shorter samples
+local function GetNeededMultiplier(stats, baselines, multiplier)
+    local resolution = TimestampResolution(GetSystemTimeSeconds())
+    -- raw sample times, whatever the mode
+    local mean = stats and stats.n > 0 and Mean(stats, stats.n)
+    -- baseline loops are shorter than their benchmark, so they lose precision first
+    if mean and baselines and baselines[1] ~= nil then
+        mean = math.min(mean, Mean(baselines, table.getn(baselines)))
+    end
+    if not mean or not IsTimerTooCoarse(resolution, mean) then
+        return nil, resolution, mean
+    end
+    local needed = multiplier * CoarseTimerFactor(resolution, mean)
+    for _, option in ipairs(LoopMultipliers) do
+        if option >= needed then
+            return option, resolution, mean
+        end
+    end
+    return LoopMultipliers[table.getn(LoopMultipliers)], resolution, mean
+end
+
+---@param lines string[]
+local function LogLines(lines)
+    for _, line in ipairs(lines) do
+        LOG(line)
+    end
+end
+
 ---@param module number
 ---@param benchmark number
 function LoadBenchmark(module, benchmark)
@@ -248,16 +355,22 @@ function StartBenchmark(module, benchmark)
     -- from the sim on stop to set to false. This is so that we can't send benchmark requests
     -- to the sim while one is running.
     local benchmarkState = State.Benchmarks
-    benchmarkState.BenchmarkRunning = true
-    benchmarkState.BenchmarkRunningMod = benchmarkState.SelectedModule
-    benchmarkState.BenchmarkRunningBen = benchmarkState.SelectedBenchmark
+    -- selecting the running benchmark again clears its count until the info arrives
     local params = benchmarkState.ParameterCount
+        or benchmarkState.ParameterCountCache[GetBenchmarkCacheKey(module, benchmark)]
     if not params then
         WARN("Missing debug function to start benchmark")
+        -- nothing will come back from the sim, so don't wait on it
+        benchmarkState.AutoRun = false
+        benchmarkState.RunAll = false
         return
     end
+    benchmarkState.BenchmarkRunning = true
+    benchmarkState.BenchmarkRunningMod = module
+    benchmarkState.BenchmarkRunningBen = benchmark
+    benchmarkState.ParameterCountCache[GetBenchmarkCacheKey(module, benchmark)] = params
     local parameters = {}
-    local benchmarkParams = benchmarkState.Parameters
+    local benchmarkParams = GetBenchmarkParameters(module)
     for i = 1, params do
         parameters[i] = benchmarkParams[i]
     end
@@ -476,19 +589,28 @@ ProfilerStamps = Class(Group) {
 }
 
 ---@class ProfilerBenchmarks : Group
+---@field autoRunButton Button
 ---@field benchmarkText Text
 ---@field benchmarkList ItemList | { background: Bitmap }
 ---@field bytecode BytecodeArea
 ---@field fileText Text
+---@field groupActions Group
 ---@field groupInput Group
 ---@field groupInteraction Group
 ---@field groupNavigation Group
 ---@field groupOutput Group
+---@field logAllButton Button
+---@field logButton Button
+---@field logModulesButton Button
+---@field loopMultiplier Combo
 ---@field modulePicker Combo
 ---@field parametersLabel ItemList
 ---@field progressLabel Text
+---@field runAllButton Button
 ---@field runButton Button
+---@field runModulesButton Button
 ---@field summary StatisticSummary
+---@field timerWarning Text
 ProfilerBenchmarks = Class(Group) {
     ---@param self ProfilerBenchmarks
     ---@param parent Group
@@ -499,11 +621,20 @@ ProfilerBenchmarks = Class(Group) {
         self.groupOutput = Group(self)
         self.groupInteraction = Group(self.groupInput)
         self.groupNavigation = Group(self.groupInput)
+        self.groupActions = Group(self.groupInput)
+        self.autoRunButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0043>Run to 5%"), 14, 2)
+        self.runAllButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0052>Module to 5%"), 14, 2)
+        self.runModulesButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0055>All to 5%"), 14, 2)
+        self.logModulesButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0058>Log all"), 14, 2)
+        self.logButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0046>Log"), 14, 2)
+        self.logAllButton = UIUtil.CreateButtonStd(self.groupActions, "/widgets02/small", LOC("<LOC profiler_0049>Log module"), 14, 2)
         self.runButton = UIUtil.CreateButtonStd(self.groupInteraction, "/widgets02/small", LOC("<LOC profiler_0006>Run"), 16, 2)
         self.parametersLabel = ItemList(self.groupInteraction, 0, 0)
+        self.loopMultiplier = Combo(self.groupInteraction, 14, table.getn(LoopMultipliers))
         self.progressLabel = UIUtil.CreateText(self.groupInteraction, "", 10, UIUtil.bodyFont, true)
         self.fileText = UIUtil.CreateText(self.groupNavigation, LOC("<LOC profiler_0007>Benchmark Modules"), 16, UIUtil.bodyFont, true)
         self.modulePicker = Combo(self.groupNavigation, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
+        self.timerWarning = UIUtil.CreateText(self.groupNavigation, "", 12, UIUtil.bodyFont, true)
         self.benchmarkText = UIUtil.CreateText(self.groupNavigation, "", 16, UIUtil.bodyFont, true) -- should immediately update, so no need to set label
         self.benchmarkList = ItemList(self.groupNavigation)
         self.benchmarkList.background = Bitmap(self.benchmarkList)
@@ -512,6 +643,35 @@ ProfilerBenchmarks = Class(Group) {
 
         self.runButton.OnClick = function(button_self)
             self:OnClickRunButton()
+        end
+        self.autoRunButton.OnClick = function(button_self)
+            self:OnClickRunButton(true)
+        end
+        self.runAllButton.OnClick = function(button_self)
+            self:OnClickRunAllButton(false)
+        end
+        self.runModulesButton.OnClick = function(button_self)
+            self:OnClickRunAllButton(true)
+        end
+        self.logModulesButton.OnClick = function(button_self)
+            self:LogModules()
+        end
+        self.logButton.OnClick = function(button_self)
+            self:OnClickLogButton()
+        end
+        self.logAllButton.OnClick = function(button_self)
+            self:OnClickLogAllButton()
+        end
+        local multiplierLabels = {}
+        for i, multiplier in LoopMultipliers do
+            multiplierLabels[i] = "x" .. multiplier
+        end
+        self.loopMultiplier:AddItems(multiplierLabels)
+        self.loopMultiplier.OnClick = function(combo_self, index)
+            State.Benchmarks.LoopMultiplier = LoopMultipliers[index]
+            self:UpdateParametersLabel()
+            self:UpdateBenchmarkStats()
+            self:UpdateRunButtonState()
         end
         self.modulePicker.OnClick = function(picker_self, index, text)
             -- index is already 1-indexed for Combo boxes
@@ -535,6 +695,7 @@ ProfilerBenchmarks = Class(Group) {
                 hook(summary_self)
             end
             SetBenchmarkStatCache(nil)
+            self:UpdateRunButtonState()
         end
 
         BenchmarkModuleSelected:AddObserver(function(index)
@@ -558,10 +719,68 @@ ProfilerBenchmarks = Class(Group) {
             :ResetTop()
             :End()
 
+        local groupActions = Layouter(self.groupActions)
+            :FillHorizontally(groupInteraction)
+            :Height(function() return 3 * self.autoRunButton.Height() + 20 end)
+            :AnchorToTop(groupInteraction)
+            :ResetTop()
+            :End()
+
         local groupNavigation = Layouter(self.groupNavigation)
             :Fill(groupInput)
-            :AnchorToTop(groupInteraction, 5)
+            :AnchorToTop(groupActions, 5)
             :End()
+
+        -- Action components
+
+        -- run buttons on the left, the matching log buttons on the right
+        local autoRunButton = Layouter(self.autoRunButton)
+            :FromLeftIn(groupActions, 0.02)
+            :AtTopIn(groupActions, 5)
+            :Over(groupActions, 10)
+            :Disable()
+            :End()
+        Tooltip.AddButtonTooltip(autoRunButton, "profiler_benchmark_run_margin")
+
+        local runAllButton = Layouter(self.runAllButton)
+            :FromLeftIn(groupActions, 0.02)
+            :Below(autoRunButton, 5)
+            :Over(groupActions, 10)
+            :Disable()
+            :End()
+        Tooltip.AddButtonTooltip(runAllButton, "profiler_benchmark_run_all_margin")
+
+        local runModulesButton = Layouter(self.runModulesButton)
+            :FromLeftIn(groupActions, 0.02)
+            :Below(runAllButton, 5)
+            :Over(groupActions, 10)
+            :Disable()
+            :End()
+        Tooltip.AddButtonTooltip(runModulesButton, "profiler_benchmark_run_modules_margin")
+
+        local logButton = Layouter(self.logButton)
+            :FromLeftIn(groupActions, 0.52)
+            :AtTopIn(groupActions, 5)
+            :Over(groupActions, 10)
+            :Disable()
+            :End()
+        Tooltip.AddButtonTooltip(logButton, "profiler_benchmark_log")
+
+        local logAllButton = Layouter(self.logAllButton)
+            :FromLeftIn(groupActions, 0.52)
+            :Below(logButton, 5)
+            :Over(groupActions, 10)
+            :Disable()
+            :End()
+        Tooltip.AddButtonTooltip(logAllButton, "profiler_benchmark_log_all")
+
+        local logModulesButton = Layouter(self.logModulesButton)
+            :FromLeftIn(groupActions, 0.52)
+            :Below(logAllButton, 5)
+            :Over(groupActions, 10)
+            :Disable()
+            :End()
+        Tooltip.AddButtonTooltip(logModulesButton, "profiler_benchmark_log_modules")
 
         -- Interaction components
 
@@ -592,11 +811,26 @@ ProfilerBenchmarks = Class(Group) {
             :CenteredRightOf(runButton)
             :End()
 
+        local loopMultiplier = Layouter(self.loopMultiplier)
+            :AtRightIn(groupInteraction, 10)
+            :AtVerticalCenterIn(groupInteraction)
+            :Width(60)
+            :End()
+        Tooltip.AddControlTooltip(loopMultiplier, "profiler_benchmark_loop_multiplier")
+
         -- Navigation components
 
         local fileText = Layouter(self.fileText)
             :AtLeftTopIn(groupNavigation, 10, 10)
             :End()
+
+        local timerWarning = Layouter(self.timerWarning)
+            :AtRightIn(groupNavigation, 10)
+            :AtVerticalCenterIn(fileText)
+            :Color("FFFFA500")
+            :Hide()
+            :End()
+        Tooltip.AddControlTooltip(timerWarning, "profiler_benchmark_timer")
 
         local modulePicker = Layouter(self.modulePicker)
             :Below(fileText, 10)
@@ -617,7 +851,7 @@ ProfilerBenchmarks = Class(Group) {
             :Font(UIUtil.bodyFont, 14)
             :Colors(
                 UIUtil.fontColor, "00000000",
-                UIUtil.fontColor, "000000",
+                "FFFF00", "30bcfffe",
                 UIUtil.highlightColor, "bcfffe"
             )
             :MouseoverItem(true)
@@ -650,18 +884,389 @@ ProfilerBenchmarks = Class(Group) {
         self.progressLabel:Hide()
     end,
 
+    --- Starts the selected benchmark, or stops the running one
     ---@param self ProfilerBenchmarks
-    OnClickRunButton = function(self)
+    ---@param autoRun? boolean keep running until the margin is reached
+    OnClickRunButton = function(self, autoRun)
         local benchmarkState = State.Benchmarks
         if benchmarkState.BenchmarkRunning then
+            benchmarkState.AutoRun = false
             StopBenchmark()
             return
         end
         local module = benchmarkState.SelectedModule
         local benchmark = benchmarkState.SelectedBenchmark
         if module > 0 and benchmark > 0 then
+            benchmarkState.AutoRun = autoRun == true
             StartBenchmark(module, benchmark)
         end
+    end,
+
+    --- Starts another run until the margin is reached, called when a run finishes
+    ---@param self ProfilerBenchmarks
+    ---@param output BenchmarkOutput
+    ContinueAutoRun = function(self, output)
+        local benchmarkState = State.Benchmarks
+        if not benchmarkState.AutoRun or output.success == nil then
+            return
+        end
+        benchmarkState.AutoRun = false
+
+        local module = benchmarkState.BenchmarkRunningMod
+        local benchmark = benchmarkState.BenchmarkRunningBen
+        -- stopping clears `AutoRun` first, so a failure here is an error in the benchmark
+        if not output.success then
+            self:WarnCoarseTimer(module, benchmark)
+            self:AdvanceRunAll()
+            return
+        end
+
+        local stats, baselines = GetBenchmarkStatCache(module, benchmark)
+        -- cleared, or the selection (and its parameters) changed
+        if not stats
+            or module ~= benchmarkState.SelectedModule or benchmark ~= benchmarkState.SelectedBenchmark then
+            self:CancelRunAll()
+            return
+        end
+
+        local summary = Summarize(stats, baselines, self.summary:GetMode())
+        local margin = summary.relativeMargin
+        -- a zero mean has no relative margin, but identical samples can't improve any further
+        if summary.n >= AutoRunMinSamples and summary.mean == 0 and summary.margin == 0 then
+            WARN("Benchmark samples are all zero, the timer is too coarse to measure it")
+            self:WarnCoarseTimer(module, benchmark)
+            self:AdvanceRunAll()
+        elseif stats.n >= AutoRunMinSamples and (summary.n == 0 or summary.mean ~= summary.mean or summary.mean == math.huge) then
+            -- paired samples divided by zero baselines are all removed, and a ratio over them is infinite
+            WARN("Benchmark baselines are zero, the timer is too coarse to measure them")
+            self:WarnCoarseTimer(module, benchmark)
+            self:AdvanceRunAll()
+        elseif margin and summary.n >= AutoRunMinSamples and margin <= AutoRunMargin then
+            SPEW(("Benchmark reached +/-%.1f%% with %d samples"):format(margin * 100, summary.n))
+            self:WarnCoarseTimer(module, benchmark)
+            self:AdvanceRunAll()
+        elseif stats.n >= AutoRunMaxSamples then
+            WARN(("Benchmark did not reach +/-%.0f%% within %d samples"):format(AutoRunMargin * 100, stats.n))
+            self:WarnCoarseTimer(module, benchmark)
+            self:AdvanceRunAll()
+        else
+            benchmarkState.AutoRun = true
+            StartBenchmark(module, benchmark)
+        end
+    end,
+
+    --- Starts or stops stepping through the benchmarks of the selected module, or of every module
+    ---@param self ProfilerBenchmarks
+    ---@param allModules boolean
+    OnClickRunAllButton = function(self, allModules)
+        local benchmarkState = State.Benchmarks
+        local runAll = benchmarkState.RunAll
+        if runAll then
+            if runAll.stopping then
+                return
+            end
+            benchmarkState.AutoRun = false
+            if benchmarkState.BenchmarkRunning then
+                -- the summary waits for the stopped benchmark's own timer warning
+                runAll.stopping = true
+                StopBenchmark()
+            else
+                self:CancelRunAll()
+            end
+            self:UpdateRunButtonState()
+            return
+        end
+        if benchmarkState.BenchmarkRunning then
+            return
+        end
+
+        local moduleIndex = 0 -- before the first module
+        if not allModules then
+            moduleIndex = benchmarkState.SelectedModule
+            local module = benchmarkState.Modules and benchmarkState.Modules[moduleIndex]
+            if not module or module.faulty then
+                return
+            end
+        end
+        benchmarkState.RunAll = {module = moduleIndex, index = 0, waiting = false, allModules = allModules, coarse = {}}
+        self:AdvanceRunAll()
+        self:UpdateRunButtonState()
+    end,
+
+    --- Gets the first module after `index` that has benchmarks to run
+    ---@param self ProfilerBenchmarks
+    ---@param index number
+    ---@return number?
+    FindNextModule = function(self, index)
+        local modules = State.Benchmarks.Modules
+        for i = index + 1, table.getn(modules) do
+            local module = modules[i]
+            if not module.faulty and table.getn(module.benchmarks) > 0 then
+                return i
+            end
+        end
+    end,
+
+    --- Selects the next benchmark, which is started once its info arrives
+    ---@param self ProfilerBenchmarks
+    AdvanceRunAll = function(self)
+        local benchmarkState = State.Benchmarks
+        local runAll = benchmarkState.RunAll
+        if not runAll then
+            return
+        end
+
+        runAll.index = runAll.index + 1
+        local module = benchmarkState.Modules[runAll.module]
+        if not module or module.faulty or runAll.index > table.getn(module.benchmarks) then
+            local nextModule = runAll.allModules and self:FindNextModule(runAll.module)
+            if not nextModule then
+                benchmarkState.RunAll = false
+                SPEW("Finished running all benchmarks")
+                self:WarnCoarseTimers(runAll)
+                if runAll.allModules then
+                    self:LogModules()
+                end
+                return
+            end
+
+            runAll.module = nextModule
+            runAll.index = 1
+            runAll.waiting = true
+            -- selecting the module also selects its last benchmark, so make that the one we want
+            benchmarkState.Modules[nextModule].LastBenchmarkSelected = 1
+            self.modulePicker:SetItem(nextModule)
+            BenchmarkModuleSelected:Set(nextModule)
+            return
+        end
+        runAll.waiting = true
+        BenchmarkSelected:Set(runAll.index)
+    end,
+
+    --- Warns when the timer was too coarse for a benchmark's samples, and suggests a loop multiplier.
+    --- While running all, the warning is also kept for the summary at the end.
+    ---@param self ProfilerBenchmarks
+    ---@param module number
+    ---@param benchmark number
+    WarnCoarseTimer = function(self, module, benchmark)
+        local benchmarkState = State.Benchmarks
+        local multiplier = benchmarkState.LoopMultiplier
+        local needed, resolution, mean = self:GetNeededMultiplier(module, benchmark, multiplier)
+        if not needed then
+            return
+        end
+        local moduleData = benchmarkState.Modules[module]
+        local advice = "restart the game"
+        if needed > multiplier then
+            advice = ("use the x%d loop multiplier or restart the game"):format(needed)
+        end
+        local text = ('"%s" in %s: the %.3f ms timer resolution is too coarse for its %.3f ms samples, %s'):format(
+            WithMultiplier(GetBenchmarkName(module, benchmark), multiplier),
+            moduleData.name ~= "" and moduleData.name or moduleData.file,
+            resolution * 1000, mean * 1000, advice)
+        WARN(text)
+        local runAll = benchmarkState.RunAll
+        if runAll then
+            table.insert(runAll.coarse, text)
+        end
+    end,
+
+    --- Gets the loop multiplier that a benchmark's samples need, see `GetNeededMultiplier`
+    ---@param self ProfilerBenchmarks
+    ---@param module? number
+    ---@param benchmark? number
+    ---@param multiplier number
+    ---@return number? needed
+    ---@return number resolution seconds
+    ---@return number? mean seconds
+    GetNeededMultiplier = function(self, module, benchmark, multiplier)
+        local stats, baselines = GetBenchmarkStatCache(module, benchmark)
+        if self.summary:GetMode() == "none" then
+            baselines = nil
+        end
+        return GetNeededMultiplier(stats, baselines, multiplier)
+    end,
+
+    --- Ends a module or all-module run before it finishes
+    ---@param self ProfilerBenchmarks
+    CancelRunAll = function(self)
+        local benchmarkState = State.Benchmarks
+        local runAll = benchmarkState.RunAll
+        if runAll then
+            benchmarkState.RunAll = false
+            self:WarnCoarseTimers(runAll)
+        end
+    end,
+
+    --- Repeats the timer warnings of a module or all-module run at its end
+    ---@param self ProfilerBenchmarks
+    ---@param runAll { coarse: string[] }
+    WarnCoarseTimers = function(self, runAll)
+        local count = table.getn(runAll.coarse)
+        if count == 0 then
+            return
+        end
+        WARN(("The timer was too coarse for %d benchmark%s:"):format(count, count == 1 and "" or "s"))
+        for _, text in ipairs(runAll.coarse) do
+            WARN("    " .. text)
+        end
+    end,
+
+    --- Starts the benchmark that `AdvanceRunAll` selected, once its parameter count is known
+    ---@param self ProfilerBenchmarks
+    OnBenchmarkInfoReady = function(self)
+        local benchmarkState = State.Benchmarks
+        local runAll = benchmarkState.RunAll
+        if not runAll or not runAll.waiting then
+            return
+        end
+
+        runAll.waiting = false
+        if runAll.module ~= benchmarkState.SelectedModule or runAll.index ~= benchmarkState.SelectedBenchmark then
+            self:CancelRunAll()
+            self:UpdateRunButtonState()
+            return
+        end
+        benchmarkState.AutoRun = true
+        StartBenchmark(runAll.module, runAll.index)
+    end,
+
+    ---@param self ProfilerBenchmarks
+    OnClickLogButton = function(self)
+        local benchmarkState = State.Benchmarks
+        local stats, baselines = GetBenchmarkStatCache()
+        if not stats then
+            WARN("No benchmark data to log")
+            return
+        end
+
+        local summary = Summarize(stats, baselines, self.summary:GetMode())
+        local parameters
+        local count = benchmarkState.ParameterCount
+        if count and count > 0 then
+            parameters = {}
+            local values = GetBenchmarkParameters(benchmarkState.SelectedModule)
+            for i = 1, count do
+                parameters[i] = tostring(values[i])
+            end
+        end
+        local baseline
+        if baselines and baselines[1] ~= nil then
+            baseline = Summarize(baselines, nil, "none")
+        end
+        local name = GetBenchmarkName(benchmarkState.SelectedModule, benchmarkState.SelectedBenchmark)
+        LogLines(ProfilerReport.FormatSummary(WithMultiplier(name, benchmarkState.LoopMultiplier), summary, parameters, baseline))
+    end,
+
+    ---@param self ProfilerBenchmarks
+    OnClickLogAllButton = function(self)
+        if not self:LogModule(State.Benchmarks.SelectedModule) then
+            WARN("No benchmark data to log")
+        end
+    end,
+
+    ---@param self ProfilerBenchmarks
+    LogModules = function(self)
+        local logged = false
+        for moduleIndex = 1, table.getn(State.Benchmarks.Modules) do
+            logged = self:LogModule(moduleIndex) or logged
+        end
+        if not logged then
+            WARN("No benchmark data to log")
+        end
+    end,
+
+    --- Logs a table of the module's benchmarks, if any of them have data
+    ---@param self ProfilerBenchmarks
+    ---@param moduleIndex number
+    ---@return boolean logged
+    LogModule = function(self, moduleIndex)
+        local benchmarkState = State.Benchmarks
+        local module = benchmarkState.Modules and benchmarkState.Modules[moduleIndex]
+        if not module or module.faulty then
+            return false
+        end
+
+        local mode = self.summary:GetMode()
+        -- rows grouped by multiplier, so higher multipliers come after the base loop count
+        local groups = {}
+        for i in LoopMultipliers do
+            groups[i] = {}
+        end
+        -- baselines by multiplier, and by parameter count since that picks the baseline loop
+        ---@type { params: number, multiplier: number, samples: { [integer]: number, n: integer } }[]
+        local pools = {}
+        local hasData = false
+        for benchmarkIndex = 1, table.getn(module.benchmarks) do
+            local name = GetBenchmarkName(moduleIndex, benchmarkIndex)
+            local ran = false
+            -- a row for each multiplier that has samples
+            for multiplierIndex, multiplier in ipairs(LoopMultipliers) do
+                local stats, baselines = GetBenchmarkStatCache(moduleIndex, benchmarkIndex, multiplier)
+                if stats then
+                    ran = true
+                    local params = benchmarkState.ParameterCountCache[GetBenchmarkCacheKey(moduleIndex, benchmarkIndex, multiplier)]
+                    table.insert(groups[multiplierIndex], {
+                        name = WithMultiplier(name, multiplier),
+                        summary = Summarize(stats, baselines, mode),
+                        params = params,
+                    })
+                    if params and baselines and baselines[1] ~= nil then
+                        local pool
+                        for _, candidate in ipairs(pools) do
+                            if candidate.params == params and candidate.multiplier == multiplier then
+                                pool = candidate
+                            end
+                        end
+                        if not pool then
+                            pool = {params = params, multiplier = multiplier, samples = {n = 0}}
+                            table.insert(pools, pool)
+                        end
+                        local samples = pool.samples
+                        for i = 1, baselines.n do
+                            samples.n = samples.n + 1
+                            samples[samples.n] = baselines[i]
+                        end
+                    end
+                end
+            end
+            -- benchmarks that haven't been run get a blank row
+            if ran then
+                hasData = true
+            else
+                table.insert(groups[1], {name = name})
+            end
+        end
+        if not hasData then
+            return false
+        end
+        local rows = {}
+        for _, group in ipairs(groups) do
+            for _, row in ipairs(group) do
+                table.insert(rows, row)
+            end
+        end
+
+        table.sort(pools, function(a, b)
+            if a.multiplier ~= b.multiplier then
+                return a.multiplier < b.multiplier
+            end
+            return a.params < b.params
+        end)
+        local baselineRows = {}
+        for _, pool in ipairs(pools) do
+            local params = pool.params
+            table.insert(baselineRows, {
+                name = WithMultiplier(("Baseline, %d parameter%s"):format(params, params == 1 and "" or "s"), pool.multiplier),
+                summary = Summarize(pool.samples, nil, "none"),
+                params = params,
+            })
+        end
+
+        LOG(('Benchmark statistics for "%s", loop count %d')
+            :format(module.name ~= "" and module.name or module.file, module.loopCount))
+        LogLines(ProfilerReport.FormatTable(rows, baselineRows))
+        return true
     end,
 
     ---@param self ProfilerBenchmarks
@@ -675,7 +1280,22 @@ ProfilerBenchmarks = Class(Group) {
     ---@param self ProfilerBenchmarks
     ---@param index number
     SelectBenchmark = function(self, index)
+        local benchmarkState = State.Benchmarks
+        -- leaving a running benchmark stops it so its results don't end up on this page
+        if benchmarkState.BenchmarkRunning and
+            (benchmarkState.SelectedModule ~= benchmarkState.BenchmarkRunningMod or index ~= benchmarkState.BenchmarkRunningBen) then
+            benchmarkState.AutoRun = false
+            self:CancelRunAll()
+            StopBenchmark()
+        end
+        benchmarkState.SelectedBenchmark = index
+        -- the previous benchmark's, until this one's info arrives
+        benchmarkState.ParameterCount = nil
+
         self.benchmarkList:SetSelection(index - 1) -- to zero-index list
+        if index > 0 then
+            self.benchmarkList:ShowItem(index - 1)
+        end
         self:UpdateParametersLabel()
         self:UpdateBenchmarkStats()
         self:UpdateRunButtonState()
@@ -795,8 +1415,11 @@ ProfilerBenchmarks = Class(Group) {
         local benchmarkState = State.Benchmarks
         local mod = benchmarkState.BenchmarkRunningMod
         local ben = benchmarkState.BenchmarkRunningBen
-        ---@diagnostic disable-next-line: param-type-mismatch
-        self.summary:SetStats(AddBenchmarkStatCache(data, baselines, mod, ben))
+        local stats, cachedBaselines = AddBenchmarkStatCache(data, baselines, mod, ben)
+        if mod == benchmarkState.SelectedModule and ben == benchmarkState.SelectedBenchmark then
+            ---@diagnostic disable-next-line: param-type-mismatch
+            self.summary:SetStats(stats, cachedBaselines)
+        end
     end,
 
     ---@param self ProfilerBenchmarks
@@ -823,13 +1446,15 @@ ProfilerBenchmarks = Class(Group) {
     UpdateParametersLabel = function(self)
         local benchmarkState = State.Benchmarks
         local params = benchmarkState.ParameterCount
-        if params then
+        if not params then
+            self.parametersLabel:Hide()
+        else
             local label = self.parametersLabel
             label:Hide()
             label:DeleteAllItems()
             if params > 0 then
                 local paramFormatter = LOC("<LOC profiler_0008>Parameter %d: %s") --[[@as LocalizedString]]
-                local parameters = benchmarkState.Parameters
+                local parameters = GetBenchmarkParameters(benchmarkState.SelectedModule)
                 for i = 1, params do
                     label:AddItem(paramFormatter:format(i, tostring(parameters[i])))
                 end
@@ -847,9 +1472,27 @@ ProfilerBenchmarks = Class(Group) {
     ---@param self ProfilerBenchmarks
     UpdateRunButtonState = function(self)
         local benchmarkState = State.Benchmarks
-        local disabled = benchmarkState.SelectedBenchmark == 0
         local running = benchmarkState.BenchmarkRunning
+        local disabled = benchmarkState.SelectedBenchmark == 0 or not (running or benchmarkState.ParameterCount)
         self:SetRunButtonState(disabled, running)
+        self:UpdateTimerWarning()
+    end,
+
+    --- Shows the timer resolution when it is too coarse for the selected benchmark's samples
+    ---@param self ProfilerBenchmarks
+    UpdateTimerWarning = function(self)
+        local current = State.Benchmarks.LoopMultiplier
+        local multiplier, resolution = self:GetNeededMultiplier(nil, nil, current)
+        if multiplier then
+            if multiplier > current then
+                self.timerWarning:SetText(LOCF("<LOC profiler_0061>Timer resolution: %.3f ms, use x%d", resolution * 1000, multiplier))
+            else
+                self.timerWarning:SetText(LOCF("<LOC profiler_0066>Timer resolution: %.3f ms, restart the game", resolution * 1000))
+            end
+            self.timerWarning:Show()
+        else
+            self.timerWarning:Hide()
+        end
     end,
 
     ---@param self ProfilerBenchmarks
@@ -864,8 +1507,10 @@ ProfilerBenchmarks = Class(Group) {
     ---@param disabled? boolean
     ---@param running? boolean
     SetRunButtonState = function(self, disabled, running)
+        -- while running all, only its own button can stop it
+        local runAll = State.Benchmarks.RunAll
         local runButton = self.runButton
-        if disabled then
+        if disabled or runAll then
             runButton:Disable()
         else
             runButton:Enable()
@@ -874,6 +1519,79 @@ ProfilerBenchmarks = Class(Group) {
             runButton.label:SetText(LOC("<LOC profiler_0010>Stop"))
         else
             runButton.label:SetText(LOC("<LOC profiler_0006>Run"))
+        end
+
+        local autoRunButton = self.autoRunButton
+        local autoRunning = running and State.Benchmarks.AutoRun and not runAll
+        if disabled or runAll or (running and not autoRunning) then
+            autoRunButton:Disable()
+        else
+            autoRunButton:Enable()
+        end
+        if autoRunning then
+            autoRunButton.label:SetText(LOC("<LOC profiler_0010>Stop"))
+        else
+            autoRunButton.label:SetText(LOC("<LOC profiler_0043>Run to 5%"))
+        end
+
+        -- running all doesn't need a selected benchmark, just a usable module
+        local modules = State.Benchmarks.Modules
+        local module = modules and modules[State.Benchmarks.SelectedModule]
+        local canRunAll = module and not module.faulty and table.getn(module.benchmarks) > 0
+        local canRunModules = modules and self:FindNextModule(0) ~= nil
+
+        -- only the button that started a run can stop it
+        local runAllButton = self.runAllButton
+        local runningAll = runAll and not runAll.allModules
+        if runningAll or (canRunAll and not running and not runAll) then
+            runAllButton:Enable()
+        else
+            runAllButton:Disable()
+        end
+        runAllButton.label:SetText(runningAll and LOC("<LOC profiler_0010>Stop") or LOC("<LOC profiler_0052>Module to 5%"))
+
+        local runModulesButton = self.runModulesButton
+        local runningModules = runAll and runAll.allModules
+        if runningModules or (canRunModules and not running and not runAll) then
+            runModulesButton:Enable()
+        else
+            runModulesButton:Disable()
+        end
+        runModulesButton.label:SetText(runningModules and LOC("<LOC profiler_0010>Stop") or LOC("<LOC profiler_0055>All to 5%"))
+
+        if GetBenchmarkStatCache() then
+            self.logButton:Enable()
+        else
+            self.logButton:Disable()
+        end
+
+        if canRunAll and ModuleHasData(State.Benchmarks.SelectedModule) then
+            self.logAllButton:Enable()
+        else
+            self.logAllButton:Disable()
+        end
+
+        local anyHasData = false
+        for moduleIndex = 1, modules and table.getn(modules) or 0 do
+            if ModuleHasData(moduleIndex) then
+                anyHasData = true
+                break
+            end
+        end
+        if anyHasData then
+            self.logModulesButton:Enable()
+        else
+            self.logModulesButton:Disable()
+        end
+
+        -- clearing or switching samples mid-run would pull them out from under it
+        local clearButton = self.summary.clearButton
+        if running or runAll then
+            clearButton:Disable()
+            self.loopMultiplier:Disable()
+        else
+            clearButton:Enable()
+            self.loopMultiplier:Enable()
         end
     end,
 
@@ -1093,8 +1811,15 @@ ProfilerWindow = ClassUI(Window) {
     ---@param info RawFunctionDebugInfo
     ReceiveBenchmarkInfo = function(self, info)
         local benchmarkState = State.Benchmarks
+        -- the info of a benchmark that was selected before can still arrive
+        local module = benchmarkState.Modules[benchmarkState.SelectedModule]
+        local benchmark = module and module.benchmarks[benchmarkState.SelectedBenchmark]
+        if not benchmark or benchmark.name ~= info.info.name then
+            return
+        end
         benchmarkState.ParameterCount = info.bytecode.numparams
         self.Tabs.Benchmarks:UpdateBenchmarkInfo(info)
+        self.Tabs.Benchmarks:OnBenchmarkInfoReady()
     end,
 
     ---@param self ProfilerWindow
@@ -1115,6 +1840,16 @@ ProfilerWindow = ClassUI(Window) {
             benchmarkState.BenchmarkProgress = benchmarkState.BenchmarkProgress + complete
         end
         benchmarksTab:AddBenchmarkStats(output.data, output.baselines)
+        -- an auto run warns about the timer itself once it stops repeating
+        local autoRun = benchmarkState.AutoRun
+        benchmarksTab:ContinueAutoRun(output)
+        if output.success ~= nil and not autoRun then
+            benchmarksTab:WarnCoarseTimer(benchmarkState.BenchmarkRunningMod, benchmarkState.BenchmarkRunningBen)
+            local runAll = benchmarkState.RunAll
+            if runAll and runAll.stopping then
+                benchmarksTab:CancelRunAll()
+            end
+        end
         benchmarksTab:UpdateBenchmarkProgress()
         benchmarksTab:UpdateRunButtonState()
     end,

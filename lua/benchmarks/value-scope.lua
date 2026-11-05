@@ -1,15 +1,41 @@
 
--- AddGlobal:               2.29 ms
--- AddUpval:                1.22 ms
--- AddLocal:                0.63 ms
+-- Results with loop count 100000:
+--
+-- |--------------------------------|---------|-----------|------------|-----------|---------|------|-----------|-----------|-----------|-------|
+-- | Name                           | Samples |   Mean ms | +/- 95% ms | +/- 95% % |  Dev ms | CV % | Median ms |    Min ms |    Max ms |  Skew |
+-- |--------------------------------|---------|-----------|------------|-----------|---------|------|-----------|-----------|-----------|-------|
+-- | "Add Constants (x2)"           |      65 |    0.8831 |     0.0078 |      0.89 |  0.0319 | 3.61 |    0.8850 |    0.8240 |    0.9766 |  0.77 |
+-- | "Add Globals (x2)"             |      29 |    3.1675 |     0.0247 |      0.78 |  0.0649 | 2.05 |    3.1433 |    3.0518 |    3.3264 |  0.50 |
+-- | "Add Locals (x2)"              |      56 |    0.8768 |     0.0059 |      0.68 |  0.0222 | 2.53 |    0.8850 |    0.8545 |    0.9155 |  0.44 |
+-- | "Add Upvalues (x2)"            |      27 |    1.8876 |     0.0179 |      0.95 |  0.0453 | 2.40 |    1.8921 |    1.8005 |    1.9531 | -0.57 |
+-- | "Circle Chebyshev (x2)"        |       6 | 1584.2285 |    18.4631 |      1.17 | 17.5905 | 1.11 | 1577.9877 | 1570.6787 | 1618.3777 |  1.09 |
+-- | "Circle Global (x2)"           |       5 | 2920.2637 |    64.9416 |      2.22 | 52.3104 | 1.79 | 2899.4751 | 2872.8943 | 2996.4600 |  0.42 |
+-- | "Circle Local (x2)"            |       5 | 2494.0063 |    13.8598 |      0.56 | 11.1641 | 0.45 | 2499.5422 | 2478.6682 | 2504.1199 | -0.35 |
+-- | "Circle Local Precompute (x2)" |       5 | 2540.2161 |    12.1212 |      0.48 |  9.7637 | 0.38 | 2542.0532 | 2528.5950 | 2553.1311 |  0.05 |
+-- | "Circle Optimal (x2)"          |       5 | 1988.3179 |     5.7676 |      0.29 |  4.6458 | 0.23 | 1985.5347 | 1984.0088 | 1994.0796 |  0.28 |
+-- | "Circle Upvalued (x2)"         |       5 | 2606.7444 |    19.2576 |      0.74 | 15.5120 | 0.60 | 2603.5767 | 2589.7827 | 2628.1738 |  0.24 |
+-- |--------------------------------|---------|-----------|------------|-----------|---------|------|-----------|-----------|-----------|-------|
+-- | "Baseline, 1 parameter (x2)"   |     190 |    0.7530 |     0.0032 |      0.42 |  0.0222 | 2.94 |    0.7629 |    0.7324 |    0.7935 |  0.58 |
+-- |--------------------------------|---------|-----------|------------|-----------|---------|------|-----------|-----------|-----------|-------|
 
--- CircleGlobal:            2391.11 ms
--- CircleUpval:             2020.50 ms
--- CircleLocal:             2042.96 ms
--- CircleLocalPreCompute:   1985.35 ms
--- CircleOptimal:           1288.08 ms
+-- Conclusion:
+-- - Locals are the fastest, then upvalues, then globals. Each "Add" iteration reads two values and
+--   writes one. With upvalues it takes about 5 ns longer than with locals, and with globals about
+--   11 ns longer. Locals cost about the same as constants.
+-- - Compared with "Circle Global", upvaluing the functions is 11% faster, and making them locals
+--   and inlining `ComputePoint` 15% faster. Also precomputing the angle step is 13% faster, but it
+--   computes 31 points instead of 30, so per point it is 1.4% faster than "Circle Local". Also
+--   replacing `table.insert` with a counter ("Circle Optimal") is 22% faster than "Circle Local
+--   Precompute", which computes the same 31 points.
+-- - "Circle Chebyshev" also replaces `math.cos` and `math.sin` with a recurrence. It computed NaN
+--   points when these results were taken, so it needs a rerun.
+-- - Each circle iteration allocates 31 or 32 tables, so longer runs collect more garbage. Per iteration,
+--   they are about 20% slower with 200000 loops than with 10000.
+-- - Function-scope can't show the difference between locals and upvalues: its local versions look
+--   up `GetPosition` in every iteration, and the call costs far more than either access.
 
 ModuleName = "Value Scope"
+ModuleLoopCount = 100000
 BenchmarkData = {
     AddGlobal = "Add Globals",
     AddUpval = "Add Upvalues",
@@ -318,8 +344,9 @@ function CircleChebyshev(loop)
 
         local cosAng = MathCos(combined)
         local sinAng = MathSqrt(1 - cosAng*cosAng)
-        local cosInit = radius * MathCos(radianOffset)
-        local sinInit = radius * MathSqrt(1 - cosInit*cosInit)
+        local cosOffset = MathCos(radianOffset)
+        local cosInit = radius * cosOffset
+        local sinInit = radius * MathSqrt(1 - cosOffset*cosOffset)
         local doubCosAng = 2 * cosAng
 
         local cos2Ang = cosAng*cosAng - sinAng*sinAng
