@@ -26,7 +26,7 @@
 ---@field Identifier? string               # usually `'Chat'`; legacy / synthetic paths may set other values
 ---@field Observer?   boolean              # sender was in observer mode (`GetFocusArmy() == -1`)
 ---@field camera?     table                # `WorldCamera:SaveSettings()` snapshot for click-to-jump links
----@field location?   table                # lightweight location hint — see `UIChatEntryLocation` for the inner shape
+---@field location?   UIChatEntryLocation  # lightweight location hint
 ---@field Args?       any[]                # `LOCF`-style format args spread alongside `text` on render
 ---@field Id?         string               # sender-stamped near-unique id; dedupes the two delivery paths
 ---@field From        number               # sim-stamped trusted sender army index — written by the relay before broadcast
@@ -66,6 +66,9 @@ function IsValidPayload(msg)
     if msg.camera   ~= nil and type(msg.camera)   ~= 'table' then return false end
     if msg.location ~= nil and type(msg.location) ~= 'table' then return false end
     if msg.Args     ~= nil and type(msg.Args)     ~= 'table' then return false end
+    if msg.to  == 'notify' and type(msg.data)     ~= 'table' then return false end
+    -- Notify uses the trigger as a table key when counting messages.
+    if msg.to  == 'notify' and type(msg.data.trigger) ~= 'string' then return false end
 
     return true
 end

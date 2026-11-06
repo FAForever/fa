@@ -74,6 +74,14 @@
 ---@field minute integer
 ---@field second integer
 
+--- `Action` from [FILE_NOTIFY_INFORMATION structure (winnt.h)](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-file_notify_information)
+---@alias FileAction
+---| 1 # FILE_ACTION_ADDED - The file was added to the directory.
+---| 2 # FILE_ACTION_REMOVED - The file was removed from the directory.
+---| 3 # FILE_ACTION_MODIFIED - The file was modified. This can be a change in the time stamp or attributes.
+---| 4 # FILE_ACTION_RENAMED_OLD_NAME - The file was renamed and this is the old name.
+---| 5 # FILE_ACTION_RENAMED_NEW_NAME - The file was renamed and this is the new name.
+
 ---@unknown
 function AITarget()
 end
@@ -472,7 +480,9 @@ end
 function Sound(sound)
 end
 
---- Define the footprint types for pathfinding, only works in `blueprints.lua`
+--- Defines the footprint specs for pathfinding. Only has an effect during rule init.
+---
+--- Specs with a duplicate `Name` are skipped with a warning
 ---@param specs FootprintSpec[]
 function SpecFootprints(specs)
 end

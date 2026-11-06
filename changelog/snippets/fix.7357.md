@@ -1,0 +1,1 @@
+- Fix keyboard navigation in the lobby's map selection dialog stopping after using the name filter or the mods manager. The map list now gets keyboard focus back, so the arrow keys, Enter and Escape work again (#7357).

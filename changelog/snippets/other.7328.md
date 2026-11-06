@@ -1,0 +1,1 @@
+- Document how the engine resolves unit footprints from the footprint specs (#7328).
