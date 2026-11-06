@@ -352,6 +352,14 @@ function killWatcher(data)
     end
 end
 
+--- Stops every ACU watcher. Used by the faf-re engine's replay timeline: after it moves a replay to another time
+--- the units these threads watch are gone, and each thread looked its unit up once.
+function KillAllWatchers()
+    for _, data in ACUs do
+        killWatcher(data)
+    end
+end
+
 ---@param id EntityId
 ---@param text string
 ---@param category NotifyCategory
