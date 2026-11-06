@@ -1,0 +1,1 @@
+- Add new terrain shaders for mappers: terrain textures blend by height, so rock, sand and grass meet in crisp, natural edges, and cliff textures can wrap around steep slopes without stretching. Existing maps look the same (#7344).
