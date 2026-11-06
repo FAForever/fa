@@ -67,6 +67,20 @@ jobs:
           # the changelog file might not exist
           if [ -f changelog-fafdevelop.md ]; then cat changelog-fafdevelop.md >> "$FILE"; fi
 
+      # The engine FAF Develop runs: the notes of the latest faf-re release deploy-fafdevelop-engine.yaml uploaded
+      - name: Add engine changelog
+        if: inputs.additional-changelog == 'fafdevelop'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          FILE="${{ github.workspace }}/docs/_posts/fafdevelop.md"
+          RELEASE=$(gh release list --repo "${{ github.repository }}" --limit 100 --json tagName,createdAt \
+            --jq '[.[] | select(.tagName | startswith("fafre-"))] | sort_by(.createdAt) | last | .tagName // empty')
+          if [ -n "$RELEASE" ]; then
+            echo "" >> "$FILE"
+            gh release view "$RELEASE" --repo "${{ github.repository }}" --json body --jq .body >> "$FILE"
+          fi
+
       - name: Download beta changelog
         if: inputs.additional-changelog == 'fafbeta'
         # No artifact exists when there are no snippets to process
