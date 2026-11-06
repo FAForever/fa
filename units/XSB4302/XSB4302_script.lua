@@ -33,8 +33,10 @@ XSB4302 = ClassUnit(SStructureUnit) {
 
                     self.Trash:Add(ForkThread(function()
                         self.unit:SetBusy(true)
+                        self:SetWeaponBusy(true)
                         WaitSeconds(1/self.unit.Blueprint.Weapon[1].RateOfFire + .2)
                         self.unit:SetBusy(false)
+                        self:SetWeaponBusy(false)
                     end,self))
                 end,
             },
