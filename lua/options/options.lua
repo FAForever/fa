@@ -297,7 +297,8 @@ options = {
             },
 
             {
-                title = "Explicit Reclaim Camera Distance",
+                title = "Reclaim Mode Distance",
+                tip = "Adjust the Camera distances one can reclaim when in explicit reclaim mode",
                 key = 'explicit_reclaim_camera_distance',
                 type = 'slider',
                 default = 150,
