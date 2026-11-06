@@ -112,8 +112,7 @@ local function ComboPresetName(enhancements)
     return 'combo_' .. table.concat(copy, '_')
 end
 
--- Turns a `<LOC key>text` tag into a `{i key}` directive so it localizes when
--- shown; text with no tag is returned as-is.
+-- Turns a `<LOC key>text` tag into a `{i key}` directive; untagged text is unchanged.
 local function LocDirective(text)
     local key = string.match(text, '^<LOC ([^>]+)>')
     if key then
@@ -122,8 +121,7 @@ local function LocDirective(text)
     return text
 end
 
---- Falls back to the enhancement's full in-game Name when it has no
---- ShortName of its own.
+--- Falls back to the enhancement's Name when it has no ShortName.
 local function CleanLabel(name, def)
     if def and def.Name then
         return LocDirective(def.Name)
@@ -131,8 +129,7 @@ local function CleanLabel(name, def)
     return name
 end
 
---- Short display label for a combo, built from each enhancement's ShortName
---- (or Name).
+--- Short display label for a combo, from each enhancement's ShortName or Name.
 local function ComboUnitName(enhancements, bp)
     local labels = {}
     for _, name in enhancements do
@@ -215,14 +212,16 @@ function MarkHiddenSacuLoadoutPresets(all_bps)
 
     for id, bp in all_bps.Unit do
         local assigned = bp.EnhancementPresetAssigned
-        if assigned and assigned.Name and string.sub(assigned.Name, 1, 6) == 'combo_' then
-            local baseId = assigned.BaseBlueprintId
-            local baseBp = baseId and all_bps.Unit[baseId]
-            if baseBp and baseBp.CategoriesHash and baseBp.CategoriesHash[BaseCategory] then
-                bp.CategoriesHash = bp.CategoriesHash or {}
+        local baseId = assigned and assigned.Name and assigned.BaseBlueprintId
+        local baseBp = baseId and all_bps.Unit[baseId]
+        if baseBp and baseBp.CategoriesHash[BaseCategory] then
+            -- Presets are deepcopies and inherit the base category; clear it so the
+            -- category only marks the base unit, as the engine does for USEBUILDPRESETS.
+            bp.CategoriesHash[BaseCategory] = false
+            if string.sub(assigned.Name, 1, 6) == 'combo_' then
                 bp.CategoriesHash['SACULOADOUTCOMBO'] = true
-                bp.Categories = table.unhash(bp.CategoriesHash)
             end
+            bp.Categories = table.unhash(bp.CategoriesHash)
         end
     end
 end

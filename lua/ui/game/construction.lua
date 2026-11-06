@@ -423,12 +423,15 @@ function CreateTabs(type)
         defaultTabOrder = {t3 = 1, t2 = 2, t1 = 3, t4 = 4} -- T4 is last because only the Novax can build T4 but not T3
     elseif type == 'enhancement' then
         local selection = sortedOptions.selection
-        local enhancements = selection[1]:GetBlueprint().Enhancements
+        local selectionBp = selection[1]:GetBlueprint()
+        local enhancements = selectionBp.Enhancements
         local gatewaySacuId = SacuLoadout.GetSelectionSacuId(selection)
         local isGatewaySelection = gatewaySacuId ~= nil
         if isGatewaySelection then
             enhancements = SacuLoadout.GetSacuEnhancements(gatewaySacuId)
         end
+        -- The gateway's SACU, or the selected unit's base blueprint if it was built from a preset.
+        local enhancementUnitId = gatewaySacuId or selectionBp.BaseBlueprintId or selectionBp.BlueprintId
         local enhCommon = import("/lua/enhancementcommon.lua")
         local enhancementPrefixes = {Back = 'b-', LCH = 'la-', RCH = 'ra-'}
         local newTabs = {}
@@ -468,12 +471,7 @@ function CreateTabs(type)
                         ---@field UnitID UnitId
 
                         enhTable.ID = enhName
-                        if isGatewaySelection then
-                            enhTable.UnitID = gatewaySacuId
-                        else
-                            local bp = selection[1]:GetBlueprint()
-                            enhTable.UnitID = bp.BaseBlueprintId or bp.BlueprintId
-                        end
+                        enhTable.UnitID = enhancementUnitId
                         table.insert(sortedOptions[slotName], enhTable)
                     end
                 end

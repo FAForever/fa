@@ -29,8 +29,8 @@ function UnitBuildIconId(id)
         return id
     end
     local bp = __blueprints[id]
-    local assigned = bp and bp.EnhancementPresetAssigned
-    if bp and bp.CategoriesHash and bp.CategoriesHash['SACULOADOUTCOMBO'] and assigned then
+    local assigned = bp.EnhancementPresetAssigned
+    if assigned and bp.CategoriesHash.SACULOADOUTCOMBO then
         return assigned.BaseBlueprintId or id
     end
     return id
@@ -55,19 +55,12 @@ function GetSelectionSacuId(selection)
         return nil
     end
 
-    local candidates = EntityCategoryGetUnitList(buildableCategories * categories.SACULOADOUTBASE)
-    local baseSacuId = nil
-    for _, id in candidates do
-        local bp = __blueprints[id]
-        -- The base SACU has no EnhancementPresetAssigned.
-        if bp and not bp.EnhancementPresetAssigned then
-            if baseSacuId then
-                return nil
-            end
-            baseSacuId = id
-        end
+    -- The category is cleared on generated presets, so this lists base units only.
+    local baseUnits = EntityCategoryGetUnitList(buildableCategories * categories.SACULOADOUTBASE)
+    if table.getn(baseUnits) > 1 then
+        return nil
     end
-    return baseSacuId
+    return baseUnits[1]
 end
 
 --- True if `selection` can build exactly one shared base SACU.
@@ -156,12 +149,10 @@ function OnSlotIconClick(item, modifiers)
     local slots = SlotMapFor(sacuId)
     if modifiers and modifiers.Right or IsRemoveEnhancement(name) then
         slots[slot] = nil
-        print('SACU ' .. slot .. ' cleared')
         return
     end
 
     slots[slot] = EnhancementChain(sacuId, name)
-    print('SACU ' .. slot .. ': ' .. name)
 end
 
 --- Blueprint id of the preset matching this combo, or nil if none.

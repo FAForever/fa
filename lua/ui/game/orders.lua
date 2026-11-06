@@ -1397,11 +1397,8 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
                 if modifiers.Shift then
                     count = 5
                 end
-                local success, info = loadout.QueueSelected(count)
-                if success then
-                    print('Queued ' .. info)
-                else
-                    print(info)
+                -- A queued loadout shows up in the build queue; only failure needs feedback.
+                if not loadout.QueueSelected(count) then
                     PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Menu_Error_01'}))
                 end
                 self:SetCheck(false)
