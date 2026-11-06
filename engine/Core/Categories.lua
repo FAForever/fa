@@ -33,7 +33,8 @@ categories = {
     ANTINAVY = categoryValue,
     --- Used for units that are specifically designed to target shields
     ANTISHIELD = categoryValue,
-    --- Unused, see `ANTINAVY` instead
+    --- Unused
+    ---@see categories.ANTINAVY # Use instead
     ANTISUB = categoryValue,
     --- Used for units that can target torpedoes
     ANTITORPEDO = categoryValue,
@@ -320,13 +321,14 @@ categories = {
       the smallest `General.SelectionPriority`, which is 6 for unfinished LOWSELECTPRIO units.
       With shift, it adds every unit it found to the selection, ignoring priority
     - double-click selection: units on screen with the clicked unit's blueprint, IsSelectable and in the
-      focus army, except units being upgraded. The base engine skips it when the clicked unit is a wall (see WALL)
+      focus army, except units being upgraded. The base engine skips it when the clicked unit is a wall
     - Lua selection (`SelectUnits`, `AddSelectUnits`): IsSelectable only. For a unit that isn't selectable
       because it is in a transport, `SelectUnits` selects the transport instead
     ]]
 
     --- Engine (UI) selection: required for the unit to be selectable, which every selection path checks.
     --- Ctrl-click selection checks it only on the clicked unit. The block above has the rules of each path
+    ---@see categories.WALL # Engine patch allowing double-click selection of walls
     SELECTABLE = categoryValue,
     SERAPHIM = categoryValue,
     --- Engine: building or repairing the unit also regenerates its shield, scaled by `Defense.Shield.RegenAssistMult`, and repair goes on until the shield is full.
