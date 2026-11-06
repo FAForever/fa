@@ -1,0 +1,1 @@
+- Add a Gameplay option to adjust the camera distance at which reclaim orders can be issued while explicitly in reclaim mode. Contextual right-click reclaim remains limited to its original distance (#7999).

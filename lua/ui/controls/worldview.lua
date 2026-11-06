@@ -355,12 +355,18 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldVie
     --- Returns true if the reclaim command can be applied
     ---@param self WorldView
     ---@return boolean
-    CanIssueReclaimOrders = function(self)
+    ---@param explicit boolean
+    CanIssueReclaimOrders = function(self, explicit)
         if not self.Camera then
             self.Camera = GetCamera('WorldCamera')
         end
 
-        return self.Camera:GetZoom() < 150
+        local distance = 150
+        if explicit then
+            distance = Prefs.GetFieldFromCurrentProfile('options').explicit_reclaim_camera_distance or distance
+        end
+
+        return self.Camera:GetZoom() < distance
     end,
 
     --- Called each frame to update the cursor, by the engine. We use it to determine the correct command
@@ -767,7 +773,7 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldVie
         local commandData = CommandMode.GetCommandMode()
         local viaCommandMode = commandData[1] and commandData[1] == 'order' and commandData[2].name == 'RULEUCC_Reclaim'
         local viaRightMouseButton = self:GetRightMouseButtonOrder() == 'RULEUCC_Reclaim' -- always returns nil when in command mode
-        local canIssueReclaimOrders = self:CanIssueReclaimOrders()
+        local canIssueReclaimOrders = self:CanIssueReclaimOrders(viaCommandMode)
 
         if enabled then
             if changed then

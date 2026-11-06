@@ -167,6 +167,17 @@ function AddEndBehavior(behavior, identifier)
     end
 end
 
+local function SetExplicitReclaimCameraMode(mode, data)
+    local enabled = mode == 'order' and data and data.name == 'RULEUCC_Reclaim'
+    ConExecute('ui_ExplicitReclaimMode ' .. (enabled and '1' or '0'))
+end
+
+ConExecute('ui_ExplicitReclaimMode 0')
+AddStartBehavior(SetExplicitReclaimCameraMode, 'ExplicitReclaimCameraDistance')
+AddEndBehavior(function()
+    ConExecute('ui_ExplicitReclaimMode 0')
+end, 'ExplicitReclaimCameraDistance')
+
 --- usually changing selection ends the command mode, this allows us to ignore that
 local ignoreSelection = false
 function SetIgnoreSelection(ignore)
