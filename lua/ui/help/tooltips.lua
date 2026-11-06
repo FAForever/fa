@@ -1061,6 +1061,10 @@ Tooltips = {
         title = '<LOC OPTIONS_0236>Zoom Pop Distance',
         description = '<LOC OPTIONS_0288>Adjusts distance to which Zoom Pop zooms to.',
     },
+    options_explicit_reclaim_camera_distance = {
+        title = 'Reclaim Mode Distance',
+        description = 'Adjusts the maximum camera distance at which reclaim orders can be issued while in explicit reclaim mode.',
+    },
     options_reclaim_overview_size_scale = {
         title = '<LOC OPTIONS_0289>Reclaim Label Scaling Factor',
         description = '<LOC OPTIONS_0290>Scales the text of the reclaim label to its value',
