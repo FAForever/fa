@@ -6,6 +6,8 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 
 local kPadding = 6
 
+---@class FlatTextButton : Bitmap
+---@field mLabel Text
 FlatTextButton = ClassUI(Bitmap) {
     __init = function(self, parent, label, pointSize)
         Bitmap.__init(self, parent)
@@ -27,7 +29,10 @@ FlatTextButton = ClassUI(Bitmap) {
         elseif event.Type == 'MouseExit' then
             self.mLabel:SetColor(UIUtil.highlightColor())
         elseif event.Type == 'ButtonPress' then
-            self:OnClick()
+            -- Left button only, as a stock button.
+            if event.Modifiers.Left then
+                self:OnClick()
+            end
             return true
         end
         return false

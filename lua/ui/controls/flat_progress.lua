@@ -8,6 +8,10 @@ local kGroove = 'ff26323a'
 local kBusyShare = 0.25
 local kBusyCycleSeconds = 1.4
 
+---@class FlatProgress : Group
+---@field mFill Bitmap
+---@field mBusy boolean
+---@field mBusyTime number
 FlatProgress = ClassUI(Group) {
     __init = function(self, parent)
         Group.__init(self, parent, "FlatProgress")
@@ -28,11 +32,12 @@ FlatProgress = ClassUI(Group) {
         self.mBusyTime = 0
     end,
 
-    --- A share from 0 to 1.
+    --- A share from 0 to 1. The fill follows the control when the layout changes.
     SetProgress = function(self, share)
         self.mBusy = false
-        self.mFill.Left:Set(self.Left())
-        self.mFill.Width:Set(math.floor(self.Width() * math.min(math.max(share, 0), 1)))
+        share = math.min(math.max(share, 0), 1)
+        self.mFill.Left:Set(self.Left)
+        self.mFill.Width:Set(function() return math.floor(self.Width() * share) end)
     end,
 
     --- Sweeps until the next SetProgress. Each frame while it lasts.
@@ -41,8 +46,9 @@ FlatProgress = ClassUI(Group) {
         self.mBusyTime = math.mod(self.mBusyTime + delta, kBusyCycleSeconds)
         local phase = self.mBusyTime / kBusyCycleSeconds
         local there = phase < 0.5 and phase * 2 or (1 - phase) * 2
-        local block = self.Width() * kBusyShare
-        self.mFill.Left:Set(math.floor(self.Left() + there * (self.Width() - block)))
-        self.mFill.Width:Set(math.floor(block))
+        self.mFill.Left:Set(function()
+            return math.floor(self.Left() + there * (self.Width() - self.Width() * kBusyShare))
+        end)
+        self.mFill.Width:Set(function() return math.floor(self.Width() * kBusyShare) end)
     end,
 }

@@ -29,6 +29,8 @@ function SetVisible(control, visible)
     end
 end
 
+---@class FlatPanel : Group
+---@field mOpacity number
 FlatPanel = ClassUI(Group) {
     __init = function(self, parent, name)
         Group.__init(self, parent, name)

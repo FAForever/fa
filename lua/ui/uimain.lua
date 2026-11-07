@@ -381,15 +381,19 @@ if rawget(_G, 'GetEngineInfo') then
         end
 
         local function StageText(stage, progress)
-            local percent = string.format("%d%%", math.floor(progress * 100))
+            -- No measure: the travelling block alone says it is under way.
+            local percent = ''
+            if progress >= 0 then
+                percent = string.format(": %d%%", math.floor(progress * 100))
+            end
             if stage == 'connecting' then
                 return LOC("<LOC rejoin_0010>Reconnecting to the game")
             elseif stage == 'transfer' then
-                return LOC("<LOC rejoin_0011>Reconnecting: receiving the game so far") .. ': ' .. percent
+                return LOC("<LOC rejoin_0011>Reconnecting: receiving the game so far") .. percent
             elseif stage == 'loading' then
                 return LOC("<LOC rejoin_0012>Rejoining the game: loading the map")
             end
-            return LOC("<LOC rejoin_0013>Rejoining the game: catching up") .. ': ' .. percent
+            return LOC("<LOC rejoin_0013>Rejoining the game: catching up") .. percent
         end
 
         --- `stage` is 'connecting', 'transfer', 'loading' or 'catchingUp', with `progress`

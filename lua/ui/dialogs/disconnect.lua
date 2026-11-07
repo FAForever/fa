@@ -265,7 +265,19 @@ if rawget(_G, 'GetEngineInfo') then
         local dialog = false
         local stages = {}
         local stageStarts = {}
+        local returnStarts = {}
         local announcedBack = {}
+
+        -- The wait before a lagging player's eject button unlocks in `CreateDialog` above. A returning
+        -- player's button waits as long from when their return began, so a click meant for the game
+        -- can't land on it when the dialog opens.
+        local function EjectDelay()
+            local delay = SessionGetScenarioInfo().Options.DisconnectionDelay02
+            if delay then
+                return tonumber(delay) - 5
+            end
+            return 85
+        end
 
         local function ElapsedText(seconds)
             return string.format("%d:%02d", math.floor(seconds / 60), math.mod(math.floor(seconds), 60))
@@ -302,8 +314,8 @@ if rawget(_G, 'GetEngineInfo') then
         end
 
         --- As /lua/ui/game/gameresult.lua tells of a defeated player: the announcement
-        --- goes to that player's line on the score board. FAF's option to hide player
-        --- names can leave no line to find, which still shows it, from the top.
+        --- goes to that player's line on the score board. With no line to find (FAF's
+        --- option to hide player names, or no score board), it still shows, from the top.
         local function AnnounceBack(client)
             LOG('REJOIN: showing ' .. client.name .. ' as back')
 
@@ -314,8 +326,8 @@ if rawget(_G, 'GetEngineInfo') then
                 text = LOCF("<LOC rejoin_0007>%s is back in the game!", client.name)
             end
             for army, info in GetArmiesTable().armiesTable do
-                if info.nickname == client.name then
-                    import("/lua/ui/game/score.lua").ArmyAnnounce(army, text)
+                -- false: no line for that army. A score board that returns nothing showed it.
+                if info.nickname == client.name and import("/lua/ui/game/score.lua").ArmyAnnounce(army, text) ~= false then
                     return
                 end
             end
@@ -374,6 +386,7 @@ if rawget(_G, 'GetEngineInfo') then
             slot.eject.OnClick = function(self, modifiers)
                 EjectSessionClient(index)
             end
+            slot.eject:Disable()
 
             return slot
         end
@@ -454,6 +467,13 @@ if rawget(_G, 'GetEngineInfo') then
                     LayoutHelpers.SetWidth(slot.fill, blockWidth)
                 end
                 slot.eject:Show()
+                if GetSystemTimeSeconds() - returnStarts[index] >= EjectDelay() then
+                    if slot.eject:IsDisabled() then
+                        slot.eject:Enable()
+                    end
+                elseif not slot.eject:IsDisabled() then
+                    slot.eject:Disable()
+                end
             else
                 slot.status:Hide()
                 slot.track:Hide()
@@ -491,15 +511,20 @@ if rawget(_G, 'GetEngineInfo') then
         local engineClients = GetSessionClients
 
         --- What the Connectivity dialog above goes by: it opens on any vote to eject, and a vote
-        --- against a returning player shows on their row in this dialog instead.
+        --- against a returning player shows on their row in this dialog instead. The engine's list
+        --- is cached (/lua/ui/override/sessionclients.lua), and this dialog reads the votes from it,
+        --- so the list it hands on is a copy.
         function GetSessionClients()
             local clients = engineClients() or {}
-            for _, client in clients do
+            local copy = {}
+            for index, client in clients do
                 if IsReturning(client) then
+                    client = table.copy(client)
                     client.ejectedBy = {}
                 end
+                copy[index] = client
             end
-            return clients
+            return copy
         end
 
         --- The rest of what opens the Connectivity dialog: see `Update` above.
@@ -536,6 +561,7 @@ if rawget(_G, 'GetEngineInfo') then
                 local stage = client.rejoinStage
                 if stage == 'back' then
                     stages[index] = nil
+                    returnStarts[index] = nil
                     if not announcedBack[index] then
                         announcedBack[index] = true
                         AnnounceBack(client)
@@ -553,6 +579,9 @@ if rawget(_G, 'GetEngineInfo') then
                     end
                     if IsReturning(client) then
                         anyReturning = true
+                        returnStarts[index] = returnStarts[index] or GetSystemTimeSeconds()
+                    else
+                        returnStarts[index] = nil
                     end
                 end
             end
