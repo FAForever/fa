@@ -1994,13 +1994,11 @@ if rawget(_G, 'GetEngineInfo') then
             end
         end
         table.insert(options.video.items, position, {
-            title = "Graphics API",
+            title = "<LOC OPTIONS_GRAPHICS_API_TITLE>Graphics API",
             key = 'graphics_api',
             type = 'toggle',
             default = 'auto',
             restart = true,
-            tip = "The renderer the game draws with. Automatic uses the newest one this PC can start. "
-                .. "Takes effect after a restart; if the chosen renderer cannot start, the game uses Direct3D 9.",
             custom = {
                 states = {
                     { text = "Automatic (newest available)", key = 'auto' },
@@ -2016,12 +2014,10 @@ if rawget(_G, 'GetEngineInfo') then
     -- The replay viewer's keyframes: saved game states it moves back to.
     local replayItems = {
         {
-            title = "Replay keyframe cache (MB)",
+            title = "<LOC OPTIONS_REPLAY_KEYFRAME_BUDGET_TITLE>Replay keyframe cache (MB)",
             key = 'replay_keyframe_budget',
             type = 'slider',
             default = 2048,
-            tip = "Disk space a replay may use for its saved positions, in the replay_keyframes folder next to the game. "
-                .. "Over this, the oldest are thinned out, and moving far back takes longer. Cleared when the next replay starts.",
             set = function(key, value, startup)
                 ConExecute("replay_KeyframeMaxMB " .. tostring(value))
             end,
@@ -2032,12 +2028,10 @@ if rawget(_G, 'GetEngineInfo') then
             },
         },
         {
-            title = "Replay keyframe spacing (seconds)",
+            title = "<LOC OPTIONS_REPLAY_KEYFRAME_SPACING_TITLE>Replay keyframe spacing (seconds)",
             key = 'replay_keyframe_spacing',
             type = 'slider',
             default = 30,
-            tip = "Game time between a replay's saved positions. Closer ones make moves shorter and use more of the cache. "
-                .. "The background preparation takes a new value from the next replay.",
             set = function(key, value, startup)
                 ConExecute("replay_KeyframeEvery " .. tostring(math.floor(value) * 10))
             end,
@@ -2048,12 +2042,10 @@ if rawget(_G, 'GetEngineInfo') then
             },
         },
         {
-            title = "Replay background preparation",
+            title = "<LOC OPTIONS_REPLAY_KEYFRAME_PREPARE_TITLE>Replay background preparation",
             key = 'replay_keyframe_prepare',
             type = 'toggle',
             default = 1,
-            tip = "A hidden low-priority copy of the game saves positions ahead of a replay you watch, so a first jump forward "
-                .. "can load one. Off saves CPU, and jumps forward play through the game instead.",
             set = function(key, value, startup)
                 ConExecute("replay_PrepareKeyframes " .. tostring(value))
             end,
