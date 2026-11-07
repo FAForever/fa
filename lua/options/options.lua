@@ -1970,3 +1970,96 @@ options = {
         },
     },
 }
+
+-- Options of the faf-re engine (Draiget/faf-re), the engine of FAF Develop. The original
+-- executable has neither a renderer choice nor these replay console variables, so the entries
+-- are added only on faf-re, which has GetEngineInfo (the original executable doesn't).
+if rawget(_G, 'GetEngineInfo') then
+    local function HasKey(items, key)
+        for _, item in items do
+            if item.key == key then
+                return true
+            end
+        end
+        return false
+    end
+
+    -- The renderer, read once when the device is created; after Vertical Sync.
+    if not HasKey(options.video.items, 'graphics_api') then
+        local position = table.getn(options.video.items) + 1
+        for index, item in options.video.items do
+            if item.key == 'vsync' then
+                position = index + 1
+                break
+            end
+        end
+        table.insert(options.video.items, position, {
+            title = "<LOC OPTIONS_GRAPHICS_API_TITLE>Graphics API",
+            key = 'graphics_api',
+            type = 'toggle',
+            default = 'auto',
+            restart = true,
+            custom = {
+                states = {
+                    { text = "Automatic (newest available)", key = 'auto' },
+                    { text = "Direct3D 9", key = 'd3d9' },
+                    { text = "Direct3D 11", key = 'd3d11' },
+                    { text = "Direct3D 12", key = 'd3d12' },
+                    { text = "Vulkan", key = 'vulkan' },
+                },
+            },
+        })
+    end
+
+    -- The replay viewer's keyframes: saved game states it moves back to.
+    local replayItems = {
+        {
+            title = "<LOC OPTIONS_REPLAY_KEYFRAME_BUDGET_TITLE>Replay keyframe cache (MB)",
+            key = 'replay_keyframe_budget',
+            type = 'slider',
+            default = 2048,
+            set = function(key, value, startup)
+                ConExecute("replay_KeyframeMaxMB " .. tostring(value))
+            end,
+            custom = {
+                min = 256,
+                max = 16384,
+                inc = 256,
+            },
+        },
+        {
+            title = "<LOC OPTIONS_REPLAY_KEYFRAME_SPACING_TITLE>Replay keyframe spacing (seconds)",
+            key = 'replay_keyframe_spacing',
+            type = 'slider',
+            default = 30,
+            set = function(key, value, startup)
+                ConExecute("replay_KeyframeEvery " .. tostring(math.floor(value) * 10))
+            end,
+            custom = {
+                min = 10,
+                max = 300,
+                inc = 10,
+            },
+        },
+        {
+            title = "<LOC OPTIONS_REPLAY_KEYFRAME_PREPARE_TITLE>Replay background preparation",
+            key = 'replay_keyframe_prepare',
+            type = 'toggle',
+            default = 1,
+            set = function(key, value, startup)
+                ConExecute("replay_PrepareKeyframes " .. tostring(value))
+            end,
+            custom = {
+                states = {
+                    { text = "<LOC _On>", key = 1 },
+                    { text = "<LOC _Off>", key = 0 },
+                },
+            },
+        },
+    }
+    for _, item in replayItems do
+        if not HasKey(options.gameplay.items, item.key) then
+            table.insert(options.gameplay.items, item)
+        end
+    end
+end
