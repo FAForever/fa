@@ -294,7 +294,7 @@ function GiveUnitToArmy(unit, army, triggerOnGiven)
     end
     IgnoreRestrictions(false)
 
-    if triggerOnGiven then
+    if triggerOnGiven and newUnit then
         unit:OnGiven(newUnit)
     end
 

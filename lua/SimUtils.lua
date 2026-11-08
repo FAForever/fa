@@ -281,7 +281,8 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         if owner == toArmy or
             unit:GetParent() ~= unit or (unit.Parent and unit.Parent ~= unit) or
             unit.CaptureProgress > 0 or
-            unit:GetFractionComplete() < 1.0
+            unit:GetFractionComplete() < 1.0 or
+            unit.NoTransfer
         then
             continue
         end
