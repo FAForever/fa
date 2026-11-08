@@ -1,0 +1,1 @@
+- Fix Omen shells flying far beyond the 110 range when ground-firing at the top of a cliff edge. Oblivion Cannon shells now expire after 3.1 seconds instead of the default 15 (#7380).
