@@ -17,12 +17,17 @@ local scenario = SessionGetScenarioInfo()
 local parent = nil
 local myIndex = ''
 
-function DestroyDialog()
+local function DestroyConnectivityDialog()
     SessionClients.ResetInterval()
     if parent then
         parent:Destroy()
         parent = false
     end
+end
+
+--- The public cleanup: /lua/ui/uimain.lua calls it on the old module when this one is reloaded.
+function DestroyDialog()
+    DestroyConnectivityDialog()
 end
 
 local function CreateDialog(clients)
@@ -31,7 +36,7 @@ local function CreateDialog(clients)
     import("/lua/ui/game/gamemain.lua").KillWaitingDialog()
 
     GetCursor():Show()
-    DestroyDialog()
+    DestroyConnectivityDialog()
 
     parent = Group(GetFrame(0), "diconnectDialogParentGroup")
     parent.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
@@ -229,7 +234,7 @@ function Update()
         end
         parent:Update(clients)
     else
-        if parent then DestroyDialog() end
+        if parent then DestroyConnectivityDialog() end
     end
 
 end
@@ -433,6 +438,14 @@ if rawget(_G, 'GetEngineInfo') then
                 dialog = false
                 SessionClients.ResetInterval()
             end
+        end
+
+        --- A reload of this module closes the rejoin dialog too. `Update` above closes only the
+        --- Connectivity dialog, so a return in progress keeps its dialog.
+        local baseDestroyDialog = DestroyDialog
+        function DestroyDialog()
+            baseDestroyDialog()
+            DestroyRejoinDialog()
         end
 
         local function UpdateSlot(slot, index, client, armies)
