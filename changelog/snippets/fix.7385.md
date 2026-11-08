@@ -1,0 +1,1 @@
+- (#7385) Fix transferred ACUs announcing all of their enhancements as just completed to the player who receives them.
