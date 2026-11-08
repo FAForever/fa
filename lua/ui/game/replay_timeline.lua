@@ -59,8 +59,12 @@ function OnEscape()
     return true
 end
 
---- The hotkey: keeps the bar shown, or leaves it to the mouse again.
+--- The hotkey: keeps the bar shown, or leaves it to the mouse again. In a replay with no bar, as after a reload of
+--- this file that failed to load (see `__moduleinfo.OnReload` below), it builds the bar first.
 function Toggle()
+    if not bar and SessionIsReplay() then
+        Create()
+    end
     pinned = not pinned
 end
 
@@ -254,12 +258,21 @@ function __moduleinfo.OnDirty()
     end
 end
 
---- A new module that failed to load (an error in the file) has no Create: the error is reported where it was imported.
+--- import.lua calls this before it knows the new module loaded, and drops one that failed (an error in the file):
+--- a frame later, only a module that is still there gets the bar. After a failed load the next module that loads has
+--- no old one to call this on, and the hotkey builds the bar again once the file is fixed (`Toggle`).
 function __moduleinfo.OnReload(newModule)
-    if rebuild and rawget(newModule, 'Create') then
-        newModule.Create()
-        if pinned then
-            newModule.Toggle()
-        end
+    if not rebuild then
+        return
     end
+    local name = __moduleinfo.name
+    ForkThread(function()
+        WaitFrames(1)
+        if __modules[name] == newModule and rawget(newModule, 'Create') then
+            newModule.Create()
+            if pinned then
+                newModule.Toggle()
+            end
+        end
+    end)
 end
