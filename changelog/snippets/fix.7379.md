@@ -1,0 +1,1 @@
+- (#7379) Fix transferred units regaining preset enhancements that were removed, losing the effects of prerequisite enhancements (such as the stealth of a cloaked Cybran SACU or the extra health of the Cybran and Seraphim ACU), and losing manual enhancements when transferred twice in the same tick.
