@@ -76,8 +76,10 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
         end,
 
         Main = function(self)
-            -- If the unit has arrived with a new player via capture, it will already have a Satellite in the wild
-            if not self.Satellite then
+            -- A station that was given or captured keeps its old satellite, or rebuilds it when it had none
+            if self.SkipSatelliteLaunch then
+                self.SkipSatelliteLaunch = nil
+            elseif not self.Satellite then
                 self.waitingForLaunch = true
 
                 if not self.AnimManip then
@@ -161,10 +163,8 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
 
             -- Shift the two units to the new army and assign relationship
             local base = ChangeUnitArmy(self, captorArmyIndex)
-            if self.Satellite and not self.Satellite.Dead then
-                local sat = ChangeUnitArmy(self.Satellite, captorArmyIndex)
-                sat.Parent = base
-                base.Satellite = sat
+            if base then
+                self:TransferSatellite(base)
             end
 
             -- Reapply unit cap checks
@@ -172,6 +172,62 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
             if ScenarioInfo.CampaignMode and not captorBrain.IgnoreArmyCaps then
                 SetIgnoreArmyUnitCap(captorArmyIndex, false)
             end
+        end
+    end,
+
+    ---@param self XEB2402
+    ---@param newUnit XEB2402
+    OnGiven = function(self, newUnit)
+        TAirFactoryUnit.OnGiven(self, newUnit)
+        self:TransferSatellite(newUnit)
+    end,
+
+    --- Moves the satellite of this station to the station that replaces it after a change of army.
+    --- The engine doesn't transfer the satellite with the station, and the new station launches a
+    --- new satellite when it is created. Without this, a satellite in flight would reappear at the
+    --- station, a satellite that isn't launched yet would stay with the old army, and a station without
+    --- a satellite would get a free one.
+    ---@param self XEB2402
+    ---@param newUnit XEB2402
+    TransferSatellite = function(self, newUnit)
+        -- `newSatellite` is a satellite that the station finished building but hasn't launched yet
+        local satellite = self.Satellite or self.newSatellite
+        self.Satellite = nil
+        self.newSatellite = nil
+
+        if satellite and not satellite.Dead and not IsDestroyed(satellite) then
+            local docked = satellite:GetParent() == self
+            local massKilled = satellite.VetExperience
+
+            -- the old satellite is destroyed by the change of army, so it shouldn't order the old station to rebuild it
+            satellite.Parent = nil
+            local newSatellite = ChangeUnitArmy(satellite, newUnit.Army)
+            if newSatellite then
+                if massKilled and massKilled > 0 then
+                    newSatellite:CalculateVeterancyLevelAfterTransfer(massKilled, true)
+                end
+
+                if docked then
+                    -- launched by the `OpenState` of the new station
+                    newSatellite:AttachTo(newUnit, 'Attachpoint01')
+                    newUnit.newSatellite = newSatellite
+                else
+                    newSatellite.Parent = newUnit
+                    newUnit.Satellite = newSatellite
+                    newSatellite:Open()
+                end
+                return
+            end
+
+            -- the new army is at its unit cap
+            satellite:Destroy()
+        end
+
+        -- No satellite to transfer: rebuild it instead of launching a free one. A satellite that was
+        -- being built is rebuilt to its progress by `FactoryRebuildUnits` when the station is given.
+        newUnit.SkipSatelliteLaunch = true
+        if not newUnit.FacRebuild_UnitId then
+            IssueToUnitBuildFactory(newUnit, 'XEA0002', 1)
         end
     end,
 }
