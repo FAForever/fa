@@ -178,7 +178,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 10/67, --10/integer interval in ticks
+            RateOfFire = 10/60, --10/integer interval in ticks
             RenderFireClock = true,
             TargetPriorities = {
                 "ANTISHIELD",

@@ -23,7 +23,11 @@ ProjectileBlueprint{
     },
     Interface = { HelpText = 0 },
     Physics = {
+        DetonateBelowHeight = 18,
         DestroyOnWater = true,
+        FragmentId = "/projectiles/SIFThunthoArtilleryShell02/SIFThunthoArtilleryShell02_proj.bp",
+        FragmentRadius = 5,
+        Fragments = 15,
         InitialSpeed = 14.6,
         InitialSpeedRange = 3,
         InitialSpeedReduceDistance = 30,
