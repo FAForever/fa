@@ -18,6 +18,32 @@ local transferUnitsCategory = categories.ALLUNITS - categories.INSIGNIFICANTUNIT
 local buildersCategory = categories.ALLUNITS - categories.CONSTRUCTION - categories.ENGINEER
 local engineersCategory = categories.ENGINEER - categories.SUBCOMMANDER - categories.COMMAND
 
+--- Recreates the enhancements a unit had before it was transferred. Each enhancement is created after
+--- its prerequisites, like when it is built manually, because enhancement scripts rely on the effects
+--- of the prerequisites (such as the stealth of the Cybran SACU's cloak).
+---@param unit Unit
+---@param activeEnhancements table<EnhancementSlot, Enhancement>
+local function CreateTransferredEnhancementsThread(unit, activeEnhancements)
+    -- Delayed by a tick like the preset enhancements, since cloak and stealth enhancements don't work otherwise
+    WaitTicks(1)
+    local enhancements = unit.Blueprint.Enhancements
+    for _, enh in activeEnhancements do
+        if unit.Dead or IsDestroyed(unit) then break end
+
+        local chain = {}
+        local name = enh
+        while name do
+            table.insert(chain, 1, name)
+            name = enhancements[name].Prerequisite
+        end
+        for _, chainEnh in chain do
+            unit:CreateEnhancement(chainEnh)
+        end
+    end
+    unit.TransferredEnhancements = nil
+    unit.OnStopBeingBuiltEnhancementsThread = nil
+end
+
 ---@class FactoryRebuildData
 ---@field FacRebuild_Progress number # progress -- save current progress for some later checks
 ---@field FacRebuild_BuildTime number # progress * bp.Economy.BuildTime
@@ -326,11 +352,20 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         end
         local enhancements = bp.Enhancements
         if enhancements then
-            local unitEnh = SimUnitEnhancements[unit.EntityId]
-            if unitEnh then
+            if unit.OnStopBeingBuiltEnhancementsThread then
+                -- The enhancements are not created yet: either the preset enhancements of a unit that
+                -- just finished building (nil, so the new unit creates its own preset), or the
+                -- enhancements of a previous transfer in the same tick
+                activeEnhancements = unit.TransferredEnhancements
+            else
+                -- An empty table is kept as well, so that a preset unit whose preset enhancements
+                -- were all removed does not get them back for free
                 activeEnhancements = {}
-                for slot, enh in unitEnh do
-                    activeEnhancements[slot] = enh
+                local unitEnh = SimUnitEnhancements[unit.EntityId]
+                if unitEnh then
+                    for slot, enh in unitEnh do
+                        activeEnhancements[slot] = enh
+                    end
                 end
             end
         end
@@ -425,15 +460,8 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
             if TableEmpty(activeEnhancements) then
                 newUnit.OnStopBeingBuiltEnhancementsThread = nil
             else
-                newUnit.OnStopBeingBuiltEnhancementsThread = newUnit:ForkThread(function()
-                    WaitTicks(1)
-                    if newUnit and not newUnit.Dead and not IsDestroyed(newUnit) then
-                        for _, enh in activeEnhancements do
-                            newUnit:CreateEnhancement(enh)
-                        end
-                    end
-                    newUnit.OnStopBeingBuiltEnhancementsThread = nil
-                end)
+                newUnit.TransferredEnhancements = activeEnhancements
+                newUnit.OnStopBeingBuiltEnhancementsThread = newUnit:ForkThread(CreateTransferredEnhancementsThread, activeEnhancements)
             end
         end
 
