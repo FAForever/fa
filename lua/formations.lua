@@ -1085,7 +1085,12 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable)
                             rowType = type
                         end
 
-                        TableInsert(FormationPos, {xPos * spacing, (-formationLength - offsetY) * spacing, groupData.Filter, formationLength, true})
+                        TableInsert(FormationPos, {
+                            xPos * spacing, (-formationLength - offsetY) * spacing,
+                            groupData.Filter,
+                            formationLength / 10,
+                            true
+                        })
                         inserted = true
 
                         groupData.Count = groupData.Count - 1
