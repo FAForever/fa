@@ -254,8 +254,9 @@ function __moduleinfo.OnDirty()
     end
 end
 
+--- A new module that failed to load (an error in the file) has no Create: the error is reported where it was imported.
 function __moduleinfo.OnReload(newModule)
-    if rebuild then
+    if rebuild and rawget(newModule, 'Create') then
         newModule.Create()
         if pinned then
             newModule.Toggle()

@@ -632,3 +632,9 @@ if rawget(_G, 'GetEngineInfo') then
         end
     end
 end
+
+--- When this module is marked for reload, also through a module it imports (/lua/system/import.lua marks every
+--- module in used_by): /lua/ui/uimain.lua can be reloaded with it and then not call the old module's DestroyDialog.
+function __moduleinfo.OnDirty()
+    DestroyDialog()
+end
