@@ -927,9 +927,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param self Unit
     ---@param target Unit | Prop
     OnStartReclaim = function(self, target)
+        -- units without the reclaim command only get here through the engine clearing a build site, see `GetReclaimCosts`
+        local canReclaim = self.Blueprint.General.CommandCapsHash['RULEUCC_Reclaim']
+
         -- When paused we reclaim at a speed of 0, with thanks to:
         -- - https://github.com/FAForever/FA-Binary-Patches/pull/19
-        if not self:IsPaused() then
+        if canReclaim and not self:IsPaused() then
             self:StartReclaimEffects(target)
             self:PlayUnitSound('StartReclaim')
             self:PlayUnitAmbientSound('ReclaimLoop')
@@ -942,7 +945,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self:DoUnitCallbacks('OnStartReclaim', target)
 
         -- add state to be able to show the amount reclaimed in the UI
-        if target.IsProp then
+        if canReclaim and target.IsProp then
             self.OnStartReclaimPropStartTick = GetGameTick() + 2
 
             local time, energy, mass = target:GetReclaimCosts(self)
@@ -4130,6 +4133,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@return number energy    # only applies to props
     ---@return number mass      # only applies to props
     GetReclaimCosts = function(self, target)
+        -- A mobile build order reclaims the props in the way of the build site, even for
+        -- builders that can't reclaim such as the CZAR, the Fatboy and external factories.
+        -- Those builders get nothing and take forever, so the order waits instead.
+        if not self.Blueprint.General.CommandCapsHash['RULEUCC_Reclaim'] then
+            return 1e9, 0, 0
+        end
+
         if target.IsProp then
             return target:GetReclaimCosts(self)
         end
