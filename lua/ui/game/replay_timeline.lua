@@ -235,3 +235,30 @@ function Create()
     IN_AddKeyMapTable({[kToggleKey] = {action = "UI_Lua import('/lua/ui/game/replay_timeline.lua').Toggle()"}})
     return bar
 end
+
+--- A reload of this file (the module manager in /lua/system/import.lua, when the file changes on disk): the old
+--- module's bar goes, and the new module builds its own, keeping the pin. Without this the old bar stayed on screen
+--- while Esc and the hotkey reached the new module, which had none.
+local rebuild = false
+
+function __moduleinfo.OnDirty()
+    rebuild = bar ~= false
+    if bar then
+        bar:Destroy()
+    end
+    if rebuild then
+        ForkThread(function()
+            WaitFrames(2)
+            import(__moduleinfo.name)
+        end)
+    end
+end
+
+function __moduleinfo.OnReload(newModule)
+    if rebuild then
+        newModule.Create()
+        if pinned then
+            newModule.Toggle()
+        end
+    end
+end
