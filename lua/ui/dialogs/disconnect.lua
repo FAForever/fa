@@ -268,10 +268,15 @@ if rawget(_G, 'GetEngineInfo') then
 
         local trackWidth = 236
         local dialog = false
-        local stages = {}
-        local stageStarts = {}
-        local returnStarts = {}
-        local announcedBack = {}
+        -- What this dialog keeps about each return, over a reload of this module too: while the new module
+        -- loads, /lua/system/import.lua hands it the old one as `__moduleinfo.old`. Without that a reload would
+        -- start each eject delay again and announce again a player who is already back.
+        local previous = __moduleinfo.old and rawget(__moduleinfo.old, 'RejoinState')
+        RejoinState = previous or {stages = {}, stageStarts = {}, returnStarts = {}, announcedBack = {}}
+        local stages = RejoinState.stages
+        local stageStarts = RejoinState.stageStarts
+        local returnStarts = RejoinState.returnStarts
+        local announcedBack = RejoinState.announcedBack
 
         -- The wait before a lagging player's eject button unlocks in `CreateDialog` above. A returning
         -- player's button waits as long from when their return began, so a click meant for the game
