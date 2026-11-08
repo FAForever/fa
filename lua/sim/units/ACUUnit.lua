@@ -26,7 +26,10 @@ ACUUnit = ClassUnit(CommandUnit) {
     CreateEnhancement = function(self, enh)
         CommandUnit.CreateEnhancement(self, enh)
 
-        self:SendNotifyMessage('completed', enh)
+        -- Enhancements recreated after a transfer (see `TransferUnitsOwnership`) were not just completed
+        if not self.OnStopBeingBuiltEnhancementsThread then
+            self:SendNotifyMessage('completed', enh)
+        end
         self:SetImmobile(false)
     end,
 
