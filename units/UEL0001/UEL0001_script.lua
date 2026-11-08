@@ -37,6 +37,7 @@ local GunLabels = { 'RightZephyr', 'OverCharge', 'AutoOverCharge' }
 ---@field RightPod TConstructionPodUnit
 ---@field HasRightPod boolean
 ---@field RebuildThread2? thread # Rebuilds right pod
+---@field TransferredPodHealth? table<string, number> # Set by `TransferUnitsOwnership` while it recreates the enhancements: health of the drones that were alive before the transfer
 ---@field MissileHatchSlider moho.SlideManipulator
 UEL0001 = ClassUnit(ACUUnit) {
     Weapons = {
@@ -338,6 +339,15 @@ UEL0001 = ClassUnit(ACUUnit) {
     ---@param self UEL0001
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementLeftPod = function(self, bp)
+        -- After a transfer, rebuild the drone if it was dead instead of creating it for free
+        local transferredPodHealth = self.TransferredPodHealth
+        local health = transferredPodHealth and transferredPodHealth.LeftPod
+        if transferredPodHealth and not health then
+            self.HasLeftPod = true
+            self.RebuildThread = self:ForkThread(self.RebuildPod, 1)
+            return
+        end
+
         local location = self:GetPosition('AttachSpecial02')
         ---@type UEA0001
         ---@diagnostic disable-next-line: assign-type-mismatch
@@ -347,6 +357,9 @@ UEL0001 = ClassUnit(ACUUnit) {
         self.Trash:Add(pod)
         self.HasLeftPod = true
         self.LeftPod = pod
+        if health then
+            pod:SetHealth(self, health)
+        end
     end,
 
     ---@param self UEL0001
@@ -369,6 +382,20 @@ UEL0001 = ClassUnit(ACUUnit) {
     ---@param self UEL0001
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementRightPod = function(self, bp)
+        -- After a transfer, rebuild the drone if it was dead instead of creating it for free
+        local transferredPodHealth = self.TransferredPodHealth
+        -- This enhancement replaces the left drone enhancement in its slot, so after a transfer it brings back the left drone too
+        if transferredPodHealth and not self.HasLeftPod then
+            self:ProcessEnhancementLeftPod(bp)
+        end
+
+        local health = transferredPodHealth and transferredPodHealth.RightPod
+        if transferredPodHealth and not health then
+            self.HasRightPod = true
+            self.RebuildThread2 = self:ForkThread(self.RebuildPod, 2)
+            return
+        end
+
         local location = self:GetPosition('AttachSpecial01')
         ---@type UEA0001
         ---@diagnostic disable-next-line: assign-type-mismatch
@@ -378,6 +405,9 @@ UEL0001 = ClassUnit(ACUUnit) {
         self.Trash:Add(pod)
         self.HasRightPod = true
         self.RightPod = pod
+        if health then
+            pod:SetHealth(self, health)
+        end
     end,
 
     ---@param self UEL0001

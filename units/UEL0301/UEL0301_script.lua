@@ -19,6 +19,7 @@ local SCUDeathWeapon = DefaultWep.SCUDeathWeapon
 ---@field RebuildPodThread? thread
 ---@field RebuildingPod? EconomyEvent
 ---@field Pod TConstructionPodUnit
+---@field TransferredPodHealth? table<string, number> # Set by `TransferUnitsOwnership` while it recreates the enhancements: health of the drones that were alive before the transfer
 UEL0301 = ClassUnit(CommandUnit) {
     IntelEffects = {
         {
@@ -187,6 +188,15 @@ UEL0301 = ClassUnit(CommandUnit) {
     ---@param self UEL0301
     ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementPod = function(self, bp)
+        -- After a transfer, rebuild the drone if it was dead instead of creating it for free
+        local transferredPodHealth = self.TransferredPodHealth
+        local health = transferredPodHealth and transferredPodHealth.Pod
+        if transferredPodHealth and not health then
+            self.HasPodEnh = true
+            self.RebuildPodThread = self:ForkThread(self.RebuildPod)
+            return
+        end
+
         local location = self:GetPosition('AttachSpecial01')
         ---@type UEA0003
         ---@diagnostic disable-next-line: assign-type-mismatch
@@ -196,6 +206,9 @@ UEL0301 = ClassUnit(CommandUnit) {
         self.Trash:Add(pod)
         self.HasPodEnh = true
         self.Pod = pod
+        if health then
+            pod:SetHealth(self, health)
+        end
     end,
 
     ---@param self UEL0301
