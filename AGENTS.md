@@ -102,6 +102,7 @@ Real verification means running the game ([setup](docs/development/setup.md)): c
 - PRs target **`develop`**. Commit subjects: imperative, under 80 characters, no trailing period.
 - Keep refactors and each functional change in separate commits or PRs, and propose commits to the user that way.
 - Every PR needs `changelog/snippets/<category>.<PR number>.md`, written for players. Categories: `graphics`, `ai`, `performance`, `balance`, `features`, `fix`, `other` ([details](docs/development-changelog.md)). Snippets reference only PR numbers. Link issues in the PR description with a closing keyword (`Fixes #1234`).
+- A PR that fixes or changes an earlier PR that is not released yet (its snippet is still in `changelog/snippets/`) adds its number to that snippet, and updates the snippet text if needed, instead of adding its own: `(#7185, #7333)`.
 - Balance changes need balance team sign-off, and features need discussion first ([CONTRIBUTING.md](CONTRIBUTING.md)).
 - Force-pushing shared branches, including the `staging/*` test deploys ([in-game-testing.md](in-game-testing.md#testing-in-live-games)), only when the user asks.
 
