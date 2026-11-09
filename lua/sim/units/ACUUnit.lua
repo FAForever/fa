@@ -27,7 +27,8 @@ ACUUnit = ClassUnit(CommandUnit) {
         CommandUnit.CreateEnhancement(self, enh)
 
         -- Enhancements recreated after a transfer (see `TransferUnitsOwnership`) were not just completed
-        if not self.OnStopBeingBuiltEnhancementsThread then
+        local replayThread = self.OnStopBeingBuiltEnhancementsThread
+        if not replayThread or CurrentThread() ~= replayThread then
             self:SendNotifyMessage('completed', enh)
         end
         self:SetImmobile(false)
