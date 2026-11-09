@@ -32,7 +32,8 @@ local function CreateTransferredEnhancementsThread(unit, activeEnhancements)
 
         local chain = {}
         local name = enh
-        while name do
+        -- skip a prerequisite that doesn't exist (e.g. removed by a mod), since `CreateEnhancement` errors on it
+        while enhancements[name] do
             table.insert(chain, 1, name)
             name = enhancements[name].Prerequisite
         end
