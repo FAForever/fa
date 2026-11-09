@@ -646,7 +646,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         -- When paused we reclaim at a speed of 0, with thanks to:
         -- - https://github.com/FAForever/FA-Binary-Patches/pull/19
         ---@diagnostic disable-next-line: param-type-mismatch
-        if self.EntityBeingReclaimed and (not IsDestroyed(self.EntityBeingReclaimed)) and IsProp(self.EntityBeingReclaimed) then
+        if self.EntityBeingReclaimed and (not IsDestroyed(self.EntityBeingReclaimed)) and IsProp(self.EntityBeingReclaimed)
+            and self.Blueprint.General.CommandCapsHash['RULEUCC_Reclaim'] -- see `GetReclaimCosts`
+        then
             self:StopReclaimEffects(self.EntityBeingReclaimed)
             self:StopUnitAmbientSound('ReclaimLoop')
             self:PlayUnitSound('StopReclaim')
@@ -666,7 +668,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         -- When paused we reclaim at a speed of 0, with thanks to:
         -- - https://github.com/FAForever/FA-Binary-Patches/pull/19
         ---@diagnostic disable-next-line: param-type-mismatch
-        if self.EntityBeingReclaimed and (not IsDestroyed(self.EntityBeingReclaimed)) and IsProp(self.EntityBeingReclaimed) then
+        if self.EntityBeingReclaimed and (not IsDestroyed(self.EntityBeingReclaimed)) and IsProp(self.EntityBeingReclaimed)
+            and self.Blueprint.General.CommandCapsHash['RULEUCC_Reclaim'] -- see `GetReclaimCosts`
+        then
             self:StartReclaimEffects(self.EntityBeingReclaimed)
             self:PlayUnitSound('StartReclaim')
             self:PlayUnitAmbientSound('ReclaimLoop')
@@ -965,7 +969,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self:DoUnitCallbacks('OnStopReclaim', target)
         self:StopReclaimEffects(target)
         self:StopUnitAmbientSound('ReclaimLoop')
-        self:PlayUnitSound('StopReclaim')
+        if self.Blueprint.General.CommandCapsHash['RULEUCC_Reclaim'] then
+            self:PlayUnitSound('StopReclaim')
+        end
         self:SetUnitState('Reclaiming', false)
         self.EntityBeingReclaimed = nil
 
