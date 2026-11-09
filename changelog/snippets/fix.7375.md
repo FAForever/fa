@@ -1,1 +1,0 @@
-- Fix veterancy levels and Seraphim regen aura refreshes reducing health to the unbuffed max health, which was introduced in #7230. Full units now stay full when they gain a veterancy level, and units in a regen aura can heal up to the extra max health it gives (#7375).
