@@ -2001,7 +2001,7 @@ if rawget(_G, 'GetEngineInfo') then
             restart = true,
             custom = {
                 states = {
-                    { text = "Automatic (newest available)", key = 'auto' },
+                    { text = "<LOC OPTIONS_GRAPHICS_API_AUTO>Automatic (newest available)", key = 'auto' },
                     { text = "Direct3D 9", key = 'd3d9' },
                     { text = "Direct3D 11", key = 'd3d11' },
                     { text = "Direct3D 12", key = 'd3d12' },
@@ -2105,9 +2105,9 @@ if rawget(_G, 'GetEngineInfo') then
             end,
             custom = {
                 states = {
-                    { text = "Smooth", key = 2 },
-                    { text = "Small text original", key = 1 },
-                    { text = "Original", key = 0 },
+                    { text = "<LOC OPTIONS_INTERFACE_TEXT_SMOOTH>Smooth", key = 2 },
+                    { text = "<LOC OPTIONS_INTERFACE_TEXT_SMALL_ORIGINAL>Small text original", key = 1 },
+                    { text = "<LOC OPTIONS_INTERFACE_TEXT_ORIGINAL>Original", key = 0 },
                 },
             },
         })

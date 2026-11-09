@@ -859,7 +859,7 @@ Tooltips = {
     },
     options_replay_keyframe_budget = {
         title = "<LOC OPTIONS_REPLAY_KEYFRAME_BUDGET_TITLE>Replay keyframe cache (MB)",
-        description = "<LOC OPTIONS_REPLAY_KEYFRAME_BUDGET_DESCRIPTION>Disk space a replay may use for its saved positions, in the replay_keyframes folder next to the game. Over this, the oldest are thinned out, and moving far back takes longer. Cleared when the next replay starts.",
+        description = "<LOC OPTIONS_REPLAY_KEYFRAME_BUDGET_DESCRIPTION>Disk space a replay may use for its saved positions, in the replay_keyframes folder next to the game, or in faf_replay_keyframes in the system's temporary folder when the game's folder can't be written. Over this, the oldest are thinned out, and moving far back takes longer. Cleared when the next replay starts.",
     },
     options_replay_keyframe_spacing = {
         title = "<LOC OPTIONS_REPLAY_KEYFRAME_SPACING_TITLE>Replay keyframe spacing (seconds)",
