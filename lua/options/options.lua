@@ -302,7 +302,7 @@ options = {
                 type = 'slider',
                 default = 150,
                 set = function(key, value, startup)
-                    ConExecute("ui_ExplicitReclaimCameraDistance " .. tostring(value))
+                    ConExecute("ui_ReclaimCameraDistance 150")
                 end,
                 custom = {
                     min = 150,
