@@ -869,6 +869,10 @@ Tooltips = {
         title = "<LOC OPTIONS_REPLAY_KEYFRAME_PREPARE_TITLE>Replay background preparation",
         description = "<LOC OPTIONS_REPLAY_KEYFRAME_PREPARE_DESCRIPTION>A hidden low-priority copy of the game saves positions ahead of a replay you watch, so a first jump forward can load one. Off saves CPU, and jumps forward play through the game instead.",
     },
+    options_interface_text = {
+        title = "<LOC OPTIONS_INTERFACE_TEXT_TITLE>Interface text",
+        description = "<LOC OPTIONS_INTERFACE_TEXT_DESCRIPTION>Smooth draws interface text from distance-field atlases, sharp at any size. Original draws it with the Windows glyphs, as the original game does. Small text original keeps text with a font size under 13 on the Windows glyphs.",
+    },
     options_selectedlanguage = {
         title = "<LOC OPTIONS_0007>Language selection",
         description = "<LOC OPTIONS_0008>Select original or custom languages. Also changes voices if available. (needs game restart)",

@@ -2062,4 +2062,54 @@ if rawget(_G, 'GetEngineInfo') then
             table.insert(options.gameplay.items, item)
         end
     end
+
+    -- Interface text: smooth text from distance-field (MSDF) atlases, the same with small text on the
+    -- Windows glyphs, or the Windows glyphs everywhere as the original game draws them. Only on a faf-re
+    -- build that has the two console variables, which older ones don't.
+    local ConTextMatches = rawget(_G, 'ConTextMatches')
+    local function HasCommand(command)
+        if not ConTextMatches then
+            return false
+        end
+        local ok, matches = pcall(ConTextMatches, command)
+        if not ok or type(matches) ~= 'table' then
+            return false
+        end
+        for _, name in matches do
+            if name == command then
+                return true
+            end
+        end
+        return false
+    end
+
+    if not HasKey(options.video.items, 'interface_text')
+        and HasCommand('ren_MsdfText') and HasCommand('ren_MsdfTextMinSize')
+    then
+        -- The option holds a level, so a saved preference never reaches the console as text. 13: below
+        -- about 13 px the Windows glyphs' hinting matters most, and distance-field text is softer there.
+        local modes = {
+            [0] = { on = '0', minSize = '1' },
+            [1] = { on = '1', minSize = '13' },
+            [2] = { on = '1', minSize = '1' },
+        }
+        table.insert(options.video.items, {
+            title = "<LOC OPTIONS_INTERFACE_TEXT_TITLE>Interface text",
+            key = 'interface_text',
+            type = 'toggle',
+            default = 2,
+            set = function(key, value, startup)
+                local mode = modes[value] or modes[2]
+                ConExecute("ren_MsdfTextMinSize " .. mode.minSize)
+                ConExecute("ren_MsdfText " .. mode.on)
+            end,
+            custom = {
+                states = {
+                    { text = "Smooth", key = 2 },
+                    { text = "Small text original", key = 1 },
+                    { text = "Original", key = 0 },
+                },
+            },
+        })
+    end
 end
