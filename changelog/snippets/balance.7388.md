@@ -1,0 +1,3 @@
+- Base the one-time heal from gaining a veterancy level on the unit's max health without veterancy instead of its blueprint max health, so that health upgrades are included (#7388).
+  - Full units with health upgrades now stay full when they gain a veterancy level.
+  - ACU veterancy heals (10% to 50% of max health) now scale with health upgrades.
