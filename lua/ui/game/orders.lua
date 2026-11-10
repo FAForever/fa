@@ -31,7 +31,7 @@ controls = import("/lua/ui/controls.lua").Get()
 ---@field _data OrderInfo
 ---@field _curHelpText string
 ---@field _toggleMode OrderToggleMode
----@field _toggleState number|boolean
+---@field _toggleState? number|boolean
 ---@field mixedModeIcon Bitmap
 ---@field toggleModeIcon Bitmap
 ---@field autoModeIcon Bitmap
@@ -40,7 +40,7 @@ controls = import("/lua/ui/controls.lua").Get()
 ---@field _unit UserUnit
 ---@field _pod UserUnit[]
 ---@field buttonText Text
----@field _OnFirestateSelection? fun(button: OrderButton, newState: FireState, id: FireStateString)
+---@field _OnFirestateSelection? fun(button: OrderButton, newState: integer, id: FireStateString)
 ---@field _popup? FireStatePopup
 ---@field _toggleIcon? Bitmap
 ---@field _mixedIcon? Bitmap
@@ -699,7 +699,7 @@ end
 
 ---@param self OrderButton
 ---@param modifiers KeyModifiers
----@param subState? boolean
+---@param subState? boolean|number
 ---@return boolean?
 local function StatToggleOrderBehavior(self, modifiers, subState)
     local state
@@ -882,23 +882,24 @@ end
 
 ---@class FireStatePopup : Bitmap
 ---@field buttons MauiCheckbox[]
+---@field border table<string, Bitmap>
 
 ---@param parent OrderButton
 ---@param toggleState boolean|number
 ---@return FireStatePopup
 local function CreateFirestatePopup(parent, toggleState)
-    local bg = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_m.dds'))
+    local bg = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_m.dds')) --[[@as FireStatePopup]]
 
     bg.border = CreateBorder(bg)
     bg:DisableHitTest(true)
-    ---@param index FireState
+    ---@param index integer
     ---@param info OrderUIRetaliateStateData
     ---@return MauiCheckbox
     local function CreateButton(index, info)
         local btn = Checkbox(bg, GetOrderBitmapNames(info.bitmap))
         btn.info = info
         btn.index = index
-        ---@param control MauiCheckbox | { info: OrderUIRetaliateStateData, index: FireState }
+        ---@param control MauiCheckbox | { info: OrderUIRetaliateStateData, index: integer }
         ---@param event KeyEvent
         ---@return boolean
         btn.HandleEvent = function(control, event)
@@ -909,7 +910,7 @@ local function CreateFirestatePopup(parent, toggleState)
             end
             return Checkbox.HandleEvent(control, event)
         end
-        ---@param control MauiCheckbox | { info: OrderUIRetaliateStateData, index: FireState }
+        ---@param control MauiCheckbox | { info: OrderUIRetaliateStateData, index: integer }
         ---@param checked boolean
         btn.OnCheck = function(control, checked)
             parent:_OnFirestateSelection(control.index, control.info.id)
@@ -949,7 +950,7 @@ end
 local function RetaliateOrderBehavior(self, modifiers)
     if not self._OnFirestateSelection then
         ---@param button OrderButton
-        ---@param newState FireState
+        ---@param newState integer
         ---@param id FireStateString
         self._OnFirestateSelection = function(button, newState, id)
             button._toggleState = newState
