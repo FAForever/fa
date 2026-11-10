@@ -1,0 +1,1 @@
+- Fix an error when a weapon fires without creating a projectile, such as a mod weapon without a projectile blueprint (#7392).
