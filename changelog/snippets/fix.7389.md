@@ -1,0 +1,1 @@
+- Fix mobile shields and the Deceiver stopping in range of enemies while assisting when the assist order was given by the AI or a script, by checking whether they are guarding in the sim instead of relying on a UI callback (#7389).
