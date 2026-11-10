@@ -26,7 +26,7 @@ local Construction = import("/lua/ui/game/construction.lua")
 
 controls = import("/lua/ui/controls.lua").Get()
 
----@class OrderButton : Checkbox, MauiCheckbox
+---@class OrderButton : MauiCheckbox
 ---@field _order string
 ---@field _data OrderInfo
 ---@field _curHelpText string
@@ -40,10 +40,11 @@ controls = import("/lua/ui/controls.lua").Get()
 ---@field _unit UserUnit
 ---@field _pod UserUnit[]
 ---@field buttonText Text
----@field _OnFirestateSelection? fun(button: OrderButton, newState: integer|boolean, id: FireState)
+---@field _OnFirestateSelection? fun(button: OrderButton, newState: FireState, id: FireStateString)
 ---@field _popup? FireStatePopup
 ---@field _toggleIcon? Bitmap
 ---@field _mixedIcon? Bitmap
+---@field mixedIcon? Bitmap # Mixed fire state icon of the retaliate button
 
 -- Positioning controls, don't belong to file
 local layoutVar = false
@@ -128,7 +129,8 @@ local function CreateOrderButtonGrid()
 end
 
 -- Local logic data
----@type table<CommandCap, OrderButton>
+--- Order buttons by command cap, toggle cap or custom order name (like `AttackMove`)
+---@type table<CommandCap | ToggleCap | string, OrderButton>
 local orderCheckboxMap = {}
 ---@type UserUnit[]
 local currentSelection = nil
@@ -155,7 +157,7 @@ end
 -- Used by most orders, which start and stop a command mode, so they toggle on when pressed
 -- and toggle off when done
 ---@param self OrderButton
----@param modifiers EventModifiers
+---@param modifiers KeyModifiers
 local function StandardOrderBehavior(self, modifiers)
     -- If we're checked, end the current command mode, otherwise start it
     if self:IsChecked() then
@@ -290,7 +292,7 @@ end
 -- Allow the right button on the attack order to change target priorities, while the left button stays as before.
 -- would be cool to implement overloading like this onto other orders too for epic things.
 ---@param self OrderButton
----@param modifiers EventModifiers
+---@param modifiers KeyModifiers
 local function AttackOrderBehavior(self, modifiers)
     if modifiers.Left then
         StandardOrderBehavior(self, modifiers)
@@ -301,6 +303,8 @@ local function AttackOrderBehavior(self, modifiers)
 end
 
 -- Allow the right button on the guard order to distribute assisters, while the left button stays as before.
+---@param self OrderButton
+---@param modifiers KeyModifiers
 local function GuardOrderBehavior(self, modifiers)
     if modifiers and modifiers.Right then
         import("/lua/ui/game/hotkeys/distribute-assisters.lua").DistributeAssisters()
@@ -312,7 +316,7 @@ end
 
 --- Dock all units on left click, dock only damaged units on right click
 ---@param self OrderButton
----@param modifiers EventModifiers
+---@param modifiers KeyModifiers
 local function DockOrderBehavior(self, modifiers)
     if modifiers.Left then
         if modifiers.Shift then
@@ -339,7 +343,7 @@ end
 
 -- Used by orders that happen immediately and don't change the command mode (ie the stop button)
 ---@param self OrderButton
----@param modifiers EventModifiers
+---@param modifiers KeyModifiers
 local function MomentaryOrderBehavior(self, modifiers)
     IssueCommand(GetUnitCommandFromCommandCap(self._order))
     self:SetCheck(false)
@@ -397,7 +401,8 @@ function SoftStop(units)
     Stop(EntityCategoryFilterOut((categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY + categories.SILO, units))
 end
 
----@param modifiers EventModifiers
+---@param self OrderButton
+---@param modifiers KeyModifiers
 function StopOrderBehavior(self, modifiers)
     local userKeyMap = Prefs.GetFromCurrentProfile("UserKeyMap")
     if userKeyMap['S'] == 'soft_stop' and not modifiers.Shift then
@@ -408,7 +413,8 @@ function StopOrderBehavior(self, modifiers)
 end
 
 -- Used by units that build silo ammo
----@param modifiers EventModifiers
+---@param self OrderButton
+---@param modifiers KeyModifiers
 local function BuildOrderBehavior(self, modifiers)
     if modifiers.Left then
         IssueCommand(GetUnitCommandFromCommandCap(self._order))
@@ -442,7 +448,7 @@ end
 
 -- Used by subs that can dive/surface
 ---@param self OrderButton
----@param modifiers EventModifiers
+---@param modifiers KeyModifiers
 local function DiveOrderBehavior(self, modifiers)
     if modifiers.Left then
         local unitList = GetSelectedUnits()
@@ -556,7 +562,7 @@ end
 
 -- Pause button specific behvior
 ---@param self OrderButton
----@param modifiers EventModifiers
+---@param modifiers KeyModifiers
 local function PauseOrderBehavior(self, modifiers)
     Checkbox.OnClick(self, modifiers)
     SetPaused(currentSelection, self:IsChecked())
@@ -584,7 +590,7 @@ local function CheckReverseSemantics(scriptBit)
 end
 
 ---@param self OrderButton
----@param modifiers EventModifiers
+---@param modifiers KeyModifiers
 local function AttackMoveBehavior(self, modifiers)
     if self:IsChecked() then
         CommandMode.EndCommandMode(true)
@@ -600,7 +606,7 @@ local function AttackMoveBehavior(self, modifiers)
 end
 
 ---@param self OrderButton
----@param modifiers EventModifiers
+---@param modifiers KeyModifiers
 local function AbilityButtonBehavior(self, modifiers)
     if self:IsChecked() then
         CommandMode.EndCommandMode(true)
@@ -617,8 +623,8 @@ end
 
 -- Generic script button specific behvior
 ---@param self OrderButton
----@param modifiers EventModifiers
----@param subState boolean
+---@param modifiers KeyModifiers
+---@param subState? boolean
 local function ScriptButtonOrderBehavior(self, modifiers, subState)
     local state
     if subState ~= nil then
@@ -648,8 +654,8 @@ end
 
 --Allow the right button on shieldtoggle to disharge the shields
 ---@param self OrderButton
----@param modifiers EventModifiers
----@param subState boolean
+---@param modifiers KeyModifiers
+---@param subState? boolean
 local function ShieldToggleOrderBehavior(self, modifiers, subState)
     if modifiers and modifiers.Right then
         SimCallback({ Func = "DischargeShields", Args = {} }, true)
@@ -662,7 +668,9 @@ end
 -- Generic script button specific behvior
 ---@param control OrderButton
 ---@param unitList UserUnit[]
----@param subCheck boolean
+---@param subCheck? boolean # If true, returns the state instead of setting the button's check
+---@return boolean? result # nil if the unit list is empty; true if the states are mixed
+---@return boolean? mixed
 local function ScriptButtonInitFunction(control, unitList, subCheck)
     local result = nil
     local mixed = false
@@ -690,8 +698,8 @@ local function ScriptButtonInitFunction(control, unitList, subCheck)
 end
 
 ---@param self OrderButton
----@param modifiers EventModifiers
----@param subState boolean | number
+---@param modifiers KeyModifiers
+---@param subState? boolean
 ---@return boolean?
 local function StatToggleOrderBehavior(self, modifiers, subState)
     local state
@@ -724,7 +732,9 @@ end
 
 ---@param control OrderButton
 ---@param unitList UserUnit[]
----@param subCheck boolean
+---@param subCheck? boolean # If true, returns the state instead of setting the button's check
+---@return boolean? result # nil if the unit list is empty; true if the states are mixed
+---@return boolean? mixed
 local function StatToggleInitFunction(control, unitList, subCheck)
     local result = nil
     local mixed = false
@@ -752,7 +762,7 @@ local function StatToggleInitFunction(control, unitList, subCheck)
 end
 
 ---@param self OrderButton
----@param modifiers EventModifiers
+---@param modifiers KeyModifiers
 local function DroneBehavior(self, modifiers)
     if modifiers.Left then
         SelectUnits(self._unit)
@@ -805,7 +815,7 @@ local function DroneInit(self, selection)
 end
 
 ---@param self OrderButton
----@param modifiers EventModifiers
+---@param modifiers KeyModifiers
 local function ExternalFactoryBehavior(self, modifiers)
     if modifiers.Left then
         SelectUnits(self._unit)
@@ -813,7 +823,7 @@ local function ExternalFactoryBehavior(self, modifiers)
 end
 
 ---@class OrderUIRetaliateStateData
----@field bitmap "stand-ground" | "return-fire" | "hold-fire" | "stand-ground"
+---@field bitmap "stand-ground" | "return-fire" | "hold-fire"
 ---@field helpText "mode_mixed" | "mode_return_fire" | "mode_hold_fire" | "mode_hold_ground"
 ---@field id? FireStateString
 
@@ -871,7 +881,7 @@ local function CreateBorder(parent)
 end
 
 ---@class FireStatePopup : Bitmap
----@field buttons table<number, Checkbox>
+---@field buttons MauiCheckbox[]
 
 ---@param parent OrderButton
 ---@param toggleState boolean|number
@@ -881,14 +891,14 @@ local function CreateFirestatePopup(parent, toggleState)
 
     bg.border = CreateBorder(bg)
     bg:DisableHitTest(true)
-    ---@param index integer
+    ---@param index FireState
     ---@param info OrderUIRetaliateStateData
     ---@return MauiCheckbox
     local function CreateButton(index, info)
         local btn = Checkbox(bg, GetOrderBitmapNames(info.bitmap))
         btn.info = info
         btn.index = index
-        ---@param control Checkbox | { info: OrderUIRetaliateStateData, index: integer }
+        ---@param control MauiCheckbox | { info: OrderUIRetaliateStateData, index: FireState }
         ---@param event KeyEvent
         ---@return boolean
         btn.HandleEvent = function(control, event)
@@ -899,7 +909,7 @@ local function CreateFirestatePopup(parent, toggleState)
             end
             return Checkbox.HandleEvent(control, event)
         end
-        ---@param control Checkbox | { info: OrderUIRetaliateStateData, index: integer }
+        ---@param control MauiCheckbox | { info: OrderUIRetaliateStateData, index: FireState }
         ---@param checked boolean
         btn.OnCheck = function(control, checked)
             parent:_OnFirestateSelection(control.index, control.info.id)
@@ -935,11 +945,11 @@ local function CreateFirestatePopup(parent, toggleState)
 end
 
 ---@param self OrderButton
----@param modifiers EventModifiers
+---@param modifiers KeyModifiers
 local function RetaliateOrderBehavior(self, modifiers)
     if not self._OnFirestateSelection then
         ---@param button OrderButton
-        ---@param newState integer
+        ---@param newState FireState
         ---@param id FireStateString
         self._OnFirestateSelection = function(button, newState, id)
             button._toggleState = newState
@@ -1117,7 +1127,7 @@ local function OverchargeInit(control, unitList)
 end
 
 ---@param self OrderButton
----@param modifiers EventModifiers
+---@param modifiers KeyModifiers
 function OverchargeBehavior(self, modifiers)
     if modifiers.Left then
         EnterOverchargeMode()
@@ -1185,7 +1195,7 @@ local function OverchargeFrame(self, deltaTime)
 end
 
 ---@param self OrderButton
----@param modifiers EventModifiers
+---@param modifiers KeyModifiers
 AutoDeployBehavior = function(self, modifiers)
     if modifiers.Left then
         StandardOrderBehavior(self, modifiers)
@@ -1213,7 +1223,7 @@ AutoDeployInit = function(self, selection)
 end
 
 ---@param self OrderButton
----@param modifiers EventModifiers
+---@param modifiers KeyModifiers
 local function TransportOrderBehavior(self, modifiers)
     if modifiers.Left then
         StandardOrderBehavior(self, modifiers)
@@ -1237,12 +1247,12 @@ end
 ---@field helpText string
 ---@field bitmapId string
 ---@field preferredSlot integer
----@field behavior function
----@field initialStateFunc? fun(control: Control, unitList: table<Unit>): any
----@field onframe? fun(control: Control, delta: number)
----@field ButtonTextFunc? fun(button: Button): string
+---@field behavior fun(self: OrderButton, modifiers: KeyModifiers)
+---@field initialStateFunc? fun(control: OrderButton, unitList: UserUnit[]): any
+---@field onframe? fun(control: OrderButton, delta: number)
+---@field ButtonTextFunc? fun(button: OrderButton): string
 ---@field extraInfo? any
----@field statToggle 'AutoDeploy' | string # Which stat from the unit blueprint's StatToggles to set. Used by external factory AutoDeploy.
+---@field statToggle? 'AutoDeploy' | string # Which stat from the unit blueprint's StatToggles to set. Used by external factory AutoDeploy.
 
 
 --- Sets up an orderInfo for each order that comes in
@@ -1336,7 +1346,7 @@ OnClick callback is called, self._data will contain this info.
 ]]
 ---@param orderInfo OrderInfo
 ---@param slot integer
----@param batchMode boolean
+---@param batchMode? boolean
 ---@return OrderButton
 local function AddOrder(orderInfo, slot, batchMode)
     batchMode = batchMode or false
