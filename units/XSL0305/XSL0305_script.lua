@@ -128,13 +128,15 @@ XSL0305 = ClassUnit(SLandUnit) {
         end
 
         local weapon = self:GetWeaponByLabel("MainGun")
+        ---@cast weapon -nil
         local bp = self:GetWeaponByLabel(label):GetBlueprint()
 
         -- a lot of the firing sequence relies on the stored blueprint - we'll store the current
         -- weapon blueprint so that it works
         weapon.Blueprint = bp
         weapon.FxMuzzleFlash = self.Weapons[label].FxMuzzleFlash
-        weapon.damageTableCache = false
+        weapon.damageTableCache = false -- Force recomputation of the weapon table cache
+        weapon.damageTableCacheValid = false -- Force recomputation of the weapon table cache
         weapon:ChangeProjectileBlueprint(bp.ProjectileId)
         weapon:ChangeFiringTolerance(bp.FiringTolerance) -- kept for backwards compatibility
         weapon:ChangeMaxRadius(bp.MaxRadius)

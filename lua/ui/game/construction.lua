@@ -79,18 +79,6 @@ function setUpgradeAndAllowing(upgradesTo_, allowOthers_)
     allowOthers = allowOthers_
 end
 
-if options.gui_draggable_queue ~= 0 then
-    -- Add gameparent handleevent for if the drag ends outside the queue window
-    local gameParent = import("/lua/ui/game/gamemain.lua").GetGameParent()
-    local oldGameParentHandleEvent = gameParent.HandleEvent
-    gameParent.HandleEvent = function(self, event)
-        if event.Type == 'ButtonRelease' then
-            import("/lua/ui/game/construction.lua").ButtonReleaseCallback()
-        end
-        oldGameParentHandleEvent(self, event)
-    end
-end
-
 local cutA = 0
 local cutB = 0
 if options.gui_visible_template_names ~= 0 then
@@ -1461,7 +1449,9 @@ function OnClickHandler(button, modifiers)
                     if not table.empty(exFacs) then
                         local exFacUnits = EntityCategoryFilterOut(categories.EXTERNALFACTORY, selection)
                         for _, exFac in exFacs do
-                            table.insert(exFacUnits, exFac:GetCreator())
+                            if exFac:GetFractionComplete() == 1 then
+                                table.insert(exFacUnits, exFac:GetCreator())
+                            end
                         end
                         -- in case we've somehow selected both the platform and the factory, only put the fac in once
                         exFacUnits = table.unique(exFacUnits)
@@ -1920,7 +1910,9 @@ function CreateExtraControls(controlType)
             SetPaused(sortedOptions.selection, checked)
             -- If we have exFacs platforms or exFac units selected, we'll pause their counterparts as well
             for _, exFac in EntityCategoryFilterDown(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, sortedOptions.selection) do
-                exFac:GetCreator():ProcessInfo('SetPaused', tostring(checked))
+                if exFac:GetFractionComplete() == 1 then
+                    exFac:GetCreator():ProcessInfo('SetPaused', tostring(checked))
+                end
             end
         end
         if pauseEnabled then
@@ -1940,7 +1932,9 @@ function CreateExtraControls(controlType)
             for _, v in sortedOptions.selection do
                 v:ProcessInfo('SetRepeatQueue', tostring(checked))
                 if EntityCategoryContains(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, v) then
-                    v:GetCreator():ProcessInfo('SetRepeatQueue', tostring(checked))
+                    if v:GetFractionComplete() == 1 then
+                        v:GetCreator():ProcessInfo('SetRepeatQueue', tostring(checked))
+                    end
                 end
             end
         end
@@ -2428,7 +2422,8 @@ function SetSecondaryDisplay(type)
                         table.insert(data, {type = 'enhancementqueue', unitID = item.id, icon = item.icon, name = item.name, enhancement = item.enhancement})
                     else
                         newStack = {type = 'queuestack', id = item.id, count = item.displayCount or item.count, position = index}
-                        if lastStack and lastStack.id == newStack.id then
+                        -- stacking the queue while dragging an item will make dragging show the wrong index
+                        if not dragging and lastStack and lastStack.id == newStack.id then
                             newStack.position = index - 1
                         else
                             index = index + 1
@@ -2517,7 +2512,9 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         -- Queue display is easy: if we've got one unit selected, and it's an exFac platform,
         -- show the queue of its attached external factory
         -- this automatically supports removing/modifying the queue, neat!
-        if EntityCategoryContains(categories.EXTERNALFACTORY, selection[1]) then
+        if EntityCategoryContains(categories.EXTERNALFACTORY, selection[1])
+            and selection[1]:GetFractionComplete() == 1
+        then
             currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1]:GetCreator())
         else
             currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1])

@@ -86,7 +86,11 @@ UnitBlueprint{
     LifeBarSize = 1,
     Physics = {
         BuildOnLayerCaps = {
+            LAYER_Air = false,
             LAYER_Land = true,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
             LAYER_Water = true,
         },
         DragCoefficient = 0.2,
@@ -126,7 +130,7 @@ UnitBlueprint{
             FiringTolerance = 0.5,
             Label = "Turret01",
             MaxRadius = 31,
-            MaximumBeamLength = 42,
+            MaximumBeamLength = 60,
             MinRadius = 2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,

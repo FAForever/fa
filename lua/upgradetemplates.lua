@@ -105,6 +105,8 @@ StructureUpgradeTemplates =
         { 'uab3102', 'uab3202'},
         { 'uab3202', 'uas0305'},
 
+        -- Shield
+        { 'uab4202', 'uab4301'},
 
     },
 

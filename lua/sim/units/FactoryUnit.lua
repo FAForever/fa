@@ -1,4 +1,7 @@
 
+local Unit = import("/lua/sim/unit.lua").Unit
+local UnitOnStopBuild = Unit.OnStopBuild
+
 local StructureUnit = import("/lua/sim/units/structureunit.lua").StructureUnit
 local StructureUnitOnCreate = StructureUnit.OnCreate
 local StructureUnitOnDestroy = StructureUnit.OnDestroy
@@ -137,6 +140,11 @@ FactoryUnit = ClassUnit(StructureUnit) {
             self.DisabledAssist = nil
         end
 
+        -- Factory can stop building but still have an unbuilt unit if a mobile build order is issued and the order is cancelled
+        if not IsDestroyed(unitBeingBuilt) and unitBeingBuilt:GetFractionComplete() < 1 then
+            unitBeingBuilt:Destroy()
+        end
+
         if not (self.FactoryBuildFailed or IsDestroyed(self)) then
             self:StopBuildFx()
 
@@ -193,10 +201,25 @@ FactoryUnit = ClassUnit(StructureUnit) {
 
     ---@param self FactoryUnit
     OnFailedToBuild = function(self)
+        local unitBeingBuilt = self.UnitBeingBuilt
+        if unitBeingBuilt and not unitBeingBuilt.Dead then
+            -- Instantly clear the build area so the next build can start, since unit `Destroy` doesn't do so.
+            unitBeingBuilt:SetCollisionShape("None")
+        end
         StructureUnitOnFailedToBuild(self)
         self.FactoryBuildFailed = true
         self:StopBuildFx()
         ChangeState(self, self.IdleState)
+    end,
+
+    --- When the factory is killed, kills the unit being built, with veterancy dispersal and credit to the instigator.
+    ---@param self FactoryUnit
+    ---@param instigator Unit | Projectile
+    ---@param type string
+    ---@param overkillRatio number
+    OnKilled = function(self, instigator, type, overkillRatio)
+        self:KillUnitBeingBuilt(instigator, type, overkillRatio)
+        StructureUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
 
     --#endregion
@@ -204,18 +227,38 @@ FactoryUnit = ClassUnit(StructureUnit) {
     ---------------------------------------------------------------------------
     --#region Lua functionality
 
+    --- Kills the unit being built, with veterancy dispersal and credit to the instigator.
+    ---@param self FactoryUnit
+    ---@param instigator Unit | Projectile
+    ---@param type string
+    ---@param overkillRatio number
+    KillUnitBeingBuilt = function(self, instigator, type, overkillRatio)
+        local unitBeingBuilt = self.UnitBeingBuilt
+        if unitBeingBuilt and not unitBeingBuilt.Dead and not unitBeingBuilt.isFinishedUnit then
+            -- Detach the unit to allow things like sinking
+            unitBeingBuilt:DetachFrom(true)
+            -- Disperse the unit's veterancy to our killers
+            -- only take remaining HP so we don't double count
+            -- Identical logic is used for cargo of transports, so this vet behavior is consistent.
+            self:VeterancyDispersal(unitBeingBuilt:GetTotalMassCost() * unitBeingBuilt:GetHealth() / unitBeingBuilt:GetMaxHealth())
+            if instigator then
+                unitBeingBuilt:Kill(instigator, type, 0)
+            else
+                unitBeingBuilt:Kill()
+            end
+        end
+    end,
+
+    --- Destroys the unit being built if it isn't already dead/destroyed, this fixes cases
+    --- where the factory is reclaimed or transferred and the unit being built still exists.
     ---@param self FactoryUnit
     DestroyUnitBeingBuilt = function(self)
         local unitBeingBuilt = self.UnitBeingBuilt --[[@as Unit]]
-        if (not IsDestroyed(unitBeingBuilt)) then
-            local fraction = unitBeingBuilt:GetFractionComplete()
-            if fraction < 1.0 then
-                if fraction > 0.5 then
-                    unitBeingBuilt:Kill()
-                else
-                    unitBeingBuilt:Destroy()
-                end
-            end
+        -- unit is dead, so it should destroy itself
+        if not unitBeingBuilt.Dead and not IsDestroyed(unitBeingBuilt)
+            and not unitBeingBuilt.isFinishedUnit
+        then
+            unitBeingBuilt:Destroy()
         end
     end,
 
@@ -426,6 +469,32 @@ FactoryUnit = ClassUnit(StructureUnit) {
         ---@param self FactoryUnit
         Main = function(self)
             self:RolloffBody()
+        end,
+    },
+
+    UpgradingState = State(StructureUnit.UpgradingState) {
+        --- Copied from `StructureUnit.UpgradingState.OnStopBuild` and modified
+        --- to unblock the build area when the factory upgrade finishes.
+        ---@see StructureUnit.UpgradingState.OnStopBuild
+        ---@param self FactoryUnit
+        ---@param unitBuilding Unit
+        ---@param order string
+        OnStopBuild = function(self, unitBuilding, order)
+            UnitOnStopBuild(self, unitBuilding, order)
+            self:EnableDefaultToggleCaps()
+
+            if unitBuilding:GetFractionComplete() == 1 then
+                NotifyUpgrade(self, unitBuilding)
+                self:StopUpgradeEffects(unitBuilding)
+                self:PlayUnitSound('UpgradeEnd')
+
+                -- Since `Destroy` wouldn't do so, immediately unblock the build area
+                -- of the new factory by setting collision shape to none. This allows
+                -- the new factory to immediately start working on its queue.
+                self:SetCollisionShape("None")
+
+                self:Destroy()
+            end
         end,
     },
 

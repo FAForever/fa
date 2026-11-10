@@ -9,8 +9,8 @@ local AIUtils = import("/lua/ai/aiutilities.lua")
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 
 --- BasicLandAttackChildCountDifficulty = BuildCondition   doc = "Please work function docs."
----@param aiBrain AIBrain default_brain
----@param master string default_master
+---@param aiBrain CampaignAIBrain
+---@param master string
 ---@return boolean
 function BasicLandAttackChildCountDifficulty(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master)
@@ -20,8 +20,8 @@ function BasicLandAttackChildCountDifficulty(aiBrain, master)
 end
 
 --- BasicLandAttackMasterCountDifficulty = BuildCondition   doc = "Please work function docs."
----@param aiBrain AIBrain default_brain
----@param master string default_master
+---@param aiBrain CampaignAIBrain
+---@param master string
 ---@return boolean
 function BasicLandAttackMasterCountDifficulty(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master)
@@ -30,9 +30,9 @@ function BasicLandAttackMasterCountDifficulty(aiBrain, master)
     return counter >= number
 end
 
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param masterName string
----@param locationName Vector
+---@param locationName string
 ---@return boolean
 function NeedTransports(aiBrain, masterName, locationName)
     if not ScenarioInfo.OSPlatoonCounter[masterName .. "_Transports"] then

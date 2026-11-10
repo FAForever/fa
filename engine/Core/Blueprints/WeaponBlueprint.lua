@@ -20,6 +20,12 @@
 -- read more here: https://wiki.faforever.com/en/Blueprints
 
 ---@class WeaponBlueprint: Blueprint
+--- During blueprint loading, which Label to look for when merging into a weapon blueprint.
+--- If the original weapon has multiple weapons with that label, they are all merged into.
+---@field MergeLabel? string
+--- During blueprint loading, if `MergeLabel` is not found, which index the weapon should be added at.  
+--- For example, index 1 controls the unit's weapon AI. Defaults to adding to the end of the `Weapon` table.
+---@field AddIndex? number
 --- if this weapon will only fire if it is above water
 ---@field AboveWaterFireOnly? boolean
 --- if this weapon will only fire at targets above water
@@ -31,10 +37,14 @@
 ---@field AimsStraightOnDisable boolean
 --- always recheck for better target regardless of whether you already have one or not
 ---@field AlwaysRecheckTarget boolean
---- used by the Omen's script
----@field AnimationOpen? FileName
+--- animation played by the weapon's Rack Salvo Charge Sequence
+---@field AnimationCharge? FileName
+--- How fast the charge animation runs
+---@field AnimationChargeRate? number
 --- animation played by the weapon's Rack Salvo Reload Sequence
 ---@field AnimationReload? FileName
+--- How fast the reload animation runs
+---@field AnimationReloadRate? number
 --- if an anti-artillery shield will block this projectile
 ---@field ArtilleryShieldBlocks? boolean
 --- information about the audio files used by the weapon
@@ -56,7 +66,7 @@
 ---@field BombDropThreshold? number
 --- information about the bonuses added to the weapon when it reaches a specific veterancy level
 ---@field Buffs BlueprintBuff[]
---- used by the Lobo script to pass the lifetime of the vision marker created upon landing
+--- used by UEL0103 (Lobo) script to pass the lifetime of the vision marker created upon landing
 ---@field CameraLifetime? number
 --- time to maintain the camera shake
 ---@field CameraShakeDuration? number
@@ -64,7 +74,7 @@
 ---@field CameraShakeMax? number
 --- minimum size of the camera shake
 ---@field CameraShakeMin? number
---- used by the Lobo script to pass the radius of the vision marker created upon landing
+--- used by UEL0103 (Lobo) script to pass the radius of the vision marker created upon landing
 ---@field CameraVisionRadius? number
 --- how far from the unit should the camera shake
 ---@field CameraShakeRadius number
@@ -74,7 +84,8 @@
 ---@field CollideFriendly boolean
 --- beams fire without stopping - overrides `RateOfFire`
 ---@field ContinuousBeam boolean
---- this projectile needs to be built and stored before the weapon can fire
+--- This projectile needs to be built and stored before the weapon can fire.
+--- Makes the engine check if the weapon has silo ammo before being allowed to fire.
 ---@field CountedProjectile? boolean
 --- damage value of the projectile fired from the weapon
 ---@field Damage number
@@ -97,6 +108,9 @@
 --- Name of the weapon. Used for lobby restrictions and for debugging:
 --- `dbg weapons` in the console shows the weapon names.
 ---@field DisplayName string
+--- if true, the impact deals only `InitialDamage` and no DoT pulse is consumed at impact:
+--- all `DoTPulses` are dealt over `DoTTime`. Projectile weapons only, ignored by beams.
+---@field DoTDelayFirstPulse? boolean
 --- number of times the Damage over Time damage will be dealt
 ---@field DoTPulses number
 --- duration that the Damage over Time will last in seconds
@@ -192,7 +206,7 @@
 --- Speed at which the projectile comes out of the muzzle. This speed is used in the ballistics
 --- calculations. If you weapon doesn't fire at its max radius, this may be too low.
 ---@field MuzzleChargeStart? number
---- used by the Galactic Colossus
+--- Determines which bone units are tractored to. Used by `ADFTractorClaw` (UAL0401 Galactic Colossus's tractor beam)
 ---@field MuzzleSpecial? number
 --- the exit velocity of the projectile once created at the muzzle of the barrel 
 ---@field MuzzleVelocity number
@@ -209,7 +223,8 @@
 --- sets `AlwaysRecheckTarget = false` and prevents automatic target resetting
 --- so that bombers don't retarget halfway through a bombing run
 ---@field NeedToComputeBombDrop? boolean
---- if the unit is set as "busy" while the weapon charges
+--- Controls whether the unit is set as "busy" while the weapon charges/reloads/fires. Set to `true` to allow
+--- other weapons to fire/unit actions to occur while this weapon is working.
 ---@field NotExclusive? boolean
 ---@field NoPause any unused
 --- The damage that the inner ring of the nuke does in each segment. The outer damage will also end
@@ -234,11 +249,11 @@
 --- The total time in seconds it takes the outer damage ring to apply its damage from the epicenter
 --- of the nuke to its outer ring radius. If `0` or `1`, this behaves as a damage area.
 ---@field NukeOuterRingTotalTime? number
---- nuke weapon flag
+--- Flag that makes weapons valid for nuke orders and makes them use nuke silo ammo.
 ---@field NukeWeapon? boolean
 ---@field Overcharge? WeaponBlueprintOvercharge
 --- overcharge weapon flag
----@field OverchargeWeapon? boolean
+---@field OverChargeWeapon? boolean
 --- flag that specifies if the weapon prefers to target what the primary weapon is currently
 --- targeting
 ---@field PrefersPrimaryWeaponTarget? boolean
@@ -276,9 +291,11 @@
 ---@field RateOfFire number
 --- if this weapon will find new target on miss events
 ---@field ReTargetOnMiss? boolean
---- if `true`, will set the orange work progress bar to display the reload progress of this weapon
+--- if `true`, will set the orange work progress bar to display the reload progress of this weapon.
+--- Should not be used for units with silo weapons, as the work progress of the reload will transfer
+--- as silo build progress after unit transfer.
 ---@field RenderFireClock? boolean
---- used by the Othuy ("lighting storm") to define the time to re-aquire a new target before going
+--- used by the XSL0402 (Othuy "lighting storm") to define the time to re-aquire a new target before going
 --- through the next lighting strike process
 ---@field RequireTime? number
 --- the number of projectiles in the firing salvo
@@ -369,6 +386,8 @@
 --- as a moble artillery unit or when a unit is required to be stationary during an unpack / repack
 --- sequence.
 ---@field WeaponUnpackLocksMotion? boolean
+--- Deprecated. Use `WeaponUnpackLocksMotion` instead.
+---@field WeaponUnpackLockMotion? boolean
 --- time the unit will take to unpack the weapon
 ---@field WeaponUnpackTimeout? number
 --- if the weapon must unpack before it's ready to fire

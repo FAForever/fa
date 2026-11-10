@@ -10,7 +10,7 @@ local CSeaUnit = import("/lua/cybranunits.lua").CSeaUnit
 local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CDFProtonCannonWeapon = CybranWeaponsFile.CDFProtonCannonWeapon
 local CAANanoDartWeapon = CybranWeaponsFile.CAANanoDartWeapon
-local CDFMissileRedirectWeapon02 = import("/lua/sim/weapons/cybran/CDFMissileRedirectWeapon02.lua").CDFMissileRedirectWeapon02
+local CDFMissileRedirectWeapon02 = import("/lua/sim/weapons/cybran/cdfmissileredirectweapon02.lua").CDFMissileRedirectWeapon02
 
 ---@class URS0202 : CSeaUnit
 URS0202 = ClassUnit(CSeaUnit) {

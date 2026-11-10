@@ -234,12 +234,12 @@ UnitBlueprint{
             RateOfFire = 10/100, --10/integer interval in ticks
             TargetPriorities = {
                 "CRUISER",
-                "(NAVAL * TECH2 * SHIELD)",
-                "(STRUCTURE * DEFENSE * ANTIAIR)",
-                "(TECH3 * NAVAL * CARRIER)",
+                "NAVAL TECH2 SHIELD",
+                "STRUCTURE DEFENSE ANTIAIR",
+                "TECH3 NAVAL CARRIER",
                 "SUBMERSIBLE",
-                "NAVAL * TECH2",
-                "NAVAL * TECH3",
+                "NAVAL TECH2",
+                "NAVAL TECH3",
                 "MOBILE",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",
                 "ALLUNITS",

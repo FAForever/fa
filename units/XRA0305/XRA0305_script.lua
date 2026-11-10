@@ -13,15 +13,18 @@ local CDFLaserDisintegratorWeapon = import("/lua/cybranweapons.lua").CDFLaserDis
 
 ---@class XRA0305 : CAirUnit
 XRA0305 = ClassUnit(CAirUnit) {
-    
     Weapons = {
         Missiles1 = ClassWeapon(CAAMissileNaniteWeapon) {},
         Disintegrator01 = ClassWeapon(CDFLaserDisintegratorWeapon) {},
     },
-    
-    OnStopBeingBuilt = function(self,builder,layer)
-        CAirUnit.OnStopBeingBuilt(self,builder,layer)
+
+    ---@param self XRA0305
+    ---@param builder Unit
+    ---@param layer Layer
+    OnStopBeingBuilt = function(self, builder, layer)
+        CAirUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
     end,
 }
+
 TypeClass = XRA0305

@@ -55,6 +55,8 @@ ExternalFactoryUnit = import("/lua/sim/units/externalfactoryunit.lua").ExternalF
 -------------------------------------------------------------------------------
 --#region Backwards compatibility
 
+DummyUnit = import("/lua/sim/unit.lua").DummyUnit
+
 local Entity = import("/lua/sim/entity.lua").Entity
 local Unit = import("/lua/sim/unit.lua").Unit
 local explosion = import("/lua/defaultexplosions.lua")

@@ -21,7 +21,7 @@ UnitBlueprint{
         LiftFactor = 5,
         MaxAirspeed = 18,
         MinAirspeed = 8,
-        StartTurnDistance = 10,
+        StartTurnDistance = 5,
         TightTurnMultiplier = 1.03,
         TurnSpeed = 1.8,
         Winged = true,

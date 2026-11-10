@@ -11,16 +11,21 @@ local CreateAeonParagonBuildingEffects = import("/lua/effectutilities.lua").Crea
 
 ---@class XAB1401 : AStructureUnit
 XAB1401 = ClassUnit(AStructureUnit) {
-
     Weapons = {
         DeathWeapon = ClassWeapon(DeathNukeWeapon) {},
     },
 
+    ---@param self XAB1401
+    ---@param builder Unit
+    ---@param layer Layer
     StartBeingBuiltEffects = function(self, builder, layer)
         AStructureUnit.StartBeingBuiltEffects(self, builder, layer)
         CreateAeonParagonBuildingEffects(self)
     end,
 
+    ---@param self XAB1401
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         AStructureUnit.OnStopBeingBuilt(self, builder, layer)
 
@@ -36,6 +41,7 @@ XAB1401 = ClassUnit(AStructureUnit) {
     end,
 
     ResourceOn = State {
+        ---@param self XAB1401
         Main = function(self)
             local aiBrain = self:GetAIBrain()
             local massAdd = 0
@@ -69,11 +75,12 @@ XAB1401 = ClassUnit(AStructureUnit) {
                 end
                 self:SetProductionPerSecondEnergy(energyAdd)
 
-                WaitTicks(6)
+                WaitTicks(1)
             end
         end,
     },
 
+    ---@param self? XAB1401 # unused
     GetRandomDir = function(self)
         local num = Random(0, 2)
         if num > 1 then

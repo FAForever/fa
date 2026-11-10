@@ -9,11 +9,18 @@
 ---@alias AIExpansionOptionValue '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8'
 ---| '99999' unlimited expansions allowed
 
+---@alias VictoryCondition 'demoralization' | 'domination' | 'eradication' | 'sandbox' | 'decapitation'
+---@alias ShareOption "CivilianDeserter" | "Defectors" | "FullShare" | "PartialShare" | "ShareUntilDeath" | "TransferToKiller"
+---@alias DisconnectShareOption ShareOption | "SameAsShare"
+---@alias DisconnectShareCommandersOption "Explode" | "Permanent" | "Recall" | "RecallDelayed"
+---@alias CommonArmyOption "Off" | "UnionWhenDisconnected" | "Union" | "Common"
+
 --- Additionally, extra options can be specified by the map in `mapname .. 'options.lua'`
 ---@class GameOptions
 ---@field AutoTeams 'none' | 'manual' | 'tvsb' | 'lvsr' | 'pvsi'
 ---@field TeamLock 'locked' | 'unlocked'
 ---@field TeamSpawn 'fixed' | 'random' | 'balanced' | 'balanced_flex' | 'random_reveal' | 'balanced_reveal' | 'balanced_reveal_mirrored' | 'balanced_flex_reveal'
+---@field TeamShareOverflow "enabled" | "disabled"
 ---
 ---@field AllowObservers boolean
 ---@field CheatsEnabled 'false' | 'true'
@@ -22,18 +29,21 @@
 ---@field FogOfWar 'none' | 'explored'
 ---@field GameSpeed 'normal' | 'fast' | 'adjustable'
 ---@field ManualUnitShare 'none' | 'no_builders' | 'all'
----@field NoRushOption '1' | '2' | '3' | '4' | '5' | '10' | '15' | '20' | '25' | '30' | '35' | '40' | '45' | '50' | '55' | '60'
+---@field NoRushOption '1' | '2' | '3' | '4' | '5' | '10' | '15' | '20' | '25' | '30' | '35' | '40' | '45' | '50' | '55' | '60' | 'Off'
 ---@field PrebuiltUnits 'Off' | 'On'
 ---@field Ranked boolean
 ---@field RevealCivilians 'No' | 'Yes'
 ---@field RandomMap 'Off' | 'Official' | 'All'
 ---@field Score 'no' | 'yes'
----@field Share 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
+---@field Share ShareOption
+---@field DisconnectShare DisconnectShareOption
+---@field DisconnectShareCommanders DisconnectShareCommandersOption
 ---@field ShareUnitCap 'none' | 'allies' | 'all'
----@field Timeouts '0' | '3'| '-1'
+---@field Timeouts '0' | '3'| '-1' | -1
 ---@field UnitCap '125' | '250' | '375' | '500' | '625' | '750' | '875' | '1000' | '1250' | '1500'
----@field UnRanked 'false' | 'true
----@field Victory 'demoralization' | 'domination' | 'eradication' | 'sandbox'
+---@field Unranked 'No' | 'Yes'
+---@field Victory VictoryCondition
+---@field CommonArmy CommonArmyOption
 ---
 ---@field BuildMult AIMultiplierOptionValue
 ---@field CheatMult AIMultiplierOptionValue
@@ -178,8 +188,13 @@ teamOptions =
                 key = 'Off'
             },
             {
+                text = "<LOC lobui_CAUponDisconnectTitle>Union control upon disconnect",
+                help = "<LOC lobui_CAUponDisconnectDescription>Initially each player has their own army and their own resources. When a player disconnects the army is not considered defeated and the share condition does not trigger. Instead, allied players can switch focus to the disconnected army to issue commands.",
+                key = 'UnionWhenDisconnected'
+            },
+            {
                 text = "<LOC lobui_CAUnion>Multiple armies, union control",
-                help = "<LOC lobui_CAUDesc>Each player has their own army and their own resources. Allied players can switch focus to your army and to issue commands.",
+            help = "<LOC lobui_CAUDesc>Each player has their own army and their own resources. Allied players can switch focus to your army and to issue commands.",
                 key = 'Union'
             },
             {
@@ -189,48 +204,142 @@ teamOptions =
             }
         }
     },
+
+    {
+        default = 1,
+        label = "<LOC lobui_resource_sharing_label>Overflow",
+        help = "<LOC lobui_resource_sharing_help>Set whether distribution of excess resources to allies is initially enabled or disabled. Players can toggle it through the diplomacy menu when teams are unlocked.",
+        key = 'TeamShareOverflow',
+        values = {
+            {
+                text = "<LOC lobui_resource_sharing_enabled_text>Enabled",
+                help = "<LOC lobui_resource_sharing_enabled_help>Excess resources are shared with allies by default.",
+                key = 'enabled',
+            },
+            {
+                text = "<LOC lobui_resource_sharing_disabled_text>Disabled",
+                help = "<LOC lobui_resource_sharing_disabled_help>Excess resources are spilled by default.",
+                key = 'disabled',
+            },
+        },
+    },
 }
 
 ---@type ScenarioOption[]
 globalOpts = {
     {
-         default = 2,
-         label = "<LOC lobui_0740>Share Conditions",
-         help = "<LOC lobui_0741>Set what happens to a player's units when they are defeated",
-         key = 'Share',
-         values = {
-             {
-                 text = "<LOC lobui_0742>Full Share",
-                 help = "<LOC lobui_0743>Your units will be transferred to your highest rated ally when you die. Previously transferred units will stay where they are.",
-                 key = 'FullShare',
-             },
-             {
-                 text = "<LOC lobui_0744>Share Until Death",
-                 help = "<LOC lobui_0745>All units you have built this game will be destroyed when you die, except those captured by the enemy.",
-                 key = 'ShareUntilDeath',
-             },
-             {
-                 text = "<LOC lobui_0796>Partial Share",
-                 help = "<LOC lobui_0797>Your buildings and engineers will be transferred to your highest rated ally when you die.  Your other units will be destroyed when you die, except those captured by the enemy.",
-                 key = 'PartialShare',
-             },
-             {
-                 text = "<LOC lobui_0762>Traitors",
-                 help = "<LOC lobui_0763>Your units will be transferred to the control of your killer.",
-                 key = 'TransferToKiller',
-             },
-             {
-                 text = "<LOC lobui_0766>Defectors",
-                 help = "<LOC lobui_0767>Your units will be transferred to the enemy with the highest score when you die.",
-                 key = 'Defectors',
-             },
-             {
-                 text = "<LOC lobui_0764>Civilian Desertion",
-                 help = "<LOC lobui_0765>Your units will be transferred to the Civilian AI, if there is one, when you die.",
-                 key = 'CivilianDeserter',
-             },
-         },
-     },
+        default = 2,
+        label = "<LOC lobui_0740>Share Conditions",
+        help = "<LOC lobui_0741>Set what happens to a player's units when they are defeated",
+        key = 'Share',
+        values = {
+            {
+                text = "<LOC lobui_0742>Full Share",
+                help = "<LOC lobui_0743>Your units will be transferred to your highest rated ally when you die. Previously transferred units will stay where they are.",
+                key = 'FullShare',
+            },
+            {
+                text = "<LOC lobui_0744>Share Until Death",
+                help = "<LOC lobui_0745>All units you have built this game will be destroyed when you die, except those captured by the enemy.",
+                key = 'ShareUntilDeath',
+            },
+            {
+                text = "<LOC lobui_0796>Partial Share",
+                help = "<LOC lobui_0797>Your buildings and engineers will be transferred to your highest rated ally when you die. Your other units will be destroyed when you die, except those captured by the enemy.",
+                key = 'PartialShare',
+            },
+            {
+                text = "<LOC lobui_0762>Traitors",
+                help = "<LOC lobui_0763>Your units will be transferred to the control of your killer.",
+                key = 'TransferToKiller',
+            },
+            {
+                text = "<LOC lobui_0766>Defectors",
+                help = "<LOC lobui_0767>Your units will be transferred to the enemy with the highest score when you die.",
+                key = 'Defectors',
+            },
+            {
+                text = "<LOC lobui_0764>Civilian Desertion",
+                help = "<LOC lobui_0765>Your units will be transferred to the Civilian AI, if there is one, when you die.",
+                key = 'CivilianDeserter',
+            },
+        },
+    },
+    {
+        default = 1,
+        label = "<LOC lobui_dc_share_01>DC Share Conditions",
+        help = "<LOC lobui_dc_share_02>Set what happens to a player's units when they disconnect.",
+        key = 'DisconnectShare',
+        values = {
+            {
+                text = "<LOC lobui_dc_share_03>Same as Share Condition",
+                help = "<LOC lobui_dc_share_04>Treat disconnecting players the same as defeated players.",
+                key = 'SameAsShare',
+            },
+            -- Commented out until further discussion on how the feature should behave and what options should be available.
+            -- The single choice option above is sent to the sim but does not show in the lobby UI, so everything will work as before.
+            -- {
+            --     text = "<LOC lobui_0742>Full Share",
+            --     help = "<LOC lobui_0743>Your units will be transferred to your highest rated ally when you die. Previously transferred units will stay where they are.",
+            --     key = 'FullShare',
+            -- },
+            -- {
+            --     text = "<LOC lobui_0744>Share Until Death",
+            --     help = "<LOC lobui_0745>All units you have built this game will be destroyed when you die, except those captured by the enemy.",
+            --     key = 'ShareUntilDeath',
+            -- },
+            -- {
+            --     text = "<LOC lobui_0796>Partial Share",
+            --     help = "<LOC lobui_0797>Your buildings and engineers will be transferred to your highest rated ally when you die. Your other units will be destroyed when you die, except those captured by the enemy.",
+            --     key = 'PartialShare',
+            -- },
+            -- {
+            --     text = "<LOC lobui_0762>Traitors",
+            --     help = "<LOC lobui_0763>Your units will be transferred to the control of your killer.",
+            --     key = 'TransferToKiller',
+            -- },
+            -- {
+            --     text = "<LOC lobui_0766>Defectors",
+            --     help = "<LOC lobui_0767>Your units will be transferred to the enemy with the highest score when you die.",
+            --     key = 'Defectors',
+            -- },
+            -- {
+            --     text = "<LOC lobui_0764>Civilian Desertion",
+            --     help = "<LOC lobui_0765>Your units will be transferred to the Civilian AI, if there is one, when you die.",
+            --     key = 'CivilianDeserter',
+            -- },
+        },
+    },
+    {
+        default = 1,
+        label = "<LOC lobui_dc_share_05>DC ACU Share Conditions",
+        help = "<LOC lobui_dc_share_06>Set what happens to a player's ACU when they disconnect. In Assassination, the DC share condition is *not* applied if the ACU was damaged 2 minutes ago or dies within 2 minutes.",
+        key = 'DisconnectShareCommanders',
+        values = {
+            {
+                text = "<LOC lobui_dc_share_07>Explode",
+                help = "<LOC lobui_dc_share_08>ACUs explode when their player disconnects.",
+                key = 'Explode',
+            },
+            -- Commented out until further discussion on how the feature should behave and what options should be available.
+            -- The single choice option above is sent to the sim but does not show in the lobby UI, so everything will work as before.
+            -- {
+            --     text = "<LOC lobui_dc_share_09>Recall",
+            --     help = "<LOC lobui_dc_share_10>ACUs not damaged in the last 2 minutes are recalled when their player disconnects.",
+            --     key = 'Recall',
+            -- },
+            -- {
+            --     text = "<LOC lobui_dc_share_11>Delayed Recall",
+            --     help = "<LOC lobui_dc_share_12>Disconnected ACUs are shared to allies for 2 minutes or until 5 minutes into the match before it recalls.",
+            --     key = 'RecallDelayed',
+            -- },
+            -- {
+            --     text = "<LOC lobui_dc_share_13>Permanent",
+            --     help = "<LOC lobui_dc_share_14>Disconnected ACUs are permanently shared to allies.",
+            --     key = 'Permanent',
+            -- },
+        },
+    },
     {
         default = 1,
         label = "<LOC lobui_0802>Unrate",
@@ -330,6 +439,11 @@ globalOpts = {
                 text = "<LOC lobui_0122>Assassination",
                 help = "<LOC lobui_0123>Game ends when commander is destroyed",
                 key = 'demoralization',
+            },
+            {
+                text = "<LOC lobui_0152>Decapitation",
+                help = "<LOC lobui_0153>Game ends when all allied commanders are destroyed",
+                key = 'decapitation',
             },
             {
                 text = "<LOC lobui_0124>Supremacy",
@@ -594,28 +708,28 @@ globalOpts = {
 ---@type ScenarioOption[]
 AIOpts = {
    {
-        default = 11,
+        default = 15,
         label = "<LOC aisettings_0001>>AIx Cheat Multiplier",
         help = "<LOC aisettings_0002>Set the cheat multiplier for the cheating AIs.",
         key = 'CheatMult',
         value_text = "%s",
         value_help = "<LOC aisettings_0003>Cheat multiplier of %s",
         values = {
-            '0.5', '0.6', '0.7', '0.8', '0.9',
+            '0.1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.7', '0.8', '0.9',
             '1.0', '1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '1.8', '1.9',
             '2.0', '2.1', '2.2', '2.3', '2.4', '2.5', '2.6', '2.7', '2.8', '2.9', '3.0', '3.1', '3.2', '3.3', '3.4', '3.5', '3.6', '3.7', '3.8', '3.9',
             '4.0', '4.1', '4.2', '4.3', '4.4', '4.5', '4.6', '4.7', '4.8', '4.9', '5.0', '5.1', '5.2', '5.3', '5.4', '5.5', '5.6', '5.7', '5.8', '5.9',
         },
    },
    {
-        default = 11,
+        default = 15,
         label = "<LOC aisettings_0054>AIx Build Multiplier",
         help = "<LOC aisettings_0055>Set the build rate multiplier for the cheating AIs.",
         key = 'BuildMult',
         value_text = "%s",
         value_help = "<LOC aisettings_0056>Build multiplier of %s",
         values = {
-            '0.5', '0.6', '0.7', '0.8', '0.9',
+            '0.1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.7', '0.8', '0.9',
             '1.0', '1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '1.8', '1.9',
             '2.0', '2.1', '2.2', '2.3', '2.4', '2.5', '2.6', '2.7', '2.8', '2.9', '3.0', '3.1', '3.2', '3.3', '3.4', '3.5', '3.6', '3.7', '3.8', '3.9',
             '4.0', '4.1', '4.2', '4.3', '4.4', '4.5', '4.6', '4.7', '4.8', '4.9', '5.0', '5.1', '5.2', '5.3', '5.4', '5.5', '5.6', '5.7', '5.8', '5.9',

@@ -123,8 +123,10 @@ end
 ---@operator call(...): table
 ---@field __init? fun(self, ...)
 ---@field __post_init? fun(self, ...)
+---@field __name MohoExportedClassName
 
 ---@class State
+---@field __base table
 
 ---@class fa-class-state : fa-class
 ---@field __State true
@@ -411,7 +413,7 @@ local Seen = { }
 
 --- Constructs a class or state, referring to the paragraphs of text at the top of this file
 ---@generic Base: table, T:table
----@param bases Base
+---@param bases? Base
 ---@param specs T
 ---@return T
 function ConstructClass(bases, specs)
@@ -522,8 +524,8 @@ function ConstructClass(bases, specs)
                             if hierarchy then
                                 class[l] = hierarchy
                                 seen[l] = hierarchy
-                            else -- we've got two elements with the same key but they're not part of each others hierarchy chain: ambigious!
-                                error("Class initialisation: field '" .. tostring(l).. "' is ambigious between the bases. They use the same field for different values. You need to create a field in the specifications that defines the behavior.")
+                            else -- we've got two elements with the same key but they're not part of each others hierarchy chain: ambiguous!
+                                error("Class initialisation: field '" .. tostring(l).. "' is ambiguous between the bases. They use the same field for different values. You need to create a field in the specifications that defines the behavior.")
                             end
                         end
                     end
@@ -909,6 +911,8 @@ Factory = {
 
 --- Converts a C class into a simplified Lua class with no bases. This must adjust the cclass in place as the reference
 -- to the table appears to be hardcoded in the engine.
+---@param cclass table<string, function>
+---@param name MohoExportedClassName
 function ConvertCClassToLuaSimplifiedClass(cclass, name)
     local seen = {}
     local flatten = {}

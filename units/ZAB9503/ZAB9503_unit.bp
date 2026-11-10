@@ -1,5 +1,14 @@
 UnitBlueprint{
     Description = "<LOC zab9503_desc>Naval Factory",
+    AI = {
+        TargetBones = {
+            "Slider_02",
+            "Slider_05",
+            "B06",
+            "B05",
+
+        },
+    },
     Audio = {
         Construct      = Sound { Bank = 'UAB',        Cue = 'UAB0203_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
         ConstructLoop  = Sound { Bank = 'UAB',        Cue = 'UAB0203_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
@@ -43,8 +52,8 @@ UnitBlueprint{
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
         AnimationUpgrade = "/units/zab9503/zab9503_aopen.sca",
         BlinkingLights = {
-            { BLBone = 0,     BLOffsetX = 0.45,  BLOffsetY = 4.6,   BLOffsetZ = 0.8,   BLScale = 1 },
-            { BLBone = 0,     BLOffsetX = 3.5,   BLOffsetY = 3.3,   BLOffsetZ = -0.25, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 0.45,  BLOffsetY = 4.6,   BLOffsetZ = 0.4,   BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 0.45,   BLOffsetY = 3.3,   BLOffsetZ = 3.45, BLScale = 1 },
         },
         BlinkingLightsFx = {
             Green = "/effects/emitters/light_green_03_emit.bp",
@@ -130,7 +139,14 @@ UnitBlueprint{
     LifeBarOffset = 6.5,
     LifeBarSize = 4.5,
     Physics = {
-        BuildOnLayerCaps = { LAYER_Water = true },
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = false,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = true,
+        },
         ComputeRollOffPoint = true,
         DragCoefficient = 0.2,
         MeshExtentsX = 5,
@@ -141,10 +157,10 @@ UnitBlueprint{
             { UnitSpin = 180,   X = -6,    Y = 0,     Z = -8 },
             { UnitSpin = 0,     X = -6,    Y = 0,     Z = 8 },
         },
-        SkirtOffsetX = -6,
-        SkirtOffsetZ = -2,
+        SkirtOffsetX = -7,
+        SkirtOffsetZ = -1,
         SkirtSizeX = 12,
-        SkirtSizeZ = 14,
+        SkirtSizeZ = 15,
     },
     SelectionSizeX = 2.5,
     SelectionSizeZ = 7.5,
@@ -153,7 +169,7 @@ UnitBlueprint{
     CollisionOffsetZ = 1,
     SizeX = 4,
     SizeY = 3,
-    SizeZ = 12,
+    SizeZ = 13,
     StrategicIconName = "icon_factory2_naval",
     StrategicIconSortPriority = 215,
     Wreckage = {

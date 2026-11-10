@@ -1,5 +1,20 @@
 ---@meta
 
+-- Engine internal states for Tactical/Nuke fire tasks:
+-- State 0: Check range
+-- Move the unit within min/max range.
+-- Then go to State 1 if we need ammo or State 2 if we don't.
+-- State 1: Building ammo
+-- Checks every 10 ticks if ammo is loaded, afterwards transitioning to State 2.
+-- State 2: Waiting to fire
+-- If unit not busy, give a fire command and increment State. Always waits 3 ticks afterwards.
+-- State 3: Firing
+-- Check if unit busy, in which case increment State. Always waits 3 ticks afterwards.
+-- State 4: Finished firing
+-- If unit not busy, end the task, otherwise wait 3 ticks.
+
+-- Only weapons with `ManualFire = true` and `OverChargeWeapon = false` in their blueprint can be used for tactical/nuke fire orders.
+
 ---@class moho.weapon_methods
 local UnitWeapon = {}
 
@@ -8,22 +23,64 @@ local UnitWeapon = {}
 function UnitWeapon:BeenDestroyed()
 end
 
+--- `UnitWeapon:CanFire` calls this engine `CanFire` function that is used in the firing cycle, alongside
+--- the self-explanatory `HasTarget`, `HasSiloAmmo`, and `TargetSolutionStatusGun() == TRS_Available` calls.
 ---
+--- Lua pseudocode describing the engine `CanFire` function's logic.
+--- Underscore prefixes indicate engine fields/functions.
+--[[
+if
+    !unit:IsStunned()
+    and !unit:IsUnitState("Busy")
+    and !unit.Blueprint.Air.CanFly or unit.Layer == "Air"
+    and !unit.Blueprint.AI.NeedUnpack or unit:IsUnitState("Immobile")
+    and weapon:_CheckWaterDepthFiringRestrictions()
+then
+    if !unit.Blueprint.Air.Winged then 
+        return weapon._AimOnTarget -- aim on target in terms of firing tolerance
+    end 
+    if !weapon.Blueprint.AutoInitiateAttackCommand 
+      or unit:_GetSpeed() >= 0.25 * unit.Blueprint.MaxAirSpeed * unit._SpeedMult
+    then
+        if !weapon.Blueprint.NeedToComputeBombDrop or !weapon:_HasTarget() then 
+            return weapon._AimOnTarget 
+        end
+        if unit:IsUnitState("MakingAttackRun") then
+            -- Involves weapon BombDropThreshold and unit PredictAheadForBombDrop
+            if weapon:_UnitIsInBombDropZone() then
+                return weapon._AimOnTarget 
+            end 
+        end
+    end
+end
+return false
+]]
+
+--- Returns true if the weapon has a target and it can fire at it, identical to the engine's firing conditions.
+---
+--- This includes having a target, ammo, a firing solution for the target, aiming within firing tolerance, unit
+--- not being busy or stunned, and a list of other conditions based on blueprint values.
 ---@return boolean
 function UnitWeapon:CanFire()
 end
 
----
+--- Sets the engine weapon attribute, but it doesn't seem to be used anywhere.
+---@deprecated # Non-functional, use Lua function instead.
+---@see Weapon.AddDamageMod # Use instead
 ---@param damage number
 function UnitWeapon:ChangeDamage(damage)
 end
 
----
+--- Sets the engine weapon attribute, but it doesn't seem to be used anywhere.
+---@deprecated # Non-functional, use Lua function instead.
+---@see Weapon.AddDamageRadiusMod # Use instead
 ---@param radius number
 function UnitWeapon:ChangeDamageRadius(radius)
 end
 
----
+--- Sets the engine weapon attribute, but it doesn't seem to be used anywhere.
+---@deprecated # Non-functional, use Lua function instead.
+---@see Weapon.ChangeDamageType # Use instead
 ---@param typeName DamageType
 function UnitWeapon:ChangeDamageType(typeName)
 end
@@ -96,8 +153,9 @@ end
 function UnitWeapon:GetCurrentTargetPos()
 end
 
---- Gets the firing clock percent, `0.0` - `1.0`
----@return number
+--- Returns the progress of the engine's firing clock determined by RateOfFire, usually from the blueprint
+---@see ChangeRateOfFire
+---@return number # within [0.0, 1.0]
 function UnitWeapon:GetFireClockPct()
 end
 
@@ -111,8 +169,9 @@ end
 function UnitWeapon:GetProjectileBlueprint()
 end
 
----
----@param label string
+--- Returns true if the given AimManipulator is the weapon's fire control
+---@see SetFireControl
+---@param label string label that was used to create the AimManipulator
 ---@return boolean
 function UnitWeapon:IsFireControl(label)
 end
@@ -131,8 +190,10 @@ end
 function UnitWeapon:SetEnabled(enabled)
 end
 
----
----@param label string
+--- Set the AimManipulator for which `OnFire` will be called when its
+--- *defined* yaw/pitch bones are on target (within the firing tolerance).  
+--- Defaults to the first aim controller that was created for the weapon.
+---@param label string # label that was used to create the AimManipulator
 function UnitWeapon:SetFireControl(label)
 end
 
@@ -161,13 +222,20 @@ end
 function UnitWeapon:SetTargetingPriorities(priorities)
 end
 
---- Transfers target from one weapon to another
-function UnitWeapon:TransferTarget()
+--- Transfers target from this weapon to another.  
+--- The other weapon may still change targets automatically afterwards.
+---@param otherWeapon Weapon
+function UnitWeapon:TransferTarget(otherWeapon)
 end
 
----
+--- Returns true if the weapon currently has a target.
+--- This only updates at the end of a tick, so it shouldn't be used in behavior relating to OnLostTarget or OnGotTarget callbacks
 ---@return boolean
 function UnitWeapon:WeaponHasTarget()
 end
+
+--- Called by the engine to check if the weapon is allowed to fire.
+---@type fun(self: Weapon): boolean
+UnitWeapon.CanWeaponFire = nil
 
 return UnitWeapon

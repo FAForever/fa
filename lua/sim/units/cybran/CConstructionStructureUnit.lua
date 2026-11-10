@@ -130,7 +130,8 @@ CConstructionStructureUnit = ClassUnit(CStructureUnit, CConstructionTemplate) {
     ---@param unitBeingBuilt Unit
     ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
-        CStructureUnitOnStartBuild(self, unitBeingBuilt, order)
+        -- Don't create effects if the build fails due to building an upgraded hive as a unit instead of an upgrade
+        if not CStructureUnitOnStartBuild(self, unitBeingBuilt, order) then return false end
 
         -- quickly open the hive
         AnimatorSetRate(self.AnimationManipulator, 1)

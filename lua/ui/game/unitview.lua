@@ -390,6 +390,7 @@ function CreateQueueGrid(parent)
     controls.queue:Hide()
 end
 
+---@param info RolloverInfo
 function UpdateWindow(info)
     if info.blueprintId == 'unknown' then
         controls.name:SetText(LOC('<LOC rollover_0000>Unknown Unit'))
@@ -775,11 +776,18 @@ function UpdateWindow(info)
             end
 
             if info.shieldRatio > 0 then
-                local getEnh = import("/lua/enhancementcommon.lua")
                 local unitBp = info.userUnit:GetBlueprint()
                 local shield = unitBp.Defense.Shield
                 if not shield.ShieldMaxHealth then
-                    shield = unitBp.Enhancements[getEnh.GetEnhancements(info.entityId).Back]
+                    local enhancements = EnhancementCommon.GetEnhancements(info.entityId)
+                    local enhBps = unitBp.Enhancements
+                    for _, enhName in enhancements do
+                        local enhancement = enhBps[enhName]
+                        if enhancement.ShieldMaxHealth > 0 then
+                            shield = enhancement
+                            break
+                        end
+                    end
                 end
                 local shieldMaxHealth, shieldRegenRate = shield.ShieldMaxHealth or 0, shield.ShieldRegenRate or 0
                 if shieldMaxHealth > 0 then
@@ -788,16 +796,8 @@ function UpdateWindow(info)
                     if shieldRegenRate > 0 then
                         shieldText = shieldText .. string.format("+%d/s", shieldRegenRate)
                     end
-                    if shieldMaxHealth > 0 then
-                        controls.shieldText:Show()
-                        if shieldRegenRate > 0 then
-                            controls.shieldText:SetText(string.format("%d / %d +%d/s",
-                                math.floor(shieldMaxHealth * info.shieldRatio), shieldMaxHealth, shieldRegenRate))
-                        else
-                            controls.shieldText:SetText(string.format("%d / %d",
-                                math.floor(shieldMaxHealth * info.shieldRatio), shieldMaxHealth))
-                        end
-                    end
+                    controls.shieldText:Show()
+                    controls.shieldText:SetText(shieldText)
                 end
             end
         end

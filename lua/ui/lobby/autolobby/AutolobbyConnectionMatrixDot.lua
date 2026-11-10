@@ -20,8 +20,6 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local EnumColors = import("/lua/shared/color.lua").EnumColors
-
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 
 --- A small dot that represents the connection status between players.
@@ -79,13 +77,13 @@ local AutolobbyConnectionMatrixDot = Class(Bitmap) {
     ---@param status UIPeerLaunchStatus
     SetStatus = function(self, status)
         if status == 'Unknown' then
-            self:SetSolidColor(EnumColors.Blue)
+            self:SetSolidColor("Blue")
         elseif status == 'Rejoining' then
-            self:SetSolidColor(EnumColors.HotPink)
+            self:SetSolidColor("HotPink")
         elseif status == 'Missing local peers' then
-            self:SetSolidColor(EnumColors.Orange)
+            self:SetSolidColor("Orange")
         elseif status == 'Ready' then
-            self:SetSolidColor(EnumColors.Green)
+            self:SetSolidColor("Green")
         end
     end,
 

@@ -1,10 +1,10 @@
 local CIridiumRocketProjectile = import('/lua/cybranprojectiles.lua').CIridiumRocketProjectile
 CDFRocketIridium03 = Class(CIridiumRocketProjectile) {
 
-    FxImpactUnit = import('/lua/EffectTemplates.lua').CNeutronClusterBombHitUnit01,
-    FxImpactProp = import('/lua/EffectTemplates.lua').CNeutronClusterBombHitUnit01,
-    FxImpactLand = import('/lua/EffectTemplates.lua').CNeutronClusterBombHitLand01,
-    FxImpactWater = import('/lua/EffectTemplates.lua').CNeutronClusterBombHitWater01,
+    FxImpactUnit = import('/lua/effecttemplates.lua').CNeutronClusterBombHitUnit01,
+    FxImpactProp = import('/lua/effecttemplates.lua').CNeutronClusterBombHitUnit01,
+    FxImpactLand = import('/lua/effecttemplates.lua').CNeutronClusterBombHitLand01,
+    FxImpactWater = import('/lua/effecttemplates.lua').CNeutronClusterBombHitWater01,
 
     OnImpact = function(self, targetType, targetEntity)
         CIridiumRocketProjectile.OnImpact(self, targetType, targetEntity)

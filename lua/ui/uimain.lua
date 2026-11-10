@@ -131,7 +131,8 @@ end
 --* The following scripts are alternate entry points to the UI from the engine
 --* Typically these are dialog popup type calls
 
--- context sensitive exit dialog
+--- Called by engine when closing the app or calling UI_Quit in console
+---@param yesNoOnly boolean # true when closing the app
 function ShowEscapeDialog(yesNoOnly)
     import("/lua/ui/dialogs/eschandler.lua").HandleEsc(yesNoOnly)
 end
@@ -143,7 +144,7 @@ function SetEscapeHandler(handler)
     escapeHandler = handler
 end
 
--- called by the engine when escape is pressed but there's no specific handler for it
+--- Used by the "escape" key action (default action for esc key)
 function EscapeHandler()
     if not WorldIsLoading() and (import("/lua/ui/game/gamemain.lua").supressExitDialog != true) then
         if escapeHandler then
@@ -189,8 +190,18 @@ function NoteGameOver()
     end
 end
 
+---@alias ClickType "ButtonPress" | "ButtonDClick"
+
+---@class MouseButtonEvent
+---@field Type ClickType
+---@field x number
+---@field y number
+
+---@type fun(event: MouseButtonEvent)[]
 local mouseClickFuncs = {}
 
+--- Called by the engine when the left, right, or middle mouse buttons are pressed.
+---@param event MouseButtonEvent
 function OnMouseButtonPress(event)
     if mouseClickFuncs and table.getsize(mouseClickFuncs) > 0 then
         for _, func in mouseClickFuncs do
@@ -199,10 +210,12 @@ function OnMouseButtonPress(event)
     end
 end
 
+---@param func fun(event: MouseButtonEvent)
 function AddOnMouseClickedFunc(func)
     table.insert(mouseClickFuncs, func)
 end
 
+---@param func fun(event: MouseButtonEvent)
 function RemoveOnMouseClickedFunc(func)
     local i = 1
     local found = false

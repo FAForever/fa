@@ -15,12 +15,12 @@ local ParseEntityCategoryProperly = import("/lua/sim/categoryutils.lua").ParseEn
 local cachedPriorities = false
 local RecycledPriTable = {}
 
-local DebugWeaponComponent = import("/lua/sim/weapons/components/DebugWeaponComponent.lua").DebugWeaponComponent
+local DebugWeaponComponent = import("/lua/sim/weapons/components/debugweaponcomponent.lua").DebugWeaponComponent
 
 --- Table of damage information passed from the weapon to the projectile
 --- Can be assigned as a meta table to the projectile's damage table to reduce memory usage for unchanged values
 ---@class WeaponDamageTable
----@field DamageToShields number        # weaponBlueprint.DamageToShields 
+---@field DamageToShields number        # weaponBlueprint.DamageToShields
 ---@field InitialDamageAmount number    # weaponBlueprint.InitialDamage or 0
 ---@field DamageRadius number           # weaponBlueprint.DamageRadius + Weapon.DamageRadiusMod
 ---@field DamageAmount number           # weaponBlueprint.Damage + Weapon.DamageMod
@@ -29,6 +29,7 @@ local DebugWeaponComponent = import("/lua/sim/weapons/components/DebugWeaponComp
 ---@field CollideFriendly boolean       # weaponBlueprint.CollideFriendly or false
 ---@field DoTTime number                # weaponBlueprint.DoTTime
 ---@field DoTPulses number              # weaponBlueprint.DoTPulses
+---@field DoTDelayFirstPulse boolean      # weaponBlueprint.DoTDelayFirstPulse
 ---@field MetaImpactAmount any          # weaponBlueprint.MetaImpactAmount
 ---@field MetaImpactRadius any          # weaponBlueprint.MetaImpactRadius
 ---@field ArtilleryShieldBlocks boolean # weaponBlueprint.ArtilleryShieldBlocks
@@ -55,7 +56,7 @@ local function ParsePriorities()
             end
             for _, priority in priorities do
                 if not finalPriorities[priority] then
-                    if StringFind(priority, '%(', 1, true) then
+                    if StringFind(priority, '(', 1, true) then
                         finalPriorities[priority] = ParseEntityCategoryProperly(priority)
                     else
                         finalPriorities[priority] = ParseEntityCategory(priority)
@@ -71,6 +72,7 @@ local WeaponMethods = moho.weapon_methods
 
 ---@class Weapon : moho.weapon_methods, InternalObject, DebugWeaponComponent
 ---@field AimControl? moho.AimManipulator
+---@field AimControlEnabled? boolean # last value passed to `AimManipulatorSetEnabled`, as the aim controller can not be queried for it
 ---@field AimLeft? moho.AimManipulator
 ---@field AimRight? moho.AimManipulator
 ---@field Army Army
@@ -81,7 +83,8 @@ local WeaponMethods = moho.weapon_methods
 ---@field DamageMod number
 ---@field DamageModifiers number[] # Set of damage multipliers used by collision beams for the weapon
 ---@field DamageRadiusMod number
----@field damageTableCache WeaponDamageTable | false # Set to false when the weapon's damage is modified
+---@field damageTableCache WeaponDamageTable? # nil when the damage table needs to be refreshed from the weapon blueprint
+---@field damageTableCacheValid boolean? # false when the damage table needs to be updated with changed damage/radius modifiers or Buffs
 ---@field DisabledBuffs table
 ---@field DisabledFiringBones Bone[] # Bones that `Unit.Animator` cannot move when this weapon has a target
 ---@field EnergyRequired? number
@@ -158,146 +161,152 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     SetupTurret = function(self, bp)
         bp = bp or self.Blueprint -- defensive programming
 
+        local unit = self.unit
+        local precedence = bp.AimControlPrecedence or 10
+
         local yawBone = bp.TurretBoneYaw
         local pitchBone = bp.TurretBonePitch
         local muzzleBone = bp.TurretBoneMuzzle
-        local precedence = bp.AimControlPrecedence or 10
-        local pitchBone2, muzzleBone2, yawBone2
+        local useDualManipulators = bp.TurretDualManipulators
+        local pitchBone2, muzzleBone2
+        if useDualManipulators then
+            pitchBone2, muzzleBone2 = bp.TurretBoneDualPitch, bp.TurretBoneDualMuzzle
+        end
+        local yawBone2 = bp.TurretBoneDualYaw
 
-        local boneDualPitch = bp.TurretBoneDualPitch
-        if boneDualPitch and boneDualPitch ~= '' then
-            pitchBone2 = boneDualPitch
-        end
-        local boneDualMuzzle = bp.TurretBoneDualMuzzle
-        if boneDualMuzzle and boneDualMuzzle ~= '' then
-            muzzleBone2 = boneDualMuzzle
-        end
-        local boneDualYaw = bp.TurretBoneDualYaw
-        if boneDualYaw and boneDualYaw ~= '' then
-            yawBone2 = boneDualYaw
+        -- verify bones so that issues are easier to debug, since `CreateAimController` fails silently.
+        local issues = ''
+        if not yawBone then issues = issues .. 'TurretBoneYaw missing from blueprint, '
+        elseif not unit:ValidateBone(yawBone) then issues = issues .. 'TurretBoneYaw "' .. tostring(yawBone) .. '" does not exist in unit mesh, ' end
+        if not pitchBone then issues = issues .. 'TurretBonePitch missing from blueprint, '
+        elseif not unit:ValidateBone(pitchBone) then issues = issues .. 'TurretBonePitch "' .. tostring(pitchBone) .. '" does not exist in unit mesh, ' end
+        if not muzzleBone then issues = issues .. 'TurretBoneMuzzle missing from blueprint, '
+        elseif not unit:ValidateBone(muzzleBone) then issues = issues .. 'TurretBoneMuzzle "' .. tostring(muzzleBone) .. '" does not exist in unit mesh, ' end
+
+        if useDualManipulators then
+            if not pitchBone then issues = issues .. 'TurretBonePitch missing from blueprint, '
+            elseif not unit:ValidateBone(pitchBone2) then issues = issues .. 'TurretBoneDualPitch "' .. tostring(pitchBone2) .. '" does not exist in unit mesh, ' end
+            if not muzzleBone then issues = issues .. 'TurretBoneMuzzle missing from blueprint, '
+            elseif not unit:ValidateBone(muzzleBone2) then issues = issues .. 'TurretBoneDualMuzzle "' .. tostring(muzzleBone2) .. '" does not exist in unit mesh, ' end
         end
 
-        local unit = self.unit
-        ---@diagnostic disable-next-line: param-type-mismatch
-        if not (unit:ValidateBone(yawBone) and unit:ValidateBone(pitchBone) and unit:ValidateBone(muzzleBone)) then
-            error('*ERROR: Bone aborting turret setup due to bone issues.', 2)
+        if yawBone2 and not unit:ValidateBone(yawBone2) then issues = issues .. 'TurretBoneDualYaw "' .. tostring(yawBone2) .. '" does not exist in unit mesh, ' end
+
+        if issues ~= '' then
+            WARN(string.format('Weapon "%s" aborting turret setup due to the following bone issues: %s.\n'
+                    , tostring(bp.BlueprintId or bp.Label)
+                    , string.sub(issues, 1, -3)
+                )
+                , debug.traceback()
+            )
             return
-        elseif pitchBone2 and muzzleBone2 then
-            if not (unit:ValidateBone(pitchBone2) and unit:ValidateBone(muzzleBone2)) then
-                error('*ERROR: Bone aborting turret setup due to pitch/muzzle bone2 issues.', 2)
-                return
-            end
-        elseif yawBone2 then
-            if not unit:ValidateBone(yawBone2) then
-                error('*ERROR: Bone aborting turret setup due to yaw bone2 issues.', 2)
-                return
-            end
         end
+
+        -- Set up turret aim controllers if bones are valid.
+
         local aimControl, aimRight, aimLeft, aimYaw2
-        if yawBone and pitchBone and muzzleBone then
-            local selfTrash = self.Trash
-            if bp.TurretDualManipulators then
-                aimControl = CreateAimController(self, 'Torso', yawBone)
-                aimRight = CreateAimController(self, 'Right', pitchBone, pitchBone, muzzleBone)
-                aimLeft = CreateAimController(self, 'Left', pitchBone2, pitchBone2, muzzleBone2)
-                self.AimRight = aimRight
-                self.AimLeft = aimLeft
-                aimControl:SetPrecedence(precedence)
-                aimRight:SetPrecedence(precedence)
-                aimLeft:SetPrecedence(precedence)
-                if EntityCategoryContains(categories.STRUCTURE, unit) then
-                    aimControl:SetResetPoseTime(9999999)
-                end
-                self:SetFireControl('Right')
-                selfTrash:Add(aimControl)
-                selfTrash:Add(aimRight)
-                selfTrash:Add(aimLeft)
-            else
-                aimControl = CreateAimController(self, 'Default', yawBone, pitchBone, muzzleBone)
-                if EntityCategoryContains(categories.STRUCTURE, unit) then
-                    aimControl:SetResetPoseTime(9999999)
-                end
-                selfTrash:Add(aimControl)
-                aimControl:SetPrecedence(precedence)
-                if bp.RackSlavedToTurret and not table.empty(bp.RackBones) then
-                    for _, v in bp.RackBones do
-                        local rackBone = v.RackBone
-                        if rackBone ~= pitchBone then
-                            local slaver = CreateSlaver(unit, rackBone, pitchBone)
-                            slaver:SetPrecedence(precedence - 1)
-                            selfTrash:Add(slaver)
-                        end
+        local selfTrash = self.Trash
+        if useDualManipulators then
+            ---@diagnostic disable-next-line: param-type-mismatch
+            aimControl = CreateAimController(self, 'Torso', yawBone)
+            ---@diagnostic disable-next-line: param-type-mismatch
+            aimRight = CreateAimController(self, 'Right', pitchBone, pitchBone, muzzleBone)
+            ---@diagnostic disable-next-line: param-type-mismatch
+            aimLeft = CreateAimController(self, 'Left', pitchBone2, pitchBone2, muzzleBone2)
+            self.AimRight = aimRight
+            self.AimLeft = aimLeft
+            aimControl:SetPrecedence(precedence)
+            aimRight:SetPrecedence(precedence)
+            aimLeft:SetPrecedence(precedence)
+            if EntityCategoryContains(categories.STRUCTURE, unit) then
+                aimControl:SetResetPoseTime(9999999)
+            end
+            self:SetFireControl('Right')
+            selfTrash:Add(aimControl)
+            selfTrash:Add(aimRight)
+            selfTrash:Add(aimLeft)
+        else
+            ---@diagnostic disable-next-line: param-type-mismatch
+            aimControl = CreateAimController(self, 'Default', yawBone, pitchBone, muzzleBone)
+            if EntityCategoryContains(categories.STRUCTURE, unit) then
+                aimControl:SetResetPoseTime(9999999)
+            end
+            selfTrash:Add(aimControl)
+            aimControl:SetPrecedence(precedence)
+            if bp.RackSlavedToTurret and not table.empty(bp.RackBones) then
+                for _, v in bp.RackBones do
+                    local rackBone = v.RackBone
+                    if rackBone ~= pitchBone then
+                        ---@diagnostic disable-next-line: param-type-mismatch
+                        local slaver = CreateSlaver(unit, rackBone, pitchBone)
+                        slaver:SetPrecedence(precedence - 1)
+                        selfTrash:Add(slaver)
                     end
                 end
             end
+        end
 
-            if yawBone2 then
-                aimYaw2 = CreateAimController(self, 'Yaw2', yawBone2, yawBone2)
-                aimYaw2:SetPrecedence(precedence-1)
-                if EntityCategoryContains(categories.STRUCTURE, unit) then
-                    aimYaw2:SetResetPoseTime(9999999)
-                end
-                selfTrash:Add(aimYaw2)
+        if yawBone2 then
+            aimYaw2 = CreateAimController(self, 'Yaw2', yawBone2)
+            aimYaw2:SetPrecedence(precedence - 1)
+            if EntityCategoryContains(categories.STRUCTURE, unit) then
+                aimYaw2:SetResetPoseTime(9999999)
             end
-        else
-            error('*ERROR: Trying to setup a turreted weapon but there are yaw bones, pitch bones or muzzle bones missing from the blueprint.', 2)
+            selfTrash:Add(aimYaw2)
         end
         self.AimControl = aimControl
 
-        local numbersExist = true
-        local turretyawmin, turretyawmax, turretyawspeed
-        local turretpitchmin, turretpitchmax, turretpitchspeed
+        -- Validate turret yaw, pitch, and speeds
 
-        -- SETUP MANIPULATORS AND SET TURRET YAW, PITCH AND SPEED
-        if bp.TurretYaw and bp.TurretYawRange then
-            turretyawmin, turretyawmax = self:GetTurretYawMinMax(bp)
-        else
-            numbersExist = false
-        end
-        if bp.TurretYawSpeed then
-            turretyawspeed = self:GetTurretYawSpeed(bp)
-        else
-            numbersExist = false
-        end
-        if bp.TurretPitch and bp.TurretPitchRange then
-            turretpitchmin, turretpitchmax = self:GetTurretPitchMinMax(bp)
-        else
-            numbersExist = false
-        end
-        if bp.TurretPitchSpeed then
-            turretpitchspeed = self:GetTurretPitchSpeed(bp)
-        else
-            numbersExist = false
-        end
-        if numbersExist then
-            aimControl:SetFiringArc(turretyawmin, turretyawmax, turretyawspeed, turretpitchmin, turretpitchmax, turretpitchspeed)
-            if aimRight and aimLeft then -- although, they should both exist if either one does
-                turretyawmin = turretyawmin / 12
-                turretyawmax = turretyawmax / 12
-                aimRight:SetFiringArc(turretyawmin, turretyawmax, turretyawspeed, turretpitchmin, turretpitchmax, turretpitchspeed)
-                aimLeft:SetFiringArc(turretyawmin, turretyawmax, turretyawspeed, turretpitchmin, turretpitchmax, turretpitchspeed)
-            end
-            
-            if aimYaw2 then
-                local turretYawMin2 = turretyawmin
-                local turretYawMax2 = turretyawmax
-                if bp.TurretDualYaw and bp.TurretDualYawRange then
-                    turretYawMin2 = bp.TurretDualYaw - bp.TurretDualYawRange
-                    turretYawMax2 = bp.TurretDualYaw + bp.TurretDualYawRange
-                end
+        if not bp.TurretYaw then issues = issues .. 'TurretYaw missing from blueprint, ' end
+        if not bp.TurretYawRange then issues = issues .. 'TurretYawRange missing from blueprint, ' end
+        if not bp.TurretYawSpeed then issues = issues .. 'TurretYawSpeed missing from blueprint, ' end
+        if not bp.TurretPitch then issues = issues .. 'TurretPitch missing from blueprint, ' end
+        if not bp.TurretPitchRange then issues = issues .. 'TurretPitchRange missing from blueprint, ' end
+        if not bp.TurretPitchSpeed then issues = issues .. 'TurretPitchSpeed missing from blueprint, ' end
 
-                local turretYawSpeed2 = bp.TurretDualYawSpeed or turretyawspeed
-                aimYaw2:SetFiringArc(turretYawMin2, turretYawMax2, turretYawSpeed2, turretpitchmin, turretpitchmax, turretpitchspeed)
+        if issues ~= '' then
+            WARN(string.format('Weapon "%s" aborting turret setup due to the following turret number issues: %s.\n'
+                    , tostring(bp.BlueprintId or bp.Label)
+                    , string.sub(issues, 1, -3)
+                )
+                , debug.traceback()
+            )
+            return
+        end
+
+        -- Set up turret yaw, pitch, and speeds if they're valid.
+
+        local turretyawmin, turretyawmax = self:GetTurretYawMinMax(bp)
+        local turretyawspeed = self:GetTurretYawSpeed(bp)
+        local turretpitchmin, turretpitchmax = self:GetTurretPitchMinMax(bp)
+        local turretpitchspeed = self:GetTurretPitchSpeed(bp)
+
+        aimControl:SetFiringArc(turretyawmin, turretyawmax, turretyawspeed, turretpitchmin, turretpitchmax, turretpitchspeed)
+        if aimRight and aimLeft then -- although, they should both exist if either one does
+            turretyawmin = turretyawmin / 12
+            turretyawmax = turretyawmax / 12
+            aimRight:SetFiringArc(turretyawmin, turretyawmax, turretyawspeed, turretpitchmin, turretpitchmax, turretpitchspeed)
+            aimLeft:SetFiringArc(turretyawmin, turretyawmax, turretyawspeed, turretpitchmin, turretpitchmax, turretpitchspeed)
+        end
+
+        if aimYaw2 then
+            local turretYawMin2 = turretyawmin
+            local turretYawMax2 = turretyawmax
+            if bp.TurretDualYaw and bp.TurretDualYawRange then
+                turretYawMin2 = bp.TurretDualYaw - bp.TurretDualYawRange
+                turretYawMax2 = bp.TurretDualYaw + bp.TurretDualYawRange
             end
-        else
-            local strg = '*ERROR: TRYING TO SETUP A TURRET WITHOUT ALL TURRET NUMBERS IN BLUEPRINT, ABORTING TURRET SETUP. WEAPON: ' .. bp.Label .. ' UNIT: '.. unit.UnitId
-            error(strg, 2)
+
+            local turretYawSpeed2 = bp.TurretDualYawSpeed or turretyawspeed
+            aimYaw2:SetFiringArc(turretYawMin2, turretYawMax2, turretYawSpeed2, 0, 0, 0)
         end
     end,
 
     ---@param self Weapon
     ---@param enabled boolean
     AimManipulatorSetEnabled = function(self, enabled)
+        self.AimControlEnabled = enabled
         local aimControl = self.AimControl
         if aimControl then
             aimControl:SetEnabled(enabled)
@@ -323,7 +332,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
 
     ---@param self Weapon
     ---@param speed number
-    ---@param bp WeaponBlueprint
+    ---@param bp? WeaponBlueprint
     SetTurretPitchSpeed = function(self, speed, bp)
         local aimControl = self.AimControl
         if aimControl then
@@ -384,7 +393,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     ---@param self Weapon
     OnGotTarget = function(self)
         -- a few non-walker units may use `Animator` as well
-        local animator = self.unit--[[@as WalkingLandUnit]].Animator
+        local animator = self.unit--[[@as WalkingLandUnit]] .Animator
         if self.DisabledFiringBones and animator then
             for _, value in self.DisabledFiringBones do
                 animator:SetBoneEnabled(value, false)
@@ -395,7 +404,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     ---@param self Weapon
     OnLostTarget = function(self)
         -- a few non-walker units may use `Animator` as well
-        local animator = self.unit--[[@as WalkingLandUnit]].Animator
+        local animator = self.unit--[[@as WalkingLandUnit]] .Animator
         if self.DisabledFiringBones and animator then
             for _, value in self.DisabledFiringBones do
                 animator:SetBoneEnabled(value, true)
@@ -404,14 +413,14 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     end,
 
     ---@param self Weapon
-    ---@param label string
+    ---@param label string # label of the aim controller that started tracking
     OnStartTracking = function(self, label)
         self:PlayWeaponSound('BarrelStart')
         self:PlayWeaponAmbientSound('BarrelLoop')
     end,
 
     ---@param self Weapon
-    ---@param label string
+    ---@param label string # label of the aim controller that stopped tracking
     OnStopTracking = function(self, label)
         self:PlayWeaponSound('BarrelStop')
         self:StopWeaponAmbientSound('BarrelLoop')
@@ -468,28 +477,44 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     end,
 
     ---@param self Weapon
-    GetDamageTableInternal = function(self)
+    ---@return WeaponDamageTable
+    GetNewDamageTable = function(self)
         local weaponBlueprint = self.Blueprint
-        ---@type WeaponDamageTable
-        local damageTable = {}
 
-        damageTable.DamageToShields = weaponBlueprint.DamageToShields
-        damageTable.InitialDamageAmount = weaponBlueprint.InitialDamage or 0
-        damageTable.DamageRadius = weaponBlueprint.DamageRadius + self.DamageRadiusMod
-        damageTable.DamageAmount = weaponBlueprint.Damage + self.DamageMod
-        damageTable.DamageType = weaponBlueprint.DamageType
-        damageTable.DamageFriendly = weaponBlueprint.DamageFriendly
-        if damageTable.DamageFriendly == nil then
-            damageTable.DamageFriendly = true
+        local damageFriendly = weaponBlueprint.DamageFriendly
+        if damageFriendly == nil then
+            damageFriendly = true
         end
-        damageTable.CollideFriendly = weaponBlueprint.CollideFriendly or false
-        damageTable.DoTTime = weaponBlueprint.DoTTime
-        damageTable.DoTPulses = weaponBlueprint.DoTPulses
-        damageTable.MetaImpactAmount = weaponBlueprint.MetaImpactAmount
-        damageTable.MetaImpactRadius = weaponBlueprint.MetaImpactRadius
-        damageTable.ArtilleryShieldBlocks = weaponBlueprint.ArtilleryShieldBlocks
+        local damageTable = {
+            DamageToShields = weaponBlueprint.DamageToShields,
+            InitialDamageAmount = weaponBlueprint.InitialDamage or 0,
+            DamageType = weaponBlueprint.DamageType,
+            DamageFriendly = damageFriendly,
+            CollideFriendly = weaponBlueprint.CollideFriendly or false,
+            DoTTime = weaponBlueprint.DoTTime,
+            DoTPulses = weaponBlueprint.DoTPulses,
+            DoTDelayFirstPulse = weaponBlueprint.DoTDelayFirstPulse,
+            MetaImpactAmount = weaponBlueprint.MetaImpactAmount,
+            MetaImpactRadius = weaponBlueprint.MetaImpactRadius,
+            ArtilleryShieldBlocks = weaponBlueprint.ArtilleryShieldBlocks,
+        }
+        -- Projectiles use the damage table as a metatable for their `DamageData` table.
+        -- This saves memory by not copying the damage table contents for every projectile.
+        -- See `Projectile.PassMetaDamage`
+        damageTable.__index = damageTable
+
+        return damageTable
+    end,
+
+    ---@param self Weapon
+    ---@return WeaponDamageTable
+    GetUpdatedDamageTable = function(self)
+        local damageTable = self.damageTableCache --[[@as WeaponDamageTable]]
+        local weaponBlueprint = self.Blueprint
 
         -- Add buff
+        damageTable.DamageRadius = weaponBlueprint.DamageRadius + self.DamageRadiusMod
+        damageTable.DamageAmount = weaponBlueprint.Damage + self.DamageMod
         damageTable.Buffs = {}
         if weaponBlueprint.Buffs ~= nil then
             for k, v in weaponBlueprint.Buffs do
@@ -499,17 +524,19 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
             end
         end
 
-        damageTable.__index = damageTable
+        self.damageTableCacheValid = true
 
         return damageTable
     end,
 
-    damageTableCache = false,
     ---@param self Weapon
     ---@return WeaponDamageTable
     GetDamageTable = function(self)
-        if not self.damageTableCache then
-            self.damageTableCache = self:GetDamageTableInternal()
+        if not self.damageTableCacheValid then
+            if not self.damageTableCache then
+                self.damageTableCache = self:GetNewDamageTable()
+            end
+            self.damageTableCache = self:GetUpdatedDamageTable()
         end
         return self.damageTableCache --[[@as WeaponDamageTable]]
     end,
@@ -537,9 +564,17 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
             if bp.NukeOuterRingDamage and bp.NukeOuterRingRadius and bp.NukeOuterRingTicks and bp.NukeOuterRingTotalTime and
                 bp.NukeInnerRingDamage and bp.NukeInnerRingRadius and bp.NukeInnerRingTicks and bp.NukeInnerRingTotalTime then
                 proj.InnerRing = NukeDamage()
-                proj.InnerRing:OnCreate(bp.NukeInnerRingDamage, bp.NukeInnerRingRadius, bp.NukeInnerRingTicks, bp.NukeInnerRingTotalTime)
+                proj.InnerRing:OnCreate(bp.NukeInnerRingDamage + self.DamageMod,
+                    bp.NukeInnerRingRadius + self.DamageRadiusMod,
+                    bp.NukeInnerRingTicks,
+                    bp.NukeInnerRingTotalTime
+                )
                 proj.OuterRing = NukeDamage()
-                proj.OuterRing:OnCreate(bp.NukeOuterRingDamage, bp.NukeOuterRingRadius, bp.NukeOuterRingTicks, bp.NukeOuterRingTotalTime)
+                proj.OuterRing:OnCreate(bp.NukeOuterRingDamage + self.DamageMod,
+                    bp.NukeOuterRingRadius + self.DamageRadiusMod,
+                    bp.NukeOuterRingTicks,
+                    bp.NukeOuterRingTotalTime
+                )
 
                 -- Need to store these three for later, in case the missile lands after the launcher dies
                 proj.Launcher = self.unit
@@ -661,10 +696,10 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     end,
 
     ---@param self Weapon
-    ---@param dmgMod number 
+    ---@param dmgMod number
     AddDamageMod = function(self, dmgMod)
         self.DamageMod = self.DamageMod + dmgMod
-        self.damageTableCache = false
+        self.damageTableCacheValid = false
     end,
 
     ---@param self Weapon
@@ -672,8 +707,8 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     AddDamageRadiusMod = function(self, dmgRadMod)
         if dmgRadMod then
             self.DamageRadiusMod = self.DamageRadiusMod + dmgRadMod
+            self.damageTableCacheValid = false
         end
-        self.damageTableCache = false
     end,
 
     ---@param self Weapon
@@ -693,11 +728,10 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     DisableBuff = function(self, buffname)
         if buffname then
             self.DisabledBuffs[buffname] = true
+            self.damageTableCacheValid = false
         else
-            -- Error
-            error('ERROR: DisableBuff in weapon.lua does not have a buffname')
+            error('DisableBuff in weapon.lua does not have a buffname')
         end
-        self.damageTableCache = false
     end,
 
     ---@param self Weapon
@@ -705,11 +739,10 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     ReEnableBuff = function(self, buffname)
         if buffname then
             self.DisabledBuffs[buffname] = nil
+            self.damageTableCacheValid = false
         else
-            -- Error
-            error('ERROR: ReEnableBuff in weapon.lua does not have a buffname')
+            error('ReEnableBuff in weapon.lua does not have a buffname')
         end
-        self.damageTableCache = false
     end,
 
     --- Method to mark weapon when parent unit gets loaded on to a transport unit

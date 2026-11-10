@@ -17,8 +17,8 @@ local NullShell = DefaultProjectileFile.NullShell
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
 local TacticalMissileComponent = import('/lua/sim/defaultprojectiles.lua').TacticalMissileComponent
-local SplitComponent = import('/lua/sim/projectiles/components/SplitComponent.lua').SplitComponent
-local DebrisComponent = import('/lua/sim/projectiles/components/DebrisComponent.lua').DebrisComponent
+local SplitComponent = import('/lua/sim/projectiles/components/splitcomponent.lua').SplitComponent
+local DebrisComponent = import('/lua/sim/projectiles/components/debriscomponent.lua').DebrisComponent
 
 ---  CYBRAN BRACKMAN "HACK PEG-POD" PROJECTILE
 ---@class CDFBrackmanHackPegProjectile01 : MultiPolyTrailProjectile
@@ -478,36 +478,42 @@ CNeutronClusterBombChildProjectile = ClassProjectile(SinglePolyTrailProjectile) 
 CNeutronClusterBombProjectile = ClassProjectile(SinglePolyTrailProjectile) {
     PolyTrail = '/effects/emitters/default_polytrail_03_emit.bp',
     ChildProjectile = '/projectiles/CIFNeutronClusterBomb02/CIFNeutronClusterBomb02_proj.bp',
+    Impacted = false,
 
     ---@param self CNeutronClusterBombProjectile
     OnCreate = function(self)
         SinglePolyTrailProjectile.OnCreate(self)
-        self.Impacted = false
     end,
 
     --- Note: Damage is done once in AOE by main projectile. Secondary projectiles
     --- are just visual.
     ---@param self CNeutronClusterBombProjectile
-    ---@param targetType string
+    ---@param targetType ImpactType
     ---@param targetEntity Unit
     OnImpact = function(self, targetType, targetEntity)
-        if self.Impacted == false and targetType ~= 'Air' then
+        if not self.Impacted and not targetEntity.DisallowCollisions then
             self.Impacted = true
-            local Random = Random 
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(0,Random(1,3),Random(1.5,3))
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(Random(1,2),Random(1,3),Random(1,2))
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(0,Random(1,3),-Random(1.5,3))
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(Random(1.5,3),Random(1,3),0)
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(-Random(1,2),Random(1,3),-Random(1,2))
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(-Random(1.5,2.5),Random(1,3),0)
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(-Random(1,2),Random(1,3),Random(2,4))
+
+            if targetType ~= 'Air' then
+                local Random = Random
+                local child = self.ChildProjectile
+
+                self:CreateChildProjectile(child):SetVelocity(0, Random(1,3), Random(1.5,3))
+                self:CreateChildProjectile(child):SetVelocity(Random(1,2), Random(1,3), Random(1,2))
+                self:CreateChildProjectile(child):SetVelocity(0, Random(1,3), -Random(1.5,3))
+                self:CreateChildProjectile(child):SetVelocity(Random(1.5,3), Random(1,3), 0)
+                self:CreateChildProjectile(child):SetVelocity(-Random(1,2), Random(1,3), -Random(1,2))
+                self:CreateChildProjectile(child):SetVelocity(-Random(1.5,2.5), Random(1,3), 0)
+                self:CreateChildProjectile(child):SetVelocity(-Random(1,2), Random(1,3), Random(2,4))
+            end
+
             SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
         end
     end,
 
     --- Overiding Destruction
     ---@param self CNeutronClusterBombProjectile
-    ---@param targetType string
+    ---@param targetType ImpactType
     ---@param targetEntity Unit
     OnImpactDestroy = function(self, targetType, targetEntity)
         self.Trash:Add(ForkThread(self.DelayedDestroyThread, self))
@@ -588,7 +594,7 @@ CLOATacticalMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMi
         SingleBeamProjectile.OnCreate(self, inWater)
         
         local blueprintPhysics = self.Blueprint.Physics
-        local radius = 0.105 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
+        local radius = 0.11 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
         self:SetCollisionShape('Sphere', 0, 0, 0, radius)
     end,
 
@@ -634,7 +640,7 @@ CLOATacticalMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMi
 
 ---  CYBRAN ROCKET PROJECILES
 ---@class CLOATacticalChildMissileProjectile : SingleBeamProjectile, TacticalMissileComponent, DebrisComponent
-CLOATacticalChildMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMissileComponent, DebrisComponent) {
+CLOATacticalChildMissileProjectile = ClassProjectile(SingleBeamProjectile, DebrisComponent) {
     BeamName = '/effects/emitters/missile_loa_munition_exhaust_beam_02_emit.bp',
     FxTrails = {'/effects/emitters/missile_cruise_munition_trail_03_emit.bp',},
     FxTrailOffset = -0.5,
@@ -656,12 +662,6 @@ CLOATacticalChildMissileProjectile = ClassProjectile(SingleBeamProjectile, Tacti
     FxOnKilled = EffectTemplate.TMissileKilled01,
     FxOnKilledScale = 0.375,
 
-    LaunchTicks = 2,
-    LaunchTurnRate = 6,
-    HeightDistanceFactor = 5,
-    MinHeight = 2,
-    FinalBoostAngle = 0,
-
     DebrisBlueprints = {
         '/effects/Entities/TacticalDebris03/TacticalDebris03_proj.bp',
     },
@@ -671,7 +671,7 @@ CLOATacticalChildMissileProjectile = ClassProjectile(SingleBeamProjectile, Tacti
         SingleBeamProjectile.OnCreate(self)
 
         local blueprintPhysics = self.Blueprint.Physics
-        local radius = 0.105 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
+        local radius = 0.11 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
         self:SetCollisionShape('Sphere', 0, 0, 0, radius)
     end,
 

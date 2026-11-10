@@ -5,7 +5,7 @@ local CDisintegratorLaserProjectile = import("/lua/cybranprojectiles.lua").CDisi
 CDFLaserDisintegrator03 = ClassProjectile(CDisintegratorLaserProjectile) {
 
     ---@param self CDFLaserDisintegrator03
-    ---@param army number
+    ---@param army Army
     ---@param EffectTable table
     ---@param EffectScale number
     CreateImpactEffects = function(self, army, EffectTable, EffectScale)

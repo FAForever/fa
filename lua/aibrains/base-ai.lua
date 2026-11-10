@@ -22,20 +22,11 @@ local GetEconomyIncome = moho.aibrain_methods.GetEconomyIncome
 local GetEconomyRequested = moho.aibrain_methods.GetEconomyRequested
 local GetEconomyTrend = moho.aibrain_methods.GetEconomyTrend
 local CategoriesDummyUnit = categories.DUMMYUNIT
-local CoroutineYield = coroutine.yield
+local WaitTicks = WaitTicks
 
 local TableGetn = table.getn
 
 local StandardBrain = import("/lua/aibrain.lua").AIBrain
-
----@class TriggerSpec
----@field Callback function
----@field ReconTypes ReconTypes
----@field Blip boolean
----@field Value boolean
----@field Category EntityCategory
----@field OnceOnly boolean
----@field TargetAIBrain AIBrain
 
 ---@class BaseAIBrain: AIBrain
 ---@field Army number
@@ -671,7 +662,7 @@ AIBrain = Class(StandardBrain) {
                 self.EconomyOverTimeCurrent.EnergyTrendOverTime = eTrend * samplefactor
                 self.EconomyOverTimeCurrent.MassTrendOverTime = mTrend * samplefactor
 
-                coroutine.yield(samplerate)
+                WaitTicks(samplerate)
             end
         end
     end,

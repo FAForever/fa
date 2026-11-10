@@ -48,6 +48,10 @@ local MaxWaterDepthAmphibious = 25
 ---@type number
 local MinWaterDepthNaval = 1.5
 
+--- Convert ogrid squared measurements to KM squared measurements.  20m per ogrid unit.
+---@type number
+local OGridSquaredToKMSquared = 0.02 * 0.02
+
 local TableInsert = table.insert
 local TableGetn = table.getn
 
@@ -821,6 +825,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
         -- local scope for performance
         local type = type
+        local oGridSquaredToKMSquared = OGridSquaredToKMSquared
 
         for k = 1, TableGetn(self) do
             local instance = self[k]
@@ -849,7 +854,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
                 -- assign the label, and then search through our neighbors to assign the same label to them
                 self.Label = label
-                metadata.Area = metadata.Area + ((0.01 * instance.Size) * (0.01 * instance.Size))
+                metadata.Area = metadata.Area + (instance.Size * instance.Size * oGridSquaredToKMSquared)
 
                 -- add our pathable neighbors to the stack
                 for k = 1, TableGetn(instance) do
@@ -871,16 +876,19 @@ CompressedLabelTree = ClassCompressedLabelTree {
                     local other = stack[free - 1]
                     free = free - 1
 
-                    -- assign label, manage metadata
-                    other.Label = label
-                    metadata.Area = metadata.Area + ((0.01 * other.Size) * (0.01 * other.Size))
+                    -- First check if we've already processed this leaf
+                    if other.Label == 0 then
+                        -- assign label, manage metadata
+                        other.Label = label
+                        metadata.Area = metadata.Area + (other.Size * other.Size * oGridSquaredToKMSquared)
 
-                    -- add unlabelled neighbors
-                    for k = 1, TableGetn(other) do
-                        local neighbor = NavLeaves[ other[k] ]
-                        if neighbor.Label == 0 then
-                            stack[free] = neighbor
-                            free = free + 1
+                        -- add unlabelled neighbors
+                        for k = 1, TableGetn(other) do
+                            local neighbor = NavLeaves[ other[k] ]
+                            if neighbor.Label == 0 then
+                                stack[free] = neighbor
+                                free = free + 1
+                            end
                         end
                     end
                 end
@@ -1599,7 +1607,7 @@ local function ComputeTreeInformation(mapHasWater)
 
     local cache = {}
     local size = ScenarioInfo.size[1] / LabelCompressionTreesPerAxis
-    local area = ((0.01 * size) * (0.01 * size))
+    local overallSizeSquared = size * size
 
     local grids = {
         NavGrids['Land'],
@@ -1731,33 +1739,33 @@ local function ComputeTreeInformation(mapHasWater)
     end
 
     ---@param tree NavTree
-    local function ComputeLabelArea(tree)
-        -- sum up the area for the tree as a whole
+    local function ComputeLabelAreaProportion(tree)
+        -- sum up the size squared for the tree as a whole
         local labels = {}
         for label, leaves in tree.Leaves do
-            local treeArea = 0
+            local treeSizeSquared = 0
             for k = 1, TableGetn(leaves) do
                 local leaf = leaves[k]
-                local areaOfLeaf = ((0.01 * leaf.Size) * (0.01 * leaf.Size))
-                treeArea = treeArea + areaOfLeaf
+                local sizeSquaredOfLeaf = leaf.Size * leaf.Size
+                treeSizeSquared = treeSizeSquared + sizeSquaredOfLeaf
             end
 
-            labels[label] = treeArea / area
+            labels[label] = treeSizeSquared / overallSizeSquared
         end
         tree.Labels = labels
 
-        -- sum up the area for each section of the tree
+        -- sum up the size squared for each section of the tree
         for label, sections in tree.Sections do
             for s = 1, TableGetn(sections) do
                 local section = sections[s] --[[@as (NavSection)]]
-                local sectionArea = 0
+                local sectionSizeSquared = 0
                 for k = 1, TableGetn(section.Leaves) do
                     local leaf = section.Leaves[k]
-                    local areaOfLeaf = ((0.01 * leaf.Size) * (0.01 * leaf.Size))
-                    sectionArea = sectionArea + areaOfLeaf
+                    local sizeSquaredOfLeaf = leaf.Size * leaf.Size
+                    sectionSizeSquared = sectionSizeSquared + sizeSquaredOfLeaf
                 end
 
-                section.Area = sectionArea / area
+                section.Area = sectionSizeSquared / overallSizeSquared
             end
         end
     end
@@ -1765,7 +1773,7 @@ local function ComputeTreeInformation(mapHasWater)
     ---@param tree NavTree
     local function ComputeNeighbors(tree)
 
-        local thresholdArea = 0.05
+        local thresholdAreaProportion = 0.05
 
         for label, sections in tree.Sections do
             for s = 1, TableGetn(sections) do
@@ -1779,7 +1787,7 @@ local function ComputeTreeInformation(mapHasWater)
                         local neighbor = NavLeaves[leaf[n]]
                         local neighborTree = neighbor.Root --[[@as NavTree]]
                         local neighborSection = NavSections[neighbor.Section] --[[@as NavSection]]
-                        if (neighbor.Label > 0) and (neighborTree ~= tree) and (neighborSection.Area > thresholdArea) then
+                        if (neighbor.Label > 0) and (neighborTree ~= tree) and (neighborSection.Area > thresholdAreaProportion) then
                             section.Neighbors[neighborSection.Identifier] = true
                         end
                     end
@@ -1800,7 +1808,7 @@ local function ComputeTreeInformation(mapHasWater)
 
                 local allLeaves, allCount = tree:FindLeaves(cache)
                 ComputeSections(tree, allLeaves, allCount)
-                ComputeLabelArea(tree)
+                ComputeLabelAreaProportion(tree)
 
             end
         end

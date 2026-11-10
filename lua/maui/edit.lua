@@ -33,8 +33,10 @@
 local Control = import("/lua/maui/control.lua").Control
 local AddUnicodeCharToEditText = import("/lua/utf.lua").AddUnicodeCharToEditText
 local ScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumber
+local LazyVarCreate = import("/lua/lazyvar.lua").Create
 
 ---@class Edit : moho.edit_methods, Control, InternalObject
+---@overload fun(parent: Control, debugname: string?): Edit
 Edit = ClassUI(moho.edit_methods, Control) {
 
     __init = function(self, parent, debugname)
@@ -43,36 +45,35 @@ Edit = ClassUI(moho.edit_methods, Control) {
             self:SetName(debugname)
         end
 
-        local LazyVar = import("/lua/lazyvar.lua")
         self._lockFontChanges = false
-        self._font = { _family = LazyVar.Create(), _pointsize = LazyVar.Create() }
+        self._font = {_family = LazyVarCreate(), _pointsize = LazyVarCreate()}
         local onFontChanged = function(var)
             self:_internalSetFont()
         end
         self._font._family.OnDirty = onFontChanged
         self._font._pointsize.OnDirty = onFontChanged
 
-        self._fg = LazyVar.Create()
+        self._fg = LazyVarCreate()
         self._fg.OnDirty = function(var)
             self:SetNewForegroundColor(var())
         end
 
-        self._bg = LazyVar.Create()
+        self._bg = LazyVarCreate()
         self._bg.OnDirty = function(var)
             self:SetNewBackgroundColor(var())
         end
 
-        self._cc = LazyVar.Create()
+        self._cc = LazyVarCreate()
         self._cc.OnDirty = function(var)
             self:SetNewCaretColor(var())
         end
 
-        self._hfg = LazyVar.Create()
+        self._hfg = LazyVarCreate()
         self._hfg.OnDirty = function(var)
             self:SetNewHighlightForegroundColor(var())
         end
 
-        self._hbg = LazyVar.Create()
+        self._hbg = LazyVarCreate()
         self._hbg.OnDirty = function(var)
             self:SetNewHighlightBackgroundColor(var())
         end
@@ -140,8 +141,17 @@ Edit = ClassUI(moho.edit_methods, Control) {
     OnEnterPressed = function(self, text)
     end,
 
-    -- called when non text keys (that don't affect text editing) are pressed, passes in the windows VK key code
-    OnNonTextKeyPressed = function(self, keycode, modifiers)
+    --- Called when a non-text key (one that doesn't affect text editing —
+    --- so things like Home / End / Insert / Delete / arrow keys are
+    --- consumed by the engine for caret navigation and do **not** reach
+    --- this handler) is pressed. `keycode` is the OS-level VK_* code (use
+    --- `UIUtil.VK_*` to compare); `event` is the full event payload, with
+    --- modifier state under `event.Modifiers`.
+    ---@param self Edit
+    ---@param keycode number
+    ---@param event KeyEvent
+    ---@diagnostic disable-next-line: unused-local
+    OnNonTextKeyPressed = function(self, keycode, event)
         AddUnicodeCharToEditText(self, keycode)
     end,
 

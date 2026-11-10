@@ -121,27 +121,6 @@ local function CreateAutoBuildEffect(parent)
     return glow
 end
 
----@param parent Control
----@param ID string # ID from `lua/ui/help/tooltips.lua`
-function CreateMouseoverDisplay(parent, ID)
-    if controls.mouseoverDisplay then
-        controls.mouseoverDisplay:Destroy()
-        controls.mouseoverDisplay = false
-    end
-
-    if not Prefs.GetOption('tooltips') then return end
-
-    local createDelay = Prefs.GetOption('tooltip_delay') or 0
-    local text = TooltipInfo['Tooltips'][ID]['title'] or ID
-    local desc = TooltipInfo['Tooltips'][ID]['description'] or ID
-
-    if not text or not desc then
-        return
-    end
-
-    controls.mouseoverDisplay = Tooltip.CreateMouseoverDisplay(parent, {["text"] = text, ["body"] = desc}, nil, true)
-end
-
 local function CreateOrderButtonGrid()
     controls.orderButtonGrid = Grid(controls.bg, GameCommon.iconWidth, GameCommon.iconHeight)
     controls.orderButtonGrid:SetName("Orders Grid")
@@ -321,6 +300,16 @@ local function AttackOrderBehavior(self, modifiers)
     end
 end
 
+-- Allow the right button on the guard order to distribute assisters, while the left button stays as before.
+local function GuardOrderBehavior(self, modifiers)
+    if modifiers and modifiers.Right then
+        import("/lua/ui/game/hotkeys/distribute-assisters.lua").DistributeAssisters()
+        return
+    end
+
+    StandardOrderBehavior(self, modifiers)
+end
+
 --- Dock all units on left click, dock only damaged units on right click
 ---@param self OrderButton
 ---@param modifiers EventModifiers
@@ -432,9 +421,7 @@ local function BuildOrderBehavior(self, modifiers)
             self._curHelpText = self._data.helpText
             self.autoBuildEffect:Destroy()
         end
-        if controls.mouseoverDisplay.text then
-            controls.mouseoverDisplay.text:SetText(self._curHelpText)
-        end
+        Tooltip.SetTooltipText(self._curHelpText)
         SetAutoMode(currentSelection, self:IsChecked())
     end
 end
@@ -506,9 +493,7 @@ local function DiveOrderBehavior(self, modifiers)
             self.autoModeIcon:SetAlpha(1)
             self._isAutoMode = true
         end
-        if controls.mouseoverDisplay.text then
-            controls.mouseoverDisplay.text:SetText(self._curHelpText)
-        end
+        Tooltip.SetTooltipText(self._curHelpText)
         SetAutoSurfaceMode(currentSelection, self._isAutoMode)
     end
 end
@@ -655,12 +640,23 @@ local function ScriptButtonOrderBehavior(self, modifiers, subState)
         ToggleScriptBit(currentSelection, self._data.extraInfo, state)
     end
 
-    if controls.mouseoverDisplay.text then
-        controls.mouseoverDisplay.text:SetText(self._curHelpText)
-    end
+    Tooltip.SetTooltipText(self._curHelpText)
     if subState == nil then
         Checkbox.OnClick(self, modifiers)
     end
+end
+
+--Allow the right button on shieldtoggle to disharge the shields
+---@param self OrderButton
+---@param modifiers EventModifiers
+---@param subState boolean
+local function ShieldToggleOrderBehavior(self, modifiers, subState)
+    if modifiers and modifiers.Right then
+        SimCallback({ Func = "DischargeShields", Args = {} }, true)
+        return
+    end
+
+    ScriptButtonOrderBehavior(self, modifiers, subState)
 end
 
 -- Generic script button specific behvior
@@ -718,9 +714,7 @@ local function StatToggleOrderBehavior(self, modifiers, subState)
         SimCallback( { Func="SetStatByCallback", Args= {[self._data.statToggle] = not state}}, true)
     end
 
-    if controls.mouseoverDisplay.text then
-        controls.mouseoverDisplay.text:SetText(self._curHelpText)
-    end
+    Tooltip.SetTooltipText(self._curHelpText)
     if subState == nil then
         Checkbox.OnClick(self, modifiers)
     else
@@ -899,12 +893,9 @@ local function CreateFirestatePopup(parent, toggleState)
         ---@return boolean
         btn.HandleEvent = function(control, event)
             if event.Type == 'MouseEnter' then
-                CreateMouseoverDisplay(control, control.info.helpText)
+                Tooltip.CreateMouseoverDisplay(control, control.info.helpText, nil, true)
             elseif event.Type == 'MouseExit' then
-                if controls.mouseoverDisplay then
-                    controls.mouseoverDisplay:Destroy()
-                    controls.mouseoverDisplay = false
-                end
+                Tooltip.DestroyMouseoverDisplay()
             end
             return Checkbox.HandleEvent(control, event)
         end
@@ -1034,7 +1025,7 @@ end
 
 ---@param button OrderButton
 local function NukeBtnText(button)
-    if not currentSelection[1] or currentSelection[1]:IsDead() then return '' end
+    if not currentSelection[1] or IsDestroyed(currentSelection[1]) then return '' end
     if table.getsize(currentSelection) > 1 then
         button.buttonText:SetColor('fffff600')
         return '?'
@@ -1051,7 +1042,7 @@ end
 
 ---@param button OrderButton
 local function TacticalBtnText(button)
-    if not currentSelection[1] or currentSelection[1]:IsDead() then return '' end
+    if not currentSelection[1] or IsDestroyed(currentSelection[1]) then return '' end
     if table.getsize(currentSelection) > 1 then
         button.buttonText:SetColor('fffff600')
         return '?'
@@ -1141,9 +1132,7 @@ function OverchargeBehavior(self, modifiers)
             self._isAutoMode = true
         end
 
-        if controls.mouseoverDisplay.text then
-            controls.mouseoverDisplay.text:SetText(self._curHelpText)
-        end
+        Tooltip.SetTooltipText(self._curHelpText)
 
         SimCallback({Func = 'AutoOvercharge', Args = {auto = self._isAutoMode == true} }, true)
     end
@@ -1151,7 +1140,7 @@ end
 
 function EnterOverchargeMode()
     local unit = currentSelection[1]
-    if not unit or unit:IsDead() or unit:IsOverchargePaused() then return end
+    if not unit or IsDestroyed(unit) or unit:IsOverchargePaused() then return end
     local bp = unit:GetBlueprint()
     local weapon = FindOCWeapon(unit:GetBlueprint())
     if not weapon then return end
@@ -1166,7 +1155,7 @@ end
 ---@param deltaTime number
 local function OverchargeFrame(self, deltaTime)
     local unit = currentSelection[1]
-    if not unit or unit:IsDead() then return end
+    if not unit or IsDestroyed(unit) then return end
     local weapon = FindOCWeapon(unit:GetBlueprint())
     if not weapon then
         self:SetNeedsFrameUpdate(false)
@@ -1269,7 +1258,7 @@ local defaultOrdersTable = {
     RULEUCC_Attack = {              helpText = "attack",            bitmapId = 'attack',                preferredSlot = 3,  behavior = AttackOrderBehavior, initialStateFunc = AttackOrderInit},
     RULEUCC_Patrol = {              helpText = "patrol",            bitmapId = 'patrol',                preferredSlot = 4,  behavior = StandardOrderBehavior},
     RULEUCC_Stop = {                helpText = "stop",              bitmapId = 'stop',                  preferredSlot = 5,  behavior = StopOrderBehavior},
-    RULEUCC_Guard = {               helpText = "assist",            bitmapId = 'guard',                 preferredSlot = 6,  behavior = StandardOrderBehavior},
+    RULEUCC_Guard = {               helpText = "assist",            bitmapId = 'guard',                 preferredSlot = 6,  behavior = GuardOrderBehavior},
     RULEUCC_RetaliateToggle = {     helpText = "mode",              bitmapId = 'stand-ground',          preferredSlot = 7,  behavior = RetaliateOrderBehavior,      initialStateFunc = RetaliateInitFunction},
     -- Unit specific rules
     RULEUCC_Overcharge = {          helpText = "overcharge",        bitmapId = 'overcharge',            preferredSlot = 8,  behavior = OverchargeBehavior,          initialStateFunc = OverchargeInit, onframe = OverchargeFrame},
@@ -1294,7 +1283,7 @@ local defaultOrdersTable = {
     ExFac = {                       helpText = "external_factory",  bitmapId = 'exfac',                 preferredSlot = 10,  behavior = ExternalFactoryBehavior},
 
     -- Unit toggle rules
-    RULEUTC_ShieldToggle = {        helpText = "toggle_shield",     bitmapId = 'shield',                preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 0},
+    RULEUTC_ShieldToggle = {        helpText = "toggle_shield",     bitmapId = 'shield',                preferredSlot = 8,  behavior = ShieldToggleOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 0},
     RULEUTC_WeaponToggle = {        helpText = "toggle_weapon",     bitmapId = 'toggle-weapon',         preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 1},
     RULEUTC_JammingToggle = {       helpText = "toggle_jamming",    bitmapId = 'jamming',               preferredSlot = 9,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 2},
     RULEUTC_IntelToggle = {         helpText = "toggle_intel",      bitmapId = 'intel',                 preferredSlot = 9,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 3},
@@ -1426,7 +1415,7 @@ local function AddOrder(orderInfo, slot, batchMode)
     -- Set up tooltips
     checkbox.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
-            CreateMouseoverDisplay(self, self._curHelpText)
+            Tooltip.CreateMouseoverDisplay(self, self._curHelpText, nil, true)
 
             if not self:IsDisabled() then
                 if controls.orderGlow then
@@ -1436,10 +1425,7 @@ local function AddOrder(orderInfo, slot, batchMode)
                 glowThread = CreateOrderGlow(self)
             end
         elseif event.Type == 'MouseExit' then
-            if controls.mouseoverDisplay then
-                controls.mouseoverDisplay:Destroy()
-                controls.mouseoverDisplay = false
-            end
+            Tooltip.DestroyMouseoverDisplay()
             if controls.orderGlow then
                 controls.orderGlow:Destroy()
                 controls.orderGlow = false
@@ -1588,10 +1574,16 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
             -- finally, make sure our units are all of the same type
             local bp = exFacs[1]:GetUnitId()
             if table.getn(EntityCategoryFilterDown(categories[bp], exFacs)) == table.getn(exFacs) then
+                local inserted = false
                 for _, exFac in exFacs do
-                    table.insert(assistingUnitList['ExFac'], exFac:GetCreator())
+                    if exFac:GetFractionComplete() == 1 then
+                        table.insert(assistingUnitList['ExFac'], exFac:GetCreator())
+                        inserted = true
+                    end
                 end
-                table.insert(availableOrders, 'ExFac')
+                if inserted then
+                    table.insert(availableOrders, 'ExFac')
+                end
             end
         end
     end
@@ -1845,10 +1837,7 @@ function SetAvailableOrders(availableOrders, availableToggles, newSelection)
 end
 
 function CreateControls()
-    if controls.mouseoverDisplay then
-        controls.mouseoverDisplay:Destroy()
-        controls.mouseoverDisplay = false
-    end
+    Tooltip.DestroyMouseoverDisplay()
     if not controls.bg then
         controls.bg = Bitmap(controls.controlClusterGroup)
     end
@@ -1943,3 +1932,26 @@ function Expand()
         controls.bg:Hide()
     end
 end
+
+--#region Backwards compatibility
+function CreateMouseoverDisplay(parent, ID)
+    Tooltip.CreateMouseoverDisplay(parent, ID, nil, true)
+end
+local _mouseoverDisplay = setmetatable({}, { __index = { Destroy = Tooltip.DestroyMouseoverDisplay, text = { SetText = Tooltip.SetTooltipText } }, __newindex = function() end })
+setmetatable(controls, {
+    __index = function(t, k)
+        if k == 'mouseoverDisplay' then
+            return _mouseoverDisplay
+        else
+            return rawget(t, k)
+        end
+    end,
+    __newindex = function(t, k, v)
+        if k == 'mouseoverDisplay' then
+            return
+        else
+            rawset(t, k, v)
+        end
+    end,
+})
+--#endregion

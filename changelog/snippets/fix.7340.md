@@ -1,0 +1,1 @@
+- Fix the mass cost that units store for an enhancement in progress (`WorkItemBuildCostMass`) being its energy cost. This only affects mods that read it (#7340).

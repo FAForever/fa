@@ -23,6 +23,7 @@ local IsDestroyed = IsDestroyed
 ---@field UnitBeingBuilt Unit | nil
 ---@field AttachmentSliderManip moho.SlideManipulator
 ---@field PrepareToBuildManipulator moho.AnimationManipulator
+---@field ReleaseEffectsBag TrashBag
 UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
     PrepareToBuildAnimRate = 5,
     BuildAttachBone = 'Build_Attachpoint',
@@ -102,6 +103,10 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
     ---@param unitBeingBuilt Unit
     OnStopBuild = function(self, unitBeingBuilt)
         TMobileFactoryUnit.OnStopBuild(self, unitBeingBuilt)
+        -- Unbuilt units can be in `OnStopBuild` when a `BuildMobile` order gets cancelled.
+        if not unitBeingBuilt.Dead and not unitBeingBuilt.isFinishedUnit then
+            unitBeingBuilt:Destroy()
+        end
         self.BuildingUnit = false
     end,
 
@@ -186,6 +191,13 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
         ---@param unitBeingBuilt Unit
         OnStopBuild = function(self, unitBeingBuilt)
             TMobileFactoryUnit.OnStopBuild(self, unitBeingBuilt)
+            -- Unbuilt units can be in `OnStopBuild` when a `BuildMobile` order gets cancelled.
+            if unitBeingBuilt:GetFractionComplete() < 1 then
+                unitBeingBuilt:Destroy()
+                ChangeState(self, self.IdleState)
+                return
+            end
+
             ChangeState(self, self.RollingOffState)
         end,
     },
@@ -194,6 +206,7 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
         ---@param self UEL0401
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
+            ---@cast unitBuilding -nil
             if not unitBuilding.Dead then
                 unitBuilding:ShowBone(0, true)
             end
@@ -221,6 +234,7 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
     CreateRollOffEffects = function(self)
         local army = self.Army
         local unitB = self.UnitBeingBuilt
+        ---@cast unitB -nil
         for k, v in self.RollOffBones do
             local fx = AttachBeamEntityToEntity(self, v, unitB, -1, army, EffectTemplate.TTransportBeam01)
             table.insert(self.ReleaseEffectsBag, fx)

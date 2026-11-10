@@ -5,6 +5,14 @@
 --*
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
+
+-- This file implements the main lobby screen
+-- To see the options/map selection screen, see mapselect.lua
+-- For mods, modsmanager.lua
+-- For unit restrictions, unitsmanager.lua
+-- For "patchnotes" screen, changelog.lua
+-- For load game screen, saveload.lua CreateLoadDialog
+
 local GameVersion = import("/lua/version.lua").GetVersion
 local UIUtil = import("/lua/ui/uiutil.lua")
 local MenuCommon = import("/lua/ui/menus/menucommon.lua")
@@ -12,14 +20,12 @@ local Prefs = import("/lua/user/prefs.lua")
 local MapUtil = import("/lua/ui/maputil.lua")
 local Group = import("/lua/maui/group.lua").Group
 local RadioButton = import("/lua/ui/controls/radiobutton.lua").RadioButton
-local MapPreview = import("/lua/ui/controls/mappreview.lua").MapPreview
 local ResourceMapPreview = import("/lua/ui/controls/resmappreview.lua").ResourceMapPreview
 local Popup = import("/lua/ui/controls/popups/popup.lua").Popup
 local Slider = import("/lua/maui/slider.lua").Slider
 local PlayerData = import("/lua/ui/lobby/data/playerdata.lua").PlayerData
 local GameInfo = import("/lua/ui/lobby/data/gamedata.lua")
 local WatchedValueArray = import("/lua/ui/lobby/data/watchedvalue/watchedvaluearray.lua").WatchedValueArray
-local ItemList = import("/lua/maui/itemlist.lua").ItemList
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Button = import("/lua/maui/button.lua").Button
@@ -30,11 +36,9 @@ local Tooltip = import("/lua/ui/game/tooltip.lua")
 local Mods = import("/lua/mods.lua")
 local FactionData = import("/lua/factions.lua")
 local TextArea = import("/lua/ui/controls/textarea.lua").TextArea
-
-local utils = import("/lua/system/utils.lua")
+local Presets = import("/lua/ui/lobby/presets.lua")
 
 local Trueskill = import("/lua/ui/lobby/trueskill.lua")
-local round = Trueskill.round
 local Player = Trueskill.Player
 local Rating = Trueskill.Rating
 local ModBlacklist = import("/etc/faf/blacklist.lua").Blacklist
@@ -43,8 +47,6 @@ local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 local CountryTooltips = import("/lua/ui/help/tooltips-country.lua").tooltip
 local SetUtils = import("/lua/system/setutils.lua")
 local JSON = import("/lua/system/dkson.lua").json
-local UnitsAnalyzer = import("/lua/ui/lobby/unitsanalyzer.lua")
-local Changelog = import("/lua/ui/lobby/changelog.lua")
 local UTF =  import("/lua/utf.lua")
 -- Uveso - aitypes inside aitypes.lua are now also available as a function.
 local aitypes
@@ -53,6 +55,8 @@ local AIStrings = {}
 local AITooltips = {}
 
 
+
+local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 
 function GetAITypes()
     AIKeys = {}
@@ -78,10 +82,32 @@ if HasCommandLineArg("/syncreplay") and HasCommandLineArg("/gpgnet") then
     IsSyncReplayServer = true
 end
 
-local globalOpts = import("/lua/ui/lobby/lobbyoptions.lua").globalOpts
-local teamOpts = import("/lua/ui/lobby/lobbyoptions.lua").teamOptions
-local AIOpts = import("/lua/ui/lobby/lobbyoptions.lua").AIOpts
+local lobbyOptions = import("/lua/ui/lobby/lobbyoptions.lua")
+local globalOpts = lobbyOptions.globalOpts
+local teamOpts = lobbyOptions.teamOptions
+local AIOpts = lobbyOptions.AIOpts
 local gameColors = import("/lua/gamecolors.lua").GameColors
+
+-- Table mapping option keys to mods that use them
+--
+-- Format: `{ [optionKey] = { modUID = modName, modUID = modName, ... } }`
+---@type table<string, table<string, string>>
+local ModOptionMapping = {}
+
+-- Set of option keys from the original/default lobbyOptions.lua
+-- Used to distinguish default options from mod-added options
+---@type table<string, true>
+local DefaultOptionKeys = {}
+
+-- Initialize DefaultOptionKeys with the original lobbyOptions.lua options
+local function initOptionKeys(...)
+    for _, optionTable in ipairs(arg) do
+        for _, option in optionTable do
+            DefaultOptionKeys[option.key] = true
+        end
+    end
+end
+initOptionKeys(globalOpts, teamOpts, AIOpts)
 
 local numOpenSlots = LobbyComm.maxPlayerSlots
 
@@ -90,14 +116,21 @@ function ImportModAIOptions()
     local simMods = import("/lua/mods.lua").AllMods()
     local OptionData
     local alreadyStored
-    for Index, ModData in simMods do
+    for _, ModData in simMods do
         if exists(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua') then
             OptionData = import(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua').AIOpts
-            for s, t in OptionData do
+            for _, t in OptionData do
                 -- check, if we have this option already stored
                 alreadyStored = false
-                for k, v in AIOpts do
+                for _, v in AIOpts do
                     if v.key == t.key then
+                        if DebugComponent.EnabledLogging then
+                            LOG(string.format(
+                                'Found duplicate mod option "%s" in mod "%s"'
+                                , t.key
+                                , ModData.name
+                            ))
+                        end
                         alreadyStored = true
                         break
                     end
@@ -105,6 +138,11 @@ function ImportModAIOptions()
                 if not alreadyStored then
                     table.insert(AIOpts, t)
                 end
+
+                -- Initialize the option's mod set
+                ModOptionMapping[t.key] = ModOptionMapping[t.key] or {}
+                -- Track that this option is used by this mod
+                ModOptionMapping[t.key][ModData.uid] = ModData.name
             end
         end
     end
@@ -114,14 +152,35 @@ ImportModAIOptions()
 -- Maps faction identifiers to their names.
 local FACTION_NAMES = {[1] = "uef", [2] = "aeon", [3] = "cybran", [4] = "seraphim", [5] = "random" }
 
-local LAST_GAME_PRESET_NAME = "lastGame"
+--- Helper function: Returns true if the given option key exists in the default lobbyOptions.lua
+---@param optionKey string
+---@return boolean
+local function IsDefaultOption(optionKey)
+    return DefaultOptionKeys[optionKey] ~= nil
+end
+
+--- Helper function: Returns true if the given option is used by any of the given mods
+---@param optionKey string
+---@param enabledModUIDs table<string, nonnil> # `table<modUID, unused>`
+---@return boolean
+local function IsOptionUsedByGivenMods(optionKey, enabledModUIDs)
+    local modUIDsUsingOpt = ModOptionMapping[optionKey]
+    if not modUIDsUsingOpt then return false end
+    for modUID, _ in modUIDsUsingOpt do
+        if enabledModUIDs[modUID] then
+            return true
+        end
+    end
+    return false
+end
+
 local rehostPlayerOptions = {} -- Player options loaded from preset, used for rehosting
 
 local formattedOptions = {}
 local nonDefaultFormattedOptions = {}
-local Warning_MAP = false
 local LrgMap = false
 
+---@type UILobbyHostUtils
 local HostUtils
 local mapPreviewSlotSwapFrom = 0
 local mapPreviewSlotSwap = false
@@ -188,21 +247,12 @@ local function parseCommandlineArguments()
         playerMean = tonumber(GetCommandLineArgOrDefault("/mean", 1500)),
         playerClan = tostring(GetCommandLineArgOrDefault("/clan", "")),
         playerDeviation = tonumber(GetCommandLineArgOrDefault("/deviation", 500)),
+        debugLobby = HasCommandLineArg("/debugLobby"), -- Used by LaunchFAInstances script to set players as ready by default
     }
 end
 local argv = parseCommandlineArguments()
 
 local playerRating = math.floor(Trueskill.round2((argv.playerMean - 3 * argv.playerDeviation) / 100.0) * 100)
-
-local teamNumbers = {
-    "<LOC _No>",
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-}
 
 local function ParseWhisper(params)
     local delimStart = string.find(params, " ")
@@ -226,18 +276,17 @@ local commands = {
 
 local Strings = LobbyComm.Strings
 
----@type LobbyComm
-local lobbyComm = false
+---@type UILobbyCommunication
+local lobbyComm
 local localPlayerName = ""
 local gameName = ""
-local hostID = false
+local hostID
 local singlePlayer = false
 ---@type Group
-local GUI = false
-local localPlayerID = false
+local GUI
+local localPlayerID
 ---@type GameData | WatchedGameData
-local gameInfo = false
-local pmDialog = false
+local gameInfo
 local lastKickMessage = UTF.UnescapeString(Prefs.GetFromCurrentProfile('lastKickMessage') or "")
 
 local defaultMode =(HasCommandLineArg("/windowed") and "windowed") or Prefs.GetFromCurrentProfile('options').primary_adapter
@@ -360,12 +409,12 @@ local function GetSlotMenuTables(stateKey, hostKey, slotNum)
     local tooltips = {}
 
     if not GetSlotMenuData()[stateKey] then
-        WARN("Invalid slot menu state selected: " .. stateKey)
+        WARN("Invalid slot menu state selected: " .. tostring(stateKey))
         return nil
     end
 
     if not GetSlotMenuData()[stateKey][hostKey] then
-        WARN("Invalid slot menu host key selected: " .. hostKey)
+        WARN("Invalid slot menu host key selected: " .. tostring(hostKey))
         return nil
     end
 
@@ -460,6 +509,7 @@ function GetLocalPlayerData()
             GameType = gametype,
             Commit = commit,
 
+            Ready = argv.debugLobby,
         }
 )
 end
@@ -500,8 +550,6 @@ function ComputeAIRating(gameOptions, aiLobbyProperties)
     local mapMultiplier = aiLobbyProperties.ratingMapMultiplier[maparea] or 1.0
     local cheatBuildMultiplier = (tonumber(gameOptions.BuildMult) or 1.0) - 1.0
     local cheatResourceMultiplier = (tonumber(gameOptions.CheatMult) or 1.0) - 1.0
-
-    
 
     -- compute the rating
     local cheatBuildValue = (aiLobbyProperties.ratingBuildMultiplier or 0.0) * cheatBuildMultiplier
@@ -642,13 +690,13 @@ end
 
 
 function Reset()
-    lobbyComm = false
+    lobbyComm = nil
     localPlayerName = ""
     gameName = ""
-    hostID = false
+    hostID = nil
     singlePlayer = false
-    GUI = false
-    localPlayerID = false
+    GUI = nil
+    localPlayerID = nil
     availableMods = {}
     selectedUIMods = Mods.GetSelectedUIMods()
     selectedSimMods = Mods.GetSelectedSimMods()
@@ -1052,9 +1100,10 @@ function SetSlotInfo(slotNum, playerInfo)
         GUI.connectdialog:Close()
         GUI.connectdialog = nil
 
-        -- Changelog, if necessary.
-        if Changelog.OpenChangelog() then
-            Changelog.Changelog(GetFrame(0))
+        -- ChangelogDialog, if necessary.
+        local changelogDialogManager = import("/lua/ui/lobby/changelog/changelogdialog.lua")
+        if changelogDialogManager.ShouldOpenChangelog() then
+            changelogDialogManager.CreateChangelogDialog(GetFrame(0))
         end
     end
 
@@ -1587,7 +1636,7 @@ local function AssignRandomStartSpots()
         return
     end
 
-    function teamsAddSpot(teams, team, spot)
+    local function teamsAddSpot(teams, team, spot)
         if not teams[team] then
             teams[team] = {}
         end
@@ -1595,7 +1644,7 @@ local function AssignRandomStartSpots()
     end
 
     -- rearrange players according to the provided setup
-    function rearrangePlayers(data)
+    local function rearrangePlayers(data)
         gameInfo.GameOptions['Quality'] = data.quality
 
         -- Copy a reference to each of the PlayerData objects indexed by their original slots.
@@ -1609,7 +1658,7 @@ local function AssignRandomStartSpots()
             local rating_cmp = function(a,b) return a.rating > b.rating end
             local slot_cmp = function(a,b) return a.slot < b.slot end
 
-            function getMasterOrder(sortedSlots)
+            local function getMasterOrder(sortedSlots)
                 local masterOrder = {}
 
                 local slot2nr = {}
@@ -1624,7 +1673,7 @@ local function AssignRandomStartSpots()
                 return masterOrder
             end
 
-            function teamsSameSize(slots)
+            local function teamsSameSize(slots)
                 local size
 
                 for t, sorted in slots do
@@ -1637,7 +1686,7 @@ local function AssignRandomStartSpots()
                 return true
             end
 
-            function reorderSlots(sortedSlots, masterOrder)
+            local function reorderSlots(sortedSlots, masterOrder)
                 local newSlots = {}
                 for i, j in masterOrder do
                     table.insert(newSlots, sortedSlots.byNr[j].slot)
@@ -1765,6 +1814,7 @@ local function AssignRandomStartSpots()
         end
     end
 
+    local s, q
     if teamSpawn == 'random' or teamSpawn == 'random_reveal' then
         s = autobalance_random(ratingTable, teams)
         q = autobalance_quality(s)
@@ -1783,7 +1833,6 @@ local function AssignRandomStartSpots()
     }
 
     local cmp = function(a, b) return a.quality > b.quality end
-    local s, q
     for fname, f in functions do
         s = f(ratingTable, teams)
         if s then
@@ -1810,7 +1859,7 @@ local function AssignRandomStartSpots()
         setups = table.shuffle(setups)
     end
 
-    best = table.remove(setups, 1)
+    local best = table.remove(setups, 1)
     rearrangePlayers(best)
 end
 
@@ -2278,27 +2327,66 @@ local function TryLaunch(skipNoObserversCheck)
         if scenarioInfo.AdaptiveMap then
             gameInfo.GameOptions["SpawnMex"] = gameInfo.SpawnMex
         end
+        if gameInfo.GameOptions["CheatsEnabled"] == "true" and singlePlayer then
+            gameInfo.GameOptions["GameSpeed"] = "adjustable"
+        end
 
         HostUtils.SendArmySettingsToServer()
+
+        --#region Filter GameOptions to remove options from disabled mods
+
+        local enabledModUIDs = Mods.GetSelectedMods()
+
+        -- Remove options from disabled mods
+        -- Only remove options that are not in the default lobbyOptions.lua
+        local keysToRemove = {}
+        for optionKey, _ in gameInfo.GameOptions do
+            -- Skip if this is a default option (always keep default options)
+            if not IsDefaultOption(optionKey) and ModOptionMapping[optionKey] then
+                -- Check if this option is used by an enabled mod
+                local isUsed = IsOptionUsedByGivenMods(optionKey, enabledModUIDs)
+
+                -- If NOT used, mark for removal
+                if not isUsed then
+                    table.insert(keysToRemove, optionKey)
+                    if DebugComponent.EnabledSpewing then
+                        SPEW(string.format('Option "%s" marked for removal because none of these mods are enabled: "%s"'
+                            , optionKey
+                            , table.concat(table.values(ModOptionMapping[optionKey]))
+                        ))
+                    end
+                end
+            end
+        end
+        if DebugComponent.EnabledLogging then
+            LOG(string.format("%d options marked for removal", table.getsize(keysToRemove)))
+        end
+
+        -- Remove the marked keys from GameOptions
+        for _, key in keysToRemove do
+            gameInfo.GameOptions[key] = nil
+        end
+        --#endregion
 
         -- Tell everyone else to launch and then launch ourselves.
         -- TODO: Sending gamedata here isn't necessary unless lobbyComm is fucking stupid and allows
         -- out-of-order message delivery.
         -- Downlord: I use this in clients now to store the rehost preset. So if you're going to remove this, please
         -- check if rehosting still works for non-host players.
+        ---@see UIlobbyMessageHandlers.Launch
         lobbyComm:BroadcastData({ Type = 'Launch', GameInfo = gameInfo })
 
         -- set the mods
+        -- We don't broadcast them because its a huge table of type ModInfo[]
+        -- Clients will set their mods independently in the `Launch` message handler
         gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
 
         SetWindowedLobby(false)
 
-        SavePresetToName(LAST_GAME_PRESET_NAME)
+        Presets.SaveLastGamePreset()
 
         -- launch the game
         lobbyComm:LaunchGame(gameInfo)
-
-        
     end
 
     LaunchGame()
@@ -2405,12 +2493,12 @@ local function UpdateGame()
                         info.Name = mod.name
                         info.Author = mod.author
                         info.Location = mod.location
-                        info.Identifier = string.lower(utils.StringSplit(mod.location, '/')[2])
+                        info.Identifier = string.lower(string.split(mod.location, '/')[2])
                         info.UID = uid
                         table.insert(iconReplacements, info)
                     -- tell us (and then spam the author, not the dev) if it failed
                     else
-                        WARN("Unable to load icons from mod '" .. mod.name .. "' with uid '" .. uid .. "'. Please inform the author: " .. mod.author)
+                        WARN("Unable to load icons from mod '" .. tostring(mod.name) .. "' with uid '" .. tostring(uid) .. "'. Please inform the author: " .. tostring(mod.author))
                         WARN(msg)
                     end
                 end
@@ -2812,7 +2900,7 @@ function CreateSlotsUI(makeLabel)
         newSlot.HandleEvent = defaultHandler
 
         -- Slot number
-        local slotNumber = UIUtil.CreateText(newSlot, i, 14, 'Arial')
+        local slotNumber = UIUtil.CreateText(newSlot, tostring(i), 14, 'Arial')
         newSlot.slotNumber = slotNumber
         LayoutHelpers.SetWidth(slotNumber, COLUMN_WIDTHS[1])
         slotNumber.Height:Set(newSlot.Height)
@@ -3047,12 +3135,7 @@ end
 
 -- create UI won't typically be called directly by another module
 function CreateUI(maxPlayers)
-    local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
-    local Text = import("/lua/maui/text.lua").Text
     local ResourceMapPreview = import("/lua/ui/controls/resmappreview.lua").ResourceMapPreview
-    local MapPreview = import("/lua/ui/controls/mappreview.lua").MapPreview
-    local MultiLineText = import("/lua/maui/multilinetext.lua").MultiLineText
-    local EffectHelpers = import("/lua/maui/effecthelpers.lua")
     local ItemList = import("/lua/maui/itemlist.lua").ItemList
     local Prefs = import("/lua/user/prefs.lua")
     local Tooltip = import("/lua/ui/game/tooltip.lua")
@@ -3155,12 +3238,12 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtLeftTopIn(GUI.logo, GUI, 1, 1)
 
     local version, gametype, commit = import("/lua/version.lua").GetVersionData()
-    GUI.gameVersionText = UIUtil.CreateText(GUI.panel, "Game version " .. version, 9, UIUtil.bodyFont)
+    GUI.gameVersionText = UIUtil.CreateText(GUI.panel, LOC('<LOC lobui_0466>Game version ') .. version, 9, UIUtil.bodyFont)
     GUI.gameVersionText:SetColor('677983')
     GUI.gameVersionText:SetDropShadow(true)
 
-    Tooltip.AddControlTooltipManual(GUI.gameVersionText, 'Version control', string.format(
-        'Game version: %s\nGame type: %s\nCommit hash: %s', version, gametype, commit:sub(1, 8)
+    Tooltip.AddControlTooltipManual(GUI.gameVersionText, '<LOC lobui_0467>Version control', string.format(
+        LOC('<LOC lobui_0468>Game version: %s\nGame type: %s\nCommit hash: %s'), version, gametype, commit:sub(1, 8)
     ))
 
     LayoutHelpers.AtLeftTopIn(GUI.gameVersionText, GUI.panel, 70, 3)
@@ -3342,11 +3425,11 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtBottomIn(GUI.patchnotesButton, GUI.optionsPanel, -51)
     LayoutHelpers.AtHorizontalCenterIn(GUI.patchnotesButton, GUI.optionsPanel, -55)
     GUI.patchnotesButton.OnClick = function(self, event)
-        Changelog.Changelog(GUI)
+        import("/lua/ui/lobby/changelog/changelogdialog.lua").CreateChangelogDialog(GUI)
     end
 
     -- Create mission briefing button
-    local briefingButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Briefing")
+    local briefingButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "<LOC _Briefing>Briefing")
     GUI.briefingButton = briefingButton
     LayoutHelpers.AtBottomIn(GUI.briefingButton, GUI.optionsPanel, -51)
     LayoutHelpers.AtHorizontalCenterIn(GUI.briefingButton, GUI.optionsPanel, -55)
@@ -3746,7 +3829,7 @@ function CreateUI(maxPlayers)
     elseif isHost then
         GUI.restrictedUnitsOrPresetsBtn.label:SetText(LOC("<LOC lobui_0424>Presets"))
         GUI.restrictedUnitsOrPresetsBtn.OnClick = function(self, modifiers)
-            ShowPresetDialog()
+            Presets.CreateUI(GUI)
         end
         Tooltip.AddButtonTooltip(GUI.restrictedUnitsOrPresetsBtn, 'Lobby_presetDescription')
     else
@@ -4450,7 +4533,7 @@ function CreateUI(maxPlayers)
         end
     end)
     if false then
-        import("/lua/ui/events/SnowFlake.lua"). CreateSnowFlakes(GUI)
+        import("/lua/ui/events/snowflake.lua"). CreateSnowFlakes(GUI)
     end
 end
 
@@ -4512,11 +4595,15 @@ function setupChatEdit(chatPanel)
     end
 
     GUI.chatEdit.OnEscPressed = function(self, text)
+
+        local changelogDialogManager = import("/lua/ui/lobby/changelog/changelogdialog.lua")
+        local changelogDialogIsOpen = changelogDialogManager.IsOpen()
+
         -- The default behaviour buggers up our escape handlers. Just delegate the escape push to
         -- the escape handling mechanism.
-        if HasCommandLineArg("/gpgnet") or Changelog.isOpen then
+        if HasCommandLineArg("/gpgnet") or changelogDialogIsOpen then
             -- Quit to desktop
-            EscapeHandler.HandleEsc(not Changelog.isOpen)
+            EscapeHandler.HandleEsc(not changelogDialogIsOpen)
         else
             -- Back to main menu
             GUI.exitButton.OnClick()
@@ -5099,7 +5186,7 @@ local FromSubjectOrHost = function(data)
     return false
 end
 
---
+---@class UIlobbyMessageHandlers
 local MessageHandlers = {
     -- Update player options. Either the host reconfiguring, or users tweaking their own settings.
     PlayerOptions = {
@@ -5571,7 +5658,7 @@ local MessageHandlers = {
                 end
              end
 
-            SavePresetToName(LAST_GAME_PRESET_NAME)
+            Presets.SaveLastGamePreset()
             lobbyComm:LaunchGame(info)
         end
     },
@@ -5658,13 +5745,19 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         CreateUI(LobbyComm.maxPlayerSlots)
     end
 
+    --- Called by the engine when we receive data from other players. There is no checking to see if the data is legitimate, these need to be done in Lua.
+    ---
+    --- Data can be sent via `BroadcastData` and/or `SendData`.
+    ---@param self UILobbyCommunication
+    ---@param data UILobbyReceivedMessage
     lobbyComm.DataReceived = function(self, data)
+        -- make it more convenient to debug malicious traffic
+        SPEW(string.format("Received data of type %s from %s (%s)", tostring(data.Type), tostring(data.SenderID), tostring(data.SenderName)))
 
-        
         -- Decide if we should just drop the packet. Violations here are usually people using a
         -- modified lobby.lua to try to do stupid shit.
         if not MessageHandlers[data.Type] then
-            WARN("Unknown message type: " .. data.Type)
+            WARN("Unknown message type: " .. tostring(data.Type))
             return
         end
 
@@ -5674,7 +5767,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         elseif MessageHandlers[data.Type].Reject then
             MessageHandlers[data.Type].Reject(data)
         else
-            WARN("Rejected message of type " .. data.Type .. " from " .. FindNameForID(data.SenderID))
+            WARN("Rejected message of type " .. tostring(data.Type) .. " from " .. tostring(FindNameForID(data.SenderID)))
         end
     end
 
@@ -5818,7 +5911,10 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         ForkThread(function() UpdateBenchmark(false) end)
 
         if argv.isRehost then
-            LoadPresetByName(LAST_GAME_PRESET_NAME);
+            local settings = Presets.GetLastGameSettings()
+            if not settings then
+                ApplyGameSettings(settings)
+            end
 
             local rehostSlot = FindRehostSlotForID(localPlayerID)
             if rehostSlot then
@@ -6161,7 +6257,7 @@ function CPUBenchmark()
         if totalTime > countTime then
             --This is necessary in order to make this 'thread' yield so other things can be done.
             countTime = totalTime + .125
-            coroutine.yield(1)
+            WaitFrames(1)
         end
     end
     BenchTime = math.ceil(totalTime * 100)
@@ -6339,7 +6435,7 @@ function SetGameTitleText(title)
 end
 
 function ShowTitleDialog()
-    CreateInputDialog(GUI, "Game Title",
+    CreateInputDialog(GUI, "<LOC lobui_0465>Game Title",
         function(self, text)
             -- remove new lines from the text
             text = text:gsub("\r", "")
@@ -6368,7 +6464,7 @@ end
 
 -- Show the rule change dialog.
 function ShowRuleDialog()
-    CreateInputDialog(GUI, "Game Rules",
+    CreateInputDialog(GUI, "<LOC lobui_0464>Game Rules",
         function(self, text)
             SetGameOption("GameRules", text, true)
             SetRuleTitleText(text)
@@ -6603,8 +6699,8 @@ function ShowLobbyOptionsDialog()
             local sliderValue = math.floor(newValue)
             slider_SnowFlakes_Count_TEXT:SetText(LOC("<LOC lobui_0447>Snowflakes count").. sliderValue)
             Prefs.SetToCurrentProfile('SnowFlakesCount', sliderValue)
-            import("/lua/ui/events/SnowFlake.lua").Clear()
-            import("/lua/ui/events/SnowFlake.lua").CreateSnowFlakes(GUI, sliderValue)
+            import("/lua/ui/events/snowflake.lua").Clear()
+            import("/lua/ui/events/snowflake.lua").CreateSnowFlakes(GUI, sliderValue)
         end
     end
 
@@ -6683,348 +6779,26 @@ function ShowLobbyOptionsDialog()
     cbox_ChatPlayerColor:SetCheck(chatPlayerColor == true or chatPlayerColor == nil, true)
 end
 
--- Load and return the current list of presets from persistent storage.
-function LoadPresetsList()
-    return Prefs.GetFromCurrentProfile("LobbyPresets") or {}
-end
+---Applies new game settings, including map, mods
+---@param settings WatchedGameData
+function ApplyGameSettings(settings)
+    SetGameOptions(settings.GameOptions, true)
 
--- Write the given list of preset profiles to persistent storage.
-function SavePresetsList(list)
-    Prefs.SetToCurrentProfile("LobbyPresets", list)
+    rehostPlayerOptions = settings.PlayerOptions
+    selectedSimMods = settings.GameMods
+    HostUtils.UpdateMods()
+
+    UpdateGame()
+end
+---Returns the current game settings
+---@return WatchedGameData
+function GetGameSettings()
+    return gameInfo
 end
 
 --- Delegate to UIUtil's CreateInputDialog, adding the ridiculus chatEdit hack.
 function CreateInputDialog(parent, title, listener, str)
     UIUtil.CreateInputDialog(parent, title, listener, GUI.chatEdit, str)
-end
-
--- Show the lobby preset UI.
-function ShowPresetDialog()
-    local dialogContent = Group(GUI)
-    LayoutHelpers.SetDimensions(dialogContent, 600, 530)
-
-    local presetDialog = Popup(GUI, dialogContent)
-    presetDialog.OnClosed = presetDialog.Destroy
-    GUI.presetDialog = presetDialog
-
-    -- Title
-    local titleText = UIUtil.CreateText(dialogContent, LOC('<LOC tooltipui0694>Lobby Presets'), 17, 'Arial Gras', true)
-    LayoutHelpers.AtHorizontalCenterIn(titleText, dialogContent, 0)
-    LayoutHelpers.AtTopIn(titleText, dialogContent, 10)
-
-    -- Preset List
-    local PresetList = ItemList(dialogContent)
-    PresetList:SetFont(UIUtil.bodyFont, 14)
-    PresetList:ShowMouseoverItem(true)
-    LayoutHelpers.SetDimensions(PresetList, 265, 430)
-    LayoutHelpers.DepthOverParent(PresetList, dialogContent, 10)
-    LayoutHelpers.AtLeftIn(PresetList, dialogContent, 14)
-    LayoutHelpers.AtTopIn(PresetList, dialogContent, 38)
-    UIUtil.CreateLobbyVertScrollbar(PresetList, 2)
-
-    -- Info List
-    local InfoList = ItemList(dialogContent)
-    InfoList:SetFont(UIUtil.bodyFont, 11)
-    InfoList:SetColors(nil, "00000000")
-    InfoList:ShowMouseoverItem(true)
-    LayoutHelpers.SetDimensions(InfoList, 281, 430)
-    LayoutHelpers.RightOf(InfoList, PresetList, 26)
-
-    -- Quit button
-    local QuitButton = UIUtil.CreateButtonStd(dialogContent, '/dialogs/close_btn/close')
-    LayoutHelpers.AtRightIn(QuitButton, dialogContent, 1)
-    LayoutHelpers.AtTopIn(QuitButton, dialogContent, 1)
-
-    -- Load button
-    local LoadButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Load>Load")
-    LayoutHelpers.AtLeftIn(LoadButton, dialogContent, -2)
-    LayoutHelpers.AtBottomIn(LoadButton, dialogContent, 10)
-    LoadButton:Disable()
-
-    -- Create button. Occupies the same space as the load button, when available.
-    local CreateButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Create>Create")
-    LayoutHelpers.RightOf(CreateButton, LoadButton, 28)
-
-    -- Save button
-    local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Save>Save")
-    LayoutHelpers.RightOf(SaveButton, CreateButton, 28)
-    SaveButton:Disable()
-
-    -- Delete button
-    local DeleteButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Delete>Delete")
-    LayoutHelpers.RightOf(DeleteButton, SaveButton, 28)
-    DeleteButton:Disable()
-
-    LoadButton.OnClick = function(self)
-        LoadPreset(PresetList:GetSelection() + 1)
-    end
-
-    QuitButton.OnClick = function(self)
-        presetDialog:Hide()
-    end
-
-    CreateButton.OnClick = function(self)
-        local dialogComplete = function(self, presetName)
-            if not presetName or presetName == "" then
-                return
-            end
-            local profiles = LoadPresetsList()
-            table.insert(profiles, GetPresetFromSettings(presetName))
-            SavePresetsList(profiles)
-
-            RefreshAvailablePresetsList(PresetList)
-
-            PresetList:SetSelection(0)
-            PresetList:OnClick(0)
-        end
-
-        CreateInputDialog(GUI, "<LOC tooltipui0704>Select name for new preset", dialogComplete)
-    end
-
-    SaveButton.OnClick = function(self)
-        local selectedPreset = PresetList:GetSelection() + 1
-
-        SavePreset(selectedPreset)
-        ShowPresetDetails(selectedPreset, InfoList)
-    end
-
-    DeleteButton.OnClick = function(self)
-        local profiles = LoadPresetsList()
-
-        -- Converting between zero-based indexing in the list and the table indexing...
-        table.remove(profiles, PresetList:GetSelection() + 1)
-
-        SavePresetsList(profiles)
-        RefreshAvailablePresetsList(PresetList)
-
-        -- And clear the detail view.
-        InfoList:DeleteAllItems()
-    end
-
-    -- Called when the selected item in the preset list changes.
-    local onListItemChanged = function(self, row)
-        ShowPresetDetails(row + 1, InfoList)
-        LoadButton:Enable()
-        SaveButton:Enable()
-        DeleteButton:Enable()
-    end
-
-    -- Because GPG's event model is painfully retarded..
-    PresetList.OnKeySelect = onListItemChanged
-    PresetList.OnClick = function(self, row, event)
-        self:SetSelection(row)
-        onListItemChanged(self, row)
-    end
-
-    PresetList.OnDoubleClick = function(self, row)
-        LoadPreset(row + 1)
-    end
-
-    -- When the user double-clicks on a metadata field, give them a popup to change its value.
-    InfoList.OnDoubleClick = function(self, row)
-        -- Closure copy, accounting for zero-based indexing in ItemList.
-        local theRow = row + 1
-
-        local nameChanged = function(self, str)
-            if str == "" then
-                return
-            end
-
-            local profiles = LoadPresetsList()
-            profiles[theRow].Name = str
-            SavePresetsList(profiles)
-
-            -- Update the name displayed in the presets list, preserving selection.
-            local lastselect = PresetList:GetSelection()
-            RefreshAvailablePresetsList(PresetList)
-            PresetList:SetSelection(lastselect)
-
-            ShowPresetDetails(theRow, InfoList)
-        end
-
-        if row == 0 then
-            CreateInputDialog(GUI, "Rename your preset", nameChanged)
-        end
-    end
-
-    -- Show the "Double-click to edit" tooltip when the user mouses-over an editable field.
-    InfoList.OnMouseoverItem = function(self, row)
-        -- Determine which metadata cell they moused-over, if any.
-        local metadataType
-        -- For now, only name is editable. A nice mechanism to edit game preferences seems plausible.
-        if row == 0 then
-            metadataType = "Preset name"
-        else
-            Tooltip.DestroyMouseoverDisplay()
-            return
-        end
-
-        local tooltip = {
-            text = metadataType,
-            body = "Double-click to edit"
-        }
-
-        Tooltip.CreateMouseoverDisplay(self, tooltip, 0, true)
-    end
-
-    RefreshAvailablePresetsList(PresetList)
-    if PresetList:GetItemCount() == 0 then
-        CreateHelpWindow()
-    end
-end
-
-function CreateHelpWindow()
-    local dialogContent = Group(GUI)
-    LayoutHelpers.SetDimensions(dialogContent, 420, 225)
-
-    local helpWindow = Popup(GUI, dialogContent)
-
-    -- Help textfield
-    local textArea = TextArea(dialogContent, 400, 163)
-    LayoutHelpers.AtLeftIn(textArea, dialogContent, 13)
-    LayoutHelpers.AtTopIn(textArea, dialogContent, 10)
-    textArea:SetText(LOC("<LOC tooltipui0706>This dialog allows you to save a snapshot of the current game configuration and reload it later.\n\nOnce the game settings are as you want them, use the \"Create\" button on this dialog to store it. You can reload the stored configuration by selecting it and pressing the \"Load\" button.\n\nThe \"Save\" button will overwrite a selected existing preset with the current configuration."))
-
-    -- OK button
-    local OkButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
-    LayoutHelpers.AtHorizontalCenterIn(OkButton, dialogContent)
-    LayoutHelpers.AtBottomIn(OkButton, dialogContent, 8)
-    OkButton.OnClick = function(self)
-        helpWindow:Close()
-    end
-end
-
--- Refresh list of presets
-function RefreshAvailablePresetsList(PresetList)
-    local profiles = LoadPresetsList()
-    PresetList:DeleteAllItems()
-
-    for k, v in profiles do
-        PresetList:AddItem(v.Name)
-    end
-end
-
--- Update the right-hand panel of the preset dialog to show the contents of the currently selected
--- profile (passed by name as a parameter)
-function ShowPresetDetails(preset, InfoList)
-    local profiles = LoadPresetsList()
-    InfoList:DeleteAllItems()
-    InfoList:AddItem('Preset Name: ' .. profiles[preset].Name)
-
-    if DiskGetFileInfo(profiles[preset].MapPath) then
-        InfoList:AddItem('Map: ' .. profiles[preset].MapName)
-    else
-        InfoList:AddItem('Map: Unavailable (' .. profiles[preset].MapName .. ')')
-    end
-
-    InfoList:AddItem('')
-
-    -- For each mod, look up its name and pretty-print it.
-    local allMods = Mods.AllMods()
-    for modId, v in profiles[preset].GameMods do
-        if v then
-            InfoList:AddItem('Mod: ' .. allMods[modId].name)
-        end
-    end
-
-    InfoList:AddItem('')
-    InfoList:AddItem('Settings :')
-    for k, v in sortedpairs(profiles[preset].GameOptions) do
-        InfoList:AddItem('- '..k..' : '..tostring(v))
-    end
-end
-
--- Create a preset table representing the current configuration.
-function GetPresetFromSettings(presetName)
-    -- Since GameOptions may only contain strings and ints, some added tables need to be removed before storing
-    local cleanGameOptions = table.copy(gameInfo.GameOptions)
-    cleanGameOptions.ClanTags = nil
-    cleanGameOptions.Ratings = nil
-
-    -- Since PlayerOptions may only contain strings and ints, some added tables need to be removed before storing
-    local cleanPlayerOptions = table.copy(gameInfo.PlayerOptions)
-    cleanPlayerOptions.AsTable = nil
-    cleanPlayerOptions.isEmpty = nil
-    cleanPlayerOptions.pairs = nil
-    cleanPlayerOptions.print = nil
-
-    return {
-        Name = presetName,
-        MapName = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).name,
-        MapPath = gameInfo.GameOptions.ScenarioFile,
-        GameOptions = cleanGameOptions,
-        GameMods = gameInfo.GameMods,
-        PlayerOptions = cleanPlayerOptions
-    }
-end
-
--- Load the given preset
-function LoadPreset(presetIndex)
-    local preset = LoadPresetsList()[presetIndex]
-
-    if not preset.GameOptions.RestrictedCategories then
-        preset.GameOptions.RestrictedCategories = {}
-    end
-
-    SetGameOptions(preset.GameOptions, true)
-
-    rehostPlayerOptions = preset.PlayerOptions
-    selectedSimMods = preset.GameMods
-    HostUtils.UpdateMods()
-
-    if GUI.presetDialog then
-        GUI.presetDialog:Hide()
-    end
-    UpdateGame()
-end
-
-function LoadPresetByName(name)
-    local presets = LoadPresetsList()
-    for index, preset in ipairs(presets) do
-        if preset.Name == name then
-            LoadPreset(index)
-            break
-        end
-    end
-end
-
--- Write the current settings to the given preset profile index
-function SavePreset(index)
-    local presets = LoadPresetsList()
-
-    local selectedPreset = index
-    presets[selectedPreset] = GetPresetFromSettings(presets[selectedPreset].Name)
-
-    SavePresetsList(presets)
-end
-
-function SavePresetToName(presetName)
-    local presets = LoadPresetsList()
-    local found = false
-    for index, preset in ipairs(presets) do
-        if preset.Name == presetName then
-            presets[index] = GetPresetFromSettings(presetName)
-            found = true
-            break
-        end
-    end
-
-    if not found then
-        table.insert(presets, GetPresetFromSettings(presetName))
-    end
-
-    SavePresetsList(presets)
-end
-
--- Find the key for the given value in a table.
--- Nil keys are not supported.
-function indexOf(table, needle)
-    for k, v in table do
-        if v == needle then
-            return k
-        end
-    end
-    return nil
 end
 
 -- Update the combobox for the given slot so it correctly shows the set of available colours.
@@ -7149,6 +6923,7 @@ function InitHostUtils()
         return
     end
 
+    ---@class UILobbyHostUtils
     HostUtils = {
         --- Cause a player's ready box to become unchecked.
         --

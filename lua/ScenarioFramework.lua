@@ -27,6 +27,7 @@ local SyncVoice = import("/lua/simsyncutils.lua").SyncVoice
 local CategoryToString = import("/lua/sim/categoryutils.lua").ToString
 local Cinematics = import("/lua/cinematics.lua")
 local Game = import("/lua/game.lua")
+local FormationCommands = import("/lua/sim/formationcommands.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 local SimCamera = import("/lua/simcamera.lua").SimCamera
 local SimUIVars = import("/lua/sim/simuistate.lua")
@@ -50,21 +51,37 @@ function ExitGame()
     Sync.RequestingExit = true
 end
 
+--- Ends an operation where the data is already provided in table form (just a wrapper for sync)
+---@param opData table
+function EndOperationT(opData)
+    Sync.OperationComplete = opData
+end
+
+local function endOperationThread(tbl)
+    WaitSeconds(3) -- Wait for the stats to be synced
+    UnlockInput()
+    EndOperationT(tbl)
+end
+
 --- Ends an operation
 ---@param success boolean instructs UI which dialog to show
 ---@param allPrimary boolean
----@param allSecondary boolean
----@param allBonus boolean
+---@param allSecondary? boolean
+---@param allBonus? boolean
 function EndOperation(success, allPrimary, allSecondary, allBonus)
-    local opFile = string.gsub(ScenarioInfo.Options.ScenarioFile, 'scenario', 'operation')
+    if allSecondary == nil then allSecondary = false end
+    if allBonus == nil then allBonus = false end
+    local opFile = string.gsub(ScenarioInfo.Options.ScenarioFile, 'scenario', 'operation')--[[@as FileName]]
     local opData
     if DiskGetFileInfo(opFile) then
         opData = import(opFile)
     end
 
-    import("/lua/sim/matchstate.lua").CallEndGame() -- We need this here to populate the score screen
+    -- we need to end the game 'properly' to populate the score screen
+    local victoryCondition = import("/lua/sim/victorycondition/VictoryConditionSingleton.lua").GetSingleton()
+    victoryCondition:EndGame()
 
-    ForkThread(EndOperationThread, {
+    ForkThread(endOperationThread, {
         success = success,
         difficulty = ScenarioInfo.Options.Difficulty,
         allPrimary = allPrimary,
@@ -75,11 +92,7 @@ function EndOperation(success, allPrimary, allSecondary, allBonus)
     })
 end
 
-function EndOperationThread(tbl)
-    WaitSeconds(3) -- Wait for the stats to be synced
-    UnlockInput()
-    EndOperationT(tbl)
-end
+
 
 ---@alias FactionSelectData {Faction: "aeon" | "cybran" | "uef"}
 
@@ -108,12 +121,6 @@ function OnFactionSelect(data)
     else
         WARN('I chose ', data.Faction, ' but I dont have a callback set!')
     end
-end
-
---- Ends an operation where the data is already provided in table form (just a wrapper for sync)
----@param opData table
-function EndOperationT(opData)
-    Sync.OperationComplete = opData
 end
 
 CreateAreaTrigger = TriggerFile.CreateAreaTrigger
@@ -156,60 +163,12 @@ end
 
 CreateUnitDeathTrigger = TriggerFile.CreateUnitDeathTrigger
 
---- Sets a unit's death to be paused. It is unpaused globally, since this usually only
---- happens to one unit at a time (e.g. the camera zooms in an ACU before it explodes)
----@param unit Unit
-function PauseUnitDeath(unit)
-    if unit and not unit.Dead then
-        unit.OnKilled = OverrideKilled
-        unit.CanBeKilled = false
-        unit.DoTakeDamage = OverrideDoDamage
-    end
-end
-
---- An override for `Unit.DoTakeDamage` to hold on to the final blow and then release it
---- on the unit once its death is unpaused
----@param self Unit
----@param instigator Unit
----@param amount number
----@param vector any
----@param damageType DamageType
-function OverrideDoDamage(self, instigator, amount, vector, damageType)
-    local preAdjHealth = self:GetHealth()
-    self:AdjustHealth(instigator, -amount)
-    local health = self:GetHealth()
-    if (health <= 0 or amount > preAdjHealth) and not self.KilledFlag then
-        self.KilledFlag = true
-        if damageType == 'Reclaimed' then
-            self:Destroy()
-        else
-            local excessDamageRatio = 0.0
-            -- Calculate the excess damage amount
-            local excess = preAdjHealth - amount
-            local maxHealth = self:GetMaxHealth()
-            if excess < 0 and maxHealth > 0 then
-                excessDamageRatio = -excess / maxHealth
-            end
-            IssueToUnitClearCommands(self)
-            ForkThread(UnlockAndKillUnitThread, self, instigator, damageType, excessDamageRatio)
-        end
-    end
-end
-function UnlockAndKillUnitThread(self, instigator, damageType, excessDamageRatio)
-    self:DoUnitCallbacks('OnKilled')
-    while PauseUnitDeathActive do
-        WaitSeconds(1)
-    end
-    self.CanBeKilled = true
-    self:Kill(instigator, damageType, excessDamageRatio)
-end
-
 --- An override for `Unit.OnKilled` to make unit death pausing work
 ---@param self Unit
 ---@param instigator Unit
 ---@param type any
 ---@param overkillRatio number
-function OverrideKilled(self, instigator, type, overkillRatio)
+local function overrideKilled(self, instigator, type, overkillRatio)
     if not self.CanBeKilled then
         self:DoTakeDamage(instigator, 1000000, nil, 'Normal')
         return
@@ -259,10 +218,62 @@ function OverrideKilled(self, instigator, type, overkillRatio)
     self:ForkThread(self.DeathThread, overkillRatio, instigator)
 end
 
----
+local function unlockAndKillUnitThread(self, instigator, damageType, excessDamageRatio)
+    self:DoUnitCallbacks('OnKilled')
+    while PauseUnitDeathActive do
+        WaitSeconds(1)
+    end
+    self.CanBeKilled = true
+    self:Kill(instigator, damageType, excessDamageRatio)
+end
+
+--- An override for `Unit.DoTakeDamage` to hold on to the final blow and then release it
+--- on the unit once its death is unpaused
+---@param self Unit
+---@param instigator Unit
+---@param amount number
+---@param vector any
+---@param damageType DamageType
+local function overrideDoDamage(self, instigator, amount, vector, damageType)
+    local preAdjHealth = self:GetHealth()
+    self:AdjustHealth(instigator, -amount)
+    local health = self:GetHealth()
+    if (health <= 0 or amount > preAdjHealth) and not self.KilledFlag then
+        self.KilledFlag = true
+        if damageType == 'Reclaimed' then
+            self:Destroy()
+        else
+            local excessDamageRatio = 0.0
+            -- Calculate the excess damage amount
+            local excess = preAdjHealth - amount
+            local maxHealth = self:GetMaxHealth()
+            if excess < 0 and maxHealth > 0 then
+                excessDamageRatio = -excess / maxHealth
+            end
+            IssueToUnitClearCommands(self)
+            ForkThread(unlockAndKillUnitThread, self, instigator, damageType, excessDamageRatio)
+        end
+    end
+end
+
+--- Sets a unit's death to be paused. It is unpaused globally, since this usually only
+--- happens to one unit at a time (e.g. the camera zooms in an ACU before it explodes)
 ---@param unit Unit
----@param army number
----@param triggerOnGiven boolean
+function PauseUnitDeath(unit)
+    if unit and not unit.Dead then
+        unit.OnKilled = overrideKilled
+        unit.CanBeKilled = false
+        unit.DoTakeDamage = overrideDoDamage
+    end
+end
+
+
+
+
+--- Transfers `unit` to `army`, ignoring unit restrictions
+---@param unit Unit
+---@param army Army
+---@param triggerOnGiven? boolean If to call :OnGiven() method on the original unit.
 ---@return Unit
 function GiveUnitToArmy(unit, army, triggerOnGiven)
     -- Shared army mod will result in different players having the same army number
@@ -277,7 +288,7 @@ function GiveUnitToArmy(unit, army, triggerOnGiven)
     IgnoreRestrictions(true)
 
     local newUnit = ChangeUnitArmy(unit, army)
-    local newBrain = ArmyBrains[army]
+    local newBrain = ArmyBrains[army]--[[@as CampaignAIBrain]]
     if not newBrain.IgnoreArmyCaps then
         SetIgnoreArmyUnitCap(army, false)
     end
@@ -325,7 +336,7 @@ CreateSubGroupDeathTrigger = TriggerFile.CreateSubGroupDeathTrigger
 
 -- Checks if units of `cat` are within the provided rectangle
 ---@param cat EntityCategory
----@param area Area | Rectangle
+---@param area AreaName | Rectangle
 ---@return boolean
 function UnitsInAreaCheck(cat, area)
     if type(area) == 'string' then
@@ -345,7 +356,7 @@ end
 
 -- Returns the number of `cat` units in `area` belonging to `brain`
 ---@param cat EntityCategory
----@param area Area | Rectangle
+---@param area AreaName | Rectangle
 ---@param brain AIBrain
 ---@return number
 function NumCatUnitsInArea(cat, area, brain)
@@ -370,7 +381,7 @@ end
 
 -- Returns the units in `area` of `cat` belonging to `brain`
 ---@param cat EntityCategory
----@param area Area | Rectangle
+---@param area AreaName | Rectangle
 ---@param brain AIBrain
 ---@return Unit[]
 function GetCatUnitsInArea(cat, area, brain)
@@ -378,9 +389,11 @@ function GetCatUnitsInArea(cat, area, brain)
         area = ScenarioUtils.AreaToRect(area)
     end
 
+    ---@type Unit[]|nil
     local entities = GetUnitsInRect(area)
     local result = {}
     if entities then
+        ---@type Unit[]
         local filteredList = EntityCategoryFilterDown(cat, entities)
 
         for _, entity in filteredList do
@@ -391,6 +404,15 @@ function GetCatUnitsInArea(cat, area, brain)
     end
 
     return result
+end
+
+--- Goes through every unit in `group` and kills them with explosions
+---@param units Unit[]
+function KillGroup(units)
+    for _, unit in pairs(units) do
+        if unit.Dead then continue end
+        unit:Kill()
+    end
 end
 
 --- Goes through every unit in `group` and destroys them without explosions
@@ -411,108 +433,9 @@ CreateUnitToPositionDistanceTrigger = TriggerFile.CreateUnitToPositionDistanceTr
 CreateUnitToMarkerDistanceTrigger = CreateUnitToPositionDistanceTrigger -- got renamed for some reason
 CreateUnitNearTypeTrigger = TriggerFile.CreateUnitNearTypeTrigger
 
--- platoon functions REQUIRE `squad` to be non-nil when present
-
--- Orders a platoon to move along a route
----@param platoon Platoon
----@param route (Marker | Vector)[]
----@param squad? string
-function PlatoonMoveRoute(platoon, route, squad)
-    for _, node in route do
-        if type(node) == 'string' then
-            node = ScenarioUtils.MarkerToPosition(node)
-        end
-        if squad then
-            platoon:MoveToLocation(node, false, squad)
-        else
-            platoon:MoveToLocation(node, false)
-        end
-    end
-end
-
---- Orders platoon to patrol a route
----@param platoon Platoon
----@param route (Marker | Vector)[]
----@param squad? string
-function PlatoonPatrolRoute(platoon, route, squad)
-    for _, node in route do
-        if type(node) == 'string' then
-            node = ScenarioUtils.MarkerToPosition(node)
-        end
-        if squad then
-            platoon:Patrol(node, squad)
-        else
-            platoon:Patrol(node)
-        end
-    end
-end
-
---- Orders a platoon to attack-move along a route
----@param platoon Platoon
----@param route (Marker | Vector)[]
----@param squad? string
-function PlatoonAttackRoute(platoon, route, squad)
-    for _, node in route do
-        if type(node) == 'string' then
-            node = ScenarioUtils.MarkerToPosition(node)
-        end
-        if squad then
-            platoon:AggressiveMoveToLocation(node, squad)
-        else
-            platoon:AggressiveMoveToLocation(node)
-        end
-    end
-end
-
---- Orders a platoon to move along a chain
----@param platoon Platoon
----@param chain MarkerChain
----@param squad? string
-function PlatoonMoveChain(platoon, chain, squad)
-    for _, pos in ScenarioUtils.ChainToPositions(chain) do
-        if squad then
-            platoon:MoveToLocation(pos, false, squad)
-        else
-            platoon:MoveToLocation(pos, false)
-        end
-    end
-end
-
---- Orders a platoon to patrol along a chain
----@param platoon Platoon
----@param chain MarkerChain
----@param squad? string
-function PlatoonPatrolChain(platoon, chain, squad)
-    for _, pos in ScenarioUtils.ChainToPositions(chain) do
-        if squad then
-            platoon:Patrol(pos, squad)
-        else
-            platoon:Patrol(pos)
-        end
-    end
-end
-
---- Orders a platoon to attack-move through a chain
----@param platoon Platoon
----@param chain MarkerChain
----@param squad? string
----@return SimCommand # the last attack-move command
-function PlatoonAttackChain(platoon, chain, squad)
-    local cmd = false
-    for _, pos in ScenarioUtils.ChainToPositions(chain) do
-        if squad then
-            cmd = platoon:AggressiveMoveToLocation(pos, squad)
-        else
-            cmd = platoon:AggressiveMoveToLocation(pos)
-        end
-    end
-
-    return cmd
-end
-
 --- Orders a group to patrol along a chain
 ---@param units Unit[]
----@param chain MarkerChain
+---@param chain ChainName
 function GroupPatrolChain(units, chain)
     for _, pos in ScenarioUtils.ChainToPositions(chain) do
         IssuePatrol(units, pos)
@@ -521,7 +444,7 @@ end
 
 --- Orders a group to patrol a route
 ---@param units Unit[]
----@param route (Marker | Vector)[]
+---@param route (MarkerName | Vector)[]
 function GroupPatrolRoute(units, route)
     for _, node in route do
         if type(node) == 'string' then
@@ -532,44 +455,181 @@ function GroupPatrolRoute(units, route)
 end
 
 --- Orders a group to patrol a route in formation
+---
+---`IssueFormPatrol` Does NOT return `SimCommand`
 ---@param units Unit[]
----@param chain MarkerChain
+---@param chain ChainName
 ---@param formation string
 function GroupFormPatrolChain(units, chain, formation)
-    for _, pos in ScenarioUtils.ChainToPositions(chain) do
-        IssueFormPatrol(units, pos, formation, 0)
+    local path = ScenarioUtils.ChainToPositions(chain)
+    local angles = FormationCommands.GetAnglesForRoute(path)
+
+    for i, pos in ipairs(path) do
+        IssueFormPatrol(units, pos, formation, angles[i])
     end
 end
 
---- Orders a group to attack-move a along a chain
+--- Orders a group to attack-move along a chain
 ---@param units Unit[]
----@param chain MarkerChain
+---@param chain ChainName
 function GroupAttackChain(units, chain)
     for _, pos in ScenarioUtils.ChainToPositions(chain) do
         IssueAggressiveMove(units, pos)
     end
 end
 
+--- Orders a group to attack-move along a route
+---@param units Unit[]
+---@param route (MarkerName | Vector)[]
+function GroupAttackRoute(units, route)
+    for _, node in route do
+        if type(node) == 'string' then
+            node = ScenarioUtils.MarkerToPosition(node)
+        end
+        IssueAggressiveMove(units, node)
+    end
+end
+
 --- Orders a group to move along a chain
 ---@param units Unit[]
----@param chain MarkerChain
+---@param chain ChainName
 function GroupMoveChain(units, chain)
     for _, pos in ScenarioUtils.ChainToPositions(chain) do
         IssueMove(units, pos)
     end
 end
 
---- Makes `units` to have their work progress start at `0.0` and scale to `1.0` over `time`
+--- Orders a group to move along a route
 ---@param units Unit[]
----@param time number
-function GroupProgressTimer(units, time)
-    ForkThread(GroupProgressTimerThread, units, time)
+---@param route (MarkerName | Vector)[]
+function GroupMoveRoute(units, route)
+    for _, node in route do
+        if type(node) == 'string' then
+            node = ScenarioUtils.MarkerToPosition(node)
+        end
+        IssueMove(units, node)
+    end
 end
 
+---Converts route from marker names to marker positions.
+---@param route any
+local function routeToPositions(route)
+    for k, v in pairs(route) do
+        if type(v) == "string" then
+            route[k] = ScenarioUtils.MarkerToPosition(v)
+        end
+    end
+end
+
+--- Orders a platoon to move along a route
+---@param platoon Platoon
+---@param route (MarkerName | Vector)[]
+---@param squad? PlatoonSquads Issues the commands to specific squad or to all squads of the platoon
+---@param formation? UnitFormations
+function PlatoonMoveRoute(platoon, route, squad, formation)
+    formation = formation or platoon:GetFormationFromPlatoonData()
+    local squads = FormationCommands.GetSquadsForFormationOrder(squad)
+    routeToPositions(route)
+
+    for _, squadName in pairs(squads) do
+        local units = platoon:GetSquadUnits(squadName)
+
+        if not table.empty(units) then
+            if formation == 'NoFormation' then
+                GroupMoveRoute(units, route)
+                return
+            end
+            local angles = FormationCommands.GetAnglesForRoute(route, platoon:GetSquadPosition(squadName))
+            FormationCommands.UnitsFormationOrder(units, IssueFormMove, route, angles, formation)
+        end
+    end
+end
+
+--- Orders platoon to patrol a route
 ---
+--- `IssueFormPatrol` Does NOT return `SimCommand`
+---@param platoon Platoon
+---@param route (MarkerName | Vector)[]
+---@param squad? PlatoonSquads Issues the commands to specific squad or to all squads of the platoon
+---@param formation? UnitFormations
+function PlatoonPatrolRoute(platoon, route, squad, formation)
+    formation = formation or platoon:GetFormationFromPlatoonData()
+    local squads = FormationCommands.GetSquadsForFormationOrder(squad)
+    routeToPositions(route)
+
+    -- Since the patrol has no end, the angles are gonna be the same for all squads
+    local angles = FormationCommands.GetAnglesForRoute(route)
+
+    for _, squadName in pairs(squads) do
+        local units = platoon:GetSquadUnits(squadName)
+
+        if not table.empty(units) then
+            if formation == 'NoFormation' then
+                GroupPatrolRoute(units, route)
+                return
+            end
+            FormationCommands.UnitsFormationOrder(units, IssueFormPatrol, route, angles, formation)
+        end
+    end
+end
+
+--- Orders a platoon to attack-move along a route
+---@param platoon Platoon
+---@param route (MarkerName | Vector)[]
+---@param squad? PlatoonSquads Issues the commands to specific squad or to all squads of the platoon
+---@param formation? UnitFormations
+---@return SimCommand? command Last command issued to the platoon, if any
+function PlatoonAttackRoute(platoon, route, squad, formation)
+    formation = formation or platoon:GetFormationFromPlatoonData()
+    local squads = FormationCommands.GetSquadsForFormationOrder(squad)
+    routeToPositions(route)
+
+    local cmd
+    for _, squadName in pairs(squads) do
+        local units = platoon:GetSquadUnits(squadName)
+
+        if not table.empty(units) then
+            if formation == 'NoFormation' then
+                GroupAttackRoute(units, route)
+                return {}
+            end
+            local angles = FormationCommands.GetAnglesForRoute(route, platoon:GetSquadPosition(squadName))
+            local commands = FormationCommands.UnitsFormationOrder(units, IssueFormAggressiveMove, route, angles, formation)
+            cmd = commands[table.getn(commands)]
+        end
+    end
+
+    return cmd
+end
+
+--- Orders a platoon to move along a chain
+---@param platoon Platoon
+---@param chain ChainName
+---@param squad? PlatoonSquadType
+function PlatoonMoveChain(platoon, chain, squad)
+    PlatoonMoveRoute(platoon, ScenarioUtils.ChainToPositions(chain), squad)
+end
+
+--- Orders a platoon to patrol along a chain
+---@param platoon Platoon
+---@param chain ChainName
+---@param squad? PlatoonSquadType
+function PlatoonPatrolChain(platoon, chain, squad)
+    PlatoonPatrolRoute(platoon, ScenarioUtils.ChainToPositions(chain), squad)
+end
+
+--- Orders a platoon to attack-move through a chain
+---@param platoon Platoon
+---@param chain ChainName
+---@param squad? PlatoonSquads
+---@return SimCommand? command Last command issued to the platoon, if any
+function PlatoonAttackChain(platoon, chain, squad)
+    return PlatoonAttackRoute(platoon, ScenarioUtils.ChainToPositions(chain), squad)
+end
+
 ---@param units Unit[]
 ---@param time number
-function GroupProgressTimerThread(units, time)
+local function groupProgressTimerThread(units, time)
     local currTime = 0
     while currTime < time do
         local prog = currTime / time
@@ -583,52 +643,55 @@ function GroupProgressTimerThread(units, time)
     end
 end
 
----
----@param dialogueTable DialogueTable
----@param callback? fun()
----@param critical? boolean
----@param speaker? Unit
-function Dialogue(dialogueTable, callback, critical, speaker)
-    if not (speaker and speaker.Dead) then
-        local dTable = table.deepcopy(dialogueTable)
-        if callback then
-            dTable.Callback = callback
-        end
-        if critical then
-            dTable.Critical = critical
-        end
-        if ScenarioInfo.DialogueLock == nil then
-            ScenarioInfo.DialogueLock = false
-            ScenarioInfo.DialogueLockPosition = 0
-            ScenarioInfo.DialogueQueue = {}
-            ScenarioInfo.DialogueFinished = {}
-        end
-        table.insert(ScenarioInfo.DialogueQueue, dTable)
-        if not ScenarioInfo.DialogueLock then
-            ScenarioInfo.DialogueLock = true
-            ForkThread(PlayDialogue)
-        end
-    end
+--- Makes `units` to have their work progress start at `0.0` and scale to `1.0` over `time`
+---@param units Unit[]
+---@param time number
+function GroupProgressTimer(units, time)
+    ForkThread(groupProgressTimerThread, units, time)
 end
 
 ---
-function FlushDialogueQueue()
-    if ScenarioInfo.DialogueQueue then
-        for _, dialogue in ScenarioInfo.DialogueQueue do
-            dialogue.Flushed = true
-        end
+---@param entryData Transmission
+local function addTransmissionData(entryData)
+    SimUIVars.SaveEntry(entryData)
+end
+
+---Syncs text to be display with video to the UI
+---@param text string
+local function displayVideoText(text)
+    if not Sync.VideoText then
+        Sync.VideoText = {}
+    end
+    table.insert(Sync.VideoText, text)
+end
+
+---Currently there's no UI code to display text only
+---@param text string
+function DisplayMissionText(text)
+    if not Sync.MissionText then
+        Sync.MissionText = {}
+    end
+    table.insert(Sync.MissionText, text)
+end
+
+---
+---@param name string
+local function waitForDialogue(name)
+    while not ScenarioInfo.DialogueFinished[name] do
+        WaitTicks(1)
     end
 end
 
 --- This function sends movie data to the sync table and saves it off for reloading in save games
 ---@param movieTable MovieTable
 ---@param text string
-function SetupMFDSync(movieTable, text)
-    DisplayVideoText(text)
+local function setupMFDSync(movieTable, text)
+    displayVideoText(text)
     Sync.PlayMFDMovie = {movieTable[1], movieTable[2], movieTable[3], movieTable[4]}
     ScenarioInfo.DialogueFinished[movieTable[1]] = false
 
     local tempText = LOC(text)
+    ---@cast tempText -nil
     local tempData = {}
     local nameStart = tempText:find(']')
     if nameStart ~= nil then
@@ -639,7 +702,7 @@ function SetupMFDSync(movieTable, text)
         tempData.text = tempText
         LOG("ERROR: Unable to find name in string: " .. text .. " (" .. tempText .. ")")
     end
-    -- `GetGameTime()` would be the perfect thing to use here--unfortunately, that's sim-side only
+
     local seconds = GetGameTimeSeconds()
     local MathFloor = math.floor
     local hours = MathFloor(seconds / 3600)
@@ -657,18 +720,12 @@ function SetupMFDSync(movieTable, text)
         tempData.color = 'ffffffff'
     end
 
-    AddTransmissionData(tempData)
-    WaitForDialogue(movieTable[1])
-end
-
----
----@param entryData Transmission
-function AddTransmissionData(entryData)
-    SimUIVars.SaveEntry(entryData)
+    addTransmissionData(tempData)
+    waitForDialogue(movieTable[1])
 end
 
 --- The actual thread used by `Dialogue`
-function PlayDialogue()
+local function playDialogue()
     while not table.empty(ScenarioInfo.DialogueQueue) do
         local dialogueTable = table.remove(ScenarioInfo.DialogueQueue, 1)
         if not dialogueTable then
@@ -700,7 +757,7 @@ function PlayDialogue()
                         else
                             movieData = {'/movies/' .. vid, bank, cue, dialogue.faction}
                         end
-                        SetupMFDSync(movieData, text)
+                        setupMFDSync(movieData, text)
                     end
                     if delay and delay > 0 then
                         WaitSeconds(delay)
@@ -719,11 +776,40 @@ function PlayDialogue()
     ScenarioInfo.DialogueLock = false
 end
 
----
----@param name string
-function WaitForDialogue(name)
-    while not ScenarioInfo.DialogueFinished[name] do
-        WaitTicks(1)
+---Adds a dialogue to the dialogue queue to be played.
+---@param dialogueTable DialogueTable
+---@param callback? fun()|false Function to call when the dialogue ends
+---@param critical? boolean Critical dialogues will always play. Non critical ones can be flushed by [FlushDialogueQueue]
+---@param speaker? Unit If this unit is dead the dialogue won't play.
+function Dialogue(dialogueTable, callback, critical, speaker)
+    if not (speaker and speaker.Dead) then
+        local dTable = table.deepcopy(dialogueTable)
+        if callback then
+            dTable.Callback = callback
+        end
+        if critical then
+            dTable.Critical = critical
+        end
+        if ScenarioInfo.DialogueLock == nil then
+            ScenarioInfo.DialogueLock = false
+            ScenarioInfo.DialogueLockPosition = 0
+            ScenarioInfo.DialogueQueue = {}
+            ScenarioInfo.DialogueFinished = {}
+        end
+        table.insert(ScenarioInfo.DialogueQueue, dTable)
+        if not ScenarioInfo.DialogueLock then
+            ScenarioInfo.DialogueLock = true
+            ForkThread(playDialogue)
+        end
+    end
+end
+
+--- Removes non critical dialogues from the queue
+function FlushDialogueQueue()
+    if ScenarioInfo.DialogueQueue then
+        for _, dialogue in ScenarioInfo.DialogueQueue do
+            dialogue.Flushed = true
+        end
     end
 end
 
@@ -743,24 +829,6 @@ function PlayTaunt(head, taunt)
     Sync.MPTaunt = {head, taunt}
 end
 
----
----@param text string
-function DisplayMissionText(text)
-    if not Sync.MissionText then
-        Sync.MissionText = {}
-    end
-    table.insert(Sync.MissionText, text)
-end
-
----
----@param text string
-function DisplayVideoText(text)
-    if not Sync.VideoText then
-        Sync.VideoText = {}
-    end
-    table.insert(Sync.VideoText, text)
-end
-
 --- Plays an NIS
 ---@param pathToMovie string
 function PlayNIS(pathToMovie)
@@ -769,9 +837,18 @@ function PlayNIS(pathToMovie)
     end
 end
 
+---@param callback fun()
+local function endGameWaitThread(callback)
+    while not ScenarioInfo.DialogueFinished['EndGameMovie'] do
+        WaitTicks(1)
+    end
+    callback()
+    ScenarioInfo.DialogueFinished['EndGameMovie'] = false
+end
+
 ---
 ---@param faction string
----@param callback fun()
+---@param callback? fun()
 function PlayEndGameMovie(faction, callback)
     if not Sync.EndGameMovie then
         Sync.EndGameMovie = faction
@@ -781,18 +858,8 @@ function PlayEndGameMovie(faction, callback)
             ScenarioInfo.DialogueFinished = {}
         end
         ScenarioInfo.DialogueFinished['EndGameMovie'] = false
-        ForkThread(EndGameWaitThread, callback)
+        ForkThread(endGameWaitThread, callback)
     end
-end
-
----
----@param callback fun()
-function EndGameWaitThread(callback)
-    while not ScenarioInfo.DialogueFinished['EndGameMovie'] do
-        WaitTicks(1)
-    end
-    callback()
-    ScenarioInfo.DialogueFinished['EndGameMovie'] = false
 end
 
 --- Plays an XACT sound if needed--currently all VOs are videos
@@ -841,16 +908,16 @@ end
 ---
 ---@param brain string
 ---@param unit string
----@param effect string
+---@param effect? "Gate"|"Warp" If to play Gate In or Warp In effect on the command unit
 ---@param name? string | true # if `true`, uses the brain's nickname
----@param pauseAtDeath? boolean
+---@param pauseAtDeath? boolean Delays the death explosion by few seconds for the cinematic camera to be able to catch it.
 ---@param deathTrigger? fun(self: Unit)
 ---@param enhancements? string[]
 ---@return CommandUnit
 function SpawnCommander(brain, unit, effect, name, pauseAtDeath, deathTrigger, enhancements)
-    local ACU = ScenarioUtils.CreateArmyUnit(brain, unit)
+    local ACU = ScenarioUtils.CreateArmyUnit(brain, unit)--[[@as CommandUnit]]
     local bp = ACU:GetBlueprint()
-    local bonesToHide = bp.WarpInEffect.HideBones
+    local bonesToHide = bp.Display.WarpInEffect.HideBones
     local delay = 0
 
     local function CreateEnhancements(unit, enhancements, delay)
@@ -916,7 +983,7 @@ end
 ---@param unit Unit
 ---@param destroyUnit? boolean
 function FakeTeleportUnit(unit, destroyUnit)
-    IssueStop({unit})
+    IssueToUnitStop(unit)
     IssueToUnitClearCommands(unit)
     unit.CanBeKilled = false
 
@@ -935,7 +1002,7 @@ function FakeTeleportUnit(unit, destroyUnit)
 end
 
 --- Run teleport effect and then optionally delete the units. The 'CanBeKilled' flag remains false if the units are not deleted
----@param units Unit
+---@param units Unit[]
 ---@param destroyUnits? boolean
 function FakeTeleportUnits(units, destroyUnits)
     IssueStop(units)
@@ -977,10 +1044,10 @@ function FakeTeleportUnits(units, destroyUnits)
     end
 end
 
----
+--- Plays teleport effects for a unit
 ---@param unit Unit
----@param callback fun()
----@param bonesToHide Bone[]
+---@param callback? fun()
+---@param bonesToHide? Bone[]
 function FakeGateInUnit(unit, callback, bonesToHide)
     local bp = unit:GetBlueprint()
 
@@ -1018,7 +1085,6 @@ function FakeGateInUnit(unit, callback, bonesToHide)
             unit:SetMesh(bp.Display.MeshBlueprint, true)
         end
     else
-        LOG ('debug:non commander')
         unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
         unit:PlayUnitSound('GateCharge')
         WaitSeconds(2)
@@ -1035,9 +1101,13 @@ end
 ---@param unit Unit
 function UpgradeUnit(unit)
     local upgradeBP = unit:GetBlueprint().General.UpgradesTo
-    IssueStop({unit})
+    if not upgradeBP then
+        WARN("ScenarioFramework: UpgradeUnit: no upgrade found for unit: " .. unit.UnitId)
+        return
+    end
+    IssueToUnitStop(unit)
     IssueToUnitClearCommands(unit)
-    IssueUpgrade({unit}, upgradeBP)
+    IssueToUnitUpgrade(unit, upgradeBP)
 end
 
 --- Triggers a help text prompt to appear in the UI.
@@ -1121,7 +1191,7 @@ end
 -- Returns lists of idle factories by category, optionally in a radius around a point.
 -- This allows you to know which factories can build and which can't.
 ---@param brain AIBrain
----@param point? Marker | Vector
+---@param point? MarkerName | Vector
 ---@param radius? number
 ---@return FactoriesAvailable
 function GetFactories(brain, point, radius)
@@ -1172,7 +1242,7 @@ end
 --- If `lifetime` is 0, the entity lasts forever, otherwise, for `lifetime` seconds.
 --- Returns a `VizMarker` so you can destroy it later if you want.
 ---@param radius number
----@param location Marker | Vector
+---@param location MarkerName | Vector
 ---@param lifetime number
 ---@param army AIBrain
 ---@return VizMarker
@@ -1210,7 +1280,6 @@ function CreateVisibleAreaAtUnit(radius, atUnit, lifetime, army)
     return VizMarker(spec)
 end
 
-
 --- Creates a visible area for `army` at `x`,`z` of `radius` size.
 --- If `lifetime` is 0, the entity lasts forever, otherwise, for `lifetime` seconds.
 --- Returns a `VizMarker` so you can destroy it later if you want.
@@ -1218,7 +1287,7 @@ end
 ---@param x number
 ---@param z number
 ---@param lifetime number
----@param army number
+---@param army Army
 ---@return VizMarker
 function CreateVisibleArea(radius, x, z, lifetime, army)
     local spec = {
@@ -1232,7 +1301,7 @@ function CreateVisibleArea(radius, x, z, lifetime, army)
 end
 
 -- Sets the playable area for an operation to `rect`. Can be an area name or rectangle.
----@param rect Area | Rectangle
+---@param rect AreaName | Rectangle
 ---@param voFlag? boolean # defaults to `true`
 function SetPlayableArea(rect, voFlag)
     if voFlag == nil then
@@ -1259,7 +1328,6 @@ function SetPlayableArea(rect, voFlag)
 
     SetPlayableRect(x0, y0, x1, y1)
     if voFlag then
-        ForkThread(PlayableRectCameraThread, rect)
         SyncVoice({Cue = 'Computer_Computer_MapExpansion_01380', Bank = 'XGG'})
     end
 
@@ -1268,21 +1336,10 @@ function SetPlayableArea(rect, voFlag)
     ForkThread(GenerateOffMapAreas)
 end
 
---- unused
-function PlayableRectCameraThread(rect)
---    local cam = import("/lua/simcamera.lua").SimCamera('WorldCamera')
---    LockInput()
---    cam:UseGameClock()
---    cam:SyncPlayableRect(rect)
---    cam:MoveTo(rect, 1)
---    cam:WaitFor()
---    UnLockInput()
-end
-
 --- Sets platoon to only be built once
 ---@param platoon Platoon
 function BuildOnce(platoon)
-    local aiBrain = platoon:GetBrain()
+    local aiBrain = platoon:GetBrain()--[[@as CampaignAIBrain]]
     aiBrain:PBMSetPriority(platoon, 0)
 end
 
@@ -1310,146 +1367,151 @@ function StartCamera(area)
 end
 
 --- Sets an army color to Aeon
----@param army number
+---@param army Army
 function SetAeonColor(army)
     SetArmyColor(army, 41, 191, 41)
 end
 
 --- Sets an army color to Aeon ally
----@param army number
+---@param army Army
 function SetAeonAllyColor(army)
     SetArmyColor(army, 165, 200, 102)
 end
 
 --- Sets an army color to Aeon neutral
----@param army number
+---@param army Army
 function SetAeonNeutralColor(army)
     SetArmyColor(army, 16, 86, 16)
 end
 
 --- Sets an army color to Cybran
----@param army number
+---@param army Army
 function SetCybranColor(army)
     SetArmyColor(army, 128, 39, 37)
 end
 
 --- Sets an army color to Cybran ally
----@param army number
+---@param army Army
 function SetCybranAllyColor(army)
     SetArmyColor(army, 219, 74, 58)
 end
 
 --- Sets an army color to Cybran neutral
----@param army number
+---@param army Army
 function SetCybranNeutralColor(army)
     SetArmyColor(army, 165, 9, 1) -- 84, 13, 13
 end
 
 --- Sets an army color to UEF
----@param army number
+---@param army Army
 function SetUEFColor(army)
     SetArmyColor(army, 41, 40, 140)
 end
 
 --- Sets an army color to UEF ally
----@param army number
+---@param army Army
 function SetUEFAllyColor(army)
     SetArmyColor(army, 71, 114, 148)
 end
 
 --- Sets an army color to UEF neutral
----@param army number
+---@param army Army
 function SetUEFNeutralColor(army)
     SetArmyColor(army, 16, 16, 86)
 end
 
 --- Sets an army color to Coalition
----@param army number
+---@param army Army
 function SetCoalitionColor(army)
     SetArmyColor(army, 80, 80, 240)
 end
 
 --- Sets an army color to neutral
----@param army number
+---@param army Army
 function SetNeutralColor(army)
     SetArmyColor(army, 211, 211, 180)
 end
 
 --- Sets an army color to Aeon player
----@param army number
+---@param army Army
 function SetAeonPlayerColor(army)
     SetArmyColor(army, 36, 182, 36)
 end
 
 --- Sets an army color to evil Aeon
----@param army number
+---@param army Army
 function SetAeonEvilColor(army)
     SetArmyColor(army, 159, 216, 2)
 end
 
 --- Sets an army color to Aeon ally 1
----@param army number
+---@param army Army
 function SetAeonAlly1Color(army)
     SetArmyColor(army, 16, 86, 16)
 end
 
 --- Sets an army color to Aeon ally 2
----@param army number
+---@param army Army
 function SetAeonAlly2Color(army)
     SetArmyColor(army, 123, 255, 125)
 end
 
 --- Sets an army color to Cybran player
----@param army number
+---@param army Army
 function SetCybranPlayerColor(army)
     SetArmyColor(army, 231, 3, 3)
 end
 
 --- Sets an army color to evil Cybran
----@param army number
+---@param army Army
 function SetCybranEvilColor(army)
     SetArmyColor(army, 225, 70, 0)
 end
 
 --- Sets an army color to Cybran ally
----@param army number
+---@param army Army
 function SetCybranAllyColor(army)
     SetArmyColor(army, 130, 33, 30)
 end
 
 --- Sets an army color to UEF player
----@param army number
+---@param army Army
 function SetUEFPlayerColor(army)
     SetArmyColor(army, 41, 41, 225)
 end
 
 --- Sets an army color to UEF ally 1
----@param army number
+---@param army Army
 function SetUEFAlly1Color(army)
     SetArmyColor(army, 81, 82, 241)
 end
 
 --- Sets an army color to UEF ally 2
----@param army number
+---@param army Army
 function SetUEFAlly2Color(army)
     SetArmyColor(army, 133, 148, 255)
 end
 
 --- Sets an army color to Seraphim
----@param army number
+---@param army Army
 function SetSeraphimColor(army)
     SetArmyColor(army, 167, 150, 2)
 end
 
 --- Sets army color to Loyalist
----@param army number
+---@param army Army
 function SetLoyalistColor(army)
     SetArmyColor(army, 0, 100, 0)
 end
 
+---Gets the current platoon counter by `name` from the attack manager
 ---
----@param aiBrain AIBrain
----@param name string
+---Initializes to 0, if the platoon hasn't been tracked by the AM yet.
+---
+---@see AttackManager.PlatoonCount
+---@param aiBrain CampaignAIBrain
+---@param name string Platoon name
+---@return integer
 function AMPlatoonCounter(aiBrain, name)
     local platoonCount = aiBrain.AttackData.PlatoonCount
     local count = platoonCount[name]
@@ -1462,10 +1524,10 @@ end
 
 ---
 ---@param platoon Platoon
----@param landingChain MarkerChain
----@param attackChain MarkerChain
+---@param landingChain ChainName
+---@param attackChain ChainName
 ---@param instant? boolean
----@param moveChain? MarkerChain
+---@param moveChain? ChainName
 function PlatoonAttackWithTransports(platoon, landingChain, attackChain, instant, moveChain)
     ForkThread(PlatoonAttackWithTransportsThread, platoon, landingChain, attackChain, instant, moveChain)
 end
@@ -1758,7 +1820,7 @@ function KillBaseInAreaThread(units)
 end
 
 ---
----@param area Area
+---@param area AreaName
 ---@param callback? fun()
 ---@param duration? number
 function StartOperationJessZoom(area, callback, duration)
@@ -1776,7 +1838,7 @@ end
 
 --- Ends the operation in safety, setting enemy alliances to neutral, and making all commanders
 --- and `units` to be invulnerable
----@param units Unit[]
+---@param units? Unit[]
 function EndOperationSafety(units)
     ScenarioInfo.OpEnded = true
     ResetUITimer() -- turn off any timer going
@@ -1953,47 +2015,6 @@ function MissionNISCameraThread(unit, blendTime, holdTime, orientationOffset, po
     end
 end
 
---- NIS Garbage
----@param unit UnitInfo | Unit
----@param camInfo CamInfo
-function OperationNISCamera(unit, camInfo)
-    if camInfo.markerCam then
-        ForkThread(OperationNISCameraThread, unit, camInfo)
-    else
-        local unitInfo = {Position = unit:GetPosition(), Heading = unit:GetHeading()}
-        ForkThread(OperationNISCameraThread, unitInfo, camInfo)
-    end
-end
-
---- CDR Death (pass `hold` only if it's a mid-operation death)--resets death pausin
----@param unit Unit
----@param holdTime? number
-function CDRDeathNISCamera(unit, holdTime)
-    PauseUnitDeathActive = true
-    local camInfo = {
-        blendTime = 1,
-        holdTime = holdTime,
-        orientationOffset = {math.pi, 0.7, 0 },
-        positionOffset = {0, 1, 0 },
-        zoomVal = 65,
-        vizRadius = 10,
-    }
-    if not camInfo.holdTime then
-        camInfo.blendTime = 2.5
-        camInfo.spinSpeed = 0.03
-        camInfo.overrideCam = true
-    end
-    local unitInfo = {Position = unit:GetPosition(), Heading = unit:GetHeading()}
-    ForkThread(OperationNISCameraThread, unitInfo, camInfo)
-end
-
---- For op intro (currently not used)
----@param unit Unit
-function IntroductionNISCamera(unit)
-    local unitInfo = {Position = unit:GetPosition(), Heading = unit:GetHeading()}
-    ForkThread(OperationNISCameraThread, unitInfo, camInfo)
-end
-
 ---@class UnitInfo
 ---@field Position Vector
 ---@field Heading Vector
@@ -2008,8 +2029,8 @@ end
 ---@field markerCam boolean allows the NIS to use a marker rather than a unit
 ---@field resetCam boolean disables the interpolation at the end of the NIS, needed for NISs that appear outside of the playable area.
 ---@field overrideCam boolean allows an NIS to interrupt an NIS that is currently playing (typically used for end of operation cameras)
----@field playableAreaIn Area
----@field playableAreaOut Area
+---@field playableAreaIn string
+---@field playableAreaOut string
 ---@field vizRadius number (ogrids)
 
 ---------------
@@ -2018,7 +2039,7 @@ end
 --- Applies `camInfo` settings onto `unitInfo`. Will unpause unit deaths when finished (or is already busy).
 ---@param unitInfo UnitInfo | Vector # can be `Vector` when `camInfo.markerCam` is set
 ---@param camInfo CamInfo
-function OperationNISCameraThread(unitInfo, camInfo)
+local function operationNISCameraThread(unitInfo, camInfo)
     if not ScenarioInfo.NIS or camInfo.overrideCam then
         local cam = import("/lua/simcamera.lua").SimCamera('WorldCamera')
 
@@ -2114,6 +2135,47 @@ function OperationNISCameraThread(unitInfo, camInfo)
     PauseUnitDeathActive = false
 end
 
+--- NIS Garbage
+---@param unit UnitInfo | Unit
+---@param camInfo CamInfo
+function OperationNISCamera(unit, camInfo)
+    if camInfo.markerCam then
+        ForkThread(operationNISCameraThread, unit, camInfo)
+    else
+        local unitInfo = {Position = unit:GetPosition(), Heading = unit:GetHeading()}
+        ForkThread(operationNISCameraThread, unitInfo, camInfo)
+    end
+end
+
+--- CDR Death (pass `hold` only if it's a mid-operation death)--resets death pausin
+---@param unit Unit
+---@param holdTime? number
+function CDRDeathNISCamera(unit, holdTime)
+    PauseUnitDeathActive = true
+    local camInfo = {
+        blendTime = 1,
+        holdTime = holdTime,
+        orientationOffset = {math.pi, 0.7, 0 },
+        positionOffset = {0, 1, 0 },
+        zoomVal = 65,
+        vizRadius = 10,
+    }
+    if not camInfo.holdTime then
+        camInfo.blendTime = 2.5
+        camInfo.spinSpeed = 0.03
+        camInfo.overrideCam = true
+    end
+    local unitInfo = {Position = unit:GetPosition(), Heading = unit:GetHeading()}
+    ForkThread(operationNISCameraThread, unitInfo, camInfo)
+end
+
+--- For op intro (currently not used)
+---@param unit Unit
+function IntroductionNISCamera(unit)
+    local unitInfo = {Position = unit:GetPosition(), Heading = unit:GetHeading()}
+    ForkThread(operationNISCameraThread, unitInfo, camInfo)
+end
+
 ---
 function OnPostLoad()
     local dialogFinished = ScenarioInfo.DialogueFinished
@@ -2126,7 +2188,7 @@ end
 
 --- Sets all `units` that are in `army` to be able to take damage and be killed. Flags if they weren't able
 --- to previously: `UndamagableFlagSet` for CanTakeDamage and `UnKillableFlagSet` for CanBeKilled.
----@param army number
+---@param army Army
 ---@param units Unit[]
 function FlagUnkillableSelect(army, units)
     for _, unit in units do
@@ -2172,7 +2234,7 @@ function FlagUnkillable(army, exceptions)
 end
 
 --- Reverts all units in `army` that had their `UnKillableFlagSet` or `UndamagableFlagSet`
----@param army number
+---@param army Army
 function UnflagUnkillable(army)
     local units = ArmyBrains[army]:GetListOfUnits(categories.ALLUNITS, false)
     for _, unit in units do
@@ -2244,7 +2306,6 @@ function AntiOffMapMainThread()
     local WaitTicks = WaitTicks
     local GetUnitsInRect = GetUnitsInRect
     local MoveOnMapThread = MoveOnMapThread
-    local IsHumanUnit = IsHumanUnit
     GenerateOffMapAreas()
 
     while ScenarioInfo.OffMapPreventionThreadAllowed do
@@ -2256,7 +2317,7 @@ function AntiOffMapMainThread()
                     -- This is to make sure that we only do this check for air units
                     if not unit.OffMapThread and EntityCategoryContains(categories.AIR, unit) then
                         -- This is to make it so it only impacts player armies, not AI or civilian or mission map armies
-                        if IsHumanUnit(unit) then
+                        if unit.Brain.Human then
                             unit.OffMapThread = unit:ForkThread(MoveOnMapThread)
                         else
                             -- So that we don't bother checking each AI unit more than once
@@ -2347,12 +2408,7 @@ end
 ---@param unit Unit
 ---@return boolean
 function IsHumanUnit(unit)
-    for _, army in ScenarioInfo.ArmySetup do
-        if army.ArmyIndex == unit.Army then
-            return army.Human
-        end
-    end
-    return false
+    return unit.Brain.Human
 end
 
 --- Returns if the unit is in the playable area

@@ -8,7 +8,6 @@
 
 local Prefs    = import("/lua/user/prefs.lua")
 local UIUtil   = import("/lua/ui/uiutil.lua")
-local Utils    = import("/lua/system/utils.lua")
 local Group    = import("/lua/maui/group.lua").Group
 local Bitmap   = import("/lua/maui/bitmap.lua").Bitmap
 local Text     = import("/lua/maui/text.lua")
@@ -159,19 +158,19 @@ function Create(parent, bp)
 
     local eco = UnitsAnalyzer.GetEconomyStats(bp)
 
-    value = StringComma(eco.BuildCostMass)
+    value = string.commaFormat(eco.BuildCostMass)
     local MassCostIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/mass.dds'):Width(iconSize):Height(iconSize)
         :AtRightIn(costLabel, 5):AnchorToBottom(costLabel, 2):End()
     local MassCostText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorMass):LeftOf(MassCostIcon, 4):AnchorToBottom(costLabel, 1):End()
 
     value = eco.YieldMass
-    value = StringComma(value > 0 and '+' .. value or value)
+    value = string.commaFormat(value > 0 and '+' .. value or value)
     local MassProdIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/mass.dds'):Width(iconSize):Height(iconSize)
         :AtRightIn(prodLabel, 5):AnchorToBottom(prodLabel, 2):End()
     local MassProdText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorMass):LeftOf(MassProdIcon, 4):AnchorToBottom(prodLabel, 1):End()
 
     local healthValue = init(bp.Defense.Health or bp.NewHealth) -- NewHealth is used by enhancements
-    value = StringComma(math.floor(healthValue))
+    value = string.commaFormat(math.floor(healthValue))
     local HealthIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/defense-health.dds'):Width(iconSize):Height(iconSize)
         :AtRightIn(defenseLabel, 5):AnchorToBottom(defenseLabel, 2):End()
     local HealthText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorDefense):LeftOf(HealthIcon, 4):AnchorToBottom(defenseLabel, 1):End()
@@ -183,19 +182,19 @@ function Create(parent, bp)
 
     -- Energy/Shield row
 
-    value = StringComma(math.ceil(eco.BuildCostEnergy))
+    value = string.commaFormat(math.ceil(eco.BuildCostEnergy))
     local EnergyCostIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/energy.dds'):Width(iconSize):Height(iconSize)
         :AtRightIn(MassCostIcon):AnchorToBottom(MassCostText, 3):End()
     local EnergyCostText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorEnergy):LeftOf(EnergyCostIcon, 4):AnchorToBottom(MassCostText, 2):End()
 
     value = eco.YieldEnergy
-    value = StringComma(value > 0 and '+' .. value or value)
+    value = string.commaFormat(value > 0 and '+' .. value or value)
     local EnergyProdIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/energy.dds'):Width(iconSize):Height(iconSize)
         :AtRightIn(MassProdIcon):AnchorToBottom(MassProdText, 3):End()
     local EnergyProdText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorEnergy):LeftOf(EnergyProdIcon, 4):AnchorToBottom(MassProdText, 2):End()
 
     local shieldValue = init(bp.ShieldMaxHealth or bp.Defense.Shield.ShieldMaxHealth)
-    value = StringComma(math.floor(shieldValue))
+    value = string.commaFormat(math.floor(shieldValue))
     local ShieldIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/defense-shields.dds'):Width(iconSize):Height(iconSize)
         :AtRightIn(HealthIcon):AnchorToBottom(HealthText, 3):End()
     local ShieldText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorDefense):LeftOf(ShieldIcon, 4):AnchorToBottom(HealthText, 2):End()
@@ -207,12 +206,12 @@ function Create(parent, bp)
 
     -- Buildrate/time row
 
-    value = StringComma(math.floor(eco.BuildTime))
+    value = string.commaFormat(math.floor(eco.BuildTime))
     local BuildTimeIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/build-time.dds'):Width(iconSize):Height(iconSize)
         :AtRightIn(EnergyCostIcon):AnchorToBottom(EnergyCostText, 3):End()
     local BuildTimeText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorBuild):LeftOf(BuildTimeIcon, 4):AnchorToBottom(EnergyCostText, 2):End()
 
-    value = StringComma(eco.BuildRate)
+    value = string.commaFormat(eco.BuildRate)
     local BuildRateIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/build-rate.dds'):Width(iconSize):Height(iconSize)
         :AtRightIn(EnergyProdIcon):AnchorToBottom(EnergyProdText, 3):End()
     local BuildRateText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorBuild):LeftOf(BuildRateIcon, 4):AnchorToBottom(EnergyProdText, 2):End()
@@ -229,19 +228,19 @@ function Create(parent, bp)
             weaponText = weaponText:AnchorToBottom(furthestDownControl, 1):End()
         end
         
-        value = StringComma(weapon.Damage)
+        value = string.commaFormat(weapon.Damage)
         local dmgIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/damage.dds'):Width(iconSize):Height(iconSize)
             :AtRightIn(EnergyCostIcon):AnchorToBottom(weaponText, 2):End()
         local dmgText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorDamage):LeftOf(dmgIcon, 4):AnchorToBottom(weaponText, 1):End()
 
         furthestDownControl = dmgText
 
-        value = StringComma(weapon.DPS)
+        value = string.commaFormat(weapon.DPS)
         local dpsIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/damage-per-second.dds'):Width(iconSize):Height(iconSize)
             :AtRightIn(EnergyProdIcon):AnchorToBottom(weaponText, 2):End()
         local dpsText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorDamage):LeftOf(dpsIcon, 4):AnchorToBottom(weaponText, 1):End()
         
-        value = StringComma(weapon.Range)
+        value = string.commaFormat(weapon.Range)
         local rangeIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/damage-range.dds'):Width(iconSize):Height(iconSize)
             :AtRightIn(ShieldIcon):AnchorToBottom(weaponText, 2):End()
         local rangeText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorDamage):LeftOf(rangeIcon, 4):AnchorToBottom(weaponText, 1):End()
@@ -259,19 +258,19 @@ function Create(parent, bp)
         local weaponText = Layouter(UIUtil.CreateText(tooltipUI, total.Info, fontTextSize-1, fontTextName)):Color(colorText):AtLeftIn(tooltipUI, left)
             :AnchorToBottom(furthestDownControl, 10):End()
 
-        value = StringComma(total.Damage)
+        value = string.commaFormat(total.Damage)
         local dmgIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/damage.dds'):Width(iconSize):Height(iconSize)
             :AtRightIn(EnergyCostIcon):AnchorToBottom(weaponText, 2):End()
         local dmgText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorDamage):LeftOf(dmgIcon, 4):AnchorToBottom(weaponText, 1):End()
 
         furthestDownControl = dmgText
 
-        value = StringComma(total.DPS)
+        value = string.commaFormat(total.DPS)
         local dpsIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/damage-per-second.dds'):Width(iconSize):Height(iconSize)
             :AtRightIn(EnergyProdIcon):AnchorToBottom(weaponText, 2):End()
         local dpsText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorDamage):LeftOf(dpsIcon, 4):AnchorToBottom(weaponText, 1):End()
         
-        value = StringComma(total.Range)
+        value = string.commaFormat(total.Range)
         local rangeIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/damage-range.dds'):Width(iconSize):Height(iconSize)
             :AtRightIn(ShieldIcon):AnchorToBottom(weaponText, 2):End()
         local rangeText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorDamage):LeftOf(rangeIcon, 4):AnchorToBottom(weaponText, 1):End()

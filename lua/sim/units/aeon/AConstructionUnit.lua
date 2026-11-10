@@ -21,7 +21,7 @@
 --**********************************************************************************
 
 local ConstructionUnit = import('/lua/defaultunits.lua').ConstructionUnit
-local CreateAeonConstructionUnitBuildingEffects = import('/lua/EffectUtilities.lua').CreateAeonConstructionUnitBuildingEffects
+local CreateAeonConstructionUnitBuildingEffects = import('/lua/effectutilities.lua').CreateAeonConstructionUnitBuildingEffects
 
 ---@class AConstructionUnit : ConstructionUnit
 ---@field BuildEffectsBag TrashBag

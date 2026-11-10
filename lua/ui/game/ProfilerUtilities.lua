@@ -1,119 +1,65 @@
-
--- structure of data
--- data = {
---     -- what
---     Lua = {
---         -- namewhat
---           ["global"]    = { }
---         , ["upval"]     = { }
---         , ["local"]     = { }
---         , ["method"]    = { }
---         , ["field"]     = { }
---         , ["other"]     = { }
---     },
-
---     -- what
---     C = {
---         -- namewhat
---           ["global"]    = { }
---         , ["upval"]     = { }
---         , ["local"]     = { }
---         , ["method"]    = { }
---         , ["field"]     = { }
---         , ["other"]     = { }
---     },
-
---     -- what
---     main = {
---         -- namewhat
---           ["global"]    = { }
---         , ["upval"]     = { }
---         , ["local"]     = { }
---         , ["method"]    = { }
---         , ["field"]     = { }
---         , ["other"]     = { }
---     },
--- }
-
 local CreateEmptyProfilerTable = import("/lua/shared/profiler.lua").CreateEmptyProfilerTable
 
--- upvalue for performance
-local StringFind = string.find
-
-local cache = { }
-local head = 1
+local cache = {}
 
 --- Flattens the profiler data in a single list, can be tweaked using filter parameters
--- @param data Profiler data as described at the top of this file
--- @param fSource Filter on the source: "Lua", "C" or "main"
--- @param fScope Filter on the scope: "global", "upvalue", "local", "method", "field" or "other"
--- @param fName Filter on the name of the function
-function Format(data, growth, fSource, fScope, fName)
-
-    -- default to no filtering
-    fSource = fSource or false
-    fScope = fScope or false 
-    fName = fName or false 
-    growth = growth or { }
-
-    if fName then 
-        fName = string.lower(fName)
+---@param data ProfilerData data as described at the top of this file
+---@param growth? ProfilerGrowth
+---@param filterSource? ProfilerSource Filter on the source
+---@param filterScope? ProfilerScope Filter on the scope
+---@param filterName? string Filter on the name of the function
+---@return ProfilerFunctionData[]
+---@return number
+function Format(data, growth, filterSource, filterScope, filterName)
+    growth = growth or {}
+    if filterName then
+        filterName = filterName:lower()
     end
 
     -- reset cache
-    head = 1
+    local cache = cache
+    local head = 1
 
     -- loop over data
     -- Lua, C or main
-    for source, i1 in data do 
-
+    for source, sourceData in data do
         -- skip content that we're not interested in
-        if fSource then 
-            if source ~= fSource then 
-                continue 
-            end
+        if filterSource and source ~= filterSource then
+            continue
         end
 
         -- global, local, method, field or other (empty)
-        for scope, i2 in i1 do 
-
-            -- skip content that we're not interested in
-            if fScope then 
-                if scope ~= fScope then 
-                    continue 
-                end
+        for scope, scopeData in sourceData do
+            if filterScope and scope ~= filterScope then
+                continue
             end
+            local scopeGrowth = growth[scope]
 
             -- name of function and value
-            for name, value in i2 do 
-
+            for name, value in scopeData do
                 -- skip content that we're not interested in
-                if fName then 
-                    if not StringFind(string.lower(name), fName) then 
-                        continue 
-                    end
+                if filterName and not name:lower():find(filterName) then
+                    continue
                 end
 
                 -- may be set to false
-                if data[source][scope][name] then 
-
+                if value then
                     -- attempt to retrieve an element
                     local element = cache[head]
-                    if not element then 
-                        element = { source = false, scope = false, name = false, value = false, growth = false  }
+                    if not element then
+                        element = {}
                         cache[head] = element
                     end
-
                     -- element is used
                     head = head + 1
 
                     -- populate element
-                    element.source = source 
+                    element.growth = scopeGrowth[name] or 0
+                    element.name = name
+                    element.nameLower = name:lower()
                     element.scope = scope
-                    element.name = name 
-                    element.k = string.lower(name)
-                    element.value = value 
-                    element.growth = growth[scope][name] or 0
+                    element.source = source
+                    element.value = value
                 end
             end
         end
@@ -124,119 +70,124 @@ function Format(data, growth, fSource, fScope, fName)
 end
 
 --- Applies insertion sort on the cache based on the provided field
--- copied from: https://github.com/akosma/CodeaSort/blob/master/InsertionSort.lua
--- @param cache Table with elements of type { source :: string, scope :: string, name :: string, value :: string }
--- @param count Number of elements in cache
--- @param field Field we want to sort on: source, scope, name or value
-function Sort(cache, count, field)
-
+--- copied from: https://github.com/akosma/CodeaSort/blob/master/InsertionSort.lua
+---@param cache ProfilerScopeData
+---@param count number of elements in cache
+---@param field ProfilerField Field we want to sort on
+---@param reverse? boolean
+function Sort(cache, count, field, reverse)
     -- sort only on lowered strings
-    if field == "name" then 
-        field = "k"
+    if field == "name" then
+        field = "nameLower"
     end
 
-    -- numbers are ordered different
-    reverse = type(cache[1][field]) == "number"
+    -- numbers are sorted descending by default
+    if type(cache[1][field]) == "number" then
+        reverse = not reverse
+    end
 
     -- insertion sort
-    if reverse then 
+    if reverse then
         for j = 2, count do
-            local key = cache[j]
+            local replacing = cache[j]
+            local value = replacing[field]
             local i = j - 1
-            while i > 0 and cache[i][field] < key[field] do
-                cache[i + 1] = cache[i]
+            local comparing = cache[i]
+            while i > 0 and comparing[field] < value do
+                cache[i + 1] = comparing
                 i = i - 1
+                comparing = cache[i]
             end
-            cache[i + 1] = key
+            cache[i + 1] = replacing
         end
-    else 
+    else
         for j = 2, count do
-            local key = cache[j]
+            local replacing = cache[j]
+            local value = replacing[field]
             local i = j - 1
-            while i > 0 and cache[i][field] > key[field] do
-                cache[i + 1] = cache[i]
+            local comparing = cache[i]
+            while i > 0 and comparing[field] > value do
+                cache[i + 1] = comparing
                 i = i - 1
+                comparing = cache[i]
             end
-            cache[i + 1] = key
+            cache[i + 1] = replacing
         end
     end
     return cache, count
 end
 
---- A function name / value look up cache
-local lCache = { }
-
+local lookupCache = {}
+---@param data ProfilerData
+---@return ProfilerGrowth
 function LookUp(data)
-
     -- reset the cache
-
-    for k, element in lCache do 
-        lCache[k] = false
+    for key, _ in lookupCache do
+        lookupCache[key] = false
     end
 
     -- populate the lookup cache
 
     -- Lua, C or main
-    for source, i1 in data do 
+    for _, sourceData in data do
         -- global, local, method, field or other (empty)
-        for scope, i2 in i1 do 
+        for scope, scopeData in sourceData do
+            local scopeInfo = lookupCache[scope]
+            if not scopeInfo then
+                scopeInfo = {}
+                lookupCache[scope] = scopeInfo
+            end
             -- name of function and number of calls
-            for name, calls in i2 do 
-
-                if calls then 
-                    local check = lCache[scope]
-                    if not check then 
-                        lCache[scope] = { } 
-                    end
-
-                    check = lCache[scope][name]
-                    if not check then 
-                        lCache[scope][name] = calls
+            for name, calls in scopeData do
+                if calls then
+                    local value = scopeInfo[name]
+                    if value then
+                        scopeInfo[name] = calls + value
                     else
-                        lCache[scope][name] = check + calls
+                        scopeInfo[name] = calls
                     end
                 end
             end
         end
     end
 
-    return lCache
+    return lookupCache
 end
 
---- A cache that shares the profile data structure
 local cachedData = CreateEmptyProfilerTable()
-
+---@param arrays ProfilerData[]
+---@return ProfilerData
 function Combine(arrays)
-
     -- reset the cache
-
     local cachedData = cachedData
 
     -- Lua, C or main
-    for source, i1 in cachedData do 
+    for _, sourceData in cachedData do
         -- global, local, method, field or other (empty)
-        for scope, i2 in i1 do 
+        for _, scopeData in sourceData do
             -- name of function and number of calls
-            for name, calls in i2 do 
-                cachedData[source][scope][name] = false
+            for name, _ in scopeData do
+                scopeData[name] = false
             end
         end
     end
 
     -- combine the input into one large profile data structure
 
-    for k, info in arrays do 
+    for _, info in arrays do
         -- Lua, C or main
-        for source, i1 in info.data do 
+        for source, sourceInfo in info.data do
             -- global, local, method, field or other (empty)
-            for scope, i2 in i1 do 
+            local sourceData = cachedData[source]
+            for scope, scopeInfo in sourceInfo do
                 -- name of function and number of calls
-                for name, calls in i2 do 
-                    local value = cachedData[source][scope][name]
-                    if not value then 
-                        cachedData[source][scope][name] = calls
+                local scopeData = sourceData[scope]
+                for name, calls in scopeInfo do
+                    local value = scopeData[name]
+                    if value then
+                        scopeData[name] = calls + value
                     else
-                        cachedData[source][scope][name] = value + calls
+                        scopeData[name] = calls
                     end
                 end
             end

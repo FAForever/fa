@@ -12,12 +12,14 @@ local util = import("/lua/utilities.lua")
 local fxutil = import("/lua/effectutilities.lua")
 
 ---@class URA0401 : CAirUnit
+---@field MovementAmbientExhaustEffectsBag table # Old style trashbag that is a table
+---@field AnimManip moho.AnimationManipulator # Takeoff/landing animations
 URA0401 = ClassUnit(CAirUnit) {
     Weapons = {
         Missile01 = ClassWeapon(CDFRocketIridiumWeapon) {},
         Missile02 = ClassWeapon(CDFRocketIridiumWeapon) {},
-        HeavyBolter = ClassWeapon(CDFHeavyElectronBolterWeapon){},
-        HeavyBolterBack = ClassWeapon(CDFHeavyElectronBolterWeapon){},
+        HeavyBolter = ClassWeapon(CDFHeavyElectronBolterWeapon) {},
+        HeavyBolterBack = ClassWeapon(CDFHeavyElectronBolterWeapon) {},
         AAMissile01 = ClassWeapon(CAAMissileNaniteWeapon) {},
         AAMissile02 = ClassWeapon(CAAMissileNaniteWeapon) {},
     },
@@ -31,12 +33,20 @@ URA0401 = ClassUnit(CAirUnit) {
         'Exhaust_Right03',
     },
 
-    DestructionPartsChassisToss = {'URA0401',},
+    DestructionPartsChassisToss = { 'URA0401', },
     DestroyNoFallRandomChance = 1.1,
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        CAirUnit.OnStopBeingBuilt(self,builder,layer)
-        self:SetScriptBit('RULEUTC_StealthToggle', true)
+    ---@param self URA0401
+    ---@param builder Unit
+    ---@param layer Layer
+    OnStopBeingBuilt = function(self, builder, layer)
+        CAirUnit.OnStopBeingBuilt(self, builder, layer)
+        -- Don't turn off stealth for AI so that it uses it by default
+        if self.Brain.BrainType == 'Human' then
+            self:SetScriptBit('RULEUTC_StealthToggle', true)
+        else
+            self:SetMaintenanceConsumptionActive()
+        end
         self.AnimManip = CreateAnimator(self)
         self.Trash:Add(self.AnimManip)
     end,
@@ -44,12 +54,12 @@ URA0401 = ClassUnit(CAirUnit) {
     ---@param self URA0401
     ---@param new HorizontalMovementState
     ---@param old HorizontalMovementState
-    OnMotionHorzEventChange = function(self, new, old )
+    OnMotionHorzEventChange = function(self, new, old)
         CAirUnit.OnMotionHorzEventChange(self, new, old)
 
-        if self.ThrustExhaustTT1 == nil then 
+        if self.ThrustExhaustTT1 == nil then
             if self.MovementAmbientExhaustEffectsBag then
-                fxutil.CleanupEffectBag(self,'MovementAmbientExhaustEffectsBag')
+                fxutil.CleanupEffectBag(self, 'MovementAmbientExhaustEffectsBag')
             else
                 self.MovementAmbientExhaustEffectsBag = {}
             end
@@ -60,16 +70,17 @@ URA0401 = ClassUnit(CAirUnit) {
             KillThread(self.ThrustExhaustTT1)
             fxutil.CleanupEffectBag(self, 'MovementAmbientExhaustEffectsBag')
             self.ThrustExhaustTT1 = nil
-        end      
+        end
     end,
 
+    ---@param self URA0401
     MovementAmbientExhaustThread = function(self)
         while not self.Dead do
             local ExhaustEffects = {
                 '/effects/emitters/dirty_exhaust_smoke_01_emit.bp',
-                '/effects/emitters/dirty_exhaust_sparks_01_emit.bp',            
+                '/effects/emitters/dirty_exhaust_sparks_01_emit.bp',
             }
-            local ExhaustBeam = '/effects/emitters/missile_exhaust_fire_beam_03_emit.bp'        
+            local ExhaustBeam = '/effects/emitters/missile_exhaust_fire_beam_03_emit.bp'
 
             for kE, vE in ExhaustEffects do
                 for kB, vB in self.MovementAmbientExhaustBones do
@@ -80,9 +91,9 @@ URA0401 = ClassUnit(CAirUnit) {
 
             WaitSeconds(2)
             fxutil.CleanupEffectBag(self, 'MovementAmbientExhaustEffectsBag')
-                            
-            WaitSeconds(util.GetRandomFloat(1,7))
-        end 
+
+            WaitSeconds(util.GetRandomFloat(1, 7))
+        end
     end,
 
     ---@param self URA0401

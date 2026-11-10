@@ -1,6 +1,8 @@
 ---@meta
 
 ---@class moho.bitmap_methods : moho.control_methods
+---@field BitmapWidth LazyVar<number>
+---@field BitmapHeight LazyVar<number>
 local CMauiBitmap = {}
 
 ---
@@ -31,11 +33,6 @@ end
 
 ---
 function CMauiBitmap:SetForwardPattern()
-end
-
----Sets color mask applied to bitmap during rendering (white images will get this color for example)
----@param color Color
-function CMauiBitmap:SetColorMask(color)
 end
 
 ---

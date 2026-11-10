@@ -25,21 +25,12 @@
 ---@field numArmies number
 ---@field focusArmy number
 
----@class ArmyInfo
----@field armyIndex number
----@field civilian boolean
----@field color string
----@field faction number
----@field human boolean
----@field name string
----@field nickname string
----@field outOfGame boolean
----@field showScore boolean
+---@class ArmyInfo : EngineArmyInfo
 
 local Prefs = import("/lua/user/prefs.lua")
 
 ---@type 'on' | 'allies-only' | 'off'
-OptionShowPlayerNames = Prefs.GetFromCurrentProfile('options.options_show_player_names')
+OptionShowPlayerNames = Prefs.GetFromCurrentProfile('options.show_player_names') or 'on'
 
 ---@param armiesTable ArmiesTable
 ---@return ArmiesTable
@@ -70,6 +61,7 @@ local GlobalGetArmiesTable = _G.GetArmiesTable
 
 --- Allows UI elements to be updated when the cache is updated by adding a callback via Observable:AddObserver()
 local Cached = PostprocessArmiesTable(GlobalGetArmiesTable())
+---@type Observer<ArmiesTable>
 Observable = import("/lua/shared/observable.lua").Create()
 Observable:Set(Cached)
 

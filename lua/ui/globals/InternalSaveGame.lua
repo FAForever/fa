@@ -29,7 +29,7 @@ do
     --- Hook to fix a buffer overflow security issue in the engine
     ---@param filename string
     _G.InternalSaveGame = function(filename, friendlyFilename, onCompletionCallback)
-        local characterLimit = 100
+        local characterLimit = 260 -- Windows's max filepath length
         if DebugAllocatedSize(filename) > characterLimit then
             filename = filename:sub(1, characterLimit)
         end

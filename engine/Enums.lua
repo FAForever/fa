@@ -33,15 +33,15 @@
 ---| "RULEUCC_Invalid"
 
 ---@alias EngineToggleCap
----| "RULEUTC_ShieldToggle"
----| "RULEUTC_WeaponToggle"
----| "RULEUTC_JammingToggle"
----| "RULEUTC_IntelToggle"
----| "RULEUTC_ProductionToggle"
----| "RULEUTC_StealthToggle"
----| "RULEUTC_GenericToggle"
----| "RULEUTC_SpecialToggle"
----| "RULEUTC_CloakToggle"
+---| "RULEUTC_ShieldToggle"     # Bit 0
+---| "RULEUTC_WeaponToggle"     # Bit 1
+---| "RULEUTC_JammingToggle"    # Bit 2
+---| "RULEUTC_IntelToggle"      # Bit 3
+---| "RULEUTC_ProductionToggle" # Bit 4
+---| "RULEUTC_StealthToggle"    # Bit 5
+---| "RULEUTC_GenericToggle"    # Bit 6
+---| "RULEUTC_SpecialToggle"    # Bit 7
+---| "RULEUTC_CloakToggle"      # Bit 8
 
 ---@alias UnitMotionType
 ---| "RULEUMT_None"
@@ -53,7 +53,7 @@
 ---| "RULEUMT_Amphibious"
 ---| "RULEUMT_Hover"
 ---| "RULEUMT_AmphibiousFloating"
----| "RULEUMT_Special"
+---| "RULEUMT_Special" # Identical to None
 
 ---@alias UnitBuildRestriction
 ---| "RULEUBR_None"
@@ -86,6 +86,12 @@
 ---| "Water"
 ---| "Air"
 ---| "Orbital"
+
+---@alias MotionState
+---| "None"         # Unit is moving normally
+---| "Attached"     # Unit attached to entity (ex: transport, factory)
+---| "Ballistic"    # Unit detached from entity and now falling
+---| "Crashed"      # Unit that was falling crashed to the ground
 
 ---@alias HorizontalMovementState
 ---| 'TopSpeed'
@@ -132,8 +138,8 @@
 ---| "Invalid"
 ---| "Terrain"
 ---| "Water"
----| "Air"
----| "Underwater"
+---| "Air" # Caused by end of lifetime
+---| "Underwater" # Caused by end of lifetime
 ---| "Projectile"
 ---| "ProjectileUnderwater"
 ---| "Prop"
@@ -294,3 +300,26 @@
 ---| "Yellow"               #FFFF00
 ---| "YellowGreen"          #9CCF31
 ---| "transparent"          #00000000
+
+---@alias BuildOrderType
+---| "Repair"
+---| "MobileBuild"
+---| "FactoryBuild"
+---| "Upgrade"
+
+---@enum FootprintFlag
+local FootprintFlags = {
+    None = 0x00,
+    IgnoreStructures = 0x01,
+}
+
+--- Bitmask
+---@enum FootprintLayerCap
+local FootprintLayerCaps = {
+    LAND = 0x01,
+    SEABED = 0x02,
+    SUB = 0x04,
+    WATER = 0x08,
+    AIR = 0x10,
+    ORBIT = 0x20,
+}

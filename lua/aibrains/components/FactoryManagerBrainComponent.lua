@@ -23,7 +23,7 @@
 local Factions = import('/lua/factions.lua').GetFactions(true)
 
 ---@alias ResearchFactoryTech "TECH2" | "TECH3"
----@alias ResearchFactoryLayer "AIR" | "LAND" | "NAVY"
+---@alias ResearchFactoryLayer "AIR" | "LAND" | "NAVAL"
 ---@alias ResearchFactoryFaction "UEF" | "AEON" | "CYBRAN" | "SERAPHIM" | "NOMADS"
 
 -- upvalue scope for performance

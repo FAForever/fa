@@ -43,8 +43,8 @@ UnitBlueprint{
     Defense = {
         AirThreatLevel = 20,
         ArmorType = "Normal",
-        Health = 4000,
-        MaxHealth = 4000,
+        Health = 3600,
+        MaxHealth = 3600,
         SubThreatLevel = 34,
     },
     Display = {
@@ -178,9 +178,9 @@ UnitBlueprint{
         Elevation = -1.5,
         MaxAcceleration = 5.5,
         MaxBrake = 5.5,
-        MaxSpeed = 4.6,
-        MaxSpeedReverse = 4.6,
-        MaxSteerForce = 4.6,
+        MaxSpeed = 4.8,
+        MaxSpeedReverse = 4.8,
+        MaxSteerForce = 4.8,
         MeshExtentsX = 0.6,
         MeshExtentsY = 0.65,
         MeshExtentsZ = 2.5,
@@ -301,7 +301,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 10/100, --10/integer interval in ticks
+            RateOfFire = 10/120, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TORPEDO",
             TargetType = "RULEWTT_Projectile",
@@ -360,7 +360,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 10/100, --10/integer interval in ticks
+            RateOfFire = 10/120, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TORPEDO",
             TargetType = "RULEWTT_Projectile",

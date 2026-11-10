@@ -24,7 +24,7 @@ local FactoryUnit = import('/lua/defaultunits.lua').FactoryUnit
 
 -- pre-import for performance
 local TrashAdd = TrashBag.Add
-local CreateSeraphimFactoryBuildingEffects = import('/lua/EffectUtilities.lua').CreateSeraphimFactoryBuildingEffects
+local CreateSeraphimFactoryBuildingEffects = import('/lua/effectutilities.lua').CreateSeraphimFactoryBuildingEffects
 
 -- upvalue scope for performance
 local ForkThread = ForkThread
