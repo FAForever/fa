@@ -543,9 +543,12 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
 
     ---@param self Weapon
     ---@param bone Bone
-    ---@return Projectile
+    ---@return Projectile? # nil when the weapon has no projectile blueprint (the engine does an instant hit instead)
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
+        if not proj then
+            return nil
+        end
 
         -- used for the retargeting feature
         proj.CreatedByWeapon = self
@@ -557,7 +560,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
         end
 
         local damageTable = self:GetDamageTable()
-        if proj and not proj:BeenDestroyed() then
+        if not proj:BeenDestroyed() then
             proj:PassMetaDamage(damageTable)
             local bp = self.Blueprint
 
