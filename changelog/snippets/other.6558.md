@@ -1,1 +1,0 @@
-- (#6558) Annotate the UI file `orders.lua`.
