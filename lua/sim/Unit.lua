@@ -2548,9 +2548,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self:DoUnitCallbacks('OnStopBeingBuilt')
 
         local bpShield = blueprintDefense.Shield
-        --- Engine always creates a dummy entry `{ RegenAssistMult = 1, ShieldSize = 0 }`
-        ---@cast bpShield -nil
-        -- ignore the dummy entry
+        -- ignore the dummy entry the engine creates for units without a shield: `{ RegenAssistMult = 1, ShieldSize = 0 }`
         if bpShield.ShieldSize ~= 0 then
             self:CreateShield(bpShield)
         end

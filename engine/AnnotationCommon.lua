@@ -14,9 +14,7 @@
 ---@class Destroyable
 local Destroyable = {}
 function Destroyable:Destroy() end
---- Called by engine for UnitWeapon, ScriptTask, Entity, Platoon, MauiControl
----@type nil | fun(self: Destroyable)
-Destroyable.OnDestroy = nil
+function Destroyable:OnDestroy() end
 
 ---@class OnDirtyListener
 local OnDirtyListener = {}

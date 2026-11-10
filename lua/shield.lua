@@ -120,7 +120,7 @@ local DEFAULT_OPTIONS = {
     ImpactMesh = '',
     ImpactEffects = '',
     Size = 10, -- also known as ShieldSize in bp
-    -- RegenAssistMulti = 1, -- Engine default is 1, but blueprints always use 60
+    -- RegenAssistMult is read by the engine from the blueprint, `blueprints-units.lua` derives it from `RegenPerBuildRate`
     ShieldMaxHealth = 250,
     ShieldRechargeTime = 10,
     ShieldEnergyDrainRechargeTime = 10,
@@ -430,7 +430,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
     --- Retrieves allied shields that overlap with this shield, caches the results per tick
     ---@param self Shield
-    ---@param tick integer # Optional parameter, represents the game tick. Used to determine if we need to refresh the cache
+    ---@param tick? integer # Represents the game tick. Used to determine if we need to refresh the cache
     ---@return Shield[]
     ---@return number # Number of overlapping shields
     GetOverlappingShields = function(self, tick)
@@ -808,7 +808,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
     --- Called when a shield collides with a projectile to check if the collision is valid
     ---@param self Shield # The shield we're checking the collision for
-    ---@param other Projectile | ShiledCollider # The projectile we're checking the collision with
+    ---@param other Projectile | ShieldCollider # The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
 
         if self.DisallowCollisions then
@@ -817,7 +817,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
         -- special logic when it is a projectile to simulate air crashes
         if other.CrashingAirplaneShieldCollisionLogic then
-            ---@cast other ShiledCollider
+            ---@cast other ShieldCollider
             if other.ShieldImpacted then
                 return false
             else
@@ -968,7 +968,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     end,
 
     OnState = State {
-        ---@param self Shield.OnState
+        ---@param self Shield
         Main = function(self)
 
             -- always start consuming energy at this point
@@ -1009,7 +1009,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             self.RolledFromFactory = true
         end,
 
-        ---@param self Shield.OnState
+        ---@param self Shield
         IsOn = function(self)
             return true
         end,
@@ -1017,7 +1017,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
     -- When manually turned off
     OffState = State {
-        ---@param self Shield.OffState
+        ---@param self Shield
         Main = function(self)
 
             -- update internal state
@@ -1034,14 +1034,14 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             self.Owner:PlayUnitSound('ShieldOff')
         end,
 
-        ---@param self Shield.OffState
+        ---@param self Shield
         IsOn = function(self)
             return false
         end,
     },
 
     RechargeState = State {
-        ---@param self Shield.RechargeState
+        ---@param self Shield
         Main = function(self)
 
             -- determine recharge time
@@ -1072,14 +1072,14 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             ChangeState(self, self.OnState)
         end,
 
-        ---@param self Shield.RechargeState
+        ---@param self Shield
         IsOn = function(self)
             return false
         end,
     },
 
     DamageDrainedState = State {
-        ---@param self Shield.DamageDrainedState
+        ---@param self Shield
         Main = function(self)
 
             -- update internal state
@@ -1098,14 +1098,14 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             ChangeState(self, self.RechargeState)
         end,
 
-        ---@param self Shield.DamageDrainedState
+        ---@param self Shield
         IsOn = function(self)
             return false
         end,
     },
 
     EnergyDrainedState = State {
-        ---@param self Shield.EnergyDrainedState
+        ---@param self Shield
         Main = function(self)
 
             -- update internal state
@@ -1125,18 +1125,18 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             -- ChangeState(self, self.RechargeState)
         end,
 
-        ---@param self Shield.EnergyDrainedState
+        ---@param self Shield
         IsOn = function(self)
             return false
         end,
     },
 
     DeadState = State {
-        ---@param self Shield.DeadState
+        ---@param self Shield
         Main = function(self)
         end,
 
-        ---@param self Shield.DeadState
+        ---@param self Shield
         IsOn = function(self)
             return false
         end,
@@ -1146,7 +1146,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
     ---@deprecated
     DamageRechargeState = State {
-        ---@param self Shield.DamageRechargeState
+        ---@param self Shield
         Main = function(self)
             -- back to the regular onstate
             ChangeState(self, self.RechargeState)
@@ -1260,7 +1260,7 @@ PersonalBubble = ClassShield(Shield) {
     end,
 
     OnState = State(Shield.OnState) {
-        ---@param self PersonalBubble.OnState
+        ---@param self PersonalBubble
         Main = function(self)
             -- Set the collision profile of the unit to match the apparent shield sphere.
             -- Since the collision handler in Unit deals with personal shields, the damage will be
@@ -1271,7 +1271,7 @@ PersonalBubble = ClassShield(Shield) {
     },
 
     OffState = State(Shield.OffState) {
-        ---@param self PersonalBubble.OffState
+        ---@param self PersonalBubble
         Main = function(self)
             -- When the shield is down for some reason, reset the unit's collision profile so it can
             -- again be hit.
@@ -1281,7 +1281,7 @@ PersonalBubble = ClassShield(Shield) {
     },
 
     RechargeState = State(Shield.RechargeState) {
-        ---@param self PersonalBubble.RechargeState
+        ---@param self PersonalBubble
         Main = function(self)
             UnitRevertCollisionShape(self.Owner)
             Shield.RechargeState.Main(self)
@@ -1327,7 +1327,7 @@ TransportShield = ClassShield(Shield) {
     end,
 
     OnState = State(Shield.OnState) {
-        ---@param self TransportShield.OnState
+        ---@param self TransportShield
         Main = function(self)
             Shield.OnState.Main(self)
 
@@ -1336,8 +1336,8 @@ TransportShield = ClassShield(Shield) {
             self.Owner.CanTakeDamage = false
         end,
 
+        ---@param self TransportShield
         ---@param unit Unit
-        ---@param self TransportShield.OnState
         AddProtectedUnit = function(self, unit)
             self.protectedUnits[unit] = true
             unit.CanTakeDamage = false
@@ -1345,7 +1345,7 @@ TransportShield = ClassShield(Shield) {
     },
 
     OffState = State(Shield.OffState) {
-        ---@param self TransportShield.OffState
+        ---@param self TransportShield
         Main = function(self)
             Shield.OffState.Main(self)
 
@@ -1356,7 +1356,7 @@ TransportShield = ClassShield(Shield) {
     },
 
     DamageDrainedState = State(Shield.DamageDrainedState) {
-        ---@param self TransportShield.DamageDrainedState
+        ---@param self TransportShield
         Main = function(self)
             Shield.DamageDrainedState.Main(self)
 
@@ -1367,7 +1367,7 @@ TransportShield = ClassShield(Shield) {
     },
 
     EnergyDrainedState = State(Shield.EnergyDrainedState) {
-        ---@param self TransportShield.EnergyDrainedState
+        ---@param self TransportShield
         Main = function(self)
             Shield.EnergyDrainedState.Main(self)
 

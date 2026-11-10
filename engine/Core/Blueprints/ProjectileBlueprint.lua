@@ -47,12 +47,14 @@
 
 ---@class ProjectileBlueprintPhysics
 --- whether to check the projectile for collisions against terrain/water
----@see Projectile.SetCollideSurface # to modify this property during the game
+---@see moho.projectile_methods.SetCollideSurface # To change it during the game
 ---@field CollideSurface boolean
 --- whether to check the projectile for collisions against other entities
----@see Projectile.SetCollideEntity # to modify this property during the game
+---@see moho.projectile_methods.SetCollideEntity # To change it during the game
 ---@field CollideEntity boolean
----@field CollideFriendlyShield boolean
+--- if this projectile collides with every shield, including those of its own army. Anti-artillery shields
+--- also require `ArtilleryShieldBlocks` in its damage data
+---@field CollideFriendlyShield? boolean
 --- if this projectile should turn to track its target
 ---@field TrackTarget boolean
 --- if this projectile should track as if it was an attack-ground attack

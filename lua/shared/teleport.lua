@@ -32,8 +32,6 @@ local MathPow = math.pow
 local MathMin = math.min
 local TableGetN = table.getn
 
-local IsKeyDown = IsKeyDown
-
 ---@param unit Unit | UserUnit
 ---@param location Vector
 ---@return number energyCost

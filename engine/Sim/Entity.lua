@@ -1,7 +1,8 @@
 ---@meta
 
+--- Passed to `_c_CreateEntity`. Without `Owner` or `Army`, the entity belongs to no army
 ---@class EntitySpec
----@field Owner? moho.entity_methods | integer # 0-indexed army index. Overrides `Army`.
+---@field Owner? moho.entity_methods | integer # Entity to take the army from, or a 0-indexed army index. Overrides `Army`
 ---@field Army? integer # 1-indexed army index
 
 ---@class moho.entity_methods : Destroyable
@@ -290,10 +291,6 @@ end
 function Entity:IsValidBone(bone, allowNil)
 end
 
---- Kills the entity and all attached entities, without any Lua callbacks.
----
----@see Unit.Kill # Kill with Lua callback and engine stats
----@see Prop.Kill # Kill with Lua callback
 ---@overload fun()
 ---@param instigator Unit
 ---@param damageType DamageType
@@ -441,37 +438,5 @@ end
 ---@param dy number
 function Entity:SinkAway(dy)
 end
-
---- Called upon collision with a projectile. Return `false` to ignore it
----@type fun(self: Entity, other: Projectile): boolean
-Entity.OnCollisionCheck = nil
-
---- Called upon collision with a weapon's collision beam. Return `false` to ignore it
----@type fun(self: Entity, firingWeapon: Weapon): boolean
-Entity.OnCollisionCheckWeapon = nil
-
----@see Damage
----@see DamageArea
----@see DamageRing
----@type fun(self: Entity, instigator: Entity, amount: number, vector: Vector, damageType: DamageType): boolean
-Entity.OnDamage = nil
-
---- Used by engine to regen HP when a shield's owner is repaired.
----
---- This behavior requires:
---- - the owner to be `SHIELD` category
---- - `Owner.ShieldIsOn() == true`
---- - owner's focus entity is the shield
---- 
---- The exact amount regenerated is `RegenRate * RepairerBuildrate / RegenAssistMult`,
---- ignoring resource consumption fraction (stalling).
---- 
---- Technically this can work for any focused entity, not just shield entities.
----
----@see Unit.ShieldIsOn
----@see Unit.SetFocusEntity
----@see UnitBlueprintDefenseShield.RegenAssistMult
----@type number?
-Entity.RegenRate = nil
 
 return Entity

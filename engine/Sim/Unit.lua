@@ -736,13 +736,7 @@ function Unit:ToggleScriptBit(bit)
 end
 
 --- detaches all units from this transport
---- 
---- If `destroySomeUnits` is true, units have a 99% chance to be killed, except
---- for `COMMAND` category units with `CheckCanBeKilled() == false`, which take
---- 10000 "Damage" damage instead.
---- 
---- Units stored inside the transport are destroyed instead, calling `DestroyedOnTransport`
----@param destroySomeUnits boolean
+---@param destroySomeUnits unknown
 function Unit:TransportDetachAllUnits(destroySomeUnits)
 end
 
@@ -757,60 +751,25 @@ end
 function Unit:TransportHasSpaceFor(target)
 end
 
---- Kills the unit, then does Lua callback and engine stat adjustments.
----
----@see Unit.CheckCanBeKilled
----@see Unit.OnKilled
----@overload fun()
----@param instigator moho.entity_methods
----@param damageType DamageType
----@param excessDamageRatio number
-function Unit:Kill(instigator, damageType, excessDamageRatio)
-end
-
 --- Called by the engine when the unit takes >= 2 times as much damage due to armor multi or handicap divisor.
----@type fun(self: moho.unit_methods, type: DamageType)
+---@type fun(self: Unit, type: DamageType)
 Unit.OnExtraDamageDealt = nil
 
 --- Called by the engine when a unit changes motion state,
 --- usually when it attaches/detaches from other entities such as transports.
----@type fun(self: moho.unit_methods, new: MotionState, old: MotionState)
+---@type fun(self: Unit, new: MotionState, old: MotionState)
 Unit.OnMotionStateChange = nil
 
 --- Called by the engine when the unit starts refueling at an air staging platform.
----@type fun(self: moho.unit_methods)
+---@type fun(self: Unit)
 Unit.OnStartRefueling = nil
 
 --- Called by the engine when the unit runs out of fuel.
----@type fun(self: moho.unit_methods)
+---@type fun(self: Unit)
 Unit.OnRunOutOfFuel = nil
 
 --- Called by the engine when the unit was out of fuel and recharges fuel (either by air staging or by landing).
----@type fun(self: moho.unit_methods)
+---@type fun(self: Unit)
 Unit.OnGotFuel = nil
-
---- Called by the engine for `SHIELD` category units to determine if our 
---- focused entity (a shield) is valid for repair tasks.
----@type nil | fun(self: moho.unit_methods): boolean
-Unit.ShieldIsOn = nil
-
----@alias UnitImpactType "Terrain" | "Water"
-
---- Impact from ballistic motion state
----@type nil | fun(self: moho.unit_methods, impactType: UnitImpactType)
-Unit.OnImpact = nil
-
----@type nil | fun(self: moho.unit_methods): boolean
-Unit.CheckCanBeKilled = nil
-
----@type nil | fun(self: moho.unit_methods): boolean
-Unit.CheckCanTakeDamage = nil
-
---- Called when stored inside transport and destroyed.
----@type nil | fun(self: moho.unit_methods)
-Unit.DestroyedOnTransport = nil
-
----@type nil | fun(self: moho.unit_methods, instigator: moho.entity_methods, type: DamageType, overkillRatio: number)
-Unit.OnKilled = nil
 
 return Unit
