@@ -15,7 +15,6 @@ local Prefs = import("/lua/user/prefs.lua")
 local Button = import("/lua/maui/button.lua").Button
 local Edit = import("/lua/maui/edit.lua").Edit
 local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
-local Keymapping = import("/lua/keymap/defaultkeymap.lua").defaultKeyMap
 local getCurrentKeyBinding = import("/lua/keymap/keymapper.lua").GetCurrentKeyBinding
 
 local mouseoverDisplay = false

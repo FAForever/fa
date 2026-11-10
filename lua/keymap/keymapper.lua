@@ -97,7 +97,6 @@ end
 ---@param action string
 ---@return string | false
 function GetCurrentKeyBinding(action)
-
     return TableFind(GetCurrentKeyMap(), action) or false
 end
 
