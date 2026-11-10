@@ -14,6 +14,8 @@
 ---@field Events? SyncEventData # used by UI mods such as supreme score board
 ---@field Reclaim table<EntityId, {mass: number, position: Vector}|false>
 ---@field EnhanceMessage? NotifyMessageSyncData[]
+---@field NukeLaunchData? { army: number, location?: Vector }[] # Army is 0-indexed. Location is only set for allies and observers.
+---@field GameResult? [integer, string][] # Army index and result, for example `"victory 10"`
 Sync = { }
 
 local SyncDefaults = {

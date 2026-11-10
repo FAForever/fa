@@ -9,6 +9,7 @@ local lastPingData = {}
 local redundantPingCheckDistance = 10
 local redundantPingCheckTime = 8
 
+---@param NukeLaunchData { army: number, location?: Vector }[]
 function DoNukePing(NukeLaunchData)
     local pingType = 'nuke'
     if SessionIsReplay() or import("/lua/ui/game/gamemain.lua").supressExitDialog or import("/lua/ui/game/gamemain.lua").IsNISMode() then return end

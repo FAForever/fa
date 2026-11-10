@@ -129,7 +129,8 @@ OverchargeProjectile = ClassSimple {
             end
             damage = math.min(damage, idealDamage)
             damage = math.max(data.minDamage, damage)
-            -- prevents radars blinks if there is less than 5k e in storage when OC hits the target
+            -- prevents spontaneous energy stalling if there is less e in storage
+            -- than the minimum consumption for OC hitting the target
             if energyAvailable < 7500 then
                 damage = energyLimitDamage
             end
