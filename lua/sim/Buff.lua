@@ -96,7 +96,7 @@ end
 --- A function that calculates buff add and mult values for a buff contributing to an "affect".
 ---@alias AffectCalculation fun(unit: Unit, affectBuffName: BuffName, affectState: BlueprintBuffAffectState, buffsForAffect: table<BuffName, BlueprintBuffAffectState>): add: number, mult: number
 
----@type table<BuffName, table<BuffName, AffectCalculation>>
+---@type table<BuffName, table<string, AffectCalculation>> # buff name -> affect type -> calculation
 UniqueAffectCalculation = {
     SeraphimACURegenAura = { Regen = regenAuraCalculate },
     SeraphimACUAdvancedRegenAura = { Regen = regenAuraCalculate },
