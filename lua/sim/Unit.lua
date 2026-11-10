@@ -647,7 +647,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         -- - https://github.com/FAForever/FA-Binary-Patches/pull/19
         ---@diagnostic disable-next-line: param-type-mismatch
         if self.EntityBeingReclaimed and (not IsDestroyed(self.EntityBeingReclaimed)) and IsProp(self.EntityBeingReclaimed)
-            and self:TestCommandCaps('RULEUCC_Reclaim') -- see `GetReclaimCosts`
+            and self.Blueprint.CategoriesHash.RECLAIM -- see `GetReclaimCosts`
         then
             self:StopReclaimEffects(self.EntityBeingReclaimed)
             self:StopUnitAmbientSound('ReclaimLoop')
@@ -669,7 +669,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         -- - https://github.com/FAForever/FA-Binary-Patches/pull/19
         ---@diagnostic disable-next-line: param-type-mismatch
         if self.EntityBeingReclaimed and (not IsDestroyed(self.EntityBeingReclaimed)) and IsProp(self.EntityBeingReclaimed)
-            and self:TestCommandCaps('RULEUCC_Reclaim') -- see `GetReclaimCosts`
+            and self.Blueprint.CategoriesHash.RECLAIM -- see `GetReclaimCosts`
         then
             self:StartReclaimEffects(self.EntityBeingReclaimed)
             self:PlayUnitSound('StartReclaim')
@@ -931,8 +931,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param self Unit
     ---@param target Unit | Prop
     OnStartReclaim = function(self, target)
-        -- units without the reclaim command only get here through the engine clearing a build site, see `GetReclaimCosts`
-        local canReclaim = self:TestCommandCaps('RULEUCC_Reclaim')
+        -- units without reclaim only get here through the engine clearing a build site, see `GetReclaimCosts`
+        local canReclaim = self.Blueprint.CategoriesHash.RECLAIM
 
         -- When paused we reclaim at a speed of 0, with thanks to:
         -- - https://github.com/FAForever/FA-Binary-Patches/pull/19
@@ -969,7 +969,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self:DoUnitCallbacks('OnStopReclaim', target)
         self:StopReclaimEffects(target)
         self:StopUnitAmbientSound('ReclaimLoop')
-        if self:TestCommandCaps('RULEUCC_Reclaim') then
+        if self.Blueprint.CategoriesHash.RECLAIM then
             self:PlayUnitSound('StopReclaim')
         end
         self:SetUnitState('Reclaiming', false)
@@ -4142,7 +4142,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         -- A mobile build order reclaims the props in the way of the build site, even for
         -- builders that can't reclaim such as the CZAR, the Fatboy and external factories.
         -- Those builders get nothing and take forever, so the order waits instead.
-        if not self:TestCommandCaps('RULEUCC_Reclaim') then
+        -- The RECLAIM category is what the engine checks for reclaim orders. `TestCommandCaps`
+        -- only reads the blueprint's command caps, so it misses `RemoveCommandCap`.
+        if not self.Blueprint.CategoriesHash.RECLAIM then
             return 1e9, 0, 0
         end
 
