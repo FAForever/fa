@@ -4142,8 +4142,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         -- A mobile build order reclaims the props in the way of the build site, even for
         -- builders that can't reclaim such as the CZAR, the Fatboy and external factories.
         -- Those builders get nothing and take forever, so the order waits instead.
-        -- The RECLAIM category is what the engine checks for reclaim orders. `TestCommandCaps`
-        -- only reads the blueprint's command caps, so it misses `RemoveCommandCap`.
+        -- Command caps only tell the UI that reclaim is available; the sim accepts reclaim
+        -- orders based on the RECLAIM category, so check that instead of `TestCommandCaps`.
         if not self.Blueprint.CategoriesHash.RECLAIM then
             return 1e9, 0, 0
         end
