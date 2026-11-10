@@ -333,21 +333,6 @@ Callbacks.AttackMove = function(data, units)
     IssueAggressiveMove(allNonStructures, { x, y, z })
 end
 
---tells a unit to toggle its pointer
-Callbacks.FlagShield = function(data, units)
-    units = SecureUnits(units)
-    local target = GetEntityById(data.target)
-    if units and target then
-        for k, u in units do
-            if not IsDestroyed(u) and u.PointerEnabled == true then
-                ---@cast u TargetPointerUnit
-                u.PointerEnabled = false --turn the pointer flag off
-                u:DisablePointer() --turn the pointer off
-            end
-        end
-    end
-end
-
 -------------------------------------------------------------------------------
 --#region General orders
 
