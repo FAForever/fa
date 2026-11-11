@@ -137,6 +137,11 @@ local function LocSubFn(op, ident)
         local keybind = keymapper.GetCurrentKeyBinding(ident)
         if keybind then
             return keymapper.LocalizeKeyName(keybind)
+        elseif import("/lua/keymap/keyactions.lua").keyActions[ident]
+            or import("/lua/keymap/debugkeyactions.lua").debugKeyActions[ident]
+        then
+            -- a valid action that the player has not bound to a key
+            return LOC("<LOC key_binding_0027>[unbound]")
         else
             WARN("missing localization key for action: " .. ident)
             return "{unknown action: " .. ident .. '}'
