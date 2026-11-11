@@ -239,9 +239,6 @@ local function overrideDoDamage(self, instigator, amount, vector, damageType)
     self:AdjustHealth(instigator, -amount)
     local health = self:GetHealth()
 
-    -- This replaces the unit's own `DoTakeDamage`, so the "commander under
-    -- attack" warning from `ACUUnit.DoTakeDamage` has to be raised here too
-    -- (campaign/co-op player ACUs always have their death paused).
     if amount > 0 and EntityCategoryContains(categories.COMMAND, self) then
         local brain = self:GetAIBrain()
         if brain and brain.OnPlayCommanderUnderAttackVO then
