@@ -33,7 +33,7 @@
 ---@alias UnitId BlueprintId
 
 
--- read more here: https://wiki.faforever.com/en/Blueprints
+-- read more here: https://wiki.faforever.com/Development/Modding/Blueprints
 
 ---@class UnitBlueprint: EntityBlueprint
 --- Table keyed with a `ScriptTask`'s `TaskName` that determines the properties of the order button for that ability.
