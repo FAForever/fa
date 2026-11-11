@@ -368,13 +368,14 @@ if rawget(_G, 'GetEngineInfo') then
             panel.Depth:Set(function() return cover.Depth() + 10 end)
             LayoutHelpers.SetDimensions(panel, barWidth + 48, 60)
             LayoutHelpers.AtHorizontalCenterIn(panel, frame)
-            -- The frame's edges reach past the panel (about 40): its bottom stays clear of IN TRANSIT's top.
-            panel.Bottom:Set(function() return frame.Top() + 0.5 * frame.Height() + LayoutHelpers.ScaleNumber(120) end)
+            -- The frame's edges reach about 26 past the panel: its bottom stays clear of IN TRANSIT's top, and its top
+            -- stays well below the middle, where the waiting and disconnect dialogs are centred.
+            panel.Bottom:Set(function() return frame.Top() + 0.5 * frame.Height() + LayoutHelpers.ScaleNumber(150) end)
             cover.panel = panel
 
             -- The standard dialog frame in the player's faction skin, as the popups use it.
             local background = UIUtil.CreateNinePatchStd(panel, '/scx_menu/lan-game-lobby/dialog/background/')
-            LayoutHelpers.FillParentFixedBorder(background, panel, 24)
+            LayoutHelpers.FillParentFixedBorder(background, panel, 40)
             background.Depth:Set(function() return panel.Depth() - 1 end)
 
             cover.text = UIUtil.CreateText(panel, '', 18, UIUtil.bodyFont)
