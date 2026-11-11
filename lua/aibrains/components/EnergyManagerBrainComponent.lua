@@ -124,8 +124,7 @@ EnergyManagerBrainComponent = ClassSimple {
         -- localize scope for better performance
         local pcall = pcall
         local TableSize = table.getsize
-        local CoroutineYield = coroutine.yield
-
+        local WaitTicks = WaitTicks
         local ok, msg
 
 
@@ -254,7 +253,7 @@ EnergyManagerBrainComponent = ClassSimple {
                     syncTable, lastSyncTable = lastSyncTable, syncTable
                 end
             end
-            CoroutineYield(1)
+            WaitTicks(1)
         end
     end,
 

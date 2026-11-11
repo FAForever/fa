@@ -1644,6 +1644,16 @@ local keyActionsOrdersAdvanced = {
         category = 'ordersAdvanced',
         wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#filter-engineers'
     },
+    ['filter_support_units_and_assist'] = {
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-assisters.lua").DistributeAssisters()',
+        category = 'ordersAdvanced',
+        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#distribute-assisters'
+    },
+    ['shift_filter_support_units_and_assist'] = {
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-assisters.lua").DistributeAssisters()',
+        category = 'ordersAdvanced',
+        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#distribute-assisters'
+    },
     ['abort_navigation'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").AbortNavigation()',
         category = 'ordersAdvanced',

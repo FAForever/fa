@@ -4,8 +4,7 @@ local ChatConfigModel = import("/lua/ui/game/chat/config/ChatConfigModel.lua")
 local ChatUtils = import("/lua/ui/game/chat/ChatUtils.lua")
 local ChatPayload = import("/lua/shared/ChatPayload.lua")
 
--------------------------------------------------------------------------------
--- Window visibility
+--#region Window visibility
 
 --- Shows the chat window.
 function OpenWindow()
@@ -23,8 +22,8 @@ function ToggleWindow()
     lv:Set(not lv())
 end
 
--------------------------------------------------------------------------------
--- Activity heartbeat
+--#endregion
+--#region Activity heartbeat
 
 --- Stamps `LastActivity` with the current system time. Call from any
 --- UI surface that counts as engagement.
@@ -41,8 +40,8 @@ function SetPinned(pinned)
     end
 end
 
--------------------------------------------------------------------------------
--- Recipient
+--#endregion
+--#region Recipient
 
 --- Sets the current send target.
 ---@param target UIChatRecipient
@@ -50,8 +49,8 @@ function SetRecipient(target)
     ChatModel.GetSingleton().Recipient:Set(target)
 end
 
--------------------------------------------------------------------------------
--- Messages
+--#endregion
+--#region Messages
 
 --- Appends an entry to the history log and stamps `LastActivity`. Used by
 --- the receive path and by locally-echoed outgoing messages.
@@ -78,8 +77,8 @@ function AppendLocalSystemMessage(text)
     }
 end
 
----------------------------------------------------------------------------
--- Filtering
+--#endregion
+--#region Filtering
 
 --- Whether an entry should be shown by chat interfaces according to options
 ---@param entry UIChatEntry
@@ -105,9 +104,8 @@ IsValidEntry = function(entry)
     return true
 end
 
-
--------------------------------------------------------------------------------
--- Slash commands
+--#endregion
+--#region Slash commands
 
 --- (Re-)registers every built-in chat command with the registry. Idempotent.
 function RegisterBuiltinCommands()
@@ -139,10 +137,10 @@ function RegisterBuiltinCommands()
     Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/Help.lua")
 end
 
--------------------------------------------------------------------------------
--- Address book
+--#endregion
+--#region Address book
 
----@param armiesTable table
+---@param armiesTable ArmyInfo[]
 ---@return number[]
 local function FindClientsAsObserver(armiesTable)
     local result = {}
@@ -218,14 +216,21 @@ function FindClients(armyID)
     return FindClientsAsPlayer(t.armiesTable, t.focusArmy, armyID)
 end
 
---- Looks up army data by army index (number) or nickname (string). For
---- nickname lookups the returned table has `ArmyID` set to the matching index.
----@param army Army | string
----@return table | nil
+---@class ArmyInfo
+---@field package ArmyID integer
+
+--- Looks up army data by army index (number) or nickname (string). The
+--- returned table has `ArmyID` set to the matching index.
+---@param army Army
+---@return ArmyInfo | nil
 local function GetArmyData(army)
     local armies = GetArmiesTable()
     if type(army) == 'number' then
-        return armies.armiesTable[army]
+        local data = armies.armiesTable[army]
+        if data then
+            data.ArmyID = army
+        end
+        return data
     elseif type(army) == 'string' then
         for i, v in armies.armiesTable do
             if v.nickname == army then
@@ -238,13 +243,13 @@ end
 
 local ToStrings = ChatUtils.ToStrings
 
--------------------------------------------------------------------------------
--- Chat line construction
+--#endregion
+--#region Chat line construction
 
 ---@class ChatLineArgs
 ---@field Name string
 ---@field Text? string
----@field ArmyData? table
+---@field ArmyData? ArmyInfo
 ---@field IsObserver? boolean
 ---@field Recipient UIChatRecipient
 ---@field Camera? table
@@ -293,8 +298,14 @@ local function AppendChatLine(args)
     }
 end
 
--------------------------------------------------------------------------------
--- Receiving (network)
+--#endregion
+--#region Receiving (network)
+
+--- Ids of Notify messages already counted by `processIncomingMessage`.
+--- Notify messages arrive through both delivery paths, and a copy the
+--- message limit rejects never reaches history for `IsDuplicateMessage`.
+---@type table<string, true>
+local processedNotifyIds = {}
 
 --- Returns true when `msg.Id` matches an entry already in history. The same
 --- chat message arrives via both delivery paths in live play (engine
@@ -342,6 +353,11 @@ function OnReceive(sender, msg)
     if not SessionIsGameOver() and msg.Observer and armyData then return end
 
     if msg.to == ChatModel.RecipientNotify then
+        ---@cast msg NotifyChatPayload
+        if msg.Id then
+            if processedNotifyIds[msg.Id] then return end
+            processedNotifyIds[msg.Id] = true
+        end
         -- ignore unwanted messages
         if not import("/lua/ui/notify/notify.lua").processIncomingMessage(sender, msg) then
             return
@@ -398,8 +414,8 @@ function OnSyncChatMessages(msgs)
     end
 end
 
--------------------------------------------------------------------------------
--- Echoing (local synthesis for outgoing privates)
+--#endregion
+--#region Echoing (local synthesis for outgoing privates)
 --
 -- The engine doesn't bounce private messages back to the sender, so we
 -- synthesise a "To <recipient>:" line locally instead.
@@ -421,8 +437,8 @@ local function OnEcho(senderData, recipientData, msg)
     }
 end
 
--------------------------------------------------------------------------------
--- Sending
+--#endregion
+--#region Sending
 
 --- Sends a chat message to the current recipient. Dispatches slash commands,
 --- drops all-whitespace bodies, short-circuits taunts, then routes the
@@ -478,32 +494,7 @@ function Send(text, attachCamera)
         msg.camera = GetCamera('WorldCamera'):SaveSettings()
     end
 
-    -- Stamp an id for `OnSyncChatMessages` to dedupe the live and
-    -- sim-routed delivery paths. Tick suffix guards against
-    -- table-address recycling.
-    msg.Id = string.format("%d %s", GameTick(), tostring(msg))
-
-    -- Replay-parser backwards compat: external replay tools scrape chat
-    -- out of recorded `GiveResourcesToPlayer` callback args. Fire one
-    -- zero-resource callback per outgoing message so they keep working.
-    -- Observers skip it (no army to ship).
-    if focusArmy ~= -1 then
-        local senderData = GetArmyData(focusArmy)
-        SimCallback({
-            Func = 'GiveResourcesToPlayer',
-            Args = {
-                From = focusArmy, To = focusArmy, Mass = 0, Energy = 0,
-                Sender = senderData and senderData.nickname or tostring(focusArmy),
-                Msg = msg,
-            },
-        }, false)
-    end
-
-    -- Sim-routed path: the sim re-broadcasts via `Sync.ChatMessages`.
-    -- In live play it runs alongside `SessionSendChatMessage` and
-    -- id-based dedupe prevents double-posting. In replays it is the
-    -- *only* path.
-    SimCallback({ Func = 'SendChatMessage', Args = { Msg = msg } }, false)
+    SendThroughSim(msg)
 
     if recipient == ChatModel.RecipientAllies then
         SessionSendChatMessage(FindClients(), msg)
@@ -525,12 +516,47 @@ function Send(text, attachCamera)
     end
 end
 
--------------------------------------------------------------------------------
--- Engine hotkey entry point
+--- Sends the sim side of an outgoing message, alongside the caller's
+--- `SessionSendChatMessage`. Also used by the Notify subsystem, which
+--- sends outside of `Send`.
+---@param msg ChatPayload
+function SendThroughSim(msg)
+    -- Stamp an id for `OnSyncChatMessages` to dedupe the live and
+    -- sim-routed delivery paths. Tick suffix guards against
+    -- table-address recycling.
+    msg.Id = string.format("%d %s", GameTick(), tostring(msg))
+
+    -- Replay-parser backwards compat: external replay tools scrape chat
+    -- out of recorded `GiveResourcesToPlayer` callback args. Fire one
+    -- zero-resource callback per outgoing message so they keep working.
+    -- Observers skip it (no army to ship).
+    local focusArmy = GetFocusArmy()
+    if focusArmy ~= -1 then
+        local senderData = GetArmyData(focusArmy)
+        SimCallback({
+            Func = 'GiveResourcesToPlayer',
+            Args = {
+                From = focusArmy, To = focusArmy, Mass = 0, Energy = 0,
+                Sender = senderData and senderData.nickname or tostring(focusArmy),
+                Msg = msg,
+            },
+        }, false)
+    end
+
+    -- Sim-routed path: the sim re-broadcasts via `Sync.ChatMessages`.
+    -- In live play it runs alongside `SessionSendChatMessage` and
+    -- id-based dedupe prevents double-posting. In replays it is the
+    -- *only* path.
+    SimCallback({ Func = 'SendChatMessage', Args = { Msg = msg } }, false)
+end
+
+--#endregion
+--#region Engine hotkey entry point
 
 --- Opens the chat window with the recipient forced to `allies` or `all`
 --- based on `send_type` and the Shift modifier. A specific-army recipient
---- (mid-private) is left alone.---@param modifiers? table  # engine-supplied modifier state ({Shift, Ctrl, ...})
+--- (mid-private) is left alone.
+---@param modifiers? KeyModifiers  # engine-supplied modifier state
 function ActivateChat(modifiers)
     -- The engine calls this via a top-level `ActivateChat` shim in
     -- `gamemain.lua` when the user presses Enter outside the edit box.
@@ -552,8 +578,8 @@ function ActivateChat(modifiers)
     end
 end
 
--------------------------------------------------------------------------------
--- Lifecycle
+--#endregion
+--#region Lifecycle
 
 --- Registers the receive handler with gamemain, populates the slash-command
 --- registry, and mounts the chat tree. Idempotent.
@@ -572,7 +598,7 @@ function Init()
     import("/lua/ui/game/chat/ChatInterface.lua").EnsureInstance()
 end
 
--------------------------------------------------------------------------------
+--#endregion
 --#region Debugging
 
 --- Hot-reload hook: re-runs `Init()` on the new module.

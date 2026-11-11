@@ -15,6 +15,45 @@ DAA0206 = ClassUnit(AAirUnit) {
     },
 
     ---@param self DAA0206
+    OnCreate = function(self)
+        AAirUnit.OnCreate(self)
+        self:StartDisableWeaponThread()
+    end,
+    
+    --- Starts a thread to make us only attack targets when on patrol/attack-move
+    --- or attack orders
+    --- @param self DAA0206
+    StartDisableWeaponThread = function(self)
+        local weapon = self:GetWeaponByLabel('Suicide')
+        if weapon then
+            self.Trash:Add(ForkThread(self.DisableWeaponThread, self, weapon))
+        end
+    end,
+
+    ---@param self DAA0206
+    ---@param weapon DefaultProjectileWeapon
+    DisableWeaponThread = function(self, weapon)
+        local interval = weapon.Blueprint.TargetCheckInterval * 10 + 1
+        while not self.Dead do
+            -- only let weapon fire when it makes sense
+            if -- we're trying to attack
+                self:IsUnitState('Attacking')
+                or self:IsUnitState('Patrolling')
+                or self:IsUnitState('Guarding')
+                -- engineer trying to take us
+                or self:IsUnitState('BeingCaptured')
+                or self:IsUnitState('BeingReclaimed')
+            then
+                weapon:SetEnabled(true)
+            else
+                weapon:SetEnabled(false)
+            end
+
+            WaitTicks(interval)
+        end
+    end,
+
+    ---@param self DAA0206
     OnRunOutOfFuel = function(self)
         self:Kill()
     end,

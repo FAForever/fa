@@ -38,7 +38,7 @@ end
 --- box — the default "open chat" shortcut. Thin shim that delegates to the
 --- chat controller, which picks the initial recipient from `send_type` and
 --- the Shift modifier before toggling the window.
----@param modifiers? table  # {Shift, Ctrl, Alt, ...}
+---@param modifiers? KeyModifiers
 function ActivateChat(modifiers)
     ChatController.ActivateChat(modifiers)
 end

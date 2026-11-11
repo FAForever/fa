@@ -25,17 +25,7 @@
 ---@field numArmies number
 ---@field focusArmy number
 
----@class ArmyInfo
----@field authorizedCommandSources number[]
----@field armyIndex number
----@field civilian boolean
----@field color string
----@field faction number
----@field human boolean
----@field name string
----@field nickname string
----@field outOfGame boolean
----@field showScore boolean
+---@class ArmyInfo : EngineArmyInfo
 
 local Prefs = import("/lua/user/prefs.lua")
 

@@ -17,7 +17,7 @@
 ---| "Teleport"
 
 
--- read more here: https://wiki.faforever.com/en/Blueprints
+-- read more here: https://wiki.faforever.com/Development/Modding/Blueprints#weapon
 
 ---@class WeaponBlueprint: Blueprint
 --- During blueprint loading, which Label to look for when merging into a weapon blueprint.

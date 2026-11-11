@@ -60,3 +60,7 @@ function compile(strExpression)
 
   return result
 end
+
+--#region Backwards compatibility
+local utils = import("/lua/system/utils.lua")
+--#endregion

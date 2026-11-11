@@ -1,4 +1,4 @@
-- Fix `MaxHealth` buffs (used by regen aura) not setting health to a lower new max health value (#7230).
+- Fix `MaxHealth` buffs (used by regen aura) not setting health to a lower new max health value (#7230, #7375).
   - Fixes aircraft getting stuck in air staging after losing the regen aura buff.
   - Fixes units taking less damage than expected for 1 shot after losing the regen aura buff.
   - Fixes units instantly refilling to the boosted max HP when regaining the regen aura buff.

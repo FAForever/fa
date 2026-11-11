@@ -14,6 +14,8 @@ local Buff = import("/lua/sim/buff.lua")
 local SUtils = import("/lua/ai/sorianutilities.lua")
 local AIBehaviors = import("/lua/ai/aibehaviors.lua")
 
+local WaitTicks = WaitTicks
+
 ---@param aiBrain AIBrain
 function AIGetEconomyNumbers(aiBrain)
     local econ = {}
@@ -1849,7 +1851,7 @@ function UseTransports(units, transports, location, transportPlatoon)
 
     local attached = true
     repeat
-        coroutine.yield(20)
+        WaitTicks(20)
         local allDead = true
         local transDead = true
         for k, v in units do
@@ -1920,7 +1922,7 @@ function UseTransports(units, transports, location, transportPlatoon)
 
     local attached = true
     while attached do
-        coroutine.yield(20)
+        WaitTicks(20)
         local allDead = true
         for _, v in transports do
             if not v.Dead then
@@ -3232,7 +3234,7 @@ function EngAvoidLocalDanger(aiBrain, eng)
             else
                 IssueToUnitClearCommands(eng)
                 IssueToUnitMove(eng, ShiftPosition(enemyUnitPos, engPos, 50, false))
-                coroutine.yield(60)
+                WaitTicks(60)
                 action = true
             end
         end
@@ -3267,7 +3269,7 @@ function EngLocalExtractorBuild(aiBrain, eng)
             end
         end
         while eng and not eng.Dead and (0<table.getn(eng:GetCommandQueue()) or eng:IsUnitState('Building') or eng:IsUnitState("Moving")) do
-            coroutine.yield(20)
+            WaitTicks(20)
         end
         return action
     end

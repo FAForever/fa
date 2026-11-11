@@ -8,6 +8,7 @@ local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
 -- upvalue scope for performance
 local Random = Random
 local IsDestroyed = IsDestroyed
+local WaitTicks = WaitTicks
 
 local TableGetn = table.getn
 local TableEmpty = table.empty
@@ -341,7 +342,7 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                     local units, unitCount = self:GetPlatoonUnits()
                     IssueClearCommands(units)
                     IssueMove(units, guardUnitPos)
-                    coroutine.yield(30)
+                    WaitTicks(30)
                     if not IsDestroyed(unitToGuard) then
                         self:ChangeState(self.GuardUnit)
                         return
@@ -353,11 +354,11 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                 -- check if our command is still going
                 if not self:IsCommandsActive(command) then
                     if not IsDestroyed(unitToGuard) then
-                        coroutine.yield(10)
+                        WaitTicks(10)
                         self:ChangeState(self.GuardUnit)
                         return
                     else
-                        coroutine.yield(10)
+                        WaitTicks(10)
                         self:ChangeState(self.Searching)
                         return
                     end
@@ -415,7 +416,7 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                     or (not unitToGuard.Dead and unitToGuard.Layer == 'Seabed' and self.MovementLayer == 'Land') then
                         local units, unitCount = self:GetPlatoonUnits()
                         IssueClearCommands(units)
-                        coroutine.yield(10)
+                        WaitTicks(10)
                         self:ChangeState(self.Searching)
                         return
                     end
@@ -430,7 +431,7 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
             else
                 local units, unitCount = self:GetPlatoonUnits()
                 IssueClearCommands(units)
-                coroutine.yield(10)
+                WaitTicks(10)
                 self:ChangeState(self.Searching)
                 return
             end
@@ -481,7 +482,7 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                     end
                     if self:CalculatePlatoonThreatAroundPosition('Surface', categories.ALLUNITS, baseToGuardPos, 120)
                     or (self.PlatoonData.BaseGuardTimeLimit and guardTime > self.PlatoonData.BaseGuardTimeLimit) then
-                        coroutine.yield(10)
+                        WaitTicks(10)
                         self:ChangeState(self.Searching)
                         return
                     end
@@ -491,7 +492,7 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
             else
                 local units, count = self:GetPlatoonUnits()
                 IssueClearCommands(units)
-                coroutine.yield(10)
+                WaitTicks(10)
                 self:ChangeState(self.Searching)
                 return
             end

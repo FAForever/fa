@@ -1983,3 +1983,146 @@ options = {
         },
     },
 }
+
+-- Options of the faf-re engine (Draiget/faf-re), the engine of FAF Develop. The original
+-- executable has neither a renderer choice nor these replay console variables, so the entries
+-- are added only on faf-re, which has GetEngineInfo (the original executable doesn't).
+if rawget(_G, 'GetEngineInfo') then
+    local function HasKey(items, key)
+        for _, item in items do
+            if item.key == key then
+                return true
+            end
+        end
+        return false
+    end
+
+    -- The renderer, read once when the device is created; after Vertical Sync.
+    if not HasKey(options.video.items, 'graphics_api') then
+        local position = table.getn(options.video.items) + 1
+        for index, item in options.video.items do
+            if item.key == 'vsync' then
+                position = index + 1
+                break
+            end
+        end
+        table.insert(options.video.items, position, {
+            title = "<LOC OPTIONS_GRAPHICS_API_TITLE>Graphics API",
+            key = 'graphics_api',
+            type = 'toggle',
+            default = 'auto',
+            restart = true,
+            custom = {
+                states = {
+                    { text = "<LOC OPTIONS_GRAPHICS_API_AUTO>Automatic (newest available)", key = 'auto' },
+                    { text = "Direct3D 9", key = 'd3d9' },
+                    { text = "Direct3D 11", key = 'd3d11' },
+                    { text = "Direct3D 12", key = 'd3d12' },
+                    { text = "Vulkan", key = 'vulkan' },
+                },
+            },
+        })
+    end
+
+    -- The replay viewer's keyframes: saved game states it moves back to.
+    local replayItems = {
+        {
+            title = "<LOC OPTIONS_REPLAY_KEYFRAME_BUDGET_TITLE>Replay keyframe cache (MB)",
+            key = 'replay_keyframe_budget',
+            type = 'slider',
+            default = 2048,
+            set = function(key, value, startup)
+                ConExecute("replay_KeyframeMaxMB " .. tostring(value))
+            end,
+            custom = {
+                min = 256,
+                max = 16384,
+                inc = 256,
+            },
+        },
+        {
+            title = "<LOC OPTIONS_REPLAY_KEYFRAME_SPACING_TITLE>Replay keyframe spacing (seconds)",
+            key = 'replay_keyframe_spacing',
+            type = 'slider',
+            default = 30,
+            set = function(key, value, startup)
+                ConExecute("replay_KeyframeEvery " .. tostring(math.floor(value) * 10))
+            end,
+            custom = {
+                min = 10,
+                max = 300,
+                inc = 10,
+            },
+        },
+        {
+            title = "<LOC OPTIONS_REPLAY_KEYFRAME_PREPARE_TITLE>Replay background preparation",
+            key = 'replay_keyframe_prepare',
+            type = 'toggle',
+            default = 1,
+            set = function(key, value, startup)
+                ConExecute("replay_PrepareKeyframes " .. tostring(value))
+            end,
+            custom = {
+                states = {
+                    { text = "<LOC _On>", key = 1 },
+                    { text = "<LOC _Off>", key = 0 },
+                },
+            },
+        },
+    }
+    for _, item in replayItems do
+        if not HasKey(options.gameplay.items, item.key) then
+            table.insert(options.gameplay.items, item)
+        end
+    end
+
+    -- Interface text: smooth text from distance-field (MSDF) atlases, the same with small text on the
+    -- Windows glyphs, or the Windows glyphs everywhere as the original game draws them. Only on a faf-re
+    -- build that has the two console variables, which older ones don't.
+    local ConTextMatches = rawget(_G, 'ConTextMatches')
+    local function HasCommand(command)
+        if not ConTextMatches then
+            return false
+        end
+        local ok, matches = pcall(ConTextMatches, command)
+        if not ok or type(matches) ~= 'table' then
+            return false
+        end
+        for _, name in matches do
+            if name == command then
+                return true
+            end
+        end
+        return false
+    end
+
+    if not HasKey(options.video.items, 'interface_text')
+        and HasCommand('ren_MsdfText') and HasCommand('ren_MsdfTextMinSize')
+    then
+        -- The option holds a level, so a saved preference never reaches the console as text. 13: below
+        -- about 13 px the Windows glyphs' hinting matters most, and distance-field text is softer there.
+        local modes = {
+            [0] = { on = '0', minSize = '1' },
+            [1] = { on = '1', minSize = '13' },
+            [2] = { on = '1', minSize = '1' },
+        }
+        table.insert(options.video.items, {
+            title = "<LOC OPTIONS_INTERFACE_TEXT_TITLE>Interface text",
+            key = 'interface_text',
+            type = 'toggle',
+            default = 2,
+            set = function(key, value, startup)
+                local mode = modes[value] or modes[2]
+                ConExecute("ren_MsdfTextMinSize " .. mode.minSize)
+                ConExecute("ren_MsdfText " .. mode.on)
+            end,
+            custom = {
+                states = {
+                    { text = "<LOC OPTIONS_INTERFACE_TEXT_SMOOTH>Smooth", key = 2 },
+                    { text = "<LOC OPTIONS_INTERFACE_TEXT_SMALL_ORIGINAL>Small text original", key = 1 },
+                    { text = "<LOC OPTIONS_INTERFACE_TEXT_ORIGINAL>Original", key = 0 },
+                },
+            },
+        })
+    end
+end

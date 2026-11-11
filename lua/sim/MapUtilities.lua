@@ -37,7 +37,7 @@ function MapResourceCheck()
 
     ForkThread(
         function()
-            local yield = coroutine.yield
+            local WaitTicks = WaitTicks
 
             -- create resource structures if possible
             for k, marker in mass do 
@@ -45,14 +45,14 @@ function MapResourceCheck()
                 TryUnit(x, y, z, "ueb1103")
             end
 
-            yield(2)
+            WaitTicks(2)
 
             for k, marker in hydro do
                 local x, y, z = marker.position[1], marker.position[2], marker.position[3]
                 TryUnit(x, y, z, "uab1102")
             end
 
-            yield(2)
+            WaitTicks(2)
 
             -- try and cap with storages
             for k, marker in mass do 
@@ -63,7 +63,7 @@ function MapResourceCheck()
                 TryUnit(x, y, z - 2, "urb1106")
             end
 
-            yield(2)
+            WaitTicks(2)
 
             -- try and cap with fabricators
             for k, marker in mass do 
@@ -78,7 +78,7 @@ function MapResourceCheck()
                 TryUnit(x - 2, y, z - 2, "xsb1104")
             end
 
-            yield(2)
+            WaitTicks(2)
         end
     )
 end
