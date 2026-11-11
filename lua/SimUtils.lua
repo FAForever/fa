@@ -1592,10 +1592,8 @@ function GiveResourcesToPlayer(data)
     -- attribution. Three LOC keys rather than one templated string so each
     -- locale gets a clean sentence per case.
     --
-    -- A resource is mentioned when the giver tried to send at least 1 of it,
-    -- followed by how full the receiver's storage is after the transfer, so
-    -- a capped donation reads as "(100%)". Nothing is posted when nothing
-    -- could be sent at all.
+    -- A resource donation is ends with how full the receiver's storage 
+    -- is after the transfer, so a capped donation reads as "(100%)".
     local function StoragePercent(stored, given, max)
         if max <= 0 then
             return 100
