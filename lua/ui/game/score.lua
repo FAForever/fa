@@ -912,5 +912,7 @@ function ArmyAnnounce(army, text)
     end
     if armyLine then
         import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC(text), armyLine)
+        return true
     end
+    return false
 end
