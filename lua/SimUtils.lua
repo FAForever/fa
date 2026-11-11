@@ -1563,21 +1563,30 @@ function GiveResourcesToPlayer(data)
     if fromBrain:IsDefeated() or toBrain:IsDefeated() or data.Mass < 0 or data.Energy < 0 then
         return
     end
-    local massTaken = fromBrain:TakeResource('MASS', data.Mass * fromBrain:GetEconomyStored('MASS'))
-    local energyTaken = fromBrain:TakeResource('ENERGY', data.Energy * fromBrain:GetEconomyStored('ENERGY'))
-
     -- `GiveResource` silently caps at the receiver's max storage, and
-    -- storage stats only update next tick, so derive what actually lands
-    -- up front from `MaxStorage - Stored`.
-    local massCapacity = toBrain:GetArmyStat('Economy_MaxStorage_Mass', 0).Value
-        - toBrain:GetEconomyStored('MASS')
-    local energyCapacity = toBrain:GetArmyStat('Economy_MaxStorage_Energy', 0).Value
-        - toBrain:GetEconomyStored('ENERGY')
-    local massGiven = math.min(massTaken, massCapacity)
-    local energyGiven = math.min(energyTaken, energyCapacity)
+    -- storage stats only update next tick, so derive what can actually land
+    -- up front from `MaxStorage - Stored`. Only take that much from the
+    -- giver: anything the receiver can't hold stays with the giver instead
+    -- of being destroyed.
+    local massCapacity = math.max(0, toBrain:GetArmyStat('Economy_MaxStorage_Mass', 0).Value
+        - toBrain:GetEconomyStored('MASS'))
+    local energyCapacity = math.max(0, toBrain:GetArmyStat('Economy_MaxStorage_Energy', 0).Value
+        - toBrain:GetEconomyStored('ENERGY'))
+    local massRequested = math.min(data.Mass, 1) * fromBrain:GetEconomyStored('MASS')
+    local energyRequested = math.min(data.Energy, 1) * fromBrain:GetEconomyStored('ENERGY')
 
-    toBrain:GiveResource('MASS', massGiven)
-    toBrain:GiveResource('ENERGY', energyGiven)
+    local massGiven = 0
+    local energyGiven = 0
+    local massToTake = math.min(massRequested, massCapacity)
+    local energyToTake = math.min(energyRequested, energyCapacity)
+    if massToTake > 0 then
+        massGiven = fromBrain:TakeResource('MASS', massToTake)
+        toBrain:GiveResource('MASS', massGiven)
+    end
+    if energyToTake > 0 then
+        energyGiven = fromBrain:TakeResource('ENERGY', energyToTake)
+        toBrain:GiveResource('ENERGY', energyGiven)
+    end
 
     -- Whisper from giver → receiver so the line reads with the giver's
     -- attribution. Three LOC keys rather than one templated string so each
@@ -1598,7 +1607,9 @@ function GiveResourcesToPlayer(data)
         msg = "<LOC chat_resources_received_energy>%s sent %s %d energy."
         args = { fromName, toName, energy }
     end
-    fromBrain:SendChatToAllies(msg, args, nil, 'ReceiveResources')
+    if msg then
+        fromBrain:SendChatToAllies(msg, args, nil, 'ReceiveResources')
+    end
 end
 
 ---@param data {From: Army, To: Army}
