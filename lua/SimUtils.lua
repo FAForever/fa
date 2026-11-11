@@ -1568,17 +1568,17 @@ function GiveResourcesToPlayer(data)
     -- up front from `MaxStorage - Stored`. Only take that much from the
     -- giver: anything the receiver can't hold stays with the giver instead
     -- of being destroyed.
-    local massCapacity = math.max(0, toBrain:GetArmyStat('Economy_MaxStorage_Mass', 0).Value
-        - toBrain:GetEconomyStored('MASS'))
-    local energyCapacity = math.max(0, toBrain:GetArmyStat('Economy_MaxStorage_Energy', 0).Value
-        - toBrain:GetEconomyStored('ENERGY'))
+    local massMax = toBrain:GetArmyStat('Economy_MaxStorage_Mass', 0).Value
+    local energyMax = toBrain:GetArmyStat('Economy_MaxStorage_Energy', 0).Value
+    local massStored = toBrain:GetEconomyStored('MASS')
+    local energyStored = toBrain:GetEconomyStored('ENERGY')
     local massRequested = math.min(data.Mass, 1) * fromBrain:GetEconomyStored('MASS')
     local energyRequested = math.min(data.Energy, 1) * fromBrain:GetEconomyStored('ENERGY')
 
     local massGiven = 0
     local energyGiven = 0
-    local massToTake = math.min(massRequested, massCapacity)
-    local energyToTake = math.min(energyRequested, energyCapacity)
+    local massToTake = math.min(massRequested, math.max(0, massMax - massStored))
+    local energyToTake = math.min(energyRequested, math.max(0, energyMax - energyStored))
     if massToTake > 0 then
         massGiven = fromBrain:TakeResource('MASS', massToTake)
         toBrain:GiveResource('MASS', massGiven)
@@ -1589,43 +1589,37 @@ function GiveResourcesToPlayer(data)
     end
 
     -- Whisper from giver → receiver so the line reads with the giver's
-    -- attribution. One LOC key per case rather than one templated string so
-    -- each locale gets a clean sentence per case.
+    -- attribution. Three LOC keys rather than one templated string so each
+    -- locale gets a clean sentence per case.
     --
     -- A resource is mentioned when the giver tried to send at least 1 of it,
-    -- even if none of it fit ("sent 0 mass (capped)"). The `_capped` variants
-    -- are used when the receiver's storage limited what was sent.
+    -- even if none of it fit ("sent 0 mass (100%)"), followed by how full the
+    -- receiver's storage is after the transfer.
+    local function StoragePercent(stored, given, max)
+        if max <= 0 then
+            return 100
+        end
+        return math.floor(100 * math.min(1, (stored + given) / max) + 0.5)
+    end
     local mass = math.floor(massGiven)
     local energy = math.floor(energyGiven)
+    local massPercent = StoragePercent(massStored, massGiven, massMax)
+    local energyPercent = StoragePercent(energyStored, energyGiven, energyMax)
     local sendsMass = massRequested >= 1
     local sendsEnergy = energyRequested >= 1
-    local capped = (sendsMass and massRequested - massGiven >= 1)
-        or (sendsEnergy and energyRequested - energyGiven >= 1)
     local toArmy = data.To --[[@as integer]]
     local fromName = fromBrain.Nickname or tostring(data.From)
     local toName = toBrain.Nickname or tostring(toArmy)
     local msg, args
     if sendsMass and sendsEnergy then
-        if capped then
-            msg = "<LOC chat_resources_received_both_capped>%s sent %s %d mass and %d energy (capped)."
-        else
-            msg = "<LOC chat_resources_received_both>%s sent %s %d mass and %d energy."
-        end
-        args = { fromName, toName, mass, energy }
+        msg = "<LOC chat_resources_received_both>%s sent %s %d mass (%d%%) and %d energy (%d%%)."
+        args = { fromName, toName, mass, massPercent, energy, energyPercent }
     elseif sendsMass then
-        if capped then
-            msg = "<LOC chat_resources_received_mass_capped>%s sent %s %d mass (capped)."
-        else
-            msg = "<LOC chat_resources_received_mass>%s sent %s %d mass."
-        end
-        args = { fromName, toName, mass }
+        msg = "<LOC chat_resources_received_mass>%s sent %s %d mass (%d%%)."
+        args = { fromName, toName, mass, massPercent }
     elseif sendsEnergy then
-        if capped then
-            msg = "<LOC chat_resources_received_energy_capped>%s sent %s %d energy (capped)."
-        else
-            msg = "<LOC chat_resources_received_energy>%s sent %s %d energy."
-        end
-        args = { fromName, toName, energy }
+        msg = "<LOC chat_resources_received_energy>%s sent %s %d energy (%d%%)."
+        args = { fromName, toName, energy, energyPercent }
     end
     if msg then
         fromBrain:SendChatToAllies(msg, args, nil, 'ReceiveResources')

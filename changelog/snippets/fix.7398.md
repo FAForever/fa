@@ -1,1 +1,1 @@
-- Fix resources being destroyed when donating more than an ally can store. The excess now stays with the giver, and the chat notification ends with "(capped)" when the ally's storage limited the amount (#7398).
+- Fix resources being destroyed when donating more than an ally can store. The excess now stays with the giver, and the chat notification shows how full the ally's storage is after the transfer, for example "sent 300 mass (85%)" (#7398).
