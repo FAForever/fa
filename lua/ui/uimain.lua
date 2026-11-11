@@ -319,6 +319,7 @@ if rawget(_G, 'GetEngineInfo') then
         local UIUtil = import("/lua/ui/uiutil.lua")
         local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
         local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+        local Group = import("/lua/maui/group.lua").Group
         local Movie = import("/lua/maui/movie.lua").Movie
         local Prefs = import("/lua/user/prefs.lua")
 
@@ -361,23 +362,34 @@ if rawget(_G, 'GetEngineInfo') then
             cover.Depth:Set(frame:GetTopmostDepth() + 1)
             LayoutHelpers.FillParent(cover, frame)
 
-            -- Under IN TRANSIT, which both this screen and the loading screen show at this height.
-            cover.text = UIUtil.CreateText(cover, '', 18, UIUtil.bodyFont)
-            cover.text:SetColor('FFbadbdb')
+            -- One panel above IN TRANSIT (centred 200 below the middle, on this screen and on the loading screen):
+            -- the loading screen's tips run below IN TRANSIT.
+            local panel = Group(cover)
+            panel.Depth:Set(function() return cover.Depth() + 10 end)
+            LayoutHelpers.SetDimensions(panel, barWidth + 48, 60)
+            LayoutHelpers.AtHorizontalCenterIn(panel, frame)
+            -- The frame's edges reach past the panel (about 40): its bottom stays clear of IN TRANSIT's top.
+            panel.Bottom:Set(function() return frame.Top() + 0.5 * frame.Height() + LayoutHelpers.ScaleNumber(120) end)
+            cover.panel = panel
+
+            -- The standard dialog frame in the player's faction skin, as the popups use it.
+            local background = UIUtil.CreateNinePatchStd(panel, '/scx_menu/lan-game-lobby/dialog/background/')
+            LayoutHelpers.FillParentFixedBorder(background, panel, 24)
+            background.Depth:Set(function() return panel.Depth() - 1 end)
+
+            cover.text = UIUtil.CreateText(panel, '', 18, UIUtil.bodyFont)
+            cover.text:SetColor(UIUtil.fontColor)
             cover.text:SetDropShadow(true)
-            cover.text.Depth:Set(function() return cover.Depth() + 10 end)
-            LayoutHelpers.AtHorizontalCenterIn(cover.text, frame)
-            cover.text.Top:Set(function() return frame.Top() + 0.5 * frame.Height() + LayoutHelpers.ScaleNumber(230) end)
+            LayoutHelpers.AtHorizontalCenterIn(cover.text, panel)
+            LayoutHelpers.AtTopIn(cover.text, panel, 10)
 
-            cover.track = Bitmap(cover)
-            cover.track:SetSolidColor('ff303030')
-            cover.track.Depth:Set(function() return cover.Depth() + 10 end)
+            -- The unit and lobby bars' skinned textures.
+            cover.track = Bitmap(panel, UIUtil.SkinnableFile('/game/unit_bmp/bar-back_bmp.dds'))
             LayoutHelpers.SetDimensions(cover.track, barWidth, 10)
-            LayoutHelpers.AtHorizontalCenterIn(cover.track, frame)
-            cover.track.Top:Set(function() return cover.text.Bottom() + LayoutHelpers.ScaleNumber(8) end)
+            LayoutHelpers.AtHorizontalCenterIn(cover.track, panel)
+            cover.track.Top:Set(function() return cover.text.Bottom() + LayoutHelpers.ScaleNumber(10) end)
 
-            cover.fill = Bitmap(cover.track)
-            cover.fill:SetSolidColor('ff4fa0e0')
+            cover.fill = Bitmap(cover.track, UIUtil.SkinnableFile('/game/unit_bmp/bar-01_bmp.dds'))
             LayoutHelpers.SetDimensions(cover.fill, 1, 10)
             LayoutHelpers.AtLeftTopIn(cover.fill, cover.track, 0, 0)
 
