@@ -18,9 +18,8 @@ local SimPing = import("/lua/simping.lua")
 local SimTriggers = import("/lua/scenariotriggers.lua")
 local SUtils = import("/lua/ai/sorianutilities.lua")
 local ScenarioFramework = import("/lua/scenarioframework.lua")
-local CommandUtils = import("/lua/sim/commands/shared.lua")
+local UnitQueueDataToCommand = import("/lua/sim/commands/shared.lua").UnitQueueDataToCommand
 local GameIsRestricted = import("/lua/game.lua").IsRestricted
-local UnitQueueDataToCommand = CommandUtils.UnitQueueDataToCommand
 
 -- upvalue table operations for performance
 local TableInsert = table.insert
