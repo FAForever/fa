@@ -1593,8 +1593,9 @@ function GiveResourcesToPlayer(data)
     -- locale gets a clean sentence per case.
     --
     -- A resource is mentioned when the giver tried to send at least 1 of it,
-    -- even if none of it fit ("sent 0 mass (100%)"), followed by how full the
-    -- receiver's storage is after the transfer.
+    -- followed by how full the receiver's storage is after the transfer, so
+    -- a capped donation reads as "(100%)". Nothing is posted when nothing
+    -- could be sent at all.
     local function StoragePercent(stored, given, max)
         if max <= 0 then
             return 100
@@ -1621,7 +1622,7 @@ function GiveResourcesToPlayer(data)
         msg = "<LOC chat_resources_received_energy>%s sent %s %d energy (%d%%)."
         args = { fromName, toName, energy, energyPercent }
     end
-    if msg then
+    if msg and (mass > 0 or energy > 0) then
         fromBrain:SendChatToAllies(msg, args, nil, 'ReceiveResources')
     end
 end
