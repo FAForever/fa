@@ -41,8 +41,8 @@ do
     -- do not allow command units to be given
     local oldChangeUnitArmy = _G.ChangeUnitArmy
     _G.ChangeUnitArmy = function(unit, army, noRestrictions)
-        -- do not allow units that opted out to change army, not even when ignoring restrictions
-        if unit and unit.NoTransfer then
+        -- do not allow units that can't be given to change army, not even when ignoring restrictions
+        if unit and not unit.CanBeGiven then
             return nil
         end
 

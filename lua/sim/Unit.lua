@@ -202,7 +202,6 @@ local UnitSetMaxHealth = _G.moho.unit_methods.SetMaxHealth
 ---@field ImmuneToStun? boolean
 ---@field Anims? Animator[] # Animators that get stopped when a unit is stunned. Not used in FAF.
 ---@field IsBeingTransferred? boolean
----@field NoTransfer? boolean # Prevents the unit from changing army, such as a hatched egg that would spawn its unit again
 ---@field OnStopBeingBuiltEnhancementsThread thread?
 ---@field ActiveConsumption boolean
 ---@field MaintenanceConsumption? boolean
@@ -255,6 +254,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     -- kept for backwards compatibility, these default to true
     CanTakeDamage = true,
     CanBeKilled = true,
+
+    --- Set to false to prevent the unit from changing army, such as a hatched egg that would spawn its unit again
+    ---@type boolean
+    CanBeGiven = true,
 
     EnergyModifier = 0,
     MassModifier = 0,

@@ -36,7 +36,7 @@ CConstructionEggUnit = ClassUnit(CStructureUnit) {
         self:SetReclaimable(false)
 
         -- the egg has hatched: changing its army would run this function again and spawn another unit
-        self.NoTransfer = true
+        self.CanBeGiven = false
         self:SetCapturable(false)
         self:SetUnSelectable(true)
 
