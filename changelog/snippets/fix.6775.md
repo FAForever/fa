@@ -1,1 +1,0 @@
-- (#6775) Fix tooltips not displaying the currently assigned keybind for their respective action.
