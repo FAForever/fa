@@ -1589,22 +1589,42 @@ function GiveResourcesToPlayer(data)
     end
 
     -- Whisper from giver → receiver so the line reads with the giver's
-    -- attribution. Three LOC keys rather than one templated string so each
-    -- locale gets a clean sentence per case.
+    -- attribution. One LOC key per case rather than one templated string so
+    -- each locale gets a clean sentence per case.
+    --
+    -- A resource is mentioned when the giver tried to send at least 1 of it,
+    -- even if none of it fit ("sent 0 mass (capped)"). The `_capped` variants
+    -- are used when the receiver's storage limited what was sent.
     local mass = math.floor(massGiven)
     local energy = math.floor(energyGiven)
+    local sendsMass = massRequested >= 1
+    local sendsEnergy = energyRequested >= 1
+    local capped = (sendsMass and massRequested - massGiven >= 1)
+        or (sendsEnergy and energyRequested - energyGiven >= 1)
     local toArmy = data.To --[[@as integer]]
     local fromName = fromBrain.Nickname or tostring(data.From)
     local toName = toBrain.Nickname or tostring(toArmy)
     local msg, args
-    if mass > 0 and energy > 0 then
-        msg = "<LOC chat_resources_received_both>%s sent %s %d mass and %d energy."
+    if sendsMass and sendsEnergy then
+        if capped then
+            msg = "<LOC chat_resources_received_both_capped>%s sent %s %d mass and %d energy (capped)."
+        else
+            msg = "<LOC chat_resources_received_both>%s sent %s %d mass and %d energy."
+        end
         args = { fromName, toName, mass, energy }
-    elseif mass > 0 then
-        msg = "<LOC chat_resources_received_mass>%s sent %s %d mass."
+    elseif sendsMass then
+        if capped then
+            msg = "<LOC chat_resources_received_mass_capped>%s sent %s %d mass (capped)."
+        else
+            msg = "<LOC chat_resources_received_mass>%s sent %s %d mass."
+        end
         args = { fromName, toName, mass }
-    elseif energy > 0 then
-        msg = "<LOC chat_resources_received_energy>%s sent %s %d energy."
+    elseif sendsEnergy then
+        if capped then
+            msg = "<LOC chat_resources_received_energy_capped>%s sent %s %d energy (capped)."
+        else
+            msg = "<LOC chat_resources_received_energy>%s sent %s %d energy."
+        end
         args = { fromName, toName, energy }
     end
     if msg then
