@@ -1622,7 +1622,13 @@ function GiveResourcesToPlayer(data)
         args = { fromName, toName, energy, energyPercent }
     end
     if msg then
-        fromBrain:SendChatToAllies(msg, args, nil, 'ReceiveResources')
+        if mass > 0 or energy > 0 then
+            fromBrain:SendChatToAllies(msg, args, nil, 'ReceiveResources')
+        else
+            -- Nothing fit: only tell the giver, so donating to a full ally
+            -- doesn't spam everyone else's chat.
+            fromBrain:SendChatToSelf(msg, args, nil, 'ReceiveResources')
+        end
     end
 end
 
