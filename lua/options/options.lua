@@ -694,6 +694,19 @@ options = {
                 },
             },
 
+            {
+                title = "<LOC ASSIST_TO_STORAGE>Redirect mass storage assist orders",
+                key = 'assist_to_storage',
+                type = 'toggle',
+                default = 'Off',
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>Off", key = 'Off' },
+                        { text = "<LOC _On>On", key = 'On' },
+                    },
+                },
+            },
+
             -- {
             --     title = '<LOC OPTIONS_0323>Area commands',
             --     type = 'header',
