@@ -1,0 +1,1 @@
+- Fix the "commander under attack" alert not playing in campaign and co-op missions (#7399).
