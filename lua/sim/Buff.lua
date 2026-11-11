@@ -245,6 +245,8 @@ end
 
 -- Function to affect the unit. Every time you want to affect a new part of unit, add it in here.
 -- afterRemove is a bool that defines if this buff is affecting after the removal of a buff.
+-- isReplacing is true when the buff was removed to be replaced by another buff in `ApplyBuff`, so
+-- the new buff's affect will run right after.
 -- We reaffect the unit to make sure that buff type is recalculated accurately without the buff
 -- that was on the unit. However, this doesn't work for stunned units because it's a fire-and-forget
 -- type buff, not a fire-and-keep-track-of type buff.
@@ -293,7 +295,10 @@ BuffEffects = {
     ---@param buffValues BlueprintBuffAffect
     ---@param unit Unit
     ---@param buffName BuffName
-    MaxHealth = function(buffDefinition, buffValues, unit, buffName)
+    ---@param instigator Unit
+    ---@param afterRemove boolean
+    ---@param isReplacing? boolean
+    MaxHealth = function(buffDefinition, buffValues, unit, buffName, instigator, afterRemove, isReplacing)
         -- With this type of buff, the idea is to adjust the Max Health of a unit.
         -- The DoNotFill flag is set when we want to adjust the max ONLY and not have the
         --     rest of the unit's HP affected to match. If it's not flagged, the unit's HP
@@ -311,12 +316,15 @@ BuffEffects = {
 
         if not unit.IsBeingTransferred then
             if not buffValues.DoNotFill then
-                unit:SetHealth(unit, unit:GetMaxHealth() - difference)
-            elseif val < health then
+                -- health can be above the old max while a buff is being replaced
+                unit:SetHealth(unit, math.min(val - difference, val))
+            elseif val < health and not isReplacing then
                 -- Set health because it stays above max health until the next AdjustHealth call
-                -- this causes AdjustHealth to be fully absorbed 
+                -- this causes AdjustHealth to be fully absorbed
                 -- this causes air units to get stuck repairing in air staging
                 -- it also makes DoNotFill buffs seemingly fill HP if the buff was removed and re-applied
+                -- When replacing (veterancy levels, regen aura refreshes), the max health only drops
+                -- for a moment before the new buff applies, so `ApplyBuff` clamps once it's done.
                 unit:SetHealth(unit, val)
             end
         end
@@ -572,7 +580,8 @@ local buffMissingWarnings = {}
 ---@param buffName string
 ---@param instigator Unit
 ---@param afterRemove boolean
-function BuffAffectUnit(unit, buffName, instigator, afterRemove)
+---@param isReplacing? boolean
+function BuffAffectUnit(unit, buffName, instigator, afterRemove, isReplacing)
     local buffDef = Buffs[buffName]
 
     local buffAffects = buffDef.Affects
@@ -583,7 +592,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
 
     for atype, vals in buffAffects do
         if BuffEffects[atype] then
-            BuffEffects[atype](buffDef, vals, unit, buffName, instigator, afterRemove)
+            BuffEffects[atype](buffDef, vals, unit, buffName, instigator, afterRemove, isReplacing)
         elseif not buffMissingWarnings[atype] then
             buffMissingWarnings[atype] = true
             WARN('Missing buff effect function ' .. tostring(atype))
@@ -596,7 +605,8 @@ end
 ---@param buffName string
 ---@param removeAllCounts? boolean
 ---@param instigator? Unit
-function RemoveBuff(unit, buffName, removeAllCounts, instigator)
+---@param isReplacing? boolean # the buff is removed to be replaced by another one in `ApplyBuff`
+function RemoveBuff(unit, buffName, removeAllCounts, instigator, isReplacing)
     local def = Buffs[buffName]
     local unitBuff = unit.Buffs.BuffTable[def.BuffType][buffName]
     if not unitBuff.Count or unitBuff.Count <= 0 then
@@ -643,7 +653,7 @@ function RemoveBuff(unit, buffName, removeAllCounts, instigator)
         end
     end
 
-    BuffAffectUnit(unit, buffName, unit, true)
+    BuffAffectUnit(unit, buffName, unit, true, isReplacing)
 end
 
 --Function to do work on the buff.  Apply it over time and in pulses.
@@ -736,15 +746,22 @@ function ApplyBuff(unit, buffName, instigator)
     -- we need the advanced version to take precedence over the lower version, but not vice versa.
     if buffName == 'SeraphimACURegenAura' and ubt['COMMANDERAURA_AdvancedRegenAura']['SeraphimACUAdvancedRegenAura'] then return end
 
+    -- Buffs removed to be replaced don't clamp health to a temporarily lower max health, we do it
+    -- after the new buff applies. Otherwise replacing a max health buff with a larger one (veterancy
+    -- levels, regen aura refreshes) would lose the health above the unbuffed max health.
+    local replaced = false
+
     if buffName == 'SeraphimACUAdvancedRegenAura' and ubt['COMMANDERAURA_RegenAura']['SeraphimACURegenAura'] then
         for key, bufftbl in ubt['COMMANDERAURA_RegenAura'] do
-            RemoveBuff(unit, key, true)
+            RemoveBuff(unit, key, true, nil, true)
+            replaced = true
         end
     end
 
     if def.Stacks == 'REPLACE' and ubt[def.BuffType] then
         for key, bufftbl in ubt[def.BuffType] do
-            RemoveBuff(unit, key, true)
+            RemoveBuff(unit, key, true, nil, true)
+            replaced = true
         end
     end
 
@@ -832,6 +849,13 @@ function ApplyBuff(unit, buffName, instigator)
     end
 
     BuffAffectUnit(unit, buffName, instigator, false)
+
+    if replaced and not unit.IsBeingTransferred then
+        local maxHealth = unit:GetMaxHealth()
+        if unit:GetHealth() > maxHealth then
+            unit:SetHealth(unit, maxHealth)
+        end
+    end
 end
 
 ---@param unit Unit
