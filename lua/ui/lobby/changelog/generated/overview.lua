@@ -6,6 +6,13 @@
 Overview = {
     Changelogs = {
         {
+            Version = 3841,
+            Name = "3841 - Game Patch",
+            Date = "2026-11-13",
+            URL = "http://faforever.github.io/fa/changelog/3841",
+            Path = "/lua/ui/lobby/changelog/generated/2026-11-13-3841.lua"
+        },
+        {
             Version = 3840,
             Name = "3840 - Hotfix",
             Date = "2026-10-20",
