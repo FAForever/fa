@@ -1,1 +1,0 @@
-- Add SHIFT binding options for "Pause Unit" and "Toggle Repeat Build" (#7170).

@@ -1,1 +1,0 @@
-- Disable the default score board sending chat messages when gifting units or resources, as that has been replaced by the chat rework (#7293).

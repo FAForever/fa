@@ -1,1 +1,0 @@
-- Replace coroutine.yield with WaitTicks, to improve clarity and save 1 table lookup (#7334)

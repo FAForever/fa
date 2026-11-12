@@ -1,1 +1,0 @@
-- Add a timeline bar to replays to move to any time, and the screens of a player taking their seat back in a game. They show only on the faf-re engine (#7373).

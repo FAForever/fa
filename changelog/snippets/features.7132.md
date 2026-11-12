@@ -1,1 +1,0 @@
--  In fullshare, make self-destruct with a selection that includes ACUs only destroy the ACUs (#7132).
