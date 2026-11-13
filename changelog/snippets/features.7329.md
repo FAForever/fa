@@ -1,0 +1,1 @@
+- Add hotkeys and a cursor for instant factory assist: a hotkey to assist factories instantly, a hotkey to toggle the "Assist factories in range instantly" option, and a lightning bolt on the assist cursor when an assist on a factory will be instant (#7329).
