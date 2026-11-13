@@ -1,0 +1,1 @@
+- When a player leaves without choosing who receives their army, the allies that received it can keep it or pass it on to another ally, including the ACU and unfinished units. Allies that already passed the army on can't receive it again (#7404).
