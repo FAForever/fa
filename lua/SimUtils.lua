@@ -1551,6 +1551,27 @@ function GetAbandonedUnderlay(unit, army)
     return closest
 end
 
+--- Shows the underlay of the abandoned army on one of its ACUs.
+---@param unit Unit
+---@param army Army # the army that abandoned the ACU
+function SetAbandonedUnderlay(unit, army)
+    local underlay = GetAbandonedUnderlay(unit, army)
+    if underlay then
+        unit:SetStrategicUnderlay(underlay)
+    end
+end
+
+--- Marks an ACU that an abandoned army gave away for good: it shows the underlay of the abandoned
+--- army, also after it changes army again, and counts for its holder like their own ACU.
+---@param unit Unit
+---@param army Army # the army that abandoned the ACU
+local function MarkSharedCommander(unit, army)
+    SetAbandonedUnderlay(unit, army)
+    unit:AddOnGivenCallback(function(oldUnit, newUnit)
+        MarkSharedCommander(newUnit, army)
+    end)
+end
+
 ---@class AbandonedRecall
 ---@field Army Army                     # the army that abandoned the ACUs
 ---@field EndTick number                # game tick at which the ACUs recall
@@ -1567,10 +1588,7 @@ local function MarkRecallingCommander(recall, unit)
     -- see the victory conditions, and especially `AbstractVictoryCondition.UnitIsEligible`
     unit.IgnoredByVictoryCondition = true
 
-    local underlay = GetAbandonedUnderlay(unit, recall.Army)
-    if underlay then
-        unit:SetStrategicUnderlay(underlay)
-    end
+    SetAbandonedUnderlay(unit, recall.Army)
 
     local ticksLeft = recall.EndTick - GetGameTick()
     if ticksLeft > 0 then
@@ -1654,15 +1672,36 @@ function RecallAbandonedArmy(self, allies)
     KillRemaining(self)
 end
 
+--- Gives all units of an abandoned army, including its ACUs, to its allies for good. The ACUs count
+--- for their new holder like their own.
+---@param self AIBrain
+---@param allies AIBrain[] # in order of preference
+function ShareAbandonedArmy(self, allies)
+    local selfIndex = self.Army
+
+    -- mark the ACUs before the transfer, so that the marks follow them to their new army
+    for _, unit in self:GetListOfUnits(categories.COMMAND, false) do
+        MarkSharedCommander(unit, selfIndex)
+    end
+
+    TrackAbandonedUnits(self, TransferUnitsToBrain(self, allies, true, categories.ALLUNITS, "AbandonedPermanent"))
+    TransferOwnershipOfBorrowedUnits(GetAllegianceCategories(selfIndex).Allies, selfIndex)
+    KillRemaining(self)
+end
+
 --- Called when the players of an army left the game, see `AIBrain.AbandonedByPlayer`.
 ---@param self AIBrain
 function KillAbandonedArmy(self)
     local option = ScenarioInfo.Options.AbandonedCommanders
 
-    if option == 'Recall' then
+    if option == 'Recall' or option == 'Share' then
         local allies = GetShareRecipients(self, GetAllegianceCategories(self.Army).Allies)
         if not table.empty(allies) then
-            RecallAbandonedArmy(self, allies)
+            if option == 'Recall' then
+                RecallAbandonedArmy(self, allies)
+            else
+                ShareAbandonedArmy(self, allies)
+            end
             return
         end
     elseif option ~= 'Explode' then
