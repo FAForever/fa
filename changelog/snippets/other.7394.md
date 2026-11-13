@@ -1,0 +1,1 @@
+- (#7394) Annotate shields, entity specs and related blueprint fields, and fix projectiles with `CollideFriendlyShield` not colliding with friendly shields.

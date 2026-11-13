@@ -2547,14 +2547,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         -- Turn off land bones if this unit has them.
         self:DoUnitCallbacks('OnStopBeingBuilt')
 
-        -- If we have a shield specified, create it.
-        -- Blueprint registration always creates a dummy Shield entry:
-        -- {
-        --     ShieldSize = 0
-        --     RegenAssistMult = 1
-        -- }
-        -- ... Which we must carefully ignore.
         local bpShield = blueprintDefense.Shield
+        -- ignore the dummy entry the engine creates for units without a shield: `{ RegenAssistMult = 1, ShieldSize = 0 }`
         if bpShield.ShieldSize ~= 0 then
             self:CreateShield(bpShield)
         end
@@ -4644,24 +4638,25 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param self Unit
     ---@param bpShield UnitBlueprintDefenseShield 
     CreateShield = function(self, bpShield)
-        -- Copy the shield template so we don't alter the blueprint table.
-        local bpShield = table.deepcopy(bpShield)
         self:DestroyShield()
 
+        -- Copy so we don't alter the blueprint table
+        bpShield = table.deepcopy(bpShield)
+        local newShield
         if bpShield.PersonalShield then
-            self.MyShield = PersonalShield(bpShield, self)
-        elseif bpShield.AntiArtilleryShield then
-            self.MyShield = AntiArtilleryShield(bpShield, self)
+            newShield = PersonalShield(bpShield, self)
         elseif bpShield.PersonalBubble then
-            self.MyShield = PersonalBubble(bpShield, self)
+            newShield = PersonalBubble(bpShield, self)
         elseif bpShield.TransportShield then
-            self.MyShield = TransportShield(bpShield, self)
+            newShield = TransportShield(bpShield, self)
+        elseif bpShield.AntiArtilleryShield then
+            newShield = AntiArtilleryShield(bpShield, self)
         else
-            self.MyShield = Shield(bpShield, self)
+            newShield = Shield(bpShield, self)
         end
 
-        self:SetFocusEntity(self.MyShield)
-        self.Trash:Add(self.MyShield)
+        self:SetFocusEntity(newShield)
+        self.MyShield = TrashAdd(self.Trash, newShield)
     end,
 
     ---@param self Unit

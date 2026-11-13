@@ -1,5 +1,10 @@
 ---@meta
 
+--- Passed to `_c_CreateEntity`. Without `Owner` or `Army`, the entity belongs to no army
+---@class EntitySpec
+---@field Owner? moho.entity_methods | integer # Entity to take the army from, or a 0-indexed army index. Overrides `Army`
+---@field Army? integer # 1-indexed army index
+
 ---@class moho.entity_methods : Destroyable
 local Entity = {}
 

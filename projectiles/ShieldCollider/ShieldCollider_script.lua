@@ -8,10 +8,12 @@ local Projectile = import("/lua/sim/projectile.lua").Projectile
 local VectorCached = Vector(0, 0, 0)
 
 -- Companion projectile enabling air units to hit shields
----@class ShiledCollider  : Projectile
+---@class ShieldCollider : Projectile
+---@field CrashingAirplaneShieldCollisionLogic true
+---@field ShieldImpacted? true
 ShieldCollider = ClassProjectile(Projectile) {
 
-    ---@param self ShiledCollider
+    ---@param self ShieldCollider
     ---@param inWater boolean
     OnCreate = function(self, inWater)
         Projectile.OnCreate(self)
@@ -30,7 +32,7 @@ ShieldCollider = ClassProjectile(Projectile) {
     end,
 
     -- Shields only detect projectiles, so we attach one to keep track of the unit.
-    ---@param self ShiledCollider
+    ---@param self ShieldCollider
     ---@param parent any
     ---@param bone Bone
     Start = function(self, parent, bone)
@@ -39,7 +41,7 @@ ShieldCollider = ClassProjectile(Projectile) {
         self:StartFalling()
     end,
 
-    ---@param self ShiledCollider
+    ---@param self ShieldCollider
     StartFalling = function(self)
         local vx, vy, vz = self.Plane:GetVelocity()
         -- For now we just follow the plane along, not attaching so it can rotate
@@ -47,7 +49,7 @@ ShieldCollider = ClassProjectile(Projectile) {
         Warp(self, self.Plane:GetPosition(self.PlaneBone), self.Plane:GetOrientation())
     end,
 
-    ---@param self ShiledCollider
+    ---@param self ShieldCollider
     ---@param other any
     OnCollisionCheck = function(self, other)
         -- We intercept this just incase the projectile collides with something it shouldn't
@@ -57,7 +59,7 @@ ShieldCollider = ClassProjectile(Projectile) {
         Projectile.OnCollisionCheck(self, other)
     end,
 
-    ---@param self ShiledCollider    
+    ---@param self ShieldCollider    
     OnDestroy = function(self)
         self:DetachAll('anchor') -- If our projectile is getting destroyed we never want to have anything attached
         if self.Trash then
@@ -65,15 +67,15 @@ ShieldCollider = ClassProjectile(Projectile) {
         end
     end,
 
-    ---@param self ShiledCollider
+    ---@param self ShieldCollider
     OnEnterWater = function(self)
         self:OnImpact('Water', nil)
     end,
 
     -- Destroy the sinking unit when it hits the ground.
-    ---@param self ShiledCollider
-    ---@param targetType string
-    ---@param targetEntity Prop|Unit
+    ---@param self ShieldCollider
+    ---@param targetType ImpactType
+    ---@param targetEntity Prop | Unit | Shield
     OnImpact = function(self, targetType, targetEntity)
         if self and not self:BeenDestroyed() and self.Plane and not self.Plane:BeenDestroyed() then
             if targetType == 'Terrain' or targetType == 'Water' then
@@ -149,7 +151,7 @@ ShieldCollider = ClassProjectile(Projectile) {
     end,
 
     -- Lets do some maths that will make the units bounce off shields
-    ---@param self ShiledCollider
+    ---@param self ShieldCollider
     ---@param shield Shield
     ---@param vector Vector
     ShieldBounce = function(self, shield, vector)

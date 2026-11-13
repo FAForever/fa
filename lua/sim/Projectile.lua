@@ -292,7 +292,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         end
     end,
 
-    --- Called by the engine when the projectile is killed, in other words: intercepted
+    --- Called by Lua when the projectile is killed (intercepted)
     ---@param self Projectile
     ---@param instigator Unit
     ---@param type string
@@ -1059,7 +1059,7 @@ DummyProjectile = ClassDummyProjectile(ProjectileMethods) {
     ---@param inWater? boolean
     OnCreate = function(self, inWater)
         -- expected to be cached by all projectiles
-        self.Blueprint = EntityGetBlueprint(self)
+        self.Blueprint = EntityGetBlueprint(self) --[[@as ProjectileBlueprint]]
         self.Army = EntityGetArmy(self)
     end,
 
