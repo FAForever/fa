@@ -35,6 +35,11 @@ CConstructionEggUnit = ClassUnit(CStructureUnit) {
         -- prevent the unit from being reclaimed
         self:SetReclaimable(false)
 
+        -- the egg has hatched: changing its army would run this function again and spawn another unit
+        self.CanBeGiven = false
+        self:SetCapturable(false)
+        self:SetUnSelectable(true)
+
         local bp = self:GetBlueprint()
         local buildUnit = bp.Economy.BuildUnit
         local pos = self:GetPosition()

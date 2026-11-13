@@ -41,6 +41,11 @@ do
     -- do not allow command units to be given
     local oldChangeUnitArmy = _G.ChangeUnitArmy
     _G.ChangeUnitArmy = function(unit, army, noRestrictions)
+        -- do not allow units that can't be given to change army, not even when ignoring restrictions
+        if unit and not unit.CanBeGiven then
+            return nil
+        end
+
         if unit and noRestrictions then
             return oldChangeUnitArmy(unit, army)
         end
