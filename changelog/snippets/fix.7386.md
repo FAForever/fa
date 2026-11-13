@@ -1,0 +1,1 @@
+- Fix the Aeon SACU's Heavy Personal Shield not being created when the enhancement is built manually (#7386).
