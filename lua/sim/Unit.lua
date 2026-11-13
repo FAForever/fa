@@ -180,6 +180,7 @@ local UnitSetMaxHealth = _G.moho.unit_methods.SetMaxHealth
 ---@field IdleEffectsBag TrashBag
 ---@field SiloWeapon? Weapon
 ---@field SiloProjectile? ProjectileBlueprint
+---@field SiloBlocksProgress? number # Silo progress set by `GiveNukeSiloBlocks` that the engine hasn't reported through work progress yet
 ---@field ReclaimTimeMultiplier? number
 ---@field CaptureTimeMultiplier? number
 ---@field PlatoonHandle? Platoon
@@ -2671,7 +2672,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         -- Prevent work progress set by weapons using `RenderFireClock` from
         -- turning into silo progress after ownership transfer of a unit paused
         -- in the silo build state without having updated progress by the engine.
-        self:SetWorkProgress(0)
+        -- The engine only updates work progress on the next silo tick, so use the
+        -- progress set by `GiveNukeSiloBlocks` if there is one. Otherwise a silo build
+        -- restart or unit transfer in the meantime reads 0 and loses the progress.
+        self:SetWorkProgress(self.SiloBlocksProgress or 0)
+        self.SiloBlocksProgress = nil
 
         -- for AI events
         self.Brain:OnUnitSiloBuildStart(self, weapon)
@@ -5212,6 +5217,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         cUnit.GiveNukeSiloAmmo(self, blocks, true)
         -- Engine won't update work progress so we do it manually
         self:SetWorkProgress(fraction)
+        -- `OnSiloBuildStart` restores this when the engine (re)starts the missile
+        self.SiloBlocksProgress = fraction
     end,
 
     --- Updates a statistic that you can retrieve on the UI side using `userunit:GetStat`. See `unit:UpdateStat` for an alternative
