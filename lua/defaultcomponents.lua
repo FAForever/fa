@@ -742,7 +742,8 @@ VeterancyComponent = ClassSimple {
         self:UpdateStat('VetLevel', nextLevel)
 
         -- shared across all units
-        Buff.ApplyBuff(self, 'VeterancyMaxHealth' .. nextLevel)
+        local maxHealthBuffName = 'VeterancyMaxHealth' .. nextLevel
+        Buff.ApplyBuff(self, maxHealthBuffName)
 
         -- unique to all units... but not quite
         local regenBuffName = self.UnitId .. 'VeterancyRegen' .. nextLevel
@@ -770,7 +771,12 @@ VeterancyComponent = ClassSimple {
 
         -- one time health injection
 
-        local maxHealth = blueprint.Defense.MaxHealth
+        -- based on the max health without veterancy, so that health upgrades and other max health
+        -- buffs are healed for too. For units without them this is the blueprint's max health.
+        local maxHealth = self:GetMaxHealth()
+        if Buff.HasBuff(self, maxHealthBuffName) then
+            maxHealth = maxHealth / Buffs[maxHealthBuffName].Affects.MaxHealth.Mult
+        end
         local mult = blueprint.VeteranHealingMult[nextLevel] or 0.1
         self:AdjustHealth(self, maxHealth * mult)
 
