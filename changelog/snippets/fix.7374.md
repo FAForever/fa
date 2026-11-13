@@ -1,0 +1,1 @@
+- Fix giving resources to an ally deleting the part that doesn't fit in their storage. Only as much as the ally can store is taken from you now, including when several gifts reach them in the same tick (#7374).
