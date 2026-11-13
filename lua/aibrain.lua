@@ -539,8 +539,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
         self:SetDefeatStatus("Defeat")
 
-        local opt = ScenarioInfo.Options
-        ForkThread(KillAbandonedArmy, self, opt.DisconnectShare, opt.DisconnectShareCommanders, opt.Victory)
+        ForkThread(KillAbandonedArmy, self)
 
         if self.Trash then
             self.Trash:Destroy()
@@ -1238,8 +1237,6 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
 local TransferUnitsOwnership = SimUtils.TransferUnitsOwnership
 local TransferUnfinishedUnitsAfterDeath = SimUtils.TransferUnfinishedUnitsAfterDeath
-local KillArmyOnDelayedRecall = SimUtils.KillArmyOnDelayedRecall
-local KillArmyOnACUDeath = SimUtils.KillArmyOnACUDeath
 local TransferUnitsToBrain = SimUtils.TransferUnitsToBrain
 local TransferUnitsToHighestBrain = SimUtils.TransferUnitsToHighestBrain
 

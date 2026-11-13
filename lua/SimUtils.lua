@@ -978,6 +978,14 @@ function TransferUnitsToHighestBrain(self, brains, transferUnfinishedUnits, cate
         return
     end
 
+    SortBrainsByRating(brains)
+    return TransferUnitsToBrain(self, brains, transferUnfinishedUnits, categoriesToTransfer, reason)
+end
+
+--- Sorts brains in place by positive rating and then score, highest first.
+---@param brains AIBrain[]
+---@return AIBrain[] brains
+function SortBrainsByRating(brains)
     local ratings = ScenarioInfo.Options.Ratings
     ---@type table<AIBrain, number>
     local brainRatings = {}
@@ -993,7 +1001,7 @@ function TransferUnitsToHighestBrain(self, brains, transferUnfinishedUnits, cate
     end
     -- sort brains by rating
     table.sort(brains, function(a, b) return brainRatings[a] > brainRatings[b] end)
-    return TransferUnitsToBrain(self, brains, transferUnfinishedUnits, categoriesToTransfer, reason)
+    return brains
 end
 
 --local helper functions for KillArmy
@@ -1166,6 +1174,13 @@ function KillArmy(self, shareOption)
 
     if GameIsEnding then return end
 
+    ShareArmy(self, shareOption)
+end
+
+--- Applies the given share condition to my army right away, then kills what remains.
+---@param self AIBrain
+---@param shareOption ShareOption
+function ShareArmy(self, shareOption)
     local selfIndex = self.Army
     local brainCategories = GetAllegianceCategories(selfIndex)
 
@@ -1224,201 +1239,205 @@ function KillRecalledArmy(self, shareOption)
     KillRemaining(self)
 end
 
---- Blocks the current thread until all units in a list are dead, or until an
---- optional timeout. Returns total ticks elapsed, or the original timeout
---- (which could have been negative or fractional) if it was reached after
---- checking the units. If all units are dead upon calling, returns `0`.
----@param units Entity[]
----@param timeout? integer in ticks
----@return integer elapsed
-function WaitUntilUnitsDeadOrTimeout(units, timeout)
-    if table.empty(units) then
-        return 0
-    end
-    if timeout and timeout <= 0 then
-        -- It seems likely that most code will compare to the original timeout
-        -- to see if the suspension did indeed timeout - returning `0` will
-        -- not work in cases where the timeout was negative.
-        return timeout
-    end
-    local elapsed = 0
-    while true do
-        local noneAlive = true
-        for _, unit in units do
-            if not unit.Dead then
-                noneAlive = false
-                break
-            end
-        end
-        if noneAlive then
-            return elapsed
-        end
-        if timeout and elapsed >= timeout then
-            -- return `timeout` instead of `elapsed` in case it was fractional
-            return timeout
-        end
-        WaitTicks(1)
-
-        elapsed = elapsed + 1
-    end
-end
-
-
-
 local StartCountdown = StartCountdown -- as defined in SimSync.lua
 
--- The time in ticks after taking damage that commanders are considered safe and not abusing disconnect rules
--- Also the duration used for the delayed recall disconnect option.
-CommanderSafeTime = 2 * 60 * 10 -- 2 minutes
--- When using the delayed recall disconnect option, commanders will be shared at
--- least until this time in game has passed
-MinimumShareTime = 5 * 60 * 10 -- 5 minutes
+-- Ticks for which the ACUs of an abandoned army are shared before they recall, when the
+-- `AbandonedCommanders` option is `Recall`
+AbandonedRecallTime = 30 * 10
 
+-- Prefix of the strategic underlay textures of recalling ACUs, when the blueprint doesn't define one
+DefaultAbandonedUnderlay = 'icon_abandoned'
 
---- Kills all given commanders that are considered unsafe as of a given game tick
---- (defaulting to now), and returns the rest.
----@param commanders ACUUnit[]
----@param tick? integer defaults to `GetGameTick()`
----@return ACUUnit[] safeCommanders
-function KillUnsafeCommanders(commanders, tick)
-    tick = tick or GetGameTick()
-    local safeCommanders = {}
-    local unsafeCommanders = {}
-    for _, com in commanders do
-        if com.LastTickDamaged and com.LastTickDamaged + CommanderSafeTime > tick then
-            table.insert(unsafeCommanders, com)
-        else
-            table.insert(safeCommanders, com)
+---@alias AbandonedUnderlayVariant { [1]: number, [2]: number, [3]: number, [4]: string } # red, green, blue, underlay name
+
+---@type table<string, AbandonedUnderlayVariant[]>
+local AbandonedUnderlayCache = {}
+
+--- Lists the colored variants of an abandoned underlay: `<prefix>_<rrggbb>_rest.dds` in the
+--- strategic icon folder, so that each file names the color it was made for.
+---@param prefix string
+---@return AbandonedUnderlayVariant[]
+local function GetAbandonedUnderlays(prefix)
+    prefix = string.lower(prefix)
+    local variants = AbandonedUnderlayCache[prefix]
+    if variants then
+        return variants
+    end
+
+    variants = {}
+    local folder = '/textures/ui/common/game/strategicicons/'
+
+    -- the pattern only matches file names: split off the folder of icon mods (`<mod>/<prefix>`)
+    local subfolder, filePrefix = '', prefix
+    local slash = string.find(prefix, '/[^/]*$')
+    if slash then
+        subfolder = string.sub(prefix, 1, slash)
+        filePrefix = string.sub(prefix, slash + 1)
+    end
+
+    for _, file in DiskFindFiles(folder .. subfolder, filePrefix .. '_*_rest.dds') do
+        -- strip the folder and `_rest.dds`, leaving `<prefix>_<rrggbb>`
+        local name = string.sub(string.lower(file), string.len(folder) + 1, -10)
+        local hex = string.sub(name, -6)
+        if string.sub(name, 1, -8) == prefix and string.find(hex, '^%x%x%x%x%x%x$') then
+            table.insert(variants, {
+                tonumber(string.sub(hex, 1, 2), 16),
+                tonumber(string.sub(hex, 3, 4), 16),
+                tonumber(string.sub(hex, 5, 6), 16),
+                name,
+            })
         end
     end
 
-    DelayedKillUnits(unsafeCommanders, AbandonedArmyGracePeriod)
-
-    return safeCommanders
+    AbandonedUnderlayCache[prefix] = variants
+    return variants
 end
 
---- Shares all units including ACUs. When the shared ACUs die or recall after
---- `shareTime`, kills my army according to the given share condition.
----@param self AIBrain
----@param shareOption ShareOption
----@param shareTime integer Game time in ticks
-function KillArmyOnDelayedRecall(self, shareOption, shareTime)
-    -- Share units including ACUs and walls and keep track of ACUs
-    local brainCategories = GetAllegianceCategories(self.Army)
-    local newUnits = TransferUnitsToHighestBrain(self, brainCategories.Allies, true, categories.ALLUNITS, "DisconnectShareTemporary")
-    ---@type (ACUUnit|Unit)[]
-    local sharedCommanders = EntityCategoryFilterDown(categories.COMMAND, newUnits or {})
+--- Finds the strategic underlay that marks an ACU of an abandoned army: the variant of the
+--- blueprint's `StrategicIconAbandonedUnderlay` whose color is closest to the army's color. The
+--- textures are client side (strategic icon mods can replace them), so the result must only be
+--- used for `SetStrategicUnderlay`, never for sim logic.
+---@param unit Unit
+---@param army Army # the army that abandoned the ACU
+---@return string?
+function GetAbandonedUnderlay(unit, army)
+    local variants = GetAbandonedUnderlays(unit.Blueprint.StrategicIconAbandonedUnderlay or DefaultAbandonedUnderlay)
+    if table.empty(variants) then
+        variants = GetAbandonedUnderlays(DefaultAbandonedUnderlay)
+    end
 
-    -- non-assassination games could have an army abandon without having any commanders
-    if not table.empty(sharedCommanders) then
-        local timeout = shareTime - GetGameTick()
-        if timeout < 0 then
-            WARN("Given time to end sharing is in the past")
+    local r, g, b = 255, 255, 255
+    local setup = ScenarioInfo.ArmySetup[ArmyBrains[army].Name]
+    local color = import("/lua/gamecolors.lua").GameColors.ArmyColors[setup.ArmyColor]
+    if color then
+        r = tonumber(string.sub(color, 3, 4), 16)
+        g = tonumber(string.sub(color, 5, 6), 16)
+        b = tonumber(string.sub(color, 7, 8), 16)
+    end
+
+    local closest, closestDistance
+    for _, variant in variants do
+        local dr, dg, db = variant[1] - r, variant[2] - g, variant[3] - b
+        local distance = dr * dr + dg * dg + db * db
+        if not closestDistance or distance < closestDistance then
+            closest, closestDistance = variant[4], distance
         end
-        local countdown = math.floor(timeout / 10)
+    end
+    return closest
+end
 
-        -- create a countdown to show when the ACU recalls (similar to the one used for timed self-destruct)
-        for i, com in sharedCommanders do
-            -- don't recall shared ACUs
-            if com.RecallingAfterDefeat then
-                sharedCommanders[i] = nil
-                continue
+---@class AbandonedRecall
+---@field Army Army                     # the army that abandoned the ACUs
+---@field EndTick number                # game tick at which the ACUs recall
+---@field Commanders table<Unit, true>  # the ACUs, updated as they change army
+
+--- Marks an ACU of an abandoned army as recalling: it doesn't keep its holder in the game, and it
+--- shows the underlay of the abandoned army and the time left until it recalls. The marks follow
+--- the ACU when it changes army, keeping the recall time.
+---@param recall AbandonedRecall
+---@param unit Unit
+local function MarkRecallingCommander(recall, unit)
+    recall.Commanders[unit] = true
+
+    -- see the victory conditions, and especially `AbstractVictoryCondition.UnitIsEligible`
+    unit.IgnoredByVictoryCondition = true
+
+    local underlay = GetAbandonedUnderlay(unit, recall.Army)
+    if underlay then
+        unit:SetStrategicUnderlay(underlay)
+    end
+
+    local ticksLeft = recall.EndTick - GetGameTick()
+    if ticksLeft > 0 then
+        StartCountdown(unit.EntityId, math.ceil(ticksLeft / 10))
+    end
+
+    unit:AddOnGivenCallback(function(oldUnit, newUnit)
+        recall.Commanders[oldUnit] = nil
+        MarkRecallingCommander(recall, newUnit)
+    end)
+end
+
+--- Shares all units of an abandoned army, including its ACUs, with its allies. The ACUs recall
+--- after `AbandonedRecallTime` and the allies keep the units. If all ACUs die before that, the
+--- share condition applies to the units instead, as if the army was defeated.
+---@param self AIBrain
+---@param allies AIBrain[] # in order of preference
+function RecallAbandonedArmy(self, allies)
+    local selfIndex = self.Army
+
+    ---@type AbandonedRecall
+    local recall = {
+        Army = selfIndex,
+        EndTick = GetGameTick() + AbandonedRecallTime,
+        Commanders = {},
+    }
+
+    -- mark the ACUs before the transfer, so that the marks follow them to their new army
+    for _, unit in self:GetListOfUnits(categories.COMMAND, false) do
+        MarkRecallingCommander(recall, unit)
+    end
+
+    TransferUnitsToBrain(self, allies, true, categories.ALLUNITS, "AbandonedTemporary")
+
+    -- outside of Assassination an army can abandon without ACUs: the transfer is then final
+    local hadCommanders = not table.empty(recall.Commanders)
+    while GetGameTick() < recall.EndTick and not table.empty(recall.Commanders) do
+        WaitTicks(1)
+        for unit in recall.Commanders do
+            if unit.Dead or IsDestroyed(unit) then
+                recall.Commanders[unit] = nil
+
+                -- the ACU died in its holder's army, which recorded the killer: the abandoned army
+                -- needs it for the Traitors share condition
+                local holder = unit.Brain
+                if holder and holder.CommanderKilledTick and holder.CommanderKilledTick >= GetGameTick() - 1 then
+                    self.CommanderKilledBy = holder.CommanderKilledBy
+                    self.CommanderKilledTick = holder.CommanderKilledTick
+                end
             end
-            -- The shared ACUs don't count as keeping the army in the game since they will eventually be removed from the game.
-            -- See the victory conditions, and especially `AbstractVictoryCondition` class with the method `UnitIsEligible`
-            com.RecallingAfterDefeat = true
-            StartCountdown(com.EntityId, countdown)
-        end
-
-        local elapsed = WaitUntilUnitsDeadOrTimeout(sharedCommanders, timeout)
-
-        -- if all the commanders die early, assume disconnect abuse and apply standard share condition. Only makes sense in Assassination.
-        local scenarioOptions = ScenarioInfo.Options
-        if elapsed < timeout and scenarioOptions.Victory == "demoralization" then
-            shareOption = scenarioOptions.Share
-        else
-            -- filter out commanders that are not currently safe and should explode because KillArmy might not
-            local safeCommanders = KillUnsafeCommanders(sharedCommanders)
-
-            if not table.empty(safeCommanders) then
-                ForkThread(FakeTeleportUnits, safeCommanders, true)
-            end
         end
     end
 
-    KillArmy(self, shareOption)
+    if GameIsEnding then
+        return
+    end
+
+    if hadCommanders and table.empty(recall.Commanders) then
+        -- the ACUs died: apply the share condition, as if the army was defeated
+        ShareArmy(self, ScenarioInfo.Options.Share)
+        return
+    end
+
+    local recalling = {}
+    for unit in recall.Commanders do
+        table.insert(recalling, unit)
+    end
+    FakeTeleportUnits(recalling, true)
+
+    -- the allies keep the units
+    TransferOwnershipOfBorrowedUnits(GetAllegianceCategories(selfIndex).Allies, selfIndex)
+    KillRemaining(self)
 end
 
---- Shares all units including ACUs. When the shared ACUs die, kills my army according to the given share condition.
+--- Called when the players of an army left the game, see `AIBrain.AbandonedByPlayer`.
 ---@param self AIBrain
----@param shareOption ShareOption
-function KillArmyOnACUDeath(self, shareOption)
-    -- Share units including ACUs and walls and keep track of ACUs
-    local brainCategories = GetAllegianceCategories(self.Army)
-    local newUnits = TransferUnitsToHighestBrain(self, brainCategories.Allies, true, categories.ALLUNITS, "DisconnectSharePermanent")
-    local sharedCommanders = EntityCategoryFilterDown(categories.COMMAND, newUnits or {})
+function KillAbandonedArmy(self)
+    local option = ScenarioInfo.Options.AbandonedCommanders
 
-    if not table.empty(sharedCommanders) then
-        local elapsed = WaitUntilUnitsDeadOrTimeout(sharedCommanders) -- note there's no timeout
-
-        -- if all the commanders die early, assume disconnect abuse and apply standard share condition. Only makes sense in Assassination.
-        local scenarioOptions = ScenarioInfo.Options
-        if elapsed < CommanderSafeTime and scenarioOptions.Victory == "demoralization" then
-            shareOption = scenarioOptions.Share
+    if option == 'Recall' then
+        local allies = SortBrainsByRating(GetAllegianceCategories(self.Army).Allies)
+        if not table.empty(allies) then
+            RecallAbandonedArmy(self, allies)
+            return
         end
+    elseif option ~= 'Explode' then
+        WARN('Invalid abandoned ACU option was used for this game: `' .. tostring(option) .. '` Defaulting to exploding ACUs.')
     end
 
-    KillArmy(self, shareOption)
-end
-
----@param self AIBrain
----@param shareOption DisconnectShareOption
----@param shareAcuOption DisconnectShareCommandersOption
----@param victoryOption VictoryCondition
-function KillAbandonedArmy(self, shareOption, shareAcuOption, victoryOption)
-    if shareOption == 'SameAsShare' then
-        shareOption = ScenarioInfo.Options.Share
-    end
-
-    if shareAcuOption == 'Explode' or shareAcuOption == 'Recall' then
-        local safeCommanders
-        local commanders = self:GetListOfUnits(categories.COMMAND, false)
-        if shareAcuOption == 'Recall' then
-            safeCommanders = KillUnsafeCommanders(commanders)
-        else
-            -- explode all the ACUs so they don't get shared
-            DelayedKillUnits(commanders, AbandonedArmyGracePeriod)
-        end
-
-        -- Only handle Assassination victory, as in other settings the player is unlikely to be defeated soon
-        if victoryOption == 'demoralization' and table.empty(safeCommanders) then
-            shareOption = ScenarioInfo.Options.Share
-        end
-
-        -- non-assassination modes can have armies abandon without commanders
-        if shareAcuOption == 'Recall' and not table.empty(safeCommanders) then
-            ForkThread(FakeTeleportUnits, safeCommanders, true)
-        end
-
-        KillArmy(self, shareOption)
-
-    elseif shareAcuOption == 'RecallDelayed' or shareAcuOption == 'Permanent' then
-
-        if victoryOption ~= 'demoralization' then
-            shareOption = 'FullShare'
-        end
-
-        if shareAcuOption == 'RecallDelayed' then
-            local shareTime = math.max(MinimumShareTime, GetGameTick() + CommanderSafeTime)
-            KillArmyOnDelayedRecall(self, shareOption, shareTime)
-        else
-            KillArmyOnACUDeath(self, shareOption)
-        end
-
-    else
-        WARN('Invalid disconnection ACU share condition was used for this game: `' .. (shareAcuOption or 'nil') .. '` Defaulting to exploding ACU.')
-        KillArmy(self, shareOption)
-    end
+    -- explode the ACUs so they don't get shared
+    DelayedKillUnits(self:GetListOfUnits(categories.COMMAND, false), AbandonedArmyGracePeriod)
+    KillArmy(self, ScenarioInfo.Options.Share)
 end
 
 --#endregion
