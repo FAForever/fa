@@ -693,6 +693,7 @@ UnitBlueprint{
     SizeX = 1.2,
     SizeY = 1.9,
     SizeZ = 1.2,
+    StrategicIconAbandonedUnderlay = "icon_abandoned",
     StrategicIconName = "icon_commander_generic",
     StrategicIconSortPriority = 0,
     Transport = {
