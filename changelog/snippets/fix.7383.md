@@ -1,0 +1,1 @@
+- Fix giving a strategic missile launcher or strategic missile defense to another player on the tick it fires letting it fire a missile while the new owner keeps that ammo (#7383).
