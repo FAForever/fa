@@ -156,7 +156,6 @@ CommandUnit = ClassUnit(WalkingLandUnit) {
         self:HideBone(0, true)
         self:SetUnSelectable(true)
         self:SetBusy(true)
-        self:GetWeaponByLabel(self.rightGunLabel):SetWeaponBusy(true)
         self:ForkThread(self.WarpInEffectThread, bones)
     end,
 
@@ -177,7 +176,6 @@ CommandUnit = ClassUnit(WalkingLandUnit) {
         self:ShowBone(0, true)
         self:SetUnSelectable(false)
         self:SetBusy(false)
-        self:GetWeaponByLabel(self.rightGunLabel):SetWeaponBusy(false)
         self:SetBlockCommandQueue(false)
 
         for _, v in bones or bp.Display.WarpInEffect.HideBones do

@@ -15,6 +15,8 @@ local SLaanseMissileWeapon = SeraphimWeapons.SLaanseMissileWeapon
 local SAMElectrumMissileDefense = SeraphimWeapons.SAMElectrumMissileDefense
 
 local ExternalFactoryComponent = import("/lua/defaultcomponents.lua").ExternalFactoryComponent
+-- only set the engine's unit busy flag for building: `Unit.SetBusy` would also stop the weapons from firing
+local UnitSetBusy = moho.unit_methods.SetBusy
 
 ---@class XSS0303 : AircraftCarrier, ExternalFactoryComponent
 XSS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
@@ -52,7 +54,7 @@ XSS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
     IdleState = State {
         Main = function(self)
             self:DetachAll(self.BuildAttachBone)
-            self:SetBusy(false)
+            UnitSetBusy(self, false)
             self:OnIdle()
         end,
 
@@ -66,7 +68,7 @@ XSS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
     BuildingState = State {
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
-            self:SetBusy(true)
+            UnitSetBusy(self, true)
             local bone = self.BuildAttachBone
             self:DetachAll(bone)
             unitBuilding:AttachTo(self, bone)

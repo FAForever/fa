@@ -11,6 +11,19 @@ local EntityGetPositionXYZ = EntityMethods.GetPositionXYZ
 local UnitMethods = moho.unit_methods
 local UnitGetVelocity = UnitMethods.GetVelocity
 local UnitGetTargetEntity = UnitMethods.GetTargetEntity
+-- Weapon states only set the engine's unit busy flag: `Unit.SetBusy` would also hold every weapon of the unit
+local UnitSetBusy = UnitMethods.SetBusy
+
+--- Clears the engine's unit busy flag. Also releases a hold set through `Unit.SetBusy`, which is what clearing
+--- the unit busy flag did before weapons had their own busy state.
+---@param unit Unit
+local function UnitClearBusy(unit)
+    if unit.BusyHold then
+        unit:SetBusy(false)
+    else
+        UnitSetBusy(unit, false)
+    end
+end
 
 local MathClamp = math.clamp
 local MathSqrt = math.sqrt
@@ -732,7 +745,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             self:AimManipulatorSetEnabled(false)
         end
 
-        self:SetWeaponBusy(self.WeaponWantBusy)
+        -- the unit can hold all of its weapons through `Unit.SetBusy`
+        self:SetWeaponBusy(self.WeaponWantBusy or self.unit.BusyHold)
     end,
 
     -- Weapon States
@@ -750,7 +764,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         Main = function(self)
             local unit = self.unit
             if unit.Dead then return end
-            unit:SetBusy(false)
+            UnitClearBusy(unit)
 
             -- at this point salvo is always done so reset the data in case firing was interrupted
             self.CurrentSalvoData = nil
@@ -837,16 +851,16 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local unit = self.unit
             local bp = self.Blueprint
             local notExclusive = bp.NotExclusive
-            unit:SetBusy(true)
+            UnitSetBusy(unit, true)
             self:PlayFxRackSalvoChargeSequence()
 
             if notExclusive then
-                unit:SetBusy(false)
+                UnitClearBusy(unit)
             end
             WaitSeconds(bp.RackSalvoChargeTime)
 
             if notExclusive then
-                unit:SetBusy(true)
+                UnitSetBusy(unit, true)
             end
 
             if bp.RackSalvoFiresAfterCharge then
@@ -879,9 +893,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local unit = self.unit
             local bp = self.Blueprint
             if bp.ManualFire and not bp.OverChargeWeapon then
-                unit:SetBusy(true)
+                UnitSetBusy(unit, true)
             else
-                unit:SetBusy(false)
+                UnitClearBusy(unit)
             end
 
             self.WeaponCanFire = true
@@ -1005,7 +1019,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         ---@param self DefaultProjectileWeapon_RackSalvoFiringState
         Main = function(self)
             local unit = self.unit
-            unit:SetBusy(true)
+            UnitSetBusy(unit, true)
             self:DestroyRecoilManips()
             local bp = self.Blueprint
             local rof = self:GetWeaponRoF()
@@ -1074,12 +1088,12 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                         end
                         self:PlayFxMuzzleChargeSequence(muzzle)
                         if notExclusive then
-                            unit:SetBusy(false)
+                            UnitClearBusy(unit)
                         end
                         WaitSeconds(chargeDelay)
 
                         if notExclusive then
-                            unit:SetBusy(true)
+                            UnitSetBusy(unit, true)
                         end
                     end
                     self:PlayFxMuzzleSequence(muzzle)
@@ -1133,12 +1147,12 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     end
                     if salvoDelay > 0 then
                         if notExclusive then
-                            unit:SetBusy(false)
+                            UnitClearBusy(unit)
                         end
                         WaitSeconds(salvoDelay)
 
                         if notExclusive then
-                            unit:SetBusy(true)
+                            UnitSetBusy(unit, true)
                         end
                     end
                 end
@@ -1247,14 +1261,14 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         ---@param self DefaultProjectileWeapon_RackSalvoReloadState
         Main = function(self)
             local unit = self.unit
-            unit:SetBusy(true)
+            UnitSetBusy(unit, true)
             self:PlayFxRackSalvoReloadSequence()
 
             local bp = self.Blueprint
             local notExclusive = bp.NotExclusive
 
             if notExclusive then
-                unit:SetBusy(false)
+                UnitClearBusy(unit)
             end
 
             WaitSeconds(bp.RackSalvoReloadTime)
@@ -1307,7 +1321,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         ---@param self DefaultProjectileWeapon_WeaponUnpackingState
         Main = function(self)
             local unit = self.unit
-            unit:SetBusy(true)
+            UnitSetBusy(unit, true)
 
             local bp = self.Blueprint
             if bp.WeaponUnpackLocksMotion then
@@ -1343,7 +1357,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local unit = self.unit
 
             if not IsDestroyed(unit) then
-                unit:SetBusy(true)
+                UnitSetBusy(unit, true)
             end
 
             local bp = self.Blueprint

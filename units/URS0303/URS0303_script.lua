@@ -13,6 +13,8 @@ local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CAAAutocannon = CybranWeaponsFile.CAAAutocannon
 
 local ExternalFactoryComponent = import("/lua/defaultcomponents.lua").ExternalFactoryComponent
+-- only set the engine's unit busy flag for building: `Unit.SetBusy` would also stop the weapons from firing
+local UnitSetBusy = moho.unit_methods.SetBusy
 local CDFMissileRedirectWeapon02 = import("/lua/sim/weapons/cybran/cdfmissileredirectweapon02.lua").CDFMissileRedirectWeapon02
 
 
@@ -55,7 +57,7 @@ URS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
     IdleState = State {
         Main = function(self)
             self:DetachAll(self.BuildAttachBone)
-            self:SetBusy(false)
+            UnitSetBusy(self, false)
             self:OnIdle()
         end,
 
@@ -69,7 +71,7 @@ URS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
     BuildingState = State {
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
-            self:SetBusy(true)
+            UnitSetBusy(self, true)
             local bone = self.BuildAttachBone
             self:DetachAll(bone)
             unitBuilding:AttachTo(self, bone)

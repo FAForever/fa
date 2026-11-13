@@ -38,6 +38,7 @@ local AttachBeamEntityToEntity = AttachBeamEntityToEntity
 local CreateEmitterAtBone = CreateEmitterAtBone
 local IsAlly = IsAlly
 local rawget = rawget
+local UnitSetBusy = moho.unit_methods.SetBusy
 
 local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFICANTUNIT     -- anything that repairs but insignificant things, such as drones
 
@@ -190,6 +191,7 @@ local UnitSetMaxHealth = _G.moho.unit_methods.SetMaxHealth
 ---@field Weapons table<string, Weapon> # string is weapon Label
 ---@field WeaponInstances table<integer|string, Weapon> # string matches weapon label
 ---@field WeaponCount number
+---@field BusyHold? boolean # Set by `Unit.SetBusy`, holds every weapon of the unit from firing
 ---@field CaptureProgress? number # Keeps track of capture progress to prevent sharing units being captured and to sync capture work progress bars
 ---@field originalBuilder? Unit
 ---@field oldowner? Army # After a unit is transferred, keeps track of the original Army to kill shared units when needed.
@@ -2350,6 +2352,23 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             local wep = self.WeaponInstances[i]
             wep:SetWeaponEnabled(enable)
             wep:AimManipulatorSetEnabled(enable)
+        end
+    end,
+
+    --- Sets the engine's unit busy flag and holds every weapon of the unit from firing while busy. Weapons
+    --- that are busy with their own firing cycle stay busy when the hold is released.
+    ---
+    --- Weapon states set only the engine flag (`moho.unit_methods.SetBusy`) so that one weapon's firing cycle
+    --- doesn't hold its siblings. Like before weapons had their own busy state, a weapon that clears the unit
+    --- busy flag (when idle, ready to fire, or during the waits of `NotExclusive` weapons) also releases the hold.
+    ---@param self Unit
+    ---@param busy boolean
+    SetBusy = function(self, busy)
+        UnitSetBusy(self, busy)
+        self.BusyHold = busy
+        for i = 1, self.WeaponCount do
+            local weapon = self.WeaponInstances[i]
+            weapon:SetWeaponBusy(weapon.WeaponWantBusy or busy)
         end
     end,
 
