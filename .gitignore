@@ -25,3 +25,7 @@ textures/ui/common/BUTTON/BACKUP/
 act.exe
 *.venv
 lua_changelog
+
+# personal agent instructions
+CLAUDE.local.md
+AGENTS.override.md
