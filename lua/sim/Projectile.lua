@@ -19,6 +19,7 @@ local Damage = Damage
 local Random = Random
 local IsAlly = IsAlly
 local ForkThread = ForkThread
+local GetGameTick = GetGameTick
 local DamageArea = DamageArea
 local IsDestroyed = IsDestroyed
 local CreateSplat = CreateSplat
@@ -682,7 +683,9 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                             radius,
                             damage,
                             damageType,
-                            damageFriendly
+                            damageFriendly,
+                            nil, -- damageSelf
+                            GetGameTick()
                         )
                     end
                 end
@@ -725,7 +728,8 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                             DoTPulses,
                             (DoTTime / (DoTPulses)),
                             damage,
-                            damageType
+                            damageType,
+                            GetGameTick()
                         )
                     end
                 end
