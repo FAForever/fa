@@ -1,0 +1,1 @@
+- Fix the Novax Center launching an extra satellite, or relaunching its satellite at the station, when it is given to another player. The satellite now moves to the new owner where it is, a satellite that is not launched yet is launched by the new owner, and a station without a satellite continues rebuilding it instead of getting a free one (#7382).
