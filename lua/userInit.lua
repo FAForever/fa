@@ -100,7 +100,7 @@ end
 
 local oldEntityCategoryFilterOut = EntityCategoryFilterOut
 function EntityCategoryFilterOut(categories, units)
-    return oldEntityCategoryFilterOut(categories, units or {})
+    return oldEntityCategoryFilterOut(categories, units or EmptyTable)
 end
 
 function PrintText(textData)
