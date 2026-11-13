@@ -111,6 +111,7 @@ end
 
 --- Callback takes a boolean and toggles a stat on given units between 0 and 1
 ---@param data table<string, boolean>
+---@param units Unit[]
 Callbacks.SetStatByCallback = function(data, units)
     for stat, value in data do
         if not type(value) == 'boolean' then
