@@ -690,6 +690,10 @@ Tooltips = {
         title = "<LOC ASSIST_TO_COPY_TITLE>Assist to copy command queue",
         description = "<LOC ASSIST_TO_COPY_DESCRIPTION>When enabled, engineers in the selection will try to copy the command queue of the engineer you issue an assist order for. \r\n\r\nRequires you to hold 'Control'",
     },
+    options_assist_factory_instantly = {
+        title = "<LOC ASSIST_FACTORY_INSTANTLY_TITLE>Assist factories in range instantly",
+        description = "<LOC ASSIST_FACTORY_INSTANTLY_DESCRIPTION>When enabled, engineers that are already in build range of a factory start assisting it immediately instead of first moving into position around it. \r\n\r\nHolding 'Control' while issuing the assist order does the opposite",
+    },
     options_mp_taunt_head = {
         title = "<LOC OPTIONS_0119>MP Taunt Head",
         description = "<LOC OPTIONS_0120>Select which 3D head is displayed when taunts are used in multiplayer",
