@@ -176,6 +176,8 @@ Callbacks.SetRecallVote = import("/lua/sim/recall.lua").SetRecallVote
 
 Callbacks.SetAbandonRecipient = SimUtils.SetAbandonRecipient
 
+Callbacks.ForwardAbandonedArmy = SimUtils.ForwardAbandonedArmy
+
 Callbacks.SpawnPing = SimPing.SpawnPing
 
 --Nuke Ping
