@@ -169,6 +169,10 @@ function OnSync()
         end
     end
 
+    if Sync.AbandonRecipientSet then
+        import("/lua/ui/game/abandondialog.lua").OnRecipientSet(Sync.AbandonRecipientSet)
+    end
+
     if Sync.ArmyTransfer --[[@as { [1]: { from: number, to: number, reason: string } }]] then 
         local army = GetFocusArmy()
         for k, transfer in Sync.ArmyTransfer do 
