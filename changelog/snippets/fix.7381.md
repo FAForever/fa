@@ -1,0 +1,1 @@
+- (#7381) Fix engineers that start reclaiming a unit while it is being built continuing to unbuild it after other engineers finish it. This refunded the full build cost of the finished, working unit and left it alive at 0 health. The reclaim orders are now dropped when the unit is finished.
