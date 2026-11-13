@@ -1,1 +1,0 @@
-- Fix dead wiki links in the blueprint annotation files (#7391).

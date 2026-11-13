@@ -1,1 +1,0 @@
-- Fix the economy bar's resource warning backgrounds: the mass background now turns yellow before red when overflowing, and the energy background now lights up when stalling (#7209).

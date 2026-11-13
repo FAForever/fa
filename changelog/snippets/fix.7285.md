@@ -1,1 +1,0 @@
-- Fix error in `/sim/recall.lua` when switching armies in non-team games (#7285).

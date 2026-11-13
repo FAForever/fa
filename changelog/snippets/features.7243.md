@@ -1,1 +1,0 @@
-- Support the `WaterSpeedMultiplier` blueprint field in the Athanah, Asylum, and Zthuee scripts. The Zthuee's previously non-functional `WaterSpeedMultiplier` of `0.9` is removed (#7243).

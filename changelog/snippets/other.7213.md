@@ -1,1 +1,0 @@
-- Fix FAF intellisense plugin not detecting hook paths with non-word characters, and fix new diagnostics showing up from hooked content (#7213).

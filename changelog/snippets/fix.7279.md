@@ -1,1 +1,0 @@
-- Added missing platoon builder for Seraphim AI in FA campaign (#7279)

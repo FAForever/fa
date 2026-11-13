@@ -1,1 +1,0 @@
-- Cached results of categories set operations to reduce object de/allocations and improved sim-speed performance. (#7280)
