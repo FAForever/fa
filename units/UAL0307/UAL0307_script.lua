@@ -8,9 +8,10 @@ local AShieldHoverLandUnit = import("/lua/aeonunits.lua").AShieldHoverLandUnit
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
 local SlowHover = import("/lua/defaultunits.lua").SlowHoverLandUnit
 local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
+local TargetPointerComponent = import("/lua/sim/units/components/TargetPointerComponent.lua").TargetPointerComponent
 
----@class UAL0307 : AShieldHoverLandUnit
-UAL0307 = ClassUnit(AShieldHoverLandUnit, ShieldEffectsComponent) {
+---@class UAL0307 : AShieldHoverLandUnit, ShieldEffectsComponent, TargetPointerComponent
+UAL0307 = ClassUnit(AShieldHoverLandUnit, ShieldEffectsComponent, TargetPointerComponent) {
     Weapons = {
         TargetPointer = ClassWeapon(DefaultProjectileWeapon) {},
     },
@@ -25,9 +26,8 @@ UAL0307 = ClassUnit(AShieldHoverLandUnit, ShieldEffectsComponent) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         AShieldHoverLandUnit.OnStopBeingBuilt(self, builder, layer)
-        self.TargetPointer = self:GetWeapon(1) --save the pointer weapon for later - this is extra clever since the pointer weapon has to be first!
-        self.TargetLayerCaps = self.Blueprint.Weapon[1].FireTargetLayerCapsTable --we save this to the unit table so dont have to call every time.
-        self.PointerEnabled = true --a flag to let our thread know whether we should turn on our pointer.
+
+        self:InitializeTargetPointer()
     end,
 
     OnShieldEnabled = function(self)
@@ -49,27 +49,6 @@ UAL0307 = ClassUnit(AShieldHoverLandUnit, ShieldEffectsComponent) {
         end
     end,
 
-    DisablePointer = function(self)
-        if not IsDestroyed(self.TargetPointer) then            
-            self.TargetPointer:SetFireTargetLayerCaps('None') --this disables the stop feature - note that its reset on layer change!
-            self.PointerRestartThread = self.Trash:Add(ForkThread(self.PointerRestart, self))
-        end
-    end,
-
-    PointerRestart = function(self)
-        while self.PointerEnabled == false do
-            WaitTicks(11)
-            if IsDestroyed(self) or IsDestroyed(self.TargetPointer) then
-                break
-            end
-
-            if not self:GetGuardedUnit() then
-                self.PointerEnabled = true
-                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self.Layer]) --this resets the stop feature - note that its reset on layer change!
-            end
-        end
-    end,
-
     OnLayerChange = function(self, new, old)
         local physics = (self.Blueprint or self:GetBlueprint()).Physics
         if physics.WaterSpeedMultiplier then
@@ -78,12 +57,7 @@ UAL0307 = ClassUnit(AShieldHoverLandUnit, ShieldEffectsComponent) {
             AShieldHoverLandUnit.OnLayerChange(self, new, old)
         end
 
-        if not IsDestroyed(self.TargetPointer) then
-            if self.PointerEnabled == false then
-                -- since its reset on layer change we need to do this, unfortunate
-                self.TargetPointer:SetFireTargetLayerCaps('None')
-            end
-        end
+        self:OverrideTargetPointerLayerCaps()
     end,
 }
 TypeClass = UAL0307
