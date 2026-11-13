@@ -1,23 +1,25 @@
+-- Results with loop count 10000:
+--
 -- |-------------------------------|---------|--------|---------|
 -- | Name                          | Mean ms | 3x Dev | Hashes? |
 -- |-------------------------------|---------|--------|---------|
--- | "For table.getn upvalued"     |   9.03  | 0.26   |    N    |
--- | "For table.getn"              |   9.02  | 0.27   |    N    |
--- | "While cache table.getn"      |   9.46  | 0.32   |    N    |
--- | "For ipairs upvalued"         | 146.    | 4.0    |    N    |
--- | "For ipairs"                  | 146.    | 2.3    |    N    |
--- | "While table.getn"            | 163.    | 2.5    |    N    |
+-- | "For table.getn upvalued"     |    3.32 |   0.17 |    N    |
+-- | "For table.getn"              |    3.42 |   0.14 |    N    |
+-- | "While cache table.getn"      |    3.84 |   0.14 |    N    |
+-- | "For ipairs upvalued"         |    5.88 |   0.05 |    N    |
+-- | "For ipairs"                  |    5.89 |   0.11 |    N    |
+-- | "While table.getn"            |   37.22 |   0.89 |    N    |
 -- |-------------------------------|---------|--------|---------|
--- | "For each with next upvalued" | 231.    | 4.6    |    Y    |
--- | "For each"                    | 232.    | 5.1    |    Y    |
--- | "For next upvalued"           | 232.    | 5.8    |    Y    |
--- | "For next"                    | 233.    | 4.2    |    Y    |
--- | "For pairs upvalued"          | 238.    | 5.2    |    Y    |
--- | "For pairs"                   | 238.    | 4.5    |    Y    |
+-- | "For next upvalued"           |    4.88 |   0.25 |    Y    |
+-- | "For each"                    |    4.91 |   0.20 |    Y    |
+-- | "For next"                    |    4.93 |   0.18 |    Y    |
+-- | "For each with next upvalued" |    4.96 |   0.19 |    Y    |
+-- | "For pairs upvalued"          |    5.21 |   0.70 |    Y    |
+-- | "For pairs"                   |    5.23 |   0.17 |    Y    |
 -- |-------------------------------|---------|--------|---------|
 --
 -- Conclusions: 
--- - Use `for i = 1, TableGetN(t) do local v = t[i]` for arrays (26x faster)
+-- - Use `for i = 1, TableGetN(t) do local v = t[i]` for arrays (1.5x faster than `pairs`)
 --   - Don't use `table.insert` when traversing arrays
 -- - Use `for k, v in t` for tables
 

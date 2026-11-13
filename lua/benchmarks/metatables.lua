@@ -1,16 +1,31 @@
 
--- Depth1:          ~200ms  (~33ms without noise)
--- Depth2:          ~250ms  (~85ms without noise)
--- Depth3:          ~270ms  (~100ms without noise)
--- Depth4:          ~320ms  (~150ms without noise)
--- Depth5:          ~350ms  (~190ms without noise)
--- Depth6:          ~390ms  (~230ms without noise)
--- Depth6Functions: ~1050ms (~870ms without noise)
+-- Results with loop count 200000:
+--
+-- |-------------------------|---------|---------|------------|-----------|--------|-------|-----------|---------|---------|------|
+-- | Name                    | Samples | Mean ms | +/- 95% ms | +/- 95% % | Dev ms |  CV % | Median ms |  Min ms |  Max ms | Skew |
+-- |-------------------------|---------|---------|------------|-----------|--------|-------|-----------|---------|---------|------|
+-- | "Depth 1"               |      32 |  6.9046 |     0.0700 |      1.01 | 0.1959 |  2.84 |    6.9580 |  6.5918 |  7.3242 | 0.34 |
+-- | "Depth 2"               |      32 |  7.9803 |     0.0812 |      1.02 | 0.2273 |  2.85 |    7.9346 |  7.5684 |  8.4229 | 0.45 |
+-- | "Depth 3"               |      29 |  9.2353 |     0.0516 |      0.56 | 0.1356 |  1.47 |    9.2773 |  9.0332 |  9.5215 | 0.38 |
+-- | "Depth 4"               |      29 | 10.5696 |     0.0663 |      0.63 | 0.1742 |  1.65 |   10.6201 | 10.2539 | 10.9863 | 0.08 |
+-- | "Depth 5"               |      26 | 11.9300 |     0.0719 |      0.60 | 0.1779 |  1.49 |   11.9019 | 11.5967 | 12.3291 | 0.30 |
+-- | "Depth 6"               |      25 | 13.9502 |     0.0867 |      0.62 | 0.2100 |  1.51 |   13.9160 | 13.6719 | 14.4043 | 0.71 |
+-- | "Depth 6 Functions"     |      29 | 36.8526 |     0.1747 |      0.47 | 0.4595 |  1.25 |   36.8652 | 36.2549 | 37.8418 | 0.64 |
+-- | "Army from Field"       |      29 |  1.9110 |     0.0285 |      1.49 | 0.0749 |  3.92 |    1.9531 |  1.8311 |  2.0752 | 0.31 |
+-- | "Army from Meta"        |      19 |  1.9531 |     0.0000 |      0.00 | 0.0000 |  0.00 |    1.9531 |  1.9531 |  1.9531 | 0.00 |
+-- | "ForkThread from Field" |      30 |  1.9165 |     0.0320 |      1.67 | 0.0857 |  4.47 |    1.9531 |  1.8311 |  2.0752 | 0.45 |
+-- | "ForkThread from Meta"  |      29 |  3.0181 |     0.0349 |      1.16 | 0.0917 |  3.04 |    3.0518 |  2.9297 |  3.1738 | 0.46 |
+-- |-------------------------|---------|---------|------------|-----------|--------|-------|-----------|---------|---------|------|
+-- | "Baseline, 1 parameter" |     334 |  0.7598 |     0.0084 |      1.10 | 0.0781 | 10.27 |    0.7324 |  0.6104 |  1.4648 | 3.61 |
+-- |-------------------------|---------|---------|------------|-----------|--------|-------|-----------|---------|---------|------|
+--
+-- The timer was too coarse for these, so they are less accurate: "Army from Field", "Army from
+-- Meta", "ForkThread from Field".
 
--- PracticalTestArmyMeta: ~57ms
--- PracticalTestArmyCached: ~56ms
--- PracticalTestWeaponsMeta: ~56ms
--- PracticalTestWeaponsCached: ~93ms
+-- Each metatable level adds about 7 ns to finding the value. With `__index` functions instead of
+-- tables, depth 6 is 2.6x slower. On a unit, caching `ForkThread` on the instance makes reading it
+-- about 1.6x faster. Caching `Army` makes no measurable difference, since it is already set on the
+-- instance. These rows were too coarse for the timer, so the figures are rough.
 
 -- A few notes:
 -- - These tests assume that the value we're looking for is in the last metatable. If the value is found earlier then it is faster.
@@ -24,6 +39,7 @@
 -- are not worth caching. Instead, you may want to reduce the hierarchy.
 
 ModuleName = "Metatables"
+ModuleLoopCount = 200000
 BenchmarkData = {
     Depth1 = "Depth 1",
     Depth2 = "Depth 2",
@@ -64,12 +80,12 @@ function Depth1(loop)
     return final - start
 end
 
-function Depth2()
+function Depth2(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-    t2 = { key = "value", }
+    local t2 = { key = "value", }
     t2.__index = t2
-    t1 = { bob = "noise" }
+    local t1 = { bob = "noise" }
     setmetatable(t1, t2)
 
     local data
@@ -273,7 +289,7 @@ end
 
 function PracticalTestArmyMeta(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
-    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local data
     local start = timer()
 
@@ -283,12 +299,13 @@ function PracticalTestArmyMeta(loop)
 
     local final = timer()
     unit:Destroy()
+    unit = nil
     return final - start
 end
 
 function PracticalTestArmyCached(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
-    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
 
     unit.Army = unit.Army
 
@@ -301,12 +318,13 @@ function PracticalTestArmyCached(loop)
 
     local final = timer()
     unit:Destroy()
+    unit = nil
     return final - start
 end
 
 function PracticalTestWeaponsMeta(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
-    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
     local data
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
@@ -316,12 +334,13 @@ function PracticalTestWeaponsMeta(loop)
 
     local final = timer()
     unit:Destroy()
+    unit = nil
     return final - start
 end
 
 function PracticalTestWeaponsCached(loop)
     local timer = GetSystemTimeSecondsOnlyForProfileUse
-    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 1)
 
     unit.ForkThread = unit.ForkThread
 
@@ -334,5 +353,6 @@ function PracticalTestWeaponsCached(loop)
 
     local final = timer()
     unit:Destroy()
+    unit = nil
     return final - start
 end
