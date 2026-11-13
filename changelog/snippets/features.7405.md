@@ -1,0 +1,1 @@
+- Add a Share value to the Abandoned ACU lobby option: the allies of a player who leaves receive their ACU and all units for good, and the ACU counts as their own. Games with this setting are unrated. It replaces the "Union control upon disconnect" army control option (#7405).
