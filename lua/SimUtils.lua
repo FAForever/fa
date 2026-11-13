@@ -1323,6 +1323,10 @@ function ForwardAbandonedArmy(data)
 
         local tracked = abandoned.AbandonedUnits
         for _, unit in TransferUnitsOwnership(finished, to, false, true) or {} do
+            -- the units aren't lent by the ally that passed them on: they don't die with it
+            if unit.oldowner == army then
+                unit.oldowner = nil
+            end
             tracked[unit] = true
         end
         -- while the ACU recalls, the share condition can still apply to the rebuilt units
