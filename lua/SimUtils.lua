@@ -1228,9 +1228,9 @@ function GetShareRecipients(self, allies)
 end
 
 --- Sim callback: the player chooses the ally that receives their army when they leave the game.
---- The UI waits for the reply in `Sync.AbandonRecipientSet` before leaving, so that every client
---- has run the command.
----@param data { To: Army, Id?: string }
+--- The UI sends it right before leaving. A choice that is no longer valid, such as a defeated
+--- ally, is ignored and the default order applies.
+---@param data { To: Army }
 function SetAbandonRecipient(data)
     local army = GetCurrentCommandSourceArmy()
     local brain = army and ArmyBrains[army]
@@ -1245,13 +1245,6 @@ function SetAbandonRecipient(data)
     end
 
     brain.AbandonRecipient = to
-
-    -- the UI of the leaving player identifies its command by the id
-    local id = data.Id
-    if type(id) ~= 'string' or string.len(id) > 32 then
-        id = nil
-    end
-    Sync.AbandonRecipientSet = { Army = army, To = to, Id = id }
 end
 
 --- Applies the given share condition to my army right away, then kills what remains.
