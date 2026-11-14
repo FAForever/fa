@@ -70,12 +70,15 @@ jobs:
       # The engine FAF Develop runs: the notes of the latest faf-re release deploy-fafdevelop-engine.yaml uploaded
       - name: Add engine changelog
         if: inputs.additional-changelog == 'fafdevelop'
+        shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           FILE="${{ github.workspace }}/docs/_posts/fafdevelop.md"
-          RELEASE=$(gh release list --repo "${{ github.repository }}" --limit 100 --json tagName,createdAt \
-            --jq '[.[] | select(.tagName | startswith("fafre-"))] | sort_by(.createdAt) | last | .tagName // empty')
+          # The newest by when it was published (the API's created_at is the date of the release's commit)
+          RELEASE=$(gh api --paginate "repos/${{ github.repository }}/releases?per_page=100" \
+            --jq '.[] | select(.draft | not) | select(.tag_name | startswith("fafre-")) | "\(.published_at) \(.tag_name)"' \
+            | LC_ALL=C sort | tail -n 1 | cut -d' ' -f2)
           if [ -n "$RELEASE" ]; then
             echo "" >> "$FILE"
             gh release view "$RELEASE" --repo "${{ github.repository }}" --json body --jq .body >> "$FILE"
