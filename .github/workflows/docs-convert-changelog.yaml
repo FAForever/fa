@@ -67,7 +67,11 @@ jobs:
           # the changelog file might not exist
           if [ -f changelog-fafdevelop.md ]; then cat changelog-fafdevelop.md >> "$FILE"; fi
 
-      # The engine FAF Develop runs: the notes of the latest faf-re release deploy-fafdevelop-engine.yaml uploaded
+      # The engine FAF Develop runs: the notes of every faf-re upload by deploy-fafdevelop-engine.yaml since the
+      # latest game release, newest first, or of the latest upload when there was none since. Releases are ordered
+      # by when they were published (the API's created_at is the date of the release's commit). The notes come
+      # from the release list itself, so an upload replacing a record meanwhile can't fail this step; without the
+      # list the deployment goes on without them.
       - name: Add engine changelog
         if: inputs.additional-changelog == 'fafdevelop'
         shell: bash
@@ -75,13 +79,20 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           FILE="${{ github.workspace }}/docs/_posts/fafdevelop.md"
-          # The newest by when it was published (the API's created_at is the date of the release's commit)
-          RELEASE=$(gh api --paginate "repos/${{ github.repository }}/releases?per_page=100" \
-            --jq '.[] | select(.draft | not) | select(.tag_name | startswith("fafre-")) | "\(.published_at) \(.tag_name)"' \
-            | LC_ALL=C sort | tail -n 1 | cut -d' ' -f2)
-          if [ -n "$RELEASE" ]; then
+          if ! gh api --paginate "repos/${{ github.repository }}/releases?per_page=100" \
+              --jq '.[] | select(.draft | not) | {published_at, tag_name, body}' > releases.json; then
+            echo "::warning::No engine changelog: the release list could not be read"
+            exit 0
+          fi
+          jq -rs '
+            (map(select(.tag_name | test("^[0-9]+$"))) | map(.published_at) | max) as $release
+            | map(select(.tag_name | startswith("fafre-"))) | sort_by(.published_at) | reverse
+            | (map(select($release == null or .published_at > $release)) as $since
+               | if ($since | length) > 0 then $since else .[:1] end)
+            | .[] | .body + "\n"' releases.json > engine-notes.md
+          if [ -s engine-notes.md ]; then
             echo "" >> "$FILE"
-            gh release view "$RELEASE" --repo "${{ github.repository }}" --json body --jq .body >> "$FILE"
+            cat engine-notes.md >> "$FILE"
           fi
 
       - name: Download beta changelog

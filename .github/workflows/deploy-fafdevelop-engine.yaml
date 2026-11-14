@@ -21,10 +21,11 @@
 name: Deploy engine to FAF Develop
 
 # Uploads a release of the faf-re engine (https://github.com/Draiget/faf-re) as the executable of
-# FAF Develop. faf-re's own release workflow builds and publishes it; nothing is built here. The
-# notes for players of every faf-re release since the previous upload are kept as a release of this
-# repository, `fafre-<tag>`, and the FAF Develop changelog shows the latest of them at the next
-# FAF Develop deployment (docs-convert-changelog.yaml).
+# FAF Develop. faf-re's own release workflow builds and publishes it; nothing is built here. Each
+# upload is recorded as a release of this repository, `fafre-<tag>-run<number>.<attempt>`, holding the
+# notes for players of every faf-re release since the previous upload. The FAF Develop changelog shows
+# the uploads since the latest game release at the next FAF Develop deployment
+# (docs-convert-changelog.yaml).
 
 on:
   workflow_dispatch:
@@ -49,7 +50,7 @@ jobs:
     environment: deploy/fafdevelop
     runs-on: ubuntu-latest
     permissions:
-      contents: write # the fafre-<tag> release
+      contents: write # the fafre-<tag>-run<number>.<attempt> release
     env:
       GH_TOKEN: ${{ github.token }}
       TAG: ${{ inputs.tag }}
@@ -82,19 +83,35 @@ jobs:
             gh api --paginate "repos/$1/releases?per_page=100" \
               --jq '.[] | select(.draft | not) | "\(.published_at) \(.tag_name)"' | LC_ALL=C sort | cut -d' ' -f2
           }
-          PREVIOUS=$(releases "${{ github.repository }}" | { grep '^fafre-' || true; } | tail -n 1)
-          PREVIOUS=${PREVIOUS#fafre-}
+          # The faf-re release of the previous upload of another release (records are
+          # fafre-<tag>-run<number>.<attempt>): deploying the latest one again keeps the notes it joined
+          PREVIOUS=$(releases "${{ github.repository }}" | { grep '^fafre-' || true; } \
+            | sed -E 's/^fafre-//; s/-run[0-9]+\.[0-9]+$//' | { grep -vxF "$TAG" || true; } | tail -n 1)
           echo "Previous upload: ${PREVIOUS:-none}"
           # The releases after the previous upload and before this one; none on the first upload, or
-          # when going back to an earlier release
+          # when going back to an earlier release (the previous upload's release comes after this one)
           releases Draiget/faf-re \
             | awk -v prev="$PREVIOUS" -v tag="$TAG" \
-              '$0 == tag { found = 1; exit } on { print } prev != "" && $0 == prev { on = 1 }
+              '!found && $0 == tag { found = 1; next }
+               !found && on { print }
+               !found && prev != "" && $0 == prev { on = 1 }
+               found && prev != "" && $0 == prev { back = 1 }
                END { if (!found) { print "::error::" tag " is not a published faf-re release" > "/dev/stderr"; exit 1 }
-                     if (on) print prev > "since.txt" }' \
+                     if (on) print prev > "since.txt"
+                     if (back) print prev > "back.txt" }' \
             > releases.txt
           SINCE=$(cat since.txt 2>/dev/null || true)
+          BACK=$(cat back.txt 2>/dev/null || true)
           echo "$TAG" >> releases.txt
+          if [ -n "$BACK" ]; then
+            # Going back: this release's own changes were listed when it was first uploaded
+            {
+              printf '## faf-re %s\n\n' "$TAG"
+              echo "Back from faf-re $BACK: the changes listed for later engine releases are not in this one."
+            } > fafdevelop-notes.md
+            cat fafdevelop-notes.md
+            exit 0
+          fi
           mkdir -p notes
           : > lines.md
           while read -r RELEASE; do
@@ -121,13 +138,12 @@ jobs:
           "https://api.faforever.com/exe/upload" -F "modName=fafdevelop" -F "apiKey=${{ secrets.apiKey }}"
           -F "file=@main_x64.exe"
 
-      # A release deployed again (going back to it) gets its record anew, so it is the newest one. If
-      # this step fails, re-run the workflow: uploading the same exe again changes nothing.
+      # One record per upload, never replaced: a release deployed again gets a new one, which is the
+      # newest. If this step fails, re-run the workflow: uploading the same exe again changes nothing.
       - name: Record the deployment for the changelog
         shell: bash
+        env:
+          RECORD: fafre-${{ inputs.tag }}-run${{ github.run_number }}.${{ github.run_attempt }}
         run: |
-          if gh release view "fafre-$TAG" --repo "${{ github.repository }}" > /dev/null 2>&1; then
-            gh release delete "fafre-$TAG" --repo "${{ github.repository }}" --yes --cleanup-tag
-          fi
-          gh release create "fafre-$TAG" --repo "${{ github.repository }}" --target "${{ github.sha }}" \
+          gh release create "$RECORD" --repo "${{ github.repository }}" --target "${{ github.sha }}" \
             --title "faf-re $TAG on FAF Develop" --notes-file fafdevelop-notes.md --latest=false
