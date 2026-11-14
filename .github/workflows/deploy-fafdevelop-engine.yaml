@@ -1,0 +1,149 @@
+# Copyright (c) FAForever
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+name: Deploy engine to FAF Develop
+
+# Uploads a release of the faf-re engine (https://github.com/Draiget/faf-re) as the executable of
+# FAF Develop. faf-re's own release workflow builds and publishes it; nothing is built here. Each
+# upload is recorded as a release of this repository, `fafre-<tag>-run<number>.<attempt>`, holding the
+# notes for players of every faf-re release since the previous upload. The FAF Develop changelog shows
+# the uploads since the latest game release at the next FAF Develop deployment
+# (docs-convert-changelog.yaml).
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "faf-re release tag, for example 2026.11.009-nightly"
+        required: true
+        type: string
+
+concurrency:
+  # Its own group: the Lua deployments share `deployment` with cancel-in-progress, which would cancel
+  # an upload part-way. That group orders their pushes to the deploy branches; the API deploys the Lua
+  # afterwards, from the push. The exe upload is a separate API call. Runs of this workflow wait for
+  # each other.
+  group: deploy-fafdevelop-engine
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Upload faf-re to FAF Develop
+    # Holds the `apiKey` secret, the same key FA-Binary-Patches uploads with
+    environment: deploy/fafdevelop
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # the fafre-<tag>-run<number>.<attempt> release
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ inputs.tag }}
+    steps:
+      - name: Check the upload key
+        env:
+          API_KEY: ${{ secrets.apiKey }}
+        run: |
+          [ -n "$API_KEY" ] || { echo "::error::No apiKey secret in the deploy/fafdevelop environment"; exit 1; }
+
+      - name: Download the release
+        run: |
+          gh release download "$TAG" --repo Draiget/faf-re \
+            --pattern main_x64.exe --pattern SHA256SUMS.txt --pattern player-notes.md
+
+      # The checksums are published with the release by faf-re's release workflow.
+      - name: Check the checksum
+        run: |
+          grep -E ' \*?main_x64\.exe$' SHA256SUMS.txt | sha256sum --check --strict
+
+      # Each faf-re release's notes cover only the changes since the release before it, so the notes of
+      # every release since the previous upload are joined. Done before the upload: a failure here
+      # changes nothing on FAF Develop.
+      - name: Collect the notes since the previous upload
+        shell: bash
+        run: |
+          # A repository's releases, oldest first by when they were published (the API's created_at is
+          # the date of the release's commit)
+          releases() {
+            gh api --paginate "repos/$1/releases?per_page=100" \
+              --jq '.[] | select(.draft | not) | "\(.published_at) \(.tag_name)"' | LC_ALL=C sort | cut -d' ' -f2
+          }
+          # The faf-re release of the previous upload of another release (records are
+          # fafre-<tag>-run<number>.<attempt>): deploying the latest one again keeps the notes it joined
+          PREVIOUS=$(releases "${{ github.repository }}" | { grep '^fafre-' || true; } \
+            | sed -E 's/^fafre-//; s/-run[0-9]+\.[0-9]+$//' | { grep -vxF "$TAG" || true; } | tail -n 1)
+          echo "Previous upload: ${PREVIOUS:-none}"
+          # The releases after the previous upload and before this one; none on the first upload, or
+          # when going back to an earlier release (the previous upload's release comes after this one)
+          releases Draiget/faf-re \
+            | awk -v prev="$PREVIOUS" -v tag="$TAG" \
+              '!found && $0 == tag { found = 1; next }
+               !found && on { print }
+               !found && prev != "" && $0 == prev { on = 1 }
+               found && prev != "" && $0 == prev { back = 1 }
+               END { if (!found) { print "::error::" tag " is not a published faf-re release" > "/dev/stderr"; exit 1 }
+                     if (on) print prev > "since.txt"
+                     if (back) print prev > "back.txt" }' \
+            > releases.txt
+          SINCE=$(cat since.txt 2>/dev/null || true)
+          BACK=$(cat back.txt 2>/dev/null || true)
+          echo "$TAG" >> releases.txt
+          if [ -n "$BACK" ]; then
+            # Going back: this release's own changes were listed when it was first uploaded
+            {
+              printf '## faf-re %s\n\n' "$TAG"
+              echo "Back from faf-re $BACK: the changes listed for later engine releases are not in this one."
+            } > fafdevelop-notes.md
+            cat fafdevelop-notes.md
+            exit 0
+          fi
+          mkdir -p notes
+          : > lines.md
+          while read -r RELEASE; do
+            NOTES="notes/$RELEASE.md"
+            if [ "$RELEASE" = "$TAG" ]; then
+              NOTES=player-notes.md
+            else
+              ASSETS=$(gh release view "$RELEASE" --repo Draiget/faf-re --json assets --jq '.assets[].name')
+              # Releases before the notes existed carry none; any other failure stops the run
+              if printf '%s\n' "$ASSETS" | grep -qx 'player-notes.md'; then
+                gh release download "$RELEASE" --repo Draiget/faf-re --pattern player-notes.md --output "$NOTES"
+              fi
+            fi
+            if [ -f "$NOTES" ]; then grep '^- ' "$NOTES" >> lines.md || true; fi
+          done < releases.txt
+          {
+            printf '## faf-re %s\n\n' "$TAG"
+            if [ -s lines.md ]; then cat lines.md; else echo "No player-facing changes${SINCE:+ since $SINCE}."; fi
+          } > fafdevelop-notes.md
+          cat fafdevelop-notes.md
+
+      - name: Upload to server
+        run: curl -f -X "POST"
+          "https://api.faforever.com/exe/upload" -F "modName=fafdevelop" -F "apiKey=${{ secrets.apiKey }}"
+          -F "file=@main_x64.exe"
+
+      # One record per upload, never replaced: a release deployed again gets a new one, which is the
+      # newest. If this step fails, re-run the workflow: uploading the same exe again changes nothing.
+      - name: Record the deployment for the changelog
+        shell: bash
+        env:
+          RECORD: fafre-${{ inputs.tag }}-run${{ github.run_number }}.${{ github.run_attempt }}
+        run: |
+          gh release create "$RECORD" --repo "${{ github.repository }}" --target "${{ github.sha }}" \
+            --title "faf-re $TAG on FAF Develop" --notes-file fafdevelop-notes.md --latest=false

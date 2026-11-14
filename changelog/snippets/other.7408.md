@@ -1,0 +1,1 @@
+- (#7408) Add a workflow that uploads a release of the faf-re engine to FAF Develop, with its notes for players in the FAF Develop changelog
