@@ -58,10 +58,12 @@ local transferReasonToAnnouncementTitle = {
     ["Defectors"] = "<LOC lobui_0766>Defectors",
     ["CivilianDeserter"] = "<LOC lobui_0764>Civilian Desertion",
     ["AbandonedTemporary"] = "<LOC usersync_abandoned_title>Abandoned Army",
+    ["AbandonedPermanent"] = "<LOC usersync_abandoned_title>Abandoned Army",
 }
 
 local transferReasonToAnnouncementText = {
     ["AbandonedTemporary"] = "<LOC usersync_abandoned_text>%s\'s ACU and units have been transferred to you. If the ACU recalls in 30 seconds, you keep the units.",
+    ["AbandonedPermanent"] = "<LOC usersync_abandoned_permanent>%s\'s ACU and units have been transferred to you. The ACU counts as your own.",
 }
 
 -- Here's an opportunity for user side script to examine the Sync table for the new tick
