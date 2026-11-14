@@ -73,18 +73,22 @@ function HandleEsc(quit_game)
             return
         end
         GetCursor():Show()
-        local text3, fn3
-        if SessionIsActive() and SessionCanRestart() then
-            text3= "Restart Session"
-            fn3 = function () RestartSession() end
-        end
-        quickDialog = UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0000>Are you sure you'd like to quit?",
-            "<LOC _Yes>", function() SafeQuit() end,
-            "<LOC _No>", function() quickDialog:Destroy() quickDialog = false end,
-            text3, fn3,
-            true,
-            {escapeButton = 2, enterButton = 1}
-        )
+
+        -- a player who leaves while their army is in the game chooses the ally that receives it
+        import("/lua/ui/game/abandondialog.lua").ConfirmLeave(SafeQuit, function()
+            local text3, fn3
+            if SessionIsActive() and SessionCanRestart() then
+                text3= "Restart Session"
+                fn3 = function () RestartSession() end
+            end
+            quickDialog = UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0000>Are you sure you'd like to quit?",
+                "<LOC _Yes>", function() SafeQuit() end,
+                "<LOC _No>", function() quickDialog:Destroy() quickDialog = false end,
+                text3, fn3,
+                true,
+                {escapeButton = 2, enterButton = 1}
+            )
+        end)
     end
 
     if quit_game then

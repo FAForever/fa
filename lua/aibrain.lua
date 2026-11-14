@@ -66,6 +66,7 @@ local cachedPlatoonUnit = {}
 ---@field CustomUnits { [string]: EntityId[] }
 ---@field CommanderKilledBy Army        # Which army last killed one of our commanders. Used for transfering to killer in `demoralization` (Assassination) and `decapitation` victory.
 ---@field CommanderKilledTick number    # When one of our commanders last died. Used for transfering to killer in `decapitation` victory.
+---@field AbandonRecipient? Army         # The ally the player chose to receive their army when they leave the game, see `SimUtils.SetAbandonRecipient`.
 ---@field LastUnitKilledBy Army         # Which army last killed one of our units. Used for transfering to killer in other victory conditions.
 ---@field Army integer # Cached `GetArmyIndex` engine call
 AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent,
