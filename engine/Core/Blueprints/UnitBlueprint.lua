@@ -66,6 +66,11 @@
 --- if defined, the collision shape will be a sphere of this radius using the
 --- `CollisionSphereOffset` species of collision offsets
 ---@field SizeSphere? number
+--- Prefix of the strategic underlay textures that mark the ACU of an abandoned army while it
+--- recalls. Each variant is `<prefix>_<rrggbb>_rest.dds` in `/textures/ui/common/game/strategicicons/`,
+--- where `rrggbb` is the army color it is made for; the closest color is used. Strategic icon mods
+--- can set it per unit through `mod_icons.lua`. Defaults to `icon_abandoned`.
+---@field StrategicIconAbandonedUnderlay? string
 --- Whether this unit uses the mass-based veterancy system
 ---@field VetEnabled boolean
 --- Defines threshold when 

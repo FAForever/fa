@@ -155,6 +155,8 @@ end
 ---@field BlueprintId BlueprintId
 ---@field IconSet? string
 ---@field TypeId? string
+--- Prefix of the strategic underlay textures for the recalling ACU of an abandoned army, see `UnitBlueprint.StrategicIconAbandonedUnderlay`
+---@field AbandonedUnderlay? string
 
 --- Attempts to assign icons to units if they exist
 ---@param units UnitBlueprint[] all unit blueprints
@@ -165,16 +167,21 @@ local function AssignIcons(units, assignments, identifier)
 
     ---@param units UnitBlueprint[]
     ---@param id string
-    ---@param icon string
-    local function AssignBlueprintId(units, id, icon)
+    ---@param icon? string
+    ---@param abandonedUnderlay? string
+    local function AssignBlueprintId(units, id, icon, abandonedUnderlay)
         -- do not punish people for capitalization of unit database
         id = StringLower(id)
 
         -- check whether unit exists
         local unit = units[id]
         if unit then
-            local path = identifier .. "/" .. icon
-            unit.StrategicIconName =  path
+            if icon then
+                unit.StrategicIconName = identifier .. "/" .. icon
+            end
+            if abandonedUnderlay then
+                unit.StrategicIconAbandonedUnderlay = identifier .. "/" .. abandonedUnderlay
+            end
         end
     end
 
@@ -184,8 +191,8 @@ local function AssignIcons(units, assignments, identifier)
 
     if assignments then
         for _, info in assignments do
-            if info.BlueprintId and info.IconSet then
-                AssignBlueprintId(units, info.BlueprintId, info.IconSet)
+            if info.BlueprintId and (info.IconSet or info.AbandonedUnderlay) then
+                AssignBlueprintId(units, info.BlueprintId, info.IconSet, info.AbandonedUnderlay)
             elseif info.TypeId and info.Iconset then
                 AssignTypeId(units, info.TypeId, info.IconSet)
             end

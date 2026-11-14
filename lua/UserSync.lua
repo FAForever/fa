@@ -57,13 +57,11 @@ local transferReasonToAnnouncementTitle = {
     ["TransferToKiller"] = "<LOC lobui_0762>Traitors",
     ["Defectors"] = "<LOC lobui_0766>Defectors",
     ["CivilianDeserter"] = "<LOC lobui_0764>Civilian Desertion",
-    ["DisconnectShareTemporary"] = "<LOC usersync_0005>Disconnect Temporary Share",
-    ["DisconnectSharePermanent"] = "<LOC usersync_0006>Disconnect Share",
+    ["AbandonedTemporary"] = "<LOC usersync_abandoned_title>Abandoned Army",
 }
 
 local transferReasonToAnnouncementText = {
-    ["DisconnectShareTemporary"] = "<LOC usersync_0007>%s\'s units and ACU transferred to you until ACU dies/recalls",
-    ["DisconnectSharePermanent"] = "<LOC usersync_0008>%s\'s units and ACU transferred to you until ACU dies",
+    ["AbandonedTemporary"] = "<LOC usersync_abandoned_text>%s\'s ACU and units have been transferred to you. If the ACU recalls in 30 seconds, you keep the units.",
 }
 
 -- Here's an opportunity for user side script to examine the Sync table for the new tick
@@ -181,9 +179,9 @@ function OnSync()
                 local primary = LOC(transferReasonToAnnouncementTitle[reason] or "<LOC lobui_0742>Full Share")
                 local secondary = LOCF(transferReasonToAnnouncementText[reason] or "<LOC fullshare_announcement>%s\'s units have been transferred to you", other)
 
-                if reason == "DisconnectShareTemporary" or reason == "DisconnectSharePermanent" then
-                    local shareOption = SessionGetScenarioInfo().Options.DisconnectShare
-                    secondary = secondary .. LOCF("<LOC usersync_0009>\nShare Condition after: %s", LOC(transferReasonToAnnouncementTitle[shareOption] or "<LOC lobui_0744>Share Until Death"))
+                if reason == "AbandonedTemporary" then
+                    local shareOption = SessionGetScenarioInfo().Options.Share
+                    secondary = secondary .. LOCF("<LOC usersync_abandoned_share>\nIf the ACU is destroyed first: %s",LOC(transferReasonToAnnouncementTitle[shareOption] or "<LOC lobui_0744>Share Until Death"))
                 end
                 
                 UIUtil.CreateAnnouncementStd(primary, secondary, nil)
