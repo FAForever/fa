@@ -1227,6 +1227,19 @@ function GetShareRecipients(self, allies)
     return allies
 end
 
+--- Adds a unit to the units of an abandoned army that can be passed on. An upgrade replaces the
+--- unit with a new one, which takes its place.
+---@param tracked table<Unit, true>
+---@param unit Unit
+local function TrackAbandonedUnit(tracked, unit)
+    tracked[unit] = true
+    unit:AddOnUnitBuiltCallback(function(builder, built)
+        if tracked[builder] and built.Blueprint.General.UpgradesFrom == builder.UnitId then
+            TrackAbandonedUnit(tracked, built)
+        end
+    end, categories.ALLUNITS)
+end
+
 --- Remembers the units an abandoned army gave to its allies, so that an ally can pass them on
 --- with `ForwardAbandonedArmy`. When the player didn't choose who receives their army, every ally
 --- that received units is offered to pass them on.
@@ -1247,7 +1260,7 @@ function TrackAbandonedUnits(self, newUnits)
 
     local holders = {}
     for _, unit in newUnits do
-        tracked[unit] = true
+        TrackAbandonedUnit(tracked, unit)
         holders[unit.Army] = true
     end
 
@@ -1285,6 +1298,16 @@ function GetForwardableUnits(self, holder)
     return units
 end
 
+--- Tells the UI of the ally that tried to pass an abandoned army on whether it worked.
+---@param from Army # the abandoned army
+---@param army Army # the ally that passed it on
+---@param to Army
+---@param accepted boolean
+local function SyncForwardResult(from, army, to, accepted)
+    Sync.AbandonForwardResults = Sync.AbandonForwardResults or {}
+    table.insert(Sync.AbandonForwardResults, { From = from, Army = army, To = to, Accepted = accepted })
+end
+
 --- Sim callback: an ally that received the army of a player who left without choosing a recipient
 --- passes it on to another ally. Allies that already passed this army on can't receive it again.
 ---@param data { From: Army, To: Army }
@@ -1297,18 +1320,21 @@ function ForwardAbandonedArmy(data)
 
     local from, to = data.From, data.To
     local abandoned = type(from) == 'number' and ArmyBrains[from]
-    local toBrain = type(to) == 'number' and ArmyBrains[to]
-    if not abandoned or not abandoned.AbandonedUnits or abandoned.AbandonRecipient
-        or not toBrain or to == army or toBrain:IsDefeated() or ArmyIsCivilian(to) or not IsAlly(army, to)
-        or abandoned.AbandonForwarders[to] or abandoned.AbandonForwarders[army]
-    then
+    if not abandoned or not abandoned.AbandonedUnits then
         return
     end
 
+    local toBrain = type(to) == 'number' and ArmyBrains[to]
     local units = GetForwardableUnits(abandoned, army)
-    if table.empty(units) then
+    if abandoned.AbandonRecipient or table.empty(units)
+        or not toBrain or to == army or toBrain:IsDefeated() or ArmyIsCivilian(to) or not IsAlly(army, to)
+        or abandoned.AbandonForwarders[to] or abandoned.AbandonForwarders[army]
+    then
+        SyncForwardResult(from, army, to, false)
         return
     end
+
+    -- also blocks a second request while the units move
     abandoned.AbandonForwarders[army] = true
 
     ForkThread(function()
@@ -1322,12 +1348,14 @@ function ForwardAbandonedArmy(data)
         end
 
         local tracked = abandoned.AbandonedUnits
+        local moved = 0
         for _, unit in TransferUnitsOwnership(finished, to, false, true) or {} do
             -- the units aren't lent by the ally that passed them on: they don't die with it
             if unit.oldowner == army then
                 unit.oldowner = nil
             end
-            tracked[unit] = true
+            TrackAbandonedUnit(tracked, unit)
+            moved = moved + 1
         end
         -- while the ACU recalls, the share condition can still apply to the rebuilt units
         local borrowed = false
@@ -1338,9 +1366,18 @@ function ForwardAbandonedArmy(data)
             if borrowed then
                 MarkSharedUnit(unit, from)
             end
-            tracked[unit] = true
+            TrackAbandonedUnit(tracked, unit)
+            moved = moved + 1
         end
 
+        -- units being captured can't move: if none did, the ally can still try again
+        if moved == 0 then
+            abandoned.AbandonForwarders[army] = nil
+            SyncForwardResult(from, army, to, false)
+            return
+        end
+
+        SyncForwardResult(from, army, to, true)
         SyncAbandonedArmyReceived(abandoned, to)
     end)
 end
