@@ -1,1 +1,1 @@
-- When you leave a multiplayer game while your army is still in it, choose which ally receives your army. Allies are listed by rating and then score, the order used when nobody is chosen. If the game is paused, the army is handed over when it resumes, or you can leave anyway (#7403).
+- When you leave a multiplayer game while your army is still in it, choose which ally receives your army. Allies are listed with their faction and rating, in the order used when nobody is chosen: by rating and then score (#7403).
