@@ -598,18 +598,37 @@ function AllSelectableMods()
     return selectableMods
 end
 
---- Topological sort the mods using before/after lists  
+--- Returns the keys of a UID-keyed table as a sorted array.
+---
+--- The iteration order of a hash table depends on its size and on the order its keys were inserted,
+--- which in turn depends on which mods each player has installed. Iterating over the sorted UIDs
+--- makes the load order the same on every machine, which is required for the sim to stay in sync.
+---@param mods table<string, ModInfo> keys are UID's
+---@return string[]
+local function SortedUids(mods)
+    local uids = {}
+    for uid in mods do
+        table.insert(uids, uid)
+    end
+    table.sort(uids)
+    return uids
+end
+
+--- Topological sort the mods using before/after lists. Mods without an ordering constraint between
+--- them end up in descending UID order, so that the result is the same on every machine.
 --- log a warning and return `nil` in case of a cycle
 ---@param mods_to_sort table<string, ModInfo> keys are UID's
 ---@return ModInfo[] | nil
 local function ModTopSort(mods_to_sort)
+    local uids = SortedUids(mods_to_sort)
+
     ---@type table<string, string[]>
     local required_for = {}
-    for uid in mods_to_sort do
+    for _, uid in uids do
         required_for[uid] = {}
     end
 
-    for uid in mods_to_sort do
+    for _, uid in uids do
         local mod = _mod_cache[uid]
         local before_mods = mod.before
         local after_mods = mod.after
@@ -652,9 +671,9 @@ local function ModTopSort(mods_to_sort)
     end
 
     -- traverse the directed graph and look for cycles
-    for uid in mods_to_sort do
+    for _, uid in uids do
         if HasCycle(uid) then
-            WARN('Inconsistent mod order lists, load order will be arbitrary')
+            WARN('Inconsistent mod order lists, ignoring them and loading the mods in UID order')
             return
         end
     end
@@ -684,8 +703,8 @@ local function GetActiveModsFiltered(filter, selected)
     local active_mods = ModTopSort(filtered)
     if active_mods == nil then
         active_mods = {}
-        for _, mod in filtered do
-            table.insert(active_mods, mod)
+        for _, uid in SortedUids(filtered) do
+            table.insert(active_mods, filtered[uid])
         end
     end
 
