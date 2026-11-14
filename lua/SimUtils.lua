@@ -239,6 +239,20 @@ end
 
 local sharedUnits = {}
 
+--- Marks a unit as shared by `owner`, so that the share condition applies to it when `owner` is
+--- defeated, as `TransferUnitsOwnership` does for transferred units.
+---@param unit Unit
+---@param owner Army
+function MarkSharedUnit(unit, owner)
+    unit.oldowner = owner
+    local sharedUnitsTable = sharedUnits[owner]
+    if not sharedUnitsTable then
+        sharedUnitsTable = {}
+        sharedUnits[owner] = sharedUnitsTable
+    end
+    table.insert(sharedUnitsTable, unit)
+end
+
 --- Transfers units to an army, returning the new units (since changing the army
 --- replaces the units with new ones)
 ---@param units Unit[]
@@ -666,6 +680,7 @@ function TryRebuildUnits(trackers, army)
         if newUnit and math.abs(progressDif) < 0.001 then
             newUnit:SetHealth(newUnit, tracker.UnitHealth)
             tracker.Success = true
+            tracker.NewUnit = newUnit
         end
         rebuilder:Destroy()
     end
@@ -710,17 +725,27 @@ end
 ---@see AddConstructionProgress # doesn't destroy and rebuild the unit
 ---@param units Unit[]
 ---@param armies Army[]
+---@return Unit[] rebuiltUnits
 function RebuildUnits(units, armies)
     local trackers, blockingEntities = StartRebuildUnits(units)
     for _, army in armies do
         TryRebuildUnits(trackers, army)
     end
     FinalizeRebuiltUnits(trackers, blockingEntities)
+
+    local rebuiltUnits = {}
+    for _, tracker in trackers do
+        if tracker.NewUnit then
+            table.insert(rebuiltUnits, tracker.NewUnit)
+        end
+    end
+    return rebuiltUnits
 end
 
 --- Takes the units and tries to rebuild them for each army (in order).
 ---@param units Unit[]
 ---@param armies Army[]
+---@return Unit[]? rebuiltUnits
 function TransferUnfinishedUnitsAfterDeath(units, armies)
     local unbuiltUnits = {}
     local unbuiltUnitCount = 0
@@ -740,7 +765,7 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
     if not (unbuiltUnits[1] and armies[1]) then
         return
     end
-    RebuildUnits(unbuiltUnits, armies)
+    return RebuildUnits(unbuiltUnits, armies)
 end
 
 ---@param data {To: integer}
@@ -910,16 +935,19 @@ function TransferUnitsToBrain(self, brains, transferUnfinishedUnits, categoriesT
     end
     categoriesToTransfer = categoriesToTransfer or defaultTransferCategory
 
+    local totalNewUnits = {}
+
     if transferUnfinishedUnits then
         local indexes = {}
         for _, brain in brains do
             table.insert(indexes, brain.Army)
         end
         local units = self:GetListOfUnits(categoriesToTransfer, false)
-        TransferUnfinishedUnitsAfterDeath(units, indexes)
+        local rebuiltUnits = TransferUnfinishedUnitsAfterDeath(units, indexes)
+        if rebuiltUnits then
+            table.destructiveCat(totalNewUnits, rebuiltUnits)
+        end
     end
-
-    local totalNewUnits = {}
 
     for _, brain in brains do
         local units = self:GetListOfUnits(categoriesToTransfer, false)
@@ -1378,7 +1406,15 @@ function RecallAbandonedArmy(self, allies)
         MarkRecallingCommander(recall, unit)
     end
 
-    TransferUnitsToBrain(self, allies, true, categories.ALLUNITS, "AbandonedTemporary")
+    local transferTick = GetGameTick()
+    local newUnits = TransferUnitsToBrain(self, allies, true, categories.ALLUNITS, "AbandonedTemporary")
+
+    -- rebuilt unfinished units are new units: they belong to this army for the share condition
+    for _, unit in newUnits or {} do
+        if not unit.oldowner then
+            MarkSharedUnit(unit, selfIndex)
+        end
+    end
 
     -- outside of Assassination an army can abandon without ACUs: the transfer is then final
     local hadCommanders = not table.empty(recall.Commanders)
@@ -1391,7 +1427,7 @@ function RecallAbandonedArmy(self, allies)
                 -- the ACU died in its holder's army, which recorded the killer: the abandoned army
                 -- needs it for the Traitors share condition
                 local holder = unit.Brain
-                if holder and holder.CommanderKilledTick and holder.CommanderKilledTick >= GetGameTick() - 1 then
+                if holder and holder.CommanderKilledTick and holder.CommanderKilledTick >= transferTick then
                     self.CommanderKilledBy = holder.CommanderKilledBy
                     self.CommanderKilledTick = holder.CommanderKilledTick
                 end
