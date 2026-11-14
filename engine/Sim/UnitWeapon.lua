@@ -222,7 +222,13 @@ end
 function UnitWeapon:SetTargetingPriorities(priorities)
 end
 
---- Transfers target from this weapon to another.  
+--- Sets the per-weapon engine fire lock.
+--- While busy the weapon itself cannot fire.
+---@param busy boolean
+function UnitWeapon:SetWeaponBusy(busy)
+end
+
+--- Transfers target from this weapon to another.
 --- The other weapon may still change targets automatically afterwards.
 ---@param otherWeapon Weapon
 function UnitWeapon:TransferTarget(otherWeapon)

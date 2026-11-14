@@ -524,6 +524,9 @@ end
 function Unit:SetBuildRate(rate)
 end
 
+--- Sets the unit's busy state. The engine reads it to progress tactical/nuke launch orders and factory build
+--- orders, and anti-projectile weapons don't acquire projectiles while the unit is busy. The `Unit` class
+--- override also holds every weapon of the unit from firing.
 ---@param busy boolean
 function Unit:SetBusy(busy)
 end

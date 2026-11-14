@@ -10,6 +10,8 @@ local AAAZealotMissileWeapon = WeaponsFile.AAAZealotMissileWeapon
 local AAMWillOWisp = WeaponsFile.AAMWillOWisp
 
 local ExternalFactoryComponent = import("/lua/defaultcomponents.lua").ExternalFactoryComponent
+-- only set the engine's unit busy flag for building: `Unit.SetBusy` would also stop the weapons from firing
+local UnitSetBusy = moho.unit_methods.SetBusy
 
 ---@class UAS0303 : AircraftCarrier, ExternalFactoryComponent
 UAS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
@@ -47,7 +49,7 @@ UAS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
     IdleState = State {
         Main = function(self)
             self:DetachAll(self.BuildAttachBone)
-            self:SetBusy(false)
+            UnitSetBusy(self, false)
             self:OnIdle()
         end,
 
@@ -62,7 +64,7 @@ UAS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
         Main = function(self)
             ---@type Unit
             local unitBuilding = self.UnitBeingBuilt
-            self:SetBusy(true)
+            UnitSetBusy(self, true)
             local bone = self.BuildAttachBone
             self:DetachAll(bone)
             unitBuilding:AttachTo(self, bone)
