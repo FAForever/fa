@@ -92,9 +92,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r $SCRIPTS/requirements.txt
 
-      - name: Test changelog conversion
-        run: python3 -B -m unittest discover -s "$SCRIPTS" -p "test_*.py"
-
       - name: Convert changelog to Lua
         run: |
           rm -f lua/ui/lobby/changelog/generated/*

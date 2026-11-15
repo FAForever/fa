@@ -66,13 +66,13 @@ def convert_changelog(markdown: Path, lua: Path):
 def markdown2lua(version: str, content: str) -> str:
     """Converts markdown content to Lua format, excluding YAML front matter."""
     yaml_content, markdown_content = extract_yaml_front_matter(content)
-    markdown_content = remove_liquid_tags(markdown_content)
     formatted_md = mdformat.text(
         markdown_content,
         options={
             "wrap": MAX_LINE_LENGTH,
         },
     )
+    formatted_md = remove_liquid_tags(formatted_md)
 
     escaped_md = escape_special_symbols(formatted_md)
     lua_description = ",\n".join(
@@ -100,9 +100,9 @@ def extract_yaml_front_matter(content: str) -> Tuple[str, str]:
 
 
 def remove_liquid_tags(text: str) -> str:
-    """Removes Liquid tags without removing the text between them."""
-    pattern = r"{%.*?%}"
-    return re.sub(pattern, "", text, flags=re.DOTALL)
+    """Removes all Liquid block tags like {% ... %} from the given text."""
+    pattern = r"{%.*?%}\s*\n"
+    return re.sub(pattern, "", text)
 
 
 def escape_special_symbols(text: str) -> str:

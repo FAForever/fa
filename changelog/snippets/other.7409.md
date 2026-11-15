@@ -1,4 +1,4 @@
 - Fix dates, formatting, and links in historical changelogs.
 
-  Correct unit names and remove visible template markup from the in-game changelog (#7409).
+  Correct unit names and normalize balance stat formatting across release notes (#7409).
 

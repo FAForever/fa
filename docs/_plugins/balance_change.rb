@@ -9,22 +9,22 @@ Jekyll::Hooks.register [:pages, :documents], :post_render do |doc|
 
   next unless apply
 
-  # Match plain text segments and inline formatting tags without crossing arrows
-  # (-&gt;), block elements, or links (such as PR links in prose).
-  atom = '(?:[^<-]|-(?!&gt;)|<code(?:\s[^>]*)?>[^<]*<\/code>|<strong(?:\s[^>]*)?>[^<]*<\/strong>|<em(?:\s[^>]*)?>[^<]*<\/em>)'
-
-  # Style individual stat changes first so stat bullets with nested lists keep
-  # their .change/.old/.new classes instead of matching as category headers.
+  # This regex takes the generated html and applies the necessary css classes to
+  # balance changes. We search for item lists with the characteristic formatting,
+  # ending with a colon in the first line and having an arrow (-&gt; in html) in
+  # the second. This is specific enough to not accidentally catch normal text or
+  # itemized lists.
+  # The unit icon and title is handled by unit_block.rb.
+  # Use https://regex101.com/ to debug the regex.
   doc.output.gsub!(
-    /(<li(?:\s[^>]*)?>(?:\s*<p>)?\s*)(#{atom}+:\s)(#{atom}+?)\s-&gt;\s(#{atom}+?)(\s*(?:<\/p>|<ul|<\/li>))/,
-    '\1<span class="change">\2</span><span class="old">\3</span> → <span class="new">\4</span>\5'
+    /<li>([^<]+?)<ul>\s*<li>([^<]+?:\s)([^<]+)\s-&gt;\s([^<]+)<\/li>/,
+    '<li><span class="change-category">\1</span><ul> <li><span class="change">\2</span><span class="old">\3</span> → <span class="new">\4</span></li>'
   )
 
-  # Wrap category headers (such as weapon or upgrade names) that precede nested
-  # stat changes, avoiding full sentences ending in a period.
+  # Needed if there is more than one change per category
   doc.output.gsub!(
-    /(<li(?:\s[^>]*)?>(?:\s*<p>)?\s*)(#{atom}+?)(?<!\.)(\s*(?:<\/p>)?\s*<ul[^>]*>\s*<li(?:\s[^>]*)?>(?:\s*<p>)?\s*<span class="change">)/,
-    '\1<span class="change-category">\2</span>\3'
+    /<li>([^<]+?:\s)([^<]+)\s-&gt;\s([^<]+)<\/li>/,
+    '<li><span class="change">\1</span><span class="old">\2</span> → <span class="new">\3</span></li>'
   )
 
 end
