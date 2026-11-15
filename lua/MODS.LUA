@@ -598,29 +598,16 @@ function AllSelectableMods()
     return selectableMods
 end
 
---- Returns the keys of a UID-keyed table as a sorted array.
----
---- Iteration order over the hash table of mods depends on how many mods the player
---- has installed, which can result in desyncs due to different mod load orders.
---- Sorting into an array prevents this.
----@param mods table<string, ModInfo> # keys are UID's
----@return string[]
-local function SortedUids(mods)
-    local uids = {}
-    for uid in mods do
-        table.insert(uids, uid)
-    end
-    table.sort(uids)
-    return uids
-end
-
 --- Topological sort the mods using before/after lists. Mods without an ordering constraint between
 --- them end up in descending UID order, so that the result is the same on every machine.
 --- log a warning and return `nil` in case of a cycle
 ---@param mods_to_sort table<string, ModInfo> keys are UID's
 ---@return ModInfo[] | nil
 local function ModTopSort(mods_to_sort)
-    local uids = SortedUids(mods_to_sort)
+    -- Iteration order over the hash table of mods depends on how many mods the player
+    -- has installed, which can result in desyncs due to different mod load orders.
+    -- Sorting into an array prevents this.
+    local uids = table.keys(mods_to_sort)
 
     ---@type table<string, string[]>
     local required_for = {}
@@ -703,7 +690,7 @@ local function GetActiveModsFiltered(filter, selected)
     local active_mods = ModTopSort(filtered)
     if active_mods == nil then
         active_mods = {}
-        for _, uid in SortedUids(filtered) do
+        for _, uid in table.keys(filtered) do
             table.insert(active_mods, filtered[uid])
         end
     end
