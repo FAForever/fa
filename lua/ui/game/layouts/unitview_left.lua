@@ -30,7 +30,14 @@ local iconTextures = {
     UIUtil.UIFile('/game/unit_view_icons/reclaim_alt_energy.dds'),
 }
 
+-- unitview.lua calls PositionWindow and UpdateStatusBars every frame. They anchor only when the branch they
+-- take changes: anchoring again every frame laid the whole panel out every frame. SetLayout forgets them.
+local positionedFor = nil
+local statusBarsFor = nil
+
 function SetLayout()
+    positionedFor = nil
+    statusBarsFor = nil
     controls.bg:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/build-over-back_bmp.dds'))
     LayoutHelpers.AtLeftIn(controls.bg, controls.parent)
     LayoutHelpers.AtBottomIn(controls.bg, controls.parent)
@@ -172,6 +179,11 @@ function SetBG(controls)
 end
 
 function PositionWindow()
+    local branch = consControl:IsHidden() and 1 or 2
+    if branch == positionedFor then
+        return
+    end
+    positionedFor = branch
     if consControl:IsHidden() then
         LayoutHelpers.AtBottomIn(controls.bg, controls.parent)
         LayoutHelpers.AtLeftIn(controls.bg, consControl, 18)
@@ -190,6 +202,11 @@ function PositionWindow()
 end
 
 function UpdateStatusBars(controls)
+    local branch = options.gui_detailed_unitview ~= 0 and (controls.store == 1 and 1 or 2) or 0
+    if branch == statusBarsFor then
+        return
+    end
+    statusBarsFor = branch
     if options.gui_detailed_unitview ~= 0 and controls.store == 1 then
         LayoutHelpers.CenteredBelow(controls.fuelBar, controls.shieldBar,3)
         LayoutHelpers.CenteredBelow(controls.shieldText, controls.fuelBar,-2.5)
