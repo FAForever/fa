@@ -167,6 +167,23 @@ function AddEndBehavior(behavior, identifier)
     end
 end
 
+local function SetExplicitReclaimCameraMode(mode, data)
+    local enabled = mode == 'order' and data and data.name == 'RULEUCC_Reclaim'
+    local distance = 150
+
+    if enabled then
+        distance = Prefs.GetFieldFromCurrentProfile('options').explicit_reclaim_camera_distance or distance
+    end
+
+    ConExecute('ui_ReclaimCameraDistance ' .. tostring(distance))
+end
+
+ConExecute('ui_ReclaimCameraDistance 150')
+AddStartBehavior(SetExplicitReclaimCameraMode, 'ExplicitReclaimCameraDistance')
+AddEndBehavior(function()
+    ConExecute('ui_ReclaimCameraDistance 150')
+end, 'ExplicitReclaimCameraDistance')
+
 --- usually changing selection ends the command mode, this allows us to ignore that
 local ignoreSelection = false
 function SetIgnoreSelection(ignore)

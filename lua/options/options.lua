@@ -296,6 +296,21 @@ options = {
                 },
             },
 
+            {
+                title = "Reclaim Mode Distance",
+                key = 'explicit_reclaim_camera_distance',
+                type = 'slider',
+                default = 150,
+                set = function(key, value, startup)
+                    ConExecute("ui_ReclaimCameraDistance 150")
+                end,
+                custom = {
+                    min = 150,
+                    max = 900,
+                    inc = 10,
+                },
+            },
+
             -- TODO: what to do with this?
             {
                 title = "<LOC OPTIONS_0159>Arrow Keys Pan Main View",
