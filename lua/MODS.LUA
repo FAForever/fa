@@ -600,10 +600,10 @@ end
 
 --- Returns the keys of a UID-keyed table as a sorted array.
 ---
---- The iteration order of a hash table depends on its size and on the order its keys were inserted,
---- which in turn depends on which mods each player has installed. Iterating over the sorted UIDs
---- makes the load order the same on every machine, which is required for the sim to stay in sync.
----@param mods table<string, ModInfo> keys are UID's
+--- Iteration order over the hash table of mods depends on how many mods the player
+--- has installed, which can result in desyncs due to different mod load orders.
+--- Sorting into an array prevents this.
+---@param mods table<string, ModInfo> # keys are UID's
 ---@return string[]
 local function SortedUids(mods)
     local uids = {}
