@@ -174,7 +174,8 @@ local WorldLabel = ClassUI(Group) {
     ---@param reclaimData UIReclaimDataCombined
     ---@return number
     CalculateFontSizeFromMass = function(self, reclaimData)
-        local scaling = 0.02 * Prefs.GetFromCurrentProfile('options.reclaim_overview_size_scale')
+        -- a profile that never saved the option has none: use its default from options.lua
+        local scaling = 0.02 * (Prefs.GetFromCurrentProfile('options.reclaim_overview_size_scale') or 10)
         if scaling == 0 then
             return 10
         end
