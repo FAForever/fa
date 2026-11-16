@@ -32,11 +32,12 @@ GPG-modified **LuaPlus 5.0**, not 5.1+. [Details](docs/development-start-here/lu
 - `{&h &a}` pre-allocates hash and array slots ([performance.md](performance.md#allocations)).
 - **Indexing `nil` returns `nil`.** `t.a.b` is `nil` when `t.a` is missing, and the repo relies on this. Don't add `and` guards or treat such chains as bugs. Calling `nil` and `t[nil] = v` still error.
 - `io` and `os` exist only in the init context. No `require` or C modules.
+- The init files (`init_*.lua`) can use only the globals in [init_data.md](init_data.md). There is no `ConExecute`, and `import` returns `false`.
 - A thread can't yield inside `pcall` or a metamethod. `WaitSeconds` and the other waits there fail with "attempt to yield across metamethod/C-call boundary". Wait outside the `pcall`.
 
 ### Runtime changes to Lua behavior
 
-[lua/system/config.lua](lua/system/config.lua) changes how code fails, in every state ([details](lua/system/AGENTS.md#runtime-changes-to-lua-behavior)):
+[lua/system/config.lua](lua/system/config.lua) changes how code fails, in every state except init ([details](lua/system/AGENTS.md#runtime-changes-to-lua-behavior)):
 
 - Reading an undefined global errors. Probe optional globals and context-specific engine functions with `rawget(_G, "Name")`.
 - Setting a field on `nil`, a boolean, number, string or thread errors.

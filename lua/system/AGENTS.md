@@ -10,7 +10,7 @@ The engine runs one init file to set up each state, then calls Lua entry points 
 
 | Context | Init file | Entry points the engine calls | Notes |
 |---|---|---|---|
-| Init | `init_faf.lua` / `init_fafbeta.lua` / `init_fafdevelop.lua` | | Mounts directories and archives. `io`/`os` available. |
+| Init | `init_faf.lua` / `init_fafbeta.lua` / `init_fafdevelop.lua` | | Mounts directories and archives. Has only the globals in [init_data.md](../../init_data.md): `io` and `os`, but no other engine functions such as `ConExecute`, and `import` returns `false`. `config.lua` doesn't run. |
 | Blueprint loading | [lua/RuleInit.lua](../../lua/RuleInit.lua) | | The game rules' own state. Runs `config.lua`, `utils.lua` and other system files (not `globalInit.lua`), then [lua/system/Blueprints.lua](Blueprints.lua) `LoadBlueprints()` to load and post-process all `*.bp` files and mod blueprints. The engine exports the results to the session UI and sim states as `__blueprints`. |
 | Main menu UI | [lua/userInit.lua](../../lua/userInit.lua) | [lua/ui/uimain.lua](../../lua/ui/uimain.lua): `StartSplashScreen`, `StartFrontEndUI`, `StartHostLobbyUI`, `StartJoinLobbyUI`. [lua/SinglePlayerLaunch.lua](../../lua/SinglePlayerLaunch.lua): `StartCommandLineSession` for the `/map` and `/scenario` command-line arguments. | The user state created at startup. `userInit.lua` sets up user globals and runs `globalInit.lua`. Splash, menus, lobby. |
 | Session UI ("user") | [lua/SessionInit.lua](../../lua/SessionInit.lua) | `uimain.lua`: `StartGameUI`, plus callbacks such as `ShowEscapeDialog`, `UpdateDisconnectDialog`, `ShowDesyncDialog`, `StartCursorText`. | A fresh state per session. `SessionInit.lua` runs `userInit.lua` first, then adds UI mods and `UserSync.lua`. In-game UI, local to one player. |
@@ -48,9 +48,9 @@ When adding new code, use `import` and module-scope variables. Only add a state 
 
 ## Runtime changes to Lua behavior
 
-[lua/system/config.lua](config.lua) runs early in every Lua state and changes some default behavior. These change how code fails:
+[lua/system/config.lua](config.lua) runs early in every Lua state except the init state, and changes some default behavior. These change how code fails:
 
-- **Reading an undefined global raises an error** ("access to nonexistent global variable") instead of returning `nil`. Modules see this too, because their environment falls through to `_G`. `if SomeOptionalGlobal then` errors when the global is missing. Probe with `rawget(_G, "SomeOptionalGlobal")` instead, as the init files do for `SetProcessPriority`. The same applies to engine functions that exist in only one context (sim vs. user).
+- **Reading an undefined global raises an error** ("access to nonexistent global variable") instead of returning `nil`. Modules see this too, because their environment falls through to `_G`. `if SomeOptionalGlobal then` errors when the global is missing. Probe with `rawget(_G, "SomeOptionalGlobal")` instead. The same applies to engine functions that exist in only one context (sim vs. user).
 - **Setting a field on `nil`, a boolean, a number or a string raises an error.** Reading a field on `nil` still returns `nil`. Stock LuaPlus allows it, storing the value on the type's shared metatable. Strings are locked at the end of [lua/system/utils.lua](utils.lua), after that file adds the extra `string.*` functions.
 - **Threads have a metatable.** `thread:Destroy()` calls `KillThread`, which is why threads can go in a `TrashBag`. Setting a field on a thread raises an error, so store thread state on the owning object.
 - **`math.random` is replaced by the engine's `Random`.** In the sim, `Random` uses the synchronized RNG, so it is safe for determinism. It follows `Random`'s argument semantics ([engine/Core.lua](../../engine/Core.lua)), not stock `math.random`'s.
