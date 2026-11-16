@@ -228,7 +228,7 @@ OffScreenIndicator = Class(Button) {
         self:UpdateTextures(self.TextureSet.East)
 
         ReusedLayoutFor(self)
-            :AnchorToRight(self)
+            :Right(self.WorldView.Right)
             :Top(function() return self.WorldView.Top() + controlSpaceCoordinates.y - self.Height() / 2 end)
             :ResetBottom()
             :ResetLeft()
