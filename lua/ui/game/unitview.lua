@@ -390,43 +390,119 @@ function CreateQueueGrid(parent)
     controls.queue:Hide()
 end
 
+-- UpdateWindow runs every frame while a unit is selected or under the cursor (the panel's OnFrame). Setting a control
+-- to the texture, text, font, value or shown state it already has still costs the engine and the layout their work,
+-- and hiding a control only to show it again later in the same frame runs its OnHide callbacks twice. So UpdateWindow
+-- works out each control's final state first and sets it through the helpers below, which compare before they set.
+-- Text, bar values and the shown state are compared with what the control holds. Textures and fonts can't be read
+-- back, so the last ones set through these helpers are remembered per control; SetLayout forgets them, as the layout
+-- files set textures and fonts of their own.
+local setTextures = setmetatable({}, { __mode = 'k' })
+local setFontFamilies = setmetatable({}, { __mode = 'k' })
+local setFontSizes = setmetatable({}, { __mode = 'k' })
+local sizedEnhancements = setmetatable({}, { __mode = 'k' })
+-- The unit name and the ability list are worked out from the blueprint: they are laid out again only when it changes.
+local nameShownFor = nil
+local abilitiesShownFor = nil
+
+local function SetTexture(control, texture)
+    if setTextures[control] ~= texture then
+        setTextures[control] = texture
+        control:SetTexture(texture)
+    end
+end
+
+local function SetSolidColor(control, color)
+    local key = 'color:' .. color
+    if setTextures[control] ~= key then
+        setTextures[control] = key
+        control:SetSolidColor(color)
+    end
+end
+
+local function SetText(control, text)
+    text = tostring(text)
+    if control:GetText() ~= text then
+        control:SetText(text)
+    end
+end
+
+local function SetFont(control, family, size)
+    if setFontFamilies[control] ~= family or setFontSizes[control] ~= size then
+        setFontFamilies[control] = family
+        setFontSizes[control] = size
+        control:SetFont(family, size)
+    end
+end
+
+local function SetShown(control, shown)
+    if shown then
+        if control:IsHidden() then
+            control:Show()
+        end
+    elseif not control:IsHidden() then
+        control:Hide()
+    end
+end
+
+local function SetBarValue(bar, value)
+    if bar._value() ~= value then
+        bar:SetValue(value)
+    end
+end
+
+--- Forgets what the helpers above remember, for a layout that sets the panel's textures and fonts again.
+local function ForgetSetValues()
+    setTextures = setmetatable({}, { __mode = 'k' })
+    setFontFamilies = setmetatable({}, { __mode = 'k' })
+    setFontSizes = setmetatable({}, { __mode = 'k' })
+    sizedEnhancements = setmetatable({}, { __mode = 'k' })
+    nameShownFor = nil
+    abilitiesShownFor = nil
+end
+
 ---@param info RolloverInfo
 function UpdateWindow(info)
+    -- the final state of the controls that more than one part below decides
+    local fuelShown, fuelValue = false, nil
+    local vetShown = false
+    local reclaimShown = false
+    local shieldTextShown, shieldText = false, nil
+    local healthText = nil
+    local vetStars = 0
+    local vetStarTexture = nil
+
     if info.blueprintId == 'unknown' then
-        controls.name:SetText(LOC('<LOC rollover_0000>Unknown Unit'))
-        controls.icon:SetTexture('/textures/ui/common/game/unit_view_icons/unidentified.dds')
-        controls.stratIcon:SetTexture('/textures/ui/common/game/strategicicons/icon_structure_generic_selected.dds')
+        SetText(controls.name, LOC('<LOC rollover_0000>Unknown Unit'))
+        nameShownFor = nil
+        SetTexture(controls.icon, '/textures/ui/common/game/unit_view_icons/unidentified.dds')
+        SetTexture(controls.stratIcon, '/textures/ui/common/game/strategicicons/icon_structure_generic_selected.dds')
         for index = 1, table.getn(controls.statGroups) do
             local i = index
-            controls.statGroups[i].icon:Hide()
+            SetShown(controls.statGroups[i].icon, false)
             if controls.statGroups[i].color then
-                controls.statGroups[i].color:SetSolidColor('00000000')
-            end
-            if controls.vetIcons[i] then
-                controls.vetIcons[i]:Hide()
+                SetSolidColor(controls.statGroups[i].color, '00000000')
             end
         end
-        controls.healthBar:Hide()
-        controls.shieldBar:Hide()
-        controls.fuelBar:Hide()
-        controls.vetBar:Hide()
-        controls.actionIcon:Hide()
-        controls.actionText:Hide()
-        controls.abilities:Hide()
-        controls.ReclaimGroup:Hide()
+        SetShown(controls.healthBar, false)
+        SetShown(controls.shieldBar, false)
+        SetShown(controls.actionIcon, false)
+        SetShown(controls.actionText, false)
+        SetShown(controls.abilities, false)
+        abilitiesShownFor = nil
     else
         local bp = __blueprints[info.blueprintId]
         local icon = '/icons/units/' .. (bp.BaseBlueprintId or bp.BlueprintId) .. '_icon.dds'
         if DiskGetFileInfo(UIUtil.UIFile(icon, true)) then
-            controls.icon:SetTexture(UIUtil.UIFile(icon, true))
+            SetTexture(controls.icon, UIUtil.UIFile(icon, true))
         else
-            controls.icon:SetTexture('/textures/ui/common/game/unit_view_icons/unidentified.dds')
+            SetTexture(controls.icon, '/textures/ui/common/game/unit_view_icons/unidentified.dds')
         end
         if DiskGetFileInfo('/textures/ui/common/game/strategicicons/' .. bp.StrategicIconName .. '_selected.dds') then
-            controls.stratIcon:SetTexture('/textures/ui/common/game/strategicicons/' ..
+            SetTexture(controls.stratIcon, '/textures/ui/common/game/strategicicons/' ..
                 bp.StrategicIconName .. '_selected.dds')
         else
-            controls.stratIcon:SetSolidColor('00000000')
+            SetSolidColor(controls.stratIcon, '00000000')
         end
         local techLevel = false
         local levels = { TECH1 = 1, TECH2 = 2, TECH3 = 3 }
@@ -440,8 +516,6 @@ function UpdateWindow(info)
         if techLevel then
             description = LOC('<LOC _Tech>') .. techLevel .. ' ' .. description
         end
-        LayoutHelpers.AtTopIn(controls.name, controls.bg, 10)
-        controls.name:SetFont(UIUtil.bodyFont, 14)
         local name = ''
         if info.customName then
             name = LOC(info.customName)
@@ -451,61 +525,62 @@ function UpdateWindow(info)
         if name ~= '' then
             name = name .. ': '
         end
-        controls.name:SetText(name .. description)
-        local scale = controls.name.Width() / controls.name.TextAdvance()
-        if scale < 1 then
-            LayoutHelpers.AtTopIn(controls.name, controls.bg, 10 / scale)
-            controls.name:SetFont(UIUtil.bodyFont, 14 * scale)
+        -- the name's font shrinks to fit the panel: worked out again only when the name changes
+        if nameShownFor ~= name .. description then
+            nameShownFor = name .. description
+            LayoutHelpers.AtTopIn(controls.name, controls.bg, 10)
+            SetFont(controls.name, UIUtil.bodyFont, 14)
+            SetText(controls.name, name .. description)
+            local scale = controls.name.Width() / controls.name.TextAdvance()
+            if scale < 1 then
+                LayoutHelpers.AtTopIn(controls.name, controls.bg, 10 / scale)
+                SetFont(controls.name, UIUtil.bodyFont, 14 * scale)
+            end
         end
         for index = 1, table.getn(statFuncs) do
             local i = index
             if statFuncs[i](info, bp) then
                 if i == 1 then
                     local value, iconType, color = statFuncs[i](info, bp)
-                    controls.statGroups[i].color:SetSolidColor(color)
-                    controls.statGroups[i].icon:SetTexture(iconType)
-                    controls.statGroups[i].value:SetText(value)
+                    SetSolidColor(controls.statGroups[i].color, color)
+                    SetTexture(controls.statGroups[i].icon, iconType)
+                    SetText(controls.statGroups[i].value, value)
                 elseif i == 3 then
                     local value, iconType, color = statFuncs[i](info, bp)
-                    controls.statGroups[i].value:SetText(value)
-                    controls.statGroups[i].icon:SetTexture(UIUtil.UIFile(Factions.Factions[
+                    SetText(controls.statGroups[i].value, value)
+                    SetTexture(controls.statGroups[i].icon, UIUtil.UIFile(Factions.Factions[
                         Factions.FactionIndexMap[string.lower(bp.General.FactionName)] ].VeteranIcon))
                 elseif i == 5 then
                     local text, iconType = statFuncs[i](info, bp)
-                    controls.statGroups[i].value:SetText(text)
+                    SetText(controls.statGroups[i].value, text)
                     if iconType == 'strategic' then
-                        controls.statGroups[i].icon:SetTexture(UIUtil.UIFile('/game/unit_view_icons/missiles.dds'))
+                        SetTexture(controls.statGroups[i].icon, UIUtil.UIFile('/game/unit_view_icons/missiles.dds'))
                     elseif iconType == 'attached' then
-                        controls.statGroups[i].icon:SetTexture(UIUtil.UIFile('/game/unit_view_icons/attached.dds'))
+                        SetTexture(controls.statGroups[i].icon, UIUtil.UIFile('/game/unit_view_icons/attached.dds'))
                     else
-                        controls.statGroups[i].icon:SetTexture(UIUtil.UIFile('/game/unit_view_icons/tactical.dds'))
+                        SetTexture(controls.statGroups[i].icon, UIUtil.UIFile('/game/unit_view_icons/tactical.dds'))
                     end
                 else
-                    controls.statGroups[i].value:SetText(statFuncs[i](info, bp))
+                    SetText(controls.statGroups[i].value, statFuncs[i](info, bp))
                 end
-                controls.statGroups[i].icon:Show()
+                SetShown(controls.statGroups[i].icon, true)
             else
-                controls.statGroups[i].icon:Hide()
+                SetShown(controls.statGroups[i].icon, false)
                 if controls.statGroups[i].color then
-                    controls.statGroups[i].color:SetSolidColor('00000000')
+                    SetSolidColor(controls.statGroups[i].color, '00000000')
                 end
             end
         end
 
-        controls.fuelBar:Hide()
-        controls.vetBar:Hide()
-        controls.ReclaimGroup:Hide()
-
         if info.shieldRatio > 0 then
-            controls.shieldBar:Show()
-            controls.shieldBar:SetValue(info.shieldRatio)
+            SetShown(controls.shieldBar, true)
+            SetBarValue(controls.shieldBar, info.shieldRatio)
         else
-            controls.shieldBar:Hide()
+            SetShown(controls.shieldBar, false)
         end
 
         if info.fuelRatio > 0 then
-            controls.fuelBar:Show()
-            controls.fuelBar:SetValue(info.fuelRatio)
+            fuelShown, fuelValue = true, info.fuelRatio
         end
 
         if info.shieldRatio > 0 and info.fuelRatio > 0 then
@@ -515,7 +590,7 @@ function UpdateWindow(info)
         end
 
         if info.health then
-            controls.healthBar:Show()
+            SetShown(controls.healthBar, true)
 
             -- Removing a MaxHealth buff causes health > maxhealth until a damage event for some reason
             info.health = math.min(info.health, info.maxHealth)
@@ -525,22 +600,17 @@ function UpdateWindow(info)
                 unitHP.blueprintId = info.blueprintId
             end
 
-            controls.healthBar:SetValue(info.health / info.maxHealth)
+            SetBarValue(controls.healthBar, info.health / info.maxHealth)
             if info.health / info.maxHealth > .75 then
-                controls.healthBar._bar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/healthbar_green.dds'))
+                SetTexture(controls.healthBar._bar, UIUtil.UIFile('/game/unit-build-over-panel/healthbar_green.dds'))
             elseif info.health / info.maxHealth > .25 then
-                controls.healthBar._bar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/healthbar_yellow.dds'))
+                SetTexture(controls.healthBar._bar, UIUtil.UIFile('/game/unit-build-over-panel/healthbar_yellow.dds'))
             else
-                controls.healthBar._bar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/healthbar_red.dds'))
+                SetTexture(controls.healthBar._bar, UIUtil.UIFile('/game/unit-build-over-panel/healthbar_red.dds'))
             end
-            controls.health:SetText(string.format("%d / %d", info.health, info.maxHealth))
+            healthText = string.format("%d / %d", info.health, info.maxHealth)
         else
-            controls.healthBar:Hide()
-        end
-
-        -- always hide veterancy stars initially
-        for i = 1, 5 do
-            controls.vetIcons[i]:Hide()
+            SetShown(controls.healthBar, false)
         end
 
         -- Control the veterancy stars
@@ -561,11 +631,9 @@ function UpdateWindow(info)
                     end
 
                     -- show stars
-                    for i = 1, 5 do
-                        if level >= i then
-                            controls.vetIcons[i]:Show()
-                            controls.vetIcons[i]:SetTexture(UIUtil.UIFile(Factions.Factions[Factions.FactionIndexMap[string.lower(bp.General.FactionName)] ].VeteranIcon))
-                        end
+                    vetStars = level
+                    if level >= 1 then
+                        vetStarTexture = UIUtil.UIFile(Factions.Factions[Factions.FactionIndexMap[string.lower(bp.General.FactionName)] ].VeteranIcon)
                     end
 
                     -- show veterancy to gain
@@ -583,7 +651,7 @@ function UpdateWindow(info)
                         else
                             text = experience .. '/' .. string.format('%d', upperThreshold)
                         end
-                        controls.nextVet:SetText(text)
+                        SetText(controls.nextVet, text)
 
                     -- show total experience
                     else
@@ -600,13 +668,13 @@ function UpdateWindow(info)
                         else
                             text = experience
                         end
-                        controls.nextVet:SetText(text)
+                        SetText(controls.nextVet, text)
                     end
 
                     -- always show it, regardless
-                    controls.vetBar:Show()
-                    controls.vetBar:SetValue(progress)
-                    controls.vetTitle:SetText(title)
+                    vetShown = true
+                    SetBarValue(controls.vetBar, progress)
+                    SetText(controls.vetTitle, title)
 
                 -- show reclaim statistics
                 else
@@ -616,9 +684,9 @@ function UpdateWindow(info)
                         reclaimedEnergy = unit:GetStat('ReclaimedEnergy').Value
                     end
                     if reclaimedMass or reclaimedEnergy then
-                        controls.ReclaimGroup:Show()
-                        controls.ReclaimGroup.MassText:SetText(tostring(reclaimedMass or 0))
-                        controls.ReclaimGroup.EnergyText:SetText(tostring(reclaimedEnergy or 0))
+                        reclaimShown = true
+                        SetText(controls.ReclaimGroup.MassText, tostring(reclaimedMass or 0))
+                        SetText(controls.ReclaimGroup.EnergyText, tostring(reclaimedEnergy or 0))
                     end
                 end
             end
@@ -653,126 +721,128 @@ function UpdateWindow(info)
                 -- show that queue
                 controls.queue.grid:UpdateQueue(PeekCurrentFactoryForQueueDisplay(factory))
             else
-                controls.queue:Hide()
+                SetShown(controls.queue, false)
             end
         else
-            controls.queue:Hide()
+            SetShown(controls.queue, false)
         end
 
         if info.focus then
             if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. info.focus.blueprintId .. '_icon.dds', true)) then
-                controls.actionIcon:SetTexture(UIUtil.UIFile('/icons/units/' .. info.focus.blueprintId .. '_icon.dds',
+                SetTexture(controls.actionIcon, UIUtil.UIFile('/icons/units/' .. info.focus.blueprintId .. '_icon.dds',
                     true))
             else
-                controls.actionIcon:SetTexture('/textures/ui/common/game/unit_view_icons/unidentified.dds')
+                SetTexture(controls.actionIcon, '/textures/ui/common/game/unit_view_icons/unidentified.dds')
             end
             if info.focus.health and info.focus.maxHealth then
-                controls.actionText:SetFont(UIUtil.bodyFont, 14)
-                controls.actionText:SetText(string.format('%d%%', (info.focus.health / info.focus.maxHealth) * 100))
+                SetFont(controls.actionText, UIUtil.bodyFont, 14)
+                SetText(controls.actionText, string.format('%d%%', (info.focus.health / info.focus.maxHealth) * 100))
             elseif queueTextures[unitQueue[1].type] then
-                controls.actionText:SetFont(UIUtil.bodyFont, 10)
-                controls.actionText:SetText(LOC(queueTextures[unitQueue[1].type].text))
+                SetFont(controls.actionText, UIUtil.bodyFont, 10)
+                SetText(controls.actionText, LOC(queueTextures[unitQueue[1].type].text))
             else
-                controls.actionText:SetText('')
+                SetText(controls.actionText, '')
             end
-            controls.actionIcon:Show()
-            controls.actionText:Show()
+            SetShown(controls.actionIcon, true)
+            SetShown(controls.actionText, true)
         elseif info.focusUpgrade then
-            controls.actionIcon:SetTexture(queueTextures.Upgrade.texture)
-            controls.actionText:SetFont(UIUtil.bodyFont, 14)
-            controls.actionText:SetText(string.format('%d%%', info.workProgress * 100))
-            controls.actionIcon:Show()
-            controls.actionText:Show()
+            SetTexture(controls.actionIcon, queueTextures.Upgrade.texture)
+            SetFont(controls.actionText, UIUtil.bodyFont, 14)
+            SetText(controls.actionText, string.format('%d%%', info.workProgress * 100))
+            SetShown(controls.actionIcon, true)
+            SetShown(controls.actionText, true)
         elseif info.userUnit and queueTextures[unitQueue[1].type] and not info.userUnit:IsInCategory('FACTORY') then
-            controls.actionText:SetFont(UIUtil.bodyFont, 10)
-            controls.actionText:SetText(LOC(queueTextures[unitQueue[1].type].text))
-            controls.actionIcon:SetTexture(queueTextures[unitQueue[1].type].texture)
-            controls.actionIcon:Show()
-            controls.actionText:Show()
+            SetFont(controls.actionText, UIUtil.bodyFont, 10)
+            SetText(controls.actionText, LOC(queueTextures[unitQueue[1].type].text))
+            SetTexture(controls.actionIcon, queueTextures[unitQueue[1].type].texture)
+            SetShown(controls.actionIcon, true)
+            SetShown(controls.actionText, true)
         elseif info.userUnit and info.userUnit:IsIdle() then
-            controls.actionIcon:SetTexture(UIUtil.UIFile('/game/unit_view_icons/idle.dds'))
-            controls.actionText:SetFont(UIUtil.bodyFont, 10)
-            controls.actionText:SetText(LOC('<LOC _Idle>'))
-            controls.actionIcon:Show()
-            controls.actionText:Show()
+            SetTexture(controls.actionIcon, UIUtil.UIFile('/game/unit_view_icons/idle.dds'))
+            SetFont(controls.actionText, UIUtil.bodyFont, 10)
+            SetText(controls.actionText, LOC('<LOC _Idle>'))
+            SetShown(controls.actionIcon, true)
+            SetShown(controls.actionText, true)
         else
-            controls.actionIcon:Hide()
-            controls.actionText:Hide()
+            SetShown(controls.actionIcon, false)
+            SetShown(controls.actionText, false)
         end
 
-        local lines = nil
-        if Prefs.GetOption('uvd_format') == 'full' then
-            lines = {}
-            --Get not autodetected abilities
-            if bp.Display.Abilities then
-                for _, id in bp.Display.Abilities do
-                    local ability = unitviewDetail.ExtractAbilityFromString(id)
-                    if not unitviewDetail.IsAbilityExist[ability] then
-                        table.insert(lines, LOC(id))
+        local abilitiesFormat = Prefs.GetOption('uvd_format')
+        if abilitiesShownFor ~= info.blueprintId .. ':' .. tostring(abilitiesFormat) then
+            abilitiesShownFor = info.blueprintId .. ':' .. tostring(abilitiesFormat)
+            local lines = nil
+            if abilitiesFormat == 'full' then
+                lines = {}
+                --Get not autodetected abilities
+                if bp.Display.Abilities then
+                    for _, id in bp.Display.Abilities do
+                        local ability = unitviewDetail.ExtractAbilityFromString(id)
+                        if not unitviewDetail.IsAbilityExist[ability] then
+                            table.insert(lines, LOC(id))
+                        end
+                    end
+                end
+                --Autodetect abilities
+                for id, func in unitviewDetail.IsAbilityExist do
+                    if (id ~= 'ability_building') and (id ~= 'ability_repairs') and
+                        (id ~= 'ability_reclaim') and (id ~= 'ability_capture') and func(bp) then
+                        table.insert(lines, LOC('<LOC ' .. id .. '>'))
                     end
                 end
             end
-            --Autodetect abilities
-            for id, func in unitviewDetail.IsAbilityExist do
-                if (id ~= 'ability_building') and (id ~= 'ability_repairs') and
-                    (id ~= 'ability_reclaim') and (id ~= 'ability_capture') and func(bp) then
-                    table.insert(lines, LOC('<LOC ' .. id .. '>'))
-                end
-            end
-        end
-        if lines and (not table.empty(lines)) then
-            local i = 1
-            local maxWidth = 0
-            local index = table.getn(lines)
-            while lines[index] do
-                if not controls.abilityText[i] then
-                    controls.abilityText[i] = UIUtil.CreateText(controls.abilities, lines[index], 12, UIUtil.bodyFont)
-                    controls.abilityText[i]:DisableHitTest()
-                    if i == 1 then
-                        LayoutHelpers.AtLeftIn(controls.abilityText[i], controls.abilities)
-                        LayoutHelpers.AtBottomIn(controls.abilityText[i], controls.abilities)
+            if lines and (not table.empty(lines)) then
+                local i = 1
+                local maxWidth = 0
+                local index = table.getn(lines)
+                while lines[index] do
+                    if not controls.abilityText[i] then
+                        controls.abilityText[i] = UIUtil.CreateText(controls.abilities, lines[index], 12, UIUtil.bodyFont)
+                        controls.abilityText[i]:DisableHitTest()
+                        if i == 1 then
+                            LayoutHelpers.AtLeftIn(controls.abilityText[i], controls.abilities)
+                            LayoutHelpers.AtBottomIn(controls.abilityText[i], controls.abilities)
+                        else
+                            LayoutHelpers.Above(controls.abilityText[i], controls.abilityText[i - 1])
+                        end
                     else
-                        LayoutHelpers.Above(controls.abilityText[i], controls.abilityText[i - 1])
+                        controls.abilityText[i]:SetText(lines[index])
                     end
-                else
-                    controls.abilityText[i]:SetText(lines[index])
+                    maxWidth = math.max(maxWidth, controls.abilityText[i].Width())
+                    index = index - 1
+                    i = i + 1
                 end
-                maxWidth = math.max(maxWidth, controls.abilityText[i].Width())
-                index = index - 1
-                i = i + 1
+                while controls.abilityText[i] do
+                    controls.abilityText[i]:Destroy()
+                    controls.abilityText[i] = nil
+                    i = i + 1
+                end
+                controls.abilities.Width:Set(maxWidth)
+                controls.abilities.Height:Set(function() return controls.abilityText[1].Height() *
+                    table.getsize(controls.abilityText) end)
+                if controls.abilities:IsHidden() then
+                    controls.abilities:Show()
+                end
+            elseif not controls.abilities:IsHidden() then
+                controls.abilities:Hide()
             end
-            while controls.abilityText[i] do
-                controls.abilityText[i]:Destroy()
-                controls.abilityText[i] = nil
-                i = i + 1
-            end
-            controls.abilities.Width:Set(maxWidth)
-            controls.abilities.Height:Set(function() return controls.abilityText[1].Height() *
-                table.getsize(controls.abilityText) end)
-            if controls.abilities:IsHidden() then
-                controls.abilities:Show()
-            end
-        elseif not controls.abilities:IsHidden() then
-            controls.abilities:Hide()
         end
     end
     if options.gui_enhanced_unitview ~= 0 then
         -- Replace fuel bar with progress bar
         if info.blueprintId ~= 'unknown' then
-            controls.fuelBar:Hide()
+            fuelShown, fuelValue = false, nil
             if info.workProgress > 0 then
-                controls.fuelBar:Show()
-                controls.fuelBar:SetValue(info.workProgress)
+                fuelShown, fuelValue = true, info.workProgress
             end
         end
     end
-    if options.gui_detailed_unitview ~= 0 then
+    local detailed = options.gui_detailed_unitview ~= 0 and info.blueprintId ~= 'unknown'
+    if detailed then
         if info.blueprintId ~= 'unknown' then
-            controls.shieldText:Hide()
-
             if info.userUnit ~= nil then
                 local regen = info.userUnit:GetStat("HitpointsRegeneration", 0).Value or 0
-                controls.health:SetText(string.format("%d / %d +%d/s", info.health, info.maxHealth, regen))
+                healthText = string.format("%d / %d +%d/s", info.health, info.maxHealth, regen)
             end
 
             if info.shieldRatio > 0 then
@@ -792,14 +862,36 @@ function UpdateWindow(info)
                 local shieldMaxHealth, shieldRegenRate = shield.ShieldMaxHealth or 0, shield.ShieldRegenRate or 0
                 if shieldMaxHealth > 0 then
                     local shieldHealth = math.floor(shieldMaxHealth * info.shieldRatio)
-                    local shieldText = string.format("%d / %d", shieldHealth, shieldMaxHealth)
+                    shieldText = string.format("%d / %d", shieldHealth, shieldMaxHealth)
                     if shieldRegenRate > 0 then
                         shieldText = shieldText .. string.format("+%d/s", shieldRegenRate)
                     end
-                    controls.shieldText:Show()
-                    controls.shieldText:SetText(shieldText)
+                    shieldTextShown = true
                 end
             end
+        end
+    end
+
+    -- the final state of the controls decided above
+    SetShown(controls.fuelBar, fuelShown)
+    if fuelShown then
+        SetBarValue(controls.fuelBar, fuelValue)
+    end
+    SetShown(controls.vetBar, vetShown)
+    SetShown(controls.ReclaimGroup, reclaimShown)
+    for i = 1, 5 do
+        SetShown(controls.vetIcons[i], vetStars >= i)
+        if vetStars >= i then
+            SetTexture(controls.vetIcons[i], vetStarTexture)
+        end
+    end
+    if healthText then
+        SetText(controls.health, healthText)
+    end
+    if detailed then
+        SetShown(controls.shieldText, shieldTextShown)
+        if shieldTextShown then
+            SetText(controls.shieldText, shieldText)
         end
     end
 
@@ -818,7 +910,7 @@ function UpdateEnhancementIcons(info)
         if unit == nil or
             (not unit:IsInCategory('COMMAND') and not unit:IsInCategory('SUBCOMMANDER')) or
             existingEnhancements == nil or existingEnhancements[slot] == nil then
-            enhancement:Hide()
+            SetShown(enhancement, false)
             continue
         end
 
@@ -827,9 +919,12 @@ function UpdateEnhancementIcons(info)
         local enhancementBp = bp.Enhancements[ existingEnhancements[slot] ]
         local texture = GetEnhancementPrefix(bpId, enhancementBp.Icon) .. '_btn_up.dds'
 
-        enhancement:Show()
-        enhancement:SetTexture(UIUtil.UIFile(texture, true))
-        LayoutHelpers.SetDimensions(enhancement, 30, 30)
+        SetShown(enhancement, true)
+        SetTexture(enhancement, UIUtil.UIFile(texture, true))
+        if not sizedEnhancements[enhancement] then
+            sizedEnhancements[enhancement] = true
+            LayoutHelpers.SetDimensions(enhancement, 30, 30)
+        end
     end
 end
 
@@ -837,6 +932,7 @@ function ShowROBox()
 end
 
 function SetLayout(layout)
+    ForgetSetValues()
     unitViewLayout = import(UIUtil.GetLayoutFilename('unitview'))
     unitViewLayout.SetLayout()
 end
