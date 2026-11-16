@@ -1,0 +1,1 @@
+- Fix the FAF Develop network settings from #7364 never being applied, because the init file has no access to console commands (#7413).
