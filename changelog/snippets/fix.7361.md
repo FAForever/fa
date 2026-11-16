@@ -1,0 +1,1 @@
+- Sanitize default unit and projectile blueprint tables before running ModBlueprints, preventing community mods from crashing on dummy or campaign units (#7361).
