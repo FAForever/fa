@@ -903,6 +903,10 @@ function CommonLogic()
             --control.Icon.Height:Set(48)
             --control.Icon.Width:Set(48)
             control.Icon.Depth:Set(function() return control.Depth() + 1 end)
+            -- buttons are reused, and an arrow hides the strategic icon
+            if control.StratIcon:IsHidden() then
+                control.StratIcon:Show()
+            end
             control.BuildKey = nil
             if showBuildIcons then
                 local unitBuildKeys = BuildMode.GetUnitKeys(sortedOptions.selection[1]:GetBlueprint().BlueprintId, GetCurrentTechTab())
@@ -936,6 +940,10 @@ function CommonLogic()
             --control.Icon.Height:Set(48)
             --control.Icon.Width:Set(48)
             control.LowFuel:SetAlpha(0, true)
+            -- buttons are reused, and an arrow hides the strategic icon
+            if control.StratIcon:IsHidden() then
+                control.StratIcon:Show()
+            end
             control.BuildKey = nil
             if control.Data.lowFuel then
                 control.LowFuel:SetNeedsFrameUpdate(true)
@@ -981,9 +989,11 @@ function CommonLogic()
             end
             StratIconReplacement(control)
 
-            -- AZ improved selection code
+            -- AZ improved selection code (buttons are reused: the marker is turned off for the others)
             if type == 'unitstack' and control.Data.idleCon then
                 control.IdleIcon:SetAlpha(1)
+            else
+                control.IdleIcon:SetAlpha(0)
             end
         end
     else -- If we dont have bigger strat icons selected, just do the idle icon
@@ -1007,9 +1017,11 @@ function CommonLogic()
 
         controls.choices.SetControlToType = function(control, type)
             oldPrimary(control, type)
-            -- AZ improved selection code
+            -- AZ improved selection code (buttons are reused: the marker is turned off for the others)
             if type == 'unitstack' and control.Data.idleCon then
                 control.IdleIcon:SetAlpha(1)
+            else
+                control.IdleIcon:SetAlpha(0)
             end
         end
     end
@@ -1040,7 +1052,12 @@ function CommonLogic()
                 control.Tmplnm.Width:Set(48)
                 if STR_Utf8Len(control.Data.template.name) >= cutA then
                     control.Tmplnm:SetText(STR_Utf8SubString(control.Data.template.name, cutA, cutB))
+                else
+                    control.Tmplnm:SetText('')
                 end
+            else
+                -- buttons are reused: no name left from a template shown before
+                control.Tmplnm:SetText('')
             end
         end
     end
@@ -2645,6 +2662,13 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             end
         end
 
+        -- The tab selected below usually fills the build grid. Show the panel first: showing a control shows every
+        -- control in it, so showing it after the fill undid the grid's hidden buttons and needed a second fill.
+        if controls.constructionGroup:IsHidden() then
+            controls.constructionGroup:Show()
+        end
+        local choicesFills = controls.choices.calcCount
+
         if not isOldSelection then
             if not controls.constructionTab:IsDisabled() then
                 controls.constructionTab:SetCheck(true)
@@ -2664,9 +2688,13 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         prevBuildables = buildableUnits
         import(UIUtil.GetLayoutFilename('construction')).OnSelection(false)
 
-        controls.constructionGroup:Show()
-        controls.choices:CalcVisible()
-        controls.secondaryChoices:CalcVisible()
+        -- The grid was filled above for this selection, with the panel shown: filling it again rebuilt every visible
+        -- button a second time. A grid without the fill count (one a mod replaced) takes the original path.
+        if choicesFills == nil or controls.choices.calcCount == choicesFills then
+            controls.constructionGroup:Show()
+            controls.choices:CalcVisible()
+            controls.secondaryChoices:CalcVisible()
+        end
     else
         if BuildMode.IsInBuildMode() then
             BuildMode.ToggleBuildMode()
