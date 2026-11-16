@@ -1,0 +1,1 @@
+- Fix the game log filling with layout errors while an off-screen marker's arrow points east after pointing west (#7416).
