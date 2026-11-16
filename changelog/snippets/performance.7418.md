@@ -1,0 +1,1 @@
+- The unit view no longer sets every icon, text and bar again on every frame while a unit is selected, which cuts its cost per frame by about 40 % (#7418).
