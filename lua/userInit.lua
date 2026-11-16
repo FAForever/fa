@@ -122,7 +122,7 @@ do
     -- Set experimental network variables tuned for ICE adapter (#7364), before the moderation hook below disables these commands
 
     local _, GameType, _ = import('/lua/ui/version.lua').GetVersionData()
-    if GameType == "FAF Develop" then
+    if GameType == "FAF Develop" or GameType == "unknown" then
         ConExecute("net_MaxSendRate 1048576")
         ConExecute("net_MaxBacklog 262144")
         ConExecute("net_AckDelay 5")
