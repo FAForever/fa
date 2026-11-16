@@ -2931,6 +2931,9 @@ end
 function Expand()
     if GetSelectedUnits() then
         controls.constructionGroup:Show()
+        -- Showing the panel shows every control in it, the grids' hidden buttons too: the grids hide them again.
+        controls.choices:CalcVisible()
+        controls.secondaryChoices:CalcVisible()
     else
         controls.constructionGroup:Hide()
     end
