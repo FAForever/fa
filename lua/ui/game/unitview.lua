@@ -394,30 +394,46 @@ end
 -- to the texture, text, font, value or shown state it already has still costs the engine and the layout their work,
 -- and hiding a control only to show it again later in the same frame runs its OnHide callbacks twice. So UpdateWindow
 -- works out each control's final state first and sets it through the helpers below, which compare before they set.
--- Text, bar values and the shown state are compared with what the control holds. Textures and fonts can't be read
--- back, so the last ones set through these helpers are remembered per control; SetLayout forgets them, as the layout
--- files set textures and fonts of their own.
+-- Text, bar values and the shown state are compared with what the control holds. A bitmap holds both a texture and a
+-- solid colour and a text's font family may be a LazyVar, so for those the helpers remember what they set last, and
+-- the control's texture, border, colour or font right after; they set again when the request differs or when
+-- anything else (a mod, a layout, a skin change) changed the control since. SetLayout forgets them as well.
 local setTextures = setmetatable({}, { __mode = 'k' })
-local setFontFamilies = setmetatable({}, { __mode = 'k' })
-local setFontSizes = setmetatable({}, { __mode = 'k' })
+local setFonts = setmetatable({}, { __mode = 'k' })
 local sizedEnhancements = setmetatable({}, { __mode = 'k' })
 -- The unit name and the ability list are worked out from the blueprint: they are laid out again only when it changes.
 local nameShownFor = nil
+local nameFontSize = 14
 local abilitiesShownFor = nil
 local abilitiesShown = false
 
+--- Whether the bitmap still shows what the helpers set last with this request.
+local function BitmapUnchanged(control, request)
+    local set = setTextures[control]
+    return set ~= nil and set.request == request and set.texture == control._filename._texture() and
+        set.border == control._filename._border and set.color == control._color()
+end
+
+local function RememberBitmap(control, request)
+    local filename, color = control._filename, control._color
+    if filename and color then
+        setTextures[control] = { request = request, texture = filename._texture(), border = filename._border,
+            color = color() }
+    end
+end
+
 local function SetTexture(control, texture)
-    if setTextures[control] ~= texture then
-        setTextures[control] = texture
+    if not BitmapUnchanged(control, texture) then
         control:SetTexture(texture)
+        RememberBitmap(control, texture)
     end
 end
 
 local function SetSolidColor(control, color)
-    local key = 'color:' .. color
-    if setTextures[control] ~= key then
-        setTextures[control] = key
+    local request = 'color:' .. color
+    if not BitmapUnchanged(control, request) then
         control:SetSolidColor(color)
+        RememberBitmap(control, request)
     end
 end
 
@@ -429,10 +445,15 @@ local function SetText(control, text)
 end
 
 local function SetFont(control, family, size)
-    if setFontFamilies[control] ~= family or setFontSizes[control] ~= size then
-        setFontFamilies[control] = family
-        setFontSizes[control] = size
-        control:SetFont(family, size)
+    local set = setFonts[control]
+    local font = control._font
+    if set and font and set.family == family and set.size == size and set.familyName == font._family() and
+        set.pointSize == font._pointsize() then
+        return
+    end
+    control:SetFont(family, size)
+    if font then
+        setFonts[control] = { family = family, size = size, familyName = font._family(), pointSize = font._pointsize() }
     end
 end
 
@@ -447,7 +468,9 @@ local function SetShown(control, shown)
 end
 
 local function SetBarValue(bar, value)
-    if bar._value() ~= value then
+    -- a bar a mod put in place may keep its value elsewhere: then it is set every time, as before
+    local current = bar._value
+    if not current or current() ~= value then
         bar:SetValue(value)
     end
 end
@@ -455,8 +478,7 @@ end
 --- Forgets what the helpers above remember, for a layout that sets the panel's textures and fonts again.
 local function ForgetSetValues()
     setTextures = setmetatable({}, { __mode = 'k' })
-    setFontFamilies = setmetatable({}, { __mode = 'k' })
-    setFontSizes = setmetatable({}, { __mode = 'k' })
+    setFonts = setmetatable({}, { __mode = 'k' })
     sizedEnhancements = setmetatable({}, { __mode = 'k' })
     nameShownFor = nil
     abilitiesShownFor = nil
@@ -526,17 +548,23 @@ function UpdateWindow(info)
         if name ~= '' then
             name = name .. ': '
         end
-        -- the name's font shrinks to fit the panel: worked out again only when the name changes
+        -- the name's font shrinks to fit the panel: worked out and anchored again only when the name changes; its
+        -- text and font are checked every frame
         if nameShownFor ~= name .. description then
             nameShownFor = name .. description
+            nameFontSize = 14
             LayoutHelpers.AtTopIn(controls.name, controls.bg, 10)
-            SetFont(controls.name, UIUtil.bodyFont, 14)
+            SetFont(controls.name, UIUtil.bodyFont, nameFontSize)
             SetText(controls.name, name .. description)
             local scale = controls.name.Width() / controls.name.TextAdvance()
             if scale < 1 then
+                nameFontSize = 14 * scale
                 LayoutHelpers.AtTopIn(controls.name, controls.bg, 10 / scale)
-                SetFont(controls.name, UIUtil.bodyFont, 14 * scale)
+                SetFont(controls.name, UIUtil.bodyFont, nameFontSize)
             end
+        else
+            SetText(controls.name, name .. description)
+            SetFont(controls.name, UIUtil.bodyFont, nameFontSize)
         end
         for index = 1, table.getn(statFuncs) do
             local i = index
@@ -922,7 +950,8 @@ function UpdateEnhancementIcons(info)
 
         SetShown(enhancement, true)
         SetTexture(enhancement, UIUtil.UIFile(texture, true))
-        if not sizedEnhancements[enhancement] then
+        local size = LayoutHelpers.ScaleNumber(30)
+        if not sizedEnhancements[enhancement] or enhancement.Width() ~= size or enhancement.Height() ~= size then
             sizedEnhancements[enhancement] = true
             LayoutHelpers.SetDimensions(enhancement, 30, 30)
         end
