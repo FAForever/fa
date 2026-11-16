@@ -11,6 +11,8 @@ local DefaultExplosions = import("/lua/defaultexplosions.lua")
 local VisionMarkerOpti = import('/lua/sim/VizMarker.lua').VisionMarkerOpti
 
 ---@class AirUnit : MobileUnit
+---@field GroundImpacted? true
+---@field OverKillRatio number
 AirUnit = ClassUnit(MobileUnit) {
     -- Contrails
     ContrailEffects = { '/effects/emitters/contrail_polytrail_01_emit.bp', },
@@ -214,7 +216,7 @@ AirUnit = ClassUnit(MobileUnit) {
                 end
 
                 -- Create a projectile we'll use to interact with Shields
-                local proj = self:CreateProjectileAtBone('/projectiles/ShieldCollider/ShieldCollider_proj.bp', 0) --[[@as ShiledCollider]]
+                local proj = self:CreateProjectileAtBone('/projectiles/ShieldCollider/ShieldCollider_proj.bp', 0) --[[@as ShieldCollider]]
                 self.colliderProj = proj
                 proj:Start(self, 0)
                 self.Trash:Add(proj)
