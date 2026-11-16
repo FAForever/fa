@@ -652,6 +652,3 @@ MountDirectory(fa_path .. "/fonts", '/fonts')
 
 -- Allows developers to embed code to debug a replay
 table.insert(path, 1, { dir = InitFileDir .. '\\..\\Debug', mountpoint = '/' })
-
--- The networking console variables for FAF Develop are set in /lua/userInit.lua: ConExecute does not exist in
--- this init state.
