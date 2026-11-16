@@ -119,6 +119,20 @@ if replayID then
 end
 
 do
+    -- Set experimental network variables tuned for ICE adapter (#7364), before the moderation hook below disables these commands
+
+    local _, GameType, _ = import('/lua/version.lua').GetVersionData()
+    if GameType == "FAF Develop" or GameType == "unknown" then
+        ConExecute("net_MaxSendRate 1048576")
+        ConExecute("net_MaxBacklog 262144")
+        ConExecute("net_AckDelay 5")
+        ConExecute("net_SendDelay 2")
+        ConExecute("net_MinResendDelay 30")
+        ConExecute("net_ResendDelayBias 10")
+    end
+end
+
+do
 
     -- Moderation functionality
     -- The following hooks and/or overloads exist to assist moderators in evaluation faul play
