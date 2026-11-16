@@ -180,6 +180,23 @@ end
 
 function PositionWindow()
     local branch = consControl:IsHidden() and 1 or 2
+    -- Showing the panel (unitview.lua's Expand) shows every control in it, so the two bracket parts are checked every
+    -- frame, not only when the branch changes.
+    local bracketsShown = branch == 2
+    if controls.bracketMax:IsHidden() == bracketsShown then
+        if bracketsShown then
+            controls.bracketMax:Show()
+        else
+            controls.bracketMax:Hide()
+        end
+    end
+    if controls.bracketMid:IsHidden() == bracketsShown then
+        if bracketsShown then
+            controls.bracketMid:Show()
+        else
+            controls.bracketMid:Hide()
+        end
+    end
     if branch == positionedFor then
         return
     end
@@ -189,12 +206,8 @@ function PositionWindow()
         LayoutHelpers.AtLeftIn(controls.bg, consControl, 18)
         controls.bracket:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/bracket-unit_bmp.dds'))
         LayoutHelpers.AtLeftTopIn(controls.bracket, controls.bg, -19, -2)
-        controls.bracketMax:Hide()
-        controls.bracketMid:Hide()
     else
         controls.bracket:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_t.dds'))
-        controls.bracketMax:Show()
-        controls.bracketMid:Show()
         LayoutHelpers.AtLeftTopIn(controls.bracket, controls.bg, -6, 3)
         LayoutHelpers.AtBottomIn(controls.bg, controls.parent)
         LayoutHelpers.AtLeftIn(controls.bg, controls.parent, 207)
