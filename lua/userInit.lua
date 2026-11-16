@@ -118,12 +118,11 @@ if replayID then
     LOG("REPLAY ID: " .. replayID)
 end
 
--- FAF Develop only: network console variables tuned for the FAF ICE adapter (#7364). They are set here because
--- ConExecute does not exist in the init file's state, and before the moderation hooks below, which block `net_`
--- commands from then on.
 do
-    local initFile = GetCommandLineArg("/init", 1)
-    if initFile and string.find(string.lower(initFile[1]), "init_fafdevelop.lua", 1, true) then
+    -- Set experimental network variables tuned for ICE adapter (#7364), before the moderation hook below disables these commands
+
+    local _, GameType, _ = import('/lua/ui/version.lua').GetVersionData()
+    if GameType == "FAF Develop" then
         ConExecute("net_MaxSendRate 1048576")
         ConExecute("net_MaxBacklog 262144")
         ConExecute("net_AckDelay 5")
