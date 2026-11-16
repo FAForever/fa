@@ -1,0 +1,1 @@
+- Selecting a unit no longer rebuilds the whole build menu, which more than halves the hitch when selecting an engineer, the commander or a factory (#7414).
