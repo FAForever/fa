@@ -404,6 +404,7 @@ local sizedEnhancements = setmetatable({}, { __mode = 'k' })
 -- The unit name and the ability list are worked out from the blueprint: they are laid out again only when it changes.
 local nameShownFor = nil
 local abilitiesShownFor = nil
+local abilitiesShown = false
 
 local function SetTexture(control, texture)
     if setTextures[control] ~= texture then
@@ -820,13 +821,13 @@ function UpdateWindow(info)
                 controls.abilities.Width:Set(maxWidth)
                 controls.abilities.Height:Set(function() return controls.abilityText[1].Height() *
                     table.getsize(controls.abilityText) end)
-                if controls.abilities:IsHidden() then
-                    controls.abilities:Show()
-                end
-            elseif not controls.abilities:IsHidden() then
-                controls.abilities:Hide()
+                abilitiesShown = true
+            else
+                abilitiesShown = false
             end
         end
+        -- checked every frame: showing the panel (Expand) shows every control in it
+        SetShown(controls.abilities, abilitiesShown)
     end
     if options.gui_enhanced_unitview ~= 0 then
         -- Replace fuel bar with progress bar
