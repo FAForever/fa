@@ -1559,10 +1559,9 @@ local function GiveResourceFraction(fromBrain, toBrain, resource, fraction)
 
     -- `GiveResource` adds to the receiver's income, which reaches storage next tick along
     -- with its trend. Anything past max storage is lost, so only take what fits
-    local pending = toBrain.PendingResourceGifts
     local capacity = toBrain:GetArmyStat(MaxStorageStat[resource], 0).Value
         - toBrain:GetEconomyStored(resource) - toBrain:GetEconomyTrend(resource)
-        - (pending.Tick == GetGameTick() and pending[resource] or 0)
+        - toBrain:GetPendingResourceGift(resource)
     if capacity <= 0 then
         return 0
     end
