@@ -1542,8 +1542,40 @@ end
 
 -- Resources given to each army this tick, which `GetEconomyStored` doesn't include yet
 local ResourcesGivenTick = -1
----@type table<Army, {Mass: number, Energy: number}>
+---@type table<Army, table<'MASS'|'ENERGY', number>>
 local ResourcesGiven = {}
+
+local MaxStorageStat = {
+    MASS = 'Economy_MaxStorage_Mass',
+    ENERGY = 'Economy_MaxStorage_Energy',
+}
+
+--- Gives `fraction` of the sender's stored `resource` to the receiver, up to what the receiver can store
+---@param fromBrain AIBrain
+---@param toBrain AIBrain
+---@param received table<'MASS'|'ENERGY', number> # given to the receiver this tick
+---@param resource 'MASS'|'ENERGY'
+---@param fraction number
+---@return number given
+local function GiveResourceFraction(fromBrain, toBrain, received, resource, fraction)
+    -- `not (x > 0)` also skips NaN
+    if not (fraction > 0) then
+        return 0
+    end
+
+    -- `GiveResource` adds to the receiver's income, which reaches storage next tick along
+    -- with its trend. Anything past max storage is lost, so only take what fits
+    local capacity = toBrain:GetArmyStat(MaxStorageStat[resource], 0).Value
+        - toBrain:GetEconomyStored(resource) - received[resource] - toBrain:GetEconomyTrend(resource)
+    if capacity <= 0 then
+        return 0
+    end
+
+    local given = fromBrain:TakeResource(resource, math.min(fraction * fromBrain:GetEconomyStored(resource), capacity))
+    toBrain:GiveResource(resource, given)
+    received[resource] = received[resource] + given
+    return given
+end
 
 ---@param data {From: Army, To: Army, Mass: number, Energy: number, Sender?: string, Msg?: table}
 function GiveResourcesToPlayer(data)
@@ -1564,41 +1596,26 @@ function GiveResourcesToPlayer(data)
 
     local fromBrain = ArmyBrains[data.From]
     local toBrain = ArmyBrains[data.To]
-    -- `not (x >= 0)` also rejects NaN
-    if fromBrain:IsDefeated() or toBrain:IsDefeated() or not (data.Mass >= 0 and data.Energy >= 0) then
+    if fromBrain:IsDefeated() or toBrain:IsDefeated() then
         return
     end
 
-    -- `GiveResource` adds to the receiver's income, which reaches storage next tick along
-    -- with its trend. Anything past max storage is lost, so only take what fits
     local tick = GetGameTick()
     if ResourcesGivenTick ~= tick then
         ResourcesGivenTick = tick
         for _, given in ResourcesGiven do
-            given.Mass = 0
-            given.Energy = 0
+            given.MASS = 0
+            given.ENERGY = 0
         end
     end
     local received = ResourcesGiven[data.To]
     if not received then
-        received = { Mass = 0, Energy = 0 }
+        received = { MASS = 0, ENERGY = 0 }
         ResourcesGiven[data.To] = received
     end
 
-    local massCapacity = toBrain:GetArmyStat('Economy_MaxStorage_Mass', 0).Value
-        - toBrain:GetEconomyStored('MASS') - received.Mass - toBrain:GetEconomyTrend('MASS')
-    local energyCapacity = toBrain:GetArmyStat('Economy_MaxStorage_Energy', 0).Value
-        - toBrain:GetEconomyStored('ENERGY') - received.Energy - toBrain:GetEconomyTrend('ENERGY')
-
-    local massRequested = math.min(data.Mass * fromBrain:GetEconomyStored('MASS'), math.max(massCapacity, 0))
-    local energyRequested = math.min(data.Energy * fromBrain:GetEconomyStored('ENERGY'), math.max(energyCapacity, 0))
-    local massGiven = fromBrain:TakeResource('MASS', massRequested)
-    local energyGiven = fromBrain:TakeResource('ENERGY', energyRequested)
-
-    toBrain:GiveResource('MASS', massGiven)
-    toBrain:GiveResource('ENERGY', energyGiven)
-    received.Mass = received.Mass + massGiven
-    received.Energy = received.Energy + energyGiven
+    local massGiven = GiveResourceFraction(fromBrain, toBrain, received, 'MASS', data.Mass)
+    local energyGiven = GiveResourceFraction(fromBrain, toBrain, received, 'ENERGY', data.Energy)
 
     -- Whisper from giver → receiver so the line reads with the giver's
     -- attribution. Three LOC keys rather than one templated string so each
