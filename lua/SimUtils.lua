@@ -1540,11 +1540,6 @@ end
 -- Chat-relay helpers moved to `/lua/ChatUtils.lua`:
 --   * `SendChatMessage`  — trusted sim relay that feeds `Sync.ChatMessages`.
 
--- Resources given to each army this tick, which `GetEconomyStored` doesn't include yet
-local ResourcesGivenTick = -1
----@type table<Army, table<'MASS'|'ENERGY', number>>
-local ResourcesGiven = {}
-
 local MaxStorageStat = {
     MASS = 'Economy_MaxStorage_Mass',
     ENERGY = 'Economy_MaxStorage_Energy',
@@ -1553,11 +1548,10 @@ local MaxStorageStat = {
 --- Gives `fraction` of the sender's stored `resource` to the receiver, up to what the receiver can store
 ---@param fromBrain AIBrain
 ---@param toBrain AIBrain
----@param received table<'MASS'|'ENERGY', number> # given to the receiver this tick
----@param resource 'MASS'|'ENERGY'
+---@param resource ResourceType
 ---@param fraction number
 ---@return number given
-local function GiveResourceFraction(fromBrain, toBrain, received, resource, fraction)
+local function GiveResourceFraction(fromBrain, toBrain, resource, fraction)
     -- `not (x > 0)` also skips NaN
     if not (fraction > 0) then
         return 0
@@ -1565,15 +1559,16 @@ local function GiveResourceFraction(fromBrain, toBrain, received, resource, frac
 
     -- `GiveResource` adds to the receiver's income, which reaches storage next tick along
     -- with its trend. Anything past max storage is lost, so only take what fits
+    local pending = toBrain.PendingResourceGifts
     local capacity = toBrain:GetArmyStat(MaxStorageStat[resource], 0).Value
-        - toBrain:GetEconomyStored(resource) - received[resource] - toBrain:GetEconomyTrend(resource)
+        - toBrain:GetEconomyStored(resource) - toBrain:GetEconomyTrend(resource)
+        - (pending.Tick == GetGameTick() and pending[resource] or 0)
     if capacity <= 0 then
         return 0
     end
 
     local given = fromBrain:TakeResource(resource, math.min(fraction * fromBrain:GetEconomyStored(resource), capacity))
     toBrain:GiveResource(resource, given)
-    received[resource] = received[resource] + given
     return given
 end
 
@@ -1600,22 +1595,8 @@ function GiveResourcesToPlayer(data)
         return
     end
 
-    local tick = GetGameTick()
-    if ResourcesGivenTick ~= tick then
-        ResourcesGivenTick = tick
-        for _, given in ResourcesGiven do
-            given.MASS = 0
-            given.ENERGY = 0
-        end
-    end
-    local received = ResourcesGiven[data.To]
-    if not received then
-        received = { MASS = 0, ENERGY = 0 }
-        ResourcesGiven[data.To] = received
-    end
-
-    local massGiven = GiveResourceFraction(fromBrain, toBrain, received, 'MASS', data.Mass)
-    local energyGiven = GiveResourceFraction(fromBrain, toBrain, received, 'ENERGY', data.Energy)
+    local massGiven = GiveResourceFraction(fromBrain, toBrain, 'MASS', data.Mass)
+    local energyGiven = GiveResourceFraction(fromBrain, toBrain, 'ENERGY', data.Energy)
 
     -- Whisper from giver → receiver so the line reads with the giver's
     -- attribution. Three LOC keys rather than one templated string so each

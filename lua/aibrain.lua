@@ -68,6 +68,7 @@ local cachedPlatoonUnit = {}
 ---@field CommanderKilledTick number    # When one of our commanders last died. Used for transfering to killer in `decapitation` victory.
 ---@field LastUnitKilledBy Army         # Which army last killed one of our units. Used for transfering to killer in other victory conditions.
 ---@field Army integer # Cached `GetArmyIndex` engine call
+---@field PendingResourceGifts { Tick: integer, [ResourceType]: number } # Given with `GiveResource` on `Tick`, which reaches storage on the next tick
 AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent,
     EnergyManagerBrainComponent, StorageManagerBrainComponent, AIChatBrainComponent, moho.aibrain_methods) {
 
@@ -126,12 +127,32 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         }
 
         self.PingCallbackList = {}
+        self.PendingResourceGifts = { Tick = -1, MASS = 0, ENERGY = 0 }
 
         EnergyManagerBrainComponent.CreateBrainShared(self)
         FactoryManagerBrainComponent.CreateBrainShared(self)
         StatManagerBrainComponent.CreateBrainShared(self)
         JammerManagerBrainComponent.CreateBrainShared(self)
         StorageManagerBrainComponent.CreateBrainShared(self)
+    end,
+
+    --- Adds to the army's income for this tick, which reaches storage on the next tick
+    ---@param self AIBrain
+    ---@param type ResourceType
+    ---@param amount number
+    GiveResource = function(self, type, amount)
+        moho.aibrain_methods.GiveResource(self, type, amount)
+
+        local pending = self.PendingResourceGifts
+        local tick = GetGameTick()
+        if pending.Tick ~= tick then
+            pending.Tick = tick
+            pending.MASS = 0
+            pending.ENERGY = 0
+        end
+        -- the engine accepts the type in any case
+        type = string.upper(type)
+        pending[type] = pending[type] + amount
     end,
 
     --- Called after `BeginSession`, at this point all props, resources and initial units exist
