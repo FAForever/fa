@@ -82,6 +82,7 @@ AirUnit = ClassUnit(MobileUnit) {
     ---@param radius integer
     SetIntelRadius = function(self, type, radius)
         MobileUnit.SetIntelRadius(self, type, radius)
+        -- Sync vision entity with vision changes that happen when the unit starts sinking in water
         if type == 'Vision' then
             local vizEnt = self.vizEnt
             if vizEnt then
