@@ -155,6 +155,18 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         pending[type] = pending[type] + amount
     end,
 
+    --- Returns how much `GiveResource` gave this tick, which isn't in storage yet
+    ---@param self AIBrain
+    ---@param type ResourceType
+    ---@return number
+    GetPendingResourceGift = function(self, type)
+        local pending = self.PendingResourceGifts
+        if pending.Tick ~= GetGameTick() then
+            return 0
+        end
+        return pending[string.upper(type)]
+    end,
+
     --- Called after `BeginSession`, at this point all props, resources and initial units exist
     ---@param self AIBrain
     OnBeginSession = function(self)
