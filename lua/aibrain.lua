@@ -136,7 +136,8 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         StorageManagerBrainComponent.CreateBrainShared(self)
     end,
 
-    --- Adds to the army's income for this tick, which reaches storage on the next tick
+    --- Gives resources to brain. They appear in its storage and income stats on the next tick
+    ---@see AIBrain.GetPendingResourceGift # for the amount given this tick
     ---@param self AIBrain
     ---@param type ResourceType
     ---@param amount number
