@@ -1540,9 +1540,11 @@ end
 -- Chat-relay helpers moved to `/lua/ChatUtils.lua`:
 --   * `SendChatMessage`  — trusted sim relay that feeds `Sync.ChatMessages`.
 
---- Resources given to each army during `Tick`, which haven't reached its storage yet
----@type {Tick: integer, [Army]: {Mass: number, Energy: number}}
-local ResourcesGivenThisTick = { Tick = -1 }
+--- Game tick that `ResourcesGiven` counts gifts for
+local ResourcesGivenTick = -1
+--- Resources given to each army during `ResourcesGivenTick`, which haven't reached its storage yet
+---@type table<Army, {Mass: number, Energy: number}>
+local ResourcesGiven = {}
 
 ---@param data {From: Army, To: Army, Mass: number, Energy: number, Sender?: string, Msg?: table}
 function GiveResourcesToPlayer(data)
@@ -1563,8 +1565,9 @@ function GiveResourcesToPlayer(data)
 
     local fromBrain = ArmyBrains[data.From]
     local toBrain = ArmyBrains[data.To]
-    -- Abort if any of the armies is defeated or if trying to send a negative value
-    if fromBrain:IsDefeated() or toBrain:IsDefeated() or data.Mass < 0 or data.Energy < 0 then
+    -- Abort if any of the armies is defeated or if trying to send a negative or invalid value.
+    -- Written as `not (x >= 0)` so it also rejects NaN, which fails every comparison
+    if fromBrain:IsDefeated() or toBrain:IsDefeated() or not (data.Mass >= 0 and data.Energy >= 0) then
         return
     end
 
@@ -1573,13 +1576,17 @@ function GiveResourcesToPlayer(data)
     -- storage is lost. Only take what fits, counting gifts already given to
     -- the receiver this tick since `GetEconomyStored` doesn't include them yet.
     local tick = GetGameTick()
-    if ResourcesGivenThisTick.Tick ~= tick then
-        ResourcesGivenThisTick = { Tick = tick }
+    if ResourcesGivenTick ~= tick then
+        ResourcesGivenTick = tick
+        for _, given in ResourcesGiven do
+            given.Mass = 0
+            given.Energy = 0
+        end
     end
-    local received = ResourcesGivenThisTick[data.To]
+    local received = ResourcesGiven[data.To]
     if not received then
         received = { Mass = 0, Energy = 0 }
-        ResourcesGivenThisTick[data.To] = received
+        ResourcesGiven[data.To] = received
     end
 
     local massCapacity = toBrain:GetArmyStat('Economy_MaxStorage_Mass', 0).Value
