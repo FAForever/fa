@@ -1574,7 +1574,8 @@ function GiveResourcesToPlayer(data)
     -- `GiveResource` only banks into the receiver's income for this tick; it
     -- reaches storage on the next economy tick, where anything past max
     -- storage is lost. Only take what fits, counting gifts already given to
-    -- the receiver this tick since `GetEconomyStored` doesn't include them yet.
+    -- the receiver this tick since `GetEconomyStored` doesn't include them yet,
+    -- and the receiver's own net income (per tick) that lands at the same time.
     local tick = GetGameTick()
     if ResourcesGivenTick ~= tick then
         ResourcesGivenTick = tick
@@ -1590,9 +1591,9 @@ function GiveResourcesToPlayer(data)
     end
 
     local massCapacity = toBrain:GetArmyStat('Economy_MaxStorage_Mass', 0).Value
-        - toBrain:GetEconomyStored('MASS') - received.Mass
+        - toBrain:GetEconomyStored('MASS') - received.Mass - toBrain:GetEconomyTrend('MASS')
     local energyCapacity = toBrain:GetArmyStat('Economy_MaxStorage_Energy', 0).Value
-        - toBrain:GetEconomyStored('ENERGY') - received.Energy
+        - toBrain:GetEconomyStored('ENERGY') - received.Energy - toBrain:GetEconomyTrend('ENERGY')
 
     local massRequested = math.min(data.Mass * fromBrain:GetEconomyStored('MASS'), math.max(massCapacity, 0))
     local energyRequested = math.min(data.Energy * fromBrain:GetEconomyStored('ENERGY'), math.max(energyCapacity, 0))
