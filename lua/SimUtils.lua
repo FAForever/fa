@@ -1540,9 +1540,8 @@ end
 -- Chat-relay helpers moved to `/lua/ChatUtils.lua`:
 --   * `SendChatMessage`  — trusted sim relay that feeds `Sync.ChatMessages`.
 
---- Game tick that `ResourcesGiven` counts gifts for
+-- Resources given to each army this tick, which `GetEconomyStored` doesn't include yet
 local ResourcesGivenTick = -1
---- Resources given to each army during `ResourcesGivenTick`, which haven't reached its storage yet
 ---@type table<Army, {Mass: number, Energy: number}>
 local ResourcesGiven = {}
 
@@ -1565,17 +1564,13 @@ function GiveResourcesToPlayer(data)
 
     local fromBrain = ArmyBrains[data.From]
     local toBrain = ArmyBrains[data.To]
-    -- Abort if any of the armies is defeated or if trying to send a negative or invalid value.
-    -- Written as `not (x >= 0)` so it also rejects NaN, which fails every comparison
+    -- `not (x >= 0)` also rejects NaN
     if fromBrain:IsDefeated() or toBrain:IsDefeated() or not (data.Mass >= 0 and data.Energy >= 0) then
         return
     end
 
-    -- `GiveResource` only banks into the receiver's income for this tick; it
-    -- reaches storage on the next economy tick, where anything past max
-    -- storage is lost. Only take what fits, counting gifts already given to
-    -- the receiver this tick since `GetEconomyStored` doesn't include them yet,
-    -- and the receiver's own net income (per tick) that lands at the same time.
+    -- `GiveResource` adds to the receiver's income, which reaches storage next tick along
+    -- with its trend. Anything past max storage is lost, so only take what fits
     local tick = GetGameTick()
     if ResourcesGivenTick ~= tick then
         ResourcesGivenTick = tick
