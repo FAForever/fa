@@ -33,6 +33,7 @@ GPG-modified **LuaPlus 5.0**, not 5.1+. [Details](docs/development-start-here/lu
 - **Indexing `nil` returns `nil`.** `t.a.b` is `nil` when `t.a` is missing, and the repo relies on this. Don't add `and` guards or treat such chains as bugs. Calling `nil` and `t[nil] = v` still error.
 - `io` and `os` exist only in the init context. No `require` or C modules.
 - The init files (`init_*.lua`) can use only the globals in [init_data.md](init_data.md). There is no `ConExecute`, and `import` returns `false`.
+- NaN fails every comparison, so a guard like `if x < 0` lets it through. Use `if not (x >= 0)` when a value can be NaN, such as one computed from player input.
 - A thread can't yield inside `pcall` or a metamethod. `WaitSeconds` and the other waits there fail with "attempt to yield across metamethod/C-call boundary". Wait outside the `pcall`.
 
 ### Runtime changes to Lua behavior
