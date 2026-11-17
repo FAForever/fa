@@ -77,6 +77,31 @@ AirUnit = ClassUnit(MobileUnit) {
     end,
 
     ---@param self AirUnit
+    ---@param type IntelType
+    ---@param radius integer
+    SetIntelRadius = function(self, type, radius)
+        MobileUnit.SetIntelRadius(self, type, radius)
+        local radii = self.IntelRadii---@type table<IntelType, integer>
+        if not radii then
+            local bp = self.Blueprint.Intel
+            radii = {
+                ['Vision'] = bp.VisionRadius,
+                ['WaterVision'] = bp.WaterVisionRadius,
+                ['Radar'] = bp.RadarRadius,
+                ['Sonar'] = bp.SonarRadius,
+                ['Omni'] = bp.OmniRadius,
+                ['RadarStealthField'] = bp.RadarStealthFieldRadius,
+                ['SonarStealthField'] = bp.SonarStealthFieldRadius,
+                ['CloakField'] = bp.CloakFieldRadius,
+                ['Jammer'] = bp.JamRadius,
+            }
+            self.IntelRadii = radii
+        end
+        self:DebugLog(string.format('[%d] %s radius changed %d -> %d', GetGameTick(), type, radii[type], radius))
+        radii[type] = radius
+    end,
+
+    ---@param self AirUnit
     OnStartRefueling = function(self)
         self:PlayUnitSound('Refueling')
     end,
