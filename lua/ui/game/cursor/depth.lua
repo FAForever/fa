@@ -157,11 +157,18 @@ local function DepthScanningThread()
 
         camera = GetCamera('WorldCamera')
         position = GetMouseWorldPos()
-        cursor = GetCursorInformation()
-        elevation = cursor.Elevation
+
+        -- the cursor's elevation comes from the engine statistics, which are read only while scanning is on:
+        -- reading them every frame with the option off rebuilt the whole statistics table every frame
+        cursor = nil
+        elevation = nil
+        if position and position[1] and CheckConditions(CommandMode) then
+            cursor = GetCursorInformation()
+            elevation = cursor.Elevation
+        end
 
         -- check if we have all the data required
-        if position and position[1] and cursor and cursor.Elevation and CheckConditions(CommandMode) then
+        if elevation then
             
             position[1] = math.clamp(position[1], 0, scenario.size[1])
             position[3] = math.clamp(position[3], 0, scenario.size[2])

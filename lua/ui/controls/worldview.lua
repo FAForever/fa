@@ -1186,6 +1186,8 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldVie
                             marker.drag.OnMove = function(dragself, x, y)
                                 PingGroup.Left:Set(function() return  (x - (PingGroup.Width()/2)) end)
                                 PingGroup.Top:Set(function() return  (y - (PingGroup.Marker.Height()/2)) end)
+                                -- the next frame update sets the projected position again
+                                PingGroup.ProjectedX = nil
                                 moved = true
                                 dragself.x = x
                                 dragself.y = y
@@ -1258,25 +1260,52 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldVie
                 PingGroup.Left:Set(function() return PingGroup.coords.x - PingGroup.Height() / 2 end)
                 PingGroup.Top:Set(function() return PingGroup.coords.y - PingGroup.Width() / 2 end)
                 PingGroup:SetNeedsFrameUpdate(true)
+
+                -- The marker follows its location's projection every frame. Its position functions are made once and
+                -- set again only when the projection moved, and Hide/Show run only on a control whose state differs:
+                -- setting new functions and calling Hide/Show on every marker every frame made each marker's whole
+                -- group lay out again and run its OnHide callbacks every frame, about 0.3 ms a frame with 12 markers.
+                local function PingLeft() return self.Left() + (PingGroup.coords.x - PingGroup.Height() / 2) end
+                local function PingTop() return self.Top() + (PingGroup.coords.y - PingGroup.Width() / 2) end
+                local function SetShown(control, shown)
+                    if control:IsHidden() == shown then
+                        if shown then
+                            control:Show()
+                        else
+                            control:Hide()
+                        end
+                    end
+                end
+
                 PingGroup.OnFrame = function(pinggrp, deltaTime)
-                    pinggrp.coords = self:Project(Vector(PingGroup.data.Location[1], PingGroup.data.Location[2], PingGroup.data.Location[3]))
-                    PingGroup.Left:Set(function() return self.Left() + (PingGroup.coords.x - PingGroup.Height() / 2) end)
-                    PingGroup.Top:Set(function() return self.Top() + (PingGroup.coords.y - PingGroup.Width() / 2) end)
+                    local location = PingGroup.data.Location
+                    if pinggrp.WorldLocation ~= location then
+                        pinggrp.WorldLocation = location
+                        pinggrp.WorldVector = Vector(location[1], location[2], location[3])
+                    end
+                    local coords = self:Project(pinggrp.WorldVector)
+                    pinggrp.coords = coords
+                    if coords.x ~= pinggrp.ProjectedX or coords.y ~= pinggrp.ProjectedY then
+                        pinggrp.ProjectedX = coords.x
+                        pinggrp.ProjectedY = coords.y
+                        PingGroup.Left:Set(PingLeft)
+                        PingGroup.Top:Set(PingTop)
+                    end
                     if pinggrp.NewPosition then
-                        pinggrp:Hide()
-                        pinggrp.Marker:Hide()
-                        pinggrp.Name:Hide()
+                        SetShown(pinggrp, false)
+                        SetShown(pinggrp.Marker, false)
+                        SetShown(pinggrp.Name, false)
                     else
                         if pinggrp.Top() < self.Top() or pinggrp.Left() < self.Left() or pinggrp.Right() > self.Right() or pinggrp.Bottom() > self.Bottom() then
-                            pinggrp:Hide()
-                            pinggrp.Name:Hide()
-                            pinggrp.Marker:Hide()
+                            SetShown(pinggrp, false)
+                            SetShown(pinggrp.Name, false)
+                            SetShown(pinggrp.Marker, false)
                         else
                             if self.PingVis then
-                                pinggrp:Show()
+                                SetShown(pinggrp, true)
                             end
-                            pinggrp.Name:Show()
-                            pinggrp.Marker:Show()
+                            SetShown(pinggrp.Name, true)
+                            SetShown(pinggrp.Marker, true)
                         end
                     end
                 end
