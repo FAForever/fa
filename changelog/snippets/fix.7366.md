@@ -1,0 +1,1 @@
+- Fix the first damage-over-time pulse after a projectile impact coming a tick late, which made the gap between the impact and the first pulse a tick longer than the rest (#7366).
