@@ -1,0 +1,1 @@
+- Fix the Seraphim SACU's Enhanced Sensor System upgrade not using its blueprint range value for the Overcharge and Auto Overcharge weapons (#7390).
