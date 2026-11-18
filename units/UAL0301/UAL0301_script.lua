@@ -94,6 +94,13 @@ UAL0301 = ClassUnit(CommandUnit) {
     ---@param self UAL0301
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementShieldHeavy = function(self, bp)
+        -- manually built enhancements are processed outside of a thread, so we can't wait here
+        self:ForkThread(self.CreateHeavyShield, bp)
+    end,
+
+    ---@param self UAL0301
+    ---@param bp UnitBlueprintEnhancement
+    CreateHeavyShield = function(self, bp)
         WaitTicks(1)
         self:CreateShield(bp)
         self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
