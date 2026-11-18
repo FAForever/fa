@@ -5,7 +5,7 @@ Delete the sections and comments that don't apply. A small PR may only need the 
 
 ## Problem
 <!--
-For a fix: the symptom, as a log excerpt, a screenshot or a short description.
+For a fix: the symptom as a log excerpt, a screenshot, or a short description.
 For a feature or balance change: why players need it, with a link to the discussion that approved it.
 If an issue already covers this, you can remove this section and link the issue in the description below.
 -->
@@ -24,7 +24,7 @@ Then link what a reviewer needs, if any:
 ## Testing done on the proposed changes
 <!--
 Describe what you tested and what you saw in a few sentences, a screenshot, or a video. Put results that compare runs, such as observations or benchmarks before and after the changes, in a table.
-Steps for reviewers to repeat go in a numbered list or a checklist.
+Testing steps go in a numbered list or a checklist.
 Long setup goes in a details block:
 
 <details><summary> Setup </summary>
