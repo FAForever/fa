@@ -145,7 +145,8 @@ local function UpdateDisplay()
         sortOrder[index] = {}
         sortOrder[index].infoIndex = index
 
-        local PlayerData = curInfo.scoreData.current[index]
+        -- score data is indexed by army, not by row
+        local PlayerData = curInfo.scoreData.current[info.armyIndex]
         PlayerData.general.mass = PlayerData.resources.massin.total
         PlayerData.general.energy = PlayerData.resources.energyin.total
         PlayerData.resources.massover = {}
@@ -187,9 +188,10 @@ local function UpdateDisplay()
 
             for curCol, colData in currentPage.tabData.columns do
                 -- check if data sub-type otherwise use parent value
+                local armyData = curInfo.scoreData.current[info.armyIndex]
                 curGrid[index].cols[curCol]:SetText(tostring(math.floor(
-                    curInfo.scoreData.current[curPlayerIndex][curScoreKey][colData.scoreKey][curType] or
-                    curInfo.scoreData.current[curPlayerIndex][curScoreKey][colData.scoreKey] or 0)))
+                    armyData[curScoreKey][colData.scoreKey][curType] or
+                    armyData[curScoreKey][colData.scoreKey] or 0)))
             end
         end
     end
@@ -224,10 +226,11 @@ function UpdateData()
     local index = 1
     -- popluate data in to cur info
     for i, armyInfo in armiesTable do
-        if not armyInfo.civilian and armyInfo.showScore then
+        if hotstats.IsScoredArmy(armyInfo, i) then
             -- set basic info from armies table
             curInfo[index] = {}
-            curInfo[index].name = hotstats.scoreData.current[i].name
+            curInfo[index].armyIndex = i
+            curInfo[index].name = hotstats.GetArmyName(armyInfo, i)
             curInfo[index].faction = armyInfo.faction
             curInfo[index].color = armyInfo.color
             --curInfo[index].teamName = index --TODO we need to get team data in here
