@@ -233,15 +233,23 @@ local function ResourceClickProcessing(self, event, uiGroup, resType)
             local EconData = GetEconomyTotals()
             local ResVolume = EconData.stored[string.upper(resType)]
             if ResVolume <= 0 then return end
+            -- Send up to a quarter of our storage, limited to the room the
+            -- receiver has left. When the (possibly stale) scores say they
+            -- are full, still ask for the quarter: the sim only takes what
+            -- fits and tells the giver when the receiver's storage is full.
             local SentValue = scoreData.resources.storage['max'..resType] - scoreData.resources.storage['stored'..resType]
-            if SentValue <= 0 then return end
-            SentValue = math.min(SentValue,ResVolume * 0.25)
+            if SentValue <= 0 then
+                SentValue = ResVolume * 0.25
+            else
+                SentValue = math.min(SentValue, ResVolume * 0.25)
+            end
             local Value = {Mass = 0, Energy = 0}
             Value[resType] = SentValue / ResVolume
             SimCallback( { Func = "GiveResourcesToPlayer",
                            Args = { From = GetFocusArmy(), To = armyID,
                            Mass = Value.Mass, Energy = Value.Energy, }} )
-            scoreData.resources.storage['stored'..resType] = scoreData.resources.storage['stored'..resType] + SentValue
+            scoreData.resources.storage['stored'..resType] = math.min(scoreData.resources.storage['max'..resType],
+                scoreData.resources.storage['stored'..resType] + SentValue)
             uiGroup[string.lower(resType)..'_in']:SetText(fmtnum(scoreData.resources.storage['stored'..resType]))
         elseif event.Modifiers.Ctrl then
             if GetFocusArmy() == armyID then

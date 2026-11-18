@@ -1540,6 +1540,66 @@ end
 -- Chat-relay helpers moved to `/lua/ChatUtils.lua`:
 --   * `SendChatMessage`  — trusted sim relay that feeds `Sync.ChatMessages`.
 
+local MaxStorageStat = {
+    MASS = 'Economy_MaxStorage_Mass',
+    ENERGY = 'Economy_MaxStorage_Energy',
+}
+
+--- Gives `fraction` of the sender's stored `resource` to the receiver, up to what the receiver can store
+---@param fromBrain AIBrain
+---@param toBrain AIBrain
+---@param resource ResourceType
+---@param fraction number
+---@return number given
+local function GiveResourceFraction(fromBrain, toBrain, resource, fraction)
+    -- `not (x > 0)` also skips NaN
+    if not (fraction > 0) then
+        return 0
+    end
+
+    -- `GiveResource` adds to the receiver's income, which reaches storage next tick along
+    -- with its trend. Anything past max storage is lost, so only take what fits
+    local capacity = toBrain:GetArmyStat(MaxStorageStat[resource], 0).Value
+        - toBrain:GetEconomyStored(resource) - toBrain:GetEconomyTrend(resource)
+        - toBrain:GetPendingResourceGift(resource)
+    if capacity <= 0 then
+        return 0
+    end
+
+    local given = fromBrain:TakeResource(resource, math.min(fraction * fromBrain:GetEconomyStored(resource), capacity))
+    toBrain:GiveResource(resource, given)
+    return given
+end
+
+--- Amount of `resource` the giver asks to send: `fraction` of what they have stored
+---@param fromBrain AIBrain
+---@param resource ResourceType
+---@param fraction number
+---@return number
+local function RequestedAmount(fromBrain, resource, fraction)
+    -- `not (x > 0)` also skips NaN
+    if not (fraction > 0) then
+        return 0
+    end
+    return math.min(fraction, 1) * fromBrain:GetEconomyStored(resource)
+end
+
+--- How full the receiver's `resource` storage will be once this tick's gifts and
+--- income arrive, in percent. Uses the same amounts as `GiveResourceFraction`, so
+--- a receiver that can't take any more reads as 100.
+---@param toBrain AIBrain
+---@param resource ResourceType
+---@return integer
+local function StoragePercent(toBrain, resource)
+    local max = toBrain:GetArmyStat(MaxStorageStat[resource], 0).Value
+    if max <= 0 then
+        return 100
+    end
+    local fill = toBrain:GetEconomyStored(resource) + toBrain:GetEconomyTrend(resource)
+        + toBrain:GetPendingResourceGift(resource)
+    return math.floor(100 * math.max(0, math.min(1, fill / max)) + 0.5)
+end
+
 ---@param data {From: Army, To: Army, Mass: number, Energy: number, Sender?: string, Msg?: table}
 function GiveResourcesToPlayer(data)
     -- The refactored chat path (see `ChatUtils.SendChatMessage`) still fires
@@ -1559,69 +1619,57 @@ function GiveResourcesToPlayer(data)
 
     local fromBrain = ArmyBrains[data.From]
     local toBrain = ArmyBrains[data.To]
-    -- Abort if any of the armies is defeated or if trying to send a negative value
-    if fromBrain:IsDefeated() or toBrain:IsDefeated() or data.Mass < 0 or data.Energy < 0 then
+    if fromBrain:IsDefeated() or toBrain:IsDefeated() then
         return
     end
-    -- `GiveResource` silently caps at the receiver's max storage, and
-    -- storage stats only update next tick, so derive what can actually land
-    -- up front from `MaxStorage - Stored`. Only take that much from the
-    -- giver: anything the receiver can't hold stays with the giver instead
-    -- of being destroyed.
-    local massMax = toBrain:GetArmyStat('Economy_MaxStorage_Mass', 0).Value
-    local energyMax = toBrain:GetArmyStat('Economy_MaxStorage_Energy', 0).Value
-    local massStored = toBrain:GetEconomyStored('MASS')
-    local energyStored = toBrain:GetEconomyStored('ENERGY')
-    local massRequested = math.min(data.Mass, 1) * fromBrain:GetEconomyStored('MASS')
-    local energyRequested = math.min(data.Energy, 1) * fromBrain:GetEconomyStored('ENERGY')
+    -- what the giver asks to send, read before anything is taken
+    local massRequested = RequestedAmount(fromBrain, 'MASS', data.Mass)
+    local energyRequested = RequestedAmount(fromBrain, 'ENERGY', data.Energy)
 
-    local massGiven = 0
-    local energyGiven = 0
-    local massToTake = math.min(massRequested, math.max(0, massMax - massStored))
-    local energyToTake = math.min(energyRequested, math.max(0, energyMax - energyStored))
-    if massToTake > 0 then
-        massGiven = fromBrain:TakeResource('MASS', massToTake)
-        toBrain:GiveResource('MASS', massGiven)
-    end
-    if energyToTake > 0 then
-        energyGiven = fromBrain:TakeResource('ENERGY', energyToTake)
-        toBrain:GiveResource('ENERGY', energyGiven)
-    end
+    local massGiven = GiveResourceFraction(fromBrain, toBrain, 'MASS', data.Mass)
+    local energyGiven = GiveResourceFraction(fromBrain, toBrain, 'ENERGY', data.Energy)
 
     -- Whisper from giver → receiver so the line reads with the giver's
     -- attribution. Three LOC keys rather than one templated string so each
     -- locale gets a clean sentence per case.
     --
-    -- A resource donation is ends with how full the receiver's storage 
-    -- is after the transfer, so a capped donation reads as "(100%)".
-    local function StoragePercent(stored, given, max)
-        if max <= 0 then
-            return 100
-        end
-        return math.floor(100 * math.min(1, (stored + given) / max) + 0.5)
-    end
+    -- Each resource the giver tried to send ends with how full the receiver's
+    -- storage is after the transfer, so a capped donation reads as "(100%)".
     local mass = math.floor(massGiven)
     local energy = math.floor(energyGiven)
-    local massPercent = StoragePercent(massStored, massGiven, massMax)
-    local energyPercent = StoragePercent(energyStored, energyGiven, energyMax)
     local sendsMass = massRequested >= 1
     local sendsEnergy = energyRequested >= 1
     local toArmy = data.To --[[@as integer]]
     local fromName = fromBrain.Nickname or tostring(data.From)
     local toName = toBrain.Nickname or tostring(toArmy)
-    local msg, args
-    if sendsMass and sendsEnergy then
-        msg = "<LOC chat_resources_received_both>%s sent %s %d mass (%d%%) and %d energy (%d%%)."
-        args = { fromName, toName, mass, massPercent, energy, energyPercent }
-    elseif sendsMass then
-        msg = "<LOC chat_resources_received_mass>%s sent %s %d mass (%d%%)."
-        args = { fromName, toName, mass, massPercent }
-    elseif sendsEnergy then
-        msg = "<LOC chat_resources_received_energy>%s sent %s %d energy (%d%%)."
-        args = { fromName, toName, energy, energyPercent }
-    end
-    if msg and (mass > 0 or energy > 0) then
+
+    if mass > 0 or energy > 0 then
+        local massPercent = StoragePercent(toBrain, 'MASS')
+        local energyPercent = StoragePercent(toBrain, 'ENERGY')
+        local msg, args
+        if sendsMass and sendsEnergy then
+            msg = "<LOC chat_resources_received_both>%s sent %s %d mass (%d%%) and %d energy (%d%%)."
+            args = { fromName, toName, mass, massPercent, energy, energyPercent }
+        elseif sendsMass then
+            msg = "<LOC chat_resources_received_mass>%s sent %s %d mass (%d%%)."
+            args = { fromName, toName, mass, massPercent }
+        else
+            msg = "<LOC chat_resources_received_energy>%s sent %s %d energy (%d%%)."
+            args = { fromName, toName, energy, energyPercent }
+        end
         fromBrain:SendChatToAllies(msg, args, nil, 'ReceiveResources')
+    elseif sendsMass or sendsEnergy then
+        -- Nothing fit: tell only the giver, so donating to a full ally gives
+        -- feedback without spamming everyone else's chat.
+        local msg
+        if sendsMass and sendsEnergy then
+            msg = "<LOC chat_resources_storage_full_both>%s's mass and energy storage is full."
+        elseif sendsMass then
+            msg = "<LOC chat_resources_storage_full_mass>%s's mass storage is full."
+        else
+            msg = "<LOC chat_resources_storage_full_energy>%s's energy storage is full."
+        end
+        fromBrain:SendChatToSelf(msg, { toName }, nil, 'ReceiveResources')
     end
 end
 
