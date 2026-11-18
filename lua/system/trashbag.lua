@@ -46,13 +46,13 @@ TrashBag = ClassTrashBag {
     ---@return T
     Add = function(self, trash)
         -- -- Uncomment for performance testing
-        -- if entity == nil then 
+        -- if trash == nil then 
         --     WARN("Attempted to add a nil to a TrashBag: " .. repr(debug.getinfo(2)))
         --     return 
         -- end
 
         -- -- Uncomment for performance testing
-        -- if not entity.Destroy then 
+        -- if not trash.Destroy then 
         --     WARN("Attempted to add an entity with no Destroy() method to a TrashBag: "  .. repr(debug.getinfo(2)))
         --     return 
         -- end

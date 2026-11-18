@@ -14,10 +14,8 @@
 -- us from scoping this as an upvalue
 -- local _c_CreateEntity = _c_CreateEntity
 
---- TODO
----@alias EntitySpec table
-
 ---@class Entity : moho.entity_methods, InternalObject
+---@overload fun(spec?: EntitySpec): Entity
 Entity = Class(moho.entity_methods) {
 
     --- Called during class initialisation
@@ -25,13 +23,13 @@ Entity = Class(moho.entity_methods) {
     -- @param spec The specifications of the entity
     -- -  if 'spec.Owner' is set to a unit then the visibility of the entity matches that of the unit
     ---@param self Entity
-    ---@param spec EntitySpec
+    ---@param spec? EntitySpec
     __init = function(self, spec)
         _c_CreateEntity(self, spec)
     end,
 
     ---@param self Entity
-    ---@param spec EntitySpec
+    ---@param spec? EntitySpec
     __post_init = function(self, spec)
         self:OnCreate(spec)
     end,
