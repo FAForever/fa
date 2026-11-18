@@ -1,0 +1,1 @@
+- Fix the CZAR, the Fatboy and its external factory reclaiming wrecks when given a build order on top of them. Units without the reclaim command now wait instead (#7376).
