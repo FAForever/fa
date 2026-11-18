@@ -6,8 +6,8 @@ Delete the sections and comments that don't apply. A small PR may only need the 
 ## Problem
 <!--
 For a fix: the symptom, as a log excerpt, a screenshot or a short description.
-For a feature: why players need it.
-Leave this out when a linked issue already shows it.
+For a feature: why players need it, with a link to the discussion that approved it.
+If an issue already covers this, you can remove this section and link the issue in the description below.
 -->
 
 
@@ -16,15 +16,20 @@ Leave this out when a linked issue already shows it.
 What changes, in 1-3 sentences.
 Then link what a reviewer needs, if any:
 - the issue, with a closing keyword: Fixes #1234
-- the discussion or decision that approved the change
-- related PRs: earlier PRs of a stack, faf-re or FA-Binary-Patches changes
+- the PR that caused the problem, so this PR also shows on its timeline
+- related changes in faf-re or FA-Binary-Patches
 -->
 
 
 ## Testing done on the proposed changes
 <!--
-What you tested and the result, in a line or a table.
-Steps for reviewers to repeat go in a numbered list or a checklist. Long setup goes in a details block.
+Describe what you tested and what you saw in a few sentences, a screenshot or a video. Put results that compare runs, such as before and after or a benchmark, in a table.
+Steps for reviewers to repeat go in a numbered list or a checklist.
+Long setup goes in a details block:
+
+<details><summary> Setup </summary>
+
+</details>
 -->
 
 
@@ -35,7 +40,7 @@ Optional. Put each part in a details block, so it stays out of the way until a r
 - Implementation: one change per bullet, grouped by behavior. Leave out what the diff shows.
 - Alternatives considered, and why they weren't used.
 
-<details><summary>Root cause</summary>
+<details><summary> Root cause </summary>
 
 </details>
 -->
@@ -44,9 +49,5 @@ Optional. Put each part in a details block, so it stays out of the way until a r
 ## Checklist
 - [ ] New code is annotated and has comments where useful
 - [ ] Changes are documented in a changelog snippet according to the [guidelines](https://faforever.github.io/fa/development/changelog#format-of-a-snippet), or added to the snippet of the unreleased PR this one changes
-- [ ] The change is conceptually approved (see the [explanation](https://github.com/FAForever/fa/blob/deploy/fafdevelop/CONTRIBUTING.md)) through:
-  - being a bugfix
-  - team lead approval
-  - a concluded discussion (add link)
-  <!-- Remove the reasons that don't apply -->
+- [ ] The change is conceptually approved ([explanation](https://github.com/FAForever/fa/blob/deploy/fafdevelop/CONTRIBUTING.md)): it is a bugfix, the team lead approved it, or a discussion concluded in its favor (linked above)
 - [ ] Requested 2-3 reviewers from the [list of reviewers and their areas of knowledge](https://github.com/FAForever/fa/blob/deploy/fafdevelop/CONTRIBUTING.md#reviewers)
