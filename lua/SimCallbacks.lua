@@ -50,6 +50,9 @@ local GetCurrentCommandSourceArmy = SimUtils.GetCurrentCommandSourceArmy
 -- upvalue categories for performance
 local CategoriesTransportation = categories.TRANSPORTATION
 
+local CategoriesEngineers = categories.ENGINEER + categories.COMMAND
+local CategoriesFactories = categories.STRUCTURE * categories.FACTORY
+
 --- List of callbacks that is being populated throughout this file
 ---@type table<string, fun(data: table, units?: Unit[])>
 local Callbacks = {}
@@ -769,6 +772,34 @@ do
         -- perform the command
         import("/lua/sim/commands/abort-navigation.lua").AbortNavigation(engineers, true)
     end
+end
+
+--- Aborts the initial assist move of the engineers that are already in build range of the factory they assist
+---@param data { Target: EntityId }
+---@param selection Unit[]
+Callbacks.AbortNavigationOfFactoryAssisters = function(data, selection)
+    -- no anti-automation guard: this only skips the assist move of engineers in range of the factory they assist
+
+    selection = SecureUnits(selection)
+    if not selection[1] then
+        return
+    end
+
+    local engineers = EntityCategoryFilterDown(CategoriesEngineers, selection) --[[@as Unit[] ]]
+    if not engineers[1] then
+        return
+    end
+
+    local target = engineers[1]:GetCommandQueue()[1].target
+    if not target or IsDestroyed(target) or not IsUnit(target)
+        ---@cast target Unit
+        or not EntityCategoryContains(CategoriesFactories, target)
+    then
+        return
+    end
+
+    -- fork call so guard order can tick first
+    ForkThread(import("/lua/sim/commands/abort-factory-assist-navigation.lua").AbortNavigationOfFactoryAssisters, engineers, target)
 end
 
 do
