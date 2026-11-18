@@ -1,17 +1,17 @@
 <!--
 Write for a volunteer reviewer with a few minutes: the top sections should be enough to decide whether and how to review.
-Delete the sections and comments that don't apply. A small PR may only need the description, testing and the checklist.
+Delete the sections and comments that don't apply. A small PR may only need Proposed Changes, Testing, and the checklist.
 -->
 
 ## Problem
 <!--
 For a fix: the symptom as a log excerpt, a screenshot, or a short description.
 For a feature or balance change: why players need it, with a link to the discussion that approved it.
-If an issue already covers this, you can remove this section and link the issue in the description below.
+If an issue already covers this, you can remove this section and link the issue in Proposed Changes below.
 -->
 
 
-## Description of the proposed changes
+## Proposed Changes
 <!--
 What changes, in 1-3 sentences. Longer explanations go in the details section below.
 Then link what a reviewer needs, if any:
@@ -21,7 +21,7 @@ Then link what a reviewer needs, if any:
 -->
 
 
-## Testing done on the proposed changes
+## Testing
 <!--
 Describe what you tested and what you saw in a few sentences, a screenshot, or a video. Put results that compare runs, such as observations or benchmarks before and after the changes, in a table.
 Testing steps go in a numbered list or a checklist.
