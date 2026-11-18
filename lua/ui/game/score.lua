@@ -55,9 +55,7 @@ function IsStorageFull(armyIndex, resType)
     return max > 0 and (storage['stored' .. resType] or 0) >= max
 end
 
---- Prints a local message (like the game speed messages) when every resource we
---- try to give to `armyIndex` is already full. Returns whether it did, so the
---- caller can skip the donation.
+--- Prints a local message if every resource we try to give to `armyIndex` is already full. 
 ---@param armyIndex number
 ---@param mass boolean # whether mass is being given
 ---@param energy boolean # whether energy is being given
