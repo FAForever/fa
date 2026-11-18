@@ -39,6 +39,46 @@ local gameSpeed = 0
 local needExpand = false
 local contractOnCreate = false
 local ScoresCache = {}
+
+--- Whether the last scores we received say `armyIndex` has no room left for `resType`.
+--- Only allies' storage is known; returns false when it isn't.
+---@param armyIndex number
+---@param resType 'Mass' | 'Energy'
+---@return boolean
+function IsStorageFull(armyIndex, resType)
+    local resources = ScoresCache[armyIndex].resources
+    local storage = resources and resources.storage
+    if not storage then
+        return false
+    end
+    local max = storage['max' .. resType] or 0
+    return max > 0 and (storage['stored' .. resType] or 0) >= max
+end
+
+--- Prints a local message (like the game speed messages) when every resource we
+--- try to give to `armyIndex` is already full. Returns whether it did, so the
+--- caller can skip the donation.
+---@param armyIndex number
+---@param mass boolean # whether mass is being given
+---@param energy boolean # whether energy is being given
+---@return boolean
+function PrintIfStorageFull(armyIndex, mass, energy)
+    local massFull = mass and IsStorageFull(armyIndex, 'Mass')
+    local energyFull = energy and IsStorageFull(armyIndex, 'Energy')
+    if (mass and not massFull) or (energy and not energyFull) or not (mass or energy) then
+        return false
+    end
+
+    local name = ScoresCache[armyIndex].name or tostring(armyIndex)
+    if massFull and energyFull then
+        print(LOCF("<LOC resources_storage_full_both>%s's mass and energy storage is full.", name))
+    elseif massFull then
+        print(LOCF("<LOC resources_storage_full_mass>%s's mass storage is full.", name))
+    else
+        print(LOCF("<LOC resources_storage_full_energy>%s's energy storage is full.", name))
+    end
+    return true
+end
 local resModeSwitch = {}
 local DisplayResMode = 0
 local DisplayStorage = 0
@@ -233,23 +273,18 @@ local function ResourceClickProcessing(self, event, uiGroup, resType)
             local EconData = GetEconomyTotals()
             local ResVolume = EconData.stored[string.upper(resType)]
             if ResVolume <= 0 then return end
-            -- Send up to a quarter of our storage, limited to the room the
-            -- receiver has left. When the (possibly stale) scores say they
-            -- are full, still ask for the quarter: the sim only takes what
-            -- fits and tells the giver when the receiver's storage is full.
             local SentValue = scoreData.resources.storage['max'..resType] - scoreData.resources.storage['stored'..resType]
             if SentValue <= 0 then
-                SentValue = ResVolume * 0.25
-            else
-                SentValue = math.min(SentValue, ResVolume * 0.25)
+                PrintIfStorageFull(armyID, resType == 'Mass', resType == 'Energy')
+                return
             end
+            SentValue = math.min(SentValue,ResVolume * 0.25)
             local Value = {Mass = 0, Energy = 0}
             Value[resType] = SentValue / ResVolume
             SimCallback( { Func = "GiveResourcesToPlayer",
                            Args = { From = GetFocusArmy(), To = armyID,
                            Mass = Value.Mass, Energy = Value.Energy, }} )
-            scoreData.resources.storage['stored'..resType] = math.min(scoreData.resources.storage['max'..resType],
-                scoreData.resources.storage['stored'..resType] + SentValue)
+            scoreData.resources.storage['stored'..resType] = scoreData.resources.storage['stored'..resType] + SentValue
             uiGroup[string.lower(resType)..'_in']:SetText(fmtnum(scoreData.resources.storage['stored'..resType]))
         elseif event.Modifiers.Ctrl then
             if GetFocusArmy() == armyID then

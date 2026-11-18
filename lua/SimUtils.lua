@@ -1658,18 +1658,6 @@ function GiveResourcesToPlayer(data)
             args = { fromName, toName, energy, energyPercent }
         end
         fromBrain:SendChatToAllies(msg, args, nil, 'ReceiveResources')
-    elseif sendsMass or sendsEnergy then
-        -- Nothing fit: tell only the giver, so donating to a full ally gives
-        -- feedback without spamming everyone else's chat.
-        local msg
-        if sendsMass and sendsEnergy then
-            msg = "<LOC chat_resources_storage_full_both>%s's mass and energy storage is full."
-        elseif sendsMass then
-            msg = "<LOC chat_resources_storage_full_mass>%s's mass storage is full."
-        else
-            msg = "<LOC chat_resources_storage_full_energy>%s's energy storage is full."
-        end
-        fromBrain:SendChatToSelf(msg, { toName }, nil, 'ReceiveResources')
     end
 end
 

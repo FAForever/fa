@@ -1,1 +1,1 @@
-- Resource donation messages now show how full the receiver's storage is after the transfer, for example "sent 300 mass (85%)". Donating to an ally whose storage is full now tells you so in your own chat, instead of doing nothing (#7398).
+- Resource donation messages now show how full the receiver's storage is after the transfer, for example "sent 300 mass (85%)". Trying to donate to an ally whose storage is full through the scoreboard, the diplomacy panel or `/gift-resources` now shows a local message instead of doing nothing (#7398).

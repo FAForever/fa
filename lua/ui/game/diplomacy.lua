@@ -729,6 +729,12 @@ function CreateShareResourcesDialog(control)
         end)
 
         okBtn.OnClick = function(self, modifiers)
+            local giveMass = massSlider:GetValue() > 0
+            local giveEnergy = energySlider:GetValue() > 0
+            if import("/lua/ui/game/score.lua").PrintIfStorageFull(control.Data.armyIndex, giveMass, giveEnergy) then
+                CreateShareResourcesDialog(control)
+                return
+            end
             SimCallback({
                 Func = "GiveResourcesToPlayer",
                 Args = {
