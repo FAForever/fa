@@ -145,7 +145,6 @@ local function UpdateDisplay()
         sortOrder[index] = {}
         sortOrder[index].infoIndex = index
 
-        -- score data is indexed by army, not by row
         local PlayerData = curInfo.scoreData.current[info.armyIndex]
         PlayerData.general.mass = PlayerData.resources.massin.total
         PlayerData.general.energy = PlayerData.resources.energyin.total

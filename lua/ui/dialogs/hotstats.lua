@@ -191,7 +191,7 @@ local function nodata()
     noData.Depth:Set(GetFrame(0):GetTopmostDepth())
 end
 
---- Whether an army from `GetArmiesTable()` gets its own entry in the score screen.
+--- Whether an army gets its own entry in the score screen.
 --- Civilians and armies that hide their score (such as the AI armies in campaign
 --- and co-op missions) are left out.
 ---@param armyInfo table
@@ -204,8 +204,7 @@ function IsScoredArmy(armyInfo, armyIndex)
         and scoreData.current[armyIndex] ~= nil
 end
 
---- Name of an army in the score data. The score data is indexed by army index,
---- with gaps for the armies the sim doesn't track.
+--- Name of an army in end of game score data.
 ---@param armyInfo table
 ---@param armyIndex number
 ---@return string
