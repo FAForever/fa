@@ -73,7 +73,7 @@ function GetMajorityFaction(units)
 end
 
 --- Filter your selection to the highest tech engineers of the majority faction for that tech level.
---- The other idle engineers in the selection assist one of those engineers. Other units keep their orders.
+--- The other idle engineers in the selection assist one of those engineers.
 function SelectHighestEngineerAndAssist()
     local selection = GetSelectedUnits()
 

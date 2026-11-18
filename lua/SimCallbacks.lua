@@ -525,8 +525,6 @@ end
 ---@field KeepIds? EntityId[] # engineers that stay selected; their orders are left alone
 
 --- Idle engineers in the old selection that do not stay selected assist the target.
---- Everything else (busy engineers, ACUs, factories and other structures, combat
---- units) keeps its orders, and so do the engineers that stay selected.
 ---@param data SelectHighestEngineerAndAssistData
 ---@param selection Unit[]
 Callbacks.SelectHighestEngineerAndAssist = function(data, selection)
