@@ -11,8 +11,8 @@
 
 ---@alias VictoryCondition 'demoralization' | 'domination' | 'eradication' | 'sandbox' | 'decapitation'
 ---@alias ShareOption "CivilianDeserter" | "Defectors" | "FullShare" | "PartialShare" | "ShareUntilDeath" | "TransferToKiller"
----@alias AbandonedCommandersOption "Explode" | "Recall"
----@alias CommonArmyOption "Off" | "UnionWhenDisconnected" | "Union" | "Common"
+---@alias AbandonedCommandersOption "Explode" | "Recall" | "Share"
+---@alias CommonArmyOption "Off" | "Union" | "Common"
 
 --- Additionally, extra options can be specified by the map in `mapname .. 'options.lua'`
 ---@class GameOptions
@@ -186,11 +186,6 @@ teamOptions =
                 key = 'Off'
             },
             {
-                text = "<LOC lobui_CAUponDisconnectTitle>Union control upon disconnect",
-                help = "<LOC lobui_CAUponDisconnectDescription>Initially each player has their own army and their own resources. When a player disconnects the army is not considered defeated and the share condition does not trigger. Instead, allied players can switch focus to the disconnected army to issue commands.",
-                key = 'UnionWhenDisconnected'
-            },
-            {
                 text = "<LOC lobui_CAUnion>Multiple armies, union control",
             help = "<LOC lobui_CAUDesc>Each player has their own army and their own resources. Allied players can switch focus to your army and to issue commands.",
                 key = 'Union'
@@ -278,6 +273,11 @@ globalOpts = {
                 text = "<LOC lobui_abandoned_acu_05>Recall",
                 help = "<LOC lobui_abandoned_acu_06>An ally receives the ACU and all units. If the ACU survives for 30 seconds, it recalls and the ally keeps the units. If it is destroyed first, the share condition applies to the units.",
                 key = 'Recall',
+            },
+            {
+                text = "<LOC lobui_abandoned_acu_07>Share",
+                help = "<LOC lobui_abandoned_acu_08>An ally receives the ACU and all units for good. The ACU counts as their own: they stay in the game while it lives. The game is unrated.",
+                key = 'Share',
             },
         },
     },
