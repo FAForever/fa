@@ -180,7 +180,7 @@ Checkbox = ClassUI(Group) {
 
     -- override this method to handle clicks differently than default (which is ToggleCheck)
     ---@param self Checkbox
-    ---@param modifiers EventModifiers
+    ---@param modifiers KeyModifiers
     OnClick = function(self, modifiers)
         self:ToggleCheck()
     end,

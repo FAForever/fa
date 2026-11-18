@@ -161,7 +161,7 @@ Checkbox = ClassUI(Bitmap) {
 
     --- Override this method to handle clicks differently than default (which is ToggleCheck)
     ---@param self MauiCheckbox
-    ---@param modifiers EventModifiers
+    ---@param modifiers KeyModifiers
     OnClick = function(self, modifiers)
         self:ToggleCheck()
     end,
