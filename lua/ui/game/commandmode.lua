@@ -348,7 +348,6 @@ end
 
 -- cached category strings for performance
 local categoriesFactories = categories.STRUCTURE * categories.FACTORY
-local categoriesShields = categories.MOBILE * categories.SHIELD
 local categoriesStructure = categories.STRUCTURE
 
 ---@param unit UserUnit
@@ -552,12 +551,6 @@ local function OnGuardIssued(command)
                 local cb = { Func = 'ValidateAssist', Args = { target = command.Target.EntityId } }
                 SimCallback(cb, true)
             end
-        end
-
-        -- validate shields
-        if EntityCategoryFilterDown(categoriesShields, command.Units)[1] then
-            local cb = { Func = 'FlagShield', Args = { target = command.Target.EntityId } }
-            SimCallback(cb, true)
         end
 
         -- see if we can cap a structure
