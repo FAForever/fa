@@ -143,6 +143,7 @@ SyncMeta = {
 
 local cUnit = moho.unit_methods
 local cUnitGetBuildRate = cUnit.GetBuildRate
+local cUnitSetReclaimable = cUnit.SetReclaimable
 local UnitSetMaxHealth = _G.moho.unit_methods.SetMaxHealth
 
 ---@class UnitBuffsTable
@@ -181,6 +182,8 @@ local UnitSetMaxHealth = _G.moho.unit_methods.SetMaxHealth
 ---@field SiloWeapon? Weapon
 ---@field SiloProjectile? ProjectileBlueprint
 ---@field ReclaimTimeMultiplier? number
+---@field ReclaimedWhileBeingBuilt? boolean # Set when a unit starts reclaiming this unit while it is being built
+---@field Unreclaimable? boolean # Set when scripts made this unit unreclaimable through `SetReclaimable`
 ---@field CaptureTimeMultiplier? number
 ---@field PlatoonHandle? Platoon
 ---@field tickIssuedShieldRepair number? # Used by shields to keep track of when this unit's guards were ordered to start shield repair instantly
@@ -937,6 +940,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         self.EntityBeingReclaimed = target
         self:SetUnitState('Reclaiming', true)
+
+        -- the engine unbuilds a unit that is being built, see `OnStopBeingBuilt`
+        if target.IsUnit and target:IsBeingBuilt() then
+            target.ReclaimedWhileBeingBuilt = true
+        end
         self:SetFocusEntity(target)
         self:CheckAssistersFocus()
         self:DoUnitCallbacks('OnStartReclaim', target)
@@ -2503,6 +2511,17 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         if self.Dead or self:BeenDestroyed() then -- Sanity check, can prevent strange shield bugs and stuff
             self:Kill()
             return false
+        end
+
+        -- A reclaim that starts while a unit is being built unbuilds it: it lowers the build
+        -- fraction and refunds the full build cost for each part removed. The engine keeps doing
+        -- that after other builders finish the unit, which refunds a finished, working unit and
+        -- leaves it alive at 0 health. Making the unit unreclaimable for a tick makes the engine
+        -- drop those reclaim orders. A new reclaim order then reclaims it as a finished unit.
+        if self.ReclaimedWhileBeingBuilt then
+            self.ReclaimedWhileBeingBuilt = nil
+            cUnitSetReclaimable(self, false)
+            self:ForkThread(self.RestoreReclaimableThread)
         end
 
         -- Create any idle effects on unit
@@ -4636,6 +4655,24 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     SetMaxHealth = function(self, maxhealth)
         UnitSetMaxHealth(self, maxhealth)
         self:UpdateShieldAssistersConsumption()
+    end,
+
+    --- Sets whether the unit can be reclaimed, and remembers it so that
+    --- `RestoreReclaimableThread` doesn't undo it.
+    ---@param self Unit
+    ---@param reclaimable boolean
+    SetReclaimable = function(self, reclaimable)
+        self.Unreclaimable = not reclaimable or nil
+        cUnitSetReclaimable(self, reclaimable)
+    end,
+
+    --- Restores the reclaimable state that `OnStopBeingBuilt` turned off to stop
+    --- reclaimers from unbuilding the finished unit.
+    ---@param self Unit
+    RestoreReclaimableThread = function(self)
+        -- give the reclaim tasks a tick to see the unit as unreclaimable
+        WaitTicks(2)
+        cUnitSetReclaimable(self, not self.Unreclaimable)
     end,
 
     -------------------------------------------------------------------------------------------
