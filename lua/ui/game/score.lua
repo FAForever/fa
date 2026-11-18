@@ -45,6 +45,14 @@ local DisplayStorage = 0
 
 local created = false
 
+--- The score of an army as last synced, if the scores are visible to the focus army.
+---@param army number
+---@return number?
+function GetArmyScore(army)
+    local data = ScoresCache[army]
+    return data and data.general and data.general.score
+end
+
 function updatePlayerName(line)
     local playerName = line.name:GetText()
     local playerDivision = sessionInfo.Options.Divisions[playerName]

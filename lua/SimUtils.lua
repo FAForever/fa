@@ -1205,6 +1205,48 @@ function KillArmy(self, shareOption)
     ShareArmy(self, shareOption)
 end
 
+--- Orders the allies that receive my units: the ally chosen when leaving the game first (see
+--- `SetAbandonRecipient`), then the others by rating and score.
+---@param self AIBrain
+---@param allies AIBrain[]
+---@return AIBrain[] allies # sorted in place
+function GetShareRecipients(self, allies)
+    SortBrainsByRating(allies)
+
+    local chosen = self.AbandonRecipient and ArmyBrains[self.AbandonRecipient]
+    if chosen then
+        for i, brain in allies do
+            if brain == chosen then
+                table.remove(allies, i)
+                table.insert(allies, 1, chosen)
+                break
+            end
+        end
+    end
+
+    return allies
+end
+
+--- Sim callback: the player chooses the ally that receives their army when they leave the game.
+--- The UI sends it right before leaving. A choice that is no longer valid, such as a defeated
+--- ally, is ignored and the default order applies.
+---@param data { To: Army }
+function SetAbandonRecipient(data)
+    local army = GetCurrentCommandSourceArmy()
+    local brain = army and ArmyBrains[army]
+    if not brain or brain:IsDefeated() then
+        return
+    end
+
+    local to = type(data) == 'table' and data.To
+    local toBrain = type(to) == 'number' and ArmyBrains[to]
+    if not toBrain or to == army or toBrain:IsDefeated() or ArmyIsCivilian(to) or not IsAlly(army, to) then
+        return
+    end
+
+    brain.AbandonRecipient = to
+end
+
 --- Applies the given share condition to my army right away, then kills what remains.
 ---@param self AIBrain
 ---@param shareOption ShareOption
@@ -1217,12 +1259,12 @@ function ShareArmy(self, shareOption)
         KillSharedUnits(selfIndex)
         ReturnBorrowedUnits(self)
     elseif shareOption == 'FullShare' then
-        TransferUnitsToHighestBrain(self, brainCategories.Allies, true, nil, "FullShare")
+        TransferUnitsToBrain(self, GetShareRecipients(self, brainCategories.Allies), true, nil, "FullShare")
         TransferOwnershipOfBorrowedUnits(brainCategories.Allies, selfIndex)
     elseif shareOption == 'PartialShare' then
         KillSharedUnits(selfIndex, categories.ALLUNITS - partialShareCategory)
         ReturnBorrowedUnits(self)
-        TransferUnitsToHighestBrain(self, brainCategories.Allies, true, partialShareCategory - categories.COMMAND, "PartialShare")
+        TransferUnitsToBrain(self, GetShareRecipients(self, brainCategories.Allies), true, partialShareCategory - categories.COMMAND, "PartialShare")
         TransferOwnershipOfBorrowedUnits(brainCategories.Allies, selfIndex)
     else
         GetBackUnits(selfIndex, brainCategories.Allies)
@@ -1462,7 +1504,7 @@ function KillAbandonedArmy(self)
     local option = ScenarioInfo.Options.AbandonedCommanders
 
     if option == 'Recall' then
-        local allies = SortBrainsByRating(GetAllegianceCategories(self.Army).Allies)
+        local allies = GetShareRecipients(self, GetAllegianceCategories(self.Army).Allies)
         if not table.empty(allies) then
             RecallAbandonedArmy(self, allies)
             return

@@ -274,12 +274,14 @@ local actions = {
             {escapeButton = 3, enterButton = 1, worldCover = true})
     end,
     EndMPGame = function()
-        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0001>Are you sure you'd like to quit?",
-        "<LOC _Yes>", EndGame,
-        "<LOC _No>", nil,
-            nil, nil,
-            true,
-            {escapeButton = 3, enterButton = 1, worldCover = true})
+        import("/lua/ui/game/abandondialog.lua").ConfirmLeave(EndGame, function()
+            UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0001>Are you sure you'd like to quit?",
+                "<LOC _Yes>", EndGame,
+                "<LOC _No>", nil,
+                nil, nil,
+                true,
+                {escapeButton = 3, enterButton = 1, worldCover = true})
+        end)
     end,
     RestartGame = function()
         UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0002>Are you sure you'd like to restart?",
@@ -314,14 +316,16 @@ local actions = {
             {escapeButton = 3, enterButton = 1, worldCover = true})
     end,
     ExitMPGame = function()
-        UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0003>Are you sure you'd like to exit?",
-            "<LOC _Yes>", function()
-                EscapeHandler.SafeQuit()
-            end,
-            "<LOC _No>", nil,
-            nil, nil,
-            true,
-            {escapeButton = 2, enterButton = 1, worldCover = true})
+        import("/lua/ui/game/abandondialog.lua").ConfirmLeave(EscapeHandler.SafeQuit, function()
+            UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0003>Are you sure you'd like to exit?",
+                "<LOC _Yes>", function()
+                    EscapeHandler.SafeQuit()
+                end,
+                "<LOC _No>", nil,
+                nil, nil,
+                true,
+                {escapeButton = 2, enterButton = 1, worldCover = true})
+        end)
     end,
     ShowObj = function()
         import("/lua/ui/game/objectivedetail.lua").ToggleDisplay()
