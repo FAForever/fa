@@ -209,8 +209,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
             Share = 'FullShare',
             ShareUnitCap = 'allies',
             DisconnectionDelay02 = '90',
-            DisconnectShare = 'SameAsShare',
-            DisconnectShareCommanders = 'Explode',
+            AbandonedCommanders = 'Recall',
             TeamShareOverflow = "enabled",
 
             -- yep, great

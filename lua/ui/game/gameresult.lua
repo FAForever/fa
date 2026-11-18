@@ -16,6 +16,9 @@ local OtherArmyResultStrings = {
     gameOver = '<LOC usersync_0004>Game Over.',
 }
 
+--- Replaces the defeat announcement of an army whose players left the game
+local AbandonedArmyResultString = '<LOC usersync_abandoned_army>%s has abandoned their army.'
+
 local MyArmyResultStrings = {
     victory = "<LOC GAMERESULT_0000>Victory!",
     defeat = "<LOC GAMERESULT_0001>You have been defeated!",
@@ -38,10 +41,13 @@ function DoGameResult(armyIndex, result)
     local armies = GetArmiesTable().armiesTable
     announced[armyIndex] = true
 
+    -- the sim flags armies whose players left the game in the same sync as their defeat
+    local abandoned = result == 'defeat' and Sync.AbandonedArmies and Sync.AbandonedArmies[armyIndex]
+
     -- If it's someone else, announce it and stop.
     if armyIndex ~= GetFocusArmy() then
         import("/lua/ui/game/score.lua").ArmyAnnounce(armyIndex,
-            LOCF(OtherArmyResultStrings[result], armies[armyIndex].nickname))
+            LOCF(abandoned and AbandonedArmyResultString or OtherArmyResultStrings[result], armies[armyIndex].nickname))
         return
     end
 

@@ -89,9 +89,9 @@ AbstractVictoryCondition = Class(DebugComponent) {
             return false
         end
 
-        -- only units that are not recalling are taken into account.
+        -- units such as the recalling ACUs of an abandoned army don't keep their army in the game.
 
-        if unit.RecallingAfterDefeat then
+        if unit.IgnoredByVictoryCondition then
             return false
         end
 
@@ -406,6 +406,13 @@ AbstractVictoryCondition = Class(DebugComponent) {
         aiBrain:OnDefeat()
 
         local brainIndex = aiBrain.Army
+
+        -- the players left the game: announce it as such, the result stays a defeat
+        if aiBrain.AbandonedAt then
+            Sync.AbandonedArmies = Sync.AbandonedArmies or {}
+            Sync.AbandonedArmies[brainIndex] = true
+        end
+
         SyncGameResult({ brainIndex, "defeat -10" })
     end,
 
