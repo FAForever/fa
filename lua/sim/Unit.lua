@@ -71,6 +71,14 @@ local function GetShieldAssistRates(unit)
     return shield, energy, mass
 end
 
+--- Returns whether the engine gave the unit a transport interface, without it `Unit:GetCargo` errors
+---@param unit Unit
+---@return boolean
+local function CanHaveCargo(unit)
+    local blueprint = unit.Blueprint
+    return blueprint.General.CommandCapsHash.RULEUCC_Transport or blueprint.CategoriesHash.PODSTAGINGPLATFORM or false
+end
+
 --- Structures that are reused for performance reasons
 --- Maps unit.techCategory to a number so we can do math on it for naval units
 
@@ -887,10 +895,41 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     OnReclaimed = function(self, reclaimer)
         self:DoUnitCallbacks('OnReclaimed', reclaimer)
         self.CreateReclaimEndEffects(reclaimer, self)
+        self:ReclaimCargo()
         self:Destroy()
 
         -- for AI events
         self.Brain:OnUnitReclaimed(self, reclaimer)
+    end,
+
+    --- Turns the cargo of a reclaimed unit into wrecks on the ground below it and destroys the cargo.
+    --- The engine reclaims a unit by draining its health and then leaving its wreck, but it destroys
+    --- the cargo without a wreck. The cargo's reclaim time is part of the carrier's, see `GetReclaimCosts`.
+    ---@param self Unit
+    ReclaimCargo = function(self)
+        if not CanHaveCargo(self) then
+            return
+        end
+
+        for _, unit in self:GetCargo() do
+            if not IsDestroyed(unit) then
+                -- external factories are part of their parent unit
+                if not EntityCategoryContains(categories.EXTERNALFACTORYUNIT, unit) then
+                    -- a transport inside another transport
+                    unit:ReclaimCargo()
+
+                    local prop = unit:CreateWreckageProp(0)
+                    if prop then
+                        -- the cargo is attached above the ground, move its wreck down like the wreck of an aircraft
+                        local pos = prop:GetPosition()
+                        local x, z = pos[1], pos[3]
+                        prop:SetPosition({ x, GetTerrainHeight(x, z) + GetTerrainTypeOffset(x, z), z }, true)
+                    end
+                end
+
+                unit:Destroy()
+            end
+        end
     end,
 
     ---@param self Unit
@@ -4150,6 +4189,15 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             local duration = (0.1 * costs * reclaimTimeMultiplier) / buildrate
             if duration < 0 then
                 duration = 1
+            end
+
+            -- the cargo is reclaimed with the unit, as it is captured with the unit (see `GetCaptureCosts`)
+            if CanHaveCargo(target) and target:GetFractionComplete() >= 1 then
+                for _, unit in target:GetCargo() do
+                    if not EntityCategoryContains(categories.EXTERNALFACTORYUNIT, unit) then
+                        duration = duration + (self:GetReclaimCosts(unit))
+                    end
+                end
             end
 
             -- duration determines both unbuilt and built unit reclaim speed
