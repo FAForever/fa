@@ -56,6 +56,9 @@ Command = {
         return true
     end,
     Execute = function(args)
+        if import("/lua/ui/game/score.lua").PrintIfStorageFull(args.target, args.type == 'mass', args.type == 'energy') then
+            return
+        end
         local fraction = args.percent / 100
         SimCallback({
             Func = "GiveResourcesToPlayer",
