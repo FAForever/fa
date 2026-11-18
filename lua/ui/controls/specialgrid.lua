@@ -24,8 +24,10 @@ SpecialGrid = ClassUI(Group) {
         self._pageMax = false
         self._vertical = isVertical
     
+        -- The construction layout anchors the grid again on every tab change, which marks Right dirty even when the
+        -- edge stays where it was. The buttons are cleared at the next fill instead, and only if the edge moved.
         self.Right.OnDirty = function(var)
-            self:ClearItems()
+            self._rightDirty = true
         end
 
     end,
@@ -83,6 +85,16 @@ SpecialGrid = ClassUI(Group) {
 
     ---@param self SpecialGrid
     CalcVisible = function(self)
+        -- counts the fills, so a caller can tell whether the grid was filled since it last looked
+        self.calcCount = (self.calcCount or 0) + 1
+        if self._rightDirty then
+            self._rightDirty = false
+            local right = self.Right()
+            if right ~= self._itemsRight then
+                self._itemsRight = right
+                self:ClearItems()
+            end
+        end
         local maxItemWidth = 0
         local itemIndex = 1
         local minControl = 'Left'
