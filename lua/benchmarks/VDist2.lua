@@ -1,11 +1,21 @@
--- UpvaluedEngineVDist2OnLocals:        0.043102264404297
--- UpvaluedEngineVDist2SqOnLocals:      0.040153503417969
--- UpvaluedLuaVDist2OnLocals:           0.029483795166016
--- UpvaluedLuaVDist2SqOnLocals:         0.014518737792969
+-- Results with loop count 200000:
+--
+-- |---------------------------------------|---------|---------|------------|-----------|--------|------|-----------|---------|---------|------|
+-- | Name                                  | Samples | Mean ms | +/- 95% ms | +/- 95% % | Dev ms | CV % | Median ms |  Min ms |  Max ms | Skew |
+-- |---------------------------------------|---------|---------|------------|-----------|--------|------|-----------|---------|---------|------|
+-- | "UpvaluedEngineVDist2OnLocals (x2)"   |      29 | 14.0465 |     0.1996 |      1.42 | 0.5247 | 3.74 |   13.8550 | 13.4277 | 15.1978 | 0.68 |
+-- | "UpvaluedEngineVDist2SqOnLocals (x2)" |      30 | 13.6434 |     0.3605 |      2.64 | 0.9655 | 7.08 |   13.3362 | 12.3291 | 15.6860 | 0.52 |
+-- | "UpvaluedLuaVDist2OnLocals (x2)"      |      29 | 10.1129 |     0.0407 |      0.40 | 0.1071 | 1.06 |   10.1318 |  9.9487 | 10.3760 | 0.42 |
+-- | "UpvaluedLuaVDist2SqOnLocals (x2)"    |      32 |  5.0964 |     0.0407 |      0.80 | 0.1139 | 2.24 |    5.0659 |  4.8218 |  5.3101 | 0.14 |
+-- |---------------------------------------|---------|---------|------------|-----------|--------|------|-----------|---------|---------|------|
+-- | "Baseline, 1 parameter (x2)"          |     107 |  1.5071 |     0.0081 |      0.54 | 0.0423 | 2.80 |    1.5259 |  1.4648 |  1.5869 | 0.48 |
+-- |---------------------------------------|---------|---------|------------|-----------|--------|------|-----------|---------|---------|------|
 
 -- Conclusion: Lua is much faster, especially when skipping the square root (useful in distance comparisons).
+-- `VDist2` in Lua is 1.4x faster than the engine's, and `VDist2Sq` in Lua 2.7x faster.
 
 ModuleName = "VDist2"
+ModuleLoopCount = 200000
 
 function UpvaluedEngineVDist2OnLocals(loop)
     local p1 = Random()*1000

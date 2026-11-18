@@ -70,6 +70,10 @@ local testSets = {
         list = {-6, 0, 1, 3, 4, 5, 6, 12},
         quartiles = {-6, 0, 3.5, 6, 12},
         remove_outliers = {0, 1, 3, 4, 5, 6, 12},
+    }, { -- subtest 15
+        list = {0, 0, 0, 0, 0, 0, 3},
+        quartiles = {0, 0, 0, 0, 3},
+        remove_outliers = {0, 0, 0, 0, 0, 0, 3},
     },
 }
 
@@ -108,6 +112,28 @@ luft.describe("Stat functions", function()
             luft.expect(removedOutliers).to.equal(set.remove_outliers)
             luft.expect(removedOutliers).to.not_be(set.remove_outliers) -- should copy the list
         end
+    end)
+    luft.test("Timestamp resolution", function()
+        luft.expect(TimestampResolution(365.5)).to.be(1 / 32768)
+        luft.expect(TimestampResolution(16383.9)).to.be(1 / 1024)
+        luft.expect(TimestampResolution(16384)).to.be(1 / 512)
+        luft.expect(TimestampResolution(32738.6)).to.be(1 / 512)
+        luft.expect(TimestampResolution(32768)).to.be(1 / 256)
+    end)
+    luft.test("Coarse timer", function()
+        luft.expect(IsTimerTooCoarse(1 / 16384, 0.002)).to.be(false)
+        luft.expect(IsTimerTooCoarse(1 / 16384, 0.0001)).to.be(true)
+        luft.expect(IsTimerTooCoarse(1 / 16384, 0)).to.be(true)
+        luft.expect(CoarseTimerFactor(0.001, 0.1)).to.be(1)
+        luft.expect(CoarseTimerFactor(0.001, 0.01)).to.be.close.to(2)
+        luft.expect(CoarseTimerFactor(0.001, 0)).to.be.close.to(40)
+    end)
+    luft.test("Confidence margin", function()
+        luft.expect(ConfidenceMargin95(1, 1)).to.be(nil)
+        luft.expect(ConfidenceMargin95(2, 2)).to.be.close.to(12.706 * 2 / math.sqrt(2))
+        luft.expect(ConfidenceMargin95(3, 31)).to.be.close.to(2.042 * 3 / math.sqrt(31))
+        luft.expect(ConfidenceMargin95(3, 41)).to.be.close.to(2.021 * 3 / math.sqrt(41))
+        luft.expect(ConfidenceMargin95(1, 1000)).to.be.close.to(1.98 / math.sqrt(1000))
     end)
 end)
 
