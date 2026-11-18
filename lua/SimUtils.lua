@@ -1227,6 +1227,161 @@ function GetShareRecipients(self, allies)
     return allies
 end
 
+--- Adds a unit to the units of an abandoned army that can be passed on. An upgrade replaces the
+--- unit with a new one, which takes its place.
+---@param tracked table<Unit, true>
+---@param unit Unit
+local function TrackAbandonedUnit(tracked, unit)
+    tracked[unit] = true
+    unit:AddOnUnitBuiltCallback(function(builder, built)
+        if tracked[builder] and built.Blueprint.General.UpgradesFrom == builder.UnitId then
+            TrackAbandonedUnit(tracked, built)
+        end
+    end, categories.ALLUNITS)
+end
+
+--- Remembers the units an abandoned army gave to its allies, so that an ally can pass them on
+--- with `ForwardAbandonedArmy`. When the player didn't choose who receives their army, every ally
+--- that received units is offered to pass them on.
+---@param self AIBrain
+---@param newUnits Unit[]?
+function TrackAbandonedUnits(self, newUnits)
+    if not self.AbandonedAt or not newUnits or table.empty(newUnits) then
+        return
+    end
+
+    -- weak keys: units destroyed meanwhile drop out once collected, see `GetForwardableUnits`
+    local tracked = self.AbandonedUnits
+    if not tracked then
+        tracked = setmetatable({}, { __mode = 'k' })
+        self.AbandonedUnits = tracked
+        self.AbandonForwarders = {}
+    end
+
+    local holders = {}
+    for _, unit in newUnits do
+        TrackAbandonedUnit(tracked, unit)
+        holders[unit.Army] = true
+    end
+
+    if not self.AbandonRecipient then
+        for holder in holders do
+            SyncAbandonedArmyReceived(self, holder)
+        end
+    end
+end
+
+--- Tells the UI of `holder` that it received units of an abandoned army that it can pass on.
+---@param self AIBrain
+---@param holder Army
+function SyncAbandonedArmyReceived(self, holder)
+    local forwarders = {}
+    for army in self.AbandonForwarders do
+        table.insert(forwarders, army)
+    end
+    Sync.AbandonedArmyReceived = Sync.AbandonedArmyReceived or {}
+    table.insert(Sync.AbandonedArmyReceived, { From = self.Army, To = holder, Forwarders = forwarders })
+end
+
+--- The units of an abandoned army that `holder` still has.
+---@param self AIBrain
+---@param holder Army
+---@return Unit[]
+function GetForwardableUnits(self, holder)
+    local units = {}
+    for unit in self.AbandonedUnits or {} do
+        -- the garbage collector may not have removed destroyed units yet
+        if not IsDestroyed(unit) and not unit.Dead and unit.Army == holder then
+            table.insert(units, unit)
+        end
+    end
+    return units
+end
+
+--- Tells the UI of the ally that tried to pass an abandoned army on whether it worked.
+---@param from Army # the abandoned army
+---@param army Army # the ally that passed it on
+---@param to Army
+---@param accepted boolean
+local function SyncForwardResult(from, army, to, accepted)
+    Sync.AbandonForwardResults = Sync.AbandonForwardResults or {}
+    table.insert(Sync.AbandonForwardResults, { From = from, Army = army, To = to, Accepted = accepted })
+end
+
+--- Sim callback: an ally that received the army of a player who left without choosing a recipient
+--- passes it on to another ally. Allies that already passed this army on can't receive it again.
+---@param data { From: Army, To: Army }
+function ForwardAbandonedArmy(data)
+    local army = GetCurrentCommandSourceArmy()
+    local brain = army and ArmyBrains[army]
+    if not brain or brain:IsDefeated() or type(data) ~= 'table' then
+        return
+    end
+
+    local from, to = data.From, data.To
+    local abandoned = type(from) == 'number' and ArmyBrains[from]
+    if not abandoned or not abandoned.AbandonedUnits then
+        return
+    end
+
+    local toBrain = type(to) == 'number' and ArmyBrains[to]
+    local units = GetForwardableUnits(abandoned, army)
+    if abandoned.AbandonRecipient or table.empty(units)
+        or not toBrain or to == army or toBrain:IsDefeated() or ArmyIsCivilian(to) or not IsAlly(army, to)
+        or abandoned.AbandonForwarders[to] or abandoned.AbandonForwarders[army]
+    then
+        SyncForwardResult(from, army, to, false)
+        return
+    end
+
+    -- also blocks a second request while the units move
+    abandoned.AbandonForwarders[army] = true
+
+    ForkThread(function()
+        local finished, unfinished = {}, {}
+        for _, unit in units do
+            if unit:GetFractionComplete() < 1.0 then
+                table.insert(unfinished, unit)
+            else
+                table.insert(finished, unit)
+            end
+        end
+
+        local tracked = abandoned.AbandonedUnits
+        local moved = 0
+        for _, unit in TransferUnitsOwnership(finished, to, false, true) or {} do
+            -- the units aren't lent by the ally that passed them on: they don't die with it
+            if unit.oldowner == army then
+                unit.oldowner = nil
+            end
+            TrackAbandonedUnit(tracked, unit)
+            moved = moved + 1
+        end
+        -- while the ACU recalls, the share condition can still apply to the rebuilt units
+        local borrowed = false
+        for _, unit in unfinished do
+            borrowed = borrowed or unit.oldowner == from
+        end
+        for _, unit in TransferUnfinishedUnitsAfterDeath(unfinished, { to }) or {} do
+            if borrowed then
+                MarkSharedUnit(unit, from)
+            end
+            TrackAbandonedUnit(tracked, unit)
+            moved = moved + 1
+        end
+
+        -- units being captured can't move: if none did, the ally can still try again
+        if moved == 0 then
+            abandoned.AbandonForwarders[army] = nil
+            SyncForwardResult(from, army, to, false)
+            return
+        end
+
+        SyncForwardResult(from, army, to, true)
+        SyncAbandonedArmyReceived(abandoned, to)
+    end)
+end
+
 --- Sim callback: the player chooses the ally that receives their army when they leave the game.
 --- The UI sends it right before leaving. A choice that is no longer valid, such as a defeated
 --- ally, is ignored and the default order applies.
@@ -1259,12 +1414,12 @@ function ShareArmy(self, shareOption)
         KillSharedUnits(selfIndex)
         ReturnBorrowedUnits(self)
     elseif shareOption == 'FullShare' then
-        TransferUnitsToBrain(self, GetShareRecipients(self, brainCategories.Allies), true, nil, "FullShare")
+        TrackAbandonedUnits(self, TransferUnitsToBrain(self, GetShareRecipients(self, brainCategories.Allies), true, nil, "FullShare"))
         TransferOwnershipOfBorrowedUnits(brainCategories.Allies, selfIndex)
     elseif shareOption == 'PartialShare' then
         KillSharedUnits(selfIndex, categories.ALLUNITS - partialShareCategory)
         ReturnBorrowedUnits(self)
-        TransferUnitsToBrain(self, GetShareRecipients(self, brainCategories.Allies), true, partialShareCategory - categories.COMMAND, "PartialShare")
+        TrackAbandonedUnits(self, TransferUnitsToBrain(self, GetShareRecipients(self, brainCategories.Allies), true, partialShareCategory - categories.COMMAND, "PartialShare"))
         TransferOwnershipOfBorrowedUnits(brainCategories.Allies, selfIndex)
     else
         GetBackUnits(selfIndex, brainCategories.Allies)
@@ -1457,6 +1612,7 @@ function RecallAbandonedArmy(self, allies)
             MarkSharedUnit(unit, selfIndex)
         end
     end
+    TrackAbandonedUnits(self, newUnits)
 
     -- outside of Assassination an army can abandon without ACUs: the transfer is then final
     local hadCommanders = not table.empty(recall.Commanders)

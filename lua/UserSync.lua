@@ -169,6 +169,14 @@ function OnSync()
         end
     end
 
+    if Sync.AbandonedArmyReceived then
+        import("/lua/ui/game/abandonforwardwindow.lua").OnAbandonedArmyReceived(Sync.AbandonedArmyReceived)
+    end
+
+    if Sync.AbandonForwardResults then
+        import("/lua/ui/game/abandonforwardwindow.lua").OnForwardResults(Sync.AbandonForwardResults)
+    end
+
     if Sync.ArmyTransfer --[[@as { [1]: { from: number, to: number, reason: string } }]] then 
         local army = GetFocusArmy()
         for k, transfer in Sync.ArmyTransfer do 
