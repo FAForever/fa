@@ -46,6 +46,9 @@ UnitBlueprint{
             ShieldRegenStartTime = 3,
             ShieldSize = 22,
             ShieldVerticalOffset = -3,
+            RegenPerBuildRate = 2.50,
+            AssistCostEnergyPerBuildRate = 4.91,
+            AssistCostMassPerBuildRate = 0.450,
         },
     },
     Display = {
@@ -90,8 +93,8 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 5000,
         BuildCostMass = 460,
-        BuildRate = 21,
-        BuildTime = 775,
+        BuildRate = 13.34,
+        BuildTime = 627,
         BuildableCategory = { "urb4205" },
         DifferentialUpgradeCostCalculation = true,
         MaintenanceConsumptionPerSecondEnergy = 200,
