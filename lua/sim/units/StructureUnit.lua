@@ -878,24 +878,40 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
     ---@param self StructureUnit
     ---@param adjacentUnit StructureUnit
     OnReceiveAdjacencyBuffTo = function(self, adjacentUnit)
-        -- edge case for missile construction: the buff doesn't apply to the missile under construction
-        if self.Blueprint.CategoriesHash["SILO"] then
-            if self:IsUnitState('SiloBuildingAmmo') then
-                local autoModeEnabled = self.AutoModeEnabled or false
-                local progress = self:GetWorkProgress()
-                if progress < 0.99 then
-                    self:StopSiloBuild()
-                    if EntityCategoryContains(categories.STRATEGIC, self) then
-                        IssueToUnitSiloBuildNuke(self)
-                    else
-                        IssueToUnitSiloBuildTactical(self)
-                    end
+        self:RestartSiloBuild()
+    end,
 
-                    self:GiveNukeSiloBlocks(progress)
-                    self:SetAutoMode(autoModeEnabled)
-                end
-            end
+    --- Restarts the missile under construction so that the engine recalculates its cost with the
+    --- current adjacency buffs, keeping the progress made so far.
+    ---@param self StructureUnit
+    RestartSiloBuild = function(self)
+        if not (self.Blueprint.CategoriesHash["SILO"] and self:IsUnitState('SiloBuildingAmmo')) then
+            return
         end
+
+        local progress = self:GetWorkProgress()
+        if progress >= 0.99 then
+            return
+        end
+
+        local autoModeEnabled = self.AutoModeEnabled or false
+        local isNuke
+        local siloWeapon = self.SiloWeapon
+        if siloWeapon then
+            isNuke = siloWeapon.Blueprint.NukeWeapon
+        else
+            isNuke = EntityCategoryContains(categories.STRATEGIC, self)
+        end
+
+        self:StopSiloBuild()
+        if isNuke then
+            IssueToUnitSiloBuildNuke(self)
+        else
+            IssueToUnitSiloBuildTactical(self)
+        end
+
+        self:GiveNukeSiloBlocks(progress)
+        self:SetAutoMode(autoModeEnabled)
     end,
 
     -- Removes all appropriate buffs from all adjacent units
@@ -922,19 +938,7 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
     ---@param self StructureUnit
     ---@param adjacentUnit StructureUnit
     OnLostAdjacencyBuffTo = function(self, adjacentUnit)
-        -- edge case for missile construction: the buff doesn't apply to the missile under construction
-        if self.Blueprint.CategoriesHash["SILO"] then
-            if self:IsUnitState('SiloBuildingAmmo') then
-                local autoModeEnabled = self.AutoModeEnabled or false
-                local progress = self:GetWorkProgress()
-                if progress < 0.99 then
-                    self:StopSiloBuild()
-                    IssueToUnitSiloBuildTactical(self)
-                    self:GiveNukeSiloBlocks(progress)
-                    self:SetAutoMode(autoModeEnabled)
-                end
-            end
-        end
+        self:RestartSiloBuild()
     end,
 
     -- Add/Remove Adjacency Effects
