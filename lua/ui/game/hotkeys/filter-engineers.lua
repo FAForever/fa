@@ -73,7 +73,7 @@ function GetMajorityFaction(units)
 end
 
 --- Filter your selection to the highest tech engineers of the majority faction for that tech level.
---- All other units assist one of those engineers.
+--- The other idle engineers in the selection assist one of those engineers.
 function SelectHighestEngineerAndAssist()
     local selection = GetSelectedUnits()
 
@@ -95,7 +95,17 @@ function SelectHighestEngineerAndAssist()
         end
 
         if highestTechEngiesAndSacusOfMajorityFaction then
-            SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = highestTechEngiesAndSacusOfMajorityFaction[1]:GetEntityId() }}, true)
+            local keepIds = {}
+            for k, unit in highestTechEngiesAndSacusOfMajorityFaction do
+                keepIds[k] = unit:GetEntityId()
+            end
+            SimCallback({
+                Func = 'SelectHighestEngineerAndAssist',
+                Args = {
+                    TargetId = highestTechEngiesAndSacusOfMajorityFaction[1]:GetEntityId(),
+                    KeepIds = keepIds,
+                },
+            }, true)
             SelectUnits(highestTechEngiesAndSacusOfMajorityFaction)
         end
     end
