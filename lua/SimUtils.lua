@@ -278,10 +278,12 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         -- Only allow units not attached to be given. This is because units will give all of its
         -- children over as well, so we only want the top level units to be given.
         -- Units currently being captured are also denied
+        -- Command units are only given without restrictions (see `ChangeUnitArmy` in SimHooks.lua)
         if owner == toArmy or
             unit:GetParent() ~= unit or (unit.Parent and unit.Parent ~= unit) or
             unit.CaptureProgress > 0 or
-            unit:GetFractionComplete() < 1.0
+            unit:GetFractionComplete() < 1.0 or
+            (not noRestrictions and unit.Blueprint.CategoriesHash["COMMAND"])
         then
             continue
         end
@@ -343,6 +345,21 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
             end
         end
 
+        -- UEF ACU and SACU drones are recreated by their enhancements after the transfer. A drone docked
+        -- on its parent is cargo, which the engine transfers as an extra drone without a parent, so destroy
+        -- the drones here. Remember the health of the ones that were alive so that the recreated drones keep
+        -- it, and dead drones are rebuilt instead of being recreated for free.
+        local podHealth
+        if unit.GetPods then
+            podHealth = {}
+            for _, pod in unit:GetPods() do
+                if not pod.Dead and not IsDestroyed(pod) then
+                    podHealth[pod.Pod] = pod:GetHealth()
+                    pod:Destroy()
+                end
+            end
+        end
+
         if unit.TransferUpgradeProgress and shareUpgrades then
             local progress = unit:GetWorkProgress()
             local upgradeBuildTime = unit.UpgradeBuildTime
@@ -385,6 +402,14 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         -- changing owner
         local newUnit = ChangeUnitArmy(unit, toArmy, noRestrictions or false)
         if not newUnit then
+            -- the transfer failed (unit cap), so give back the drones that we destroyed
+            if podHealth and not unit.Dead then
+                unit.TransferredPodHealth = podHealth
+                for podName in podHealth do
+                    unit['ProcessEnhancement' .. podName](unit)
+                end
+                unit.TransferredPodHealth = nil
+            end
             continue
         end
 
@@ -425,6 +450,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
             if TableEmpty(activeEnhancements) then
                 newUnit.OnStopBeingBuiltEnhancementsThread = nil
             else
+                newUnit.TransferredPodHealth = podHealth
                 newUnit.OnStopBeingBuiltEnhancementsThread = newUnit:ForkThread(function()
                     WaitTicks(1)
                     if newUnit and not newUnit.Dead and not IsDestroyed(newUnit) then
@@ -432,6 +458,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
                             newUnit:CreateEnhancement(enh)
                         end
                     end
+                    newUnit.TransferredPodHealth = nil
                     newUnit.OnStopBeingBuiltEnhancementsThread = nil
                 end)
             end
