@@ -63,7 +63,7 @@ Buffs = {}
 ---@field Add? number
 --- List of ceilings to use depending on the `techCategory` of the unit. Takes precedence over
 --- `Ceil` but falls back on it if no ceiling for the teach category is found.
----@field BPCeilings? table<string, number>
+---@field BPCeilings? table<TechCategory, number>
 --- List of floors to use depending on the `techCategory` of the unit. Takes precedence over `Floor`
 --- but falls back on it if no floor for the teach category is found.
 ---@field BPFloors? table<string, number>
