@@ -1,0 +1,1 @@
+- Fix the faf-re rejoin screen's status overlapping the loading tips: it now sits in a skinned panel above IN TRANSIT (#7401).
