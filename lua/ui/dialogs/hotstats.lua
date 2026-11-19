@@ -1119,10 +1119,9 @@ end
 -- the starting function launch by the hook
 function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standardScore)
     --LOG("called Set_graph...")
-    -- Campaign and co-op games get the same score screen as skirmish games.
-    -- The operation debriefing and objectives stay available on the
-    -- "Standard" tab.
-    standardScore:Hide()
+    -- Campaign and co-op games get the same score screen as skirmish games,
+    -- but open on the "Standard" tab so the operation debriefing and
+    -- objectives are shown first.
     page_active=Group(dialog)
     page_active.Left:Set(0)
     page_active.Top:Set(0)
@@ -1239,10 +1238,16 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
         end
     end
 
-    -- Init graph mode
-
-    graph_btn:SetCheck(true)
-    page_graph(clientArea)
+    if showCampaign then
+        -- Init standard mode, which opens on the debriefing and objectives
+        standardBtn:SetCheck(true)
+        Title_score:SetText("")
+    else
+        -- Init graph mode
+        standardScore:Hide()
+        graph_btn:SetCheck(true)
+        page_graph(clientArea)
+    end
     local beta=Bitmap(dialog)
     beta:SetTexture(mySkinnableFile(UIUtil.UIFile('/hotstats/bt_sca.dds')))
     LayoutHelpers.AtRightTopIn(beta,GetFrame(0),99,67)
