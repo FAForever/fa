@@ -262,7 +262,7 @@ function create_graph_bar(parent,name)
             player[player_nbr].color=v.color
             player[player_nbr].index=m
             player[player_nbr].faction=v.faction
-            graphic[player_nbr]={}
+            graphic[m]={}
         end
     end
     local row_nbr=1
