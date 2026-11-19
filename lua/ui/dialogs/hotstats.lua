@@ -333,8 +333,10 @@ function create_graph_bar(parent,name)
             end
             if value[columns_num][play.index].columns_value != nil and math.floor(value[columns_num][play.index].columns_value) != 0 and value[columns_num][play.index].columns_value>=value[columns_num].max_columns_value then
                 if value[columns_num][play.index].columns_value>value[columns_num].max_columns_value then
+                    -- players later in the list have no entry yet, and start as non-winners
                     for k2, play2 in player do
-                        if value[columns_num][play2.index].winner != nil then value[columns_num][play2.index].winner=false end
+                        local entry = value[columns_num][play2.index]
+                        if entry then entry.winner=false end
                     end
                 end
                 value[columns_num].max_columns_value=value[columns_num][play.index].columns_value
@@ -679,6 +681,7 @@ end
 function clean_view()
     if noData then noData:Destroy() noData = nil end
     if create_anime_graph != nil and create_anime_graph then KillThread(create_anime_graph) end
+    if create_anime_graph2 != nil and create_anime_graph2 then KillThread(create_anime_graph2) end
     if page_active != nil and page_active then page_active:Destroy() page_active=false end
     if page_active_graph != nil and page_active_graph then page_active_graph:Destroy() page_active_graph=false end
     if page_active_graph2 != nil and page_active_graph2 then page_active_graph2:Destroy() page_active_graph2=false end
