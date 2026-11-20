@@ -7,6 +7,7 @@ Copy the examples you need out of the comments, then delete the sections and com
 <!--
 For a fix: the symptom as a log excerpt, a screenshot, or a short description.
 For a feature or balance change: why players need it, with a link to the discussion that approved it.
+For other changes, such as refactors, docs or tooling: why they're needed.
 If an issue already covers this, you can remove this section and link the issue in Proposed Changes below.
 -->
 
@@ -24,10 +25,10 @@ Then link what a reviewer needs, if any:
 ## Testing
 <!--
 Steps that someone who doesn't know the change can follow to check it. If a linked issue already has complete steps, link them and add only what's missing.
-Number every step, setup included. Put any code snippets of a step in a details block inside it, and its expected results in checkboxes under it.
-When expected results are values such as benchmarks before and after the changes, put them in a table and refer to it from a checkbox. When the steps differ between parts of a test, give each part a heading that says where it starts from.
+Number every step, setup included. Put a code snippet longer than 3 lines in a details block inside its step, and the expected results in bullets under it. A screenshot can be an expected result.
+When expected results are values such as benchmarks before and after the changes, put them in a table and refer to it from a bullet. When the test splits into parts with different steps, give each part a lettered heading that says which step it follows, and continue the numbering from that step, so a step can be referred to as A3 or B3.
 
-1. Start ...
+1. Start ... and run `...`
 2. Run ...
    <details><summary> Code snippet </summary>
 
@@ -37,12 +38,16 @@ When expected results are values such as benchmarks before and after the changes
 
    </details>
 
-   - [ ] ... happens
-   - [ ] ... matches the table below
+   - ... happens
+   - ... matches the table below
 
-### Option off (repeat steps 1-2)
+### A: Option on (after step 2)
 3. Do ...
-   - [ ] ... happens
+   - ... happens
+
+### B: Option off (repeat steps 1-2 with the option off)
+3. Do ...
+   - ... happens
 -->
 
 
@@ -50,7 +55,7 @@ When expected results are values such as benchmarks before and after the changes
 <!--
 Add only the parts that apply, each in its own details block, so it stays collapsed until a reviewer opens it:
 - Root cause: the chain from the symptom to the cause, one step per line, each with its evidence.
-- Implementation: one change per bullet, grouped by behavior. Include what is easy to miss in the diff, such as the rule behind a change repeated across many files, or a small change inside a large one. Leave out what a reviewer sees at a glance, such as which functions or files changed.
+- Implementation: one change per bullet, grouped by behavior. Include what is easy to miss in the diff, such as the rule behind a change repeated across many files, or a small change inside a large one. Leave out what a reviewer sees at a glance, such as which files changed.
 - Alternatives considered, and why they weren't used.
 - Other long parts, such as a feature spec.
 
