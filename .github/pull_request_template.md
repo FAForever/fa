@@ -24,14 +24,26 @@ Then link what a reviewer needs, if any:
 ## Testing
 <!--
 Steps that someone who doesn't know the change can follow to check it. If a linked issue already has complete steps, link them and add only what's missing.
-Number every step, setup included. Put the expected result of a step in a checkbox under it, and snippets or long setup in a details block inside it.
-When only values differ between runs, such as benchmarks before and after the changes, put them in a table and refer to it from a checkbox. When the steps differ, give each part a heading that says where it starts from.
+Number every step, setup included. Put the code snippets of a step in a details block inside it, and its expected results in checkboxes under it.
+When expected results are values such as benchmarks before and after the changes, put them in a table and refer to it from a checkbox. When the steps differ between parts of a test, give each part a heading that says where it starts from.
 
-1. Start a skirmish with ...
-   <details><summary> Setup </summary>
+1. Start a skirmish and run ...
+   <details><summary> Code snippet </summary>
+
+   ```lua
+
+   ```
 
    </details>
-2. Do ...
+2. Run ...
+   <details><summary> Code snippet </summary>
+
+   ```lua
+
+   ```
+
+   </details>
+
    - [ ] ... happens
    - [ ] ... matches the table below
 
