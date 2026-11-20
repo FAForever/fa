@@ -23,13 +23,21 @@ Then link what a reviewer needs, if any:
 
 ## Testing
 <!--
-Describe what you tested and what you saw in a few sentences, a screenshot, or a video. Put results that compare runs, such as observations or benchmarks before and after the changes, in a table.
-Testing steps go in a numbered list or a checklist.
-Long setup goes in a details block:
+Steps that someone who doesn't know the change can follow to check it. If a linked issue already has complete steps, link them and add only what's missing.
+Number every step, setup included. Put the expected result of a step in a checkbox under it, and snippets or long setup in a details block inside it.
+When only values differ between runs, such as benchmarks before and after the changes, put them in a table and refer to it from a checkbox. When the steps differ, give each part a heading that says where it starts from.
 
-<details><summary> Setup </summary>
+1. Start a skirmish with ...
+   <details><summary> Setup </summary>
 
-</details>
+   </details>
+2. Do ...
+   - [ ] ... happens
+   - [ ] ... matches the table below
+
+### Option off: repeat steps 1-2 with the option off
+3. Do ...
+   - [ ] ... happens
 -->
 
 
@@ -37,8 +45,9 @@ Long setup goes in a details block:
 <!--
 Add only the parts that apply, each in its own details block, so it stays collapsed until a reviewer opens it:
 - Root cause: the chain from the symptom to the cause, one step per line, each with its evidence.
-- Implementation: one change per bullet, grouped by behavior. Leave out what the diff shows.
+- Implementation: one change per bullet, grouped by behavior. Include what is easy to miss in the diff, such as the rule behind a change repeated across many files, or a small change inside a large one. Leave out what a reviewer sees at a glance, such as which functions or files changed.
 - Alternatives considered, and why they weren't used.
+- Other long parts, such as a feature spec, in their own blocks.
 
 <details><summary> Root cause </summary>
 
