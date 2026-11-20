@@ -9,7 +9,6 @@ ProjectileBlueprint{
         "ANTINAVY",
         "PROJECTILE",
     },
-    Defense = { Health = 1 },
     Display = {
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,

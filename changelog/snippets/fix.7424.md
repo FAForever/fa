@@ -1,0 +1,1 @@
+- Fix ship and submarine anti-missile weapons targeting projectiles that are only missiles instead of only tactical missiles, and remove health from projectiles that can no longer be shot down (#7424).

@@ -440,7 +440,7 @@ UnitBlueprint{
             RangeCategory = "UWRC_Countermeasure",
             RateOfFire = 10/10, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE,STRATEGIC",
-            TargetRestrictOnlyAllow = "TACTICAL,MISSILE",
+            TargetRestrictOnlyAllow = "TACTICAL MISSILE",
             TargetType = "RULEWTT_Projectile",
             TurretBoneMuzzle = "Center_Turret_Muzzle",
             TurretBonePitch = "Center_Turret_Barrel",

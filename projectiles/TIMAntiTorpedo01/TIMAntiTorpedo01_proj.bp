@@ -8,10 +8,6 @@ ProjectileBlueprint{
         "PROJECTILE",
         "UEF",
     },
-    Defense = {
-        Health = 500,
-        MaxHealth = 500,
-    },
     Display = {
         Mesh = {
             LODs = {
