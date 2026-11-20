@@ -24,17 +24,10 @@ Then link what a reviewer needs, if any:
 ## Testing
 <!--
 Steps that someone who doesn't know the change can follow to check it. If a linked issue already has complete steps, link them and add only what's missing.
-Number every step, setup included. Put the code snippets of a step in a details block inside it, and its expected results in checkboxes under it.
+Number every step, setup included. Put any code snippets of a step in a details block inside it, and its expected results in checkboxes under it.
 When expected results are values such as benchmarks before and after the changes, put them in a table and refer to it from a checkbox. When the steps differ between parts of a test, give each part a heading that says where it starts from.
 
-1. Start a skirmish and run ...
-   <details><summary> Code snippet </summary>
-
-   ```lua
-
-   ```
-
-   </details>
+1. Start ...
 2. Run ...
    <details><summary> Code snippet </summary>
 
@@ -68,7 +61,7 @@ Add only the parts that apply, each in its own details block, so it stays collap
 
 
 ## Checklist
-- [ ] New code is annotated and has comments where useful
+- [ ] New code is annotated according to the [annotation guide](https://github.com/FAForever/fa/blob/deploy/fafdevelop/annotation.md) and has comments where useful
 - [ ] Changes are documented in a changelog snippet according to the [guidelines](https://faforever.github.io/fa/development/changelog#format-of-a-snippet), or added to the snippet of the unreleased PR this one changes
 - [ ] The change is conceptually approved ([explanation](https://github.com/FAForever/fa/blob/deploy/fafdevelop/CONTRIBUTING.md)): it is a bugfix, the team lead approved it, or a discussion concluded in its favor (linked above)
 - [ ] Requested 2-3 reviewers from the [list of reviewers and their areas of knowledge](https://github.com/FAForever/fa/blob/deploy/fafdevelop/CONTRIBUTING.md#reviewers)
