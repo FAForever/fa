@@ -69,4 +69,4 @@ Add only the parts that apply, each in its own details block, so it stays collap
 - [ ] New code is annotated and commented according to the [annotation guide](https://github.com/FAForever/fa/blob/deploy/fafdevelop/annotation.md)
 - [ ] Changes are documented in a changelog snippet according to the [guidelines](https://faforever.github.io/fa/development/changelog#format-of-a-snippet), or added to the snippet of the unreleased PR this one changes
 - [ ] The change is conceptually approved ([explanation](https://github.com/FAForever/fa/blob/deploy/fafdevelop/CONTRIBUTING.md)): it is a bugfix, the game or balance team lead approved it, or a discussion concluded in its favor (linked above)
-- [ ] Requested or @mentioned 2-3 reviewers from the [list of reviewers and their areas of knowledge](https://github.com/FAForever/fa/blob/deploy/fafdevelop/CONTRIBUTING.md#reviewers)
+- [ ] Requested or mentioned 2-3 reviewers from the [list of reviewers and their areas of knowledge](https://github.com/FAForever/fa/blob/deploy/fafdevelop/CONTRIBUTING.md#reviewers)
