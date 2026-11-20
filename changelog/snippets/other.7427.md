@@ -1,0 +1,1 @@
+- Restructure the pull request template so that reviewers find the summary, the links they need and the test steps at the top, with longer explanations collapsed (#7427).
