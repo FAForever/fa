@@ -11,6 +11,7 @@ ProjectileBlueprint{
         "SERAPHIM",
         "UNTARGETABLE",
     },
+    Defense = { Health = 1 },
     Display = {
         ImpactEffects = { Type = "Small01" },
         StrategicIconSize = 1,
