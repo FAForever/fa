@@ -10,11 +10,6 @@ ProjectileBlueprint{
         "MISSILE",
         "PROJECTILE",
     },
-    Defense = {
-        Health = 1,
-        MaxHealth = 1,
-    },
-    DesiredShooterCap = 1,
     Display = {
         Mesh = {
             LODs = {

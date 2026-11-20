@@ -6,6 +6,7 @@ ProjectileBlueprint{
     },
     Categories = {
         "ANTIAIR",
+        "MISSILE",
         "PROJECTILE",
         "UEF",
     },

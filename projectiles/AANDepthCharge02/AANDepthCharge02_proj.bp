@@ -8,7 +8,6 @@ ProjectileBlueprint{
         "ANTINAVY",
         "PROJECTILE",
     },
-    Defense = { Health = 1 },
     Display = {
         Mesh = {
             LODs = {

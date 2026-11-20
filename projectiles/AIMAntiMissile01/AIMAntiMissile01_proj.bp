@@ -9,10 +9,6 @@ ProjectileBlueprint{
         "ANTIMISSILE",
         "PROJECTILE",
     },
-    Defense = {
-        Health = 1,
-        MaxHealth = 1,
-    },
     Display = { StrategicIconSize = 1 },
     General = {
         Category = "Defense",

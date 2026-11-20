@@ -7,6 +7,7 @@ ProjectileBlueprint{
     Categories = {
         "ANTIAIR",
         "CYBRAN",
+        "MISSILE",
         "PROJECTILE",
     },
     Display = {

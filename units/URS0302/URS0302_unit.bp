@@ -549,7 +549,7 @@ UnitBlueprint{
             RateOfFire = 10/10, --10/integer interval in ticks
             TargetResetWhenReady = true,
             TargetRestrictDisallow = "UNTARGETABLE,STRATEGIC",
-            TargetRestrictOnlyAllow = "TACTICAL,MISSILE",
+            TargetRestrictOnlyAllow = "TACTICAL MISSILE",
             TargetType = "RULEWTT_Projectile",
             TurretBoneMuzzle = "Left_Muzzle01",
             TurretBonePitch = "Left_Muzzle01",
@@ -602,7 +602,7 @@ UnitBlueprint{
             RateOfFire = 10/10, --10/integer interval in ticks
             TargetResetWhenReady = true,
             TargetRestrictDisallow = "UNTARGETABLE,STRATEGIC",
-            TargetRestrictOnlyAllow = "TACTICAL,MISSILE",
+            TargetRestrictOnlyAllow = "TACTICAL MISSILE",
             TargetType = "RULEWTT_Projectile",
             TurretBoneMuzzle = "Right_Muzzle01",
             TurretBonePitch = "Right_Muzzle01",
