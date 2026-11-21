@@ -9,6 +9,8 @@ local AddChatCommand = import("/lua/ui/notify/commands.lua").AddChatCommand
 
 local overlayDisabled
 local overlayLockedOut
+local overlayTextSize
+local overlayEtaSize
 local categoryOverlayDisabled = {}
 local categoryDisabled = {}
 local customMessagesDisabled = {}
@@ -62,6 +64,31 @@ function init()
     Prefs.SetToCurrentProfile('Notify_overlay_disabled', false)
 
     overlayLockedOut = Prefs.GetFromCurrentProfile('Notify_all_disabled')
+
+    overlayTextSize = math.max(6, math.min(24, Prefs.GetFromCurrentProfile('Notify_overlay_text_size') or 12))
+    overlayEtaSize = math.max(6, math.min(24, Prefs.GetFromCurrentProfile('Notify_overlay_eta_size') or 10))
+    Prefs.SetToCurrentProfile('Notify_overlay_text_size', overlayTextSize)
+    Prefs.SetToCurrentProfile('Notify_overlay_eta_size', overlayEtaSize)
+end
+
+function setOverlayTextSize(size)
+    overlayTextSize = math.max(6, math.min(24, math.floor(size)))
+    Prefs.SetToCurrentProfile('Notify_overlay_text_size', overlayTextSize)
+    for _, overlay in overlays do
+        if overlay.progress then
+            overlay.progress:SetFont(UIUtil.bodyFont, overlayTextSize)
+        end
+    end
+end
+
+function setOverlayEtaSize(size)
+    overlayEtaSize = math.max(6, math.min(24, math.floor(size)))
+    Prefs.SetToCurrentProfile('Notify_overlay_eta_size', overlayEtaSize)
+    for _, overlay in overlays do
+        if overlay.etaText then
+            overlay.etaText:SetFont(UIUtil.bodyFont, overlayEtaSize)
+        end
+    end
 end
 
 function destroyOverlays()
@@ -225,13 +252,13 @@ function createEnhancementOverlay(args)
     if overlay.showName and not args.siloStatus then
         progressText = overlay.name .. " " .. progressText
     end
-    overlay.progress = UIUtil.CreateText(overlay, progressText, 12, UIUtil.bodyFont)
+    overlay.progress = UIUtil.CreateText(overlay, progressText, overlayTextSize, UIUtil.bodyFont)
     overlay.progress:SetColor('white')
     overlay.progress:SetDropShadow(true)
     local progressOffset = overlay.isACU and -15 or overlay.showETA and -7 or 0
     LayoutHelpers.AtCenterIn(overlay.progress, overlay, progressOffset, 0)
 
-    overlay.etaText = UIUtil.CreateText(overlay, 'ETA', 10, UIUtil.bodyFont)
+    overlay.etaText = UIUtil.CreateText(overlay, 'ETA', overlayEtaSize, UIUtil.bodyFont)
     overlay.etaText:SetColor('white')
     overlay.etaText:SetDropShadow(true)
     LayoutHelpers.AtCenterIn(overlay.etaText, overlay, overlay.isACU and 15 or 7, 0)

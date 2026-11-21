@@ -8,6 +8,7 @@ local Edit = import("/lua/maui/edit.lua").Edit
 local Popup = import("/lua/ui/controls/popups/popup.lua").Popup
 local Tooltip = import("/lua/ui/game/tooltip.lua")
 local MultiLineText = import("/lua/maui/multilinetext.lua").MultiLineText
+local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
 
 local Notify = import("/lua/ui/notify/notify.lua")
 local defaultMessages = import("/lua/ui/notify/defaultmessages.lua")
@@ -774,11 +775,38 @@ function CreateUI()
         previousCategoryButton = categoryButton
     end
 
+    local overlayTextSizeLabel = UIUtil.CreateText(dialogContent, '', 12, UIUtil.bodyFont)
+    local overlayTextSizeSlider = IntegerSlider(dialogContent, false, 6, 24, 1)
+    LayoutHelpers.Below(overlayTextSizeLabel, bottomOption, 8)
+    LayoutHelpers.AtLeftIn(overlayTextSizeLabel, dialogContent, 100)
+    LayoutHelpers.Below(overlayTextSizeSlider, overlayTextSizeLabel, 2)
+    LayoutHelpers.AtLeftIn(overlayTextSizeSlider, dialogContent, 100)
+    LayoutHelpers.SetWidth(overlayTextSizeSlider, 290)
+    overlayTextSizeSlider.OnValueChanged = function(self, value)
+        overlayTextSizeLabel:SetText(string.format('Overlay Text Size: %d', value))
+        NotifyOverlay.setOverlayTextSize(value)
+    end
+
+    local overlayEtaSizeLabel = UIUtil.CreateText(dialogContent, '', 12, UIUtil.bodyFont)
+    local overlayEtaSizeSlider = IntegerSlider(dialogContent, false, 6, 24, 1)
+    LayoutHelpers.Below(overlayEtaSizeLabel, bottomOption, 8)
+    LayoutHelpers.AtLeftIn(overlayEtaSizeLabel, dialogContent, 590)
+    LayoutHelpers.Below(overlayEtaSizeSlider, overlayEtaSizeLabel, 2)
+    LayoutHelpers.AtLeftIn(overlayEtaSizeSlider, dialogContent, 590)
+    LayoutHelpers.SetWidth(overlayEtaSizeSlider, 290)
+    overlayEtaSizeSlider.OnValueChanged = function(self, value)
+        overlayEtaSizeLabel:SetText(string.format('ETA Text Size: %d', value))
+        NotifyOverlay.setOverlayEtaSize(value)
+    end
+
+    overlayTextSizeSlider:SetValue(Prefs.GetFromCurrentProfile('Notify_overlay_text_size') or 12)
+    overlayEtaSizeSlider:SetValue(Prefs.GetFromCurrentProfile('Notify_overlay_eta_size') or 10)
+
     -- This contains all the actual dropdowns etc
     mainContainer = Group(dialogContent)
     LayoutHelpers.AtLeftIn(mainContainer, dialogContent, 10)
     LayoutHelpers.AtRightIn(mainContainer, dialogContent, 20)
-    LayoutHelpers.AnchorToBottom(mainContainer, bottomOption, 10)
+    LayoutHelpers.AnchorToBottom(mainContainer, overlayTextSizeSlider, 10)
     LayoutHelpers.AnchorToTop(mainContainer, okButton, 24)
     mainContainer.Height:Set(function() return mainContainer.Bottom() - mainContainer.Top() - (10) end)
     mainContainer.top = 0
