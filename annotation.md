@@ -31,6 +31,8 @@ Comments say what a reader can't get from the code in a few seconds. Write them 
 4. Use exact identifiers (`CAPTURABLE`, not "capturable units") and common words, not new terms.
 5. Put a fact where it applies: engine behavior in the `engine/` stub, Lua behavior in the Lua file. Repeating a fact in a `---` description is fine when the hover needs it.
 6. No period after the last sentence, and no em-dashes (`—`). Split into separate sentences, or use a colon, a comma or parentheses.
+7. When a description names another function, variable, class, or class field, reference it with `@see` (`---@see CAiBrain.GiveResource`). In the description of a class or class field, hover doesn't show `@see`, so also link the name in the text: `[NaturalProducer](lua://UnitBlueprintEconomy.NaturalProducer)`.
+8. Consecutive `---` lines join into one paragraph on hover. Separate paragraphs with a blank `---` line.
 
 ### Leave out
 
