@@ -28,6 +28,36 @@
 # The primary check is whether we launched the script from the correct
 # directory. The active directory should always be '(...)/fa/changelog/snippets'
 
+#endregion
+
+# -----------------------------------------------------------------------------
+#region Verify that no snippets are placed in the parent folder
+
+# Snippets that are accidentally created in 'changelog/' instead of
+# 'changelog/snippets/' are never bundled, so the entry silently goes missing
+# from the changelog. Anything there that looks like a snippet is an error.
+# The legitimate content of 'changelog/' (template.md and the snippets folder)
+# does not match the pattern.
+
+misplaced_found=0
+for file in ../*.md; do
+    [[ -f "$file" ]] || continue
+    filename="${file##*/}"
+    if [[ "$filename" =~ ^[A-Za-z]+\.([0-9]+|\<number\>)\.md$ ]]; then
+        echo "Misplaced snippet: changelog/$filename - move it into changelog/snippets/"
+        misplaced_found=1
+    fi
+done
+
+if [[ $misplaced_found -ne 0 ]]; then
+    exit 1
+fi
+
+#endregion
+
+# -----------------------------------------------------------------------------
+#region Verify that there are snippets to verify
+
 if ! ls *.md >/dev/null 2>&1; then
     echo "No Markdown files found to verify."
     exit 0
