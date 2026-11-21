@@ -12,7 +12,7 @@ The guides for coding agents are in [agents/](agents/). Before working in a path
 | `lua/ui/` | All UI. `lua/maui/` has the primitives it builds on | [ui.md](agents/ui.md). Chat: [chat.md](agents/chat.md), [chat-layout.md](agents/chat-layout.md) |
 | `lua/system/` | Runtime: `import`, classes, blueprint loading, `config.lua` | [system.md](agents/system.md): Lua states, entry points, module scope, globals |
 | `lua/` (top level) | Faction class libraries, `defaultunits.lua`, effects, scenario framework, AI brain, sync | [sim.md](agents/sim.md) |
-| `lua/AI/`, `lua/aibrains/` | AI | |
+| `lua/AI/`, `lua/aibrains/` | AI. `lua/aibrains/components/` holds the components of every army's brain, human ones included | Components: [sim.md](agents/sim.md) |
 | `units/<ID>/` | Unit blueprints and scripts | [units.md](agents/units.md). Unit IDs by name, tech and role: [unit-names.md](agents/unit-names.md) |
 | `engine/` | Annotation-only stubs of engine globals and `moho.*` classes. Never loaded | [engine.md](agents/engine.md) |
 | `projectiles/`, `effects/`, `env/`, `meshes/`, `textures/` | Assets FAF adds or changes | |

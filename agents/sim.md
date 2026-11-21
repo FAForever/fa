@@ -11,6 +11,7 @@ This guide covers working with simulation code: the class chains for units, weap
 | [../defaultunits.lua](../lua/defaultunits.lua), [defaultweapons.lua](../lua/sim/defaultweapons.lua), [DefaultProjectiles.lua](../lua/sim/DefaultProjectiles.lua) | Re-export hubs for the classes in `units/`, `weapons/` and `projectiles/`. Kept for backwards compatibility with mods and unit scripts |
 | `../aeonunits.lua`, `../cybranweapons.lua`, `../seraphimprojectiles.lua`, … | Faction libraries. Most re-export the classes in `units/<faction>/`, `weapons/<faction>/` and `projectiles/<faction>/` |
 | [../aibrain.lua](../lua/aibrain.lua) | `AIBrain`, one per army. Unit events such as `OnUnitKilled` and `OnUnitStopBeingBuilt` are forwarded to it |
+| [../aibrains/components/](../lua/aibrains/components/) | Brain components. Most are mixed into every `AIBrain`, human armies included (storage, energy, jammers, factories, stats, chat): see the `AIBrain` class in `aibrain.lua` |
 | [../SimCallbacks.lua](../lua/SimCallbacks.lua), [../SimSync.lua](../lua/SimSync.lua) | UI to sim and sim to UI boundaries. `SecureUnits` filters unit lists sent by a player |
 | [../SimUtils.lua](../lua/SimUtils.lua) | Unit transfer between armies (`TransferUnitsOwnership`) |
 | [../shield.lua](../lua/shield.lua), [../defaultcomponents.lua](../lua/defaultcomponents.lua) | `Shield` classes, and the `IntelComponent` / `VeterancyComponent` mixed into `Unit` |
