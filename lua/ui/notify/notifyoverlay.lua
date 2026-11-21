@@ -228,12 +228,13 @@ function createEnhancementOverlay(args)
     overlay.progress = UIUtil.CreateText(overlay, progressText, 12, UIUtil.bodyFont)
     overlay.progress:SetColor('white')
     overlay.progress:SetDropShadow(true)
-    LayoutHelpers.AtCenterIn(overlay.progress, overlay, overlay.showETA and -15 or 0, 0)
+    local progressOffset = overlay.isACU and -15 or overlay.showETA and -7 or 0
+    LayoutHelpers.AtCenterIn(overlay.progress, overlay, progressOffset, 0)
 
     overlay.etaText = UIUtil.CreateText(overlay, 'ETA', 10, UIUtil.bodyFont)
     overlay.etaText:SetColor('white')
     overlay.etaText:SetDropShadow(true)
-    LayoutHelpers.AtCenterIn(overlay.etaText, overlay, 15, 0)
+    LayoutHelpers.AtCenterIn(overlay.etaText, overlay, overlay.isACU and 15 or 7, 0)
     if not overlay.showETA or overlay.siloStatus then
         overlay.etaText:SetText('')
     end
