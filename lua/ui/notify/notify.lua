@@ -26,12 +26,22 @@ local messages
 local ACUs = {}
 local messageCounts = {}
 local messageLimits = {tech = 1, other = 1, experimentals = 1}
-local customMessagesDisabled
+local customMessagesDisabled = {}
+local selfOnly = {}
+local textDisabled = {}
+local notificationCategories = {'acus', 'experimentals', 'tech', 'other'}
 
 local focusArmy
 local replay
 local observer
 local localClient
+
+local function getNotificationCategory(category)
+    if factions[category] then
+        return 'acus'
+    end
+    return category
+end
 
 function init(isReplay, parent, notifyMessages)
     messages = notifyMessages
@@ -86,12 +96,32 @@ function setupStartDisables()
     end
     categoriesDisabled.All = state
 
-    state = Prefs.GetFromCurrentProfile('Notify_custom_disabled')
-    if state == nil then
-        Prefs.SetToCurrentProfile('Notify_custom_disabled', false)
-        state = false
+    local legacyCustomDisabled = Prefs.GetFromCurrentProfile('Notify_custom_disabled') or false
+    for _, category in notificationCategories do
+        local textFlag = 'Notify_' .. category .. '_text_disabled'
+        state = Prefs.GetFromCurrentProfile(textFlag)
+        if state == nil then
+            state = false
+            Prefs.SetToCurrentProfile(textFlag, state)
+        end
+        textDisabled[category] = state
+
+        local customFlag = 'Notify_' .. category .. '_custom_disabled'
+        state = Prefs.GetFromCurrentProfile(customFlag)
+        if state == nil then
+            state = legacyCustomDisabled
+            Prefs.SetToCurrentProfile(customFlag, state)
+        end
+        customMessagesDisabled[category] = state
+
+        local selfOnlyFlag = 'Notify_' .. category .. '_self_only'
+        state = Prefs.GetFromCurrentProfile(selfOnlyFlag)
+        if state == nil then
+            state = false
+            Prefs.SetToCurrentProfile(selfOnlyFlag, state)
+        end
+        selfOnly[category] = state
     end
-    customMessagesDisabled = state
 end
 
 -- This function is called from chat.lua when a player receives a message from another player flagged as Notify = true. Generated below.
@@ -110,7 +140,12 @@ function processIncomingMessage(sender, msg)
         return true
     end
 
-    if import("/lua/ui/game/gamemain.lua").IsNISMode() or categoriesDisabled.All or categoriesDisabled[category] or factions[category] and categoriesDisabled['acus'] then
+    local notificationCategory = getNotificationCategory(category)
+    if import("/lua/ui/game/gamemain.lua").IsNISMode() or categoriesDisabled.All or categoriesDisabled[notificationCategory] or textDisabled[notificationCategory] then
+        return false
+    end
+
+    if selfOnly[notificationCategory] and msg.notifyFrom ~= focusArmy then
         return false
     end
 
@@ -140,7 +175,7 @@ function processIncomingMessage(sender, msg)
         end
     end
 
-    if customMessagesDisabled then
+    if customMessagesDisabled[notificationCategory] then
         local message = defaultMessages[category][source]
         if trigger == 'started' then
             msg.text = LOC('<LOC notify_starting>') .. message
@@ -209,18 +244,25 @@ function toggleCategoryChat(category)
 
     local flag = 'Notify_' .. category .. '_disabled'
     Prefs.SetToCurrentProfile(flag, categoriesDisabled[category])
+    NotifyOverlay.toggleCategory(category)
 end
 
 -- Toggles between allowing custom messages or showing the defaults instead
-function toggleCustomMessages(bool)
-    customMessagesDisabled = bool
-    Prefs.SetToCurrentProfile('Notify_custom_disabled', bool)
-    NotifyOverlay.toggleCustomMessages(bool)
-    if customMessagesDisabled then
-        print 'Custom Messages Disabled'
-    elseif not customMessagesDisabled then
-        print 'Custom Messages Enabled'
-    end
+function toggleCustomMessages(category, bool)
+    customMessagesDisabled[category] = bool
+    Prefs.SetToCurrentProfile('Notify_' .. category .. '_custom_disabled', bool)
+    NotifyOverlay.toggleCustomMessages(category, bool)
+end
+
+function toggleCategoryText(category)
+    textDisabled[category] = not textDisabled[category]
+    Prefs.SetToCurrentProfile('Notify_' .. category .. '_text_disabled', textDisabled[category])
+end
+
+function toggleSelfOnly(category)
+    selfOnly[category] = not selfOnly[category]
+    Prefs.SetToCurrentProfile('Notify_' .. category .. '_self_only', selfOnly[category])
+    NotifyOverlay.toggleSelfOnly(category)
 end
 
 function round(num, idp)
@@ -375,7 +417,7 @@ function watchEnhancement(id, text, category, source)
     local overlayData = {}
     overlayData.unit = GetUnitById(id)
     overlayData.pos = overlayData.unit:GetPosition()
-    overlayData.msg = {to = 'allies', NotifyOverlay = true, data = {id = id, text = text, category = category, source = source}}
+    overlayData.msg = {notifyFrom = ACUs[id].army, to = 'allies', NotifyOverlay = true, data = {id = id, text = text, category = category, source = source}}
     overlayData.eta = -1
 
     while true do

@@ -9,8 +9,20 @@ local AddChatCommand = import("/lua/ui/notify/commands.lua").AddChatCommand
 
 local overlayDisabled
 local overlayLockedOut
-local customMessagesDisabled
+local categoryOverlayDisabled = {}
+local categoryDisabled = {}
+local customMessagesDisabled = {}
+local selfOnly = {}
+local notificationCategories = {'acus', 'experimentals', 'tech', 'other'}
+local factions = import("/lua/factions.lua").FactionIndexMap
 overlays = {}
+
+local function getNotificationCategory(category)
+    if factions[category] then
+        return 'acus'
+    end
+    return category
+end
 
 function init()
     import("/lua/ui/game/gamemain.lua").RegisterChatFunc(processNotification, 'NotifyOverlay') -- Imported here to avoid loading the file before the game is fully initialized
@@ -24,7 +36,30 @@ function init()
     end
     overlayDisabled = state
 
-    customMessagesDisabled = Prefs.GetFromCurrentProfile('Notify_custom_disabled')
+    local legacyCustomDisabled = Prefs.GetFromCurrentProfile('Notify_custom_disabled') or false
+    for _, category in notificationCategories do
+        categoryDisabled[category] = Prefs.GetFromCurrentProfile('Notify_' .. category .. '_disabled') or false
+
+        local overlayFlag = 'Notify_' .. category .. '_overlay_disabled'
+        state = Prefs.GetFromCurrentProfile(overlayFlag)
+        if state == nil then
+            state = overlayDisabled
+            Prefs.SetToCurrentProfile(overlayFlag, state)
+        end
+        categoryOverlayDisabled[category] = state
+
+        customMessagesDisabled[category] = Prefs.GetFromCurrentProfile('Notify_' .. category .. '_custom_disabled')
+        if customMessagesDisabled[category] == nil then
+            customMessagesDisabled[category] = legacyCustomDisabled
+        end
+
+        selfOnly[category] = Prefs.GetFromCurrentProfile('Notify_' .. category .. '_self_only') or false
+    end
+    -- The former global preference only seeds the category preferences above.
+    -- Keep the runtime global available for chat commands, but do not let a stale
+    -- global value override the new per-category controls.
+    overlayDisabled = false
+    Prefs.SetToCurrentProfile('Notify_overlay_disabled', false)
 
     overlayLockedOut = Prefs.GetFromCurrentProfile('Notify_all_disabled')
 end
@@ -68,10 +103,13 @@ function toggleOverlayTemporary(args)
     destroyOverlays()
 end
 
-function toggleCustomMessages(bool)
-    customMessagesDisabled = bool
+function toggleCustomMessages(category, bool)
+    customMessagesDisabled[category] = bool
     for _, overlay in overlays do
-        if customMessagesDisabled then
+        if getNotificationCategory(overlay.category) ~= category then
+            continue
+        end
+        if bool then
             overlay.name = defaultMessages[overlay.category][overlay.source]
         else
             overlay.name = overlay.customName
@@ -82,9 +120,41 @@ end
 -- This is called when we recieve a chat message from another player in the 'NotifyOverlay' chat channel
 -- These messages are generated below in generateEnhancementMessage or sendDestroyOverlayMessage
 function processNotification(players, msg)
-    if not overlayDisabled and not overlayLockedOut then
-        updateEnhancementOverlay(msg.data)
+    local category = getNotificationCategory(msg.data.category)
+    if overlayDisabled or overlayLockedOut or categoryDisabled[category] or categoryOverlayDisabled[category] then
+        return
     end
+    if selfOnly[category] and msg.notifyFrom ~= GetFocusArmy() then
+        return
+    end
+    updateEnhancementOverlay(msg.data)
+end
+
+function toggleCategoryOverlay(category, bool)
+    categoryOverlayDisabled[category] = bool
+    Prefs.SetToCurrentProfile('Notify_' .. category .. '_overlay_disabled', bool)
+    if bool then
+        for _, overlay in overlays do
+            if getNotificationCategory(overlay.category) == category then
+                overlay.destroy = true
+            end
+        end
+    end
+end
+
+function toggleCategory(category)
+    categoryDisabled[category] = not categoryDisabled[category]
+    if categoryDisabled[category] then
+        for _, overlay in overlays do
+            if getNotificationCategory(overlay.category) == category then
+                overlay.destroy = true
+            end
+        end
+    end
+end
+
+function toggleSelfOnly(category)
+    selfOnly[category] = not selfOnly[category]
 end
 
 function round(num, idp)
@@ -109,7 +179,7 @@ function createEnhancementOverlay(args)
     overlay.siloStatus = args.siloStatus ~= nil
     overlay.lastUpdate = GetGameTimeSeconds()
 
-    if customMessagesDisabled then
+    if customMessagesDisabled[getNotificationCategory(overlay.category)] then
         overlay.name = defaultMessages[overlay.category][overlay.source]
     else
         overlay.name = overlay.customName

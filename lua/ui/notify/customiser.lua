@@ -30,15 +30,28 @@ local linesVisible = {}
 local linesCollapsed = true
 
 local NotifyMessages = 'Notify_Messages_ESC'
+local NotifyMessagesMigration = 'Notify_Messages_MigrationVersion'
+local NotifyMessagesMigrationVersion = 1
 -- proxy for notify messages
 local notifyOptions = LazyVar.Create()
 
 function InitMessages()
     local prefsMessages = UTF.UnescapeTable(Prefs.GetFromCurrentProfile(NotifyMessages))
     if prefsMessages and not table.empty(prefsMessages) then
+        local migrationVersion = Prefs.GetFromCurrentProfile(NotifyMessagesMigration) or 0
+        if migrationVersion < NotifyMessagesMigrationVersion then
+            for category, defaults in defaultMessageTable do
+                if not factions[category] then
+                    prefsMessages[category] = table.deepcopy(defaults)
+                end
+            end
+            Prefs.SetToCurrentProfile(NotifyMessages, UTF.EscapeTable(prefsMessages))
+            Prefs.SetToCurrentProfile(NotifyMessagesMigration, NotifyMessagesMigrationVersion)
+        end
+
         for catName, cat in defaultMessageTable do
             if not prefsMessages[catName] then
-                prefsMessages[catName] = cat
+                prefsMessages[catName] = table.deepcopy(cat)
             else
                 local prefsCat = prefsMessages[catName]
                 for key, def in cat do
@@ -50,7 +63,8 @@ function InitMessages()
         end
         notifyOptions:Set(prefsMessages)
     else
-        notifyOptions:Set(defaultMessageTable)
+        notifyOptions:Set(table.deepcopy(defaultMessageTable))
+        Prefs.SetToCurrentProfile(NotifyMessagesMigration, NotifyMessagesMigrationVersion)
     end
 end
 
@@ -473,6 +487,84 @@ function CreateMessageToggleButton(parent, category, size)
     return button
 end
 
+function CreateCategoryOptionButton(parent, category, option, label)
+    local states = {
+        normal = UIUtil.SkinnableFile('/BUTTON/medium/_btn_up.dds'),
+        active = UIUtil.SkinnableFile('/BUTTON/medium/_btn_down.dds'),
+        over = UIUtil.SkinnableFile('/BUTTON/medium/_btn_over.dds'),
+        disabled = UIUtil.SkinnableFile('/BUTTON/medium/_btn_dis.dds'),
+    }
+
+    local preference
+    local enabled
+    if option == 'text' then
+        preference = 'Notify_' .. category .. '_text_disabled'
+        enabled = not Prefs.GetFromCurrentProfile(preference)
+    elseif option == 'overlay' then
+        preference = 'Notify_' .. category .. '_overlay_disabled'
+        enabled = not Prefs.GetFromCurrentProfile(preference)
+    elseif option == 'custom' then
+        preference = 'Notify_' .. category .. '_custom_disabled'
+        enabled = not Prefs.GetFromCurrentProfile(preference)
+    else
+        preference = 'Notify_' .. category .. '_self_only'
+        enabled = Prefs.GetFromCurrentProfile(preference) or false
+    end
+
+    local button = UIUtil.CreateButton(parent, states.normal, states.active, states.over, states.disabled, label, 11)
+    button.checked = enabled
+    button:SetTexture(enabled and states.active or states.normal)
+    button.HandleEvent = function(self, event)
+        if event.Type == 'ButtonPress' then
+            self.checked = not self.checked
+            self:SetTexture(self.checked and states.active or states.normal)
+
+            if option == 'text' then
+                Notify.toggleCategoryText(category)
+            elseif option == 'overlay' then
+                NotifyOverlay.toggleCategoryOverlay(category, not self.checked)
+            elseif option == 'custom' then
+                Notify.toggleCustomMessages(category, not self.checked)
+            else
+                Notify.toggleSelfOnly(category)
+            end
+            return true
+        elseif event.Type == 'MouseEnter' then
+            self:OnRolloverEvent('enter')
+            return true
+        elseif event.Type == 'MouseExit' then
+            self:OnRolloverEvent('exit')
+            return true
+        end
+    end
+
+    return button
+end
+
+function SetCategoryMasterBehaviour(categoryButton, category, childButtons)
+    categoryButton.HandleEvent = function(self, event)
+        if event.Type == 'ButtonPress' then
+            self.checked = not self.checked
+            self:SetTexture(UIUtil.SkinnableFile(self.checked and '/BUTTON/medium/_btn_down.dds' or '/BUTTON/medium/_btn_up.dds'))
+            Notify.toggleCategoryChat(category)
+            for _, button in childButtons do
+                if self.checked then
+                    button:Enable()
+                else
+                    button:Disable()
+                end
+            end
+            return true
+        elseif event.Type == 'MouseEnter' then
+            self:OnRolloverEvent('enter')
+            return true
+        elseif event.Type == 'MouseExit' then
+            self:OnRolloverEvent('exit')
+            return true
+        end
+    end
+end
+
 function CreateUI()
     if popup then
         CloseUI()
@@ -586,132 +678,63 @@ function CreateUI()
         }
     )
 
-    -- Set up the toggle buttons
-    -- Button to toggle ACU notifications
-    local acuButton = CreateMessageToggleButton(dialogContent, 'acus', 'medium')
-    acuButton.label:SetText(LOC('<LOC notify_0011>ACUs'))
-    LayoutHelpers.SetWidth(acuButton, 151)
-    LayoutHelpers.Below(acuButton, title, 10)
-    LayoutHelpers.AtLeftIn(acuButton, dialogContent, 10)
-    Tooltip.AddControlTooltip(acuButton,
-        {
-            text = "<LOC notify_0012>Toggle ACUs",
-            body = "<LOC notify_0013>Toggles showing ACU upgrade notifications from other players"
-        }
-    )
+    local categoryDefinitions = {
+        {key = 'acus', label = 'ACU'},
+        {key = 'experimentals', label = 'Experimentals'},
+        {key = 'tech', label = 'Tech'},
+        {key = 'other', label = 'Other'},
+    }
+    local optionDefinitions = {
+        {key = 'text', label = 'Text Notifications'},
+        {key = 'overlay', label = 'Overlay'},
+        {key = 'custom', label = 'Show Custom'},
+        {key = 'self', label = 'Only Self'},
+    }
 
-    -- Button to toggle Experimental notifications
-    local expButton = CreateMessageToggleButton(dialogContent, 'experimentals', 'medium')
-    expButton.label:SetText(LOC('<LOC notify_0014>Experimentals'))
-    LayoutHelpers.SetWidth(expButton, 151)
-    LayoutHelpers.Below(expButton, title, 10)
-    LayoutHelpers.RightOf(expButton, acuButton, 10)
-    Tooltip.AddControlTooltip(expButton,
-        {
-            text = "<LOC notify_0015>Toggle Experimentals",
-            body = "<LOC notify_0016>Toggles showing Experimental-related notifications from other players"
-        }
-    )
-
-    -- Button to toggle tech notifications
-    local techButton = CreateMessageToggleButton(dialogContent, 'tech', 'medium')
-    techButton.label:SetText(LOC('<LOC notify_0017>Tech'))
-    LayoutHelpers.SetWidth(techButton, 151)
-    LayoutHelpers.Below(techButton, title, 10)
-    LayoutHelpers.RightOf(techButton, expButton, 10)
-    Tooltip.AddControlTooltip(techButton,
-        {
-            text = "<LOC notify_0018>Toggle Tech",
-            body = "<LOC notify_0019>Toggles showing Tech-Upgrade-related notifications from other players"
-        }
-    )
-
-    -- Button to toggle 'other' notifications
-    local otherButton = CreateMessageToggleButton(dialogContent, 'other', 'medium')
-    otherButton.label:SetText(LOC('<LOC notify_0020>Other'))
-    LayoutHelpers.SetWidth(otherButton, 151)
-    LayoutHelpers.Below(otherButton, title, 10)
-    LayoutHelpers.RightOf(otherButton, techButton, 10)
-    Tooltip.AddControlTooltip(otherButton,
-        {
-            text = "<LOC notify_0021>Toggle Other",
-            body = "<LOC notify_0022>Toggles showing miscellaneous notifications from other players"
-        }
-    )
-
-    -- Button to toggle ACU Overlay
-    local overlayButton = CreateMessageToggleButton(dialogContent, 'overlay', 'medium')
-    overlayButton.label:SetText(LOC('<LOC notify_0023>Overlays'))
-    LayoutHelpers.SetWidth(overlayButton, 151)
-    LayoutHelpers.Below(overlayButton, title, 10)
-    LayoutHelpers.RightOf(overlayButton, otherButton, 10)
-    overlayButton.HandleEvent = function(self, event)
-        if event.Type == 'ButtonPress' then
-            if not self.checked then
-                self.checked = true
-                self:SetTexture(UIUtil.SkinnableFile('/BUTTON/medium/_btn_down.dds'))
-            else
-                self.checked = false
-                self:SetTexture(UIUtil.SkinnableFile('/BUTTON/medium/_btn_up.dds'))
-            end
-
-            NotifyOverlay.toggleOverlay(not self.checked, false)
-
-            return true
-        elseif event.Type == 'MouseEnter' then
-            self:OnRolloverEvent('enter')
-            return true
-        elseif event.Type == 'MouseExit' then
-            self:OnRolloverEvent('exit')
-            return true
+    local previousCategoryButton
+    local bottomOption
+    for _, category in categoryDefinitions do
+        local categoryButton = CreateMessageToggleButton(dialogContent, category.key, 'medium')
+        categoryButton.label:SetText(category.label)
+        LayoutHelpers.SetWidth(categoryButton, 180)
+        LayoutHelpers.Below(categoryButton, title, 10)
+        if previousCategoryButton then
+            LayoutHelpers.RightOf(categoryButton, previousCategoryButton, 40)
+        else
+            LayoutHelpers.AtLeftIn(categoryButton, dialogContent, 70)
         end
-    end
-    Tooltip.AddControlTooltip(overlayButton,
-        {
-            text = "<LOC notify_0024>Toggle Overlay",
-            body = "<LOC notify_0025>Toggles showing ACU upgrade completion and ETA overlays"
-        }
-    )
 
-    -- Button to toggle displaying only default messages
-    local defaultMessagesButton = CreateMessageToggleButton(dialogContent, 'custom', 'medium')
-    defaultMessagesButton.label:SetText(LOC('<LOC notify_0026>Show Custom'))
-    LayoutHelpers.SetWidth(defaultMessagesButton, 151)
-    LayoutHelpers.Below(defaultMessagesButton, title, 10)
-    LayoutHelpers.RightOf(defaultMessagesButton, overlayButton, 10)
-    defaultMessagesButton.HandleEvent = function(self, event)
-        if event.Type == 'ButtonPress' then
-            if not self.checked then
-                self.checked = true
-                self:SetTexture(UIUtil.SkinnableFile('/BUTTON/medium/_btn_down.dds'))
+        local previousOption
+        local childButtons = {}
+        for _, option in optionDefinitions do
+            local button = CreateCategoryOptionButton(dialogContent, category.key, option.key, option.label)
+            LayoutHelpers.SetWidth(button, 180)
+            if previousOption then
+                LayoutHelpers.Below(button, previousOption, 4)
             else
-                self.checked = false
-                self:SetTexture(UIUtil.SkinnableFile('/BUTTON/medium/_btn_up.dds'))
+                LayoutHelpers.Below(button, categoryButton, 6)
             end
-
-            Notify.toggleCustomMessages(not self.checked)
-
-            return true
-        elseif event.Type == 'MouseEnter' then
-            self:OnRolloverEvent('enter')
-            return true
-        elseif event.Type == 'MouseExit' then
-            self:OnRolloverEvent('exit')
-            return true
+            LayoutHelpers.AtHorizontalCenterIn(button, categoryButton)
+            table.insert(childButtons, button)
+            previousOption = button
+            bottomOption = button
         end
+
+        if not categoryButton.checked then
+            for _, button in childButtons do
+                button:Disable()
+            end
+        end
+
+        SetCategoryMasterBehaviour(categoryButton, category.key, childButtons)
+        previousCategoryButton = categoryButton
     end
-    Tooltip.AddControlTooltip(defaultMessagesButton,
-        {
-            text = "<LOC notify_0027>Toggle Custom",
-            body = "<LOC notify_0028>Toggles displaying custom messages from other players instead of default ones"
-        }
-    )
 
     -- This contains all the actual dropdowns etc
     mainContainer = Group(dialogContent)
     LayoutHelpers.AtLeftIn(mainContainer, dialogContent, 10)
     LayoutHelpers.AtRightIn(mainContainer, dialogContent, 20)
-    LayoutHelpers.AnchorToBottom(mainContainer, acuButton, 10)
+    LayoutHelpers.AnchorToBottom(mainContainer, bottomOption, 10)
     LayoutHelpers.AnchorToTop(mainContainer, okButton, 24)
     mainContainer.Height:Set(function() return mainContainer.Bottom() - mainContainer.Top() - (10) end)
     mainContainer.top = 0
