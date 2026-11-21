@@ -44,9 +44,8 @@ annotate_error() {
 #endregion
 
 # -----------------------------------------------------------------------------
-#region Verify that no snippets are placed in the parent folder
+#region Verify that no snippets are in `changelog/`, which is not bundled
 
-# only `changelog/snippets/` is bundled, so a snippet in `changelog/` is silently left out
 misplaced_found=0
 for file in ../*.md; do
     [[ -f "$file" ]] || continue
