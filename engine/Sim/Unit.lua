@@ -450,13 +450,13 @@ end
 
 --- Removes nuclear missiles from the unit.
 --- This is the method to call for both SML's and SMD's.
----@see Unit:RemoveTacticalSiloAmmo(amount) # for tactical missiles
+---@see Unit.RemoveTacticalSiloAmmo # for tactical missiles
 ---@param amount number
 function Unit:RemoveNukeSiloAmmo(amount)
 end
 
 --- Removes tactical missiles from the unit
----@see Unit:RemoveNukeSiloAmmo(amount) # for nuclear missiles
+---@see Unit.RemoveNukeSiloAmmo # for nuclear missiles
 ---@param amount number
 function Unit:RemoveTacticalSiloAmmo(amount)
 end
