@@ -82,6 +82,7 @@ Large games run thousands of units, and UI code often runs every frame. Upvalue 
 
 - Annotate everything new ([annotation.md](annotation.md)): typed `@param`/`@return`, `---@field` for every class field, and a `---` description unless it would only repeat the name.
 - Comments only say what the code doesn't show: engine behavior, non-obvious reasons, easy mistakes, hooks. Don't repeat names or code, list callers, or describe the change. Keep them short and declarative, with no period at the end and no em-dashes. Before finishing, reread your comments and cut them ([details](annotation.md#comment-style)).
+- In comments, docs, and commit messages, use the serial (Oxford) comma in lists of three or more: `units, weapons, and projectiles`, not `units, weapons and projectiles`.
 - 4-space indentation. Match the surrounding code, and don't reformat code you aren't changing.
 - In docs, link the file and name the function or field. Line-number links go stale with any edit.
 
