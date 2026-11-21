@@ -73,7 +73,7 @@ done
 # -----------------------------------------------------------------------------
 #region Verify that there are snippets to verify
 
-if ! ls *.md >/dev/null 2>&1; then
+if ! ls -- *.md >/dev/null 2>&1; then
     echo "No Markdown files found to verify."
     exit $misplaced_found
 fi
