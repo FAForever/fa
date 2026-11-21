@@ -5146,6 +5146,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                     unitType = 'smd'
                     category = 'other'
                 elseif EntityCategoryContains(categories.TECH3 * categories.STRUCTURE * categories.ARTILLERY, self) then
+                    id = self.EntityId
                     unitType = 'arty'
                     category = 'other'
                 elseif self.Blueprint.TechCategory == 'EXPERIMENTAL' then

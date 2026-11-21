@@ -235,7 +235,7 @@ function generateEnhancementMessage(data)
             progress = building > 0 and unit:GetWorkProgress() or 0
             siloStatus = string.format('%d%%', math.floor(progress * 100))
         end
-    elseif msg.data.category == 'experimentals' or msg.data.source == 'nuke' or msg.data.source == 'smd' then
+    elseif msg.data.category == 'experimentals' or msg.data.source == 'nuke' or msg.data.source == 'smd' or msg.data.source == 'arty' then
         progress = unit:GetFractionComplete()
     else
         progress = unit:GetWorkProgress()
