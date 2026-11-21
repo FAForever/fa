@@ -202,10 +202,11 @@ class GitHub:
         return self._run(args, body)
 
     def list_prs(self, label):
-        prs = self._run(["pr", "list", "--repo", REPO, "--state", "open", "--base", "develop",
-                         "--label", label, "--limit", "1000", "--json", "number,author,title,headRefOid"])
-        return sorted(({"number": p["number"], "author": p["author"]["login"], "title": p["title"],
-                        "head": p["headRefOid"]} for p in prs), key=lambda p: p["number"])
+        # All pages, so that no labeled pull request is silently left out
+        pages = self._run(["api", "--paginate", "--slurp", f"repos/{REPO}/pulls?state=open&base=develop&per_page=100"])
+        prs = [p for page in pages for p in page if label in [lbl["name"] for lbl in p["labels"]]]
+        return sorted(({"number": p["number"], "author": p["user"]["login"], "title": p["title"],
+                        "head": p["head"]["sha"]} for p in prs), key=lambda p: p["number"])
 
     def comments(self, pr):
         pages = self._run(["api", "--paginate", "--slurp", f"repos/{REPO}/issues/{pr}/comments"])
@@ -274,6 +275,7 @@ class Status:
         self.gh, self.cfg, self.pr, self.author = gh, cfg, pr, author
         self.marker = f"<!-- staging-status: {cfg['branch']} -->"
         self.id, self.body, self.url, self.data = None, "", None, {}
+        self.stale = []
 
     def _read(self, comment):
         self.id, self.body, self.url = comment["id"], comment["body"], comment["html_url"]
@@ -281,11 +283,21 @@ class Status:
         self.data = json.loads(match.group(1)) if match else {}
 
     def load(self):
-        for comment in self.gh.comments(self.pr):
-            if comment["user"]["login"] == BOT and self.marker in comment["body"]:
-                self._read(comment)
-                break
+        # The newest comment is the current one. Older ones remain when deleting
+        # them failed after a repost, they are deleted on the next save
+        found = [c for c in self.gh.comments(self.pr) if c["user"]["login"] == BOT and self.marker in c["body"]]
+        if found:
+            self._read(max(found, key=lambda c: c["id"]))
+            self.stale = [c["id"] for c in found if c["id"] != self.id]
         return self
+
+    def _delete_stale(self):
+        for comment_id in self.stale:
+            try:
+                self.gh.delete_comment(comment_id)
+            except RuntimeError as error:
+                print(f"Could not delete the outdated status comment {comment_id}: {error}")
+        self.stale = []
 
     def save(self, updates, notify=None):
         """Merges the updates into the metadata, which is read again first so
@@ -320,14 +332,13 @@ class Status:
         if self.id and not notify:
             if body != self.body:
                 self._read(self.gh.edit_comment(self.id, body))
-            return self.url
-
-        # The old comment is only deleted once its replacement exists, so that
-        # a failed request never loses the approval and the history
-        old = self.id
-        self._read(self.gh.create_comment(self.pr, body))
-        if old:
-            self.gh.delete_comment(old)
+        else:
+            # The old comment is only deleted once its replacement exists, so
+            # that a failed request never loses the approval and the history
+            if self.id:
+                self.stale.append(self.id)
+            self._read(self.gh.create_comment(self.pr, body))
+        self._delete_stale()
         return self.url
 
 
@@ -666,7 +677,7 @@ def record(gh, cfg, name, event):
             status.save({"labeled": False, "final": "closed", "removed": {"by": sender, "at": t}, "checking": False})
 
     elif action in ("synchronize", "reopened") and label in labels:
-        status.save({"labeled": True, "final": None, "checking": True})
+        status.save({"labeled": True, "removed": None, "final": None, "checking": True})
 
 
 def check(gh, cfg, mode="check", push=False, event=("", {})):
@@ -806,11 +817,15 @@ def check(gh, cfg, mode="check", push=False, event=("", {})):
             notify = (f"approve:{c['latest']}", [approved.get("by")], "new commits are waiting for approval")
 
         # The label state belongs to the record job, which may have changed it
-        # since the pull requests were listed. Only pull requests that were
-        # labeled before status comments existed are marked here
+        # since the pull requests were listed. Pull requests that were labeled
+        # before status comments existed are marked here. A removal that was
+        # recorded while the label was added again is undone, after asking for
+        # the current labels, because record jobs can finish in any order
         updates = {"check": c, "checking": False}
         if "labeled" not in status.data:
             updates["labeled"] = True
+        elif status.data.get("labeled") is False and not status.data.get("final") and label in gh.pr_labels(n):
+            updates.update(labeled=True, removed=None)
         url = status.save(updates, notify)
 
         line = f"[#{n}]({REPO_URL}/pull/{n}): {p['title']}"

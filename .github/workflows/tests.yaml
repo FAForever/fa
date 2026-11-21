@@ -18,6 +18,10 @@ on:
       - develop
       - master
 
+# The tests only read the repository
+permissions:
+  contents: read
+
 jobs:
   syntax:
     name: Syntax
@@ -30,6 +34,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref }}
+          persist-credentials: false
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             # include all shell scripts used for testing
@@ -80,6 +85,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref }}
+          persist-credentials: false
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             *.sh
@@ -99,6 +105,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref }}
+          persist-credentials: false
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             *.sh
