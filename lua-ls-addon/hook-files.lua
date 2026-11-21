@@ -9,7 +9,11 @@
 --
 -- Detection: prefer an explicit `---@declare-hook <path>` annotation (works for any hookdir);
 -- fall back to the `/hook/<relpath>` path convention (covers the documented default with zero
--- annotation effort, but misses mods with a custom hookdir).
+-- annotation effort, but misses mods with a custom hookdir). The path is matched on the decoded
+-- file path, case-insensitively: the raw URI percent-encodes characters such as spaces
+-- (`My%20Games/...`), which would never match the decoded workspace paths it's compared with.
+
+local furi = require 'file-uri'
 
 local M = {}
 
@@ -22,7 +26,16 @@ function M.findTarget(uri, text)
     if explicit then
         return explicit
     end
-    return uri:match('/[Hh]ook/(.+)$')
+    local path = furi.decode(uri)
+    if not path then
+        return nil
+    end
+    path = path:gsub('\\', '/')
+    local _, hookEnd = path:lower():find('/hook/', 1, true)
+    if not hookEnd then
+        return nil
+    end
+    return path:sub(hookEnd + 1)
 end
 
 return M

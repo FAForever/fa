@@ -20,8 +20,15 @@ SupCom's actual dialect.
 Point a workspace's `.vscode/settings.json` at `plugin.lua`:
 
 ```json
-"Lua.runtime.plugin": "../fa-lua-addon/plugin.lua"
+"Lua.runtime.plugin": "../fa-lua-addon/plugin.lua",
+"Lua.language.fixIndent": false
 ```
+
+`Lua.language.fixIndent` must be off: LuaLS computes that feature's edits against the
+plugin-rewritten text but applies them to the original, so with this plugin it occasionally
+deletes real code on the line where Enter was pressed. `config.lua` sets it too, but only if
+LuaLS applies third-party configs in your workspace (`Lua.workspace.checkThirdParty`), so set it
+explicitly.
 
 `config.lua` is picked up automatically by LuaLS's third-party config system for any matching
 workspace - no separate wiring needed.
@@ -35,18 +42,34 @@ here.
 
 | File | Solves |
 |---|---|
-| `hash-comments.lua` | `#` as a comment marker |
+| `lexer.lua` | shared tokenizer every scanner reads (comments, strings, `#` comments, numbers) |
+| `hash-comments.lua` | `#` as a whole-line comment marker |
 | `table-hints.lua` | `{&N &N}` table-preallocation hints |
-| `class-support.lua` | `Class()`-family OOP sugar |
+| `class-support.lua` | `Class()`-family OOP sugar: strips the wrapper so LuaLS sees the spec table |
 | `for-in-pairs.lua` | untyped bare-table `for` loops |
-| `export-env.lua` | FA's implicit module system (bare top-level exports, forward references) |
+| `export-env.lua` | FA's implicit module system: scope-aware rewrite of a file's free names into a module table |
 | `hook-files.lua` | SupCom mod "hook" file target detection |
 | `config.lua` | workspace settings: non-standard tokens, engine globals, require/path conventions |
-| `plugin.lua` | orchestrates the above, and safely merges their diffs |
+| `plugin.lua` | orchestrates the above, merges their diffs, resolves `import()` paths, keeps hook merges current |
+
+## What belongs in the FA source instead
+
+The addon only handles what annotations can't. Anything LuaLS gets right once the source is
+annotated is left to the source:
+
+- **Class docs.** Write `---@class Name: Base1, Base2` above `Name = Class(Base1, Base2) {...}`.
+  For a class or state nested in another class's spec table, use FA's `Owner_Field` naming
+  (`---@class DefaultProjectileWeapon_IdleState: State`). The addon strips the `Class(...)`
+  wrapper (LuaLS can't see a spec table through the call), but doesn't invent docs; a class
+  without one still gets its fields, but no named type or inheritance.
+- **Global files.** A file loaded into the global environment with `doscript` (globalInit.lua,
+  simInit.lua and the files they load) defines real globals, not module exports. Mark it with
+  `---@declare-global` so `export-env.lua` leaves it alone.
 
 ## Design constraints
 
-This is a set of heuristic text scanners, not a real parser - each one documents its own known
-false-positive/false-negative edge cases and the reasoning behind them. Where a rewrite carries
-real risk (e.g. `export-env.lua`'s reference rewriting under name shadowing), the trade-off is
-verified against the full FA source tree and documented in that file, not just asserted.
+This is a set of token scanners, not a real parser - each one documents its own known
+false-positive/false-negative edge cases and the reasoning behind them. `export-env.lua` tracks
+real block scopes (locals, parameters, loop variables), so a name is only rewritten where nothing
+shadows it. Behaviour changes are checked by running the transform over the whole FA source tree
+and parsing every result.
