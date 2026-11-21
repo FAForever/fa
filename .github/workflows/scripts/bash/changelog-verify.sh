@@ -33,9 +33,7 @@
 # -----------------------------------------------------------------------------
 #region Reporting
 
-# Prints an error as a GitHub Actions workflow command, which shows it as an
-# annotation on the workflow run summary and on the file in the pull request.
-# Outside of GitHub Actions it is printed as a regular line.
+# GitHub Actions shows `::error` lines as annotations on the run and on the file in the pull request
 annotate_error() {
     local file="$1"
     local title="$2"
@@ -48,12 +46,7 @@ annotate_error() {
 # -----------------------------------------------------------------------------
 #region Verify that no snippets are placed in the parent folder
 
-# Snippets that are accidentally created in 'changelog/' instead of
-# 'changelog/snippets/' are never bundled, so the entry silently goes missing
-# from the changelog. Anything there that looks like a snippet is an error.
-# The legitimate content of 'changelog/' (template.md and the snippets folder)
-# does not match the pattern.
-
+# only `changelog/snippets/` is bundled, so a snippet in `changelog/` is silently left out
 misplaced_found=0
 for file in ../*.md; do
     [[ -f "$file" ]] || continue
@@ -64,9 +57,6 @@ for file in ../*.md; do
         misplaced_found=1
     fi
 done
-
-# Misplaced snippets fail the verification at the end, so that invalid snippet
-# names are reported in the same run.
 
 #endregion
 
@@ -98,7 +88,6 @@ is_valid_filename() {
     fi
 }
 
-# Report every invalid snippet instead of stopping at the first one
 invalid_found=0
 for file in *.md; do
     if is_valid_filename "$file"; then
