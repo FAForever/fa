@@ -1,3 +1,4 @@
+---@declare-global
 -- a set of functions that remove objects from tables
 -- the function passed in will take the item as input, and return true if it should be removed, false otherwise
 

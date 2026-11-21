@@ -9,6 +9,7 @@
   "Lua.runtime.version": "Lua 5.1",
   "Lua.telemetry.enable": false,
   "Lua.workspace.checkThirdParty": false,
+  "Lua.language.fixIndent": false,
   "Lua.runtime.path": ["/?"],
   "Lua.runtime.plugin": "./lua-ls-addon/plugin.lua",
   "Lua.workspace.ignoreDir": [

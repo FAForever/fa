@@ -83,6 +83,18 @@ configs = {
         action = 'add',
         value  = 'inject-field',
     },
+    {
+        -- LuaLS's fix-indent (script/core/fix-indent.lua, run on every didChange) computes its
+        -- "trim surplus indent after Enter" edit against the plugin-transformed text - which
+        -- plugin.lua's OnSetText shifts by prepending `local M = {}\n` (or a hook's whole target
+        -- file), adding `M.` prefixes, stripping `#` comments - but maps it back to the editor
+        -- with the original line table. The edit then lands about a line up and several bytes
+        -- right, occasionally deleting real code on the line where Enter was pressed. The
+        -- rewrites can't be made position-neutral, so turn the feature off instead.
+        key    = 'Lua.language.fixIndent',
+        action = 'set',
+        value  = false,
+    },
 }
 for _, name in ipairs {'moho'} do
     configs[#configs+1] = {
