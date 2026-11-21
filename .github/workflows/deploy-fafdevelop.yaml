@@ -61,16 +61,19 @@ jobs:
 
   changelog:
     name: Create changelog of FAF Develop
+    needs: [refs]
     uses: ./.github/workflows/docs-generate-changelog.yaml
     with:
       branch: staging/fafdevelop
+      ref: ${{ needs.refs.outputs.staging }}
 
   changelog-lua:
     name: Convert changelog to Lua
-    needs: [changelog]
+    needs: [refs, changelog]
     uses: ./.github/workflows/docs-convert-changelog.yaml
     with:
       branch: staging/fafdevelop
+      ref: ${{ needs.refs.outputs.staging }}
       additional-changelog: fafdevelop
 
   deploy:
@@ -179,4 +182,6 @@ jobs:
           PREVIOUS: ${{ needs.refs.outputs.previous }}
           MANUAL_BY: ${{ github.event_name == 'workflow_dispatch' && github.actor || '' }}
         run: |
+          # The staging commit may no longer be on any branch
+          git fetch --quiet origin "$STAGING"
           python3 .github/workflows/scripts/python/staging.py deploy staging/fafdevelop --result "$RESULT" --staging "$STAGING" --deployed "$DEPLOYED" --previous "$PREVIOUS" --manual-by "$MANUAL_BY"

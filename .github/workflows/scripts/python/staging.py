@@ -549,11 +549,12 @@ def snippet_errors(tree, before):
         for entry in filter(None, git("ls-tree", "-r", "-z", tree, "--", *changed).stdout.split("\0")):
             meta, path = entry.split("\t", 1)
             mode, kind, sha = meta.split()
-            # Only regular files, a link could point outside of the folder
-            if kind == "blob" and mode in ("100644", "100755"):
-                target = Path(tmp, path)
-                target.parent.mkdir(parents=True, exist_ok=True)
-                target.write_bytes(blob(sha))
+            target = Path(tmp, path)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            # Links and submodules are written as empty files, so that the
+            # script still checks their names without following them
+            regular = kind == "blob" and mode in ("100644", "100755")
+            target.write_bytes(blob(sha) if regular else b"")
         snippets = Path(tmp, "changelog", "snippets")
         snippets.mkdir(parents=True, exist_ok=True)
         result = subprocess.run(["bash", str(SNIPPET_VERIFY)], cwd=snippets, capture_output=True,
