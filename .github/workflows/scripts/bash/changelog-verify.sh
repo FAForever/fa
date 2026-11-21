@@ -31,6 +31,21 @@
 #endregion
 
 # -----------------------------------------------------------------------------
+#region Reporting
+
+# Prints an error as a GitHub Actions workflow command, which shows it as an
+# annotation on the workflow run summary and on the file in the pull request.
+# Outside of GitHub Actions it is printed as a regular line.
+annotate_error() {
+    local file="$1"
+    local title="$2"
+    local message="$3"
+    echo "::error file=$file,title=$title::$message"
+}
+
+#endregion
+
+# -----------------------------------------------------------------------------
 #region Verify that no snippets are placed in the parent folder
 
 # Snippets that are accidentally created in 'changelog/' instead of
@@ -44,7 +59,8 @@ for file in ../*.md; do
     [[ -f "$file" ]] || continue
     filename="${file##*/}"
     if [[ "$filename" =~ ^[A-Za-z]+\.([0-9]+|\<number\>)\.md$ ]]; then
-        echo "Misplaced snippet: changelog/$filename - move it into changelog/snippets/"
+        annotate_error "changelog/$filename" "Misplaced snippet" \
+            "changelog/$filename is not in changelog/snippets/, so it would be left out of the changelog. Move it into changelog/snippets/."
         misplaced_found=1
     fi
 done
@@ -68,28 +84,36 @@ fi
 # -----------------------------------------------------------------------------
 #region Verify the snippets whether they match the convention
 
+categories="fix|balance|features|graphics|ai|performance|other"
+
 # Function to process snippets file names
 is_valid_filename() {
     local filename="$1"
 
     # Pattern to match: starts with 'fix', 'graphics', etc.,
     # followed by a dot, then 1 to 5 digits, and ends with '.md'
-    if [[ "$filename" =~ ^(fix|graphics|performance|ai|features|other|performance|balance)\.[0-9]{1,5}\.md$ ]]; then
+    if [[ "$filename" =~ ^($categories)\.[0-9]{1,5}\.md$ ]]; then
         return 0
     else
         return 1
     fi
 }
 
+# Report every invalid snippet instead of stopping at the first one
+invalid_found=0
 for file in *.md; do
     if is_valid_filename "$file"; then
         echo " - Verified: $file"
     else
-        echo "Invalid format: $file"
-        exit 1
+        annotate_error "changelog/snippets/$file" "Invalid snippet name" \
+            "changelog/snippets/$file does not match <category>.<pr number>.md, where the category is one of: ${categories//|/, }."
+        invalid_found=1
     fi
 done
 
+if [[ $invalid_found -ne 0 ]]; then
+    exit 1
+fi
 echo "All snippets are formatted correctly."
 
 #endregion
