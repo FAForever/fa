@@ -202,7 +202,7 @@ function generateEnhancementMessage(data)
     end
 
     local progress
-    if msg.data.category == 'experimentals' then
+    if msg.data.category == 'experimentals' or msg.data.source == 'nuke' or msg.data.source == 'smd' then
         progress = unit:GetFractionComplete()
     else
         progress = unit:GetWorkProgress()

@@ -99,6 +99,7 @@ defaultMessages = {
     },
     other = {
         nuke = "Nuke Silo construction",
+        smd = "Strategic Missile Defense construction",
         arty = "Tech 3 Artillery construction",
     },
 }
@@ -168,5 +169,6 @@ clarityTable = {
     researchnavaltech2 = "Tech 2 Naval HQ",
     researchnavaltech3 = "Tech 3 Naval HQ",
     nuke = "Nuke Launcher",
+    smd = "Strategic Missile Defense",
     arty = "Tech 3 Static Artillery",
 }

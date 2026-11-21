@@ -5122,6 +5122,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
             ---@alias NotifySource Enhancement | string
             ---| 'nuke'
+            ---| 'smd'
             ---| 'arty'
 
             ---@alias NotifyCategory
@@ -5137,7 +5138,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                     unitType = string.lower('research' .. self.Blueprint.LayerCategory .. self.Blueprint.TechCategory)
                     category = 'tech'
                 elseif EntityCategoryContains(categories.NUKE * categories.STRUCTURE - categories.EXPERIMENTAL, self) then -- Ensure to exclude Yolona Oss, which gets its own message
+                    id = self.EntityId
                     unitType = 'nuke'
+                    category = 'other'
+                elseif EntityCategoryContains(categories.ANTIMISSILE * categories.STRUCTURE * categories.SILO, self) then
+                    id = self.EntityId
+                    unitType = 'smd'
                     category = 'other'
                 elseif EntityCategoryContains(categories.TECH3 * categories.STRUCTURE * categories.ARTILLERY, self) then
                     unitType = 'arty'
