@@ -454,6 +454,16 @@ function PlayOptionRolloverSound()
     })
 end
 
+function UpdateOptionButtonBrightness(button)
+    if not button.optionAvailable then
+        button:SetAlpha(0.35)
+    elseif button.checked then
+        button:SetAlpha(1)
+    else
+        button:SetAlpha(0.55)
+    end
+end
+
 function CreateMessageToggleButton(parent, category, size)
     local states = {
         normal   = UIUtil.SkinnableFile('/BUTTON/' .. size .. '/_btn_up.dds'),
@@ -471,6 +481,7 @@ function CreateMessageToggleButton(parent, category, size)
                 self.checked = false
                 self:SetTexture(states.normal)
             end
+            UpdateOptionButtonBrightness(self)
             PlayOptionToggleSound(self.checked)
 
             Notify.toggleCategoryChat(self.category)
@@ -496,9 +507,10 @@ function CreateMessageToggleButton(parent, category, size)
     else
         button:SetTexture(states.active)
     end
-
     button.category = category
     button.HandleEvent = buttonBehaviour
+    button.optionAvailable = true
+    UpdateOptionButtonBrightness(button)
 
     return button
 end
@@ -530,10 +542,13 @@ function CreateCategoryOptionButton(parent, category, option, label)
     local button = UIUtil.CreateButton(parent, states.normal, states.active, states.over, states.disabled, label, 11, nil, nil, 'NO_SOUND', 'UI_opt_mini_button_over')
     button.checked = enabled
     button:SetTexture(enabled and states.active or states.normal)
+    button.optionAvailable = true
+    UpdateOptionButtonBrightness(button)
     button.HandleEvent = function(self, event)
         if event.Type == 'ButtonPress' then
             self.checked = not self.checked
             self:SetTexture(self.checked and states.active or states.normal)
+            UpdateOptionButtonBrightness(self)
             PlayOptionToggleSound(self.checked)
 
             if option == 'text' then
@@ -564,14 +579,18 @@ function SetCategoryMasterBehaviour(categoryButton, category, childButtons)
         if event.Type == 'ButtonPress' then
             self.checked = not self.checked
             self:SetTexture(UIUtil.SkinnableFile(self.checked and '/BUTTON/medium/_btn_down.dds' or '/BUTTON/medium/_btn_up.dds'))
+            UpdateOptionButtonBrightness(self)
             PlayOptionToggleSound(self.checked)
             Notify.toggleCategoryChat(category)
             for _, button in childButtons do
                 if self.checked then
                     button:Enable()
+                    button.optionAvailable = true
                 else
                     button:Disable()
+                    button.optionAvailable = false
                 end
+                UpdateOptionButtonBrightness(button)
             end
             return true
         elseif event.Type == 'MouseEnter' then
@@ -674,6 +693,7 @@ function CreateUI()
                 self:SetTexture(UIUtil.SkinnableFile('/BUTTON/large/_btn_up.dds'))
                 self.label:SetText(LOC('<LOC notify_0030>Notify Disabled'))
             end
+            UpdateOptionButtonBrightness(self)
             PlayOptionToggleSound(self.checked)
 
             Notify.toggleNotifyPermanent(not self.checked)
@@ -745,6 +765,8 @@ function CreateUI()
         if not categoryButton.checked then
             for _, button in childButtons do
                 button:Disable()
+                button.optionAvailable = false
+                UpdateOptionButtonBrightness(button)
             end
         end
 
