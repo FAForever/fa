@@ -440,6 +440,20 @@ function CloseUI()
     end
 end
 
+function PlayOptionToggleSound(enabled)
+    PlaySound(Sound {
+        Bank = 'Interface',
+        Cue = enabled and 'UI_Menu_Accept_01' or 'UI_Menu_Cancel_02',
+    })
+end
+
+function PlayOptionRolloverSound()
+    PlaySound(Sound {
+        Bank = 'Interface',
+        Cue = 'UI_Opt_Mini_Button_Over',
+    })
+end
+
 function CreateMessageToggleButton(parent, category, size)
     local states = {
         normal   = UIUtil.SkinnableFile('/BUTTON/' .. size .. '/_btn_up.dds'),
@@ -457,11 +471,13 @@ function CreateMessageToggleButton(parent, category, size)
                 self.checked = false
                 self:SetTexture(states.normal)
             end
+            PlayOptionToggleSound(self.checked)
 
             Notify.toggleCategoryChat(self.category)
 
             return true
         elseif event.Type == 'MouseEnter' then
+            PlayOptionRolloverSound()
             self:OnRolloverEvent('enter')
             return true
         elseif event.Type == 'MouseExit' then
@@ -470,7 +486,7 @@ function CreateMessageToggleButton(parent, category, size)
         end
     end
 
-    local button = UIUtil.CreateButton(parent, states.normal, states.active, states.over, states.disabled, "", 11)
+    local button = UIUtil.CreateButton(parent, states.normal, states.active, states.over, states.disabled, "", 11, nil, nil, 'NO_SOUND', 'UI_opt_mini_button_over')
 
     local active = Prefs.GetFromCurrentProfile('Notify_' .. category .. '_disabled')
     button.checked = not active -- Invert the bool because we want enabled messages (prefs is false) to be lit up (down)
@@ -511,13 +527,14 @@ function CreateCategoryOptionButton(parent, category, option, label)
         enabled = Prefs.GetFromCurrentProfile(preference) or false
     end
 
-    local button = UIUtil.CreateButton(parent, states.normal, states.active, states.over, states.disabled, label, 11)
+    local button = UIUtil.CreateButton(parent, states.normal, states.active, states.over, states.disabled, label, 11, nil, nil, 'NO_SOUND', 'UI_opt_mini_button_over')
     button.checked = enabled
     button:SetTexture(enabled and states.active or states.normal)
     button.HandleEvent = function(self, event)
         if event.Type == 'ButtonPress' then
             self.checked = not self.checked
             self:SetTexture(self.checked and states.active or states.normal)
+            PlayOptionToggleSound(self.checked)
 
             if option == 'text' then
                 Notify.toggleCategoryText(category)
@@ -530,6 +547,7 @@ function CreateCategoryOptionButton(parent, category, option, label)
             end
             return true
         elseif event.Type == 'MouseEnter' then
+            PlayOptionRolloverSound()
             self:OnRolloverEvent('enter')
             return true
         elseif event.Type == 'MouseExit' then
@@ -546,6 +564,7 @@ function SetCategoryMasterBehaviour(categoryButton, category, childButtons)
         if event.Type == 'ButtonPress' then
             self.checked = not self.checked
             self:SetTexture(UIUtil.SkinnableFile(self.checked and '/BUTTON/medium/_btn_down.dds' or '/BUTTON/medium/_btn_up.dds'))
+            PlayOptionToggleSound(self.checked)
             Notify.toggleCategoryChat(category)
             for _, button in childButtons do
                 if self.checked then
@@ -556,6 +575,7 @@ function SetCategoryMasterBehaviour(categoryButton, category, childButtons)
             end
             return true
         elseif event.Type == 'MouseEnter' then
+            PlayOptionRolloverSound()
             self:OnRolloverEvent('enter')
             return true
         elseif event.Type == 'MouseExit' then
@@ -654,11 +674,13 @@ function CreateUI()
                 self:SetTexture(UIUtil.SkinnableFile('/BUTTON/large/_btn_up.dds'))
                 self.label:SetText(LOC('<LOC notify_0030>Notify Disabled'))
             end
+            PlayOptionToggleSound(self.checked)
 
             Notify.toggleNotifyPermanent(not self.checked)
 
             return true
         elseif event.Type == 'MouseEnter' then
+            PlayOptionRolloverSound()
             self:OnRolloverEvent('enter')
             return true
         elseif event.Type == 'MouseExit' then
