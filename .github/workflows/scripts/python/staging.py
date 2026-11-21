@@ -310,7 +310,9 @@ class Status:
             if fresh:
                 self._read(fresh)
             else:
-                self.id = None
+                # Another run reposted it in the meantime, continue from that one
+                self.id, self.data = None, {}
+                self.load()
 
         self.data.update(updates)
         mention = ""
