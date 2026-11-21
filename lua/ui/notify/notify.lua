@@ -269,6 +269,10 @@ function sendEnhancementMessage(messageTable)
     local army = messageTable.army
     local trigger = messageTable.trigger
 
+    if category == 'experimentals' then
+        LOG(string.format('Notify UI experimental %s: id=%s source=%s army=%s', trigger, tostring(id), tostring(source), tostring(army)))
+    end
+
     if trigger == 'started' then
         onStartEnhancement(id, army, category, source)
     elseif trigger == 'cancelled' then
@@ -286,7 +290,7 @@ function onStartEnhancement(id, army, category, source)
     ---@type NotifyChatPayload
     local msg = {notifyFrom = army, to = 'notify', Chat = true, text = 'Starting ' .. messages()[category][source], data = {category = category, source = source, trigger = 'started'}}
 
-    -- Start by storing ACU IDs for future use
+    -- Store unit IDs used by progress overlays.
     if id and (focusArmy == -1 or army == focusArmy) then
         if not ACUs[id] then
             ACUs[id] = {id = id, army = army, watcher = false, startTime = 0}
@@ -334,9 +338,11 @@ function onCompletedEnhancement(id, category, source, army)
     if id then
         local data = ACUs[id]
         if data then
-            local time = round(GetGameTimeSeconds() - data.startTime, 2)
-            msg.text = string.format("%s %s (%.2fs)", messages()[category][source], LOC('<LOC notify_done>'), time)
-            msg.data.time = time
+            if factions[category] then
+                local time = round(GetGameTimeSeconds() - data.startTime, 2)
+                msg.text = string.format("%s %s (%.2fs)", messages()[category][source], LOC('<LOC notify_done>'), time)
+                msg.data.time = time
+            end
             killWatcher(data)
         end
     end
@@ -368,6 +374,9 @@ end
 function watchEnhancement(id, text, category, source)
     local overlayData = {}
     overlayData.unit = GetUnitById(id)
+    if category == 'experimentals' then
+        LOG(string.format('Notify watcher experimental: id=%s unit=%s source=%s', tostring(id), tostring(overlayData.unit), tostring(source)))
+    end
     overlayData.pos = overlayData.unit:GetPosition()
     overlayData.msg = {to = 'allies', NotifyOverlay = true, data = {id = id, text = text, category = category, source = source}}
     overlayData.eta = -1
