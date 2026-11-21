@@ -1,0 +1,18 @@
+[
+    {
+        "label": "Testing: FAF Beta",
+        "branch": "staging/fafbeta",
+        "stage_workflow": "stage-fafbeta.yaml",
+        "deploy_workflow": "deploy-fafbeta.yaml",
+        "color": "FBCA04",
+        "description": "Merged into staging/fafbeta by the monthly stage workflow; skipped if it conflicts"
+    },
+    {
+        "label": "Testing: FAF Develop",
+        "branch": "staging/fafdevelop",
+        "stage_workflow": "stage-fafdevelop.yaml",
+        "deploy_workflow": "deploy-fafdevelop.yaml",
+        "color": "0E8A16",
+        "description": "Merged into staging/fafdevelop by the weekly stage workflow; skipped if it conflicts"
+    }
+]

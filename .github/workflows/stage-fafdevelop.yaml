@@ -32,6 +32,17 @@ jobs:
     name: Update FAF Develop
     needs: [test]
     runs-on: ubuntu-latest
+    # A stage run that started earlier must not overwrite the result of a later
+    # one, so they run one after another and each reads its input when it starts
+    concurrency:
+      group: stage-fafdevelop
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    env:
+      # Writes the status comments of labeled pull requests
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       # https://github.com/actions/checkout/tree/v6/
       - name: Checkout FA repository
@@ -40,13 +51,18 @@ jobs:
           ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
           repository: FAForever/fa
           ref: develop
+          fetch-depth: 0
 
-      # Update the staging/fafdevelop branch, we force push here because
-      # we're not interested in fixing conflicts
-      - name: Update staging/fafdevelop
+      - name: Setup Git configuration
         run: |
           # Configure git
           git config user.email "github@faforever.com"
           git config user.name "FAForever Machine User"
-          
-          git push origin HEAD:staging/fafdevelop --force
+
+      # Pull requests with the label are squash merged on top of develop and
+      # the result is force pushed to staging/fafdevelop, we force push here
+      # because we're not interested in fixing conflicts. Pull requests that
+      # conflict are left out and reported in the run summary and in their
+      # status comment
+      - name: Update staging/fafdevelop
+        run: python3 .github/workflows/scripts/python/staging.py stage staging/fafdevelop --push

@@ -27,9 +27,18 @@ on:
         type: string
         required: true
         description: The branch to check out
+      ref:
+        type: string
+        required: false
+        description: The commit to check out instead of the branch
       additional-changelog:
         type: string # fafdevelop or fafbeta
         description: Add changelog entry for current fafdevelop or fafbeta changes
+
+# The conversion runs scripts from the checked out commit, which can include
+# labeled pull requests, so the token can only read and no credential is kept
+permissions:
+  contents: read
 
 jobs:
   convert_changelog:
@@ -44,7 +53,8 @@ jobs:
         uses: actions/checkout@v6
         with:
           ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
-          ref: ${{ inputs.branch }}
+          ref: ${{ inputs.ref || inputs.branch }}
+          persist-credentials: false
           sparse-checkout: |
             changelog/snippets
             docs/_posts

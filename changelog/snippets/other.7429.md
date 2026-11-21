@@ -1,0 +1,1 @@
+- Add the labels `Testing: FAF Beta` and `Testing: FAF Develop` to include pull requests in the FAF Beta Balance and FAF Develop game types without merging them. A status comment on each labeled pull request shows when it is deployed and what is needed to include it (#7429).
