@@ -50,6 +50,4 @@ jobs:
 
           # URLs are excluded because not all type of URLs are supported, see also:
           # - https://github.com/urlstechie/urlchecker-action/issues/105
-          # The staging label files were added with the documentation that links
-          # them, so their links on develop fail in that pull request (#7429)
-          exclude_urls: https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf,https://github.com/FAForever/fa/deployments,https://github.com/FAForever/fa/deployments/production,https://github.com/FAForever/fa/blob/develop/.github/workflows/scripts/staging-labels.json,https://github.com/FAForever/fa/blob/develop/.github/workflows/check-staging-labels.yaml
+          exclude_urls: https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf,https://github.com/FAForever/fa/deployments,https://github.com/FAForever/fa/deployments/production
