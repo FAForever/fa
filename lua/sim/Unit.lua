@@ -5135,6 +5135,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             if not source then
                 local bp = self.Blueprint
                 if bp.CategoriesHash.RESEARCH then
+                    id = self.EntityId
                     unitType = string.lower('research' .. self.Blueprint.LayerCategory .. self.Blueprint.TechCategory)
                     category = 'tech'
                 elseif EntityCategoryContains(categories.NUKE * categories.STRUCTURE - categories.EXPERIMENTAL, self) then -- Ensure to exclude Yolona Oss, which gets its own message
