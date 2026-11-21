@@ -65,9 +65,8 @@ for file in ../*.md; do
     fi
 done
 
-if [[ $misplaced_found -ne 0 ]]; then
-    exit 1
-fi
+# Misplaced snippets fail the verification at the end, so that invalid snippet
+# names are reported in the same run.
 
 #endregion
 
@@ -76,7 +75,7 @@ fi
 
 if ! ls *.md >/dev/null 2>&1; then
     echo "No Markdown files found to verify."
-    exit 0
+    exit $misplaced_found
 fi
 
 #endregion
@@ -111,9 +110,10 @@ for file in *.md; do
     fi
 done
 
-if [[ $invalid_found -ne 0 ]]; then
+if [[ $misplaced_found -ne 0 || $invalid_found -ne 0 ]]; then
     exit 1
 fi
+
 echo "All snippets are formatted correctly."
 
 #endregion
