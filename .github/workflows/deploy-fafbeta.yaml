@@ -33,8 +33,11 @@ on:
     - cron: "0 23 1 * *"
 
 jobs:
+  # Test what is deployed, the staging branch includes labeled pull requests
   test:
     uses: ./.github/workflows/tests.yaml
+    with:
+      ref: staging/fafbeta
 
   changelog:
     name: Create changelog of FAF Beta
@@ -54,6 +57,10 @@ jobs:
     name: Update FAF Beta Balance
     needs: [test, changelog-lua]
     runs-on: ubuntu-latest
+    outputs:
+      staging: ${{ steps.refs.outputs.staging }}
+      previous: ${{ steps.refs.outputs.previous }}
+      deployed: ${{ steps.push.outputs.deployed }}
     steps:
       # https://github.com/actions/checkout/tree/v6/
       - name: Checkout FA repository
@@ -67,6 +74,13 @@ jobs:
           # Configure git
           git config user.email "github@faforever.com"
           git config user.name "FAForever Machine User"
+
+      # What is deployed and what it replaces, to report it to labeled pull requests
+      - name: Remember references
+        id: refs
+        run: |
+          echo "staging=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "previous=$(git ls-remote origin refs/heads/deploy/fafbeta | cut -f1)" >> "$GITHUB_OUTPUT"
 
       # Allows us to better understand the game version and the specific commit hash when we receive a log
       - name: Update version references
@@ -114,5 +128,44 @@ jobs:
       # Update the deploy/fafbeta branch, we force push here because
       # we're not interested in fixing conflicts
       - name: Update deploy/fafbeta
+        id: push
         run: |
           git push origin HEAD:deploy/fafbeta --force
+          echo "deployed=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  # Updates the status comments of the pull requests that were staged, also
+  # when the tests or the deployment failed
+  report:
+    name: Report to labeled pull requests
+    needs: [test, changelog-lua, deploy]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      # https://github.com/actions/checkout/tree/v6/
+      - name: Checkout FA repository
+        uses: actions/checkout@v6
+        with:
+          ref: develop
+          fetch-depth: 0
+
+      - name: Setup Git configuration
+        run: |
+          # Configure git
+          git config user.email "github@faforever.com"
+          git config user.name "FAForever Machine User"
+
+      - name: Report deployment
+        env:
+          RESULT: ${{ needs.test.result == 'failure' && 'tests' || (needs.deploy.result == 'success' && 'success' || 'failed') }}
+          STAGING: ${{ needs.deploy.outputs.staging }}
+          DEPLOYED: ${{ needs.deploy.outputs.deployed }}
+          PREVIOUS: ${{ needs.deploy.outputs.previous }}
+          MANUAL_BY: ${{ github.event_name == 'workflow_dispatch' && github.actor || '' }}
+        run: |
+          python3 .github/workflows/scripts/python/staging.py deploy staging/fafbeta --result "$RESULT" --staging "$STAGING" --deployed "$DEPLOYED" --previous "$PREVIOUS" --manual-by "$MANUAL_BY"

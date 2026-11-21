@@ -1,0 +1,140 @@
+# Copyright (c) 2026 FAForever
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+name: Check pull requests labeled for staging
+
+# Updates the status comments of pull requests that are labeled for staging as
+# soon as something changes, instead of waiting for the next stage run. This
+# makes conflicts visible right after a label is added. Nothing is pushed.
+#
+# `pull_request_target` and `issue_comment` run the workflow of `develop` with
+# access to secrets, also for pull requests from forks. The pull request is
+# only fetched and merged in memory, its code is never checked out or run.
+#
+# Comments are written with the GITHUB_TOKEN as github-actions[bot]. Edits made
+# with the GITHUB_TOKEN do not trigger workflows, only edits by people do.
+
+on:
+  push:
+    branches: [develop]
+  pull_request_target:
+    types: [labeled, unlabeled, synchronize, reopened, closed]
+    branches: [develop]
+  # Ticking the approval checkbox in a status comment edits the comment
+  issue_comment:
+    types: [edited]
+
+jobs:
+  # The labels and their staging branches are defined in one place
+  setup:
+    name: Read staging configuration
+    if: >-
+      github.event_name != 'issue_comment' || (
+        github.event.issue.pull_request &&
+        github.event.comment.user.login == 'github-actions[bot]' &&
+        contains(github.event.comment.body, '<!-- staging-status:'))
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.config.outputs.matrix }}
+    steps:
+      # https://github.com/actions/checkout/tree/v6/
+      - name: Checkout FA repository
+        uses: actions/checkout@v6
+        with:
+          ref: develop
+          sparse-checkout: .github/workflows
+
+      # Keeps only the staging branches that the event concerns, so that
+      # pushes and label changes of unrelated pull requests start no jobs
+      - name: Read configuration
+        id: config
+        run: echo "matrix=$(python3 .github/workflows/scripts/python/staging.py matrix)" >> "$GITHUB_OUTPUT"
+
+  # Records approvals, removals and closed pull requests right away and shows
+  # that a check is in progress. This job is not limited by concurrency so
+  # that no event is dropped while a check is queued
+  record:
+    name: Record ${{ matrix.branch }}
+    needs: [setup]
+    if: github.event_name != 'push' && needs.setup.outputs.matrix != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include: ${{ fromJSON(needs.setup.outputs.matrix) }}
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      # https://github.com/actions/checkout/tree/v6/
+      - name: Checkout FA repository
+        uses: actions/checkout@v6
+        with:
+          ref: develop
+          # The schedules are read from the workflows
+          sparse-checkout: .github/workflows
+
+      - name: Record event
+        run: python3 .github/workflows/scripts/python/staging.py record "${{ matrix.branch }}"
+
+  # Only one check per staging branch runs at a time. A check that is still
+  # queued is replaced by a newer one, which is fine because every check
+  # merges all labeled pull requests again
+  check:
+    name: Check ${{ matrix.branch }}
+    needs: [setup, record]
+    if: >-
+      always() && needs.setup.result == 'success' && needs.setup.outputs.matrix != '[]' &&
+      needs.record.result != 'failure'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include: ${{ fromJSON(needs.setup.outputs.matrix) }}
+    concurrency:
+      group: staging-status-${{ matrix.branch }}
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      # https://github.com/actions/checkout/tree/v6/
+      - name: Checkout FA repository
+        uses: actions/checkout@v6
+        with:
+          ref: develop
+          fetch-depth: 0
+
+      - name: Setup Git configuration
+        run: |
+          # Configure git
+          git config user.email "github@faforever.com"
+          git config user.name "FAForever Machine User"
+
+      # Creates the labels as soon as this workflow is on develop
+      - name: Create missing labels
+        if: github.event_name == 'push'
+        run: python3 .github/workflows/scripts/python/staging.py labels
+
+      - name: Check labeled pull requests
+        run: python3 .github/workflows/scripts/python/staging.py check "${{ matrix.branch }}"
