@@ -339,7 +339,11 @@ function onCompletedEnhancement(id, category, source, army)
                 msg.text = string.format("%s %s (%.2fs)", messages()[category][source], LOC('<LOC notify_done>'), time)
                 msg.data.time = time
             end
-            killWatcher(data)
+            if source == 'nuke' or source == 'smd' then
+                data.siloComplete = true
+            else
+                killWatcher(data)
+            end
         end
     end
 
@@ -384,6 +388,8 @@ function watchEnhancement(id, text, category, source)
             end
             return
         end
+        local data = ACUs[id]
+        overlayData.siloComplete = data and data.siloComplete
         NotifyOverlay.generateEnhancementMessage(overlayData)
         WaitSeconds(0.1)
     end

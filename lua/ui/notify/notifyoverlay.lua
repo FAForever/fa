@@ -106,6 +106,7 @@ function createEnhancementOverlay(args)
     overlay.id = args.id
     overlay.pos = args.pos
     overlay.eta = args.eta
+    overlay.siloStatus = args.siloStatus ~= nil
     overlay.lastUpdate = GetGameTimeSeconds()
 
     if customMessagesDisabled then
@@ -134,18 +135,20 @@ function createEnhancementOverlay(args)
 
         LayoutHelpers.AtLeftTopIn(overlay, worldView, (pos.x - overlay.Width() / 2) / LayoutHelpers.GetPixelScaleFactor(), (pos.y - overlay.Height() / 2 + 1) / LayoutHelpers.GetPixelScaleFactor())
 
-        local timeRemaining = math.ceil(overlay.eta - seconds)
-        if timeRemaining ~= overlay.lastTimeRemaining then
-            if timeRemaining >= 0 then
-                overlay.etaText:SetText("ETA " .. string.format("%.2d:%.2d", timeRemaining / 60, math.mod(timeRemaining, 60)))
-            else
-                overlay.etaText:SetText("ETA --:--")
+        if not overlay.siloStatus then
+            local timeRemaining = math.ceil(overlay.eta - seconds)
+            if timeRemaining ~= overlay.lastTimeRemaining then
+                if timeRemaining >= 0 then
+                    overlay.etaText:SetText("ETA " .. string.format("%.2d:%.2d", timeRemaining / 60, math.mod(timeRemaining, 60)))
+                else
+                    overlay.etaText:SetText("ETA --:--")
+                end
+                overlay.lastTimeRemaining = timeRemaining
             end
-            overlay.lastTimeRemaining = timeRemaining
         end
     end
 
-    overlay.progress = UIUtil.CreateText(overlay, overlay.name .. " " .. args.progress .. "%", 12, UIUtil.bodyFont)
+    overlay.progress = UIUtil.CreateText(overlay, args.siloStatus or overlay.name .. " " .. args.progress .. "%", 12, UIUtil.bodyFont)
     overlay.progress:SetColor('white')
     overlay.progress:SetDropShadow(true)
     LayoutHelpers.AtCenterIn(overlay.progress, overlay, -15, 0)
@@ -154,6 +157,9 @@ function createEnhancementOverlay(args)
     overlay.etaText:SetColor('white')
     overlay.etaText:SetDropShadow(true)
     LayoutHelpers.AtCenterIn(overlay.etaText, overlay, 15, 0)
+    if overlay.siloStatus then
+        overlay.etaText:SetText('')
+    end
 
     return overlay
 end
@@ -179,7 +185,13 @@ function updateEnhancementOverlay(args)
             overlay.destroy = destroy
             return
         end
-        overlay.progress:SetText(overlay.name .. " " .. args.progress .. "%")
+        overlay.siloStatus = args.siloStatus ~= nil
+        if overlay.siloStatus then
+            overlay.progress:SetText(args.siloStatus)
+            overlay.etaText:SetText('')
+        else
+            overlay.progress:SetText(overlay.name .. " " .. args.progress .. "%")
+        end
         overlay.eta = args.eta
         overlay.pos = args.pos
         overlay.lastUpdate = GetGameTimeSeconds()
@@ -193,6 +205,7 @@ function generateEnhancementMessage(data)
     local lastProgress = data.last_progress
     local lastPercent = data.last_percent
     local lastMessage = data.last_message
+    local lastSiloStatus = data.last_silo_status
 
     local tick = GameTick()
     local seconds = GetGameTimeSeconds()
@@ -202,7 +215,27 @@ function generateEnhancementMessage(data)
     end
 
     local progress
-    if msg.data.category == 'experimentals' or msg.data.source == 'nuke' or msg.data.source == 'smd' then
+    local siloStatus
+    if data.siloComplete then
+        local missileInfo = unit:GetMissileInfo()
+        local stored
+        local building
+        if msg.data.source == 'nuke' then
+            stored = missileInfo.nukeSiloStorageCount
+            building = missileInfo.nukeSiloBuildCount
+        else
+            stored = missileInfo.tacticalSiloStorageCount
+            building = missileInfo.tacticalSiloBuildCount
+        end
+
+        if stored > 0 then
+            siloStatus = string.format('%d', stored)
+            progress = 0
+        else
+            progress = building > 0 and unit:GetWorkProgress() or 0
+            siloStatus = string.format('%d%%', math.floor(progress * 100))
+        end
+    elseif msg.data.category == 'experimentals' or msg.data.source == 'nuke' or msg.data.source == 'smd' then
         progress = unit:GetFractionComplete()
     else
         progress = unit:GetWorkProgress()
@@ -216,11 +249,11 @@ function generateEnhancementMessage(data)
 
         local pos = unit:GetPosition()
 
-        if lastMessage and (seconds - lastMessage >= 3) or math.abs(eta - data.eta) > 1 or VDist3Sq(pos, data.pos) > 0.0001 or percent ~= lastPercent then
+        if lastMessage and (seconds - lastMessage >= 3) or math.abs(eta - data.eta) > 1 or VDist3Sq(pos, data.pos) > 0.0001 or percent ~= lastPercent or siloStatus ~= lastSiloStatus then
             data.eta = eta
             data.pos = pos
             data.last_message = seconds
-            msg.data = table.merged(msg.data, {progress = percent, eta = eta, pos = pos})
+            msg.data = table.merged(msg.data, {progress = percent, eta = eta, pos = pos, siloStatus = siloStatus})
             import("/lua/ui/notify/notify.lua").sendMessage(msg)
         end
     end
@@ -228,6 +261,7 @@ function generateEnhancementMessage(data)
     data.last_tick = tick
     data.last_progress = progress
     data.last_percent = percent
+    data.last_silo_status = siloStatus
 end
 
 function sendDestroyOverlayMessage(id)
