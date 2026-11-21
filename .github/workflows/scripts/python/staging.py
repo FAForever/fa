@@ -50,13 +50,11 @@ they are printed instead.
 
 import argparse
 import hashlib
-import io
 import json
 import os
 import re
 import subprocess
 import sys
-import tarfile
 import tempfile
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -80,6 +78,7 @@ DATA_RE = re.compile(r"<!-- staging-data: (\{.*?\}) -->", re.S)
 STAGED_RE = re.compile(r"^Staged from \S+/pull/(\d+) at ([0-9a-f]{40})$", re.M)
 CHECKED_RE = re.compile(r"^- \[[xX]\] Approve \[`[0-9a-f]+`\]\(\S+/pull/\d+/commits/([0-9a-f]{40})\)", re.M)
 CONFLICT_INFO_RE = re.compile(r"^(\d{6}) ([0-9a-f]{40}) ([123])\t(.*)$")
+ANNOTATION_RE = re.compile(r"^::(?:error|warning|notice)[^:]*::")
 
 LEFT_OUT_REASONS = {
     "conflict": "merge conflict",
@@ -204,7 +203,7 @@ class GitHub:
 
     def list_prs(self, label):
         prs = self._run(["pr", "list", "--repo", REPO, "--state", "open", "--base", "develop",
-                         "--label", label, "--limit", "100", "--json", "number,author,title,headRefOid"])
+                         "--label", label, "--limit", "1000", "--json", "number,author,title,headRefOid"])
         return sorted(({"number": p["number"], "author": p["author"]["login"], "title": p["title"],
                         "head": p["headRefOid"]} for p in prs), key=lambda p: p["number"])
 
@@ -213,10 +212,17 @@ class GitHub:
         return [comment for page in pages for comment in page]
 
     def get_comment(self, comment_id):
+        """The comment, or None when it was deleted. Other errors are raised so
+        that a temporary failure does not create a second status comment"""
         try:
             return self.api(f"repos/{REPO}/issues/comments/{comment_id}")
-        except RuntimeError:
-            return None
+        except RuntimeError as error:
+            if "HTTP 404" in str(error):
+                return None
+            raise
+
+    def pr_labels(self, pr):
+        return [label["name"] for label in self.api(f"repos/{REPO}/issues/{pr}/labels")]
 
     def create_comment(self, pr, body):
         return self.api(f"repos/{REPO}/issues/{pr}/comments", "POST", {"body": body})
@@ -311,14 +317,17 @@ class Status:
             print(f"--- Status comment of #{self.pr}{' (reposted)' if notify else ''} ---\n{body}", file=sys.stderr)
             return f"{REPO_URL}/pull/{self.pr}"
 
-        if notify and self.id:
-            self.gh.delete_comment(self.id)
-            self.id = None
-
-        if self.id and body == self.body:
+        if self.id and not notify:
+            if body != self.body:
+                self._read(self.gh.edit_comment(self.id, body))
             return self.url
-        comment = self.gh.edit_comment(self.id, body) if self.id else self.gh.create_comment(self.pr, body)
-        self._read(comment)
+
+        # The old comment is only deleted once its replacement exists, so that
+        # a failed request never loses the approval and the history
+        old = self.id
+        self._read(self.gh.create_comment(self.pr, body))
+        if old:
+            self.gh.delete_comment(old)
         return self.url
 
 
@@ -524,25 +533,35 @@ def conflict_lines(files):
     return "\n\n".join(out) if out else "The conflicting files could not be determined"
 
 
-def snippet_errors(tree):
-    """Runs changelog-verify.sh the way the changelog workflow does: in
-    changelog/snippets of the given tree, extracted without touching the
-    working tree. The files are only read by the script from develop. Returns
-    what the script complains about, or None when it passes"""
-    archive = subprocess.run(["git", "archive", tree, "changelog"], capture_output=True)
-    if archive.returncode != 0:
+def snippet_errors(tree, before):
+    """Runs changelog-verify.sh the way the changelog workflow does, in
+    changelog/snippets, on the changelog files that a merge adds or changes
+    between two trees. Files that were already there are left out, so that an
+    invalid snippet on develop neither hides nor blames a pull request. The
+    files are written without touching the working tree and only read by the
+    script from develop. Returns what the script complains about, or None when
+    it passes"""
+    changed = [path for path in git("diff", "-z", "--name-only", "--no-renames", "--diff-filter=AM",
+                                    before, tree, "--", "changelog").stdout.split("\0") if path]
+    if not changed:
         return None
     with tempfile.TemporaryDirectory() as tmp:
-        with tarfile.open(fileobj=io.BytesIO(archive.stdout)) as tar:
-            tar.extractall(tmp, filter="data")
+        for entry in filter(None, git("ls-tree", "-r", "-z", tree, "--", *changed).stdout.split("\0")):
+            meta, path = entry.split("\t", 1)
+            mode, kind, sha = meta.split()
+            # Only regular files, a link could point outside of the folder
+            if kind == "blob" and mode in ("100644", "100755"):
+                target = Path(tmp, path)
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(blob(sha))
         snippets = Path(tmp, "changelog", "snippets")
-        if not snippets.is_dir():
-            return None
+        snippets.mkdir(parents=True, exist_ok=True)
         result = subprocess.run(["bash", str(SNIPPET_VERIFY)], cwd=snippets, capture_output=True,
                                 text=True, encoding="utf-8", errors="replace")
     if result.returncode == 0:
         return None
-    lines = [line.strip() for line in (result.stdout + result.stderr).splitlines()
+    # Annotations of the script are reduced to their message
+    lines = [ANNOTATION_RE.sub("", line.strip()) for line in (result.stdout + result.stderr).splitlines()
              if line.strip() and not line.strip().startswith("- Verified")]
     return lines or [f"{SNIPPET_VERIFY.name} failed"]
 
@@ -618,12 +637,19 @@ def record(gh, cfg, name, event):
     approver = (status.data.get("approved") or {}).get("by")
 
     if action == "labeled" and event["label"]["name"] == label:
-        status.save({"labeled": True, "removed": None, "final": None, "checking": True,
-                     "approved": {"sha": pr["head"]["sha"], "by": sender, "at": t}})
+        updates = {"labeled": True, "removed": None, "final": None, "checking": True}
+        # Triage members can add labels too, only write access approves
+        if gh.write_access(sender):
+            updates["approved"] = {"sha": pr["head"]["sha"], "by": sender, "at": t}
+        status.save(updates)
 
     elif action == "unlabeled" and event["label"]["name"] == label:
         # Removing the label of a merged pull request is part of closing it
         if sender == BOT or pr.get("merged") or not status.id:
+            return
+        # Jobs can finish out of order, a removal is outdated when the label
+        # was added again in the meantime
+        if label in gh.pr_labels(pr["number"]):
             return
         status.save({"labeled": False, "removed": {"by": sender, "at": t}, "checking": False},
                     (f"removed:{t}", {status.author, approver} - {sender},
@@ -663,12 +689,14 @@ def check(gh, cfg, mode="check", push=False, event=("", {})):
             git("push", "origin", f"HEAD:{branch}", "--force")
         return
 
-    git("fetch", "--quiet", "origin", *[f"pull/{p['number']}/head" for p in prs])
+    # The heads are taken from the fetch, the listed heads may be outdated
+    git("fetch", "--quiet", "origin", *[f"+pull/{p['number']}/head:refs/staging/pull/{p['number']}" for p in prs])
 
     # Decide which commit of each pull request is staged
     statuses, picks, checks = {}, {}, {}
     for p in prs:
-        n, latest = p["number"], p["head"]
+        n = p["number"]
+        latest = p["head"] = git_out("rev-parse", f"refs/staging/pull/{n}")
         status = statuses[n] = Status(gh, cfg, n, p["author"]).load()
         approved = (status.data.get("approved") or {}).get("sha")
         c = checks[n] = {"latest": latest}
@@ -703,16 +731,14 @@ def check(gh, cfg, mode="check", push=False, event=("", {})):
     staged_files, conflicted_by = {}, {n: [] for n in picks}
     titles = {p["number"]: p["title"] for p in prs}
     # A changelog snippet that the changelog workflow rejects would fail the
-    # whole deployment, so a pull request that makes the check fail is left out
-    snippets_before = snippet_errors(base)
+    # whole deployment, so a pull request that adds one is left out
     for n, sha in picks.items():
         tree, files = merge(head, sha)
         if files is None:
-            snippets_after = snippet_errors(tree)
-            if snippets_after and not snippets_before:
-                checks[n].update(state="snippet", sha=sha, snippets=snippets_after)
+            invalid = snippet_errors(tree, head)
+            if invalid:
+                checks[n].update(state="snippet", sha=sha, snippets=invalid)
                 continue
-            snippets_before = snippets_after
             trailer = f"Staged from {REPO_URL}/pull/{n} at {sha}"
             if related[n]:
                 shares = ", ".join(f"#{o}" for o in related[n])

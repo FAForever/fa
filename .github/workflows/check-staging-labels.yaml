@@ -65,7 +65,10 @@ jobs:
       # pushes and label changes of unrelated pull requests start no jobs
       - name: Read configuration
         id: config
-        run: echo "matrix=$(python3 .github/workflows/scripts/python/staging.py matrix)" >> "$GITHUB_OUTPUT"
+        run: |
+          # Assigned first so that a failing script fails this step
+          matrix=$(python3 .github/workflows/scripts/python/staging.py matrix)
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
 
   # Records approvals, removals and closed pull requests right away and shows
   # that a check is in progress. This job is not limited by concurrency so

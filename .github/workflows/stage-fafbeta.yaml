@@ -32,6 +32,10 @@ jobs:
     name: Update FAF Beta Balance
     needs: [test]
     runs-on: ubuntu-latest
+    # A stage run that started earlier must not overwrite the result of a later
+    # one, so they run one after another and each reads its input when it starts
+    concurrency:
+      group: stage-fafbeta
     permissions:
       contents: read
       issues: write

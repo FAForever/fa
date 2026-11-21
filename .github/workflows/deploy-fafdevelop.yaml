@@ -33,11 +33,31 @@ on:
     - cron: "0 21 * * 4"
 
 jobs:
+  # Resolves the staging branch once, so that a stage run during this workflow
+  # does not change what is tested, deployed and reported
+  refs:
+    name: Resolve staging/fafdevelop
+    runs-on: ubuntu-latest
+    outputs:
+      staging: ${{ steps.refs.outputs.staging }}
+      previous: ${{ steps.refs.outputs.previous }}
+    steps:
+      - name: Resolve references
+        id: refs
+        run: |
+          remote="https://github.com/${{ github.repository }}"
+          staging=$(git ls-remote "$remote" refs/heads/staging/fafdevelop | cut -f1)
+          previous=$(git ls-remote "$remote" refs/heads/deploy/fafdevelop | cut -f1)
+          test -n "$staging"
+          echo "staging=$staging" >> "$GITHUB_OUTPUT"
+          echo "previous=$previous" >> "$GITHUB_OUTPUT"
+
   # Test what is deployed, the staging branch includes labeled pull requests
   test:
+    needs: [refs]
     uses: ./.github/workflows/tests.yaml
     with:
-      ref: staging/fafdevelop
+      ref: ${{ needs.refs.outputs.staging }}
 
   changelog:
     name: Create changelog of FAF Develop
@@ -55,11 +75,9 @@ jobs:
 
   deploy:
     name: Update FAF Develop
-    needs: [test, changelog-lua]
+    needs: [refs, test, changelog-lua]
     runs-on: ubuntu-latest
     outputs:
-      staging: ${{ steps.refs.outputs.staging }}
-      previous: ${{ steps.refs.outputs.previous }}
       deployed: ${{ steps.push.outputs.deployed }}
     steps:
       # https://github.com/actions/checkout/tree/v6/
@@ -67,20 +85,13 @@ jobs:
         uses: actions/checkout@v6
         with:
           ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
-          ref: staging/fafdevelop
+          ref: ${{ needs.refs.outputs.staging }}
 
       - name: Setup Git configuration
         run: |
           # Configure git
           git config user.email "github@faforever.com"
           git config user.name "FAForever Machine User"
-
-      # What is deployed and what it replaces, to report it to labeled pull requests
-      - name: Remember references
-        id: refs
-        run: |
-          echo "staging=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-          echo "previous=$(git ls-remote origin refs/heads/deploy/fafdevelop | cut -f1)" >> "$GITHUB_OUTPUT"
 
       # Allows us to better understand the game version and the specific commit hash when we receive a log
       - name: Update version references
@@ -137,8 +148,8 @@ jobs:
   # when the tests or the deployment failed
   report:
     name: Report to labeled pull requests
-    needs: [test, changelog-lua, deploy]
-    if: ${{ !cancelled() }}
+    needs: [refs, test, changelog-lua, deploy]
+    if: ${{ !cancelled() && needs.refs.result == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -163,9 +174,9 @@ jobs:
       - name: Report deployment
         env:
           RESULT: ${{ needs.test.result == 'failure' && 'tests' || (needs.deploy.result == 'success' && 'success' || 'failed') }}
-          STAGING: ${{ needs.deploy.outputs.staging }}
+          STAGING: ${{ needs.refs.outputs.staging }}
           DEPLOYED: ${{ needs.deploy.outputs.deployed }}
-          PREVIOUS: ${{ needs.deploy.outputs.previous }}
+          PREVIOUS: ${{ needs.refs.outputs.previous }}
           MANUAL_BY: ${{ github.event_name == 'workflow_dispatch' && github.actor || '' }}
         run: |
           python3 .github/workflows/scripts/python/staging.py deploy staging/fafdevelop --result "$RESULT" --staging "$STAGING" --deployed "$DEPLOYED" --previous "$PREVIOUS" --manual-by "$MANUAL_BY"
