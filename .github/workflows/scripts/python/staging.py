@@ -562,6 +562,10 @@ def snippet_errors(tree, before):
         for entry in filter(None, git("ls-tree", "-r", "-z", tree, "--", *changed).stdout.split("\0")):
             meta, path = entry.split("\t", 1)
             mode, kind, sha = meta.split()
+            # The changelog workflow can not run when the folders themselves
+            # are replaced, for example by a link
+            if path in ("changelog", "changelog/snippets"):
+                return [f"{path} must be a folder"]
             target = Path(tmp, path)
             target.parent.mkdir(parents=True, exist_ok=True)
             # Links and submodules are written as empty files, so that the
