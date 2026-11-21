@@ -1,3 +1,4 @@
+---@declare-global
 -- Layer caps
 LAND = 0x01
 SEABED = 0x02

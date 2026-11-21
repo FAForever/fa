@@ -1,3 +1,4 @@
+---@declare-global
 --
 -- Call MultiEvent:AddCallback(fun,arg) to set a trigger function which is called when the event is set.
 -- You can add as many callbacks as you want.

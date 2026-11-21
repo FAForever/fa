@@ -1,3 +1,5 @@
+---@declare-global
+
 --- The global `categories` table for entity categories allow set operations using add, sub, mul metamethods
 --- 
 --- By default each operation returns a new object with the result,
