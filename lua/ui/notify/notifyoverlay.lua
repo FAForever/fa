@@ -201,7 +201,12 @@ function generateEnhancementMessage(data)
         return
     end
 
-    local progress = unit:GetWorkProgress()
+    local progress
+    if msg.data.category == 'experimentals' then
+        progress = unit:GetFractionComplete()
+    else
+        progress = unit:GetWorkProgress()
+    end
     local percent = math.floor(progress * 100)
     if lastTick then
         local eta = -1

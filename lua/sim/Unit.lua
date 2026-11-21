@@ -5146,7 +5146,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                     id = self.EntityId
                     unitType = bp.BlueprintId
                     category = 'experimentals'
-                    LOG(string.format('Notify experimental %s: id=%s source=%s army=%s', trigger, tostring(id), tostring(unitType), tostring(self.Army)))
                 else
                     return
                 end
