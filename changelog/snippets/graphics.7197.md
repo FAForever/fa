@@ -1,1 +1,0 @@
-- Give the Seraphim ACU's Refracting Chronotron Amplifier its own model, so it is no longer visually identical to the engineering upgrades (#7197).

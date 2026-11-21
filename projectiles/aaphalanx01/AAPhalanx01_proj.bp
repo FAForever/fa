@@ -12,7 +12,7 @@ ProjectileBlueprint{
     Display = { StrategicIconSize = 1 },
     Physics = {
         DestroyOnWater = true,
-        LeadTarget = false,
+        LeadTarget = true,
         Lifetime = 0,
         MaxSpeed = 110,
         TrackTarget = true,

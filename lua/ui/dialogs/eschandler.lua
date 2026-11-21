@@ -83,7 +83,7 @@ function HandleEsc(quit_game)
             "<LOC _No>", function() quickDialog:Destroy() quickDialog = false end,
             text3, fn3,
             true,
-            {escapeButton = 2, enterButton = 1, OnlyWorldCover = true}
+            {escapeButton = 2, enterButton = 1}
         )
     end
 

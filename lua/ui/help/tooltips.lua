@@ -852,6 +852,27 @@ Tooltips = {
         title = "<LOC OPTIONS_FRAMETIME_TITLE>Minimum frametime",
         description = "<LOC OPTIONS_FRAMETIME_DESCRIPTION>Allows you to manipulate the minimum frametime. Incompatible with vertical sync, which is automatically disabled when you move the slider and apply the settings. May introduce image tearing. Option exists to give players a way to try to match the refresh rate of modern monitors. Note that the framerate is often CPU limited and not GPU limited, especially during visually intense fights. A list of values that map to common refresh rates: \r\n\r\n  - 16 = 60hz\r\n  - 10 = 100hz\r\n  - 8 = 120hz\r\n  - 7 = 144hz\r\n  - 6 = 165hz",
     },
+    -- faf-re engine only: these options are added to the tabs only when GetEngineInfo exists (lua/options/options.lua).
+    options_graphics_api = {
+        title = "<LOC OPTIONS_GRAPHICS_API_TITLE>Graphics API",
+        description = "<LOC OPTIONS_GRAPHICS_API_DESCRIPTION>The renderer the game draws with. Automatic uses the newest one this PC can start. Takes effect after a restart; if the chosen renderer cannot start, the game uses Direct3D 9.",
+    },
+    options_replay_keyframe_budget = {
+        title = "<LOC OPTIONS_REPLAY_KEYFRAME_BUDGET_TITLE>Replay keyframe cache (MB)",
+        description = "<LOC OPTIONS_REPLAY_KEYFRAME_BUDGET_DESCRIPTION>Disk space a replay may use for its saved positions, in the replay_keyframes folder next to the game, or in faf_replay_keyframes in the system's temporary folder when the game's folder can't be written. Over this, the oldest are thinned out, and moving far back takes longer. Cleared when the next replay starts.",
+    },
+    options_replay_keyframe_spacing = {
+        title = "<LOC OPTIONS_REPLAY_KEYFRAME_SPACING_TITLE>Replay keyframe spacing (seconds)",
+        description = "<LOC OPTIONS_REPLAY_KEYFRAME_SPACING_DESCRIPTION>Game time between a replay's saved positions. Closer ones make moves shorter and use more of the cache. The background preparation takes a new value from the next replay.",
+    },
+    options_replay_keyframe_prepare = {
+        title = "<LOC OPTIONS_REPLAY_KEYFRAME_PREPARE_TITLE>Replay background preparation",
+        description = "<LOC OPTIONS_REPLAY_KEYFRAME_PREPARE_DESCRIPTION>A hidden low-priority copy of the game saves positions ahead of a replay you watch, so a first jump forward can load one. Off saves CPU, and jumps forward play through the game instead.",
+    },
+    options_interface_text = {
+        title = "<LOC OPTIONS_INTERFACE_TEXT_TITLE>Interface text",
+        description = "<LOC OPTIONS_INTERFACE_TEXT_DESCRIPTION>Smooth draws interface text from distance-field atlases, sharp at any size. Original draws it with the Windows glyphs, as the original game does. Small text original keeps text with a font size under 13 on the Windows glyphs.",
+    },
     options_selectedlanguage = {
         title = "<LOC OPTIONS_0007>Language selection",
         description = "<LOC OPTIONS_0008>Select original or custom languages. Also changes voices if available. (needs game restart)",

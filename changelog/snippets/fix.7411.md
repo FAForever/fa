@@ -1,0 +1,1 @@
+- Fix the vision of a scout that is killed and bounces off a shield staying behind and jittering where it hit the shield, instead of following the scout (#7411).
