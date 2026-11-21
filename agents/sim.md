@@ -60,8 +60,8 @@ Sim objects cache values as fields. Read these instead of calling the engine get
 
 From `Sim::AdvanceBeat` in the [faf-re](https://github.com/Draiget/faf-re) decompilation:
 
-1. Player commands for the tick, including `SimCallback` handlers.
-2. Each army's tick, in army order: platoon cleanup, economy, then weapon targeting and firing (`OnGotTarget`, `OnLostTarget`, `OnFire`). Weapons fire before unit orders run.
+1. Player commands for the tick, including `SimCallback` handlers and `SimLua`.
+2. Each army's tick, in army order: platoon cleanup, economy, then weapon targeting and firing (`OnGotTarget`, `OnLostTarget`, `OnFire`). Weapons fire before unit orders run. Effects between armies follow this order: overflow a later army shares with allies (`SetResourceSharing` in [CAiBrain.lua](../engine/Sim/CAiBrain.lua)) reaches an earlier army on the next tick.
 3. Unit command tasks: script task `TaskTick`, build and reclaim callbacks.
 4. Lua threads: everything started with `ForkThread`, including state `Main` threads.
 5. Entity ticks: motion, projectile collisions and impacts, and the damage and kills they cause (`OnImpact`, `OnDamage`, `OnKilled`, `OnLayerChange`).

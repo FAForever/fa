@@ -613,18 +613,21 @@ end
 function Unit:SetPaused(paused)
 end
 
---- Enables or disables resource production for the unit.
---- Used for mass fabricators or extractors for example.
+--- Enables or disables resource production for the unit. Disabling it also disables the unit's resource storage
 ---@param active boolean
 function Unit:SetProductionActive(active)
 end
 
---- sets the production of energy of the unit
+--- Sets the unit's energy production per second. Negative amounts are set to 0
+---@see UnitBlueprintEconomy.NaturalProducer # If the unit is not a natural producer, its production is scaled by how much of its consumption is met
+---@see Unit.SetProductionActive
 ---@param amount number
 function Unit:SetProductionPerSecondEnergy(amount)
 end
 
---- sets the production of mass of the unit
+--- Sets the unit's mass production per second. Negative amounts are set to 0
+---@see UnitBlueprintEconomy.NaturalProducer # If the unit is not a natural producer, its production is scaled by how much of its consumption is met
+---@see Unit.SetProductionActive
 ---@param amount number
 function Unit:SetProductionPerSecondMass(amount)
 end

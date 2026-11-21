@@ -98,16 +98,7 @@ Snippets can do more than spawn units. Use them to set up state, run the test an
 
 ### Economy stats
 
-Tests of an army's stored resources, income, trend or storage ([#7374](https://github.com/FAForever/fa/pull/7374)):
-
-- Stored and max storage are 0 on the first ticks of a game and fill on ticks 2 and 3. Start the test from a `ForkThread` after about `WaitTicks(30)`.
-- `GetEconomyIncome`, `GetEconomyUsage` and `GetEconomyTrend` are per tick (0.1 is 1 per second) and show the last tick's values. Max storage is `brain:GetArmyStat('Economy_MaxStorage_Mass', 0).Value` (`_Energy` for energy).
-- `brain:GiveResource` adds to this tick's income, not to storage. `GetEconomyStored` and `GetEconomyIncome` don't change until the next tick. Code that gives several times in one tick can't read the stored amount to see what it already gave.
-- `brain:TakeResource` changes stored right away, never takes more than is stored, and returns the amount taken.
-- Each economy tick adds income (with gifts) and subtracts usage, and only then caps at max storage. Anything above the cap is lost, or given to allies when resource sharing is on. A negative trend therefore leaves room for more than max minus stored, and an army at full storage passes its income to allies, which changes the totals of a two-army test. This order comes from faf-re (`ProcessArmyEconomy` in `CEconomy.cpp`), not from a test.
-- Both ways to remove an ACU's income have a catch. `SetProductionPerSecondMass(0)` leaves its base production (1 mass and 20 energy per second), so the trend no longer matches how storage moves. A nonzero value replaces the base production instead of adding to it: `SetProductionPerSecondEnergy(20000)` gave exactly 2000 per tick. `SetProductionActive(false)` also seems to remove its storage: max storage dropped from 650 to 0 in a test. To test full storage with negative income, leave production on, give the army a second ACU or other storage, or add the base production to the expected values.
-- Sim callbacks and `SimLua` code run between beats, with the same `GetGameTick()` as that beat's threads. A gift at tick N is in storage when Lua sees tick N + 1.
-- To catch deleted resources, log stored and trend for both armies before the action, and the amount taken from the sender right after it. After `WaitTicks(1)`, log stored again: lost = stored and trend of both armies before − stored of both after. A loss about equal to one tick of trend means the trend was wrong, not that resources were deleted.
+Economy values come from the economy step of each army's tick ([order within a tick](sim.md#order-within-a-tick)), so an action shows in them on a later tick, and overflow shared between armies can take one more. Storage is empty until the first ticks of a game have passed. When each value changes is on the economy functions in [CAiBrain.lua](../engine/Sim/CAiBrain.lua) (`GetEconomy*`, `GiveResource`, `TakeResource`, `SetResourceSharing`). Time the test's reads from that.
 
 ## Testing in live games
 
