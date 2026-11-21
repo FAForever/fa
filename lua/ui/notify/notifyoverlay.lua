@@ -173,6 +173,9 @@ function createEnhancementOverlay(args)
     overlay.customName = args.text
     overlay.category = args.category
     overlay.source = args.source
+    overlay.isACU = factions[overlay.category] ~= nil
+    overlay.showName = overlay.isACU or overlay.category == 'tech' or overlay.category == 'other'
+    overlay.showETA = overlay.isACU or overlay.category == 'experimentals'
     overlay.id = args.id
     overlay.pos = args.pos
     overlay.eta = args.eta
@@ -205,7 +208,7 @@ function createEnhancementOverlay(args)
 
         LayoutHelpers.AtLeftTopIn(overlay, worldView, (pos.x - overlay.Width() / 2) / LayoutHelpers.GetPixelScaleFactor(), (pos.y - overlay.Height() / 2 + 1) / LayoutHelpers.GetPixelScaleFactor())
 
-        if not overlay.siloStatus then
+        if overlay.showETA and not overlay.siloStatus then
             local timeRemaining = math.ceil(overlay.eta - seconds)
             if timeRemaining ~= overlay.lastTimeRemaining then
                 if timeRemaining >= 0 then
@@ -218,16 +221,20 @@ function createEnhancementOverlay(args)
         end
     end
 
-    overlay.progress = UIUtil.CreateText(overlay, args.siloStatus or overlay.name .. " " .. args.progress .. "%", 12, UIUtil.bodyFont)
+    local progressText = args.siloStatus or args.progress .. "%"
+    if overlay.showName and not args.siloStatus then
+        progressText = overlay.name .. " " .. progressText
+    end
+    overlay.progress = UIUtil.CreateText(overlay, progressText, 12, UIUtil.bodyFont)
     overlay.progress:SetColor('white')
     overlay.progress:SetDropShadow(true)
-    LayoutHelpers.AtCenterIn(overlay.progress, overlay, -15, 0)
+    LayoutHelpers.AtCenterIn(overlay.progress, overlay, overlay.showETA and -15 or 0, 0)
 
     overlay.etaText = UIUtil.CreateText(overlay, 'ETA', 10, UIUtil.bodyFont)
     overlay.etaText:SetColor('white')
     overlay.etaText:SetDropShadow(true)
     LayoutHelpers.AtCenterIn(overlay.etaText, overlay, 15, 0)
-    if overlay.siloStatus then
+    if not overlay.showETA or overlay.siloStatus then
         overlay.etaText:SetText('')
     end
 
@@ -259,8 +266,13 @@ function updateEnhancementOverlay(args)
         if overlay.siloStatus then
             overlay.progress:SetText(args.siloStatus)
             overlay.etaText:SetText('')
-        else
+        elseif overlay.showName then
             overlay.progress:SetText(overlay.name .. " " .. args.progress .. "%")
+        else
+            overlay.progress:SetText(args.progress .. "%")
+            if not overlay.showETA then
+                overlay.etaText:SetText('')
+            end
         end
         overlay.eta = args.eta
         overlay.pos = args.pos
