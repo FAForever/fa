@@ -1,1 +1,0 @@
-- Annotate `WldUiProvider` class (#7268).

@@ -1,0 +1,1 @@
+- Fix players desyncing at the start of a game with several sim mods, because the mods were loaded in a different order depending on which other mods each player had installed (#7410).

@@ -390,7 +390,6 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
         -- change state if we're enabled
         if self.Enabled then
-            self.DisallowCollisions = true
             ChangeState(self, self.EnergyDrainedState)
         end
     end,
@@ -401,7 +400,6 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
         -- change state if we're enabled
         if self.Enabled then
-            self.DisallowCollisions = false
             ChangeState(self, self.OnState)
         end
     end,
@@ -858,6 +856,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     ---@param self Shield
     RemoveShield = function(self)
         self._IsUp = false
+        self.DisallowCollisions = true
 
         EntitySetCollisionShape(self, 'None')
 
@@ -897,6 +896,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         end
 
         self._IsUp = true
+        self.DisallowCollisions = false
     end,
 
     ---@param self Shield
@@ -1016,7 +1016,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 health = EntityGetMaxHealth(self)
             end
 
-            -- fully charged, reset our helpt
+            -- fully charged, reset our health
             EntitySetHealth(self, self, health)
 
             -- update internal state
@@ -1026,7 +1026,6 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             self.RegenThreadStartTick = GetGameTick() + 10 * self.RegenStartTime
 
             -- back to the regular onstate
-            self.DisallowCollisions = false
             ChangeState(self, self.OnState)
         end,
 

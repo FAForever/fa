@@ -301,6 +301,12 @@ end
 --#endregion
 --#region Receiving (network)
 
+--- Ids of Notify messages already counted by `processIncomingMessage`.
+--- Notify messages arrive through both delivery paths, and a copy the
+--- message limit rejects never reaches history for `IsDuplicateMessage`.
+---@type table<string, true>
+local processedNotifyIds = {}
+
 --- Returns true when `msg.Id` matches an entry already in history. The same
 --- chat message arrives via both delivery paths in live play (engine
 --- `SessionSendChatMessage` and sim `Sync.ChatMessages`), so whichever lands
@@ -348,6 +354,10 @@ function OnReceive(sender, msg)
 
     if msg.to == ChatModel.RecipientNotify then
         ---@cast msg NotifyChatPayload
+        if msg.Id then
+            if processedNotifyIds[msg.Id] then return end
+            processedNotifyIds[msg.Id] = true
+        end
         -- ignore unwanted messages
         if not import("/lua/ui/notify/notify.lua").processIncomingMessage(sender, msg) then
             return
@@ -484,32 +494,7 @@ function Send(text, attachCamera)
         msg.camera = GetCamera('WorldCamera'):SaveSettings()
     end
 
-    -- Stamp an id for `OnSyncChatMessages` to dedupe the live and
-    -- sim-routed delivery paths. Tick suffix guards against
-    -- table-address recycling.
-    msg.Id = string.format("%d %s", GameTick(), tostring(msg))
-
-    -- Replay-parser backwards compat: external replay tools scrape chat
-    -- out of recorded `GiveResourcesToPlayer` callback args. Fire one
-    -- zero-resource callback per outgoing message so they keep working.
-    -- Observers skip it (no army to ship).
-    if focusArmy ~= -1 then
-        local senderData = GetArmyData(focusArmy)
-        SimCallback({
-            Func = 'GiveResourcesToPlayer',
-            Args = {
-                From = focusArmy, To = focusArmy, Mass = 0, Energy = 0,
-                Sender = senderData and senderData.nickname or tostring(focusArmy),
-                Msg = msg,
-            },
-        }, false)
-    end
-
-    -- Sim-routed path: the sim re-broadcasts via `Sync.ChatMessages`.
-    -- In live play it runs alongside `SessionSendChatMessage` and
-    -- id-based dedupe prevents double-posting. In replays it is the
-    -- *only* path.
-    SimCallback({ Func = 'SendChatMessage', Args = { Msg = msg } }, false)
+    SendThroughSim(msg)
 
     if recipient == ChatModel.RecipientAllies then
         SessionSendChatMessage(FindClients(), msg)
@@ -529,6 +514,40 @@ function Send(text, attachCamera)
             SessionSendChatMessage(msg)
         end
     end
+end
+
+--- Sends the sim side of an outgoing message, alongside the caller's
+--- `SessionSendChatMessage`. Also used by the Notify subsystem, which
+--- sends outside of `Send`.
+---@param msg ChatPayload
+function SendThroughSim(msg)
+    -- Stamp an id for `OnSyncChatMessages` to dedupe the live and
+    -- sim-routed delivery paths. Tick suffix guards against
+    -- table-address recycling.
+    msg.Id = string.format("%d %s", GameTick(), tostring(msg))
+
+    -- Replay-parser backwards compat: external replay tools scrape chat
+    -- out of recorded `GiveResourcesToPlayer` callback args. Fire one
+    -- zero-resource callback per outgoing message so they keep working.
+    -- Observers skip it (no army to ship).
+    local focusArmy = GetFocusArmy()
+    if focusArmy ~= -1 then
+        local senderData = GetArmyData(focusArmy)
+        SimCallback({
+            Func = 'GiveResourcesToPlayer',
+            Args = {
+                From = focusArmy, To = focusArmy, Mass = 0, Energy = 0,
+                Sender = senderData and senderData.nickname or tostring(focusArmy),
+                Msg = msg,
+            },
+        }, false)
+    end
+
+    -- Sim-routed path: the sim re-broadcasts via `Sync.ChatMessages`.
+    -- In live play it runs alongside `SessionSendChatMessage` and
+    -- id-based dedupe prevents double-posting. In replays it is the
+    -- *only* path.
+    SimCallback({ Func = 'SendChatMessage', Args = { Msg = msg } }, false)
 end
 
 --#endregion

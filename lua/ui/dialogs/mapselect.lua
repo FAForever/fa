@@ -450,6 +450,19 @@ local OnMapChanged = function(self, row, noSound)
     end
 end
 
+--- Give keyboard focus back to the map list so its own key handling (arrows, Enter, Esc)
+--- works again. Deferred by a frame: the engine finishes its own focus handling for the
+--- current click after our callbacks run, which would undo an immediate re-acquire.
+local function RefocusMapList()
+    local list = mapList
+    ForkThread(function()
+        WaitFrames(1)
+        if list and not IsDestroyed(list) then
+            list:AcquireKeyboardFocus(true)
+        end
+    end)
+end
+
 function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultScenarioName, curOptions, availableMods, OnModsChanged)
     LoadScenarios()
 
@@ -545,7 +558,16 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     Tooltip.AddButtonTooltip(modButton, "Lobby_Mods")
     modButton.OnClick = function(self, modifiers)
         -- direct import allows data caching in ModsManager
-        import("/lua/ui/lobby/modsmanager.lua").CreateDialog(dialogContent, true, availableMods, OnModsChanged)
+        local modsDialog = import("/lua/ui/lobby/modsmanager.lua").CreateDialog(dialogContent, true, availableMods, OnModsChanged)
+        -- The mods manager takes keyboard focus for its search box; give it back to the map list
+        -- however the mods manager is closed (save, Esc, clicking outside).
+        if modsDialog then
+            local oldOnClosed = modsDialog.OnClosed
+            modsDialog.OnClosed = function(self)
+                oldOnClosed(self)
+                RefocusMapList()
+            end
+        end
     end
     dialogContent.modButton = modButton
 
@@ -611,6 +633,18 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
 
     filterName.OnTextChanged = function(self, newText, oldText)
       PopulateMapList()
+    end
+
+    -- Typing in the name filter takes keyboard focus away from the map list, and nothing
+    -- gave it back, so arrows/Enter/Esc stopped working. Return it when the user leaves the box.
+    filterName.OnLoseKeyboardFocus = function(self)
+        RefocusMapList()
+    end
+
+    filterName.OnEnterPressed = function(self, text)
+        self:AbandonFocus()
+        RefocusMapList()
+        return true
     end
 
     nameFilter = filterName
@@ -684,7 +718,13 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     end
 
     mapList.OnKeySelect = OnMapChanged
-    mapList.OnClick = OnMapChanged
+    mapList.OnClick = function(self, row, noSound)
+        -- noSound is set for programmatic calls (e.g. PopulateMapList while typing in the filter)
+        if not noSound then
+            RefocusMapList()
+        end
+        OnMapChanged(self, row, noSound)
+    end
     mapList.OnDoubleClick = function(self, row)
         if mapIsOutdated() then
             GUI_OldMap(over)

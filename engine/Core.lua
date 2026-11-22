@@ -53,7 +53,7 @@
 ---@alias Color string `EnumColor` or hexcode like `'RrGgBb'`, or `'AaRrGgBb'` with transparency
 ---@alias Bone string | number
 ---@alias Army string | integer
----@alias Language "cn" | "cz" | "de" | "es" | "fr" | "it" | "pl" | "ru" | "tw" | "tzm" | "us"
+---@alias Language "cn" | "cz" | "de" | "es" | "fr" | "it" | "ko" | "pl" | "ru" | "tw" | "tzm" | "us"
 
 -- note that these object span both the sim and user states
 ---@alias GoalObject moho.manipulator_methods | EconomyEvent | Camera
@@ -480,7 +480,9 @@ end
 function Sound(sound)
 end
 
---- Define the footprint types for pathfinding, only works in `blueprints.lua`
+--- Defines the footprint specs for pathfinding. Only has an effect during rule init.
+---
+--- Specs with a duplicate `Name` are skipped with a warning
 ---@param specs FootprintSpec[]
 function SpecFootprints(specs)
 end

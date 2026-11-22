@@ -9,12 +9,10 @@
 
 ---@class NotifyChatPayload : ChatPayload
 ---@field data NotifyChatPayloadData
---- FIXME: Notify messages are not relayed through sim, so they don't use this
---- field, but they also don't show up in replays.
----@field From nil
 
 local Prefs = import("/lua/user/prefs.lua")
 local FindClients = import("/lua/ui/game/chat/ChatController.lua").FindClients
+local SendThroughSim = import("/lua/ui/game/chat/ChatController.lua").SendThroughSim
 local defaultMessages = import("/lua/ui/notify/defaultmessages.lua").defaultMessages
 local AddChatCommand = import("/lua/ui/notify/commands.lua").AddChatCommand
 local NotifyOverlay = import("/lua/ui/notify/notifyoverlay.lua")
@@ -31,12 +29,14 @@ local messageLimits = {tech = 1, other = 1, experimentals = 1}
 local customMessagesDisabled
 
 local focusArmy
+local replay
 local observer
 local localClient
 
 function init(isReplay, parent, notifyMessages)
     messages = notifyMessages
     focusArmy = GetFocusArmy()
+    replay = isReplay
     observer = isReplay or focusArmy == -1
 
     local clients = GetSessionClients()
@@ -246,9 +246,14 @@ function focusArmyChanged()
 end
 
 function sendMessage(msg)
+    -- Replays show the players' own chat messages recorded through `SendThroughSim`
+    if replay and msg.Chat then return end
     if observer then
         SessionSendChatMessage(localClient, msg)
     else
+        if msg.Chat then
+            SendThroughSim(msg)
+        end
         SessionSendChatMessage(FindClients(), msg)
     end
 end
@@ -347,6 +352,15 @@ function killWatcher(data)
     end
 end
 
+--- Stops every ACU watcher. Used by the faf-re engine's replay timeline: after it moves a replay to another time
+--- the units these threads watch are gone, and each thread looked its unit up once. With the new sim's first beat
+--- the engine sends the 'started' message again for each ACU upgrading in it, which starts its watcher anew.
+function KillAllWatchers()
+    for _, data in ACUs do
+        killWatcher(data)
+    end
+end
+
 ---@param id EntityId
 ---@param text string
 ---@param category NotifyCategory
@@ -359,6 +373,15 @@ function watchEnhancement(id, text, category, source)
     overlayData.eta = -1
 
     while true do
+        -- The faf-re engine's replay timeline can remove the units while a move loads, before it stops this thread.
+        if IsDestroyed(overlayData.unit) then
+            local data = ACUs[id]
+            if data and data.watcher == CurrentThread() then
+                data.watcher = false
+                NotifyOverlay.sendDestroyOverlayMessage(id)
+            end
+            return
+        end
         NotifyOverlay.generateEnhancementMessage(overlayData)
         WaitSeconds(0.1)
     end

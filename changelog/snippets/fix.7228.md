@@ -1,1 +1,0 @@
-- Fix error when using interrupt pathfinding on immobile engineers (#7228).

@@ -1,0 +1,1 @@
+- The changelog verification now fails when a snippet is placed in `changelog/` instead of `changelog/snippets/`, where it would be left out of the changelog (#7428).

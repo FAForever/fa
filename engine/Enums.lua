@@ -306,3 +306,20 @@
 ---| "MobileBuild"
 ---| "FactoryBuild"
 ---| "Upgrade"
+
+---@enum FootprintFlag
+local FootprintFlags = {
+    None = 0x00,
+    IgnoreStructures = 0x01,
+}
+
+--- Bitmask
+---@enum FootprintLayerCap
+local FootprintLayerCaps = {
+    LAND = 0x01,
+    SEABED = 0x02,
+    SUB = 0x04,
+    WATER = 0x08,
+    AIR = 0x10,
+    ORBIT = 0x20,
+}

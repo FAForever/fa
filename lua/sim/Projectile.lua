@@ -318,7 +318,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     --- Called by the engine when the projectile impacts something
     ---@param self Projectile
     ---@param targetType ImpactType
-    ---@param targetEntity Unit | Prop
+    ---@param targetEntity? Unit | Shield | Prop # nil if hitting terrain
     OnImpact = function(self, targetType, targetEntity)
         -- Since collision is checked before impacts are run, collision changes caused by impacts need to be checked by impacts
         -- For example, a shield will first tell every projectile that it can collide with it, and then only afterwards will
@@ -623,7 +623,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     ---@param self Projectile
     ---@param instigator Unit | Projectile # The launcher, and if it doesn't exist, the projectile itself
     ---@param DamageData WeaponDamageTable # passed by the weapon
-    ---@param targetEntity Unit | Prop | nil # nil if hitting terrain
+    ---@param targetEntity? Unit | Shield | Prop # nil if hitting terrain
     ---@param cachedPosition? Vector # A cached position that is passed to prevent table allocations, can not be used in fork threads and / or after a yield statement
     DoDamage = function(self, instigator, DamageData, targetEntity, cachedPosition)
 

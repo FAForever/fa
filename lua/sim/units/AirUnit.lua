@@ -11,6 +11,7 @@ local DefaultExplosions = import("/lua/defaultexplosions.lua")
 local VisionMarkerOpti = import('/lua/sim/VizMarker.lua').VisionMarkerOpti
 
 ---@class AirUnit : MobileUnit
+---@field vizEnt? VisionMarkerOpti # Used by [EnableVisionWhileFalling](lua://UnitBlueprintAir.EnableVisionWhileFalling)
 AirUnit = ClassUnit(MobileUnit) {
     -- Contrails
     ContrailEffects = { '/effects/emitters/contrail_polytrail_01_emit.bp', },
@@ -72,6 +73,20 @@ AirUnit = ClassUnit(MobileUnit) {
                     blueprint.CollisionSphereOffsetZ or 0,
                     blueprint.SizeSphere
                 )
+            end
+        end
+    end,
+
+    ---@param self AirUnit
+    ---@param type IntelType
+    ---@param radius integer
+    SetIntelRadius = function(self, type, radius)
+        MobileUnit.SetIntelRadius(self, type, radius)
+        -- Sync vision entity with vision changes that happen when the unit starts sinking in water
+        if type == 'Vision' then
+            local vizEnt = self.vizEnt
+            if vizEnt then
+                vizEnt:SetIntelRadius(type, radius)
             end
         end
     end,
@@ -232,6 +247,7 @@ AirUnit = ClassUnit(MobileUnit) {
                     vizEnt:UpdateIntel(army, self:GetIntelRadius("Vision"), "Vision", true)
                     vizEnt:UpdatePosition(x, z)
                     vizEnt:AttachTo(self, 0)
+                    self.vizEnt = vizEnt
                 end
             end
 

@@ -1,1 +1,0 @@
-- Improved wreckage detection for lobby map preview (#7269).
