@@ -196,7 +196,7 @@ UnitBlueprint{
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 50,
             ProjectileId = "/projectiles/ADFOblivionCannon02/ADFOblivionCannon02_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.4, -- 110 / 50 * 1.4 = 3.1 s, so shells that clear a cliff edge expire near max range
+            ProjectileLifetimeUsesMultiplier = 1.4,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
@@ -260,7 +260,7 @@ UnitBlueprint{
             MuzzleVelocity = 50,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = "/projectiles/ADFOblivionCannon02/ADFOblivionCannon02_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.4, -- 110 / 50 * 1.4 = 3.1 s, so shells that clear a cliff edge expire near max range
+            ProjectileLifetimeUsesMultiplier = 1.4,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
@@ -324,7 +324,7 @@ UnitBlueprint{
             MuzzleVelocity = 50,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = "/projectiles/ADFOblivionCannon02/ADFOblivionCannon02_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.4, -- 110 / 50 * 1.4 = 3.1 s, so shells that clear a cliff edge expire near max range
+            ProjectileLifetimeUsesMultiplier = 1.4,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
