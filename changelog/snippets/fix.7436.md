@@ -1,1 +1,1 @@
-- Your explanation here... [Don't forget to change the category in the filename] (#7436).
+- Fix typo that gave Seraphim splash gun 5 damage radius instead of 2.7 (#7436).
