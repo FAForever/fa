@@ -36,6 +36,8 @@ on:
   pull_request:
     paths:
       - "changelog/snippets/*.md"
+      # catch snippets that are misplaced in the parent folder
+      - "changelog/*.md"
 
   push:
     branches:

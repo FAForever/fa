@@ -1,1 +1,0 @@
-- New effects made to match the Emissary projectile's new behavior, with input from Nomander, Fichom, and others in the FAF community (#7335).
