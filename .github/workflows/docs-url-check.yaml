@@ -30,6 +30,9 @@ on:
 
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   verify:
     name: Verify URLs
@@ -44,6 +47,15 @@ jobs:
             docs
             .github/workflows/scripts/python
 
+      - name: Setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+
+      # The same version as the urlchecker-action below, so that both extract the same URLs.
+      - name: Install urlchecker
+        run: python -m pip install urlchecker==0.0.34
+
       # Links to files of this repository on the target branch are checked
       # against the checked out commit instead of over HTTP, so that links to
       # files that the pull request adds pass and links to files that do not
@@ -52,10 +64,10 @@ jobs:
         id: repo-links
         env:
           BRANCH: ${{ github.base_ref || github.ref_name }}
-        run: python3 .github/workflows/scripts/python/check_repo_links.py docs --branch "$BRANCH" --exclude docs/README.md
+        run: python .github/workflows/scripts/python/check_repo_links.py docs --branch "$BRANCH" --exclude docs/README.md
 
       - name: urlchecker-action
-        # Also runs when the previous step fails, but not when the checkout failed.
+        # Also runs when the previous step fails, but not when an earlier step failed.
         if: ${{ !cancelled() && steps.repo-links.outcome != 'skipped' }}
         uses: urlstechie/urlchecker-action@0.0.34
         with:
@@ -63,9 +75,7 @@ jobs:
           file_types: .md
           exclude_files: docs/README.md
 
-          # Checked by the previous step.
-          exclude_patterns: ${{ steps.repo-links.outputs.exclude_patterns }}
-
-          # URLs are excluded because not all type of URLs are supported, see also:
+          # The first URLs are checked by the previous step. The others are
+          # excluded because not all type of URLs are supported, see also:
           # - https://github.com/urlstechie/urlchecker-action/issues/105
-          exclude_urls: https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf,https://github.com/FAForever/fa/deployments,https://github.com/FAForever/fa/deployments/production
+          exclude_urls: ${{ steps.repo-links.outputs.exclude_urls }},https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf,https://github.com/FAForever/fa/deployments,https://github.com/FAForever/fa/deployments/production

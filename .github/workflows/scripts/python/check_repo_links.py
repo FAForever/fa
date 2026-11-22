@@ -6,8 +6,9 @@ exists in the commit that is checked out. On a pull request that is the merge
 commit, so a link to a file that the pull request adds passes, while a link to
 a file that does not exist after the merge fails.
 
-The URL check excludes these links by pattern, so the script writes the
-patterns to `$GITHUB_OUTPUT` as `exclude_patterns`.
+The links are extracted with urlchecker, the same package that the URL check
+uses, so the script sees the same URLs. It writes the URLs that it checked to
+`$GITHUB_OUTPUT` as `exclude_urls`, so that the URL check skips exactly those.
 
 Usage:
     python3 check_repo_links.py --repository FAForever/fa --branch develop \
@@ -22,8 +23,7 @@ import subprocess
 import sys
 from urllib.parse import unquote
 
-# Characters that end a URL in Markdown or HTML.
-URL_END = r"\s()\[\]<>\"'`"
+from urlchecker.core.fileproc import collect_links_from_file
 
 
 def escape_data(value: str) -> str:
@@ -63,6 +63,13 @@ def markdown_files(folder: str, excluded: set[str]):
                 yield file
 
 
+def line_of(file: str, link: str) -> int:
+    """Line number of the first occurrence of `link` in `file`."""
+    with open(file, encoding="utf-8") as handle:
+        content = handle.read()
+    return content.count("\n", 0, max(content.find(link), 0)) + 1
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("folder", help="folder with the Markdown files to check")
@@ -75,35 +82,34 @@ def main() -> int:
     if not args.repository:
         parser.error("--repository is required when GITHUB_REPOSITORY is not set")
 
-    prefixes = [f"https://github.com/{args.repository}/{kind}/{args.branch}/" for kind in ("blob", "tree")]
-    url = re.compile("(?:%s)([^%s]*)" % ("|".join(re.escape(p) for p in prefixes), URL_END))
-
-    # Write the patterns first so that the URL check skips these links even when this check fails.
-    output = os.environ.get("GITHUB_OUTPUT")
-    if output:
-        with open(output, "a", encoding="utf-8") as file:
-            file.write(f"exclude_patterns={','.join(prefixes)}\n")
-
+    prefixes = tuple(f"https://github.com/{args.repository}/{kind}/{args.branch}/" for kind in ("blob", "tree"))
     excluded = {os.path.normpath(file) for file in args.exclude}
-    checked = 0
+    checked = set()
     missing = []
     for file in markdown_files(args.folder, excluded):
-        with open(file, encoding="utf-8") as handle:
-            for number, line in enumerate(handle, start=1):
-                for match in url.finditer(line):
-                    link = match.group(0).rstrip(".,;:!?")
-                    path = unquote(re.split("[#?]", match.group(1), maxsplit=1)[0].rstrip(".,;:!?"))
-                    checked += 1
-                    if path_exists(args.rev, path):
-                        print(f"  ok      {link}")
-                    else:
-                        print(f"  missing {link}")
-                        missing.append((file, number, link, path))
+        for link in collect_links_from_file(file):
+            # The URL check splits its exclusions at commas, so such links are left to it.
+            if not link.startswith(prefixes) or "," in link:
+                continue
+            prefix = next(p for p in prefixes if link.startswith(p))
+            path = unquote(re.split("[#?]", link[len(prefix):], maxsplit=1)[0])
+            checked.add(link)
+            if path_exists(args.rev, path):
+                print(f"  ok      {link}")
+            else:
+                print(f"  missing {link}")
+                missing.append((file, link, path))
 
-    print(f"Checked {checked} links to {' and '.join(prefixes)} against {args.rev}.")
-    for file, number, link, path in missing:
+    # The URL check runs even when this check fails, and skips the links that this check reported.
+    output = os.environ.get("GITHUB_OUTPUT")
+    if output:
+        with open(output, "a", encoding="utf-8") as handle:
+            handle.write(f"exclude_urls={','.join(sorted(checked))}\n")
+
+    print(f"Checked {len(checked)} links to {' and '.join(prefixes)} against {args.rev}.")
+    for file, link, path in missing:
         message = f"'{path}' does not exist in the checked out commit: {link}"
-        print(f"::error file={escape_property(file)},line={number}::{escape_data(message)}")
+        print(f"::error file={escape_property(file)},line={line_of(file, link)}::{escape_data(message)}")
     return 1 if missing else 0
 
 
