@@ -1,0 +1,1 @@
+- Links in the documentation to files of this repository are now checked against the pull request after the merge, so links to files that the pull request adds no longer fail the URL check (#7434).
