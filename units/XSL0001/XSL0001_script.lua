@@ -517,7 +517,7 @@ XSL0001 = ClassUnit(ACUUnit) {
     ProcessEnhancementBlastAttack = function(self, bp)
         local wep = self:GetWeaponByLabel('ChronotronCannon')
         ---@cast wep -nil
-        wep:AddDamageRadiusMod(bp.NewgeRadius or 5)
+        wep:AddDamageRadiusMod(bp.NewDamageRadius or 5)
         wep:AddDamageMod(bp.AdditionalDamage)
     end,
 
