@@ -23,10 +23,10 @@ name: Documentation - Verify URLs
 on:
   push:
     branches: ["develop"]
-    paths: ["docs/**"]
+    paths: ["docs/**", ".github/workflows/docs-url-check.yaml", ".github/workflows/scripts/python/check_repo_links.py"]
 
-  pull_request: 
-    paths: ["docs/**"]
+  pull_request:
+    paths: ["docs/**", ".github/workflows/docs-url-check.yaml", ".github/workflows/scripts/python/check_repo_links.py"]
 
   workflow_dispatch:
 
@@ -35,18 +35,36 @@ jobs:
     name: Verify URLs
     runs-on: ubuntu-latest
     steps:
+      # On a pull request this checks out the merge commit. The sparse checkout
+      # still has the trees of all folders, which is enough to look up paths.
       - name: Checkout code
         uses: actions/checkout@v6
         with:
           sparse-checkout: |
             docs
+            .github/workflows/scripts/python
+
+      # Links to files of this repository on the target branch are checked
+      # against the checked out commit instead of over HTTP, so that links to
+      # files that the pull request adds pass and links to files that do not
+      # exist after the merge fail.
+      - name: Check links to files of this repository
+        id: repo-links
+        env:
+          BRANCH: ${{ github.base_ref || github.ref_name }}
+        run: python3 .github/workflows/scripts/python/check_repo_links.py docs --branch "$BRANCH" --exclude docs/README.md
 
       - name: urlchecker-action
+        # Also runs when the previous step fails, but not when the checkout failed.
+        if: ${{ !cancelled() && steps.repo-links.outcome != 'skipped' }}
         uses: urlstechie/urlchecker-action@0.0.34
         with:
           subfolder: docs
           file_types: .md
           exclude_files: docs/README.md
+
+          # Checked by the previous step.
+          exclude_patterns: ${{ steps.repo-links.outputs.exclude_patterns }}
 
           # URLs are excluded because not all type of URLs are supported, see also:
           # - https://github.com/urlstechie/urlchecker-action/issues/105
