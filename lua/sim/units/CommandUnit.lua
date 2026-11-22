@@ -116,8 +116,9 @@ CommandUnit = ClassUnit(WalkingLandUnit) {
         -- FractionComplete is zero only if we're the initiating builder. Clearly, we want to allow
         -- assisting builds of other races, just not *starting* them.
         -- We skip the check if we're assisting another builder: it's up to them to have the ability
-        -- to start this build, not us.
-        if not self:GetGuardedUnit() and unitBeingBuilt:GetFractionComplete() == 0 and
+        -- to start this build, not us. A repair order never starts a build, even at zero progress:
+        -- `CheckAssistFocus` turns a guard into one when the guarded builder starts a new build.
+        if order ~= 'Repair' and not self:GetGuardedUnit() and unitBeingBuilt:GetFractionComplete() == 0 and
             not self:CanBuild(unitBeingBuilt.Blueprint.BlueprintId) then
             IssueToUnitStop(self)
             IssueToUnitClearCommands(self)
