@@ -111,15 +111,12 @@ CommandUnit = ClassUnit(WalkingLandUnit) {
             self.BuildingUnit = true
         end
 
-        -- Check if we're about to try and build something we shouldn't. This can only happen due to
-        -- a native code bug in the SCU REBUILDER behaviour.
-        -- FractionComplete is zero only if we're the initiating builder. Clearly, we want to allow
-        -- assisting builds of other races, just not *starting* them.
-        -- We skip the check if we're assisting another builder: it's up to them to have the ability
-        -- to start this build, not us. A repair order never starts a build, even at zero progress:
-        -- `CheckAssistFocus` turns a guard into one when the guarded builder starts a new build.
-        if order ~= 'Repair' and not self:GetGuardedUnit() and unitBeingBuilt:GetFractionComplete() == 0 and
-            not self:CanBuild(unitBeingBuilt.Blueprint.BlueprintId) then
+        -- Don't start a build we can't otherwise build. The engine's REBUILDER behaviour (no unit
+        -- has that category by default) rebuilds a guarded structure that dies, whatever its faction
+        -- or tech level. Assisting is a repair order, even at zero progress, such as when
+        -- `CheckAssistFocus` turns a guard into a repair of the guarded builder's new build, and
+        -- assisting a build of another faction is fine.
+        if order ~= 'Repair' and not self:CanBuild(unitBeingBuilt.Blueprint.BlueprintId) then
             IssueToUnitStop(self)
             IssueToUnitClearCommands(self)
             unitBeingBuilt:Destroy()
