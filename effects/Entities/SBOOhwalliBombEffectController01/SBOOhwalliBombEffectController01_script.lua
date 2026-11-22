@@ -3,7 +3,7 @@
 --**  File     :  \data\effects\Entities\SBOOhwalliBombEffectController01\SBOOhwalliBombEffectController01_script.lua
 --**  Author(s):  Greg Kohne
 --**
---**  Summary  :  Ohwalli Bomb effect controller script, non-damaging
+--**  Summary  :  Ohwalli Bomb effect controller script, spawns damaging fireball plumes
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
@@ -31,6 +31,7 @@ local BaseRingRiftEffects = {
 
 local SBOOhwalliBombEffect01 = '/effects/Entities/SBOOhwalliBombEffect01/SBOOhwalliBombEffect01_proj.bp'         
 local SBOOhwalliBombEffect06 = '/effects/Entities/SBOOhwalliBombEffect06/SBOOhwalliBombEffect06_proj.bp'
+local PlumeCount = 7
 
 ---@class SBOOhwalliBombEffectController01 : NullShell
 SBOOhwalliBombEffectController01 = Class(NullShell) {
@@ -55,16 +56,16 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
     end,
 
     ---@param self SBOOhwalliBombEffectController01
-    ---@param army number
+    ---@param army Army
     CreateInitialBuildup = function( self, army )
 		WaitTicks(11)
         for k, v in SOhwalliBombHit01 do
-            emit = CreateEmitterAtEntity(self,army,v)
+            CreateEmitterAtEntity(self,army,v)
         end
     end,
 
     ---@param self SBOOhwalliBombEffectController01
-    ---@param army number
+    ---@param army Army
     CreateRifts = function(self, army )
         -- Create projectiles in a dispersal pattern, that create x/z direction that 
         -- the effects emitters use a path.
@@ -79,7 +80,7 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
 
         ------Create pre-buildup effects------
         for k, v in EffectTemplate.SOhwalliBombHit02 do
-            emit = CreateEmitterAtEntity(self,army,v)
+            CreateEmitterAtEntity(self,army,v)
         end  
 
         for i = 0, (num_projectiles -1) do
@@ -93,7 +94,7 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
     end,
 
     ---@param self SBOOhwalliBombEffectController01
-    ---@param army number
+    ---@param army Army
     MainBlast = function( self, army )
 		WaitTicks(26)
 
@@ -105,7 +106,7 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
 
 		-- Create explosion effects
         for k, v in EffectTemplate.SOhwalliDetonate01 do
-            emit = CreateEmitterAtEntity(self,army,v)
+            CreateEmitterAtEntity(self,army,v)
         end
 
         self:CreatePlumes()
@@ -145,14 +146,13 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
     ---@param self SBOOhwalliBombEffectController01
     CreatePlumes = function(self)
         -- Create fireball plumes to accentuate the explosive detonation
-        local num_projectiles = 7
-        local horizontal_angle = (2*math.pi) / num_projectiles
+        local horizontal_angle = (2*math.pi) / PlumeCount
         local angleInitial = RandomFloat( 0, horizontal_angle )
         local xVec, yVec, zVec
         local angleVariation = 0.5
         local px, py, pz
 
-        for i = 0, (num_projectiles -1) do            
+        for i = 0, (PlumeCount -1) do            
             xVec = MathSin(angleInitial + (i*horizontal_angle) + RandomFloat(-angleVariation, angleVariation) )
             yVec = RandomFloat( 0.7, 2.8 ) + 2.0
             zVec = MathCos(angleInitial + (i*horizontal_angle) + RandomFloat(-angleVariation, angleVariation) )

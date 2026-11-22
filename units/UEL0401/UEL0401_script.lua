@@ -23,6 +23,7 @@ local IsDestroyed = IsDestroyed
 ---@field UnitBeingBuilt Unit | nil
 ---@field AttachmentSliderManip moho.SlideManipulator
 ---@field PrepareToBuildManipulator moho.AnimationManipulator
+---@field ReleaseEffectsBag TrashBag
 UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
     PrepareToBuildAnimRate = 5,
     BuildAttachBone = 'Build_Attachpoint',
@@ -205,6 +206,7 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
         ---@param self UEL0401
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
+            ---@cast unitBuilding -nil
             if not unitBuilding.Dead then
                 unitBuilding:ShowBone(0, true)
             end
@@ -232,6 +234,7 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
     CreateRollOffEffects = function(self)
         local army = self.Army
         local unitB = self.UnitBeingBuilt
+        ---@cast unitB -nil
         for k, v in self.RollOffBones do
             local fx = AttachBeamEntityToEntity(self, v, unitB, -1, army, EffectTemplate.TTransportBeam01)
             table.insert(self.ReleaseEffectsBag, fx)

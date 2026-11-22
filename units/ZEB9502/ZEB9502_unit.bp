@@ -5,7 +5,8 @@ UnitBlueprint{
             "Target01",
             "Target02",
             "Target03",
-            "ZEB9502",
+            "Platform",
+            "Flipper",
         },
     },
     Audio = {
@@ -50,7 +51,7 @@ UnitBlueprint{
     Display = {
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
         AnimationFinishBuildLand = "/units/ueb0202/ueb0202_aplatform.sca",
-        AnimationUpgrade = "/units/ueb0202/ueb0202_aupgrade.sca",
+        AnimationUpgrade = "/units/zeb9502/zeb9502_aupgrade.sca",
         BlinkingLights = {
             { BLBone = "Tower04", BLOffsetX = 0.25,  BLOffsetY = 0.07,  BLOffsetZ = 0.6,   BLScale = 2 },
         },
@@ -66,12 +67,16 @@ UnitBlueprint{
                 {
                     LODCutoff = 200,
                     ShaderName = "Unit",
+                    AlbedoName = "/units/ueb0102/ueb0102_albedo.dds",
+                    NormalsName = "/units/ueb0102/ueb0102_normalsts.dds",
+                    SpecularName = "/units/ueb0102/ueb0102_specteam.dds",
                 },
                 {
                     LODCutoff = 500,
                     ShaderName = "Unit",
-                    AlbedoName = "zeb9502_lod1_albedo.dds",
-                    SpecularName = "zeb9502_lod1_specteam.dds",
+                    AlbedoName = "/units/ueb0102/ueb0102_lod1_albedo.dds",
+                    NormalsName = "/units/ueb0102/ueb0102_lod1_normalsts.dds",
+                    SpecularName = "/units/ueb0102/ueb0102_lod1_specteam.dds",
                 },
             },
         },
@@ -138,6 +143,14 @@ UnitBlueprint{
     LifeBarOffset = 1.65,
     LifeBarSize = 4.5,
     Physics = {
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = true,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
         MaxGroundVariation = 1.1,
@@ -173,7 +186,7 @@ UnitBlueprint{
     SelectionSizeZ = 3.1,
     SelectionThickness = 0.3,
     SizeX = 3.5,
-    SizeY = 0.75,
+    SizeY = 1,
     SizeZ = 3.5,
     StrategicIconName = "icon_factory2_air",
     StrategicIconSortPriority = 215,

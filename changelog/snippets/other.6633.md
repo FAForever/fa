@@ -1,1 +1,0 @@
-- (#6633) Improve documentation of the terrain type features

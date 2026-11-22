@@ -255,7 +255,7 @@ AIStructureManager = ClassSimple {
             -- platoon.Base = self.Base
 
             -- setmetatable(platoon, import("/lua/aibrains/platoons/platoon-simple-structure.lua").AIPlatoonSimpleStructure)
-            -- brain:AssignUnitsToPlatoon(platoon, { unit }, 'Unassigned', 'None')
+            -- brain:AssignUnitToPlatoon(platoon, unit, 'Unassigned', 'None')
             -- ChangeState(platoon, platoon.Start)
         end
     end,

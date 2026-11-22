@@ -26,7 +26,7 @@ local StringFormat = string.format
 
 --- Interrupts the pathfinding of the given units. This has various interesting side effects as the 'done with pathfinding' signal is used in various commands. As a few examples:
 --- - For engineers that are building they can start building from further away (but still within the build range)
---- - For engineers that are on a patrol or an attack move the engineer can start reclaiming from further away 
+--- - For engineers that are on a patrol or an attack move the engineer could reclaim from as far as its guard scan radius. The sim callback excludes them for this reason
 --- - For engineers that are assisting they can start assisting immediately if the target is in range (instead of moving into formation)
 --- - For transports that are unloading units are deattached immediately when aborting the move command
 ---@param units Unit[]
@@ -42,7 +42,9 @@ function AbortNavigation(units, doPrint)
         local unit = units[k]
         if not IsDestroyed(unit) then
             local navigator = unit:GetNavigator()
-            navigator:AbortMove()
+            if navigator then
+                navigator:AbortMove()
+            end
             unit:RefocusAssisters()
         end
     end

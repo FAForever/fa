@@ -88,7 +88,10 @@ Prefetcher = CreatePrefetchSet()
 
 local FileCache = {}
 local oldDiskGetFileInfo = DiskGetFileInfo
+---@param file FileName
+---@return FileInfo | false
 function DiskGetFileInfo(file)
+    if type(file) ~= 'string' then error('string expected but got ' .. type(file), 2) end
     if FileCache[file] == nil then
         FileCache[file] = oldDiskGetFileInfo(file) or false
     end
@@ -113,6 +116,20 @@ end
 local replayID = import("/lua/ui/uiutil.lua").GetReplayId()
 if replayID then
     LOG("REPLAY ID: " .. replayID)
+end
+
+do
+    -- Set experimental network variables tuned for ICE adapter (#7364), before the moderation hook below disables these commands
+
+    local _, GameType, _ = import('/lua/version.lua').GetVersionData()
+    if GameType == "FAF Develop" or GameType == "unknown" then
+        ConExecute("net_MaxSendRate 1048576")
+        ConExecute("net_MaxBacklog 262144")
+        ConExecute("net_AckDelay 5")
+        ConExecute("net_SendDelay 2")
+        ConExecute("net_MinResendDelay 30")
+        ConExecute("net_ResendDelayBias 10")
+    end
 end
 
 do

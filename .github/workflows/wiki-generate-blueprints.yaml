@@ -34,14 +34,14 @@ jobs:
       steps:
         # Checkout repos, FA repo is sparse checkout as it is quite large
         - name: Checkout Brewlan Wikigen Repository
-          uses: actions/checkout@v4
+          uses: actions/checkout@v6
           with:
             repository: The-Balthazar/BrewWikiGen
             path: ./brew-wiki-gen
 
         # FA repo is sparse checkout as it is quite large and we dont won't to incur higher action minutes for no reason
         - name: Checkout FAF Repository # -png folder doesnt exist yet, confirm location.
-          uses: actions/checkout@v4
+          uses: actions/checkout@v6
           with:
             path: ./fa
             sparse-checkout-cone-mode: |
@@ -56,7 +56,7 @@ jobs:
               projectiles
 
         - name: Checkout FAF Wiki Repository
-          uses: actions/checkout@v4
+          uses: actions/checkout@v6
           with:
             repository: FAForever/fa.wiki
             path: ./fa.wiki
@@ -76,7 +76,7 @@ jobs:
 
   
         - name: Upload as artifact
-          uses: actions/upload-artifact@v4
+          uses: actions/upload-artifact@v7
           with:
             name: Wiki
             path: fa.wiki

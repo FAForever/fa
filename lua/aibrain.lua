@@ -23,6 +23,7 @@ local FactoryManagerBrainComponent = import("/lua/aibrains/components/factoryman
 local JammerManagerBrainComponent = import("/lua/aibrains/components/jammermanagerbraincomponent.lua").JammerManagerBrainComponent
 local StatManagerBrainComponent = import("/lua/aibrains/components/statmanagerbraincomponent.lua").StatManagerBrainComponent
 local EnergyManagerBrainComponent = import("/lua/aibrains/components/energymanagerbraincomponent.lua").EnergyManagerBrainComponent
+local AIChatBrainComponent = import("/lua/aibrains/components/ChatBrainComponent.lua").AIChatBrainComponent
 
 ---@class TriggerSpec
 ---@field Callback function
@@ -37,7 +38,6 @@ local EnergyManagerBrainComponent = import("/lua/aibrains/components/energymanag
 ---@field Position Vector
 ---@field TaggedBy Unit
 
----@class PlatoonTable
 ---@alias AIResult "defeat" | "draw" | "victor"
 ---@alias BrainState "Defeat" | "Draw" | "InProgress" | "Recalled" | "Victory"
 ---@alias BrainType "AI" | "Human"
@@ -48,8 +48,11 @@ local EnergyManagerBrainComponent = import("/lua/aibrains/components/energymanag
 local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
 local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
 local CategoriesDummyUnit = categories.DUMMYUNIT
+--- Cached table for assigning a single unit to a platoon, to avoid creating a new table every time.
+---@type { [1]: Unit }
+local cachedPlatoonUnit = {}
 
----@class AIBrain: FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent, EnergyManagerBrainComponent, StorageManagerBrainComponent, moho.aibrain_methods
+---@class AIBrain: FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent, EnergyManagerBrainComponent, StorageManagerBrainComponent, AIChatBrainComponent, moho.aibrain_methods
 ---@field AI boolean
 ---@field Name string           # Army name
 ---@field Nickname string       # Player / AI / character name
@@ -65,8 +68,9 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field CommanderKilledTick number    # When one of our commanders last died. Used for transfering to killer in `decapitation` victory.
 ---@field LastUnitKilledBy Army         # Which army last killed one of our units. Used for transfering to killer in other victory conditions.
 ---@field Army integer # Cached `GetArmyIndex` engine call
+---@field PendingResourceGifts { Tick: integer, [ResourceType]: number } # Given with `GiveResource` on `Tick`, which reaches storage on the next tick
 AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent,
-    EnergyManagerBrainComponent, StorageManagerBrainComponent, moho.aibrain_methods) {
+    EnergyManagerBrainComponent, StorageManagerBrainComponent, AIChatBrainComponent, moho.aibrain_methods) {
 
     Status = 'InProgress',
 
@@ -123,12 +127,45 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         }
 
         self.PingCallbackList = {}
+        self.PendingResourceGifts = { Tick = -1, MASS = 0, ENERGY = 0 }
 
         EnergyManagerBrainComponent.CreateBrainShared(self)
         FactoryManagerBrainComponent.CreateBrainShared(self)
         StatManagerBrainComponent.CreateBrainShared(self)
         JammerManagerBrainComponent.CreateBrainShared(self)
         StorageManagerBrainComponent.CreateBrainShared(self)
+    end,
+
+    --- Gives resources to brain. They appear in its storage and income stats on the next tick
+    ---@see AIBrain.GetPendingResourceGift # for the amount given this tick
+    ---@param self AIBrain
+    ---@param type ResourceType
+    ---@param amount number
+    GiveResource = function(self, type, amount)
+        moho.aibrain_methods.GiveResource(self, type, amount)
+
+        local pending = self.PendingResourceGifts
+        local tick = GetGameTick()
+        if pending.Tick ~= tick then
+            pending.Tick = tick
+            pending.MASS = 0
+            pending.ENERGY = 0
+        end
+        -- the engine accepts the type in any case
+        type = string.upper(type)
+        pending[type] = pending[type] + amount
+    end,
+
+    --- Returns how much `GiveResource` gave this tick, which isn't in storage yet
+    ---@param self AIBrain
+    ---@param type ResourceType
+    ---@return number
+    GetPendingResourceGift = function(self, type)
+        local pending = self.PendingResourceGifts
+        if pending.Tick ~= GetGameTick() then
+            return 0
+        end
+        return pending[string.upper(type)]
     end,
 
     --- Called after `BeginSession`, at this point all props, resources and initial units exist
@@ -221,7 +258,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     end,
 
     ---@param self AIBrain
-    ---@param blip any the unit (could be fake) in question
+    ---@param blip Blip
     ---@param reconType ReconTypes
     ---@param val boolean
     OnIntelChange = function(self, blip, reconType, val)
@@ -254,7 +291,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
     ---@param self AIBrain
     ---@param key string
-    ---@param sound SoundHandle
+    ---@param sound? SoundHandle
     PlayVOSound = function(self, key, sound)
         if not self.VOSounds[key] then
             WARN("PlayVOSound: " .. key .. " not found")
@@ -644,6 +681,18 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
         -- retrieve units, excluding insignificant units
         return BrainGetListOfUnits(self, cats - CategoriesDummyUnit, needToBeIdle, requireBuilt)
+    end,
+
+    --- Assigns a single unit to a platoon
+    ---@param self AIBrain
+    ---@param platoon Platoon | string Either a reference to a platoon, or the unique name of the platoon
+    ---@param unit Unit
+    ---@param squad PlatoonSquadType
+    ---@param formation UnitFormations
+    ---@return UnitFormations #Returns the name of the formation
+    AssignUnitToPlatoon = function(self, platoon, unit, squad, formation)
+        cachedPlatoonUnit[1] = unit
+        return self:AssignUnitsToPlatoon(platoon, cachedPlatoonUnit, squad, formation)
     end,
 
     --#endregion

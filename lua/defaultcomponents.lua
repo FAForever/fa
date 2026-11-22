@@ -1,6 +1,8 @@
 local Buff = import("/lua/sim/buff.lua")
 local Entity = import("/lua/sim/entity.lua").Entity
 
+local IsDestroyed = IsDestroyed
+
 ---@class ShieldEffectsComponent : Unit
 ---@field Trash TrashBag
 ---@field ShieldEffectsBag TrashBag
@@ -251,6 +253,7 @@ IntelComponent = ClassSimple {
 
             --- display progress
             for k = 1, ticks do
+                if self.Dead or IsDestroyed(self) then return end
 
                 -- prevent changing work progress when we are doing work (such as an enhancement)
                 if not self.WorkItem then
@@ -628,7 +631,7 @@ VeterancyComponent = ClassSimple {
     ---@param self VeterancyComponent | Unit
     ---@param instigator Unit
     ---@param amount number
-    ---@param vector Vector unused
+    ---@param vector? Vector unused
     ---@param damageType DamageType unused
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         amount = MathMin(amount, self:GetMaxHealth())

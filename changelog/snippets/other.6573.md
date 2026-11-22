@@ -1,3 +1,0 @@
-- (#6473) Rework the patchnotes dialog in the lobby.
-  
-  This is a big internal change, which will make delivering accurate changelogs easier in the future. It also stops the game from keeping 5MB worth of changelog text loaded while you play. The button to view the changelog online now points to a new website where all the changelogs are available. This will be the new default website to read about game patches.

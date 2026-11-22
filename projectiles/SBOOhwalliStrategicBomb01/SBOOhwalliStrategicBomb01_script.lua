@@ -4,6 +4,8 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------------------
 
+-- UnitDatabaseData: {"files": ["effects/Entities/SBOOhwalliBombEffectController01/SBOOhwalliBombEffectController01_script.lua", "effects/Entities/SBOOhwalliBombEffect01/SBOOhwalliBombEffect01_script.lua"], "tooltip": "The explosion spawns ${PlumeCount} fireball plumes that land randomly nearby, each dealing ${PlumeDamage} damage in a ${PlumeDamageRadius} radius."}
+
 local SOhwalliStrategicBombProjectile = import("/lua/seraphimprojectiles.lua").SOhwalliStrategicBombProjectile
 local SOhwalliStrategicBombProjectileOnCreate = SOhwalliStrategicBombProjectile.OnCreate
 
@@ -35,42 +37,37 @@ SBOOhwalliStategicBomb01 = ClassProjectile(SOhwalliStrategicBombProjectile) {
         local position = self:GetPosition()
 
         -- create vision
-        local marker = VisionMarkerOpti({ Owner = self })
+        local marker = VisionMarkerOpti()
         marker:UpdatePosition(position[1], position[3])
         marker:UpdateDuration(9)
         marker:UpdateIntel(self.Army, 12, 'Vision', true)
 
-        -- separate damage thread
         local data = self.DamageData
-        local damage = data.DamageAmount
-        local radius = data.DamageRadius or 0
-        local damageType = data.DamageType
-        local damageFriendly = data.DamageFriendly
-        local damageSelf = data.DamageSelf or false
         local instigator = self.Launcher or self
-        ForkThread(self.DamageThread, self, position, instigator, damage, radius, damageType, damageFriendly, damageSelf)
+
+        -- forked first so the delayed prop effects land on the same tick as, and before, the DoT pulse
+        ForkThread(self.EffectThread, self, position, instigator, data.DamageRadius or 0)
+
+        -- initial damage on impact, remaining damage as a DoT pulse (weapon blueprint)
+        self:DoDamage(instigator, data, targetEntity, position)
 
         self:Destroy()
     end,
 
+    --- trees and props only: the engine DoT system can not express these damage types
     ---@param self SBOOhwalliStategicBomb01
     ---@param position Vector
     ---@param instigator? Unit | Projectile
-    ---@param damage number
     ---@param radius number
-    DamageThread = function(self, position, instigator, damage, radius, damageType, damageFriendly, damageSelf)
+    EffectThread = function(self, position, instigator, radius)
         -- knock over trees
         DamageArea(instigator, position, 0.75 * radius, 1, 'TreeForce', true, true)
         DamageArea(instigator, position, 0.75 * radius, 1, 'TreeForce', true, true)
-
-        -- initial damage
-        DamageArea(instigator, position, radius, 0.1 * damage, damageType, damageFriendly, damageSelf)
         DamageArea(instigator, position, 0.9 * radius, 1, 'TreeFire', true, true)
 
-        -- wait for the full explosion and then deal the remaining damage
-        WaitTicks(28)
+        -- disintegrate props when the delayed damage pulse lands
+        WaitTicks(27)
         DamageArea(instigator, position, 0.4 * radius, 1, 'Disintegrate', true, true)
-        DamageArea(instigator, position, radius, 0.9 * damage, damageType, damageFriendly, damageSelf)
     end,
 }
 TypeClass = SBOOhwalliStategicBomb01

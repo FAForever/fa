@@ -17,6 +17,7 @@
 -- Conclusion: these functions are very cheap to use and are likely a lookup table
 -- on the C-side.
 
+---@diagnostic disable: discard-returns
 
 ModuleName = "Math Trigonometry"
 BenchmarkData = {

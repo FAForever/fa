@@ -10,8 +10,8 @@
 ---@class VectorBase
 ---@field [1] number    # x
 ---@field [2] number    # y
----@field x number
----@field y number
+---@field x number Read only value. Changing it has no effect on the vector. Set `[1]` instead.
+---@field y number Read only value. Changing it has no effect on the vector. Set `[2]` instead.
 
 ---@class Quaternion : VectorBase
 ---@operator mul(Quaternion): Quaternion
@@ -28,7 +28,7 @@
 ---@operator mul(number): Vector
 ---@operator unm: Vector
 ---@field [3] number    # z
----@field z number
+---@field z number Read only value. Changing it has no effect on the vector. Set `[3]` instead.
 
 ---@class Vector2 : VectorBase
 ---@operator add(Vector2): Vector2
@@ -42,13 +42,45 @@
 ---@field x1 number
 ---@field y1 number
 
+---@class PointVector
+---@field px number
+---@field py number
+---@field pz number
+---@field vx number
+---@field vy number
+---@field vz number
+
 ---@alias Color string `EnumColor` or hexcode like `'RrGgBb'`, or `'AaRrGgBb'` with transparency
 ---@alias Bone string | number
 ---@alias Army string | integer
----@alias Language "cn" | "cz" | "de" | "es" | "fr" | "it" | "pl" | "ru" | "tw" | "tzm" | "us"
+---@alias Language "cn" | "cz" | "de" | "es" | "fr" | "it" | "ko" | "pl" | "ru" | "tw" | "tzm" | "us"
 
 -- note that these object span both the sim and user states
 ---@alias GoalObject moho.manipulator_methods | EconomyEvent | Camera
+
+---@class FileInfo
+---@field IsFolder boolean
+---@field ReadOnly boolean
+---@field SizeBytes integer
+---@field TimeStamp string # unsigned 64 bit int in lowercase hexadecimal
+---@field WriteTime FileInfo.WriteTime
+
+---@class FileInfo.WriteTime
+---@field year integer
+---@field month integer
+---@field mday integer # month day
+---@field wday integer # week day
+---@field hour integer
+---@field minute integer
+---@field second integer
+
+--- `Action` from [FILE_NOTIFY_INFORMATION structure (winnt.h)](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-file_notify_information)
+---@alias FileAction
+---| 1 # FILE_ACTION_ADDED - The file was added to the directory.
+---| 2 # FILE_ACTION_REMOVED - The file was removed from the directory.
+---| 3 # FILE_ACTION_MODIFIED - The file was modified. This can be a change in the time stamp or attributes.
+---| 4 # FILE_ACTION_RENAMED_OLD_NAME - The file was renamed and this is the old name.
+---| 5 # FILE_ACTION_RENAMED_NEW_NAME - The file was renamed and this is the new name.
 
 ---@unknown
 function AITarget()
@@ -66,9 +98,10 @@ end
 function Basename(fullPath, stripExtension)
 end
 
---- likely used for debugging, but the use is unknown
----@unknown
-function BeginLoggingStats()
+--- Begins the SupComMark performance benchmark.
+---@see EndLoggingStats # End the benchmark and save results to disk.
+---@param filename string # The name (with extension) for the resulting timestamped benchmark filename.
+function BeginLoggingStats(filename)
 end
 
 --- called during blueprint loading to update the loading animation
@@ -100,7 +133,7 @@ end
 
 --- returns a table of information for the given file, or `false` if the file doesn't exist
 ---@param filename FileName
----@return table | false
+---@return FileInfo | false
 function DiskGetFileInfo(filename)
 end
 
@@ -111,8 +144,9 @@ end
 function DiskToLocal(SysOrLocalPath)
 end
 
---- stops logging stats and optionally exits the application
----@param exit boolean
+--- Ends the SupComMark performance benchmark and saves the results to disk.
+---@see BeginLoggingStats # Begin the benchmark
+---@param exit boolean? # Exits the application iff `false`.
 function EndLoggingStats(exit)
 end
 
@@ -136,7 +170,7 @@ end
 
 ---@overload fun(category: EntityCategory, units: UserUnit[]): UserUnit[]
 ---@overload fun(category: EntityCategory, unitIds: UnitId[]): UnitId[]       
---- filters a list of (user) units or unit ids to only those that match the given category.
+--- filters a list of (user) units or unit blueprint ids to only those that match the given category.
 ---@param category EntityCategory
 ---@param units Unit[]
 ---@return Unit[]
@@ -311,15 +345,14 @@ function ParseEntityCategory(cat)
 end
 
 --- Creates a point vector
----@alternative Not used, better off allocating a separate position and vector
+---@deprecated Not used, better off allocating a separate position and vector
 ---@param px number
 ---@param py number
 ---@param pz number
 ---@param vx number
 ---@param vy number
 ---@param vz number
----@return Vector position
----@return Vector velocity
+---@return PointVector
 function PointVector(px, py, pz, vx, vy, vz)
 end
 
@@ -383,7 +416,7 @@ function RegisterUnitBlueprint(spec)
 end
 
 --- Resumes the thread after suspending it, does nothing if the thread wasn't suspended
----@see # Counterpart of SuspendCurrentThread
+---@see SuspendCurrentThread # Counterpart of SuspendCurrentThread
 ---@param thread thread
 function ResumeThread(thread)
 end
@@ -447,7 +480,9 @@ end
 function Sound(sound)
 end
 
---- Define the footprint types for pathfinding, only works in `blueprints.lua`
+--- Defines the footprint specs for pathfinding. Only has an effect during rule init.
+---
+--- Specs with a duplicate `Name` are skipped with a warning
 ---@param specs FootprintSpec[]
 function SpecFootprints(specs)
 end

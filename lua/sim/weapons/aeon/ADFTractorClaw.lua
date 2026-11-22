@@ -184,11 +184,11 @@ ADFTractorClaw = ClassWeapon(Weapon) {
         WaitFor(slider)
 
         if (not IsDestroyed(target)) and (not IsDestroyed(unit)) then
+            -- don't allow targeting because leading shots doesn't work while it is moving
+            target:SetDoNotTarget(true)
 
             -- attach the slider to the target
-            target:SetDoNotTarget(false)
             target:AttachBoneTo(-1, unit, muzzle)
-            self:MakeImmune(target)
 
             -- make it stop what it was doing
             IssueToUnitClearCommands(target)
@@ -213,6 +213,10 @@ ADFTractorClaw = ClassWeapon(Weapon) {
 
             -- we're at the arm, do destruction effects
             if (not IsDestroyed(target)) and (not IsDestroyed(unit)) and (not IsDestroyed(self)) then
+                -- allow targeting now that the target is mostly stationary
+                -- the weapon can still move around to make shots miss, but it usually 
+                -- shouldn't cause too much missing with its slower movement
+                target:SetDoNotTarget(false)
 
                 -- stop rotating
                 rotatorA:SetGoal(0)

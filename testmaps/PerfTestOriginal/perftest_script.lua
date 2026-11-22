@@ -41,15 +41,15 @@ function StartPerfTest()
     -- Long wait to give stuff time to load up before running the perf test.
     WaitSeconds(25)
 
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Intro_Shot'), 0.0)
+    Cinematics.CameraMoveToMarker('Intro_Shot', 0.0)
     BeginLoggingStats('perftest.log')
     WaitSeconds(2)
 
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_2'), 10.0)
+    Cinematics.CameraMoveToMarker('Perf_Cam_2', 10.0)
 
     WaitSeconds(10.0)
 
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_000'), 5.0)
+    Cinematics.CameraMoveToMarker('Perf_Cam_000', 5.0)
     PerfTest1()
     SetArmyGroupState(P_GA_L4_P2, 'HoldFire')
     PerfTest2()
@@ -63,7 +63,7 @@ end
 
 -- Small Battle Start - Should be a light load test
 function PerfTest1()
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_3'), 0.0)
+    Cinematics.CameraMoveToMarker('Perf_Cam_3', 0.0)
 
     SetArmyGroupState(U_MB_Base, 'Aggressive')
     SetArmyGroupState(P_GA_L1_P1, 'Aggressive') -- Assault
@@ -73,14 +73,14 @@ function PerfTest1()
     ScenarioUtils.AssignOrders('SBN_Patrol', P_GA_L2_P1)
     WaitSeconds(1)
 
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_4'), 10.0)
+    Cinematics.CameraMoveToMarker('Perf_Cam_4', 10.0)
     PerfTest1_HAI()
     WaitSeconds(60)
 end
 
 -- Naval Battle Start - Should be a medium load test
 function PerfTest2()
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_5'), 0)
+    Cinematics.CameraMoveToMarker('Perf_Cam_5', 0)
 
     -- Player Cybran Moves
     SetStateAndMove(P_NG_L1_P1, 'Agressive', -20, -55)
@@ -117,56 +117,56 @@ end
 
 -- Big Battle Start - Heaviest Load Battle
 function PerfTest3()
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_7'), 0)
+    Cinematics.CameraMoveToMarker('Perf_Cam_7', 0)
     ForkThread(SpawnMainBattle)
 end
 
 function PerfTest4()
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_11'), 0)
+    Cinematics.CameraMoveToMarker('Perf_Cam_11', 0)
     PerfTest4_Mavor()
     WaitSeconds(30.0)
 
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_12'), 0)
+    Cinematics.CameraMoveToMarker('Perf_Cam_12', 0)
     PerfTest4_Nukes()
     WaitSeconds(16.0)
 
     Cinematics.CameraReset()
     WaitSeconds(22.0)
 
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_13'), 0)
+    Cinematics.CameraMoveToMarker('Perf_Cam_13', 0)
     WaitSeconds(40.0)
 
     EndLoggingStats()
 end
 
 function PerfTest4_Mavor()
-    IssueAttack({P_EB1[1]}, UEF_Nukes[1])
-    IssueAttack({P_EB1[1]}, UEF_Nukes[2])
-    IssueAttack({P_EB1[1]}, UEF_Nukes[3])
-    IssueAttack({P_EB1[1]}, UEF_Nukes[4])
+    IssueToUnitAttack(P_EB1[1], UEF_Nukes[1])
+    IssueToUnitAttack(P_EB1[1], UEF_Nukes[2])
+    IssueToUnitAttack(P_EB1[1], UEF_Nukes[3])
+    IssueToUnitAttack(P_EB1[1], UEF_Nukes[4])
 end
 
 function PerfTest4_Nukes()
-    IssueNuke({A_Base_Nukes[1]}, ScenarioUtils.MarkerToPosition('ANuke_1'))
-    IssueNuke({A_Base_Nukes[2]}, ScenarioUtils.MarkerToPosition('ANuke_2'))
-    IssueNuke({A_Base_Nukes[3]}, ScenarioUtils.MarkerToPosition('ANuke_3'))
-    IssueNuke({A_Base_Nukes[4]}, ScenarioUtils.MarkerToPosition('ANuke_4'))
-    IssueNuke({A_Base_Nukes[5]}, ScenarioUtils.MarkerToPosition('ANuke_5'))
-    IssueNuke({A_Base_Nukes[6]}, ScenarioUtils.MarkerToPosition('ANuke_6'))
+    IssueToUnitNuke(A_Base_Nukes[1], ScenarioUtils.MarkerToPosition('ANuke_1'))
+    IssueToUnitNuke(A_Base_Nukes[2], ScenarioUtils.MarkerToPosition('ANuke_2'))
+    IssueToUnitNuke(A_Base_Nukes[3], ScenarioUtils.MarkerToPosition('ANuke_3'))
+    IssueToUnitNuke(A_Base_Nukes[4], ScenarioUtils.MarkerToPosition('ANuke_4'))
+    IssueToUnitNuke(A_Base_Nukes[5], ScenarioUtils.MarkerToPosition('ANuke_5'))
+    IssueToUnitNuke(A_Base_Nukes[6], ScenarioUtils.MarkerToPosition('ANuke_6'))
 end
 
 function PerfTest1_HAI()
-    IssueFerry({P_GA_L4_P1[1]}, ScenarioUtils.MarkerToPosition('Player_Ferry_3'))
-    IssueFerry({P_GA_L4_P1[2]}, ScenarioUtils.MarkerToPosition('Player_Ferry_2'))
-    IssueFerry({P_GA_L4_P1[3]}, ScenarioUtils.MarkerToPosition('Player_Ferry_1'))
+    IssueToUnitFerry(P_GA_L4_P1[1], ScenarioUtils.MarkerToPosition('Player_Ferry_3'))
+    IssueToUnitFerry(P_GA_L4_P1[2], ScenarioUtils.MarkerToPosition('Player_Ferry_2'))
+    IssueToUnitFerry(P_GA_L4_P1[3], ScenarioUtils.MarkerToPosition('Player_Ferry_1'))
 
     SetArmyGroupState(P_GA_L4_P2, 'Aggressive')
     SetArmyGroupState(P_GA_Artillery_P1, 'Aggressive')
 
-    IssueAttack({P_GA_Artillery_P1[1]}, ScenarioUtils.MarkerToPosition('ART_Targ_1'))
-    IssueAttack({P_GA_Artillery_P1[2]}, ScenarioUtils.MarkerToPosition('ART_Targ_2'))
-    IssueAttack({P_GA_Artillery_P1[3]}, ScenarioUtils.MarkerToPosition('ART_Targ_3'))
-    IssueAttack({P_GA_Artillery_P1[4]}, ScenarioUtils.MarkerToPosition('ART_Targ_4'))
+    IssueToUnitAttack(P_GA_Artillery_P1[1], ScenarioUtils.MarkerToPosition('ART_Targ_1'))
+    IssueToUnitAttack(P_GA_Artillery_P1[2], ScenarioUtils.MarkerToPosition('ART_Targ_2'))
+    IssueToUnitAttack(P_GA_Artillery_P1[3], ScenarioUtils.MarkerToPosition('ART_Targ_3'))
+    IssueToUnitAttack(P_GA_Artillery_P1[4], ScenarioUtils.MarkerToPosition('ART_Targ_4'))
     WaitSeconds(15.0)
 
     StartAttackMove(P_GA_L4_P1, ScenarioUtils.MarkerToPosition('SBP_P2'))
@@ -176,10 +176,10 @@ end
 function PerfTest3_Nukes()
     SetArmyGroupState(UEF_Nukes, 'Aggressive')
 
-    IssueNuke({UEF_Nukes[1]}, ScenarioUtils.MarkerToPosition('Nuke_1'))
-    IssueNuke({UEF_Nukes[2]}, ScenarioUtils.MarkerToPosition('Nuke_2'))
-    IssueNuke({UEF_Nukes[3]}, ScenarioUtils.MarkerToPosition('Nuke_3'))
-    IssueNuke({UEF_Nukes[4]}, ScenarioUtils.MarkerToPosition('Nuke_4'))
+    IssueToUnitNuke(UEF_Nukes[1], ScenarioUtils.MarkerToPosition('Nuke_1'))
+    IssueToUnitNuke(UEF_Nukes[2], ScenarioUtils.MarkerToPosition('Nuke_2'))
+    IssueToUnitNuke(UEF_Nukes[3], ScenarioUtils.MarkerToPosition('Nuke_3'))
+    IssueToUnitNuke(UEF_Nukes[4], ScenarioUtils.MarkerToPosition('Nuke_4'))
 end
 
 function GetInitalBaseStarted()
@@ -207,12 +207,12 @@ function GetAllArmiesGoing()
     tt1 = {P_GA_L4_P2[1], P_GA_L4_P2[2]}
     tt2 = {P_GA_L4_P2[3], P_GA_L4_P2[4]}
     tt3 = {P_GA_L4_P2[5], P_GA_L4_P2[6]}
-    IssueTransportLoad({tt1[1]}, P_GA_L4_P1[1])
-    IssueTransportLoad({tt1[2]}, P_GA_L4_P1[1])
-    IssueTransportLoad({tt2[1]}, P_GA_L4_P1[2])
-    IssueTransportLoad({tt2[2]}, P_GA_L4_P1[2])
-    IssueTransportLoad({tt3[1]}, P_GA_L4_P1[3])
-    IssueTransportLoad({tt3[2]}, P_GA_L4_P1[3])
+    IssueToUnitTransportLoad(tt1[1], P_GA_L4_P1[1])
+    IssueToUnitTransportLoad(tt1[2], P_GA_L4_P1[1])
+    IssueToUnitTransportLoad(tt2[1], P_GA_L4_P1[2])
+    IssueToUnitTransportLoad(tt2[2], P_GA_L4_P1[2])
+    IssueToUnitTransportLoad(tt3[1], P_GA_L4_P1[3])
+    IssueToUnitTransportLoad(tt3[2], P_GA_L4_P1[3])
     WaitSeconds(2)
 
     -- Naval Group
@@ -240,7 +240,7 @@ function GetAllArmiesGoing()
     IssueTransportLoad(P_NG_L4_P3, P_NG_L3_P3[1])
 
     for k,v in P_NG_L4_P4 do
-        IssueGuard({v}, P_NG_L2_P1[1])
+        IssueToUnitGuard(v, P_NG_L2_P1[1])
     end
     WaitSeconds(2)
 
@@ -289,7 +289,7 @@ function GetAllArmiesGoing()
     IssueTransportLoad(U_NG_L4_P1, U_NG_L3_P3[1])
 
     for k,v in U_NG_L4_P2 do
-        IssueGuard({v}, U_NG_L2_P1[1])
+        IssueToUnitGuard(v, U_NG_L2_P1[1])
     end
     WaitSeconds(1)
 
@@ -322,7 +322,7 @@ end
 function AtlantisRising()
     WaitSeconds(18.0)
 
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_6'), 8)
+    Cinematics.CameraMoveToMarker('Perf_Cam_6', 8)
 
     SetArmyGroupState(U_NG_L4_P2, 'Aggressive')
     SetArmyGroupState(P_NG_L4_P4, 'Aggressive')
@@ -408,7 +408,7 @@ function Major_Ground_Assault_Start()
     SetArmyGroupState(P_MGA_L7_P1, 'Aggressive')
     SetArmyGroupState(U_MGA_L6_P1, 'Aggressive')
 
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_8'), 10)
+    Cinematics.CameraMoveToMarker('Perf_Cam_8', 10)
     WaitSeconds(20.0)
 
     SetArmyGroupState(P_MGA_L6_P1, 'Aggressive')
@@ -431,12 +431,12 @@ function Major_Ground_Assault_Start()
     IssuePatrol(U_MGA_Fighters2, A_Base_Colossus[1]:GetPosition())
     WaitSeconds(15.0)
 
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_9'), 0)
+    Cinematics.CameraMoveToMarker('Perf_Cam_9', 0)
 
     PerfTest3_Nukes()
     WaitSeconds(8.0)
 
-    Cinematics.CameraMoveToMarker(ScenarioUtils.GetMarker('Perf_Cam_10'), 0)
+    Cinematics.CameraMoveToMarker('Perf_Cam_10', 0)
     WaitSeconds(20.0)
 end
 
@@ -577,7 +577,7 @@ function SetStateAndMove(ArmyGroup, NewFireState, xOff, zOff)
             if not v.Dead then
                 v:SetFireState(NewFireState)
                 local x, y, z = unpack(v:GetPosition())
-                IssueAggressiveMove({v}, {x + xOff, y, z + zOff})
+                IssueToUnitAggressiveMove(v, {x + xOff, y, z + zOff})
             end
         end
     else

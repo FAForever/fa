@@ -14,7 +14,7 @@
 ---@param varName string
 ---@return boolean
 function AMPlatoonsGreaterOrEqualVarTable(aiBrain, name, varName)
-	local counter = aiBrain.AttackData.AMPlatoonCount[name] or 0
+	local counter = aiBrain.AttackData.PlatoonCount[name] or 0
 	local num = ScenarioInfo.VarTable[varName]
 	
 	if not num then
@@ -29,7 +29,7 @@ end
 ---@param varName string
 ---@return boolean
 function AMPlatoonsLessThanVarTable(aiBrain, name, varName)
-	local counter = aiBrain.AttackData.AMPlatoonCount[name] or 0
+	local counter = aiBrain.AttackData.PlatoonCount[name] or 0
 	local num = ScenarioInfo.VarTable[varName]
 	
 	if not num then
@@ -96,7 +96,7 @@ end
 ---@param num number
 ---@return boolean
 function NumGreaterOrEqualAMPlatoons(aiBrain, name, num)
-    return (aiBrain.AttackData.AMPlatoonCount[name] or 0) >= num
+    return (aiBrain.AttackData.PlatoonCount[name] or 0) >= num
 end
 
 ---@param aiBrain AIBrain
@@ -104,7 +104,7 @@ end
 ---@param num number
 ---@return boolean
 function NumGreaterAMPlatoons(aiBrain, name, num)
-    return (aiBrain.AttackData.AMPlatoonCount[name] or 0) > num
+    return (aiBrain.AttackData.PlatoonCount[name] or 0) > num
 end
 
 ---@param aiBrain AIBrain
@@ -112,7 +112,7 @@ end
 ---@param num number
 ---@return boolean
 function NumLessOrEqualAMPlatoons(aiBrain, name, num)
-	return (aiBrain.AttackData.AMPlatoonCount[name] or 0) <= num
+	return (aiBrain.AttackData.PlatoonCount[name] or 0) <= num
 end
 
 ---@param aiBrain AIBrain
@@ -120,7 +120,7 @@ end
 ---@param num number
 ---@return boolean
 function NumLessAMPlatoons(aiBrain, name, num)
-	return (aiBrain.AttackData.AMPlatoonCount[name] or 0) < num
+	return (aiBrain.AttackData.PlatoonCount[name] or 0) < num
 end
 
 ---@param aiBrain AIBrain

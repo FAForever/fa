@@ -38,18 +38,18 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-      # https://github.com/actions/checkout/tree/v4/
+      # https://github.com/actions/checkout/tree/v6/
       - name: Checkout etfreeman-db code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: FAForever/etfreeman-db
           path: gh-pages
           ref: gh-pages
           ssh-key: ${{ secrets.ETFREEMAN_DB_DEPLOYMENT_KEY }}
 
-      # https://github.com/actions/download-artifact/tree/v4/
+      # https://github.com/actions/download-artifact/tree/v7/
       - name: Download recent build artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: etfreeman-db-dist
           path: dist

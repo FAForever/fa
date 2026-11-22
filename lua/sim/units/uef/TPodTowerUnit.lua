@@ -194,7 +194,7 @@ TPodTowerUnit = ClassUnit(TStructureUnit) {
             self.OpenAnim:PlayAnim(bp.Display.AnimationOpen, false):SetRate(2.0)
             -- wait 5 ticks and stop the animation so that the doors stay open
             ForkThread(function()
-                coroutine.yield(5)
+                WaitTicks(5)
                 self.OpenAnim:SetRate(0)
             end)
         end
@@ -224,7 +224,7 @@ TPodTowerUnit = ClassUnit(TStructureUnit) {
     FinishedBeingBuilt = State {
         Main = function(self)
             -- Wait one tick to make sure this wasn't captured and we don't create an extra pod
-            coroutine.yield(1)
+            WaitTicks(1)
 
             self:InitializeTower()
 
@@ -263,7 +263,7 @@ TPodTowerUnit = ClassUnit(TStructureUnit) {
                         ChangeState(self, self.RebuildingPodState)
                     end
                 end
-                coroutine.yield(1)
+                WaitTicks(1)
             end
         end,
 

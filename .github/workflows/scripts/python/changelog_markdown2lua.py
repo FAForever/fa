@@ -6,6 +6,7 @@ each markdown file into a corresponding Lua file.
 """
 
 import mdformat
+import re
 import yaml
 
 from argparse import ArgumentParser
@@ -54,7 +55,7 @@ def get_parser():
 def convert_changelog(markdown: Path, lua: Path):
     """Converts a single markdown file to a Lua file."""
     file_name_parts = markdown.stem.split('-')
-    version = file_name_parts[3]
+    version = file_name_parts[3] if len(file_name_parts) > 3 else 1
 
     source_info = f"Source: {markdown}"
     header = HEADER.format(source=source_info)
@@ -71,6 +72,7 @@ def markdown2lua(version: str, content: str) -> str:
             "wrap": MAX_LINE_LENGTH,
         },
     )
+    formatted_md = remove_liquid_tags(formatted_md)
 
     escaped_md = escape_special_symbols(formatted_md)
     lua_description = ",\n".join(
@@ -95,6 +97,12 @@ def extract_yaml_front_matter(content: str) -> Tuple[str, str]:
             rest_of_content = content[end+3:].strip()
             return yaml_content, rest_of_content
     return '', content
+
+
+def remove_liquid_tags(text: str) -> str:
+    """Removes all Liquid block tags like {% ... %} from the given text."""
+    pattern = r"{%.*?%}\s*\n"
+    return re.sub(pattern, "", text)
 
 
 def escape_special_symbols(text: str) -> str:

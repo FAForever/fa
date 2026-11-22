@@ -9,6 +9,7 @@ local WalkingLandUnit = import("/lua/sim/units/walkinglandunit.lua").WalkingLand
 ---@field UnitBuildOrder? string
 ---@field rightGunLabel string
 ---@field BuildEffectBones? Bone[] -- cached table from blueprint
+---@field ArmPreparedForBuild? boolean # The build arm is raised and the gun disabled, but the build hasn't started yet
 CommandUnit = ClassUnit(WalkingLandUnit) {
     DeathThreadDestructionWaitTime = 2,
 
@@ -33,6 +34,17 @@ CommandUnit = ClassUnit(WalkingLandUnit) {
         self:SetWeaponEnabledByLabel(self.rightGunLabel, true)
         self:GetWeaponManipulatorByLabel(self.rightGunLabel):SetHeadingPitch(self.BuildArmManipulator:GetHeadingPitch())
         self:SetImmobile(false)
+        self.ArmPreparedForBuild = nil
+    end,
+
+    --- The engine also runs this when a repair task ends. A repair that never started, such as one
+    --- given to a paused unit, gets no `OnStopBuild` to lower the arm
+    ---@param self CommandUnit
+    ClearWork = function(self)
+        WalkingLandUnit.ClearWork(self)
+        if self.ArmPreparedForBuild and not self:BeenDestroyed() then
+            self:ResetRightArm()
+        end
     end,
 
     ---@param self CommandUnit
@@ -75,6 +87,7 @@ CommandUnit = ClassUnit(WalkingLandUnit) {
         self.BuildArmManipulator:SetPrecedence(20)
         self:SetWeaponEnabledByLabel(self.rightGunLabel, false)
         self.BuildArmManipulator:SetHeadingPitch(self:GetWeaponManipulatorByLabel(self.rightGunLabel):GetHeadingPitch())
+        self.ArmPreparedForBuild = true
 
         -- This is an extremely ugly hack to get around an engine bug. If you have used a command such as OC or repair on an illegal
         -- target (An allied unit, or something at full HP, for example) while moving, the engine is tricked into a state where
@@ -92,6 +105,7 @@ CommandUnit = ClassUnit(WalkingLandUnit) {
     OnStartBuild = function(self, unitBeingBuilt, order)
         WalkingLandUnit.OnStartBuild(self, unitBeingBuilt, order)
         self.UnitBeingBuilt = unitBeingBuilt
+        self.ArmPreparedForBuild = nil
 
         if order ~= 'Upgrade' then
             self.BuildingUnit = true
@@ -105,8 +119,8 @@ CommandUnit = ClassUnit(WalkingLandUnit) {
         -- to start this build, not us.
         if not self:GetGuardedUnit() and unitBeingBuilt:GetFractionComplete() == 0 and
             not self:CanBuild(unitBeingBuilt.Blueprint.BlueprintId) then
-            IssueStop({ self })
-            IssueClearCommands({ self })
+            IssueToUnitStop(self)
+            IssueToUnitClearCommands(self)
             unitBeingBuilt:Destroy()
         end
     end,

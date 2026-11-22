@@ -7,9 +7,9 @@
 
 
 ---@class AIBuilderTemplateCondition
----@field [1] FileReference         # File reference
----@field [2] FunctionReference     # Function reference
----@field [3] FunctionParameters    # Function parameters
+---@field [1] FileReference|function # File reference
+---@field [2] FunctionReference|FunctionParameters?     # Function reference
+---@field [3] FunctionParameters?    # Function parameters
 
 ---@class AIBuilderCondition
 ---@field [1] function 
@@ -17,20 +17,20 @@
 
 ---@class AIBuilderData
 --- Used by the structure manager. Indicates to use the `UpgradeTo` field of the blueprint of the structure
----@field UseUpgradeToBlueprintField boolean
+---@field UseUpgradeToBlueprintField? boolean
 --- used by the structure manager. Indicates a specific blueprint to upgrade to, the second character is replaced with the faction of the structure: `uab0302` would become `ueb0302` for the UEF tech 3 land factory
----@field UpgradeToFactionReplace string
+---@field UpgradeToFactionReplace? string
 --- categories used for various tasks
 ---@field Categories EntityCategory
 
 ---@class AIBuilderTemplate
 ---@field BuilderConditions AIBuilderTemplateCondition[]
 ---@field BuilderData AIBuilderData
----@field BuilderDisabled boolean
----@field BuilderInstanceCount number
----@field BuilderInstances table
+---@field BuilderDisabled? boolean
+---@field BuilderInstanceCount? number
+---@field BuilderInstances? table
 ---@field BuilderName string
----@field BuilderType string                        # Used to filter builders for a given unit
+---@field BuilderType? string                        # Used to filter builders for a given unit
 ---@field BuilderFaction FactionCategory | nil    # Used to quickly reject builders for a given unit
 ---@field BuilderLayer LayerCategory | nil         # Used to quickly reject builders for a given unit
 ---@field BuilderTech TechCategory | nil           # Used to quickly reject builders for a given unit

@@ -225,8 +225,8 @@ function CreateScalableUnitExplosion(unit, debrisMultiplier, circularDebris)
             local layer = unit.Layer
 
             -- data for emitters / shaking
-            local baseEffects = false
-            local environmentEffects = false 
+            local baseEffects
+            local environmentEffects
             local shakeTimeModifier = 0
             local shakeMaxMul = 1
 
@@ -436,6 +436,7 @@ function CreateDefaultHitExplosionAtBone(obj, boneName, scale)
 end
 
 ---@param obj Unit
+---@param deathAnimation moho.AnimationManipulator
 function CreateTimedStuctureUnitExplosion(obj, deathAnimation)
 
     local numExplosions = math.floor(0.75 * GetAverageBoundingXYZRadius(obj) * GetRandomInt(2,4))
@@ -445,14 +446,14 @@ function CreateTimedStuctureUnitExplosion(obj, deathAnimation)
     -- if there is a death animation, roll with that
     if deathAnimation then
         while deathAnimation:GetAnimationFraction() < 1 do
-            CreateDefaultHitExplosionOffset(obj, 1.0, unpack({GetRandomOffset(x, y, z, 0.8)}))
+            CreateDefaultHitExplosionOffset(obj, 1.0, GetRandomOffset(x, y, z, 0.8))
             obj:PlayUnitSound('DeathExplosion')
             WaitSeconds(GetRandomFloat(0.1, 0.2))
         end
     -- do generic destruction effect
     else
         for i = 0, numExplosions do
-            CreateDefaultHitExplosionOffset(obj, 1.0, unpack({GetRandomOffset(x, y, z, 0.8)}))
+            CreateDefaultHitExplosionOffset(obj, 1.0, GetRandomOffset(x, y, z, 0.8))
             obj:PlayUnitSound('DeathExplosion')
             WaitSeconds(GetRandomFloat(0.1, 0.2))
         end
@@ -595,9 +596,9 @@ end
 
 --- A dummy function that should not be used in critical code. Instead, copy the body and adjust it accordingly.
 ---@param obj Unit
----@param bone string
+---@param bone Bone
 ---@param scale number
----@param army string
+---@param army Army
 function CreateFlash(obj, bone, scale, army)
     CreateLightParticle(obj, bone, army, scale * (6 + 4 * Random()) , 10.5 + 4 * Random(), 'glow_03', 'ramp_flare_02')
 end
@@ -609,7 +610,7 @@ end
 --- A dummy function that should not be used in critical code. Instead, copy the body and adjust it accordingly.
 ---@param obj Unit
 ---@param scale number
----@param army string
+---@param army Army
 function CreateScorchMarkSplat(obj, scale, army)
     CreateSplat(
         EntityGetPosition(obj),
@@ -625,7 +626,7 @@ end
 --- A dummy function that should not be used in critical code. Instead, copy the body and adjust it accordingly.
 ---@param obj Unit
 ---@param scale number
----@param army string
+---@param army Army
 function CreateScorchMarkDecal(obj, scale, army)
     CreateDecal(
         EntityGetPosition(obj), 
@@ -644,7 +645,7 @@ end
 ---@param scale number
 ---@param LOD number
 ---@param lifetime number
----@param army string
+---@param army Army
 function CreateRandomScorchSplatAtObject(obj, scale, LOD, lifetime, army)
     CreateSplat(
         EntityGetPosition(obj), 

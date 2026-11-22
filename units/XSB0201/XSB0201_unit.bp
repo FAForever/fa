@@ -1,5 +1,12 @@
 UnitBlueprint{
     Description = "<LOC xsb0201_desc>Land Factory HQ",
+    AI = {
+        TargetBones = {
+            "Attachpoint",
+            "B01",
+            "B06",
+        },
+    },
     Audio = {
         Construct      = Sound { Bank = 'XSB',            Cue = 'XSB0201_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
         ConstructLoop  = Sound { Bank = 'XSB',            Cue = 'XSB0201_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
@@ -40,13 +47,13 @@ UnitBlueprint{
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
         AnimationDeath = {
             {
-                Animation = "/units/xsb0201/xsb0201_ADeath.sca",
+                Animation = "/units/xsb0201/xsb0201_adeath.sca",
                 AnimationRateMax = 1,
                 AnimationRateMin = 1,
                 Weight = 100,
             },
         },
-        AnimationUpgrade = "/units/xsb0201/xsb0201_Aupgrade.sca",
+        AnimationUpgrade = "/units/xsb0201/xsb0201_aupgrade.sca",
         BlinkingLights = {
             { BLBone = 0,     BLOffsetX = -1.75, BLOffsetY = 0.15,  BLOffsetZ = -1.68, BLScale = 1 },
             { BLBone = 0,     BLOffsetX = 1.74,  BLOffsetY = 0.15,  BLOffsetZ = -1.68, BLScale = 1 },
@@ -67,13 +74,16 @@ UnitBlueprint{
                     LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
                     Scrolling = true,
                     ShaderName = "Seraphim",
+                    AlbedoName = "/units/xsb0101/xsb0101_albedo.dds",
+                    NormalsName = "/units/xsb0101/xsb0101_normalsts.dds",
+                    SpecularName = "/units/xsb0101/xsb0101_specteam.dds",
                 },
                 {
                     LODCutoff = 500,
-                    LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
                     ShaderName = "Seraphim",
-                    AlbedoName = "xsb0201_lod1_albedo.dds",
-                    SpecularName = "xsb0201_lod1_specteam.dds",
+                    AlbedoName = "/units/xsb0101/xsb0101_lod1_albedo.dds",
+                    NormalsName = "/units/xsb0101/xsb0101_lod1_normalsts.dds",
+                    SpecularName = "/units/xsb0101/xsb0101_lod1_specteam.dds",
                 },
             },
         },
@@ -139,6 +149,14 @@ UnitBlueprint{
     LifeBarOffset = 1.95,
     LifeBarSize = 4.5,
     Physics = {
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = true,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
         MaxGroundVariation = 1.1,

@@ -39,10 +39,10 @@ TIFFragmentationSensorShell01 = ClassProjectile(TArtilleryProjectile) {
 
         -- create vision
         ---@type VisionMarkerOpti
-        local marker = VisionMarkerOpti({ Owner = self })
+        local marker = VisionMarkerOpti()
         marker:UpdatePosition(px, pz)
         marker:UpdateDuration(5)
-        marker:UpdateIntel(self.Army, 5, 'Vision', true)
+        marker:UpdateIntel(self.Army, 4, 'Vision', true)
 
 		-- one initial projectile following same directional path as the original
         local proj = self:CreateChildProjectile(bp.FragmentId)

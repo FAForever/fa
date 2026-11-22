@@ -37,7 +37,7 @@ function CDRRunAway(aiBrain, cdr)
             local canTeleport = cdr:HasEnhancement('Teleporter')
             local runSpot, prevSpot
             local plat = aiBrain:MakePlatoon('', '')
-            aiBrain:AssignUnitsToPlatoon(plat, {cdr}, 'support', 'None')
+            aiBrain:AssignUnitToPlatoon(plat, cdr, 'support', 'None')
             cdr.PlatoonHandle = plat
             cdr.PlatoonHandle.BuilderName = 'CDRRunAway'
             repeat
@@ -51,7 +51,7 @@ function CDRRunAway(aiBrain, cdr)
                     plat:Stop()
                     if VDist2(cdrPos[1], cdrPos[3], runSpot[1], runSpot[3]) >= 10 then
                         if canTeleport then
-                            IssueTeleport({cdr}, runSpot)
+                            IssueToUnitTeleport(cdr, runSpot)
                         else
                             plat:MoveToLocation(runSpot, false)
                         end
@@ -132,7 +132,7 @@ function CDROverCharge(aiBrain, cdr)
             cdr.UnitBeingBuiltBehavior = cdr.UnitBeingBuilt
         end
         local plat = aiBrain:MakePlatoon('', '')
-        aiBrain:AssignUnitsToPlatoon(plat, {cdr}, 'support', 'None')
+        aiBrain:AssignUnitToPlatoon(plat, cdr, 'support', 'None')
         cdr.PlatoonHandle = plat
         cdr.PlatoonHandle.BuilderName = 'CDROverCharge'
         plat:Stop()
@@ -191,7 +191,7 @@ function CDROverCharge(aiBrain, cdr)
                     if aiBrain:GetEconomyStored('ENERGY') >= weapon.EnergyRequired and target and not target.Dead then
                         overCharging = true
                         IssueToUnitClearCommands(cdr)
-                        IssueOverCharge({cdr}, target)
+                        IssueToUnitOverCharge(cdr, target)
                     elseif target and not target.Dead then -- Commander attacks even if not enough energy for overcharge
                         IssueToUnitClearCommands(cdr)
                         IssueToUnitMove(cdr, targetPos)
@@ -260,7 +260,7 @@ function CDRReturnHome(aiBrain, cdr)
     local loc = cdr.CDRHome
     if not cdr.Initializing and not cdr.Dead and VDist2Sq(cdrPos[1], cdrPos[3], loc[1], loc[3]) > distSqAway then
         local plat = aiBrain:MakePlatoon('', '')
-        aiBrain:AssignUnitsToPlatoon(plat, {cdr}, 'support', 'None')
+        aiBrain:AssignUnitToPlatoon(plat, cdr, 'support', 'None')
         cdr.PlatoonHandle = plat
         cdr.PlatoonHandle.BuilderName = 'CDRReturnHome'
         repeat
@@ -268,7 +268,7 @@ function CDRReturnHome(aiBrain, cdr)
             if not aiBrain:PlatoonExists(plat) then
                 return
             end
-            IssueStop({cdr})
+            IssueToUnitStop(cdr)
             IssueToUnitMove(cdr, loc)
             cdr.GoingHome = true
             WaitSeconds(7)
@@ -334,7 +334,7 @@ function CommanderThread(cdr, platoon)
         and not cdr:IsUnitState("Upgrading") and not cdr:IsUnitState('BlockCommandQueue') then
             if not cdr.EngineerBuildQueue or table.empty(cdr.EngineerBuildQueue) then
                 local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
-                aiBrain:AssignUnitsToPlatoon(pool, {cdr}, 'Unassigned', 'None')
+                aiBrain:AssignUnitToPlatoon(pool, cdr, 'Unassigned', 'None')
             elseif cdr.EngineerBuildQueue and not table.empty(cdr.EngineerBuildQueue) then
                 if not cdr.NotBuildingThread then
                     cdr.NotBuildingThread = cdr:ForkThread(platoon.WatchForNotBuilding)
@@ -385,7 +385,7 @@ function CommanderThreadImproved(cdr, platoon)
                 -- get the global armypool platoon
                 local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                 -- assing the CDR to the armypool
-                aiBrain:AssignUnitsToPlatoon(pool, {cdr}, 'Unassigned', 'None')
+                aiBrain:AssignUnitToPlatoon(pool, cdr, 'Unassigned', 'None')
             -- if we have a BuildQueue then continue building
             elseif cdr.EngineerBuildQueue and not table.empty(cdr.EngineerBuildQueue) then
                 if not cdr.NotBuildingThread then
@@ -450,10 +450,10 @@ function AirUnitRefitThread(unit, plan, data)
                     end
                     if closest then
                         local plat = aiBrain:MakePlatoon('', '')
-                        aiBrain:AssignUnitsToPlatoon(plat, {unit}, 'Attack', 'None')
-                        IssueStop({unit})
+                        aiBrain:AssignUnitToPlatoon(plat, unit, 'Attack', 'None')
+                        IssueToUnitStop(unit)
                         IssueToUnitClearCommands(unit)
-                        IssueTransportLoad({unit}, closest)
+                        IssueToUnitTransportLoad(unit, closest)
                         if EntityCategoryContains(categories.AIRSTAGINGPLATFORM, closest) and not closest.AirStaging then
                             closest.AirStaging = closest:ForkThread(AirStagingThread)
                             closest.Refueling = {}
@@ -487,7 +487,7 @@ function AirStagingThread(unit)
         if ready and numUnits > 0 then
             local pos = unit:GetPosition()
             IssueToUnitClearCommands(unit)
-            IssueTransportUnload({unit}, {pos[1] + 5, pos[2], pos[3] + 5})
+            IssueToUnitTransportUnload(unit, {pos[1] + 5, pos[2], pos[3] + 5})
             WaitSeconds(2)
             for _, v in unit.Refueling do
                 if not v.Dead then
@@ -502,7 +502,7 @@ function AirStagingThread(unit)
                         plat.PlatoonData = {}
                         plat.PlatoonData = v.PlatoonData
                     end
-                    aiBrain:AssignUnitsToPlatoon(plat, {v}, 'Attack', 'GrowthFormation')
+                    aiBrain:AssignUnitToPlatoon(plat, v, 'Attack', 'GrowthFormation')
                 end
             end
         end
@@ -761,7 +761,7 @@ function BehemothBehavior(self)
 
         if targetUnit then
             IssueToUnitClearCommands(experimental)
-            IssueAttack({experimental}, targetUnit)
+            IssueToUnitAttack(experimental, targetUnit)
         end
 
         -- Walk to and kill target loop
@@ -769,7 +769,7 @@ function BehemothBehavior(self)
             local nearCommander = CommanderOverrideCheck(self)
             if nearCommander and nearCommander ~= targetUnit then
                 IssueToUnitClearCommands(experimental)
-                IssueAttack({experimental}, nearCommander)
+                IssueToUnitAttack(experimental, nearCommander)
                 targetUnit = nearCommander
             end
 
@@ -786,7 +786,7 @@ function BehemothBehavior(self)
             -- Kill shields loop
             while closestBlockingShield do
                 IssueToUnitClearCommands(experimental)
-                IssueAttack({experimental}, closestBlockingShield)
+                IssueToUnitAttack(experimental, closestBlockingShield)
 
                 -- Wait for shield to die loop
                 while not closestBlockingShield.Dead and not experimental.Dead do
@@ -893,7 +893,7 @@ function FatBoyBehavior(self)
             if useMove then
                 IssueToUnitMove(experimental, targetUnit:GetPosition())
             else
-                IssueAttack({experimental}, targetUnit)
+                IssueToUnitAttack(experimental, targetUnit)
             end
 
             -- Wait to get in range
@@ -971,9 +971,9 @@ function FatBoyBuildCheck(self)
     end
 
     if unitBeingBuilt and not unitBeingBuilt.Dead then
-        aiBrain:AssignUnitsToPlatoon(experimental.NewPlatoon, {unitBeingBuilt}, 'Attack', 'NoFormation')
+        aiBrain:AssignUnitToPlatoon(experimental.NewPlatoon, unitBeingBuilt, 'Attack', 'NoFormation')
         IssueToUnitClearCommands(unitBeingBuilt)
-        IssueGuard({unitBeingBuilt}, experimental)
+        IssueToUnitGuard(unitBeingBuilt, experimental)
     end
 end
 
@@ -1059,7 +1059,7 @@ TempestBehavior = function(self)
             end
 
             if unitToBuild then
-                IssueStop({unit})
+                IssueToUnitStop(unit)
                 IssueToUnitClearCommands(unit)
                 aiBrain:BuildUnit(unit, unitToBuild, 1)
             end
@@ -1083,7 +1083,7 @@ TempestBehavior = function(self)
                 testHeading = unit:GetHeading()
                 unit.BuiltUnitCount = unit.BuiltUnitCount + 1
                 ScenarioFramework.CreateUnitDestroyedTrigger(TempestUnitDeath, unitBeingBuilt)
-                aiBrain:AssignUnitsToPlatoon(self, {unitBeingBuilt}, 'Attack', 'GrowthFormation')
+                aiBrain:AssignUnitToPlatoon(self, unitBeingBuilt, 'Attack', 'GrowthFormation')
                 IssueToUnitClearCommands(unitBeingBuilt)
                 unitBeingBuilt:ForkThread(TempestBuiltUnitMoveOut, position, testHeading)
             end
@@ -1161,7 +1161,7 @@ CzarBehavior = function(self)
             if targetUnit and VDist3(targetUnit:GetPosition(), experimental:GetPosition()) > 50 then
                 IssueToUnitMove(experimental, targetUnit:GetPosition())
             else
-                IssueAttack({experimental}, experimental:GetPosition())
+                IssueToUnitAttack(experimental, experimental:GetPosition())
                 WaitTicks(5)
 
                 IssueToUnitMove(experimental, targetUnit:GetPosition())
@@ -1175,7 +1175,7 @@ CzarBehavior = function(self)
                 IssueToUnitClearCommands(experimental)
                 WaitTicks(5)
 
-                IssueAttack({experimental}, experimental:GetPosition())
+                IssueToUnitAttack(experimental, experimental:GetPosition())
                 WaitTicks(5)
 
                 IssueToUnitMove(experimental, nearCommander:GetPosition())
@@ -1214,7 +1214,7 @@ AhwassaBehavior = function(self)
     while not experimental.Dead do
         if targetLocation and targetLocation ~= oldTargetLocation then
             IssueToUnitClearCommands(experimental)
-            IssueAttack({experimental}, targetLocation)
+            IssueToUnitAttack(experimental, targetLocation)
             WaitSeconds(25)
         end
         WaitSeconds(1)
@@ -1245,7 +1245,7 @@ TickBehavior = function(self)
     while not experimental.Dead do
         if targetLocation and targetLocation ~= oldTargetLocation then
             IssueToUnitClearCommands(experimental)
-            IssueAggressiveMove({experimental}, targetLocation)
+            IssueToUnitAggressiveMove(experimental, targetLocation)
             WaitSeconds(25)
         end
         WaitSeconds(1)
@@ -1259,7 +1259,7 @@ end
 -- Good for AoE type attacks
 ---@param aiBrain AIBrain           # aiBrain for experimental
 ---@param experimental Unit         # the unit itself
----@return nil                      # position of best place to attack, nil if nothing found
+---@return Vector?                  # position of best place to attack, nil if nothing found
 GetHighestThreatClusterLocation = function(aiBrain, experimental)
     if not aiBrain or not experimental then
         return nil
@@ -1271,7 +1271,7 @@ GetHighestThreatClusterLocation = function(aiBrain, experimental)
     for _, threat in threatTable do
         if threat[3] > 0 then
             local unitsAtLocation = aiBrain:GetUnitsAroundPoint(ParseEntityCategory('COMMAND'), {threat[1], 0, threat[2]}, ScenarioInfo.size[1] / 16, 'Enemy')
-            local validUnit = false
+            local validUnit
             for _, unit in unitsAtLocation do
                 if not unit.Dead then
                     validUnit = unit
@@ -1350,7 +1350,7 @@ end
 function CDRFinishUnit(cdr)
     if cdr.UnitBeingBuiltBehavior and (not cdr.UnitBeingBuiltBehavior:BeenDestroyed()) then
         IssueToUnitClearCommands(cdr)
-        IssueRepair({cdr}, cdr.UnitBeingBuiltBehavior)
+        IssueToUnitRepair(cdr, cdr.UnitBeingBuiltBehavior)
         repeat
             WaitSeconds(1)
             if cdr.GoingHome or cdr:IsUnitState("Attacking") or cdr.Fighting then
@@ -1377,10 +1377,11 @@ function CDRHideBehavior(aiBrain, cdr)
         cdr.GoingHome = false
         cdr.Fighting = false
         cdr.Upgrading = false
-        
-        local category = false
+
+        ---@type EntityCategory
+        local category
         local runShield = false
-        local runPos = false
+        local runPos
         local nmaShield = aiBrain:GetNumUnitsAroundPoint(categories.SHIELD * categories.STRUCTURE, cdr:GetPosition(), 100, 'Ally')
         local nmaPD = aiBrain:GetNumUnitsAroundPoint(categories.DIRECTFIRE * categories.DEFENSE, cdr:GetPosition(), 100, 'Ally')
         local nmaAA = aiBrain:GetNumUnitsAroundPoint(categories.ANTIAIR * categories.DEFENSE, cdr:GetPosition(), 100, 'Ally')
@@ -1415,10 +1416,10 @@ end
 ---@param dest Vector
 ---@param aggro any
 ---@param pathDist any
----@return boolean
+---@return PlatoonCommand?
 ExpPathToLocation = function(aiBrain, platoon, layer, dest, aggro, pathDist)
     local NavUtils = import("/lua/sim/navutils.lua")
-    local cmd = false
+    local cmd
     local platoonUnits = platoon:GetPlatoonUnits()
     platoon.PlatoonSurfaceThreat = platoon:GetPlatoonThreat('Surface', categories.ALLUNITS)
     local path, reason = NavUtils.PathToWithThreatThreshold(layer, platoon:GetPlatoonPosition(), dest, aiBrain, NavUtils.ThreatFunctions.AntiSurface, platoon.PlatoonSurfaceThreat * 10, aiBrain.IMAPConfig.Rings)
@@ -1447,7 +1448,7 @@ end
 ---@param platoon Platoon
 ---@return boolean
 function InWaterCheck(platoon)
-    local t4Pos = platoon:GetPlatoonPosition()
+    local t4Pos = platoon:GetPlatoonPosition() ---@cast t4Pos -nil
     local inWater = GetTerrainHeight(t4Pos[1], t4Pos[3]) < GetSurfaceHeight(t4Pos[1], t4Pos[3])
 
     return inWater

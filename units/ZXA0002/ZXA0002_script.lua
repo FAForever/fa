@@ -6,11 +6,12 @@
 
 local TConstructionUnit = import("/lua/terranunits.lua").TConstructionUnit
 
----@class ZXA0001 : TConstructionUnit
-ZXA0001 = ClassUnit(TConstructionUnit) {
+---@class ZXA0002 : TConstructionUnit
+ZXA0002 = ClassUnit(TConstructionUnit) {
+    ---@param self ZXA0002
     OnCreate = function(self)
         TConstructionUnit.OnCreate(self)
     end,
 }
-    
-TypeClass = ZXA0001
+
+TypeClass = ZXA0002
