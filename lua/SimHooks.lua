@@ -41,7 +41,11 @@ do
     -- do not allow command units to be given
     local oldChangeUnitArmy = _G.ChangeUnitArmy
     _G.ChangeUnitArmy = function(unit, army, allowCommanders)
-        if not unit then return end
+        if not unit then
+            WARN(debug.traceback('ChangeUnitArmy called without a unit'))
+            return
+        end
+
         -- The `CanBeGiven` name comes from coop campaign scripts
         if not unit.CanBeGiven then
             return
