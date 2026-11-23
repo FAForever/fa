@@ -918,7 +918,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                     -- a transport inside another transport
                     unit:ReclaimCargo()
 
-                    local prop = unit:CreateWreckageProp(0)
+                    -- not `CreateWreckageProp`, so units that leave no wreck (such as Kennel pods) keep doing so
+                    local prop = unit:CreateWreckage(0)
                     if prop then
                         -- the cargo is attached above the ground, move its wreck down like the wreck of an aircraft
                         local pos = prop:GetPosition()
