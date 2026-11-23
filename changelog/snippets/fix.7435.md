@@ -1,0 +1,1 @@
+- Fix ACUs and SACUs that assist a damaged builder destroying that builder's new construction of another faction, and then never using overcharge, or enhancement weapons such as the Seraphim tactical missile launcher, again (#7435).
