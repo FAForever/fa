@@ -40,7 +40,7 @@ end
 do
     -- do not allow command units to be given
     local oldChangeUnitArmy = _G.ChangeUnitArmy
-    _G.ChangeUnitArmy = function(unit, army, noRestrictions)
+    _G.ChangeUnitArmy = function(unit, army, allowCommanders)
         if not unit then return end
         -- The `CanBeGiven` name comes from coop campaign scripts
         if not unit.CanBeGiven then
@@ -48,7 +48,7 @@ do
         end
 
         -- only allow sharing command units if specified
-        if noRestrictions or not unit.Blueprint.CategoriesHash["COMMAND"] then
+        if allowCommanders or not unit.Blueprint.CategoriesHash["COMMAND"] then
             return oldChangeUnitArmy(unit, army)
         end
     end
