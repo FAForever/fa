@@ -1,1 +1,0 @@
-- Add backwards compatibility for the naval formation changes in Nomads (#7289).

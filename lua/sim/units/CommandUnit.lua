@@ -9,6 +9,7 @@ local WalkingLandUnit = import("/lua/sim/units/walkinglandunit.lua").WalkingLand
 ---@field UnitBuildOrder? string
 ---@field rightGunLabel string
 ---@field BuildEffectBones? Bone[] -- cached table from blueprint
+---@field ArmPreparedForBuild? boolean # The build arm is raised and the gun disabled, but the build hasn't started yet
 CommandUnit = ClassUnit(WalkingLandUnit) {
     DeathThreadDestructionWaitTime = 2,
 
@@ -33,6 +34,17 @@ CommandUnit = ClassUnit(WalkingLandUnit) {
         self:SetWeaponEnabledByLabel(self.rightGunLabel, true)
         self:GetWeaponManipulatorByLabel(self.rightGunLabel):SetHeadingPitch(self.BuildArmManipulator:GetHeadingPitch())
         self:SetImmobile(false)
+        self.ArmPreparedForBuild = nil
+    end,
+
+    --- The engine also runs this when a repair task ends. A repair that never started, such as one
+    --- given to a paused unit, gets no `OnStopBuild` to lower the arm
+    ---@param self CommandUnit
+    ClearWork = function(self)
+        WalkingLandUnit.ClearWork(self)
+        if self.ArmPreparedForBuild and not self:BeenDestroyed() then
+            self:ResetRightArm()
+        end
     end,
 
     ---@param self CommandUnit
@@ -75,6 +87,7 @@ CommandUnit = ClassUnit(WalkingLandUnit) {
         self.BuildArmManipulator:SetPrecedence(20)
         self:SetWeaponEnabledByLabel(self.rightGunLabel, false)
         self.BuildArmManipulator:SetHeadingPitch(self:GetWeaponManipulatorByLabel(self.rightGunLabel):GetHeadingPitch())
+        self.ArmPreparedForBuild = true
 
         -- This is an extremely ugly hack to get around an engine bug. If you have used a command such as OC or repair on an illegal
         -- target (An allied unit, or something at full HP, for example) while moving, the engine is tricked into a state where
@@ -92,19 +105,18 @@ CommandUnit = ClassUnit(WalkingLandUnit) {
     OnStartBuild = function(self, unitBeingBuilt, order)
         WalkingLandUnit.OnStartBuild(self, unitBeingBuilt, order)
         self.UnitBeingBuilt = unitBeingBuilt
+        self.ArmPreparedForBuild = nil
 
         if order ~= 'Upgrade' then
             self.BuildingUnit = true
         end
 
-        -- Check if we're about to try and build something we shouldn't. This can only happen due to
-        -- a native code bug in the SCU REBUILDER behaviour.
-        -- FractionComplete is zero only if we're the initiating builder. Clearly, we want to allow
-        -- assisting builds of other races, just not *starting* them.
-        -- We skip the check if we're assisting another builder: it's up to them to have the ability
-        -- to start this build, not us.
-        if not self:GetGuardedUnit() and unitBeingBuilt:GetFractionComplete() == 0 and
-            not self:CanBuild(unitBeingBuilt.Blueprint.BlueprintId) then
+        -- Don't start a build we can't otherwise build. The engine's REBUILDER behaviour (no unit
+        -- has that category by default) rebuilds a guarded structure that dies, whatever its faction
+        -- or tech level. Assisting is a repair order, even at zero progress, such as when
+        -- `CheckAssistFocus` turns a guard into a repair of the guarded builder's new build, and
+        -- assisting a build of another faction is fine.
+        if order ~= 'Repair' and not self:CanBuild(unitBeingBuilt.Blueprint.BlueprintId) then
             IssueToUnitStop(self)
             IssueToUnitClearCommands(self)
             unitBeingBuilt:Destroy()

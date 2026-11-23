@@ -1,0 +1,1 @@
+- Fix ACUs and SACUs not firing their main gun after being ordered to repair or assist a structure while paused, when that order was then cancelled, for example by Stop or an enhancement order (#7425).
