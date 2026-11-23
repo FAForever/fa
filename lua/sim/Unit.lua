@@ -950,6 +950,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                 reclaimers[self.EntityId] = self
             else
                 target.BeingReclaimedWhileBeingBuilt = { [self.EntityId] = self }
+                target:ForkThread(target.BeingReclaimedWhileBeingBuiltThread)
             end
         end
         self:SetFocusEntity(target)
@@ -4689,6 +4690,42 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                     issueOrder(units, order.target or position)
                 end
             end
+        end
+    end,
+
+    --- Destroys the unit when reclaimers hold it at no progress while a builder keeps building
+    --- it. Without a builder the engine decays it and calls `OnDecayed`
+    ---@see Unit.OnDecayed
+    ---@param self Unit
+    BeingReclaimedWhileBeingBuiltThread = function(self)
+        local lastFraction = -1
+        local unchangedTicks = 0
+        while self:IsBeingBuilt() do
+            local reclaimers = self.BeingReclaimedWhileBeingBuilt
+            if not reclaimers or table.empty(reclaimers) then
+                self.BeingReclaimedWhileBeingBuilt = nil
+                return
+            end
+
+            local fraction = self:GetFractionComplete()
+            if fraction == lastFraction then
+                unchangedTicks = unchangedTicks + 1
+            else
+                unchangedTicks = 0
+            end
+            lastFraction = fraction
+
+            -- the builder's progress in the same tick can keep the fraction just above 0
+            if fraction <= 0 or unchangedTicks >= 10 then
+                for _, reclaimer in reclaimers do
+                    if reclaimer.EntityBeingReclaimed == self and reclaimer:IsUnitState('Reclaiming') then
+                        self:OnDecayed()
+                        return
+                    end
+                end
+            end
+
+            WaitTicks(1)
         end
     end,
 
