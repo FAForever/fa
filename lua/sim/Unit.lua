@@ -44,6 +44,7 @@ local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFIC
 local DefaultTerrainType = GetTerrainType(-1, -1)
 
 local GetNearestPlayablePoint = import("/lua/scenarioframework.lua").GetNearestPlayablePoint
+local UnitQueueDataToCommand = import("/lua/sim/commands/shared.lua").UnitQueueDataToCommand
 
 --- Helper function that returns a unit's shield and its assist costs,
 --- or nil if the shield cannot be assisted or does not have custom assist costs.
@@ -143,7 +144,6 @@ SyncMeta = {
 
 local cUnit = moho.unit_methods
 local cUnitGetBuildRate = cUnit.GetBuildRate
-local cUnitSetReclaimable = cUnit.SetReclaimable
 local UnitSetMaxHealth = _G.moho.unit_methods.SetMaxHealth
 
 ---@class UnitBuffsTable
@@ -182,8 +182,7 @@ local UnitSetMaxHealth = _G.moho.unit_methods.SetMaxHealth
 ---@field SiloWeapon? Weapon
 ---@field SiloProjectile? ProjectileBlueprint
 ---@field ReclaimTimeMultiplier? number
----@field ReclaimedWhileBeingBuilt? boolean # Set when a unit starts reclaiming this unit while it is being built
----@field Unreclaimable? boolean # Set when scripts made this unit unreclaimable through `SetReclaimable`
+---@field BeingReclaimedWhileBeingBuilt? table<EntityId, Unit> # Units that started reclaiming this unit while it was being built
 ---@field CaptureTimeMultiplier? number
 ---@field PlatoonHandle? Platoon
 ---@field tickIssuedShieldRepair number? # Used by shields to keep track of when this unit's guards were ordered to start shield repair instantly
@@ -945,9 +944,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self.EntityBeingReclaimed = target
         self:SetUnitState('Reclaiming', true)
 
-        -- the engine unbuilds a unit that is being built, see `OnStopBeingBuilt`
         if target.IsUnit and target:IsBeingBuilt() then
-            target.ReclaimedWhileBeingBuilt = true
+            local reclaimers = target.BeingReclaimedWhileBeingBuilt
+            if reclaimers then
+                reclaimers[self.EntityId] = self
+            else
+                target.BeingReclaimedWhileBeingBuilt = { [self.EntityId] = self }
+            end
         end
         self:SetFocusEntity(target)
         self:CheckAssistersFocus()
@@ -977,6 +980,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self:PlayUnitSound('StopReclaim')
         self:SetUnitState('Reclaiming', false)
         self.EntityBeingReclaimed = nil
+
+        local reclaimers = target.BeingReclaimedWhileBeingBuilt
+        if reclaimers then
+            reclaimers[self.EntityId] = nil
+        end
 
         if target and target.IsProp then
             ---@cast target -Unit
@@ -2517,15 +2525,16 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             return false
         end
 
-        -- A reclaim that starts while a unit is being built unbuilds it: it lowers the build
-        -- fraction and refunds the full build cost for each part removed. The engine keeps doing
-        -- that after other builders finish the unit, which refunds a finished, working unit and
-        -- leaves it alive at 0 health. Making the unit unreclaimable for a tick makes the engine
-        -- drop those reclaim orders. A new reclaim order then reclaims it as a finished unit.
-        if self.ReclaimedWhileBeingBuilt then
-            self.ReclaimedWhileBeingBuilt = nil
-            cUnitSetReclaimable(self, false)
-            self:ForkThread(self.RestoreReclaimableThread)
+        -- a reclaim that started while the unit was being built keeps unbuilding it for its full
+        -- build cost, and reissuing the order restarts it as the reclaim of a finished unit
+        local reclaimers = self.BeingReclaimedWhileBeingBuilt
+        if reclaimers then
+            self.BeingReclaimedWhileBeingBuilt = nil
+            for _, reclaimer in reclaimers do
+                if reclaimer.EntityBeingReclaimed == self then
+                    reclaimer:ReissueCommandQueue()
+                end
+            end
         end
 
         -- Create any idle effects on unit
@@ -4661,22 +4670,26 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self:UpdateShieldAssistersConsumption()
     end,
 
-    --- Sets whether the unit can be reclaimed, and remembers it so that
-    --- `RestoreReclaimableThread` doesn't undo it.
+    --- Clears the command queue and issues it again, which restarts the current order.
+    --- Orders without a callback in `UnitQueueDataToCommand` are dropped
+    ---@see UnitQueueDataToCommand
     ---@param self Unit
-    ---@param reclaimable boolean
-    SetReclaimable = function(self, reclaimable)
-        self.Unreclaimable = not reclaimable or nil
-        cUnitSetReclaimable(self, reclaimable)
-    end,
-
-    --- Restores the reclaimable state that `OnStopBeingBuilt` turned off to stop
-    --- reclaimers from unbuilding the finished unit.
-    ---@param self Unit
-    RestoreReclaimableThread = function(self)
-        -- give the reclaim tasks a tick to see the unit as unreclaimable
-        WaitTicks(2)
-        cUnitSetReclaimable(self, not self.Unreclaimable)
+    ReissueCommandQueue = function(self)
+        local queue = self:GetCommandQueue()
+        IssueToUnitClearCommands(self)
+        local units = { self }
+        for _, order in queue do
+            local commandInfo = UnitQueueDataToCommand[order.commandType]
+            local issueOrder = commandInfo.Callback
+            if issueOrder then
+                local position = { order.x, order.y, order.z }
+                if commandInfo.Type == 'BuildMobile' then
+                    issueOrder(units, position, order.blueprintId, {})
+                else
+                    issueOrder(units, order.target or position)
+                end
+            end
+        end
     end,
 
     -------------------------------------------------------------------------------------------
