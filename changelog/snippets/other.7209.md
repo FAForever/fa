@@ -1,1 +1,0 @@
-- Add module reloading for the economy bar (`economy.lua`) (#7209).
