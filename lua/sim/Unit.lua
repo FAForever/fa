@@ -651,7 +651,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         -- - https://github.com/FAForever/FA-Binary-Patches/pull/19
         ---@diagnostic disable-next-line: param-type-mismatch
         if self.EntityBeingReclaimed and (not IsDestroyed(self.EntityBeingReclaimed)) and IsProp(self.EntityBeingReclaimed)
-            and self.Blueprint.CategoriesHash.RECLAIM -- see `GetReclaimCosts`
+            and self.Blueprint.CategoriesHash.RECLAIM -- reclaim-incapable units reclaiming using mobile build orders
         then
             self:StopReclaimEffects(self.EntityBeingReclaimed)
             self:StopUnitAmbientSound('ReclaimLoop')
@@ -673,7 +673,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         -- - https://github.com/FAForever/FA-Binary-Patches/pull/19
         ---@diagnostic disable-next-line: param-type-mismatch
         if self.EntityBeingReclaimed and (not IsDestroyed(self.EntityBeingReclaimed)) and IsProp(self.EntityBeingReclaimed)
-            and self.Blueprint.CategoriesHash.RECLAIM -- see `GetReclaimCosts`
+            and self.Blueprint.CategoriesHash.RECLAIM -- reclaim-incapable units reclaiming using mobile build orders
         then
             self:StartReclaimEffects(self.EntityBeingReclaimed)
             self:PlayUnitSound('StartReclaim')
