@@ -1,1 +1,1 @@
-- Fix transferring a Megalith egg after it hatched spawning its unit again. Hatched eggs can no longer be given, shared or captured, and can no longer be selected (#7378).
+- Fix transferring a Megalith egg after it hatched spawning its unit again. Hatched eggs can no longer be given, shared, captured, or selected. They also no longer take damage or block shots aimed at the unit inside them (#7378).
