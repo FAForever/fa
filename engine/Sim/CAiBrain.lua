@@ -470,7 +470,7 @@ end
 function CAiBrain:GetUnitsAroundPoint(category, position, radius, alliance)
 end
 
---- Gives resources to brain.
+--- Gives resources to brain. They appear in its storage and income stats on the next tick
 ---@param type ResourceType
 ---@param amount number
 function CAiBrain:GiveResource(type, amount)

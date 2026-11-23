@@ -1,2 +1,0 @@
-- Added single unit variant to all relevant IssueCommand sim functions (#7311)
-- Improved documentation of IssueCommand sim functions (#7311)

@@ -103,8 +103,9 @@ ShieldCollider = ClassProjectile(Projectile) {
                     if not EntityCategoryContains(exclusions, self.Plane) then -- Exclude experimentals and transports from momentum system, but not damage
                         Warp(self, self.Plane:GetPosition(self.PlaneBone), self.Plane:GetOrientation())
 
-                        self:DetachAll('anchor') -- Make sure to detach just in case, prior to trying to attach
-                        self.Plane:DetachAll(self.PlaneBone)
+                        -- Attaching fails if the plane already has a parent. Don't detach the plane's
+                        -- own attachments, such as the vision entity of falling scouts.
+                        self.Plane:DetachFrom()
 
                         self.Plane:AttachBoneTo(self.PlaneBone, self, 'anchor') -- We attach our bone at the very last moment when we need it
                         self.Plane.Detector = CreateCollisionDetector(self.Plane)

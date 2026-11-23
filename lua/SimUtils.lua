@@ -1541,6 +1541,37 @@ end
 -- Chat-relay helpers moved to `/lua/ChatUtils.lua`:
 --   * `SendChatMessage`  — trusted sim relay that feeds `Sync.ChatMessages`.
 
+local MaxStorageStat = {
+    MASS = 'Economy_MaxStorage_Mass',
+    ENERGY = 'Economy_MaxStorage_Energy',
+}
+
+--- Gives `fraction` of the sender's stored `resource` to the receiver, up to what the receiver can store
+---@param fromBrain AIBrain
+---@param toBrain AIBrain
+---@param resource ResourceType
+---@param fraction number
+---@return number given
+local function GiveResourceFraction(fromBrain, toBrain, resource, fraction)
+    -- `not (x > 0)` also skips NaN
+    if not (fraction > 0) then
+        return 0
+    end
+
+    -- `GiveResource` adds to the receiver's income, which reaches storage next tick along
+    -- with its trend. Anything past max storage is lost, so only take what fits
+    local capacity = toBrain:GetArmyStat(MaxStorageStat[resource], 0).Value
+        - toBrain:GetEconomyStored(resource) - toBrain:GetEconomyTrend(resource)
+        - toBrain:GetPendingResourceGift(resource)
+    if capacity <= 0 then
+        return 0
+    end
+
+    local given = fromBrain:TakeResource(resource, math.min(fraction * fromBrain:GetEconomyStored(resource), capacity))
+    toBrain:GiveResource(resource, given)
+    return given
+end
+
 ---@param data {From: Army, To: Army, Mass: number, Energy: number, Sender?: string, Msg?: table}
 function GiveResourcesToPlayer(data)
     -- The refactored chat path (see `ChatUtils.SendChatMessage`) still fires
@@ -1560,25 +1591,12 @@ function GiveResourcesToPlayer(data)
 
     local fromBrain = ArmyBrains[data.From]
     local toBrain = ArmyBrains[data.To]
-    -- Abort if any of the armies is defeated or if trying to send a negative value
-    if fromBrain:IsDefeated() or toBrain:IsDefeated() or data.Mass < 0 or data.Energy < 0 then
+    if fromBrain:IsDefeated() or toBrain:IsDefeated() then
         return
     end
-    local massTaken = fromBrain:TakeResource('MASS', data.Mass * fromBrain:GetEconomyStored('MASS'))
-    local energyTaken = fromBrain:TakeResource('ENERGY', data.Energy * fromBrain:GetEconomyStored('ENERGY'))
 
-    -- `GiveResource` silently caps at the receiver's max storage, and
-    -- storage stats only update next tick, so derive what actually lands
-    -- up front from `MaxStorage - Stored`.
-    local massCapacity = toBrain:GetArmyStat('Economy_MaxStorage_Mass', 0).Value
-        - toBrain:GetEconomyStored('MASS')
-    local energyCapacity = toBrain:GetArmyStat('Economy_MaxStorage_Energy', 0).Value
-        - toBrain:GetEconomyStored('ENERGY')
-    local massGiven = math.min(massTaken, massCapacity)
-    local energyGiven = math.min(energyTaken, energyCapacity)
-
-    toBrain:GiveResource('MASS', massGiven)
-    toBrain:GiveResource('ENERGY', energyGiven)
+    local massGiven = GiveResourceFraction(fromBrain, toBrain, 'MASS', data.Mass)
+    local energyGiven = GiveResourceFraction(fromBrain, toBrain, 'ENERGY', data.Energy)
 
     -- Whisper from giver → receiver so the line reads with the giver's
     -- attribution. Three LOC keys rather than one templated string so each
