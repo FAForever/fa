@@ -41,8 +41,9 @@ do
     -- do not allow command units to be given
     local oldChangeUnitArmy = _G.ChangeUnitArmy
     _G.ChangeUnitArmy = function(unit, army, noRestrictions)
+        if not unit then return end
         -- The `CanBeGiven` name comes from coop campaign scripts
-        if unit and not unit.CanBeGiven then
+        if not unit.CanBeGiven then
             return
         end
 
