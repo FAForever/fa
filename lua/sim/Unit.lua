@@ -647,10 +647,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             self:StopUnitAmbientSound('ConstructLoop')
         end
 
-        -- When paused we reclaim at a speed of 0, with thanks to:
-        -- - https://github.com/FAForever/FA-Binary-Patches/pull/19
+        -- Reclaim effects are disabled when paused because this engine patch sets reclaim
+        -- speed to 0 when paused: https://github.com/FAForever/FA-Binary-Patches/pull/19
+
+        local reclaimTarget = self.EntityBeingReclaimed
         ---@diagnostic disable-next-line: param-type-mismatch
-        if self.EntityBeingReclaimed and (not IsDestroyed(self.EntityBeingReclaimed)) and IsProp(self.EntityBeingReclaimed)
+        if reclaimTarget.IsProp and not IsDestroyed(reclaimTarget)
             and self.Blueprint.CategoriesHash.RECLAIM -- reclaim-incapable units reclaiming using mobile build orders
         then
             self:StopReclaimEffects(self.EntityBeingReclaimed)
@@ -669,10 +671,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             self:PlayUnitAmbientSound('ConstructLoop')
         end
 
-        -- When paused we reclaim at a speed of 0, with thanks to:
-        -- - https://github.com/FAForever/FA-Binary-Patches/pull/19
+        -- Reclaim effects are disabled when paused because this engine patch sets reclaim
+        -- speed to 0 when paused: https://github.com/FAForever/FA-Binary-Patches/pull/19
+
+        local reclaimTarget = self.EntityBeingReclaimed
         ---@diagnostic disable-next-line: param-type-mismatch
-        if self.EntityBeingReclaimed and (not IsDestroyed(self.EntityBeingReclaimed)) and IsProp(self.EntityBeingReclaimed)
+        if reclaimTarget.IsProp and not IsDestroyed(reclaimTarget)
             and self.Blueprint.CategoriesHash.RECLAIM -- reclaim-incapable units reclaiming using mobile build orders
         then
             self:StartReclaimEffects(self.EntityBeingReclaimed)
