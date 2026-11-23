@@ -1,0 +1,1 @@
+- Test staging for T3 mobile artillery (#1).
