@@ -255,6 +255,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     CanTakeDamage = true,
     CanBeKilled = true,
 
+    --- Set to false to prevent the unit from changing army, such as a hatched egg that would spawn its unit again
+    ---@type boolean
+    CanBeGiven = true,
+
     EnergyModifier = 0,
     MassModifier = 0,
 
