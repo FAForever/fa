@@ -32,13 +32,14 @@ CConstructionEggUnit = ClassUnit(CStructureUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         LandFactoryUnit.OnStopBeingBuilt(self, builder, layer)
 
-        -- prevent the unit from being reclaimed
+        -- The egg has hatched; prevent any interactions with it
         self:SetReclaimable(false)
-
-        -- the egg has hatched: changing its army would run this function again and spawn another unit
+        self:SetUnSelectable(true)
+        self.CanTakeDamage = false
+        self:SetCollisionShape('None')
+        -- Disable changing army as that would run this function and spawn a second unit
         self.CanBeGiven = false
         self:SetCapturable(false)
-        self:SetUnSelectable(true)
 
         local bp = self:GetBlueprint()
         local buildUnit = bp.Economy.BuildUnit
