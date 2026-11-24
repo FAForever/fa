@@ -71,21 +71,6 @@ local function GetShieldAssistRates(unit)
     return shield, energy, mass
 end
 
---- Returns whether the unit carries its cargo attached to it, as transports do, rather than in internal storage, as
---- carriers do. Without the engine's transport interface (`RULEUCC_Transport` or `PODSTAGINGPLATFORM`),
---- `Unit:GetCargo` errors. Like `KillCargo`, a unit with storage slots counts all of its cargo as stored.
----@param unit Unit
----@return boolean
-local function HasAttachedCargo(unit)
-    local blueprint = unit.Blueprint
-    if not (blueprint.General.CommandCapsHash.RULEUCC_Transport or blueprint.CategoriesHash.PODSTAGINGPLATFORM) then
-        return false
-    end
-
-    local storageSlots = blueprint.Transport.StorageSlots
-    return not storageSlots or storageSlots == 0
-end
-
 --- Structures that are reused for performance reasons
 --- Maps unit.techCategory to a number so we can do math on it for naval units
 
@@ -902,38 +887,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     OnReclaimed = function(self, reclaimer)
         self:DoUnitCallbacks('OnReclaimed', reclaimer)
         self.CreateReclaimEndEffects(reclaimer, self)
-        self:ReclaimCargo()
         self:Destroy()
 
         -- for AI events
         self.Brain:OnUnitReclaimed(self, reclaimer)
-    end,
-
-    --- Turns the attached cargo of a reclaimed unit into wrecks where the cargo is and destroys the cargo.
-    --- The engine reclaims a unit by draining its health and then leaving its wreck, but it destroys
-    --- the cargo without a wreck. The cargo's reclaim time is part of the transport's, see `GetReclaimCosts`.
-    --- Cargo in internal storage (carriers) is left to the engine: it leaves no wreck either when its carrier is killed.
-    ---@param self Unit
-    ReclaimCargo = function(self)
-        if not HasAttachedCargo(self) then
-            return
-        end
-
-        for _, unit in self:GetCargo() do
-            if not IsDestroyed(unit) then
-                -- external factories are part of their parent unit
-                if not EntityCategoryContains(categories.EXTERNALFACTORYUNIT, unit) then
-                    -- a transport inside another transport
-                    unit:ReclaimCargo()
-
-                    -- not `CreateWreckageProp`, so units that leave no wreck (such as Kennel pods) keep doing so
-                    -- the wreck stays where the cargo is, as the transport's own wreck does
-                    unit:CreateWreckage(0)
-                end
-
-                unit:Destroy()
-            end
-        end
     end,
 
     ---@param self Unit

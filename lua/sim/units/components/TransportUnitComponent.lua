@@ -2,6 +2,14 @@ local TableInsert = table.insert
 local TableEmpty = table.empty
 local EntityCategoryContains = EntityCategoryContains
 
+--- Whether the engine gave the unit a transport interface. Without it, `Unit:GetCargo` errors
+---@param unit Unit
+---@return boolean
+local function CanHaveCargo(unit)
+    local blueprint = unit.Blueprint
+    return blueprint.General.CommandCapsHash.RULEUCC_Transport or blueprint.CategoriesHash.PODSTAGINGPLATFORM or false
+end
+
 ---@class BaseTransport
 ---@field DisableIntelOfCargo boolean
 ---@field cargoCache? table
@@ -140,6 +148,38 @@ BaseTransport = ClassSimple {
             return cargoMass
         else
             self:VeterancyDispersal(cargoMass)
+        end
+    end,
+
+    --- Leaves a wreck for each attached cargo unit where it is, then destroys the cargo. The engine destroys the cargo
+    --- of a reclaimed unit without a wreck, so call this from `OnReclaimed`
+    ---@param self BaseTransport | Unit
+    ReclaimCargo = function(self)
+        if not CanHaveCargo(self) then
+            return
+        end
+
+        -- like `KillCargo`, a unit with storage slots counts all of its cargo as stored. Stored cargo leaves no wreck
+        -- when its carrier dies either
+        local storageSlots = self.Blueprint.Transport.StorageSlots
+        if storageSlots and storageSlots ~= 0 then
+            return
+        end
+
+        for _, unit in self:GetCargo() do
+            if not IsDestroyed(unit) then
+                -- external factories are part of their parent unit
+                if not unit.Blueprint.CategoriesHash.EXTERNALFACTORYUNIT then
+                    if unit.ReclaimCargo then
+                        unit:ReclaimCargo()
+                    end
+
+                    -- not `CreateWreckageProp`, so overrides that leave no wreck still apply
+                    unit:CreateWreckage(0)
+                end
+
+                unit:Destroy()
+            end
         end
     end,
 
