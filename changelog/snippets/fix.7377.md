@@ -1,1 +1,1 @@
-- Reclaiming a transport now leaves a wreck for each unit it carries, where that unit was, and the cargo adds its reclaim time to the transport's, as it already adds its capture time. Before, the cargo was destroyed without a wreck. Carriers are unchanged: their cargo leaves no wreck, as when they are killed (#7377).
+- Reclaiming a transport now leaves a wreck for each unit it carries, where that unit was. Before, the cargo was destroyed without a wreck. Carriers are unchanged: their cargo leaves no wreck, as when they are killed (#7377).

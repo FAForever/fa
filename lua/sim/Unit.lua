@@ -4195,15 +4195,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                 duration = 1
             end
 
-            -- attached cargo is reclaimed with the unit, as it is captured with the unit (see `GetCaptureCosts`)
-            if HasAttachedCargo(target) and target:GetFractionComplete() >= 1 then
-                for _, unit in target:GetCargo() do
-                    if not EntityCategoryContains(categories.EXTERNALFACTORYUNIT, unit) then
-                        duration = duration + (self:GetReclaimCosts(unit))
-                    end
-                end
-            end
-
             -- duration determines both unbuilt and built unit reclaim speed
             -- energy and mass fields needed for unbuilt units to give back resources when reclaimed
             return duration, buildEnergyCosts, buildMassCosts
