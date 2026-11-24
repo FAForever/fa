@@ -151,18 +151,11 @@ BaseTransport = ClassSimple {
         end
     end,
 
-    --- Leaves a wreck for each attached cargo unit where it is, then destroys the cargo. The engine destroys the cargo
-    --- of a reclaimed unit without a wreck, so call this from `OnReclaimed`
+    --- Leaves a wreck for each cargo unit where it is, then destroys the cargo. The engine destroys the cargo of a
+    --- reclaimed unit without a wreck, so call this from `OnReclaimed`
     ---@param self BaseTransport | Unit
     ReclaimCargo = function(self)
         if not CanHaveCargo(self) then
-            return
-        end
-
-        -- like `KillCargo`, a unit with storage slots counts all of its cargo as stored. Stored cargo leaves no wreck
-        -- when its carrier dies either
-        local storageSlots = self.Blueprint.Transport.StorageSlots
-        if storageSlots and storageSlots ~= 0 then
             return
         end
 
