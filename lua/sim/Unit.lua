@@ -71,12 +71,19 @@ local function GetShieldAssistRates(unit)
     return shield, energy, mass
 end
 
---- Returns whether the engine gave the unit a transport interface, without it `Unit:GetCargo` errors
+--- Returns whether the unit carries its cargo attached to it, as transports do, rather than in internal storage, as
+--- carriers do. Without the engine's transport interface (`RULEUCC_Transport` or `PODSTAGINGPLATFORM`),
+--- `Unit:GetCargo` errors. Like `KillCargo`, a unit with storage slots counts all of its cargo as stored.
 ---@param unit Unit
 ---@return boolean
-local function CanHaveCargo(unit)
+local function HasAttachedCargo(unit)
     local blueprint = unit.Blueprint
-    return blueprint.General.CommandCapsHash.RULEUCC_Transport or blueprint.CategoriesHash.PODSTAGINGPLATFORM or false
+    if not (blueprint.General.CommandCapsHash.RULEUCC_Transport or blueprint.CategoriesHash.PODSTAGINGPLATFORM) then
+        return false
+    end
+
+    local storageSlots = blueprint.Transport.StorageSlots
+    return not storageSlots or storageSlots == 0
 end
 
 --- Structures that are reused for performance reasons
@@ -902,12 +909,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self.Brain:OnUnitReclaimed(self, reclaimer)
     end,
 
-    --- Turns the cargo of a reclaimed unit into wrecks on the ground below it and destroys the cargo.
+    --- Turns the attached cargo of a reclaimed unit into wrecks where the cargo is and destroys the cargo.
     --- The engine reclaims a unit by draining its health and then leaving its wreck, but it destroys
-    --- the cargo without a wreck. The cargo's reclaim time is part of the carrier's, see `GetReclaimCosts`.
+    --- the cargo without a wreck. The cargo's reclaim time is part of the transport's, see `GetReclaimCosts`.
+    --- Cargo in internal storage (carriers) is left to the engine: it leaves no wreck either when its carrier is killed.
     ---@param self Unit
     ReclaimCargo = function(self)
-        if not CanHaveCargo(self) then
+        if not HasAttachedCargo(self) then
             return
         end
 
@@ -919,13 +927,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                     unit:ReclaimCargo()
 
                     -- not `CreateWreckageProp`, so units that leave no wreck (such as Kennel pods) keep doing so
-                    local prop = unit:CreateWreckage(0)
-                    if prop then
-                        -- the cargo is attached above the ground, move its wreck down like the wreck of an aircraft
-                        local pos = prop:GetPosition()
-                        local x, z = pos[1], pos[3]
-                        prop:SetPosition({ x, GetTerrainHeight(x, z) + GetTerrainTypeOffset(x, z), z }, true)
-                    end
+                    -- the wreck stays where the cargo is, as the transport's own wreck does
+                    unit:CreateWreckage(0)
                 end
 
                 unit:Destroy()
@@ -4192,8 +4195,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                 duration = 1
             end
 
-            -- the cargo is reclaimed with the unit, as it is captured with the unit (see `GetCaptureCosts`)
-            if CanHaveCargo(target) and target:GetFractionComplete() >= 1 then
+            -- attached cargo is reclaimed with the unit, as it is captured with the unit (see `GetCaptureCosts`)
+            if HasAttachedCargo(target) and target:GetFractionComplete() >= 1 then
                 for _, unit in target:GetCargo() do
                     if not EntityCategoryContains(categories.EXTERNALFACTORYUNIT, unit) then
                         duration = duration + (self:GetReclaimCosts(unit))
