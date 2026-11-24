@@ -4,7 +4,7 @@ This repository is the Lua game code (plus blueprints, effects, textures, locali
 
 ## Where to look
 
-The guides for coding agents are in [agents/](agents/). Before working in a path below, read its guide: nothing loads them automatically.
+The guides for coding agents are in [agents/](agents/). Before working in a path below, read its guide: nothing loads them automatically. Before editing this file or a guide, read [editing-guides.md](agents/editing-guides.md).
 
 | Path | Contents | Guide |
 |---|---|---|
