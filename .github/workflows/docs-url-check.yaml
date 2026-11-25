@@ -89,4 +89,4 @@ jobs:
           UNSUPPORTED: https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf,https://github.com/FAForever/fa/deployments,https://github.com/FAForever/fa/deployments/production
         run: >-
           python .github/workflows/scripts/python/check_web_links.py docs --exclude docs/README.md
-          --exclude-urls "$REPO_LINKS" --exclude-urls "$SITE_LINKS" --exclude-urls "$UNSUPPORTED"
+          --exclude-urls "$REPO_LINKS" --exclude-urls "$SITE_LINKS" --exclude-urls "$UNSUPPORTED" --retry-count 2

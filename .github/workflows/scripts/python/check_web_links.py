@@ -5,9 +5,12 @@ each URL is requested only once, however many files link to it. The requests
 to one host are made one after another and the hosts are checked in parallel,
 so that a site isn't sent a burst of requests that it may block.
 
-A link passes when the final response, after redirects, has status 200. The
-error of a failed link names the status or the exception, so that a missing
-page (404) can be told apart from a blocked request (403, 429) or a timeout.
+A link passes when the final response, after redirects, has status 200. A link
+to a missing page (404, 410) or a host that can't be reached fails. Sites
+often block automated requests (401, 403, 429), and a server error (5xx) or a
+timeout can be temporary, so those are reported as warnings. The urlchecker
+action passed them too: it loaded them in a browser and accepted any page
+with a title, such as a bot challenge.
 
 Usage:
     python3 check_web_links.py --exclude docs/README.md \
@@ -53,9 +56,13 @@ def line_of(file: str, link: str) -> int:
     return content.count("\n", 0, max(content.find(link), 0)) + 1
 
 
-def check(url: str, retry_count: int, timeout: float) -> str | None:
-    """None when the URL responds with 200, otherwise the reason it failed."""
-    reason = None
+# Statuses that mean the page doesn't exist. Other failing statuses may be a blocked or temporary failure.
+MISSING = {404, 410}
+
+
+def check(url: str, retry_count: int, timeout: float) -> tuple[str, str] | None:
+    """None when the URL responds with 200, otherwise the severity ("error" or "warning") and the reason."""
+    result = None
     pause = 2
     for attempt in range(retry_count):
         if attempt:
@@ -65,13 +72,19 @@ def check(url: str, retry_count: int, timeout: float) -> str | None:
             response = requests.get(url, timeout=timeout + attempt, headers=get_user_agent())
             if response.status_code == 200:
                 return None
-            reason = f"HTTP {response.status_code}"
+            severity = "error" if response.status_code in MISSING else "warning"
+            result = (severity, f"HTTP {response.status_code}")
+            if severity == "error":
+                return result
+        except requests.Timeout as error:
+            result = ("warning", type(error).__name__)
         except requests.RequestException as error:
-            reason = type(error).__name__
-    return reason
+            # Connection errors include hosts that don't resolve anymore.
+            result = ("error", type(error).__name__)
+    return result
 
 
-def check_host(urls: list[str], retry_count: int, timeout: float) -> dict[str, str | None]:
+def check_host(urls: list[str], retry_count: int, timeout: float) -> dict[str, tuple[str, str] | None]:
     """Check the URLs of one host one after another."""
     return {url: check(url, retry_count, timeout) for url in urls}
 
@@ -100,20 +113,27 @@ def main() -> int:
     for url in sorted(sources):
         hosts.setdefault(urlsplit(url).netloc.lower(), []).append(url)
 
-    results: dict[str, str | None] = {}
+    results: dict[str, tuple[str, str] | None] = {}
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
         for result in pool.map(lambda urls: check_host(urls, args.retry_count, args.timeout), hosts.values()):
             results.update(result)
 
-    failed = {url: reason for url, reason in results.items() if reason}
+    labels = {None: "ok", "warning": "warning", "error": "failed"}
     for url in sorted(results):
-        print(f"  {'failed' if url in failed else 'ok':6}  {url}")
-    print(f"Checked {len(results)} URLs on {len(hosts)} hosts, linked {sum(map(len, sources.values()))} times; {len(failed)} failed.")
-    for url, reason in sorted(failed.items()):
+        print(f"  {labels[results[url] and results[url][0]]:7}  {url}")
+    counts = {severity: sum(1 for r in results.values() if r and r[0] == severity) for severity in ("error", "warning")}
+    print(
+        f"Checked {len(results)} URLs on {len(hosts)} hosts, linked {sum(map(len, sources.values()))} times; "
+        f"{counts['error']} failed, {counts['warning']} possibly blocked."
+    )
+    for url, result in sorted(results.items()):
+        if not result:
+            continue
+        severity, reason = result
+        message = f"{url} failed: {reason}" if severity == "error" else f"{url} could not be confirmed: {reason}, possibly blocked or temporary"
         for file in sources[url]:
-            message = f"{url} failed: {reason}"
-            print(f"::error file={escape_property(file)},line={line_of(file, url)}::{escape_data(message)}")
-    return 1 if failed else 0
+            print(f"::{severity} file={escape_property(file)},line={line_of(file, url)}::{escape_data(message)}")
+    return 1 if counts["error"] else 0
 
 
 if __name__ == "__main__":
