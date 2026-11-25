@@ -23,3 +23,15 @@ Read the root [AGENTS.md](../AGENTS.md) first. These rules apply to `AGENTS.md`,
 - Say what to do. Leave out the reasoning, the history, and examples, unless the rule is unclear without them.
 - The [code style](../AGENTS.md#code-style) and [comment style](../annotation.md#comment-style) rules apply: short declarative sentences, the serial comma, no em-dashes, and links to the file with the name of the function or field, not a line number.
 - Write for any coding agent. `CLAUDE.md` only imports `AGENTS.md`, and nothing in `AGENTS.md` or `agents/` depends on one harness.
+
+## Testing a change with agents
+
+Test guide changes with subagents or other sessions only when the user asks for it. Otherwise finish the change, and in the final report say it wasn't tested with agents and suggest the test below.
+
+1. Make one copy of the repository per run, in a folder with a neutral name, so runs don't change each other's files. Check out the commit the change is based on, remove the remote, and add the change as one commit with a neutral message, so the history doesn't hint at the change. If the change moves or removes files, fix the links to them so that agents don't look for the files in other checkouts.
+   To save disk space, clone with `git clone --shared`, which reuses the original's objects, and unless the change is about assets, use a sparse checkout that leaves them out. They are most of the repository's size.
+2. Start each agent in the copy with no context but the task: a new session, or a subagent that doesn't inherit the current session's context. If the agent doesn't load the instructions file at startup, as subagents often don't, tell it to read the file first.
+3. Give a realistic task in the area the change covers, and let the agent make the change.
+4. When it's done, check which guides it opened in its tool calls, and grade the changes in its copy against the rules the change adds. If the harness doesn't show a subagent's tool calls, ask the agent which files it read.
+5. Test several models, because stronger models are more likely to find guides than weaker ones.
+6. In the PR description, list each run's harness, model, task, the guides it opened, and the rules it missed, and say when the startup load was simulated.
