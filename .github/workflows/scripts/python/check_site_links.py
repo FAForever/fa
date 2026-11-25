@@ -83,14 +83,15 @@ def blank_indented_code(text: str) -> str:
     Lines indented less continue the list item and stay.
     """
     lines = text.split("\n")
-    content_indent = 0
+    # The content indentation of each open list item, outermost first.
+    open_items: list[int] = []
     in_code = False
     previous_blank = True
     for i, line in enumerate(lines):
         blank_line = not line.strip()
         expanded = line.expandtabs(4)
         indent = len(expanded) - len(expanded.lstrip())
-        code_indent = content_indent + 4
+        code_indent = (open_items[-1] if open_items else 0) + 4
         if in_code and (blank_line or indent >= code_indent):
             lines[i] = ""
         elif not blank_line and indent >= code_indent and previous_blank:
@@ -99,11 +100,13 @@ def blank_indented_code(text: str) -> str:
         else:
             in_code = False
             if not blank_line:
+                # A line indented less than an item's content ends that item, such as text
+                # that continues the parent item after a nested list.
+                while open_items and open_items[-1] > indent:
+                    open_items.pop()
                 item = LIST_ITEM.match(expanded)
                 if item:
-                    content_indent = len(item.group(0))
-                elif indent == 0:
-                    content_indent = 0
+                    open_items.append(len(item.group(0)))
         previous_blank = blank_line
     return "\n".join(lines)
 
