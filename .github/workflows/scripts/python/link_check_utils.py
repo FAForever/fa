@@ -1,6 +1,7 @@
 """Helpers shared by the link check scripts of the documentation workflow."""
 
 import os
+import re
 
 
 def escape_data(value: str) -> str:
@@ -30,7 +31,9 @@ def markdown_files(folder: str, excluded: set[str]):
 
 
 def line_of(file: str, value: str) -> int:
-    """Line number of the first occurrence of `value` in `file`."""
+    """Line number of the first occurrence of `value` in `file` that isn't the start of a longer URL."""
     with open(file, encoding="utf-8") as handle:
         content = handle.read()
-    return content.count("\n", 0, max(content.find(value), 0)) + 1
+    # A period ends a sentence unless more of the URL follows it.
+    match = re.search(re.escape(value) + r"(?![\w/#?%~=&+-]|[.,;:!][\w/])", content)
+    return content.count("\n", 0, match.start() if match else 0) + 1

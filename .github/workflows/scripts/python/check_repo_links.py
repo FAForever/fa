@@ -57,16 +57,20 @@ def main() -> int:
         parser.error("--repository is required when GITHUB_REPOSITORY is not set")
 
     prefixes = tuple(f"https://github.com/{args.repository}/{kind}/{args.branch}/" for kind in ("blob", "tree"))
+    # GitHub also accepts http, www, and any case in the owner and repository names. The branch is case-sensitive.
+    prefix = re.compile(
+        rf"(?i:https?://(?:www\.)?github\.com/{re.escape(args.repository)}/(?:blob|tree)/){re.escape(args.branch)}/"
+    )
     excluded = {os.path.normpath(file) for file in args.exclude}
     checked = set()
     missing = []
     for file in markdown_files(args.folder, excluded):
         for link in collect_links_from_file(file):
+            match = prefix.match(link)
             # The URL check splits its exclusions at commas, so such links are left to it.
-            if not link.startswith(prefixes) or "," in link:
+            if not match or "," in link:
                 continue
-            prefix = next(p for p in prefixes if link.startswith(p))
-            path = unquote(re.split("[#?]", link[len(prefix):], maxsplit=1)[0])
+            path = unquote(re.split("[#?]", link[match.end():], maxsplit=1)[0])
             checked.add(link)
             if path_exists(args.rev, path):
                 print(f"  ok      {link}")

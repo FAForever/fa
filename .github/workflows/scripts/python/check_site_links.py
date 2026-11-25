@@ -47,7 +47,7 @@ HEADING_ID = re.compile(r"\s*\{(?:#|:[^}]*?#)([\w-]+)[^}]*\}\s*$")
 CODE_SPAN = re.compile(r"(`+)[^`].*?\1", re.S)
 COMMENT = re.compile(r"<!--.*?-->", re.S)
 SCHEME = re.compile(r"[a-zA-Z][\w+.-]*:|//")
-DYNAMIC_HEADING =re.compile(r"^ {0,3}#.*\{\{|<h[1-6][^>]*\{\{", re.M)
+DYNAMIC_HEADING = re.compile(r"^ {0,3}#.*\{\{|<h[1-6][^>]*\{\{", re.M)
 ATX_HEADING = re.compile(r"^ {0,3}#{1,6}[ \t]+(.*?)(?:[ \t]+#+)?[ \t]*$", re.M)
 SETEXT_HEADING = re.compile(r"^ {0,3}(\S[^\n]*)\n {0,3}(?:=+|-+)[ \t]*$", re.M)
 EXPLICIT_ID = re.compile(r"\{(?:#|:[^}]*?#)([\w-]+)[^}]*\}|\bid\s*=\s*[\"']([^\"'{}]+)[\"']")
@@ -70,14 +70,41 @@ def blank(pattern: re.Pattern, text: str) -> str:
     return pattern.sub(lambda m: "\n" * m.group(0).count("\n"), text)
 
 
+LIST_ITEM = re.compile(r" {0,3}(?:[-*+]|\d+[.)])[ \t]")
+
+
+def blank_indented_code(text: str) -> str:
+    """Blank code blocks indented by four spaces or a tab, but not indented lines that continue a list item."""
+    lines = text.split("\n")
+    in_list = False
+    in_code = False
+    previous_blank = True
+    for i, line in enumerate(lines):
+        blank_line = not line.strip()
+        indented = line.startswith(("    ", "\t"))
+        if in_code and (indented or blank_line):
+            lines[i] = ""
+        elif indented and previous_blank and not in_list:
+            in_code = True
+            lines[i] = ""
+        else:
+            in_code = False
+            if not blank_line and not indented:
+                in_list = bool(LIST_ITEM.match(line))
+        previous_blank = blank_line
+    return "\n".join(lines)
+
+
 class Page:
     def __init__(self, file: str, url: str, text: str):
         self.file = file
         self.url = url
         # The content that is rendered: without front matter, comments, and code blocks.
-        self.text = blank(FENCE, blank(COMMENT, blank(FRONT_MATTER, text)))
+        self.text = blank_indented_code(blank(FENCE, blank(COMMENT, blank(FRONT_MATTER, text))))
         # Liquid tags, such as loops and includes, or Liquid in a heading can generate headings.
-        self.dynamic = "{%" in self.text or bool(DYNAMIC_HEADING.search(self.text))
+        # Liquid in inline code is only shown, so it doesn't count.
+        without_code = blank(CODE_SPAN, self.text)
+        self.dynamic = "{%" in without_code or bool(DYNAMIC_HEADING.search(without_code))
         self._ids = None
 
     @property
