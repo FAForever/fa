@@ -37,7 +37,8 @@ PERMALINK = re.compile(r"^permalink:\s*[\"']?([^\"'\s]*)", re.M)
 # Link destinations: inline Markdown links and images, reference definitions, and HTML attributes.
 INLINE = re.compile(r"!?\[[^\]\n]*\]\(\s*(<[^>\n]*>|\{\{[^}\n]*\}\}|[^\s()]*(?:\([^\s()]*\)[^\s()]*)*)")
 REFERENCE = re.compile(r"^ {0,3}\[[^\]\n]+\]:\s*(<[^>\n]*>|\{\{[^}\n]*\}\}|\S+)", re.M)
-ATTRIBUTE = re.compile(r"\b(?:href|src)\s*=\s*[\"']([^\"'\n]*)[\"']")
+# The value ends at the quote that opened it, so `src="{{ 'x' | relative_url }}"` is read whole.
+ATTRIBUTE = re.compile(r"\b(?:href|src)\s*=\s*([\"'])(?P<dest>(?:(?!\1)[^\n])*)\1")
 RELATIVE_URL = re.compile(r"\{\{\s*[\"']([^\"']*)[\"']\s*\|\s*relative_url\s*\}\}")
 
 # A fence closes with the same character, at least as many times as it opened with.
@@ -70,27 +71,38 @@ def blank(pattern: re.Pattern, text: str) -> str:
     return pattern.sub(lambda m: "\n" * m.group(0).count("\n"), text)
 
 
-LIST_ITEM = re.compile(r" {0,3}(?:[-*+]|\d+[.)])[ \t]")
+LIST_ITEM = re.compile(r" {0,3}(?:[-*+]|\d+[.)])[ \t]+")
 
 
 def blank_indented_code(text: str) -> str:
-    """Blank code blocks indented by four spaces or a tab, but not indented lines that continue a list item."""
+    """Blank code blocks indented by four spaces more than the content they belong to.
+
+    Outside a list that is four spaces. In a list item the content starts after
+    the marker, two spaces in for `- `, so a code block in it needs six.
+    Lines indented less continue the list item and stay.
+    """
     lines = text.split("\n")
-    in_list = False
+    content_indent = 0
     in_code = False
     previous_blank = True
     for i, line in enumerate(lines):
         blank_line = not line.strip()
-        indented = line.startswith(("    ", "\t"))
-        if in_code and (indented or blank_line):
+        expanded = line.expandtabs(4)
+        indent = len(expanded) - len(expanded.lstrip())
+        code_indent = content_indent + 4
+        if in_code and (blank_line or indent >= code_indent):
             lines[i] = ""
-        elif indented and previous_blank and not in_list:
+        elif not blank_line and indent >= code_indent and previous_blank:
             in_code = True
             lines[i] = ""
         else:
             in_code = False
-            if not blank_line and not indented:
-                in_list = bool(LIST_ITEM.match(line))
+            if not blank_line:
+                item = LIST_ITEM.match(expanded)
+                if item:
+                    content_indent = len(item.group(0))
+                elif indent == 0:
+                    content_indent = 0
         previous_blank = blank_line
     return "\n".join(lines)
 
@@ -125,7 +137,8 @@ class Page:
                 count = counts.get(base, 0)
                 counts[base] = count + 1
                 self._ids.add(base if count == 0 else f"{base}-{count}")
-            for match in EXPLICIT_ID.finditer(text):
+            # An id written in inline code is only shown, not set.
+            for match in EXPLICIT_ID.finditer(blank(CODE_SPAN, text)):
                 self._ids.add(match.group(1) or match.group(2))
         return self._ids
 
@@ -185,7 +198,8 @@ def local_links(page: Page):
     for pattern in (INLINE, REFERENCE, ATTRIBUTE):
         for match in pattern.finditer(text):
             # Browsers ignore whitespace around a link destination, such as in `href=" x "`.
-            value = match.group(1).strip().strip("<>").strip()
+            dest = match.group("dest") if "dest" in pattern.groupindex else match.group(1)
+            value = dest.strip().strip("<>").strip()
             line = text.count("\n", 0, match.start(1)) + 1
             liquid = RELATIVE_URL.fullmatch(value)
             if liquid:

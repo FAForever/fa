@@ -5,7 +5,7 @@ each URL is requested only once, however many files link to it. The requests
 to one host are made one after another and the hosts are checked in parallel,
 so that a site isn't sent a burst of requests that it may block.
 
-A link passes when the final response, after redirects, has status 200. A link
+A link passes when the final response, after redirects, has a 2xx status. A link
 to a missing page (404, 410) or a host that can't be reached fails. Sites
 often block automated requests (401, 403, 429), and a server error (5xx) or a
 timeout can be temporary, so those are reported as warnings. The urlchecker
@@ -35,7 +35,7 @@ MISSING = {404, 410}
 
 
 def check(url: str, retry_count: int, timeout: float) -> tuple[str, str] | None:
-    """None when the URL responds with 200, otherwise the severity ("error" or "warning") and the reason."""
+    """None when the URL responds with a 2xx status, otherwise the severity ("error" or "warning") and the reason."""
     result = None
     pause = 2
     for attempt in range(retry_count):
@@ -46,7 +46,7 @@ def check(url: str, retry_count: int, timeout: float) -> tuple[str, str] | None:
             # Only the status is needed, so the body isn't downloaded.
             with requests.get(url, timeout=timeout + attempt, headers=get_user_agent(), stream=True) as response:
                 status = response.status_code
-            if status == 200:
+            if 200 <= status < 300:
                 return None
             severity = "error" if status in MISSING else "warning"
             result = (severity, f"HTTP {status}")
