@@ -1,0 +1,6 @@
+- Overhaul and complete the Simplified Chinese localization (#7345).
+  - Retranslated the UEF campaign text (X01-X06) and the X1CA / X1MP / X1T co-op and tutorial strings, fixing mistranslations (for example `sleeping cell` rendered as a prison, `ate it` as "just ate a meal", wrong compass directions, duplicated sentences) and rewriting stilted machine-translated phrasing.
+  - Added the 67 missing co-op mission strings so no mission text is left untranslated: SCCA campaigns A02-A06 / E01-E04 / C06, the Trident and Havens taunts and the X1CA objectives.
+  - Fixed 24 UI strings that carried the wrong number, the wrong negation or the wrong meaning (for example overcharge cost, shield charge numbers, `Mip Levels that are not Rendered`, and a lobby tooltip that described a different string entirely).
+  - Corrected the remaining traditional-Chinese character forms (`裂縫`, `瞭解`, `紅`, `顏`, `刪`, `顆`, `橋樑`, `象徵`, ...) across the whole file and aligned character names and terms with the Traditional Chinese localization (`Vedetta`, `开采`, `钻石`).
+  - `Unit_Description_0458` now correctly says T3 (was T1) and mentions capturing units.
