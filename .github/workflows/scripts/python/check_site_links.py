@@ -27,9 +27,11 @@ import re
 import sys
 from urllib.parse import unquote, urljoin, urlsplit
 
+from link_check_utils import annotate, line_of
 from urlchecker.core.fileproc import collect_links_from_file
 
-FRONT_MATTER = re.compile(r"\A---\s*\n(.*?)\n---\s*\n", re.S)
+# Front matter may be empty: two lines of `---` make Jekyll render the file as a page.
+FRONT_MATTER = re.compile(r"\A---[ \t]*\r?\n(.*?)^---[ \t]*\r?(?:\n|\Z)", re.S | re.M)
 PERMALINK = re.compile(r"^permalink:\s*[\"']?([^\"'\s]*)", re.M)
 
 # Link destinations: inline Markdown links and images, reference definitions, and HTML attributes.
@@ -40,24 +42,17 @@ RELATIVE_URL = re.compile(r"\{\{\s*[\"']([^\"']*)[\"']\s*\|\s*relative_url\s*\}\
 
 # A fence closes with the same character, at least as many times as it opened with.
 FENCE = re.compile(r"^ {0,3}((`|~)\2{2,})[^\n]*\n.*?^ {0,3}\1\2*[ \t]*$", re.M | re.S)
-HEADING_ID = re.compile(r"\s*\{:?\s*#([\w-]+)[^}]*\}\s*$")
+# An id in a kramdown attribute list, such as `{#id}` or `{: .class #id}`.
+HEADING_ID = re.compile(r"\s*\{(?:#|:[^}]*?#)([\w-]+)[^}]*\}\s*$")
 CODE_SPAN = re.compile(r"(`+)[^`].*?\1", re.S)
 COMMENT = re.compile(r"<!--.*?-->", re.S)
 SCHEME = re.compile(r"[a-zA-Z][\w+.-]*:|//")
 DYNAMIC_HEADING =re.compile(r"^ {0,3}#.*\{\{|<h[1-6][^>]*\{\{", re.M)
 ATX_HEADING = re.compile(r"^ {0,3}#{1,6}[ \t]+(.*?)(?:[ \t]+#+)?[ \t]*$", re.M)
 SETEXT_HEADING = re.compile(r"^ {0,3}(\S[^\n]*)\n {0,3}(?:=+|-+)[ \t]*$", re.M)
-EXPLICIT_ID = re.compile(r"\{:?\s*#([\w-]+)\s*\}|\bid\s*=\s*[\"']([^\"'{}]+)[\"']")
+EXPLICIT_ID = re.compile(r"\{(?:#|:[^}]*?#)([\w-]+)[^}]*\}|\bid\s*=\s*[\"']([^\"'{}]+)[\"']")
 
 
-def escape_data(value: str) -> str:
-    """Escape a value for a workflow command message."""
-    return value.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
-
-
-def escape_property(value: str) -> str:
-    """Escape a value for a workflow command property."""
-    return escape_data(value).replace(":", "%3A").replace(",", "%2C")
 
 
 def heading_id(text: str) -> str:
@@ -168,12 +163,6 @@ def local_links(page: Page):
                 yield line, value, "local"
 
 
-def line_of(file: str, value: str) -> int:
-    """Line number of the first occurrence of `value` in `file`."""
-    with open(file, encoding="utf-8") as handle:
-        content = handle.read()
-    return content.count("\n", 0, max(content.find(value), 0)) + 1
-
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -248,9 +237,9 @@ def main() -> int:
 
     print(f"Checked {checked} links between {len(pages)} pages and {len(files)} files of the site.")
     for file, line, value, reason in sorted(warnings):
-        print(f"::warning file={escape_property(file)},line={line}::{escape_data(f'{value}: {reason}')}")
+        annotate("warning", file, line, f"{value}: {reason}")
     for file, line, value, reason in sorted(errors):
-        print(f"::error file={escape_property(file)},line={line}::{escape_data(f'{value}: {reason}')}")
+        annotate("error", file, line, f"{value}: {reason}")
     return 1 if errors else 0
 
 

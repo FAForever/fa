@@ -23,17 +23,10 @@ import subprocess
 import sys
 from urllib.parse import unquote
 
+from link_check_utils import annotate, line_of, markdown_files
 from urlchecker.core.fileproc import collect_links_from_file
 
 
-def escape_data(value: str) -> str:
-    """Escape a value for a workflow command message."""
-    return value.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
-
-
-def escape_property(value: str) -> str:
-    """Escape a value for a workflow command property."""
-    return escape_data(value).replace(":", "%3A").replace(",", "%2C")
 
 
 @functools.cache
@@ -53,21 +46,6 @@ def path_exists(rev: str, path: str) -> bool:
     return path in result.stdout.split("\0")
 
 
-def markdown_files(folder: str, excluded: set[str]):
-    for root, _, files in os.walk(folder):
-        for name in sorted(files):
-            if not name.endswith(".md"):
-                continue
-            file = os.path.join(root, name).replace(os.sep, "/")
-            if os.path.normpath(file) not in excluded:
-                yield file
-
-
-def line_of(file: str, link: str) -> int:
-    """Line number of the first occurrence of `link` in `file`."""
-    with open(file, encoding="utf-8") as handle:
-        content = handle.read()
-    return content.count("\n", 0, max(content.find(link), 0)) + 1
 
 
 def main() -> int:
@@ -108,8 +86,7 @@ def main() -> int:
 
     print(f"Checked {len(checked)} links to {' and '.join(prefixes)} against {args.rev}.")
     for file, link, path in missing:
-        message = f"'{path}' does not exist in the checked out commit: {link}"
-        print(f"::error file={escape_property(file)},line={line_of(file, link)}::{escape_data(message)}")
+        annotate("error", file, line_of(file, link), f"'{path}' does not exist in the checked out commit: {link}")
     return 1 if missing else 0
 
 

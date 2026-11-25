@@ -23,10 +23,10 @@ name: Documentation - Verify URLs
 on:
   push:
     branches: ["develop"]
-    paths: ["docs/**", ".github/workflows/docs-url-check.yaml", ".github/workflows/scripts/python/check_repo_links.py", ".github/workflows/scripts/python/check_site_links.py", ".github/workflows/scripts/python/check_web_links.py"]
+    paths: ["docs/**", ".github/workflows/docs-url-check.yaml", ".github/workflows/scripts/python/check_repo_links.py", ".github/workflows/scripts/python/check_site_links.py", ".github/workflows/scripts/python/check_web_links.py", ".github/workflows/scripts/python/link_check_utils.py"]
 
   pull_request:
-    paths: ["docs/**", ".github/workflows/docs-url-check.yaml", ".github/workflows/scripts/python/check_repo_links.py", ".github/workflows/scripts/python/check_site_links.py", ".github/workflows/scripts/python/check_web_links.py"]
+    paths: ["docs/**", ".github/workflows/docs-url-check.yaml", ".github/workflows/scripts/python/check_repo_links.py", ".github/workflows/scripts/python/check_site_links.py", ".github/workflows/scripts/python/check_web_links.py", ".github/workflows/scripts/python/link_check_utils.py"]
 
   workflow_dispatch:
 

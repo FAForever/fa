@@ -25,35 +25,13 @@ from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urlsplit
 
 import requests
+from link_check_utils import annotate, line_of, markdown_files
 from urlchecker.core.fileproc import collect_links_from_file
 from urlchecker.core.urlproc import get_user_agent
 
 
-def escape_data(value: str) -> str:
-    """Escape a value for a workflow command message."""
-    return value.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
 
 
-def escape_property(value: str) -> str:
-    """Escape a value for a workflow command property."""
-    return escape_data(value).replace(":", "%3A").replace(",", "%2C")
-
-
-def markdown_files(folder: str, excluded: set[str]):
-    for root, _, files in os.walk(folder):
-        for name in sorted(files):
-            if not name.endswith(".md"):
-                continue
-            file = os.path.join(root, name).replace(os.sep, "/")
-            if os.path.normpath(file) not in excluded:
-                yield file
-
-
-def line_of(file: str, link: str) -> int:
-    """Line number of the first occurrence of `link` in `file`."""
-    with open(file, encoding="utf-8") as handle:
-        content = handle.read()
-    return content.count("\n", 0, max(content.find(link), 0)) + 1
 
 
 # Statuses that mean the page doesn't exist. Other failing statuses may be a blocked or temporary failure.
@@ -69,18 +47,23 @@ def check(url: str, retry_count: int, timeout: float) -> tuple[str, str] | None:
             time.sleep(pause)
             pause *= 2
         try:
-            response = requests.get(url, timeout=timeout + attempt, headers=get_user_agent())
-            if response.status_code == 200:
+            # Only the status is needed, so the body isn't downloaded.
+            with requests.get(url, timeout=timeout + attempt, headers=get_user_agent(), stream=True) as response:
+                status = response.status_code
+            if status == 200:
                 return None
-            severity = "error" if response.status_code in MISSING else "warning"
-            result = (severity, f"HTTP {response.status_code}")
+            severity = "error" if status in MISSING else "warning"
+            result = (severity, f"HTTP {status}")
             if severity == "error":
                 return result
         except requests.Timeout as error:
             result = ("warning", type(error).__name__)
-        except requests.RequestException as error:
-            # Connection errors include hosts that don't resolve anymore.
+        except requests.ConnectionError as error:
+            # Includes hosts that don't resolve anymore.
             result = ("error", type(error).__name__)
+        except requests.RequestException as error:
+            # Such as too many redirects: the page may still work in a browser.
+            result = ("warning", type(error).__name__)
     return result
 
 
@@ -132,7 +115,7 @@ def main() -> int:
         severity, reason = result
         message = f"{url} failed: {reason}" if severity == "error" else f"{url} could not be confirmed: {reason}, possibly blocked or temporary"
         for file in sources[url]:
-            print(f"::{severity} file={escape_property(file)},line={line_of(file, url)}::{escape_data(message)}")
+            annotate(severity, file, line_of(file, url), message)
     return 1 if counts["error"] else 0
 
 
