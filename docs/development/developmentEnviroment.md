@@ -9,7 +9,7 @@ permalink: development/development-environment
 
 A collection of useful information to help you set up your development environment. There is also a video on [Youtube](https://www.youtube.com/watch?v=KoewR3193_U) to help guide you through this article.
 
-Read this in other languages: [English](setup-english.md), [Russian](setup-russian.md)
+Read this in other languages: [English](https://github.com/FAForever/fa/blob/develop/setup/setup-english.md), [Russian](https://github.com/FAForever/fa/blob/develop/setup/setup-russian.md)
 
 ## Running the game with your changes
 
