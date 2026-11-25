@@ -34,7 +34,7 @@ PERMALINK = re.compile(r"^permalink:\s*[\"']?([^\"'\s]*)", re.M)
 
 # Link destinations: inline Markdown links and images, reference definitions, and HTML attributes.
 INLINE = re.compile(r"!?\[[^\]\n]*\]\(\s*(<[^>\n]*>|\{\{[^}\n]*\}\}|[^\s()]*(?:\([^\s()]*\)[^\s()]*)*)")
-REFERENCE = re.compile(r"^ {0,3}\[[^\]\n]+\]:\s*(<[^>\n]*>|\S+)", re.M)
+REFERENCE = re.compile(r"^ {0,3}\[[^\]\n]+\]:\s*(<[^>\n]*>|\{\{[^}\n]*\}\}|\S+)", re.M)
 ATTRIBUTE = re.compile(r"\b(?:href|src)\s*=\s*[\"']([^\"'\n]*)[\"']")
 RELATIVE_URL = re.compile(r"\{\{\s*[\"']([^\"']*)[\"']\s*\|\s*relative_url\s*\}\}")
 
@@ -204,22 +204,24 @@ def main() -> int:
         for line, value, kind in links:
             parts = urlsplit(value)
             if kind == "absolute":
-                target = parts.path[len(base_path):]
                 absolute.add(value)
+                reference = parts.path
             elif kind == "liquid":
-                target = parts.path
-            elif value.startswith("/"):
-                if not (parts.path == base_path or parts.path.startswith(base_path + "/")):
-                    errors.append((page.file, line, value, f"misses the base path {base_path} of the site; use relative_url"))
-                    continue
-                target = parts.path[len(base_path):]
+                reference = base_path + parts.path  # relative_url adds the base path.
             else:
-                # Resolve like a browser, against the published URL of the page, base path included.
-                resolved = urlsplit(urljoin(f"{base_path}/{page.url.lstrip('/')}", value)).path
-                if not (resolved == base_path or resolved.startswith(base_path + "/")):
-                    errors.append((page.file, line, value, f"resolves to {resolved}, outside the base path {base_path} of the site"))
-                    continue
-                target = resolved[len(base_path):]
+                reference = value
+
+            # Resolve like a browser, against the published URL of the page, so that
+            # dot segments are removed before the base path is checked.
+            resolved = urlsplit(urljoin(f"{base_path}/{page.url.lstrip('/')}", reference)).path
+            if not (resolved == base_path or resolved.startswith(base_path + "/")):
+                if kind == "local" and value.startswith("/") and not value.startswith(base_path + "/"):
+                    reason = f"misses the base path {base_path} of the site; use relative_url"
+                else:
+                    reason = f"resolves to {resolved}, outside the base path {base_path} of the site"
+                errors.append((page.file, line, value, reason))
+                continue
+            target = resolved[len(base_path):]
 
             checked += 1
             path = unquote(target)
