@@ -23,10 +23,10 @@ name: Documentation - Verify URLs
 on:
   push:
     branches: ["develop"]
-    paths: ["docs/**", ".github/workflows/docs-url-check.yaml", ".github/workflows/scripts/python/check_repo_links.py"]
+    paths: ["docs/**", ".github/workflows/docs-url-check.yaml", ".github/workflows/scripts/python/check_repo_links.py", ".github/workflows/scripts/python/check_site_links.py"]
 
   pull_request:
-    paths: ["docs/**", ".github/workflows/docs-url-check.yaml", ".github/workflows/scripts/python/check_repo_links.py"]
+    paths: ["docs/**", ".github/workflows/docs-url-check.yaml", ".github/workflows/scripts/python/check_repo_links.py", ".github/workflows/scripts/python/check_site_links.py"]
 
   workflow_dispatch:
 
@@ -66,8 +66,16 @@ jobs:
           BRANCH: ${{ github.base_ref || github.ref_name }}
         run: python .github/workflows/scripts/python/check_repo_links.py docs --branch "$BRANCH" --exclude docs/README.md
 
+      # Links between the pages of the documentation site, including links to
+      # headings, are resolved against the permalinks of the pages instead of
+      # over HTTP, so that links to pages that the pull request adds pass.
+      - name: Check links between pages of the documentation site
+        id: site-links
+        if: ${{ !cancelled() && steps.repo-links.outcome != 'skipped' }}
+        run: python .github/workflows/scripts/python/check_site_links.py docs --site-url https://faforever.github.io/fa --exclude docs/README.md
+
       - name: urlchecker-action
-        # Also runs when the previous step fails, but not when an earlier step failed.
+        # Also runs when the checks above fail, but not when an earlier step failed.
         if: ${{ !cancelled() && steps.repo-links.outcome != 'skipped' }}
         uses: urlstechie/urlchecker-action@0.0.34
         with:
@@ -75,7 +83,7 @@ jobs:
           file_types: .md
           exclude_files: docs/README.md
 
-          # The first URLs are checked by the previous step. The others are
+          # The first URLs are checked by the steps above. The others are
           # excluded because not all type of URLs are supported, see also:
           # - https://github.com/urlstechie/urlchecker-action/issues/105
-          exclude_urls: ${{ steps.repo-links.outputs.exclude_urls }},https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf,https://github.com/FAForever/fa/deployments,https://github.com/FAForever/fa/deployments/production
+          exclude_urls: ${{ steps.repo-links.outputs.exclude_urls }},${{ steps.site-links.outputs.exclude_urls }},https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf,https://github.com/FAForever/fa/deployments,https://github.com/FAForever/fa/deployments/production

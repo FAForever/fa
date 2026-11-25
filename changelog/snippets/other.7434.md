@@ -1,1 +1,1 @@
-- Links in the documentation to files of this repository are now checked against the pull request after the merge, so links to files that the pull request adds no longer fail the URL check (#7434).
+- Links in the documentation to files of this repository and between pages of the documentation site are now checked against the pull request after the merge, so links to files or pages that the pull request adds no longer fail the URL check. Links to headings of the documentation site are checked too, and three broken links are fixed (#7434).
