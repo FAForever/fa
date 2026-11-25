@@ -91,7 +91,15 @@ def main() -> int:
                 sources.setdefault(url, []).append(file)
 
     # The fragment isn't sent to the server, so links that differ only in it share one request.
-    pages = sorted({urldefrag(url).url for url in sources})
+    page_of: dict[str, str] = {}
+    invalid: dict[str, tuple[str, str]] = {}
+    for url in sources:
+        try:
+            page_of[url] = urldefrag(url).url
+        except ValueError as error:
+            # Such as an unclosed `[` in the host, which Python reads as an IPv6 address.
+            invalid[url] = ("error", f"not a valid URL ({error})")
+    pages = sorted(set(page_of.values()))
     hosts: dict[str, list[str]] = {}
     for page in pages:
         hosts.setdefault(urlsplit(page).netloc.lower(), []).append(page)
@@ -100,7 +108,7 @@ def main() -> int:
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
         for result in pool.map(lambda urls: check_host(urls, args.retry_count, args.timeout), hosts.values()):
             page_results.update(result)
-    results = {url: page_results[urldefrag(url).url] for url in sources}
+    results = {url: page_results[page] for url, page in page_of.items()} | invalid
 
     labels = {None: "ok", "warning": "warning", "error": "failed"}
     for url in sorted(results):

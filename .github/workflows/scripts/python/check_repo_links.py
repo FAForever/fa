@@ -33,7 +33,8 @@ def path_exists(rev: str, path: str) -> bool:
     path = path.strip("/")
     if path == "":
         return True
-    if any(part in ("", ".", "..") for part in path.split("/")):
+    # A NUL, such as from `%00`, can't be in a path and can't be passed to git.
+    if "\0" in path or any(part in ("", ".", "..") for part in path.split("/")):
         return False
     result = subprocess.run(
         ["git", "--literal-pathspecs", "ls-tree", "-z", "--name-only", "--full-tree", rev, "--", path],

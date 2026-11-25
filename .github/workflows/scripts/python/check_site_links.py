@@ -184,7 +184,8 @@ def local_links(page: Page):
     text = blank(CODE_SPAN, page.text)
     for pattern in (INLINE, REFERENCE, ATTRIBUTE):
         for match in pattern.finditer(text):
-            value = match.group(1).strip("<>")
+            # Browsers ignore whitespace around a link destination, such as in `href=" x "`.
+            value = match.group(1).strip().strip("<>").strip()
             line = text.count("\n", 0, match.start(1)) + 1
             liquid = RELATIVE_URL.fullmatch(value)
             if liquid:
@@ -215,22 +216,30 @@ def main() -> int:
         links = list(local_links(page))
         # Absolute links are extracted with urlchecker, so that the URL check can exclude exactly these.
         for value in collect_links_from_file(page.file):
-            parts = urlsplit(value)
+            try:
+                parts = urlsplit(value)
+            except ValueError:
+                continue  # Not a valid URL, which the web link check reports.
             if parts.netloc.lower() == site.netloc.lower() and (parts.path == base_path or parts.path.startswith(base_path + "/")):
                 links.append((line_of(page.file, value), value, "absolute"))
 
         for line, value, kind in links:
-            parts = urlsplit(value)
-            if kind == "absolute":
-                reference = parts.path
-            elif kind == "liquid":
-                reference = base_path + parts.path  # relative_url adds the base path.
-            else:
-                reference = value
+            try:
+                parts = urlsplit(value)
+                if kind == "absolute":
+                    reference = parts.path
+                elif kind == "liquid":
+                    reference = base_path + parts.path  # relative_url adds the base path.
+                else:
+                    reference = value
 
-            # Resolve like a browser, against the published URL of the page, so that
-            # dot segments are removed before the base path is checked.
-            resolved = urlsplit(urljoin(f"{base_path}/{page.url.lstrip('/')}", reference)).path
+                # Resolve like a browser, against the published URL of the page, so that
+                # dot segments are removed before the base path is checked.
+                resolved = urlsplit(urljoin(f"{base_path}/{page.url.lstrip('/')}", reference)).path
+            except ValueError as error:
+                # Such as an unclosed `[` in the host, which Python reads as an IPv6 address.
+                errors.append((page.file, line, value, f"is not a valid URL: {error}"))
+                continue
             if not (resolved == base_path or resolved.startswith(base_path + "/")):
                 if kind == "local" and value.startswith("/") and not value.startswith(base_path + "/"):
                     reason = f"misses the base path {base_path} of the site; use relative_url"
