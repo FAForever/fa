@@ -204,7 +204,6 @@ def main() -> int:
         for line, value, kind in links:
             parts = urlsplit(value)
             if kind == "absolute":
-                absolute.add(value)
                 reference = parts.path
             elif kind == "liquid":
                 reference = base_path + parts.path  # relative_url adds the base path.
@@ -221,6 +220,9 @@ def main() -> int:
                     reason = f"resolves to {resolved}, outside the base path {base_path} of the site"
                 errors.append((page.file, line, value, reason))
                 continue
+            if kind == "absolute":
+                # Only links within the site are left out of the URL check.
+                absolute.add(value)
             target = resolved[len(base_path):]
 
             checked += 1
