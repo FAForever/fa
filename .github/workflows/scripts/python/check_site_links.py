@@ -53,8 +53,6 @@ SETEXT_HEADING = re.compile(r"^ {0,3}(\S[^\n]*)\n {0,3}(?:=+|-+)[ \t]*$", re.M)
 EXPLICIT_ID = re.compile(r"\{(?:#|:[^}]*?#)([\w-]+)[^}]*\}|\bid\s*=\s*[\"']([^\"'{}]+)[\"']")
 
 
-
-
 def heading_id(text: str) -> str:
     """The id that kramdown's GFM parser, the default on GitHub Pages, gives a heading."""
     text = re.sub(r"!?\[([^\]]*)\]\([^)]*\)", r"\1", text)
@@ -116,6 +114,11 @@ def normalize(url_path: str) -> str:
     return "" if path == "index" else path
 
 
+# Files that Jekyll doesn't publish by default, relative to the site folder, and
+# posts, which are only published when they have front matter.
+JEKYLL_EXCLUDES = ("Gemfile", "gemfiles/", "node_modules/", "vendor/bundle/", "vendor/cache/", "vendor/gems/", "vendor/ruby/", "_posts/")
+
+
 def load_site(folder: str) -> tuple[dict[str, Page], set[str]]:
     """The pages of the site by their normalized URL, and the paths of the static files."""
     pages = {}
@@ -139,7 +142,7 @@ def load_site(folder: str) -> tuple[dict[str, Page], set[str]]:
                         url = re.sub(r"\.md$", ".html", relative)
                     pages[normalize(url)] = Page(file, url, text)
                     continue
-            if not name.startswith((".", "_")):
+            if not name.startswith((".", "_")) and not relative.startswith(JEKYLL_EXCLUDES):
                 files.add(relative)
     return pages, files
 
@@ -161,7 +164,6 @@ def local_links(page: Page):
                 yield line, "/" + liquid.group(1).lstrip("/"), "liquid"
             elif "{" not in value and not SCHEME.match(value):
                 yield line, value, "local"
-
 
 
 def main() -> int:

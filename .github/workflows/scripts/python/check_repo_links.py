@@ -27,8 +27,6 @@ from link_check_utils import annotate, line_of, markdown_files
 from urlchecker.core.fileproc import collect_links_from_file
 
 
-
-
 @functools.cache
 def path_exists(rev: str, path: str) -> bool:
     """Whether a file or folder exists at `path` in the tree of `rev`."""
@@ -44,8 +42,6 @@ def path_exists(rev: str, path: str) -> bool:
         check=True,
     )
     return path in result.stdout.split("\0")
-
-
 
 
 def main() -> int:
