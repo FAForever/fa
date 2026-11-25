@@ -71,7 +71,8 @@ def blank(pattern: re.Pattern, text: str) -> str:
     return pattern.sub(lambda m: "\n" * m.group(0).count("\n"), text)
 
 
-LIST_ITEM = re.compile(r" {0,3}(?:[-*+]|\d+[.)])[ \t]+")
+# Any indentation, so that nested items are found. A marker indented as far as code is code.
+LIST_ITEM = re.compile(r" *(?:[-*+]|\d+[.)])[ \t]+")
 
 
 def blank_indented_code(text: str) -> str:
