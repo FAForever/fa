@@ -25,7 +25,7 @@ import os
 import posixpath
 import re
 import sys
-from urllib.parse import unquote, urlsplit
+from urllib.parse import unquote, urljoin, urlsplit
 
 from urlchecker.core.fileproc import collect_links_from_file
 
@@ -38,7 +38,9 @@ REFERENCE = re.compile(r"^ {0,3}\[[^\]\n]+\]:\s*(<[^>\n]*>|\S+)", re.M)
 ATTRIBUTE = re.compile(r"\b(?:href|src)\s*=\s*[\"']([^\"'\n]*)[\"']")
 RELATIVE_URL = re.compile(r"\{\{\s*[\"']([^\"']*)[\"']\s*\|\s*relative_url\s*\}\}")
 
-FENCE = re.compile(r"^ {0,3}(```|~~~).*?^ {0,3}\1", re.M | re.S)
+# A fence closes with the same character, at least as many times as it opened with.
+FENCE = re.compile(r"^ {0,3}((`|~)\2{2,})[^\n]*\n.*?^ {0,3}\1\2*[ \t]*$", re.M | re.S)
+HEADING_ID = re.compile(r"\s*\{:?\s*#([\w-]+)[^}]*\}\s*$")
 CODE_SPAN = re.compile(r"(`+)[^`].*?\1", re.S)
 COMMENT = re.compile(r"<!--.*?-->", re.S)
 SCHEME = re.compile(r"[a-zA-Z][\w+.-]*:|//")
@@ -60,10 +62,13 @@ def escape_property(value: str) -> str:
 
 def heading_id(text: str) -> str:
     """The id that kramdown's GFM parser, the default on GitHub Pages, gives a heading."""
-    text = re.sub(r"\{:?\s*#[\w-]+\s*\}\s*$", "", text)
     text = re.sub(r"!?\[([^\]]*)\]\([^)]*\)", r"\1", text)
     text = re.sub(r"<[^>]+>", "", text)
-    text = text.replace("`", "").replace("*", "")
+    # Remove emphasis markers outside code spans: `*` anywhere, `_` only at the edges of words.
+    parts = re.split(r"(`+[^`]*`+)", text)
+    for i in range(0, len(parts), 2):
+        parts[i] = re.sub(r"(?<!\w)_+|_+(?!\w)", "", parts[i].replace("*", ""))
+    text = "".join(part.strip("`") if i % 2 else part for i, part in enumerate(parts))
     return re.sub(r"[^\w\- ]", "", text.strip().lower()).replace(" ", "-")
 
 
@@ -88,9 +93,14 @@ class Page:
             text = self.text
             self._ids = set()
             counts = {}
-            headings = [m.group(1) for m in ATX_HEADING.finditer(text)]
-            headings += [m.group(1) for m in SETEXT_HEADING.finditer(text) if not m.group(1).startswith(("|", "-", "#"))]
-            for heading in headings:
+            headings = [(m.start(), m.group(1)) for m in ATX_HEADING.finditer(text)]
+            headings += [(m.start(), m.group(1)) for m in SETEXT_HEADING.finditer(text) if not m.group(1).startswith(("|", "-", "#"))]
+            for _, heading in sorted(headings):
+                explicit = HEADING_ID.search(heading)
+                if explicit:
+                    # A heading with its own id doesn't take an automatic id or suffix.
+                    self._ids.add(explicit.group(1))
+                    continue
                 base = heading_id(heading)
                 count = counts.get(base, 0)
                 counts[base] = count + 1
@@ -204,7 +214,12 @@ def main() -> int:
                     continue
                 target = parts.path[len(base_path):]
             else:
-                target = posixpath.join(posixpath.dirname("/" + page.url.lstrip("/")), parts.path) if parts.path else "/" + page.url.lstrip("/")
+                # Resolve like a browser, against the published URL of the page, base path included.
+                resolved = urlsplit(urljoin(f"{base_path}/{page.url.lstrip('/')}", value)).path
+                if not (resolved == base_path or resolved.startswith(base_path + "/")):
+                    errors.append((page.file, line, value, f"resolves to {resolved}, outside the base path {base_path} of the site"))
+                    continue
+                target = resolved[len(base_path):]
 
             checked += 1
             path = unquote(target)
