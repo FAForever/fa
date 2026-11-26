@@ -354,8 +354,9 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         if unit.GetPods then
             podHealth = {}
             for _, pod in unit:GetPods() do
-                if not pod.Dead and not IsDestroyed(pod) then
-                    podHealth[pod.Pod] = pod:GetHealth()
+                local podName = pod.Pod
+                if podName and not pod.Dead and not IsDestroyed(pod) then
+                    podHealth[podName] = pod:GetHealth()
                     pod:Destroy()
                 end
             end
@@ -403,11 +404,15 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         -- changing owner
         local newUnit = ChangeUnitArmy(unit, toArmy, noRestrictions or false)
         if not newUnit then
+            unit.IsBeingTransferred = nil
             -- the transfer failed (unit cap), so give back the drones that we destroyed
-            if podHealth and not unit.Dead then
+            if podHealth and not unit.Dead and not IsDestroyed(unit) then
                 unit.TransferredPodHealth = podHealth
                 for podName in podHealth do
-                    unit['ProcessEnhancement' .. podName](unit)
+                    local processEnhancement = unit['ProcessEnhancement' .. podName]
+                    if processEnhancement then
+                        processEnhancement(unit)
+                    end
                 end
                 unit.TransferredPodHealth = nil
             end
