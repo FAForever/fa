@@ -662,6 +662,10 @@ Tooltips = {
         title = "<LOC ASSIST_TO_UPGRADE_TITLE>Assist to upgrade extractors",
         description = "<LOC ASSIST_TO_UPGRADE_DESCRIPTION>When enabled, mass extractors automatically queue and pause their upgrade when you issue an assist order.",
     },
+    options_assist_to_storage = {
+        title = "<LOC ASSIST_TO_STORAGE>Redirect mass storage assist orders",
+        description = "<LOC ASSIST_TO_STORAGE_DESCRIPTION>When enabled, assist orders issued on completed mass storages are redirected to an adjacent Tech 1 or Tech 2 mass extractor.",
+    },
     options_alt_to_force_attack_move = {
         title = "<LOC ALT_TO_FORCE_ATTACK_MOVE_TITLE>Hold alt to force attack move",
         description = "<LOC ALT_TO_FORCE_ATTACK_MOVE_DESCRIPTION>When enabled holding alt will always turn orders into an attack move order, except when holding Ctrl"

@@ -486,8 +486,35 @@
     "zthuee",
     "Zulip"
   ],
-  "Lua.diagnostics.disable": [
-    "inject-field",
-    "unsupport-symbol"
-  ]
+  "Lua.diagnostics.disable": ["inject-field", "unsupport-symbol"],
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#399857",
+    "activityBar.activeBorder": "#e7e7e7",
+    "activityBar.background": "#399857",
+    "activityBar.foreground": "#e7e7e7",
+    "activityBar.inactiveForeground": "#e7e7e799",
+    "activityBarBadge.background": "#5d3da2",
+    "activityBarBadge.foreground": "#e7e7e7",
+    "activityBarTop.activeBackground": "#399857",
+    "activityBarTop.activeBorder": "#e7e7e7",
+    "activityBarTop.background": "#399857",
+    "activityBarTop.foreground": "#e7e7e7",
+    "activityBarTop.inactiveForeground": "#e7e7e799",
+    "commandCenter.border": "#e7e7e799",
+    "commandCenter.foreground": "#e7e7e7",
+    "sash.hoverBorder": "#399857",
+    "statusBar.background": "#2b7342",
+    "statusBar.debuggingBackground": "#2b7342",
+    "statusBar.debuggingForeground": "#e7e7e7",
+    "statusBar.foreground": "#e7e7e7",
+    "statusBar.inactiveBackground": "#2b7342",
+    "statusBarItem.hoverBackground": "#399857",
+    "statusBarItem.remoteBackground": "#35235d",
+    "statusBarItem.remoteForeground": "#e7e7e7",
+    "titleBar.activeBackground": "#2b7342",
+    "titleBar.activeForeground": "#e7e7e7",
+    "titleBar.inactiveBackground": "#2b734299",
+    "titleBar.inactiveForeground": "#e7e7e799"
+  },
+  "peacock.color": "#2b7342"
 }

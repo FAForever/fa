@@ -19,6 +19,7 @@ local SimTriggers = import("/lua/scenariotriggers.lua")
 local SUtils = import("/lua/ai/sorianutilities.lua")
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 local UnitQueueDataToCommand = import("/lua/sim/commands/shared.lua").UnitQueueDataToCommand
+local GameIsRestricted = import("/lua/game.lua").IsRestricted
 local FilterOutInvalidTargets = import("/lua/shared/commands/distribute-assisters.lua").FilterOutInvalidTargets
 
 -- upvalue table operations for performance
@@ -43,12 +44,14 @@ local IssueClearCommands = IssueClearCommands
 local IssueBuildMobile = IssueBuildMobile
 local IssueAggressiveMove = IssueAggressiveMove
 local IssueGuard = IssueGuard
+local IssueUpgrade = IssueUpgrade
 local IssueFerry = IssueFerry
 
 local GetCurrentCommandSourceArmy = SimUtils.GetCurrentCommandSourceArmy
 
 -- upvalue categories for performance
 local CategoriesTransportation = categories.TRANSPORTATION
+local CategoriesMassExtraction = categories.MASSEXTRACTION
 
 --- List of callbacks that is being populated throughout this file
 ---@type table<string, fun(data: table, units?: Unit[])>
@@ -107,6 +110,115 @@ end
 
 --- Empty callback for ui mods to communicate
 Callbacks.EmptyCallback = function(data, units)
+end
+
+-- Keep this behavior synchronized with `OnGuardUpgrade` and `UpgradeUnit` in
+-- `/lua/ui/game/commandmode.lua`.
+--
+-- The logic is intentionally duplicated because direct assist orders are handled
+-- in the user layer, while mass-storage redirects resolve their adjacent extractor
+-- in the simulation layer. Changes to upgrade eligibility, timing, or pause behavior
+-- must be applied to both implementations.
+---@param extractor Unit
+---@param preference string
+local function UpgradeAndPauseExtractor(extractor, preference)
+    local shouldUpgrade =
+        preference == 'Tech1Tech2Extractors'
+        or (preference == 'Tech1Extractors' and EntityCategoryContains(categories.TECH1, extractor))
+
+    if not shouldUpgrade
+        or not OkayToMessWithArmy(extractor.Army)
+        or extractor:IsUnitState('Upgrading')
+        or extractor:GetFocusUnit()
+    then
+        return
+    end
+
+    local upgradeTo = extractor.Blueprint.General.UpgradesTo
+    if not upgradeTo or upgradeTo == '' or GameIsRestricted(upgradeTo, extractor.Army) then
+        return
+    end
+
+    if extractor:IsPaused() then
+        extractor:SetPaused(false)
+    end
+
+    IssueUpgrade({ extractor }, upgradeTo)
+    WaitTicks(5)
+
+    if not extractor.Dead then
+        extractor:SetPaused(true)
+    end
+end
+
+--- Redirects a guard order on a completed mass storage to its adjacent extractor.
+---@param data { CommandId: number, Target: EntityId, UpgradePreference: string, RingStorages: boolean }
+Callbacks.ValidateMassStorageAssist = function(data, units)
+    local target = data and GetEntityById(data.Target)
+    if IsEntity(target)
+        and not target.Dead
+        and EntityCategoryContains(categories.MASSSTORAGE, target)
+        and target:GetFractionComplete() == 1
+    then
+        -- print('found assist order on complete mass storage')
+
+        local extractor
+        for _, adjacentUnit in target.AdjacentUnits or {} do
+            if IsEntity(adjacentUnit)
+                and not adjacentUnit.Dead
+                and EntityCategoryContains(CategoriesMassExtraction, adjacentUnit)
+                and (not extractor or adjacentUnit.EntityId < extractor.EntityId)
+            then
+                extractor = adjacentUnit
+            end
+        end
+
+        if extractor then
+            -- print('found adjacent t1/t2 mass extractor: ' .. tostring(extractor.EntityId))
+
+            local assistingUnits = SecureUnits(units)
+            if type(data.CommandId) ~= 'number' then
+                return
+            end
+
+            for _, unit in assistingUnits do
+                local queue = unit:GetCommandQueue()
+                local unitQueueCount = TableGetn(queue)
+                local lastCommand = queue[unitQueueCount]
+
+                -- Keep the original order in place until every unit has been validated. The UI
+                -- later deletes this exact shared command by ID, so no queue reconstruction is
+                -- needed and all preceding group orders retain their original engine identity.
+                if not lastCommand
+                    or (lastCommand.commandType ~= 9 and lastCommand.commandType ~= 15)
+                    or (lastCommand.target ~= target and lastCommand.targetId ~= target.EntityId)
+                then
+                    return
+                end
+            end
+
+            if TableEmpty(assistingUnits) then
+                return
+            end
+
+            IssueGuard(assistingUnits, extractor)
+
+            if data.RingStorages then
+                local engineers = EntityCategoryFilterDown(categories.ENGINEER, assistingUnits)
+                if not TableEmpty(engineers) then
+                    import("/lua/sim/commands/ringing/ring-with-storages.lua").RingExtractor(extractor, engineers)
+                end
+            end
+
+            Sync.MassStorageAssistRedirects = Sync.MassStorageAssistRedirects or {}
+            TableInsert(Sync.MassStorageAssistRedirects, {
+                Army = GetCurrentCommandSourceArmy(),
+                CommandId = data.CommandId,
+            })
+
+            ForkThread(UpgradeAndPauseExtractor, extractor, data.UpgradePreference)
+        end
+    end
 end
 
 --- Callback takes a boolean and toggles a stat on given units between 0 and 1
