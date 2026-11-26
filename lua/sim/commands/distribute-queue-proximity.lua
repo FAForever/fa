@@ -34,6 +34,174 @@ local PopulateLocation = import("/lua/sim/commands/shared.lua").PopulateLocation
 local SortUnitsByDistanceToPoint = import("/lua/sim/commands/shared.lua").SortUnitsByDistanceToPoint
 local LoadIntoTransports = import("/lua/sim/commands/load-in-transport.lua").LoadIntoTransports
 
+local function LogFerryQueue(units, target, orders)
+    local hasFerryOrder = false
+
+    for _, order in orders do
+        local commandInfo = UnitQueueDataToCommand[order.commandType]
+        local commandType = commandInfo and commandInfo.Type
+        if commandType == 'Ferry' or commandType == 'TransportLoadUnits' or commandType == 'TransportReverseLoadUnits' then
+            hasFerryOrder = true
+            break
+        end
+    end
+
+    if not hasFerryOrder then
+        return
+    end
+
+    LOG(string.format(
+        '[DistributeOrdersProximity][Ferry] target=%s selectedUnits=%s queuedOrders=%s',
+        tostring(target:GetEntityId()),
+        tostring(TableGetn(units)),
+        tostring(TableGetn(orders))
+    ))
+
+    for index, order in orders do
+        local commandInfo = UnitQueueDataToCommand[order.commandType]
+        LOG(string.format(
+            '[DistributeOrdersProximity][Ferry] order=%s rawType=%s type=%s position=(%s, %s, %s) targetId=%s target=%s id=%s',
+            tostring(index),
+            tostring(order.commandType),
+            tostring(commandInfo and commandInfo.Type),
+            tostring(order.x),
+            tostring(order.y),
+            tostring(order.z),
+            tostring(order.targetId),
+            tostring(order.target),
+            tostring(order.id)
+        ))
+    end
+
+    for index, unit in units do
+        local ferryBeacon = unit:GetTransportFerryBeacon()
+        LOG(string.format(
+            '[DistributeOrdersProximity][Ferry] unit=%s entityId=%s blueprint=%s beacon=%s busy=%s moving=%s transportLoading=%s attached=%s',
+            tostring(index),
+            tostring(unit:GetEntityId()),
+            tostring(unit.BlueprintId),
+            tostring(ferryBeacon),
+            tostring(unit:IsUnitState('Busy')),
+            tostring(unit:IsUnitState('Moving')),
+            tostring(unit:IsUnitState('TransportLoading')),
+            tostring(unit:IsUnitState('Attached'))
+        ))
+    end
+end
+
+local function LogFerryQueueSnapshot(label, units)
+    for unitIndex, unit in units do
+        if IsDestroyed(unit) or unit.Dead then
+            LOG(string.format(
+                '[DistributeOrdersProximity][FerryTrace] phase=%s unit=%s destroyed=true',
+                tostring(label),
+                tostring(unitIndex)
+            ))
+            continue
+        end
+
+        local queue = unit:GetCommandQueue()
+        LOG(string.format(
+            '[DistributeOrdersProximity][FerryTrace] phase=%s unit=%s entityId=%s queuedOrders=%s moving=%s transportLoading=%s attached=%s',
+            tostring(label),
+            tostring(unitIndex),
+            tostring(unit:GetEntityId()),
+            tostring(TableGetn(queue)),
+            tostring(unit:IsUnitState('Moving')),
+            tostring(unit:IsUnitState('TransportLoading')),
+            tostring(unit:IsUnitState('Attached'))
+        ))
+
+        for orderIndex, order in queue do
+            local commandInfo = UnitQueueDataToCommand[order.commandType]
+            LOG(string.format(
+                '[DistributeOrdersProximity][FerryTrace] phase=%s unit=%s order=%s rawType=%s type=%s position=(%s, %s, %s) targetId=%s target=%s',
+                tostring(label),
+                tostring(unitIndex),
+                tostring(orderIndex),
+                tostring(order.commandType),
+                tostring(commandInfo and commandInfo.Type),
+                tostring(order.x),
+                tostring(order.y),
+                tostring(order.z),
+                tostring(order.targetId),
+                tostring(order.target)
+            ))
+        end
+    end
+end
+
+local function TraceFerryQueues(units)
+    LogFerryQueueSnapshot('immediate', units)
+
+    ForkThread(function()
+        WaitTicks(1)
+        LogFerryQueueSnapshot('tick-1', units)
+
+        WaitTicks(9)
+        LogFerryQueueSnapshot('tick-10', units)
+    end)
+end
+
+local function LogTransportTarget(orderIndex, order)
+    local target = order.target
+    if not target then
+        LOG(string.format(
+            '[DistributeOrdersProximity][FerryTarget] order=%s targetId=%s target=nil',
+            tostring(orderIndex),
+            tostring(order.targetId)
+        ))
+        return
+    end
+
+    local isUnit = IsUnit(target)
+    if not isUnit then
+        LOG(string.format(
+            '[DistributeOrdersProximity][FerryTarget] order=%s targetId=%s target=%s isUnit=false',
+            tostring(orderIndex),
+            tostring(order.targetId),
+            tostring(target)
+        ))
+        return
+    end
+
+    local blueprint = target.Blueprint
+    local targetQueue = target:GetCommandQueue()
+    local x, y, z = target:GetPositionXYZ()
+    LOG(string.format(
+        '[DistributeOrdersProximity][FerryTarget] order=%s targetId=%s entityId=%s blueprint=%s description=%s position=(%s, %s, %s) transport=%s air=%s mobile=%s ferryBeacon=%s queuedOrders=%s',
+        tostring(orderIndex),
+        tostring(order.targetId),
+        tostring(target:GetEntityId()),
+        tostring(blueprint and blueprint.BlueprintId),
+        tostring(blueprint and blueprint.Description),
+        tostring(x),
+        tostring(y),
+        tostring(z),
+        tostring(EntityCategoryContains(categories.TRANSPORTATION, target)),
+        tostring(EntityCategoryContains(categories.AIR, target)),
+        tostring(EntityCategoryContains(categories.MOBILE, target)),
+        tostring(target:GetTransportFerryBeacon()),
+        tostring(TableGetn(targetQueue))
+    ))
+
+    for targetOrderIndex, targetOrder in targetQueue do
+        local commandInfo = UnitQueueDataToCommand[targetOrder.commandType]
+        LOG(string.format(
+            '[DistributeOrdersProximity][FerryTarget] order=%s targetOrder=%s rawType=%s type=%s position=(%s, %s, %s) targetId=%s target=%s',
+            tostring(orderIndex),
+            tostring(targetOrderIndex),
+            tostring(targetOrder.commandType),
+            tostring(commandInfo and commandInfo.Type),
+            tostring(targetOrder.x),
+            tostring(targetOrder.y),
+            tostring(targetOrder.z),
+            tostring(targetOrder.targetId),
+            tostring(targetOrder.target)
+        ))
+    end
+end
+
 
 --- Processes the orders and re-distributes them over the units. Assumes that all units in the
 --- selection to have the same command queue. If that is not the case then orders are lost
@@ -75,6 +243,8 @@ DistributeOrdersProximity = function(units, target, clearCommands, doPrint)
 
     ---@type UnitCommand[]
     local orders = target:GetCommandQueue()
+
+    LogFerryQueue(units, target, orders)
 
     for k, order in orders do
 
@@ -175,24 +345,78 @@ DistributeOrdersProximity = function(units, target, clearCommands, doPrint)
         end
     end
 
+    local ferryTraceUnits = nil
     if indexOfTransportOrder then
         -- filter out all transports
         local unitsWithNoTransports = EntityCategoryFilterDown(categories.ALLUNITS -
             (categories.TRANSPORTATION + categories.AIR), units)
+        ferryTraceUnits = unitsWithNoTransports
 
         -- retrieve all transports we use in orders
         local transports = {}
+        local seenTransports = {}
+        local transportLoadTargets = {}
+        local preserveTransportCommands = false
         for k, order in groups[indexOfTransportOrder] do
-            if order.target and EntityCategoryContains(categories.TRANSPORTATION, order.target) then
-                TableInsert(transports, order.target)
+            LogTransportTarget(k, order)
+
+            local target = order.target
+            if target and EntityCategoryContains(categories.TRANSPORTATION, target) then
+                local transportId = target:GetEntityId()
+                if not seenTransports[transportId] then
+                    seenTransports[transportId] = true
+                    TableInsert(transports, target)
+                end
+                transportLoadTargets[transportId] = target
+
+                -- A ferry load command targets the transport itself while it is
+                -- close to the cargo. Do not clear its route while rebuilding
+                -- the cargo queues.
+                preserveTransportCommands = true
+                LOG(string.format(
+                    '[DistributeOrdersProximity][Ferry] preserving direct transport=%s command queue while reconstructing cargo load orders',
+                    tostring(transportId)
+                ))
+            elseif target and EntityCategoryContains(categories.FERRYBEACON, target) then
+                -- When the ferry is away from the pickup point, the cargo load
+                -- command targets the ferry beacon instead of the transport.
+                -- Resolve the beacon back to its assigned transport.
+                local armyTransports = brain:GetListOfUnits(categories.TRANSPORTATION, false)
+                local resolvedTransport = false
+                for _, transport in armyTransports do
+                    if transport:GetTransportFerryBeacon() == target then
+                        resolvedTransport = true
+                        local transportId = transport:GetEntityId()
+                        if not seenTransports[transportId] then
+                            seenTransports[transportId] = true
+                            TableInsert(transports, transport)
+                        end
+                        transportLoadTargets[transportId] = target
+
+                        preserveTransportCommands = true
+                        LOG(string.format(
+                            '[DistributeOrdersProximity][Ferry] resolved beacon=%s to transport=%s and preserved its command queue',
+                            tostring(target:GetEntityId()),
+                            tostring(transportId)
+                        ))
+                    end
+                end
+
+                if not resolvedTransport then
+                    LOG(string.format(
+                        '[DistributeOrdersProximity][Ferry] unable to resolve beacon=%s to an army transport',
+                        tostring(target:GetEntityId())
+                    ))
+                end
             end
         end
 
         -- try and issue the transport orders. Only apply distribution to units that are transported
         if (TableGetn(transports) > 0) and (TableGetn(unitsWithNoTransports) > 0) then
             local transportedUnits, transportsUsed, remainingUnits, remainingTransports = LoadIntoTransports(unitsWithNoTransports
-                , transports, true, true)
+                , transports, true, true, preserveTransportCommands, transportLoadTargets)
             units = transportedUnits
+            LogFerryQueueSnapshot('after-load-before-distribution', unitsWithNoTransports)
         end
 
         -- remove all orders up to and including the transport order
@@ -458,6 +682,10 @@ DistributeOrdersProximity = function(units, target, clearCommands, doPrint)
                 end
             end
         end
+    end
+
+    if ferryTraceUnits then
+        TraceFerryQueues(ferryTraceUnits)
     end
 
     ---------------------------------------------------------------------------

@@ -82,11 +82,13 @@ end
 ---@param transports Unit
 ---@param clearCommands boolean     # if true, transport orders are applied immediately
 ---@param doPrint boolean           # if true, prints the number of units that are being transported
+---@param preserveTransportCommands boolean? # if true, does not clear the transports' command queues
+---@param transportLoadTargets table<EntityId, Unit>? # optional command target for each transport
 ---@return Unit[]   # Units that are transported
 ---@return Unit[]   # Transports that are used
 ---@return Unit[]   # Remaining units that are not transported
 ---@return Unit[]   # Remaining transports that are not required
-LoadIntoTransports = function(units, transports, clearCommands, doPrint)
+LoadIntoTransports = function(units, transports, clearCommands, doPrint, preserveTransportCommands, transportLoadTargets)
 
     ---------------------------------------------------------------------------
     -- defensive programming
@@ -106,7 +108,9 @@ LoadIntoTransports = function(units, transports, clearCommands, doPrint)
 
     if clearCommands then
         IssueClearCommands(units)
-        IssueClearCommands(transports)
+        if not preserveTransportCommands then
+            IssueClearCommands(transports)
+        end
     end
 
     ---------------------------------------------------------------------------
@@ -161,6 +165,10 @@ LoadIntoTransports = function(units, transports, clearCommands, doPrint)
     for t = 1, transportCount do
         -- find units to attach
         local transport = transports[t]
+        local transportLoadTarget = transport
+        if transportLoadTargets then
+            transportLoadTarget = transportLoadTargets[transport:GetEntityId()] or transport
+        end
         local transportSmallClamps, transportMediumClamps, transportLargeClamps = GetAvailableTransportSlots(transport)
 
         do -- process tech 3 units
@@ -342,7 +350,7 @@ LoadIntoTransports = function(units, transports, clearCommands, doPrint)
                     table.insert(transportedUnits, unitsToLoadTech3[k])
                 end
 
-                IssueTransportLoad(unitsToLoadTech3, transport)
+                IssueTransportLoad(unitsToLoadTech3, transportLoadTarget)
             end
 
             -- load tech 2, gather if we're also loading tech 3
@@ -364,7 +372,7 @@ LoadIntoTransports = function(units, transports, clearCommands, doPrint)
                     table.insert(transportedUnits, unitsToLoadTech2[k])
                 end
 
-                IssueTransportLoad(unitsToLoadTech2, transport)
+                IssueTransportLoad(unitsToLoadTech2, transportLoadTarget)
             end
 
             -- load tech 1, gather if we're also loading tech 2 or tech 3
@@ -386,7 +394,7 @@ LoadIntoTransports = function(units, transports, clearCommands, doPrint)
                     table.insert(transportedUnits, unitsToLoadTech1[k])
                 end
 
-                IssueTransportLoad(unitsToLoadTech1, transport)
+                IssueTransportLoad(unitsToLoadTech1, transportLoadTarget)
             end
 
             -- keep track of the transports that we're using
