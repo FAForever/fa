@@ -652,9 +652,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         local reclaimTarget = self.EntityBeingReclaimed
         ---@diagnostic disable-next-line: param-type-mismatch
-        if reclaimTarget.IsProp and not IsDestroyed(reclaimTarget)
-            and self.Blueprint.CategoriesHash.RECLAIM -- reclaim-incapable units reclaiming using mobile build orders
-        then
+        if reclaimTarget.IsProp and not IsDestroyed(reclaimTarget) then
             self:StopReclaimEffects(self.EntityBeingReclaimed)
             self:StopUnitAmbientSound('ReclaimLoop')
             self:PlayUnitSound('StopReclaim')
@@ -676,9 +674,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         local reclaimTarget = self.EntityBeingReclaimed
         ---@diagnostic disable-next-line: param-type-mismatch
-        if reclaimTarget.IsProp and not IsDestroyed(reclaimTarget)
-            and self.Blueprint.CategoriesHash.RECLAIM -- reclaim-incapable units reclaiming using mobile build orders
-        then
+        if reclaimTarget.IsProp and not IsDestroyed(reclaimTarget) then
             self:StartReclaimEffects(self.EntityBeingReclaimed)
             self:PlayUnitSound('StartReclaim')
             self:PlayUnitAmbientSound('ReclaimLoop')
@@ -950,7 +946,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             self:PlayUnitAmbientSound('ReclaimLoop')
         end
 
-        self.EntityBeingReclaimed = target
+        -- leave it unset so pausing doesn't start reclaim effects either
+        if canReclaim then
+            self.EntityBeingReclaimed = target
+        end
         self:SetUnitState('Reclaiming', true)
         self:SetFocusEntity(target)
         self:CheckAssistersFocus()
