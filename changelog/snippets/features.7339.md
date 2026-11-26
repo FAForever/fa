@@ -1,0 +1,1 @@
+- Add an alternative, distribute-orders command that assigns units to orders by their distance from each order. (#7339).
