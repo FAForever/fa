@@ -9,6 +9,7 @@ local AirUnitOnStopTransportLoading = AirUnit.OnStopTransportLoading
 local AirUnitKill = AirUnit.Kill
 local AirUnitOnImpact = AirUnit.OnImpact
 local AirUnitOnStorageChange = AirUnit.OnStorageChange
+local AirUnitOnReclaimed = AirUnit.OnReclaimed
 
 local BaseTransport = import("/lua/sim/units/components/transportunitcomponent.lua").BaseTransport
 local BaseTransportOnTransportAttach = BaseTransport.OnTransportAttach
@@ -17,6 +18,7 @@ local BaseTransportOnAttachedKilled = BaseTransport.OnAttachedKilled
 local BaseTransportOnStartTransportLoading = BaseTransport.OnStartTransportLoading
 local BaseTransportOnStopTransportLoading = BaseTransport.OnStopTransportLoading
 local BaseTransportDestroyedOnTransport = BaseTransport.DestroyedOnTransport
+local BaseTransportReclaimCargo = BaseTransport.ReclaimCargo
 
 local UnloadCommands = {
     [24] = true, -- TransportUnloadUnits
@@ -150,6 +152,13 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
         damageType = damageType or "Normal"
         excessDamageRatio = excessDamageRatio or 0
         AirUnitKill(self, instigator, damageType, excessDamageRatio)
+    end,
+
+    ---@param self AirTransport
+    ---@param reclaimer Unit
+    OnReclaimed = function(self, reclaimer)
+        BaseTransportReclaimCargo(self)
+        AirUnitOnReclaimed(self, reclaimer)
     end,
 
     -- Override OnImpact to dispense with our cargo
