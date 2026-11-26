@@ -1086,10 +1086,15 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                         break
                     end
 
+                    -- A unit given to another army is replaced by a new unit that receives its silo ammo,
+                    -- and the old unit is destroyed. Its weapon thread can still run later in that tick,
+                    -- so a destroyed unit must not fire a counted projectile: the ammo it would spend
+                    -- already belongs to the new unit.
                     local proj
-                    if not countedProjectile or
-                        (bp.NukeWeapon and self.unit:GetNukeSiloAmmoCount() > 0) or
-                        (not bp.NukeWeapon and self.unit:GetTacticalSiloAmmoCount() > 0)
+                    if not countedProjectile or (not unit:BeenDestroyed() and (
+                        (bp.NukeWeapon and unit:GetNukeSiloAmmoCount() > 0) or
+                        (not bp.NukeWeapon and unit:GetTacticalSiloAmmoCount() > 0)
+                    ))
                     then
                         proj = self:CreateProjectileAtMuzzle(muzzle)
                     end
