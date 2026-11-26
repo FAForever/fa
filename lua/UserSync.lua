@@ -3,6 +3,7 @@
 
 -- The global sync table is copied from the sim layer every time the main and sim threads are
 -- synchronized on the sim beat (which is like a tick but happens even when the game is paused)
+---@type SyncTable
 Sync = {}
 
 -- The PreviousSync table holds just what you'd expect it to, the sync table from the previous
@@ -407,7 +408,6 @@ function OnSync()
     end
 
     if Sync.Cheaters then
-        --Ted, this is where you would hook in better cheater reporting.
         local names = ''
         local isare = LOC('<LOC cheating_fragment_0000>is')
         local srcs = SessionGetCommandSourceNames()

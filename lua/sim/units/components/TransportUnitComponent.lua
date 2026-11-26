@@ -112,7 +112,11 @@ BaseTransport = ClassSimple {
 
             -- Kill the contents of a transport in a transport, however that happened
             if EntityCategoryContains(categories.TRANSPORTATION, unit) then
-                cargoMass = cargoMass + unit:KillCargo(instigator, cargoDamageType, true)
+                -- Some mods also use TRANSPORTATION for aircraft without cargo handling.
+                local killCargo = unit.KillCargo
+                if killCargo ~= nil then
+                    cargoMass = cargoMass + killCargo(unit, instigator, cargoDamageType, true)
+                end
             end
 
             -- cache the cargo so we can impact it later (if needed)

@@ -135,6 +135,7 @@ UnitBlueprint{
         SelectionCenterOffsetZ = 12,
         SelectionSizeX = 2,
         SelectionSizeZ = 4,
+        UISelection = Sound { Bank = 'Interface', Cue = 'Cybran_Select_Factory', LodCutoff = 'UnitMove_LodCutoff' },
     },
     Footprint = {
         SizeX = 5,

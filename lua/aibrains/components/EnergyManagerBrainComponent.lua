@@ -22,7 +22,7 @@
 
 ---@class EnergyManagerBrainComponent
 ---@field EnergyDepleted boolean
----@field EnergyDependingUnits table<EntityId, Unit>
+---@field EnergyDependingUnits table<EntityId, Unit|Shield>
 ---@field EnergyExcessConsumed number
 ---@field EnergyExcessRequired number
 ---@field EnergyExcessConverted number
@@ -52,7 +52,7 @@ EnergyManagerBrainComponent = ClassSimple {
 
     --- Adds an entity to the list of entities that receive callbacks when the energy storage is depleted or viable, expects the functions OnEnergyDepleted and OnEnergyViable on the unit
     ---@param self AIBrain
-    ---@param entity Unit
+    ---@param entity Unit | Shield
     AddEnergyDependingEntity = function(self, entity)
         self.EnergyDependingUnits[entity.EntityId] = entity
 
@@ -124,8 +124,7 @@ EnergyManagerBrainComponent = ClassSimple {
         -- localize scope for better performance
         local pcall = pcall
         local TableSize = table.getsize
-        local CoroutineYield = coroutine.yield
-
+        local WaitTicks = WaitTicks
         local ok, msg
 
 
@@ -254,7 +253,7 @@ EnergyManagerBrainComponent = ClassSimple {
                     syncTable, lastSyncTable = lastSyncTable, syncTable
                 end
             end
-            CoroutineYield(1)
+            WaitTicks(1)
         end
     end,
 

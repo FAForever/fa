@@ -1,7 +1,7 @@
 import '/lua/system/utils.lua'
 
 
-diff_fields = {'total', 'here', 'in_c_children', 'in_lua_children', 'yielded', 'ncalls'}
+local diff_fields = {'total', 'here', 'in_c_children', 'in_lua_children', 'yielded', 'ncalls'}
 
 
 start_profiledata = false
@@ -85,15 +85,15 @@ function report(check1, check2, key)
     local dt = diff_checkpoints(check1,check2)
     table.sort(dt, sort_by(key))
 
-    sum_key = 0
-    sum_here = 0
+    local sum_key = 0
+    local sum_here = 0
     for i,t in ipairs(dt) do
         sum_key = sum_key + t[key]
         sum_here = sum_here + t.here
     end
 
     -- Print only functions responsible for the first 99% of time spent. This cuts off a lot of noise.
-    sum_report = 0
+    local sum_report = 0
     for i,t in ipairs(dt) do
         sum_report = sum_report + t[key]
         if sum_report >= sum_key*0.01 then

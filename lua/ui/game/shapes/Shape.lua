@@ -63,23 +63,23 @@ Shape = ClassSimple {
     end,
 
     --- Hides the shape, it will no longer be rendered until unhidden.
-    ---@param self UICircleShape
+    ---@param self UIShape
     Hide = function(self)
         self.Hidden = true
     end,
 
     --- Shows the shape. It will be rendered again.
-    ---@param self UICircleShape
+    ---@param self UIShape
     Show = function(self)
         self.Hidden = false
     end,
 
-    ---@param self UICircleShape
+    ---@param self UIShape
     SetHidden = function(self, hide)
         self.Hidden = hide
     end,
 
-    ---@param self UICircleShape
+    ---@param self UIShape
     IsHidden = function(self)
         return self.Hidden
     end,

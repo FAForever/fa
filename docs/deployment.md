@@ -9,11 +9,11 @@ nav_order: 3
 
 In this repository we can deploy to three different environments:
 
-- `deploy/faf` - the `FAF` game type. This is the default release branch and is used by matchmaker
-- `deploy/fafbeta` - the `FAF Beta Balance` game type. This branch only contains balance changes and bug fixes.
-- `deploy/fafdevelop` - the `FAF Develop` game type. This branch contains all current changes that are in development.
+- `deploy/faf` - the `FAF` game type. This is the default release branch and is used by the matchmaker
+- `deploy/fafbeta` - the `FAF Beta` game type. This branch is for experimental changes that should not be part of `FAF Develop` for whatever reason.
+- `deploy/fafdevelop` - the `FAF Develop` game type. This branch contains all current changes that are meant to be included in the next game patch.
 
-All three branches originate from the `develop` branch, which is the default branch of the remote on Github. Pushing commits towards any of the deployment branches is sufficient to trigger a deployment to the given game type.
+All three branches originate from the `develop` branch, which is the default branch of the remote on GitHub.
 
 ## Deployment procedures for the FAF game type
 
@@ -119,6 +119,15 @@ The deployment workflows for FAF Beta Balance and FAF Develop are triggered peri
 The [FAForever API](https://github.com/FAForever/faf-java-api/blob/develop/src/main/java/com/faforever/api/deployment/GitHubDeploymentService.java) registers the push to a deployment branch via webhook. The server creates and updates a [deployment status](https://github.com/FAForever/fa/deployments). During this process, the server retrieves and processes the relevant game files. If successful, the new game version becomes available within approximately 5 to 10 minutes.
 
 These workflows exist to apply some post processing of blueprints and various Lua modules. Not all of the post processing is implemented yet.
+
+## Related deployments
+
+A push to `deploy/faf` will also automatically trigger deployments of the unit databases to keep their info up-to-date:
+
+- [Unit DB](https://github.com/FAForever/fa/blob/develop/.github/workflows/unitdb-update.yaml)
+- [Spooky DB](https://github.com/FAForever/fa/blob/develop/.github/workflows/spookydb-update.yaml)
+- [ETFreeman DB](https://github.com/FAForever/fa/blob/develop/.github/workflows/etfreeman-db-update.yaml)
+
 
 # FAQ
 

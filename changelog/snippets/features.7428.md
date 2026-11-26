@@ -1,0 +1,1 @@
+- Improve wreckage detection for the lobby map preview. This change was released in the last patch (3841), but was missing from its changelog (#7269, #7428).

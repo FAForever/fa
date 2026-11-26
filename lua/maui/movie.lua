@@ -9,6 +9,7 @@
 local Control = import("/lua/maui/control.lua").Control
 
 ---@class Movie : moho.movie_methods, Control, InternalObject
+---@overload fun(parent: Control, filename?: FileName, sound?: SoundHandle, voice?: SoundHandle): Movie
 Movie = ClassUI(moho.movie_methods, Control) {
 
     __init = function(self, parent, filename, sound, voice)

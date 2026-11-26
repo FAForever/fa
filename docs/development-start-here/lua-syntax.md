@@ -27,7 +27,7 @@ One useful exception is the following statement.
 
 And another useful exception is the following syntax:
 
-- The `{h&a&}` is new syntax to create a table with a pre-allocated hash and array sections. The value `h` pre-allocates `math.pow(2, h)` entries in the hash section of a table. The value `a` pre-allocates `a` entries in the array section of a table.
+- The `{&h&a}` is new syntax to create a table with a pre-allocated hash and array sections. The value `h` pre-allocates the smallest power of two greater than `h` entries in the hash section of a table (`&2` and `&3` both allocate 4). The value `a` pre-allocates `a` entries in the array section of a table.
 
 It is for example applied in [#4539](https://github.com/FAForever/fa/issues/4539) to significantly improve the performance of the game.
 

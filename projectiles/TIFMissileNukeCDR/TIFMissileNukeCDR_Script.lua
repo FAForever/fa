@@ -126,7 +126,7 @@ TIFMissileNukeCDR = ClassProjectile(TIFTacticalNuke) {
 
         if self.Armed then
             -- create vision
-            local marker = VisionMarkerOpti({ Owner = self })
+            local marker = VisionMarkerOpti()
             marker:UpdatePosition(position[1], position[3])
             marker:UpdateDuration(9)
             marker:UpdateIntel(self.Army, 12, 'Vision', true)

@@ -238,6 +238,7 @@ UnitBlueprint{
         SelectionCenterOffsetZ = 2.5,
         SelectionSizeX = 2,
         SelectionSizeZ = 2,
+        UISelection = Sound { Bank = 'Interface', Cue = 'UEF_Select_Factory', LodCutoff = 'UnitMove_LodCutoff' },
     },
     General = {
         BuildBones = {

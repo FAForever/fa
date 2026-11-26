@@ -27,7 +27,7 @@ AIFQuantumWarhead02 = ClassProjectile(NullShell) {
     end,
 
     ---@param self CIFEMPFluxWarhead02
-    ---@param army number
+    ---@param army Army
     ShakeAndBurnMe = function(self, army)
         self:ShakeCamera(75, 3, 0, 10)
         WaitTicks(6)
@@ -40,7 +40,7 @@ AIFQuantumWarhead02 = ClassProjectile(NullShell) {
     end,
 
     ---@param self CIFEMPFluxWarhead02
-    ---@param army number
+    ---@param army Army
     InnerCloudFlares = function(self, army)
         local numFlares = 50
         local angle = (2*math.pi) / numFlares

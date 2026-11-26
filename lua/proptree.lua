@@ -19,7 +19,7 @@ local MaximumBurningTrees = 150
 local Random = Random
 local ForkThread = ForkThread
 local DamageArea = DamageArea
-local WaitTicks = coroutine.yield
+local WaitTicks = WaitTicks
 local CreateEmitterAtEntity = CreateEmitterAtEntity
 local CreateLightParticleIntel = CreateLightParticleIntel
 

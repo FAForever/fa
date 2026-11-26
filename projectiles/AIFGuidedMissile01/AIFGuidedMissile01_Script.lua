@@ -40,6 +40,7 @@ AIFGuidedMissile = ClassProjectile(AGuidedMissileProjectile) {
     SplitThread = function(self)
         -- local scope for performance
         local army = self.Army
+        local damageRadius = self.DamageData.DamageRadius
 
         -- create a split effect
         for k, v in AMercyGuidedMissileSplit do
@@ -55,11 +56,11 @@ AIFGuidedMissile = ClassProjectile(AGuidedMissileProjectile) {
         local numProjectiles = 8
         local angle = (2 * math.pi) / numProjectiles
         local ChildProjectileBP = '/projectiles/AIFGuidedMissile02/AIFGuidedMissile02_proj.bp'
-        local spreadMul = 0.4 -- Adjusts the width of the dispersal
+        local spreadMul = 0.25 -- Adjusts the width of the dispersal
         local xVec, yVec, zVec = 0, vy, 0
         local target = self:GetCurrentTargetPosition()
         local tx, ty, tz = target[1], target[2], target[3]
-        local radius = 5
+        local radius = damageRadius * 0.7
 
         -- Launch projectiles at semi-random angles away from split location
         for i = 0, (numProjectiles - 1) do
@@ -90,21 +91,46 @@ AIFGuidedMissile = ClassProjectile(AGuidedMissileProjectile) {
     ---@param TargetType any
     ---@param TargetEntity any
     OnImpact = function(self, TargetType, TargetEntity)
-        AGuidedMissileProjectile.OnImpact(self, TargetType, TargetEntity)
-
         -- local scope for performance
         local army = self.Army
 
         -- let bloom thrive a bit
         CreateLightParticleIntel(self, -1, army, 9, 8, 'glow_02', 'ramp_flare_02')
 
-        -- create the impact effects
-        CreateEmitterAtEntity(self, army, '/effects/emitters/_Mercy_Circle_1.bp')
-        CreateEmitterAtEntity(self, army, '/effects/emitters/_Mercy_distort.bp')
-        CreateEmitterAtEntity(self, army, '/effects/emitters/_Mercy_Circle_2.bp')
-        CreateEmitterAtEntity(self, army, '/effects/emitters/_Mercy_Fog.bp'):SetEmitterParam('LIFETIME', 100)
-        CreateEmitterAtEntity(self, army, '/effects/emitters/_Mercy_sparkle_2.bp'):SetEmitterParam('LIFETIME', 100)
-        self:Destroy()
+        local damageData = self.DamageData
+        if damageData.DoTTime then
+            -- prepare scaling impact effects by weapon stats
+            local lifetime = math.ceil(damageData.DoTTime * 10)
+            local radius = damageData.DamageRadius
+            local pulseRate = damageData.DoTPulses / lifetime
+
+            ---@param emitter moho.IEffect
+            ---@return moho.IEffect
+            local function ScaleCircleEmitters(emitter)
+                return emitter:SetEmitterParam('LIFETIME', lifetime)
+                    :SetEmitterCurveParam('BEGINSIZE_CURVE', radius, 1)
+                    :SetEmitterCurveParam('ENDSIZE_CURVE', radius * 0.8, 1)
+            end
+            ---@param emitter moho.IEffect
+            ---@return moho.IEffect
+            local function ScaleAtmosphereEmitters(emitter)
+                return emitter:SetEmitterParam('LIFETIME', lifetime * 0.75)
+                    :SetEmitterCurveParam('SIZE_CURVE', radius, 1.076)
+                    :SetEmitterCurveParam('LIFETIME_CURVE', lifetime * 0.35, 0)
+            end
+
+            -- create and scale the impact effects
+            ScaleCircleEmitters(CreateEmitterAtEntity(self, army, '/effects/emitters/_Mercy_Circle_1.bp'))
+                :SetEmitterCurveParam('EMITRATE_CURVE', pulseRate, 0)
+            ScaleCircleEmitters(CreateEmitterAtEntity(self, army, '/effects/emitters/_Mercy_distort.bp'))
+                :SetEmitterCurveParam('EMITRATE_CURVE', pulseRate, 0)
+            ScaleCircleEmitters(CreateEmitterAtEntity(self, army, '/effects/emitters/_Mercy_Circle_2.bp'))
+                :SetEmitterCurveParam('LIFETIME_CURVE', lifetime, 0)
+            ScaleAtmosphereEmitters(CreateEmitterAtEntity(self, army, '/effects/emitters/_Mercy_Fog.bp'))
+            ScaleAtmosphereEmitters(CreateEmitterAtEntity(self, army, '/effects/emitters/_Mercy_sparkle_2.bp'))
+        end
+
+        AGuidedMissileProjectile.OnImpact(self, TargetType, TargetEntity)
     end
 }
 TypeClass = AIFGuidedMissile

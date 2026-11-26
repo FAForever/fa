@@ -452,7 +452,7 @@ function GetShiftAction(actionName, category)
 end
 
 function ContainsKeyModifiers(key)
-    return StringStarts(key, 'Shift') or StringStarts(key, 'Ctrl') or StringStarts(key, 'Alt')
+    return string.startsWith(key, 'Shift') or string.startsWith(key, 'Ctrl') or string.startsWith(key, 'Alt')
 end
 
 function KeyCategory(key, map, actions)

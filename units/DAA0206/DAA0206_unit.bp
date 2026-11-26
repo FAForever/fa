@@ -39,22 +39,21 @@ UnitBlueprint{
         "AIR",
         "BOMB",
         "BOMBER",
-        "CANNOTUSEAIRSTAGING",
         "MOBILE",
         "PRODUCTDL",
         "RECLAIMABLE",
         "SELECTABLE",
         "SHOWATTACKRETICLE",
         "TECH2",
-        "TRANSPORTBUILTBYTIER2FACTORY",
-        "TRANSPORTBUILTBYTIER3FACTORY",
+        "BUILTBYTIER2FACTORY",
+        "BUILTBYTIER3FACTORY",
         "VISIBLETORECON",
     },
     Defense = {
         ArmorType = "Light",
         EconomyThreatLevel = 80000,
-        Health = 90,
-        MaxHealth = 90,
+        Health = 72,
+        MaxHealth = 72,
     },
     Display = {
         Abilities = { "<LOC ability_suicideweapon>Suicide Weapon" },
@@ -105,9 +104,9 @@ UnitBlueprint{
         UniformScale = 0.15,
     },
     Economy = {
-        BuildCostEnergy = 4600,
-        BuildCostMass = 230,
-        BuildTime = 1200,
+        BuildCostEnergy = 8850,
+        BuildCostMass = 270,
+        BuildTime = 1600,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -117,7 +116,11 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
+            RULEUCC_CallTransport = true,
+            RULEUCC_Dock = true,
+            RULEUCC_Guard = true,
             RULEUCC_Move = true,
+            RULEUCC_Patrol = true,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
         },
@@ -133,7 +136,7 @@ UnitBlueprint{
     Physics = {
         AttackElevation = 0.5,
         Elevation = 12,
-        FuelRechargeRate = 0,
+        FuelRechargeRate = 5,
         FuelUseTime = 400,
         GroundCollisionOffset = -0.25,
         MaxSpeed = 13,
@@ -159,18 +162,19 @@ UnitBlueprint{
     Weapon = {
         {
             AboveWaterTargetsOnly = true,
+            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound { Bank = 'UAAWeapon', Cue = 'UAA0304_Bomb_Quark', LodCutoff = 'Weapon_LodCutoff' },
             },
             BallicsticArc = "RULEUBA_None",
             CollideFriendly = true,
-            Damage = 50,
+            Damage = 350,
             DamageFriendly = true,
-            DamageRadius = 7.5,
+            DamageRadius = 3.5,
             DamageType = "Normal",
             DisplayName = "Kamikaze",
-            DoTPulses = 20,
-            DoTTime = 9.5,
+            DoTPulses = 6,
+            DoTTime = 4,
             EffectiveRadius = 0,
             FireTargetLayerCapsTable = {
                 Air = "Land|Seabed|Water",
@@ -202,7 +206,7 @@ UnitBlueprint{
             RateOfFire = 10/1, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 35,
-            TargetCheckInterval = 999999,
+            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 "TECH4",
                 "TECH3 STRUCTURE",
@@ -211,7 +215,6 @@ UnitBlueprint{
                 "(ALLUNITS - SPECIALLOWPRI)",
             },
             TargetRestrictDisallow = "UNTARGETABLE",
-            TrackingRadius = 0.5,
             TurretBoneMuzzle = "DAA0206",
             TurretBonePitch = "DAA0206",
             TurretBoneYaw = "DAA0206",

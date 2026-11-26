@@ -38,7 +38,7 @@ Tooltips = {
     },
     assist = {
         title = "<LOC tooltipui0008>Assist",
-        description = "",
+        description = "Right-click to distribute assist orders of mobile shields, scouts and stealth generators across selection.",
         keyID = "guard",
     },
     mode_hold = {
@@ -183,15 +183,15 @@ Tooltips = {
     },
     toggle_shield = {
         title = "<LOC tooltipui0040>Shield Toggle",
-        description = "<LOC tooltipui0481>Turn the selected units shields on/off",
+        description = "<LOC tooltipui0481>Turn the selected units shields on/off. Right click to discharge.",
     },
     toggle_shield_dome = {
         title = "<LOC tooltipui0482>Shield Dome Toggle",
-        description = "<LOC tooltipui0483>Turn the selected units shield dome on/off",
+        description = "<LOC tooltipui0483>Turn the selected units shield dome on/off. Right click to discharge.",
     },
     toggle_shield_personal = {
         title = "<LOC tooltipui0484>Personal Shield Toggle",
-        description = "<LOC tooltipui0485>Turn the selected units personal shields on/off",
+        description = "<LOC tooltipui0485>Turn the selected units personal shields on/off. Right click to discharge.",
     },
     toggle_sniper = {
         title = "<LOC tooltipui0647>Sniper Toggle",
@@ -401,10 +401,6 @@ Tooltips = {
         title = 'Chat Feed Background',
         description = "Adds a black bar behind chat lines when the chat window is closed",
     },
-    chat_feed_persist = {
-        title = "Persist Chat Feed Timeout",
-        description = "Allows chat to timeout normally in the chat feed after closing the chat window",
-    },
     chat_send_type = {
         title = "<LOC chat_send_type_title>Default recipient: allies",
         description = "<LOC chat_send_type_description>When enabled, enter sends messages to allies and holding shift + enter sends to all. When not enabled, the behavior is reversed.",
@@ -585,37 +581,43 @@ Tooltips = {
     -- **********************
     -- ** Options Strings
     -- **********************
-
+    
+    options_invert_middle_mouse_button = {
+        title = "<LOC INVERT_MOUSE_PAN>Invert pan direction with middle mouse button",
+        description = "<LOC INVERT_MOUSE_PAN_DESCRIPTION>When enabled, dragging with the middle mouse button moves the camera in the opposite direction.",
+    },
     options_commands_ignore_mode = {
         title = "<LOC OPTIONS_0319>Ignore Mode",
         description = "<LOC OPTIONS_0320>When enabled, ignores any other command but move commands when you hold {i properkeyname_0123}. This can help to guarantee that you issue a move command, instead of (accidentally) starting a reclaim or attack command.\r\n\r\nThis is disabled when holding {i properkeyname_0009}.",
     },
-
     options_selection_threshold_regular = {
         title = "<LOC OPTIONS_0312>Default Selection Threshold",
         description = "<LOC OPTIONS_0316>The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This can help you select individual units or props, especially on displays with higher resolutions.\r\n\r\nInteraction with units take precedence over props.\r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
     },
-
     options_selection_threshold_reclaim = {
         title = "<LOC OPTIONS_0313>Reclaim Mode Selection Threshold",
         description = "<LOC OPTIONS_0317>The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This threshold is specifically used when you are in reclaim mode. It makes it easier to hit all of your clicks, reducing the amount of fake reclaim orders.\r\n\r\nInteraction with units take precedence over props.\r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
     },
-
     options_selection_threshold_replay = {
         title = "<LOC OPTIONS_0314>Replay Selection Threshold",
         description = "<LOC OPTIONS_0318>The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This threshold is specifically used when watching a replay, it makes it easier to hover over units.\r\n\r\nInteraction with units take precedence over props.\r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
     },
-
+    options_reclaim_batching_distance_treshold = {
+        title = "<LOC OPTIONS_RECLAIM_BATCHING_DISTANCE>Reclaim Batching Distance Threshold",
+        description = "<LOC OPTIONS_RECLAIM_BATCHING_DISTANCE_DESCRIPTION>Adjusts the distance threshold for batching reclaim commands. Higher values group more props together.",
+    },
     options_painting = {
         title = "<LOC options_painting_title>Painting",
         description = "<LOC options_painting_description>When enabled, you can send and receive brush strokes to or from other players.\r\nYou can create a brush stroke using the right mouse button. Painting is disabled when you have a unit selection or when you hold shift. You can delete a brush stroke by holding ALT while drawing. You can mute a player by holding CTRL and ALT while drawing.",
     },
-
     options_painting_duration = {
         title = "<LOC options_painting_duration_title>Duration of paintings",
         description = "<LOC options_painting_duration_description>The higher the value, the longer it takes for a painting to decay and be removed.",
     },
-
+    options_painting_duration_observing = {
+        title = "<LOC options_painting_duration_observing_title>Duration of paintings when observing",
+        description = "<LOC options_painting_duration_observing_description>Sets the duration (in seconds) that painting visualizations remain visible while observing.",
+    },
     options_wheel_sensitivity = {
         title = "<LOC OPTIONS_0001>Zoom Wheel Sensitivity",
         description = "<LOC OPTIONS_0035>Sets the Zoom Speed when using the Mouse Wheel",
@@ -657,30 +659,37 @@ Tooltips = {
         description = "<LOC OPTIONS_0118>Shows full, partial or no description when the unit icon is moused over",
     },
     options_assist_to_upgrade = {
-        title = "<LOC ASSIST_TO_UPGRADE_TITLE>Assist to Upgrade",
-        description = "<LOC ASSIST_TO_UPGRADE_DESCRIPTION>When enabled structures automatically queue and pause their upgrade when you issue an assist order",
+        title = "<LOC ASSIST_TO_UPGRADE_TITLE>Assist to upgrade extractors",
+        description = "<LOC ASSIST_TO_UPGRADE_DESCRIPTION>When enabled, mass extractors automatically queue and pause their upgrade when you issue an assist order.",
     },
-
     options_alt_to_force_attack_move = {
         title = "<LOC ALT_TO_FORCE_ATTACK_MOVE_TITLE>Hold alt to force attack move",
         description = "<LOC ALT_TO_FORCE_ATTACK_MOVE_DESCRIPTION>When enabled holding alt will always turn orders into an attack move order, except when holding Ctrl"
     },
-
+    options_assist_to_upgrade_radar = {
+        title = "<LOC ASSIST_TO_UPGRADE_RADAR>Assist to upgrade radars",
+        description = "<LOC ASSIST_TO_UPGRADE_RADAR_DESCRIPTION>When enabled, radars automatically queue and pause their upgrade when you issue an assist order.",
+    },
+    options_repeatbuild = {
+        title = "<LOC OPTIONS_0287>Factories Default to Repeat Build",
+        description = "<LOC OPTIONS_REPEAT_BUILD_DESCRIPTION>When enabled, factories and quantum gateways will have repeat build enabled by default upon completion.",
+    },
+    options_show_player_names = {
+        title = "<LOC options_show_player_names_title>Show Player Names",
+        description = "<LOC options_show_player_names_description>Controls the display of player names in the UI. You can choose to show all player names, or only your allies.",
+    },
     options_area_commands_button = {
         title = "<LOC area_commands_button_title>Button to trigger area commands",
         description = "<LOC area_commands_button_description>When holding this button you'll trigger area command interface as you issue a command in command mode."
     },
-
     options_assist_to_unpause = {
         title = "<LOC ASSIST_TO_UNPAUSE_TITLE>Assist to Unpause",
         description = "<LOC ASSIST_TO_UNPAUSE_DESCRIPTION>When enabled structures automatically unpause as engineers start assisting it.",
     },
-
     options_assist_to_copy_command_queue = {
         title = "<LOC ASSIST_TO_COPY_TITLE>Assist to copy command queue",
         description = "<LOC ASSIST_TO_COPY_DESCRIPTION>When enabled, engineers in the selection will try to copy the command queue of the engineer you issue an assist order for. \r\n\r\nRequires you to hold 'Control'",
     },
-
     options_mp_taunt_head = {
         title = "<LOC OPTIONS_0119>MP Taunt Head",
         description = "<LOC OPTIONS_0120>Select which 3D head is displayed when taunts are used in multiplayer",
@@ -842,6 +851,27 @@ Tooltips = {
     options_frametime = {
         title = "<LOC OPTIONS_FRAMETIME_TITLE>Minimum frametime",
         description = "<LOC OPTIONS_FRAMETIME_DESCRIPTION>Allows you to manipulate the minimum frametime. Incompatible with vertical sync, which is automatically disabled when you move the slider and apply the settings. May introduce image tearing. Option exists to give players a way to try to match the refresh rate of modern monitors. Note that the framerate is often CPU limited and not GPU limited, especially during visually intense fights. A list of values that map to common refresh rates: \r\n\r\n  - 16 = 60hz\r\n  - 10 = 100hz\r\n  - 8 = 120hz\r\n  - 7 = 144hz\r\n  - 6 = 165hz",
+    },
+    -- faf-re engine only: these options are added to the tabs only when GetEngineInfo exists (lua/options/options.lua).
+    options_graphics_api = {
+        title = "<LOC OPTIONS_GRAPHICS_API_TITLE>Graphics API",
+        description = "<LOC OPTIONS_GRAPHICS_API_DESCRIPTION>The renderer the game draws with. Automatic uses the newest one this PC can start. Takes effect after a restart; if the chosen renderer cannot start, the game uses Direct3D 9.",
+    },
+    options_replay_keyframe_budget = {
+        title = "<LOC OPTIONS_REPLAY_KEYFRAME_BUDGET_TITLE>Replay keyframe cache (MB)",
+        description = "<LOC OPTIONS_REPLAY_KEYFRAME_BUDGET_DESCRIPTION>Disk space a replay may use for its saved positions, in the replay_keyframes folder next to the game, or in faf_replay_keyframes in the system's temporary folder when the game's folder can't be written. Over this, the oldest are thinned out, and moving far back takes longer. Cleared when the next replay starts.",
+    },
+    options_replay_keyframe_spacing = {
+        title = "<LOC OPTIONS_REPLAY_KEYFRAME_SPACING_TITLE>Replay keyframe spacing (seconds)",
+        description = "<LOC OPTIONS_REPLAY_KEYFRAME_SPACING_DESCRIPTION>Game time between a replay's saved positions. Closer ones make moves shorter and use more of the cache. The background preparation takes a new value from the next replay.",
+    },
+    options_replay_keyframe_prepare = {
+        title = "<LOC OPTIONS_REPLAY_KEYFRAME_PREPARE_TITLE>Replay background preparation",
+        description = "<LOC OPTIONS_REPLAY_KEYFRAME_PREPARE_DESCRIPTION>A hidden low-priority copy of the game saves positions ahead of a replay you watch, so a first jump forward can load one. Off saves CPU, and jumps forward play through the game instead.",
+    },
+    options_interface_text = {
+        title = "<LOC OPTIONS_INTERFACE_TEXT_TITLE>Interface text",
+        description = "<LOC OPTIONS_INTERFACE_TEXT_DESCRIPTION>Smooth draws interface text from distance-field atlases, sharp at any size. Original draws it with the Windows glyphs, as the original game does. Small text original keeps text with a font size under 13 on the Windows glyphs.",
     },
     options_selectedlanguage = {
         title = "<LOC OPTIONS_0007>Language selection",
@@ -1079,6 +1109,10 @@ Tooltips = {
     options_cursor_splash_damage = {
         title = "<LOC OPTIONS_0301>Splash Damage Indicator",
         description = "<LOC OPTIONS_0302>Shows a splash damage indicator when an attack command is possible, usually when you attempt to ground-fire with a unit with splash damage, like a bomber.\r\n\r\nDoes not interfere with how the attack command is processed, this is merely a visual change.",
+    },
+    options_launch_ignore_selection = {
+        title = "<LOC LAUNCH_IGNORE_SELECTION_TITLE>Launch commands ignore units",
+        description = "<LOC LAUNCH_IGNORE_SELECTION_DESCRIPTION>Determines whether tactical missile and nuke launch commands ignore the units under the cursor and target the ground instead.\r\n\r\nTargeting a unit directly allows hitting units whose hitbox is above the ground, such as the Megalith, makes the impact point consistent, and lets queued launches follow the target as it moves between reloads.",
     },
     options_cursor_depth_scanning = {
         title = "<LOC WATER_DEPTH_ASSISTANCE_TITLE>Water depth indication",

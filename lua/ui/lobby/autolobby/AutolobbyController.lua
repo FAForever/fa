@@ -20,7 +20,6 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local Utils = import("/lua/system/utils.lua")
 local MapUtil = import("/lua/ui/maputil.lua")
 local GameColors = import("/lua/gamecolors.lua")
 
@@ -623,6 +622,23 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         -- TODO: verify that the StartSpot is not occupied
         -- put the player where it belongs
         self.PlayerOptions[playerOptions.StartSpot] = playerOptions
+
+        -- Army numbers need to be calculated: they are numbered incrementally in slot order.
+        local slots = {}
+        for slotIndex, _ in pairs(self.PlayerOptions) do
+            table.insert(slots, slotIndex)
+        end
+        table.sort(slots)
+
+        -- send player options to the server
+        for armyIndex, slotIndex in ipairs(slots) do
+            local otherPlayerOptions = self.PlayerOptions[slotIndex]
+            local ownerId = otherPlayerOptions.OwnerID
+            self:SendPlayerOptionToServer(ownerId, 'Team', otherPlayerOptions.Team)
+            self:SendPlayerOptionToServer(ownerId, 'Army', armyIndex)
+            self:SendPlayerOptionToServer(ownerId, 'StartSpot', otherPlayerOptions.StartSpot)
+            self:SendPlayerOptionToServer(ownerId, 'Faction', otherPlayerOptions.Faction)
+        end
 
         -- sync game options with the connected peer
         self:SendData(data.SenderID, { Type = "UpdateGameOptions", GameOptions = self.GameOptions })

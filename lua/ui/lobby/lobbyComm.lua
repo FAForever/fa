@@ -140,6 +140,7 @@ LobbyComm = Class(moho.lobby_methods) {
     --#endregion
 
     ---@param self UILobbyCommunication
+    ---@param info GameData
     LaunchGame = function(self, info)
         SavePreferences()
         moho.lobby_methods.LaunchGame(self, info)
