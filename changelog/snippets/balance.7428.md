@@ -1,0 +1,1 @@
+- Reduce the UEF ACU bubble shield costs to increase its T2 stage relevancy. This change was released in the last patch (3841), but was missing from its changelog (#7113, #7428).
