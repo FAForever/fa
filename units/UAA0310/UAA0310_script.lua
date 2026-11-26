@@ -5,6 +5,7 @@
 -- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 local AirTransport = import("/lua/defaultunits.lua").AirTransport
+local AirUnitOnReclaimed = import("/lua/defaultunits.lua").AirUnit.OnReclaimed
 local aWeapons = import("/lua/aeonweapons.lua")
 local AQuantumBeamGenerator = aWeapons.AQuantumBeamGenerator
 local AAAZealotMissileWeapon = aWeapons.AAAZealotMissileWeapon
@@ -45,6 +46,13 @@ UAA0310 = ClassUnit(AirTransport, ExternalFactoryComponent) {
     StartBeingBuiltEffects = function(self, builder, layer)
         AirTransport.StartBeingBuiltEffects(self, builder, layer)
         CreateAeonCZARBuildingEffects(self)
+    end,
+
+    --- Skips `AirTransport.ReclaimCargo`, so the stored cargo leaves no wreck, as in naval carriers
+    ---@param self UAA0310
+    ---@param reclaimer Unit
+    OnReclaimed = function(self, reclaimer)
+        AirUnitOnReclaimed(self, reclaimer)
     end,
 
     ---@param self UAA0310

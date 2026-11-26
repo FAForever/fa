@@ -27,6 +27,9 @@ local Buff = import("/lua/sim/buff.lua")
 
 local podBpEco = __blueprints['uea0001']--[[@as UnitBlueprint]].Economy
 
+-- weapons that fire from the gun barrel, and from the Zephyr Amplifier barrel once it is built
+local GunLabels = { 'RightZephyr', 'OverCharge', 'AutoOverCharge' }
+
 ---@class UEL0001 : ACUUnit
 ---@field LeftPod TConstructionPodUnit
 ---@field HasLeftPod boolean
@@ -598,6 +601,51 @@ UEL0001 = ClassUnit(ACUUnit) {
 
     -- Gun Upgrade
 
+    --- Re-assigns `Blueprint` and `AimControl` of the gun, OverCharge and AutoOverCharge to copies
+    --- that aim and fire from `bone`. Pass `nil` to return to the muzzle of the blueprint.
+    ---@param self UEL0001
+    ---@param bone? Bone
+    ChangeGunMuzzleBone = function(self, bone)
+        for _, label in GunLabels do
+            local weapon = self:GetWeaponByLabel(label)
+            ---@cast weapon -nil
+
+            -- re-assign this weapon's blueprint to a version with the new aim muzzle bone and rack
+            -- muzzle bone, so that visual effects and projectile creation use the new bone. The gun
+            -- has a single rack and aims and fires from the same muzzle
+            local bp = weapon:GetBlueprint()
+            if bone then
+                bp = table.copy(bp)
+                bp.TurretBoneMuzzle = bone
+                local rack = table.copy(bp.RackBones[1])
+                rack.MuzzleBones = { bone }
+                bp.RackBones = { rack }
+            end
+            weapon.Blueprint = bp
+
+            -- these weapons use `UseFiringSolutionInsteadOfAimBone`: projectiles launch along the
+            -- firing solution of the aim controller, which the engine computes from the muzzle bone
+            -- the controller was created with. It can not be changed, so the controller is re-created
+            local aimControl = weapon.AimControl
+            local heading, pitch = aimControl:GetHeadingPitch()
+            aimControl:Destroy()
+            weapon:SetupTurret(bp)
+            aimControl = weapon.AimControl
+            aimControl:SetHeadingPitch(heading, pitch)
+
+            local enabled = weapon.AimControlEnabled ~= false
+            aimControl:SetEnabled(enabled)
+            if label ~= 'RightZephyr' then
+                -- matches `OverchargeWeapon.OnEnableWeapon` and `OverchargeWeapon.OnDisableWeapon`
+                if enabled then
+                    aimControl:SetPrecedence(20)
+                else
+                    aimControl:SetPrecedence(0)
+                end
+            end
+        end
+    end,
+
     ---@param self UEL0001
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementHeavyAntiMatterCannon = function(self, bp)
@@ -611,6 +659,7 @@ UEL0001 = ClassUnit(ACUUnit) {
         local aoc = self:GetWeaponByLabel('AutoOverCharge')
         ---@cast aoc -nil
         aoc:ChangeMaxRadius(bp.NewMaxRadius or 44)
+        self:ChangeGunMuzzleBone(bp.NewMuzzleBone)
     end,
 
     ---@param self UEL0001
@@ -630,6 +679,7 @@ UEL0001 = ClassUnit(ACUUnit) {
         local aoc = self:GetWeaponByLabel('AutoOverCharge')
         ---@cast aoc -nil
         aoc:ChangeMaxRadius(bpDisrupt or 22)
+        self:ChangeGunMuzzleBone(nil)
     end,
 
     -- RAS

@@ -1,7 +1,6 @@
 local Types = import("/lua/ui/game/chat/commands/ChatCommandTypes.lua")
 
--------------------------------------------------------------------------------
--- Registry + parser + dispatcher for chat slash-commands. See design.md.
+--#region Registry + parser + dispatcher for chat slash-commands. See design.md.
 
 --- One declared parameter slot in a command's signature. Resolver is picked by `Type`.
 ---@class UIChatCommandParam
@@ -33,8 +32,8 @@ local Commands = {}
 ---@type table<string, string>
 local Aliases = {}
 
--------------------------------------------------------------------------------
--- Registration
+--#endregion
+--#region Registration
 
 --- Removes a command and its aliases from the registry.
 ---@param name string
@@ -178,8 +177,8 @@ function FindMatching(prefix)
     return result
 end
 
--------------------------------------------------------------------------------
--- Parsing
+--#endregion
+--#region Parsing
 
 --- "whisper Jip hello" -> "whisper", {"Jip", "hello"}
 ---@param body string
@@ -245,8 +244,8 @@ local function ParseArgs(cmd, tokens)
     return args, nil
 end
 
--------------------------------------------------------------------------------
--- Dispatch
+--#endregion
+--#region Dispatch
 
 --- Fall-through to legacy `RunChatCommand` for pre-MVC commands
 --- registered via Notify's `AddChatCommand` (`/enablenotify`, etc.).
@@ -341,3 +340,4 @@ function Dispatch(text)
     end
     return true, nil
 end
+--#endregion

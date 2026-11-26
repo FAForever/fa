@@ -255,6 +255,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     CanTakeDamage = true,
     CanBeKilled = true,
 
+    --- Set to false to prevent the unit from changing army, such as a hatched egg that would spawn its unit again
+    ---@type boolean
+    CanBeGiven = true,
+
     EnergyModifier = 0,
     MassModifier = 0,
 
@@ -3308,7 +3312,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         self.WorkItem = tempEnhanceBp
         self.WorkItemBuildCostEnergy = tempEnhanceBp.BuildCostEnergy
-        self.WorkItemBuildCostMass = tempEnhanceBp.BuildCostEnergy
+        self.WorkItemBuildCostMass = tempEnhanceBp.BuildCostMass
         self.WorkItemBuildTime = tempEnhanceBp.BuildTime
         self.WorkProgress = 0
 
@@ -5111,14 +5115,25 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     -- Utility Functions
     ---@param self Unit
-    ---@param trigger any
-    ---@param source any
+    ---@param trigger NotifyTrigger
+    ---@param source? NotifySource
     SendNotifyMessage = function(self, trigger, source)
         local focusArmy = GetFocusArmy()
         if focusArmy == -1 or focusArmy == self.Army then
             local id
             local unitType
-            local category
+            ---@alias NotifyTrigger 'started' | 'cancelled' | 'completed' | 'transferred'
+
+            ---@alias NotifySource Enhancement | string
+            ---| 'nuke'
+            ---| 'arty'
+
+            ---@alias NotifyCategory
+            ---| 'tech'
+            ---| 'other'
+            ---| 'experimentals'
+            ---| FactionCategory
+            local category ---@type NotifyCategory
 
             if not source then
                 local bp = self.Blueprint
@@ -5152,6 +5167,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                 end
             else
                 if not Sync.EnhanceMessage then Sync.EnhanceMessage = {} end
+                ---@class NotifyMessageSyncData
+                ---@field source NotifySource
+                ---@field trigger NotifyTrigger
+                ---@field category NotifyCategory
+                ---@field id? EntityId
+                ---@field army Army
                 local message = {source = source or unitType, trigger = trigger, category = category, id = id, army = self.Army}
                 table.insert(Sync.EnhanceMessage, message)
             end

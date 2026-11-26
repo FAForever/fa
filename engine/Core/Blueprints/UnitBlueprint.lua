@@ -33,7 +33,7 @@
 ---@alias UnitId BlueprintId
 
 
--- read more here: https://wiki.faforever.com/en/Blueprints
+-- read more here: https://wiki.faforever.com/Development/Modding/Blueprints
 
 ---@class UnitBlueprint: EntityBlueprint
 --- Table keyed with a `ScriptTask`'s `TaskName` that determines the properties of the order button for that ability.
@@ -873,6 +873,8 @@
 ---@field ZephyrDamageMod number
 --- New Max Radius of the unit
 ---@field NewMaxRadius number
+--- Muzzle bone the gun fires from once the enhancement shows a different barrel
+---@field NewMuzzleBone? Bone
 --- New Rate of Fire of the unit. This is How fast the Gun shoots
 ---@field NewRateOfFire number
 --- New Damage Radius of the unit
@@ -1137,10 +1139,6 @@
 ---@field Elevation number
 --- if true, terrain under building's skirt will be flattened
 ---@field FlattenSkirt boolean
---- Determines what cells this unit occupies for pathfinding.
---- Mobile units are forced to use the closest footprint spec that is defined in `footprints.lua`.
---- Structures can define their own footprints.
----@field Footprint FootprintBlueprint
 --- unit fuels up at this rate per second. Required for air staging to undock automatically.
 ---@field FuelRechargeRate number
 --- unit has fuel for this number of seconds. Required for air staging to undock automatically.
@@ -1205,9 +1203,9 @@
 ---@field SkirtOffsetX number
 --- offset of top edge of skirt from left edge of footprint
 ---@field SkirtOffsetZ number
---- unit construction pad Size X for building
+--- unit construction pad Size X for building. Must be at least as large as the unit's footprint.
 ---@field SkirtSizeX number
---- unit construction pad Size Z for building
+--- unit construction pad Size Z for building. Must be at least as large as the unit's footprint.
 ---@field SkirtSizeZ number
 --- Stands upright regardless of terrain
 ---@field StandUpright boolean

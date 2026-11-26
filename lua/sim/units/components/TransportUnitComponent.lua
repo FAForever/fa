@@ -2,6 +2,14 @@ local TableInsert = table.insert
 local TableEmpty = table.empty
 local EntityCategoryContains = EntityCategoryContains
 
+--- Whether the engine gave the unit a transport interface. Without it, `Unit:GetCargo` errors
+---@param unit Unit
+---@return boolean
+local function CanHaveCargo(unit)
+    local blueprint = unit.Blueprint
+    return blueprint.General.CommandCapsHash.RULEUCC_Transport or blueprint.CategoriesHash.PODSTAGINGPLATFORM or false
+end
+
 ---@class BaseTransport
 ---@field DisableIntelOfCargo boolean
 ---@field cargoCache? table
@@ -112,7 +120,11 @@ BaseTransport = ClassSimple {
 
             -- Kill the contents of a transport in a transport, however that happened
             if EntityCategoryContains(categories.TRANSPORTATION, unit) then
-                cargoMass = cargoMass + unit:KillCargo(instigator, cargoDamageType, true)
+                -- Some mods also use TRANSPORTATION for aircraft without cargo handling.
+                local killCargo = unit.KillCargo
+                if killCargo ~= nil then
+                    cargoMass = cargoMass + killCargo(unit, instigator, cargoDamageType, true)
+                end
             end
 
             -- cache the cargo so we can impact it later (if needed)
@@ -136,6 +148,31 @@ BaseTransport = ClassSimple {
             return cargoMass
         else
             self:VeterancyDispersal(cargoMass)
+        end
+    end,
+
+    --- Leaves a wreck for each cargo unit where it is, then destroys the cargo. The engine destroys the cargo of a
+    --- reclaimed unit without a wreck, so call this from `OnReclaimed`
+    ---@param self BaseTransport | Unit
+    ReclaimCargo = function(self)
+        if not CanHaveCargo(self) then
+            return
+        end
+
+        for _, unit in self:GetCargo() do
+            if not IsDestroyed(unit) then
+                -- external factories are part of their parent unit
+                if not unit.Blueprint.CategoriesHash.EXTERNALFACTORYUNIT then
+                    if unit.ReclaimCargo then
+                        unit:ReclaimCargo()
+                    end
+
+                    -- not `CreateWreckageProp`, so overrides that leave no wreck still apply
+                    unit:CreateWreckage(0)
+                end
+
+                unit:Destroy()
+            end
         end
     end,
 

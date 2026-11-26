@@ -346,6 +346,11 @@ function CreateUI(isReplay)
     import("/lua/keymap/hotkeylabels.lua").init()
     import("/lua/ui/notify/customiser.lua").init(isReplay, import("/lua/ui/game/borders.lua").GetMapGroup())
     import("/lua/ui/game/reclaim.lua").SetMapSize()
+
+    -- faf-re engine only: a timeline bar to move a replay to any time. GetEngineInfo exists only in faf-re.
+    if isReplay and rawget(_G, 'GetEngineInfo') then
+        import("/lua/ui/game/replay_timeline.lua").Create()
+    end
 end
 
 --- Find out the max Hz capability of the adapter so we don't render unnecessary frames, reducing the load on the render thread.
@@ -614,10 +619,6 @@ local upgradeTab = false
 function OnSelectionChanged(oldSelection, newSelection, added, removed)
 
     if ignoreSelection then
-        return
-    end
-
-    if import("/lua/ui/game/selection.lua").IsHidden() then
         return
     end
 

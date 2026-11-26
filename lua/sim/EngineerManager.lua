@@ -10,6 +10,7 @@ local AIUtils = import("/lua/ai/aiutilities.lua")
 local Builder = import("/lua/sim/builder.lua")
 
 local TableGetn = table.getn
+local WaitTicks = WaitTicks
 
 ---@class EngineerManager : BuilderManager
 ---@field Location Vector
@@ -160,7 +161,7 @@ EngineerManager = Class(BuilderManager) {
 
     ---@param self EngineerManager
     LowMassRepeatThread = function(self)
-        coroutine.yield(30)
+        WaitTicks(30)
         if self.Brain.LowMassMode then
             self:LowMass()
         end
@@ -289,7 +290,7 @@ EngineerManager = Class(BuilderManager) {
 
     ---@param self EngineerManager
     LowEnergyRepeatThread = function(self)
-        coroutine.yield(30)
+        WaitTicks(30)
         if self.Brain.LowEnergyMode then
             self:LowEnergy()
         end
@@ -731,7 +732,7 @@ EngineerManager = Class(BuilderManager) {
     ---@param manager EngineerManager
     ---@param ticks integer
     Wait = function(unit, manager, ticks)
-        coroutine.yield(ticks)
+        WaitTicks(ticks)
         if not unit.Dead then
             manager:AssignEngineerTask(unit)
         end
@@ -740,7 +741,7 @@ EngineerManager = Class(BuilderManager) {
     ---@param manager EngineerManager
     ---@param unit Unit
     EngineerWaiting = function(manager, unit)
-        coroutine.yield(50)
+        WaitTicks(50)
         if not unit.Dead then
             manager:AssignEngineerTask(unit)
         end

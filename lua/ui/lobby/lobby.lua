@@ -6257,7 +6257,7 @@ function CPUBenchmark()
         if totalTime > countTime then
             --This is necessary in order to make this 'thread' yield so other things can be done.
             countTime = totalTime + .125
-            coroutine.yield(1)
+            WaitFrames(1)
         end
     end
     BenchTime = math.ceil(totalTime * 100)

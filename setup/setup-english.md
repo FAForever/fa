@@ -83,11 +83,8 @@ Useful extensions if you intent to work with shaders:
 
 Setup the FA Lua Extension
 ----------------
-Releases can be found [here](https://github.com/FAForever/fa-lua-vscode-extension/releases). 
-
-To setup you will want to download the `.vsix` file and install it in VS Code. Follow the steps in the image and you will be able to select the extension file downloaded.  
+Install the official Lua Language Server extension from the VS Code extension marketplace.  
 ![Extension install](/images/setup/extension-install.png)
-> Note: Whenever there is a new version of the extension you will have to download it and install it again
 
 Once you have it installed you're good to go for the FAF repo. For mod/map folders will be a different setup process (TODO, write guide for maps/mods).
 
@@ -170,7 +167,7 @@ After you acquire the replay, you need to match the game version to run it. This
 
         Example command (uses debugger and immediately launches replay):
         ```cmd
-        "C:\ProgramData\FAForever\replaydata\bin\FADeepProbe.exe" ForgedAlliance.exe /init "init_local_development.lua" /EnableDiskWatch /nomovie /showlog /log "dev.log" /RunWithTheWind /replay "C:/ProgramData/FAForever/cache/temp.scfareplay"
+        "C:\ProgramData\FAForever\replaydata\bin\FADeepProbe.exe" ForgedAlliance.exe /init "init_local_development.lua" /EnableDiskWatch /nomovie /showlog /log "dev.log" /replay "C:/ProgramData/FAForever/cache/temp.scfareplay"
         ```
         
         Make sure to add `init_local_development.lua` to the replay directory, or change the path to the init file in the normal game directory.

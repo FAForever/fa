@@ -21,8 +21,8 @@ local ChatPayload = import("/lua/shared/ChatPayload.lua")
 ---   and live-spectator behaviour where privates become visible so the
 ---   conversation can be attributed.
 --- * `all` broadcasts always pass.
---- * `allies` broadcasts pass to the sender and to anyone `IsAlly` with
----   the sender.
+--- * `allies` broadcasts and `notify` messages pass to the sender and to
+---   anyone `IsAlly` with the sender.
 --- * Numeric `to` is a private whisper — only the sender and the named
 ---   recipient pass.
 ---@param msg ChatPayload
@@ -33,7 +33,7 @@ function IsLocalRecipient(msg)
 
     local to = msg.to
     if to == 'all' then return true end
-    if to == 'allies' then
+    if to == 'allies' or to == 'notify' then
         return focus == msg.From or IsAlly(focus, msg.From)
     end
 
@@ -91,11 +91,6 @@ function SendChatMessage(data)
     -- have dropped the message anyway.
     if not ChatPayload.IsValidPayload(msg) then return end
 
-    -- `'notify'` is a UI subsystem channel — players reach this relay path
-    -- only with broadcast or whisper recipients, so reject the shared
-    -- validator's broader allow-list here.
-    if msg.to == 'notify' then return end
-
     -- Trusted sender stamp; ignore whatever the client put in `msg.From`.
     local from = SimUtils.GetCurrentCommandSourceArmy()
     if not from then return end
@@ -107,6 +102,11 @@ function SendChatMessage(data)
     end
 
     msg.From = from
+    -- Notify attributes the line to `notifyFrom` for observers, so it
+    -- must be trusted the same way as `From`.
+    if msg.to == 'notify' then
+        msg.notifyFrom = from
+    end
 
     RelayChatMessage(msg)
 end

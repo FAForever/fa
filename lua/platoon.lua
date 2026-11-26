@@ -2271,7 +2271,7 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         if not eng or eng.Dead then
-            coroutine.yield(1)
+            WaitTicks(1)
             self:PlatoonDisband()
             return
         end
@@ -2310,7 +2310,7 @@ Platoon = Class(moho.platoon_methods) {
         end
         -- if we have nothing to build, disband!
         if not cons.BuildStructures or not platPos then
-            coroutine.yield(1)
+            WaitTicks(1)
             self:PlatoonDisband()
             return
         end
@@ -2496,7 +2496,7 @@ Platoon = Class(moho.platoon_methods) {
             end
             local radius = (cons.AdjacencyDistance or 50)
             if not pos or not pos then
-                coroutine.yield(1)
+                WaitTicks(1)
                 self:PlatoonDisband()
                 return
             end
@@ -2514,7 +2514,7 @@ Platoon = Class(moho.platoon_methods) {
             local radius = (cons.AdjacencyDistance or 50)
             local radius = (cons.AdjacencyDistance or 50)
             if not pos or not pos then
-                coroutine.yield(1)
+                WaitTicks(1)
                 self:PlatoonDisband()
                 return
             end
@@ -2566,7 +2566,7 @@ Platoon = Class(moho.platoon_methods) {
                         end
                     else
                         if aiBrain:PlatoonExists(self) then
-                            coroutine.yield(1)
+                            WaitTicks(1)
                             self:PlatoonDisband()
                             return
                         end
@@ -2578,7 +2578,7 @@ Platoon = Class(moho.platoon_methods) {
         -- wait in case we're still on a base
         local count = 0
         while not eng.Dead and eng:IsUnitState('Attached') and count < 2 do
-            coroutine.yield(60)
+            WaitTicks(60)
             count = count + 1
         end
 
@@ -3725,11 +3725,11 @@ Platoon = Class(moho.platoon_methods) {
     --- try the next thing in the queue
     ---@param eng EngineerBuilder
     WatchForNotBuilding = function(eng)
-        coroutine.yield(10)
+        WaitTicks(10)
         local aiBrain = eng:GetAIBrain()
 
         while not eng.Dead and not eng.PlatoonHandle.UsingTransport and (eng.UnitBeingBuiltBehavior or eng.ProcessBuild != nil or not eng:IsIdleState()) do
-            coroutine.yield(30)
+            WaitTicks(30)
         end
 
         eng.NotBuildingThread = nil
@@ -3798,7 +3798,7 @@ Platoon = Class(moho.platoon_methods) {
                 if Utilities.GetDistanceBetweenTwoPoints2(PlatoonPos[1] or 0, PlatoonPos[3] or 0, buildLocation[1] or 0, buildLocation[3] or 0) >= 30 then
                     -- issue buildcommand to block other engineers from caping mex/hydros or to reserve the buildplace
                     aiBrain:BuildStructure(eng, whatToBuild, {buildLocation[1], buildLocation[3], 0}, buildRelative)
-                    coroutine.yield(3)
+                    WaitTicks(3)
                     -- wait until we are close to the buildplace so we have intel
                     while not eng.Dead do
                         PlatoonPos = eng:GetPosition()
@@ -3810,7 +3810,7 @@ Platoon = Class(moho.platoon_methods) {
                         if eng:IsUnitState("Building") then
                             break
                         end
-                        coroutine.yield(1)
+                        WaitTicks(1)
                     end
                 end
                 if not eng or eng.Dead or not eng.PlatoonHandle or not aiBrain:PlatoonExists(eng.PlatoonHandle) then
@@ -4531,7 +4531,7 @@ Platoon = Class(moho.platoon_methods) {
             for k, v in buildMassDistantPoints do
                 IssueToUnitMove(eng, v.position )
                 while VDist2Sq(engPos[1],engPos[3],v.position[1],v.position[3]) > 165 do
-                    coroutine.yield(5)
+                    WaitTicks(5)
                     engPos = eng:GetPosition()
                     if eng:IsIdleState() and VDist2Sq(engPos[1],engPos[3],v.position[1],v.position[3]) > 165 then
                         break
@@ -4555,9 +4555,9 @@ Platoon = Class(moho.platoon_methods) {
             buildMassDistantPoints = aiBrain:RebuildTable(buildMassDistantPoints)
         end
         -- Wait for everything to be built
-        coroutine.yield(5)
+        WaitTicks(5)
         while eng:IsUnitState('Building') or 0<tableGetn(eng:GetCommandQueue()) do
-            coroutine.yield(5)
+            WaitTicks(5)
         end
         -- If we found a hydro marker then we are going to just queue a few pgens
         -- mainly incase something goes wrong and no engineer goes to build a hydro
@@ -4657,7 +4657,7 @@ Platoon = Class(moho.platoon_methods) {
                     if aiBrain:CanBuildStructureAt('ueb1103', v.position) then
                         IssueToUnitMove(eng, v.position )
                         while VDist2Sq(engPos[1],engPos[3],v.position[1],v.position[3]) > 165 do
-                            coroutine.yield(5)
+                            WaitTicks(5)
                             engPos = eng:GetPosition()
                             if eng:IsIdleState() and VDist2Sq(engPos[1],engPos[3],v.position[1],v.position[3]) > 165 then
                                 break
@@ -4675,9 +4675,9 @@ Platoon = Class(moho.platoon_methods) {
                         else
                             WARN('No buildLocation or whatToBuild during ACU initialization')
                         end
-                        coroutine.yield(5)
+                        WaitTicks(5)
                         while eng:IsUnitState('Building') or 0<tableGetn(eng:GetCommandQueue()) do
-                            coroutine.yield(5)
+                            WaitTicks(5)
                         end
                     end
                     buildMassDistantPoints[k] = nil
@@ -4686,9 +4686,9 @@ Platoon = Class(moho.platoon_methods) {
             end
         end
         -- wait for the build queue to complete
-        coroutine.yield(5)
+        WaitTicks(5)
         while eng:IsUnitState('Building') or 0<tableGetn(eng:GetCommandQueue()) do
-            coroutine.yield(5)
+            WaitTicks(5)
         end
         -- if we still have close mass points to build then we'll queue them.
         -- Then we try to work out how many pgens we'll need to not stall anything if a hydro isnt present and queue them up.
@@ -4708,9 +4708,9 @@ Platoon = Class(moho.platoon_methods) {
                 end
                 buildMassPoints[k] = nil
             end
-            coroutine.yield(5)
+            WaitTicks(5)
             while eng:IsUnitState('Building') or 0<tableGetn(eng:GetCommandQueue()) do
-                coroutine.yield(5)
+                WaitTicks(5)
             end
         end
         local energyCount = 3
@@ -4768,7 +4768,7 @@ Platoon = Class(moho.platoon_methods) {
         -- wait for the build to complete
         if not hydroPresent then
             while eng:IsUnitState('Building') or 0<tableGetn(eng:GetCommandQueue()) do
-                coroutine.yield(5)
+                WaitTicks(5)
             end
         end
         -- if we had a hydro and we also had mass points we will walk to it then try find an engineer that might be building it
@@ -4780,7 +4780,7 @@ Platoon = Class(moho.platoon_methods) {
             if VDist3Sq(engPos,closestHydro.Position) > 144 then
                 IssueToUnitMove(eng, closestHydro.Position )
                 while VDist3Sq(engPos,closestHydro.Position) > 100 do
-                    coroutine.yield(5)
+                    WaitTicks(5)
                     engPos = eng:GetPosition()
                     if eng:IsIdleState() and VDist3Sq(engPos,closestHydro.Position) > 100 then
                         break
@@ -4792,7 +4792,7 @@ Platoon = Class(moho.platoon_methods) {
             local assistee = false
             local assistListCount = 0
             while not next(assistList) do
-                coroutine.yield( 15 )
+                WaitTicks( 15 )
                 assistList = AIUtils.GetAssistees(aiBrain, 'MAIN', 'Engineer', categories.HYDROCARBON, categories.ALLUNITS)
                 assistListCount = assistListCount + 1
                 if assistListCount > 10 then
@@ -4820,7 +4820,7 @@ Platoon = Class(moho.platoon_methods) {
                 IssueToUnitClearCommands(eng)
                 eng.UnitBeingAssist = assistee.UnitBeingBuilt or assistee.UnitBeingAssist or assistee
                 IssueToUnitGuard(eng, eng.UnitBeingAssist)
-                coroutine.yield(30)
+                WaitTicks(30)
                 while eng and not eng.Dead and not eng:IsIdleState() do
                     if not eng.UnitBeingAssist or eng.UnitBeingAssist.Dead or eng.UnitBeingAssist:BeenDestroyed() then
                         break
@@ -4830,7 +4830,7 @@ Platoon = Class(moho.platoon_methods) {
                         IssueToUnitClearCommands(eng)
                         break
                     end
-                    coroutine.yield(30)
+                    WaitTicks(30)
                 end
                 -- the hydro should be finished, now we will try build an adjacent air factory if the map is 20km or larger or this is the rush air personality.
                 -- otherwise build another land first then an air factory, try to make them adjacent but it gets a little tricky here without having the move the acu
@@ -4869,7 +4869,7 @@ Platoon = Class(moho.platoon_methods) {
                         end
                     end
                     while eng:IsUnitState('Building') or 0<tableGetn(eng:GetCommandQueue()) do
-                        coroutine.yield(5)
+                        WaitTicks(5)
                     end
                 end
             end

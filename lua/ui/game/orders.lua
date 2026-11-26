@@ -259,6 +259,16 @@ local function AttackOrderBehavior(self, modifiers)
     end
 end
 
+-- Allow the right button on the guard order to distribute assisters, while the left button stays as before.
+local function GuardOrderBehavior(self, modifiers)
+    if modifiers and modifiers.Right then
+        import("/lua/ui/game/hotkeys/distribute-assisters.lua").DistributeAssisters()
+        return
+    end
+
+    StandardOrderBehavior(self, modifiers)
+end
+
 --- Dock all units on left click, dock only damaged units on right click
 ---@param self Checkbox
 ---@param modifiers EventModifiers
@@ -1118,7 +1128,7 @@ local defaultOrdersTable = {
     RULEUCC_Attack = {              helpText = "attack",            bitmapId = 'attack',                preferredSlot = 3,  behavior = AttackOrderBehavior, initialStateFunc = AttackOrderInit},
     RULEUCC_Patrol = {              helpText = "patrol",            bitmapId = 'patrol',                preferredSlot = 4,  behavior = StandardOrderBehavior},
     RULEUCC_Stop = {                helpText = "stop",              bitmapId = 'stop',                  preferredSlot = 5,  behavior = StopOrderBehavior},
-    RULEUCC_Guard = {               helpText = "assist",            bitmapId = 'guard',                 preferredSlot = 6,  behavior = StandardOrderBehavior},
+    RULEUCC_Guard = {               helpText = "assist",            bitmapId = 'guard',                 preferredSlot = 6,  behavior = GuardOrderBehavior},
     RULEUCC_RetaliateToggle = {     helpText = "mode",              bitmapId = 'stand-ground',          preferredSlot = 7,  behavior = RetaliateOrderBehavior,      initialStateFunc = RetaliateInitFunction},
     -- Unit specific rules
     RULEUCC_Overcharge = {          helpText = "overcharge",        bitmapId = 'overcharge',            preferredSlot = 8,  behavior = OverchargeBehavior,          initialStateFunc = OverchargeInit, onframe = OverchargeFrame},

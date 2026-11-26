@@ -7870,6 +7870,116 @@ technique Cloud_LowFidelity
     }
 }
 
+/// SonanceFadeVS
+///
+/// As EffectVS, for glowing motes that fade in, such as those swirling into the held shell of the Aeon T3
+/// artillery (uab2302). Models have no transparency of their own, so the draw scale carries it: its whole
+/// part is how far the mote is still faded out, in tenths, its fraction the size of the mote. The mote is
+/// drawn at that size, and the fade is passed on to SonanceFadePS.
+EFFECT_VERTEX SonanceFadeVS(
+    float3 position : POSITION0,
+    float4 texcoord0 : TEXCOORD0,
+    float3 UnusedNormal : NORMAL,
+    float3 UnusedTangent : TANGENT,
+    float3 UnusedBinormal : BINORMAL,
+    int boneIndex[4] : BLENDINDICES,
+    float3 row0 : TEXCOORD1,
+    float3 row1 : TEXCOORD2,
+    float3 row2 : TEXCOORD3,
+    float3 row3 : TEXCOORD4,
+    anim_t anim : TEXCOORD5,
+    float4 material : TEXCOORD6,
+    float4 color : COLOR0
+)
+{
+    EFFECT_VERTEX vertex = (EFFECT_VERTEX)0;
+    CompatSwizzle(color);
+
+    float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
+
+    float scale = length( worldMatrix[0].xyz );
+    float size = frac( scale );
+    float fade = 1.0 - 0.1 * ( scale - size );
+    position = position * ( size / scale );
+
+    vertex.position = mul( float4(position,1), worldMatrix);
+    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
+
+    vertex.texcoord0.xy = texcoord0.xy;
+    vertex.material = float4( time - material.x, saturate( fade ), material.zw);
+    vertex.color = color;
+
+    return vertex;
+}
+
+/// Unlit and additive: draws the albedo texture brightened, weighted by its alpha (so that black and
+/// transparent parts add nothing) and by the fade passed on by SonanceFadeVS
+float4 SonanceFadePS( EFFECT_VERTEX vertex, uniform float brightness ) : COLOR0
+{
+    float4 color = tex2D( albedoSampler, vertex.texcoord0.xy );
+    return float4( color.rgb * brightness * vertex.material.y, color.a );
+}
+
+technique SonanceFade_HighFidelity
+<
+    string abstractTechnique = "SonanceFade";
+    int fidelity = FIDELITY_HIGH;
+
+    int renderStage = STAGE_POSTWATER + STAGE_POSTEFFECT;
+    int parameter = PARAM_UNUSED;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_One_Write_RGB )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+        RasterizerState( Rasterizer_Cull_None )
+
+        VertexShader = compile vs_1_1 SonanceFadeVS();
+        PixelShader = compile ps_2_0 SonanceFadePS( 3.0 );
+    }
+}
+
+technique SonanceFade_MedFidelity
+<
+    string abstractTechnique = "SonanceFade";
+    int fidelity = FIDELITY_MEDIUM;
+
+    int renderStage = STAGE_POSTWATER + STAGE_POSTEFFECT;
+    int parameter = PARAM_UNUSED;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_One_Write_RGB )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+        RasterizerState( Rasterizer_Cull_None )
+
+        VertexShader = compile vs_1_1 SonanceFadeVS();
+        PixelShader = compile ps_2_0 SonanceFadePS( 3.0 );
+    }
+}
+
+technique SonanceFade_LowFidelity
+<
+    string abstractTechnique = "SonanceFade";
+    int fidelity = FIDELITY_LOW;
+
+    int renderStage = STAGE_POSTWATER + STAGE_POSTEFFECT;
+    int parameter = PARAM_UNUSED;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_One_Write_RGB )
+        DepthState( Depth_Enable_LessEqual_Write_None )
+        RasterizerState( Rasterizer_Cull_None )
+
+        VertexShader = compile vs_1_1 SonanceFadeVS();
+        PixelShader = compile ps_2_0 SonanceFadePS( 3.0 );
+    }
+}
+
 /// OuterCloud
 ///
 ///

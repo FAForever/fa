@@ -19,6 +19,7 @@ local GetEconomyTrend = moho.aibrain_methods.GetEconomyTrend
 local GetEconomyStoredRatio = moho.aibrain_methods.GetEconomyStoredRatio
 
 local MathMin = math.min
+local WaitTicks = WaitTicks
 
 ---@class AIBrainEconomyData
 ---@field EnergyIncome table<number, number>
@@ -200,7 +201,7 @@ AIBrainEconomyComponent = ClassSimple {
                     brainSync.EconomyData[army] = economyOverTimeCurrent
                 end
 
-                coroutine.yield(self.EconomySampleRateInTicks)
+                WaitTicks(self.EconomySampleRateInTicks)
             end
         end
     end,
