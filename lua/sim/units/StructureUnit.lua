@@ -883,9 +883,15 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
 
     --- Restarts the missile under construction so that the engine recalculates its cost with the
     --- current adjacency buffs, keeping the progress made so far.
+    ---
+    --- Can't handle a silo with both a nuke and a tactical missile weapon: `GiveNukeSiloBlocks`
+    --- takes the build time of the first silo weapon, and the engine patch behind it sets the
+    --- block count of whichever missile is under construction without a missile type.
     ---@param self StructureUnit
     RestartSiloBuild = function(self)
-        if not (self.Blueprint.CategoriesHash["SILO"] and self:IsUnitState('SiloBuildingAmmo')) then
+        -- The engine doesn't check the silo build command caps for orders issued in the sim,
+        -- and losing them doesn't stop a build, so the silo build state is the only gate needed
+        if not self:IsUnitState('SiloBuildingAmmo') then
             return
         end
 
@@ -900,7 +906,13 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
         if siloWeapon then
             isNuke = siloWeapon.Blueprint.NukeWeapon
         else
-            isNuke = EntityCategoryContains(categories.STRATEGIC, self)
+            -- Find the silo weapon the way the engine does: a weapon with `CountedProjectile`
+            -- fills the nuke or tactical silo depending on `NukeWeapon`, and the last one wins
+            for _, weaponBp in self.Blueprint.Weapon do
+                if weaponBp.CountedProjectile then
+                    isNuke = weaponBp.NukeWeapon
+                end
+            end
         end
 
         self:StopSiloBuild()

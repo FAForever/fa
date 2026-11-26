@@ -5191,6 +5191,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param self Unit
     ---@param fraction number
     GiveNukeSiloBlocks = function(self, fraction)
+        self.SiloBlocksProgress = nil
         if fraction < 0 or fraction > 1 then
             return
         end
