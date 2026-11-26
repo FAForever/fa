@@ -76,10 +76,11 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
         end,
 
         Main = function(self)
-            -- A station that was given or captured keeps its old satellite, or rebuilds it when it had none
-            if self.SkipSatelliteLaunch then
-                self.SkipSatelliteLaunch = nil
-            elseif not self.Satellite then
+            -- A station that was given or captured keeps its old satellite, or rebuilds it when it had none.
+            -- A satellite that it finished building since then is still launched.
+            local skipLaunch = self.SkipSatelliteLaunch and not self.newSatellite
+            self.SkipSatelliteLaunch = nil
+            if not skipLaunch and not self.Satellite then
                 self.waitingForLaunch = true
 
                 if not self.AnimManip then
@@ -139,6 +140,7 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
         if self.Satellite and not self.Satellite.Dead and not self.Satellite.IsDying then
             self.Satellite:Kill()
         end
+        self:DestroyNewSatellite()
 
         self:SetActiveConsumptionInactive()
         ChangeState(self, self.IdleState)
@@ -149,7 +151,21 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
         if self.Satellite and not self.Satellite.Dead and not self.Satellite.IsDying then
             self.Satellite:Destroy()
         end
+        self:DestroyNewSatellite()
         TAirFactoryUnit.OnDestroy(self)
+    end,
+
+    --- Destroys a satellite that the station finished building but hasn't launched yet, so it doesn't
+    --- survive the station without a parent.
+    ---@param self XEB2402
+    DestroyNewSatellite = function(self)
+        local newSatellite = self.newSatellite
+        if newSatellite then
+            self.newSatellite = nil
+            if not IsDestroyed(newSatellite) then
+                newSatellite:Destroy()
+            end
+        end
     end,
 
     OnCaptured = function(self, captor)
