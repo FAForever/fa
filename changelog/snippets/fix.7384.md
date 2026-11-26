@@ -1,1 +1,1 @@
-- Fix silo missile progress being reset when adjacent mass fabricators toggle during an energy stall, and fix nuke launchers without auto mode stopping their missile when an adjacent fabricator turns off (#7384).
+- Fix silo missile progress being reset when adjacent mass fabricators toggle during an energy stall, and fix missile launchers without auto mode stopping their missile when an adjacent fabricator turns on or off (#7384).
