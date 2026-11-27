@@ -34,6 +34,7 @@
 ---| "TransportDamage" # Skips visual effects in OnKilled
 ---| "FAF_AntiShield" # Only deals damage to shields
 ---| "Discharge" # Used by "discharge shields" command
+---| "ShieldSpill"
 
 ---@alias ArmorType
 ---| "ASF"
@@ -46,6 +47,11 @@
 ---| "Structure"
 ---| "TMD"
 
+---@class ArmorDefinition
+---@field [1] ArmorType
+---@field [integer] string # `"<DamageType> <multiplier>"`
+
+---@type ArmorDefinition[]
 armordefinition = {
 
     {   -- Armor Type Name

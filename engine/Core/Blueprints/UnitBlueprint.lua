@@ -377,7 +377,9 @@
 --- (It could be changed by a veterancy buff or enhancement)
 ---@field RegenRate number
 --- if the unit has a shield, the settings are held in a table here
----@field Shield? UnitBlueprintDefenseShield
+--- Blueprint loading always creates this table, with `{ RegenAssistMult = 1, ShieldSize = 0 }` when the
+--- unit has no shield
+---@field Shield UnitBlueprintDefenseShield
 --- if the various threat levels are not to be auto-generated at all for this unit
 ---@field SkipDynamicThreatCalculations? boolean
 --- The threat level this unit poses to the enemy.
@@ -403,6 +405,8 @@
 ---@field SurfaceThreatLevel number
 
 ---@class UnitBlueprintDefenseShield
+--- Picks the damage multipliers the shield takes from each damage type
+---@field AbsorptionType? AbsorptionType
 --- If this shield only blocks weapons marked with `ArtilleryShieldBlocks`.
 --- Should not be defined with `PersonalBubble`, `PersonalShield`, or `TransportShield`.
 ---@field AntiArtilleryShield? boolean
