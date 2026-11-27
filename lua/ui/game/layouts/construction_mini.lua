@@ -4,6 +4,7 @@ local Grid = import("/lua/maui/grid.lua").Grid
 local Button = import("/lua/maui/button.lua").Button
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local SacuLoadout = import('/lua/ui/game/sacuLoadout.lua')
 
 
 function SetLayout()
@@ -480,8 +481,15 @@ function OnTabChangeLayout(type)
     else
         LayoutHelpers.AtTopIn(controls.choices, controls.minBG, 31)
         LayoutHelpers.AtLeftTopIn(controls.extraBtn1, controls.minBG, 10, 31)
-        controls.extraBtn1.icon:Hide()
-        controls.extraBtn1.icon:SetSolidColor('00000000')
+        if SacuLoadout.IsGatewaySelection(GetSelectedUnits()) then
+            controls.extraBtn1.icon.OnTexture = UIUtil.UIFile('/game/construct-sm_btn/infinite_on.dds')
+            controls.extraBtn1.icon.OffTexture = UIUtil.UIFile('/game/construct-sm_btn/infinite_off.dds')
+            controls.extraBtn1.icon:Show()
+            controls.extraBtn1.icon:SetTexture(controls.extraBtn1.icon.OnTexture)
+        else
+            controls.extraBtn1.icon:Hide()
+            controls.extraBtn1.icon:SetSolidColor('00000000')
+        end
     end
 end
 
