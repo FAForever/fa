@@ -48,6 +48,9 @@ UnitBlueprint{
             ShieldSize = 120,
             ShieldSpillOverDamageMod = 0.35,
             ShieldVerticalOffset = -50,
+            RegenPerBuildRate = 1.33,
+            AssistCostEnergyPerBuildRate = 1.88,
+            AssistCostMassPerBuildRate = 0.188,
         },
     },
     Display = {
