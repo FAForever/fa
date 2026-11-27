@@ -238,6 +238,13 @@ local function overrideDoDamage(self, instigator, amount, vector, damageType)
     local preAdjHealth = self:GetHealth()
     self:AdjustHealth(instigator, -amount)
     local health = self:GetHealth()
+
+    if amount > 0 and EntityCategoryContains(categories.COMMAND, self) then
+        local brain = self:GetAIBrain()
+        if brain and brain.OnPlayCommanderUnderAttackVO then
+            brain:OnPlayCommanderUnderAttackVO()
+        end
+    end
     if (health <= 0 or amount > preAdjHealth) and not self.KilledFlag then
         self.KilledFlag = true
         if damageType == 'Reclaimed' then
