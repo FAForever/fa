@@ -1,445 +1,453 @@
--- Makes FA's implicit module system visible to LuaLS: finds each file's bare top-level
--- declarations and rewrites the file into a real Lua module, so every export resolves
--- correctly wherever it's referenced from - including forward references, from inside a
--- function defined earlier in the same file.
+-- Makes FA's implicit module system visible to LuaLS by rewriting each file into a real Lua
+-- module.
 --
--- This is a heuristic pre-parse scanner, not a real parser. FA files never `return {...}` - a
--- file's bare top-level assignments and functions (no `local` keyword), such as
--- `Name = ...` / `function Name(...)`, ARE its exports, resolved by `import()` at runtime. We
--- rewrite the whole file into a classic Lua module: `local M = {}`, every export reachable as
--- `M.Name`, and the file ends with `return M`. That's what makes forward/mutual references
--- between exports resolve correctly, including from *inside* an earlier-defined function's
--- body: `M` itself is assigned exactly once (`local M = {}`), so its own local-scoping is
--- trivially unambiguous regardless of where in the file it's referenced from, and `M.Name`
--- field resolution (unlike a bare local) isn't restricted to "last assignment before this
--- textual position" - LuaLS resolves it by merging every known `M.Name = ...` in the file,
--- wherever it sits. This also sidesteps Lua 5.1's 200-local-per-chunk cap entirely for exported
--- names, since table fields don't consume it - only forward-declared *unsafe* names (see below)
--- do.
+-- At runtime, `import()` (lua/system/import.lua) runs a file with a fresh table as its
+-- environment (`__index = _G`), so every assignment to a name that isn't a local - at the top
+-- level, inside an `if`/`do`/`for` block, or inside a function body - writes into that module
+-- table, and `import()` returns it. FA files never `return {...}`; their free assignments ARE
+-- their exports. LuaLS knows nothing about per-file environments (no annotation can express
+-- one), so it would treat all of those names as workspace-wide globals.
 --
--- Depth tracks both block keywords (function/if/do/repeat...end/until) AND `{`/`}`, since
--- FA classes are one big table constructor (`Unit = ClassUnit(...) { Foo = function(self)
--- ... end, ... }`) - without counting braces too, every `Key = function(...) end,` entry
--- inside it looks exactly like a bare top-level export the moment its own function/end
--- balances back to depth 0, and gets wrongly captured (verified against real FA files:
--- lua/sim/Unit.lua alone went from 3 genuine top-level names to 329 false ones without this).
+-- The rewrite: `local M = {}` at the top, every free occurrence of an exported name becomes
+-- `M.Name` (definitions and references alike), and `return M` at the end. `M.Name` field
+-- resolution, unlike a bare local, isn't restricted to "last assignment before this position":
+-- LuaLS merges every `M.Name = ...` in the file, so forward references and mutual recursion
+-- resolve, including from inside an earlier-defined function. Table fields also don't count
+-- toward Lua 5.1's 200-locals-per-chunk limit.
 --
--- Rewriting every REFERENCE (not just each definition) to `M.Name` is only safe for a name
--- that isn't shadowed anywhere in the file - a `local`, function parameter, or `for` loop
--- variable sharing the same name would have every bare use *inside its own scope* wrongly
--- redirected to the module field otherwise (confirmed with a real example:
--- lua/system/profile.lua does `checkpoint = debug.profiledata` at the top level, then
--- `function checkpoint_to_table(checkpoint)` - the parameter shadows the export for that
--- function's whole body). A file-wide "does this name appear as a local/param/loop-var
--- anywhere" scan is a conservative, whole-file-granularity substitute for real scope
--- resolution: names it flags ("unsafe") keep today's exact behaviour (forward-declared as a
--- real `local`, bridged into `M` with one `M.Name = Name` assignment before `return M`) rather
--- than risk a wrong rewrite. Verified empirically negligible: across all 2,801 *.lua files in
--- the fa repo (102,668 top-level exports total), only 24 files / 57 names are ever shadowed
--- anywhere in their own file.
+-- "Free" is decided by real scope tracking over lexer.lua's tokens: a frame stack of
+-- function / block / if / loop / repeat scopes (holding their locals, parameters and loop
+-- variables) plus table-constructor and paren frames. A name is free when it isn't a field
+-- (`x.Name`, `x:Name`), isn't a table-constructor key (`{ Name = ... }`), and no enclosing scope
+-- declares it at that point. `local a = <expr>` only takes effect once its statement ends, so
+-- `local Foo = Foo` still reads the outer `Foo`. Exports are the free names assigned anywhere in
+-- the file (`Name = ...`, `a, Name = ...`, `function Name(...)`), and only free occurrences get
+-- rewritten - a parameter or local that shadows an export inside its own scope is left alone.
 --
--- Known limitations (acceptable trade-off for a regex/state-machine scanner
--- instead of a full parser): spaced-out member access (`t . Name = x`) isn't
--- recognised as a member access and could false-positive.
+-- Files that run in the global environment opt out with `---@declare-global` (or `---@meta`):
+-- their names are real globals. So does a file that already ends in its own top-level `return`.
+--
+-- Known limitations (a token scanner, not a full parser):
+--   - `until <expr>` is scanned in the enclosing scope, not the repeat body's.
+--   - A hook file appended to its target can see the target's top-level locals at runtime;
+--     each text is analysed on its own, so that isn't modelled.
+
+local lexer = require 'lexer'
 
 local M = {}
 
-local BLOCK_OPEN  = { ['function'] = true, ['if'] = true, ['do'] = true, ['repeat'] = true }
-local BLOCK_CLOSE = { ['end'] = true, ['until'] = true }
-local LOOP_HEADER = { ['for'] = true, ['while'] = true }
-
--- Files marked `---@declare-global` (or `---@meta`) are declaring real globals, not FA
--- module exports - e.g. the engine API stubs. Leave them as plain, untransformed Lua.
+--- Files marked `---@declare-global` (or `---@meta`) declare real globals, not module exports -
+--- e.g. engine API stubs and the files globalInit.lua `doscript`s into _G.
+---@param text string
+---@return boolean
 local function optsOut(text)
     return text:find('%-%-%-@declare%-global') ~= nil
         or text:find('%-%-%-@meta') ~= nil
 end
 
---- Given the position right after an identifier, checks whether it's followed by
---- `(, <name>)* =` (not `==`) - i.e. whether this identifier is one entry in a
---- comma-separated name-list that ultimately ends in a bare assignment. Used so each name in
---- `A, B, C = 1, 2, 3` can independently confirm its own membership, regardless of position.
----@param text string
----@param pos  integer
----@param n    integer
+-- Keywords that start a statement.
+local STATEMENT_KEYWORDS = {
+    ['local'] = true, ['if'] = true, ['for'] = true, ['while'] = true, ['do'] = true,
+    ['repeat'] = true, ['return'] = true, ['break'] = true, ['end'] = true, ['else'] = true,
+    ['elseif'] = true, ['until'] = true, ['goto'] = true,
+}
+
+--- Whether `tok` can be the last token of an expression - two expressions in a row (`a b`)
+--- means a new statement started.
+---@param tok fa.token?
 ---@return boolean
-local function isNameListThenEquals(text, pos, n)
-    local k = pos
-    while true do
-        local _, we = text:find('^%s*', k)
-        k = we + 1
-        if text:sub(k, k) ~= ',' then
-            return false
-        end
-        k = k + 1
-        local _, we2 = text:find('^%s*', k)
-        k = we2 + 1
-        local ns, ne = text:find('^[%a_][%w_]*', k)
-        if not ns then
-            return false
-        end
-        k = ne + 1
-        local _, we3 = text:find('^%s*', k)
-        k = we3 + 1
-        if text:sub(k, k) == '=' and text:sub(k, k + 1) ~= '==' then
+local function endsExpression(tok)
+    if not tok then
+        return false
+    end
+    if tok.type == 'name' or tok.type == 'number' or tok.type == 'string' then
+        return true
+    end
+    if tok.type == 'keyword' then
+        return tok.value == 'end' or tok.value == 'true' or tok.value == 'false' or tok.value == 'nil'
+    end
+    if tok.type == 'op' then
+        return tok.value == ')' or tok.value == ']' or tok.value == '}' or tok.value == '...'
+    end
+    return false
+end
+
+--- Whether tokens[i] starts a new statement.
+---@param tokens fa.token[]
+---@param i integer
+---@return boolean
+local function isStatementStart(tokens, i)
+    local tok = tokens[i]
+    if tok.type == 'op' then
+        return tok.value == ';' or tok.value == '::'
+    end
+    if tok.type == 'keyword' then
+        if STATEMENT_KEYWORDS[tok.value] then
             return true
         end
-        -- else loop again, expecting another ", name"
+        return tok.value == 'function' and endsExpression(tokens[i - 1])
     end
+    if tok.type == 'name' then
+        return endsExpression(tokens[i - 1])
+    end
+    return false
 end
 
---- Given the position right after `function`, finds and returns the parameter-list body text
---- (between the parens), covering `function Name(...)`, `function Obj.Name(...)`,
---- `function Obj:Method(...)` and anonymous `function(...)` alike - the name/dotted/colon
---- chain in front of the parens (if any) doesn't matter, only the parens themselves do.
----@param text string
----@param pos  integer  position right after the `function` keyword
----@return string?
-local function findParamsText(text, pos)
-    local j = pos
-    local n = #text
-    while j <= n and text:sub(j, j):match('[%s%w_%.%:]') do
+--- From the token right after a name, checks for `(, <name>(.<name>)*)* =` - whether that name
+--- is one target of a multiple assignment (`a, b.c, Name = ...`).
+---@param tokens fa.token[]
+---@param j integer
+---@return boolean
+local function isNameListThenEquals(tokens, j)
+    while tokens[j] and tokens[j].value == ',' do
         j = j + 1
-    end
-    if text:sub(j, j) ~= '(' then
-        return nil
-    end
-    local closeParen = text:find(')', j, true)
-    if not closeParen then
-        return nil
-    end
-    return text:sub(j + 1, closeParen - 1)
-end
-
---- Splits a `for` loop header's variable-name list (numeric or generic form) starting right
---- after the `for` keyword, returning every comma-separated name up to (not including) the
---- `=` or `in` that ends the list. These are implicitly local for the loop body.
----@param text string
----@param pos  integer  position right after the `for` keyword
----@return string[]
-local function findForLoopVars(text, pos)
-    local names = {}
-    local namesText = text:match('^%s*([%a_][%w_%s,]-)%s*=', pos)
-        or text:match('^%s*([%a_][%w_%s,]-)%s+in%f[%A]', pos)
-    if namesText then
-        for nm in namesText:gmatch('[%a_][%w_]*') do
-            names[#names + 1] = nm
+        if not (tokens[j] and tokens[j].type == 'name') then
+            return false
+        end
+        j = j + 1
+        while tokens[j] and tokens[j].value == '.' and tokens[j + 1] and tokens[j + 1].type == 'name' do
+            j = j + 2
         end
     end
-    return names
+    return tokens[j] ~= nil and tokens[j].type == 'op' and tokens[j].value == '='
 end
 
+---@class fa.nameUse
+---@field name   string
+---@field start  integer
+---@field assign boolean  whether this occurrence assigns the name
+
+---@class fa.exportAnalysis
+---@field optOut       boolean  `---@declare-global`/`---@meta` file
+---@field exports      string[] free names assigned somewhere in the file, in order of first assignment
+---@field hasTopReturn boolean  the file already ends with its own top-level `return`
+---@field usesM        boolean  `M` appears as a bare name, so the module table needs another name
+---@field uses         fa.nameUse[] every free name occurrence
+
+---@class fa.frame
+---@field kind      'function'|'block'|'if'|'loop'|'repeat'|'table'|'paren'
+---@field scope?    table<string, boolean>  locals declared in this frame (nil: not a scope yet)
+---@field loopVars? string[]  `for` variables, declared once the body (`do`) starts
+---@field body?     boolean   loop frame whose `do` has been seen
+
 ---@param text string
----@return string[] exports  ordered, de-duplicated bare top-level names
----@return boolean  hasTopReturn  whether the file already has a top-level `return`
----@return integer  topLevelLocalCount  count of the file's own pre-existing top-level locals
----@return table<string, boolean> unsafeNames  export names shadowed by a local/param/loop-var
----                                somewhere in the file - unsafe to rewrite every reference of
-function M.scan(text)
+---@return fa.exportAnalysis
+local function analyze(text)
+    ---@type fa.exportAnalysis
+    local result = { optOut = false, exports = {}, hasTopReturn = false, usesM = false, uses = {} }
     if optsOut(text) then
-        return {}, false, 0, {}
+        result.optOut = true
+        return result
     end
 
-    local n = #text
+    local tokens = lexer.codeTokens(text)
+    local topScope = {}
+    ---@type fa.frame[]
+    local frames = {}
+    -- `local a, b = <expr>`: names waiting for their statement to end before they're in scope
+    local pending
+    local exportSet = {}
+
+    local function currentScope()
+        for k = #frames, 1, -1 do
+            if frames[k].scope then
+                return frames[k].scope
+            end
+        end
+        return topScope
+    end
+
+    local function isDeclared(name)
+        for k = #frames, 1, -1 do
+            local scope = frames[k].scope
+            if scope and scope[name] then
+                return true
+            end
+        end
+        return topScope[name] == true
+    end
+
+    local function activatePending()
+        if pending then
+            for _, name in ipairs(pending.names) do
+                pending.scope[name] = true
+            end
+            pending = nil
+        end
+    end
+
+    --- Pops frames down to and including the innermost one of a kind in `kinds`, as long as
+    --- only frames of a kind in `through` lie above it. Recovers from unbalanced code mid-edit.
+    local function popTo(kinds, through)
+        for k = #frames, 1, -1 do
+            local kind = frames[k].kind
+            if kinds[kind] then
+                for _ = #frames, k, -1 do
+                    frames[#frames] = nil
+                end
+                return
+            end
+            if not through[kind] then
+                return
+            end
+        end
+    end
+
+    local SCOPE_KINDS = { ['function'] = true, block = true, ['if'] = true, loop = true, ['repeat'] = true }
+    local BRACKET_KINDS = { table = true, paren = true }
+    local TABLE_ONLY = { table = true }
+    local PAREN_ONLY = { paren = true }
+    local REPEAT_ONLY = { ['repeat'] = true }
+
+    local function use(name, start, assign)
+        result.uses[#result.uses + 1] = { name = name, start = start, assign = assign }
+        if assign and not exportSet[name] then
+            exportSet[name] = true
+            result.exports[#result.exports + 1] = name
+        end
+    end
+
+    --- Declares the parameters of the function frame just pushed, given the index of its `(`.
+    --- Returns the index after the closing `)`.
+    ---@param j integer
+    ---@return integer
+    local function parseParams(j)
+        if not (tokens[j] and tokens[j].value == '(') then
+            return j
+        end
+        local scope = frames[#frames].scope
+        j = j + 1
+        while tokens[j] and tokens[j].value ~= ')' do
+            if tokens[j].type == 'name' then
+                scope[tokens[j].value] = true
+            end
+            j = j + 1
+        end
+        return j + 1
+    end
+
+    --- Collects `<name> (, <name>)*` starting at j. Returns the names and the index after them.
+    ---@param j integer
+    ---@return string[]
+    ---@return integer
+    local function parseNameList(j)
+        local names = {}
+        while tokens[j] and tokens[j].type == 'name' do
+            names[#names + 1] = tokens[j].value
+            if tokens[j].value == 'M' then
+                result.usesM = true
+            end
+            j = j + 1
+            if tokens[j] and tokens[j].value == ',' and tokens[j + 1] and tokens[j + 1].type == 'name' then
+                j = j + 1
+            else
+                break
+            end
+        end
+        return names, j
+    end
+
     local i = 1
-    local depth = 0
-    local loopHeaderDepth = 0
-    local lastWord = nil
-    local prevChar = nil
-    local hasTopReturn = false
-    -- Persists across the commas in a `local a, b, c = ...` name-list, unlike `lastWord`
-    -- (which resets on every comma) - needed so e.g. `local pairs, ipairs = pairs, ipairs`
-    -- doesn't wrongly treat `ipairs` as a bare export just because the comma before it wiped
-    -- `lastWord` back to nil.
-    local localList = false
-    -- Counts every top-level `local` name (including `local function Name()`) that already
-    -- exists in the file, so the caller can tell whether adding more locals (for unsafe names)
-    -- would cross Lua's 200-local-per-chunk cap.
-    local topLevelLocalCount = 0
-
-    -- Every name introduced as a `local` (any depth), a function parameter (any depth, any
-    -- function), or a `for` loop variable (any depth) anywhere in the file - a superset used
-    -- below to flag which exports are unsafe to rewrite at every reference site.
-    local localOrParamNames = {}
-
-    local exportsSet = {}
-    local exports = {}
-    local function addExport(name)
-        if not exportsSet[name] then
-            exportsSet[name] = true
-            exports[#exports + 1] = name
-        end
-    end
-
+    local n = #tokens
     while i <= n do
-        local c = text:sub(i, i)
+        local tok = tokens[i]
+        local nextI = i + 1
 
-        if c == '-' and text:sub(i, i + 1) == '--' then
-            local afterDashes = i + 2
-            local eqs = text:match('^%[(=*)%[', afterDashes)
-            if eqs then
-                local _, closeEnd = text:find(']' .. eqs .. ']', afterDashes + 2 + #eqs, true)
-                i = closeEnd and (closeEnd + 1) or (n + 1)
-            else
-                local nl = text:find('\n', i, true)
-                i = nl and (nl + 1) or (n + 1)
-            end
+        if pending and #frames == pending.depth and i >= pending.from and isStatementStart(tokens, i) then
+            activatePending()
+        end
 
-        elseif c == '"' or c == "'" then
-            local quote = c
-            local j = i + 1
-            while j <= n do
-                local cj = text:sub(j, j)
-                if cj == '\\' then
-                    j = j + 2
-                elseif cj == quote then
-                    j = j + 1
-                    break
+        if tok.type == 'keyword' then
+            local kw = tok.value
+            if kw == 'local' then
+                local fnTok, nameTok = tokens[i + 1], tokens[i + 2]
+                if fnTok and fnTok.value == 'function' and nameTok and nameTok.type == 'name' then
+                    -- `local function Name` - in scope immediately, so it can call itself
+                    currentScope()[nameTok.value] = true
+                    if nameTok.value == 'M' then
+                        result.usesM = true
+                    end
+                    frames[#frames + 1] = { kind = 'function', scope = {} }
+                    nextI = parseParams(i + 3)
                 else
-                    j = j + 1
-                end
-            end
-            i = j
-            prevChar = quote
-            lastWord = nil
-
-        elseif c == '[' then
-            local eqs = text:match('^%[(=*)%[', i)
-            if eqs then
-                local _, closeEnd = text:find(']' .. eqs .. ']', i + 2 + #eqs, true)
-                i = closeEnd and (closeEnd + 1) or (n + 1)
-            else
-                i = i + 1
-            end
-            prevChar = ']'
-            lastWord = nil
-
-        elseif c:match('%s') then
-            i = i + 1
-
-        elseif c:match('[%a_]') then
-            local _, e, word = text:find('^([%a_][%w_]*)', i)
-            i = e + 1
-
-            local k = i
-            while k <= n and text:sub(k, k):match('%s') do
-                k = k + 1
-            end
-            local nextChar = text:sub(k, k)
-
-            if word == 'function' then
-                depth = depth + 1
-                if depth == 1 and loopHeaderDepth == 0 then
-                    if lastWord == 'local' then
-                        topLevelLocalCount = topLevelLocalCount + 1
+                    local names, j = parseNameList(i + 1)
+                    if tokens[j] and tokens[j].value == '=' then
+                        activatePending()
+                        pending = { names = names, scope = currentScope(), depth = #frames, from = j + 1 }
+                        nextI = j + 1
                     else
-                        local ns, _, fname = text:find('^%s*([%a_][%w_]*)%s*%(', i)
-                        if ns then
-                            addExport(fname)
+                        local scope = currentScope()
+                        for _, name in ipairs(names) do
+                            scope[name] = true
                         end
+                        nextI = j
                     end
                 end
-                -- this function's own parameters are locally-scoped to its body, at any depth
-                local paramsText = findParamsText(text, i)
-                if paramsText then
-                    -- Lua 5.4 (the runtime LuaLS executes plugins under) makes generic-for
-                    -- control variables implicitly const - reassigning `p` directly here is a
-                    -- compile error ("attempt to assign to const variable 'p'") that fails this
-                    -- whole module's `require`, taking every other scanner down with it (the
-                    -- exact cause of a prior "everything is broken" regression - confirmed via
-                    -- the LuaLS output log's stack traceback pointing at this line).
-                    for rawParam in paramsText:gmatch('[^,]+') do
-                        local p = rawParam:match('^%s*(.-)%s*$')
-                        if p:match('^[%a_][%w_]*$') then
-                            localOrParamNames[p] = true
+
+            elseif kw == 'function' then
+                local j = i + 1
+                local isMethod = false
+                local nameTok = tokens[j]
+                if nameTok and nameTok.type == 'name' then
+                    -- `function Name.a.b:c(...)` - `Name` is a reference in the enclosing scope
+                    j = j + 1
+                    local dotted = false
+                    while tokens[j] and (tokens[j].value == '.' or tokens[j].value == ':')
+                      and tokens[j + 1] and tokens[j + 1].type == 'name' do
+                        dotted = true
+                        if tokens[j].value == ':' then
+                            isMethod = true
                         end
+                        j = j + 2
+                    end
+                    if nameTok.value == 'M' then
+                        result.usesM = true
+                    end
+                    if not isDeclared(nameTok.value) then
+                        use(nameTok.value, nameTok.start, not dotted)
                     end
                 end
-            elseif BLOCK_OPEN[word] then
-                depth = depth + 1
-                if word == 'do' and loopHeaderDepth > 0 then
-                    loopHeaderDepth = loopHeaderDepth - 1
+                local scope = {}
+                if isMethod then
+                    scope.self = true
                 end
-            elseif BLOCK_CLOSE[word] then
-                depth = math.max(0, depth - 1)
-            elseif LOOP_HEADER[word] then
-                loopHeaderDepth = loopHeaderDepth + 1
-                if word == 'for' then
-                    for _, nm in ipairs(findForLoopVars(text, i)) do
-                        localOrParamNames[nm] = true
+                frames[#frames + 1] = { kind = 'function', scope = scope }
+                nextI = parseParams(j)
+
+            elseif kw == 'do' then
+                local top = frames[#frames]
+                if top and top.kind == 'loop' and not top.body then
+                    top.body = true
+                    for _, name in ipairs(top.loopVars) do
+                        top.scope[name] = true
                     end
+                else
+                    frames[#frames + 1] = { kind = 'block', scope = {} }
                 end
-            elseif word == 'return' then
-                if depth == 0 and loopHeaderDepth == 0 then
-                    hasTopReturn = true
+
+            elseif kw == 'for' then
+                -- loop variables are only visible inside the body, not in the header expressions
+                local loopVars, j = parseNameList(i + 1)
+                frames[#frames + 1] = { kind = 'loop', scope = {}, loopVars = loopVars }
+                nextI = j
+
+            elseif kw == 'while' then
+                frames[#frames + 1] = { kind = 'loop', scope = {}, loopVars = {} }
+
+            elseif kw == 'if' then
+                frames[#frames + 1] = { kind = 'if' }
+
+            elseif kw == 'then' or kw == 'else' then
+                local top = frames[#frames]
+                if top and top.kind == 'if' then
+                    top.scope = {}
                 end
-            elseif word == 'local' then
-                localList = true
-            elseif depth == 0 and loopHeaderDepth == 0
-               and prevChar ~= '.' and prevChar ~= ':' then
-                if localList then
-                    topLevelLocalCount = topLevelLocalCount + 1
-                elseif nextChar == '=' and text:sub(k, k + 1) ~= '==' then
-                    addExport(word)
-                elseif nextChar == ',' and isNameListThenEquals(text, i, n) then
-                    addExport(word)
+
+            elseif kw == 'elseif' then
+                local top = frames[#frames]
+                if top and top.kind == 'if' then
+                    top.scope = nil
+                end
+
+            elseif kw == 'repeat' then
+                frames[#frames + 1] = { kind = 'repeat', scope = {} }
+
+            elseif kw == 'until' then
+                popTo(REPEAT_ONLY, BRACKET_KINDS)
+
+            elseif kw == 'end' then
+                popTo(SCOPE_KINDS, BRACKET_KINDS)
+                if pending and #frames < pending.depth then
+                    activatePending()
+                end
+
+            elseif kw == 'return' then
+                if #frames == 0 then
+                    result.hasTopReturn = true
                 end
             end
 
-            if localList then
-                localOrParamNames[word] = true
+        elseif tok.type == 'op' then
+            local v = tok.value
+            if v == '{' then
+                frames[#frames + 1] = { kind = 'table' }
+            elseif v == '(' or v == '[' then
+                frames[#frames + 1] = { kind = 'paren' }
+            elseif v == '}' then
+                popTo(TABLE_ONLY, PAREN_ONLY)
+            elseif v == ')' or v == ']' then
+                popTo(PAREN_ONLY, {})
             end
 
-            if word ~= 'local' then
-                localList = localList and nextChar == ','
+        elseif tok.type == 'name' then
+            local prev = tokens[i - 1]
+            local nextTok = tokens[i + 1]
+            local top = frames[#frames]
+            local isField = prev and prev.type == 'op' and (prev.value == '.' or prev.value == ':')
+            local isKey = top and top.kind == 'table' and nextTok and nextTok.value == '='
+            if not isField and not isKey then
+                if tok.value == 'M' then
+                    result.usesM = true
+                end
+                if not isDeclared(tok.value) then
+                    local inStatement = not (top and BRACKET_KINDS[top.kind])
+                    local assign = inStatement and nextTok ~= nil
+                        and (nextTok.value == '=' or (nextTok.value == ',' and isNameListThenEquals(tokens, i + 1)))
+                    use(tok.value, tok.start, assign == true)
+                end
             end
-
-            lastWord = word
-            prevChar = nil
-
-        elseif c == '{' then
-            depth = depth + 1
-            prevChar = nil
-            lastWord = nil
-            i = i + 1
-
-        elseif c == '}' then
-            depth = math.max(0, depth - 1)
-            prevChar = nil
-            lastWord = nil
-            i = i + 1
-
-        else
-            prevChar = (c == '.' or c == ':') and c or nil
-            lastWord = nil
-            i = i + 1
         end
+
+        i = nextI
     end
 
-    local unsafeNames = {}
-    for _, name in ipairs(exports) do
-        if localOrParamNames[name] then
-            unsafeNames[name] = true
-        end
-    end
-
-    return exports, hasTopReturn, topLevelLocalCount, unsafeNames
+    return result
 end
 
---- Second pass: for every bare occurrence of a name in `safeNames`, not preceded by `.`/`:`
---- (member access on something else), produces a diff inserting `M.` immediately before it.
---- Handles both definition sites (`Name = ...` -> `M.Name = ...`, `function Name(...)` ->
---- `function M.Name(...)`) and every later reference uniformly - the same insert-before-token
---- diff does both jobs, no separate "is this the definition" tracking needed.
----
---- A bare `Name` immediately followed by `=` (not `==`) is only rewritten at `depth == 0`: at
---- `depth > 0` that shape is a table-constructor key (`{ Name = value }`), not an assignment -
---- exactly the same hazard, and the same depth-based fix, as the original brace-depth bug in
---- `M.scan` above. A `Name` NOT followed by `=` is always a genuine read, safe to rewrite at
---- any depth.
----@param text       string
----@param safeNames  table<string, boolean>
----@return fa.diff[]
-function M.rewriteReferences(text, safeNames)
-    local n = #text
-    local i = 1
-    local depth = 0
-    local loopHeaderDepth = 0
-    local prevChar = nil
-    local diffs = {}
+-- Small cache: plugin.lua analyses the same text more than once per OnSetText.
+local CACHE_SIZE = 8
+local cacheKeys, cacheValues = {}, {}
 
-    while i <= n do
-        local c = text:sub(i, i)
-
-        if c == '-' and text:sub(i, i + 1) == '--' then
-            local afterDashes = i + 2
-            local eqs = text:match('^%[(=*)%[', afterDashes)
-            if eqs then
-                local _, closeEnd = text:find(']' .. eqs .. ']', afterDashes + 2 + #eqs, true)
-                i = closeEnd and (closeEnd + 1) or (n + 1)
-            else
-                local nl = text:find('\n', i, true)
-                i = nl and (nl + 1) or (n + 1)
-            end
-
-        elseif c == '"' or c == "'" then
-            local quote = c
-            local j = i + 1
-            while j <= n do
-                local cj = text:sub(j, j)
-                if cj == '\\' then
-                    j = j + 2
-                elseif cj == quote then
-                    j = j + 1
-                    break
-                else
-                    j = j + 1
-                end
-            end
-            i = j
-            prevChar = quote
-
-        elseif c == '[' then
-            local eqs = text:match('^%[(=*)%[', i)
-            if eqs then
-                local _, closeEnd = text:find(']' .. eqs .. ']', i + 2 + #eqs, true)
-                i = closeEnd and (closeEnd + 1) or (n + 1)
-            else
-                i = i + 1
-            end
-            prevChar = ']'
-
-        elseif c:match('%s') then
-            i = i + 1
-
-        elseif c:match('[%a_]') then
-            local wordStart = i
-            local _, e, word = text:find('^([%a_][%w_]*)', i)
-            i = e + 1
-
-            local k = i
-            while k <= n and text:sub(k, k):match('%s') do
-                k = k + 1
-            end
-            local nextChar = text:sub(k, k)
-
-            if word == 'function' then
-                depth = depth + 1
-            elseif BLOCK_OPEN[word] then
-                depth = depth + 1
-                if word == 'do' and loopHeaderDepth > 0 then
-                    loopHeaderDepth = loopHeaderDepth - 1
-                end
-            elseif BLOCK_CLOSE[word] then
-                depth = math.max(0, depth - 1)
-            elseif LOOP_HEADER[word] then
-                loopHeaderDepth = loopHeaderDepth + 1
-            elseif safeNames[word] and prevChar ~= '.' and prevChar ~= ':' then
-                local isEqTarget = nextChar == '=' and text:sub(k, k + 1) ~= '=='
-                if not isEqTarget or depth == 0 then
-                    diffs[#diffs + 1] = { start = wordStart, finish = wordStart - 1, text = 'M.' }
-                end
-            end
-
-            prevChar = nil
-
-        elseif c == '{' then
-            depth = depth + 1
-            prevChar = nil
-            i = i + 1
-
-        elseif c == '}' then
-            depth = math.max(0, depth - 1)
-            prevChar = nil
-            i = i + 1
-
-        else
-            prevChar = (c == '.' or c == ':') and c or nil
-            i = i + 1
+--- Scope analysis of `text` (cached).
+---@param text string
+---@return fa.exportAnalysis
+function M.analyze(text)
+    for idx = 1, #cacheKeys do
+        if cacheKeys[idx] == text then
+            return cacheValues[idx]
         end
     end
+    local result = analyze(text)
+    table.insert(cacheKeys, 1, text)
+    table.insert(cacheValues, 1, result)
+    if #cacheKeys > CACHE_SIZE then
+        cacheKeys[#cacheKeys] = nil
+        cacheValues[#cacheValues] = nil
+    end
+    return result
+end
 
-    return diffs
+--- Prefixes every free occurrence of a name in `exportSet` with `<moduleName>.`.
+---@param text       string
+---@param exportSet  table<string, boolean>
+---@param moduleName string
+---@return fa.diff[] diffs
+---@return table<integer, boolean> rewritten  start offsets of the rewritten names
+function M.rewriteReferences(text, exportSet, moduleName)
+    local diffs = {}
+    local rewritten = {}
+    local analysis = M.analyze(text)
+    if analysis.optOut then
+        return diffs, rewritten
+    end
+    local prefix = moduleName .. '.'
+    for _, nameUse in ipairs(analysis.uses) do
+        if exportSet[nameUse.name] then
+            diffs[#diffs + 1] = { start = nameUse.start, finish = nameUse.start - 1, text = prefix }
+            rewritten[nameUse.start] = true
+        end
+    end
+    return diffs, rewritten
 end
 
 return M
