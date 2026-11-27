@@ -520,7 +520,12 @@ Callbacks.RingArtilleryTech3Exp = function(data, selection)
     import("/lua/sim/commands/ringing/ring-with-power-tech3.lua").RingWithPower(target, engineers)
 end
 
----@param data any
+---@class SelectHighestEngineerAndAssistData
+---@field TargetId EntityId   # engineer that the others assist
+---@field KeepIds? EntityId[] # engineers that stay selected; their orders are left alone
+
+--- Idle engineers in the old selection that do not stay selected assist the target.
+---@param data SelectHighestEngineerAndAssistData
 ---@param selection Unit[]
 Callbacks.SelectHighestEngineerAndAssist = function(data, selection)
     if selection then
@@ -529,9 +534,22 @@ Callbacks.SelectHighestEngineerAndAssist = function(data, selection)
         if not target or not target.Army then return end
         if not OkayToMessWithArmy(target.Army) then return end
 
-        local noACU = EntityCategoryFilterDown(categories.ALLUNITS - categories.COMMAND, selection)
-        IssueClearCommands(noACU)
-        IssueGuard(noACU, target)
+        local keep = { [target] = true }
+        for _, unit in SecureUnits(data.KeepIds) do
+            keep[unit] = true
+        end
+
+        local assisters = {}
+        local engineers = EntityCategoryFilterDown(categories.ENGINEER - (categories.COMMAND + categories.STRUCTURE), selection)
+        for _, unit in engineers do
+            if not keep[unit] and unit:IsIdleState() then
+                TableInsert(assisters, unit)
+            end
+        end
+
+        if not assisters[1] then return end
+        IssueClearCommands(assisters)
+        IssueGuard(assisters, target)
     end
 end
 

@@ -1,0 +1,1 @@
+- Fix the "filter engineers by tech level" hotkey making every selected unit assist the chosen engineer. Factories no longer cancel their queues and combat units no longer follow the engineer: only the idle engineers that are filtered out of the selection assist (#7421).
