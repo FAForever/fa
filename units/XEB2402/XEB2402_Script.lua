@@ -84,6 +84,7 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
 
         Main = function(self)
             if not self.Satellite and (self.newSatellite or self.FreeSatelliteLaunch) then
+                self.launchingSatellite = true
                 self.waitingForLaunch = true
 
                 if not self.AnimManip then
@@ -105,6 +106,7 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
                 self:Retract()
 
                 IssueToUnitClearCommands(self)
+                self.launchingSatellite = nil
 
                 -- the satellite died during the launch, and clearing the commands removed its rebuild order
                 if not self.Satellite then
@@ -154,7 +156,7 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
         if satellite and not satellite.Dead and not satellite.IsDying then
             satellite:Kill()
         end
-        self:DestroyNewSatellite()
+        self:DestroyNewSatellite(true)
 
         self:SetActiveConsumptionInactive()
         ChangeState(self, self.IdleState)
@@ -174,11 +176,14 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
     --- Destroys a satellite that the station finished building but hasn't launched yet, so it doesn't
     --- survive the station.
     ---@param self XEB2402
-    DestroyNewSatellite = function(self)
+    ---@param kill? boolean # kill it instead, when the station is killed
+    DestroyNewSatellite = function(self, kill)
         local newSatellite = self.newSatellite
         if newSatellite then
             self.newSatellite = nil
-            if not IsDestroyed(newSatellite) then
+            if kill and not newSatellite.Dead then
+                newSatellite:Kill()
+            elseif not IsDestroyed(newSatellite) then
                 newSatellite:Destroy()
             end
         end
@@ -200,10 +205,11 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
     end,
 
     --- Orders the station to build a new satellite. During the launch sequence, the sequence gives
-    --- the order when it ends, because a build order would restart it.
+    --- the order when it ends, because a build order would restart it, and the sequence clears the
+    --- commands when it ends.
     ---@param self XEB2402
     RebuildSatellite = function(self)
-        if not self.waitingForLaunch then
+        if not self.launchingSatellite then
             IssueToUnitBuildFactory(self, 'XEA0002', 1)
         end
     end,
@@ -224,7 +230,6 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
     ---@param self XEB2402
     ---@param newUnit XEB2402
     TransferSatellite = function(self, newUnit)
-        -- `newSatellite` is a satellite that the station finished building but hasn't launched yet
         -- `newSatellite` is a satellite that the station finished building but hasn't launched yet.
         -- Letting go of the satellite first keeps the old one, which the change of army destroys,
         -- from ordering the old station to rebuild it.
