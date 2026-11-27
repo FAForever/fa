@@ -565,6 +565,11 @@ options = {
                 key = 'assist_factory_instantly',
                 type = 'toggle',
                 default = 'Off',
+                set = function(key, value, startup)
+                    if GetCurrentUIState() == 'game' then
+                        import("/lua/ui/game/commandmode.lua").UpdateAssistFactoryInstantlyOption(value)
+                    end
+                end,
                 custom = {
                     states = {
                         { text = "<LOC _Off>Off", key = 'Off' },
