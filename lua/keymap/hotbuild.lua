@@ -216,7 +216,8 @@ function hotbuildCyclePreview(maxPos, factoryFlag)
         -- Start the fading thread
         if not factoryFlag or maxPos == 1 then
             cycleThread = ForkThread(function()
-                local stayTime = options.hotbuild_cycle_reset_time / 2000.0
+                -- a profile that never saved the option has none: use its default from options.lua (1100)
+                local stayTime = (options.hotbuild_cycle_reset_time or 1100) / 2000.0
                 local fadeTime = stayTime
 
                 WaitSeconds(stayTime)
@@ -229,7 +230,7 @@ function hotbuildCyclePreview(maxPos, factoryFlag)
         end
     else
         cycleThread = ForkThread(function()
-            WaitSeconds(options.hotbuild_cycle_reset_time / 1000.0)
+            WaitSeconds((options.hotbuild_cycle_reset_time or 1100) / 1000.0)
             cyclePos = 0
         end)
     end
@@ -341,7 +342,7 @@ function StopCycleMap(self, event)
     worldview.HandleEvent = oldHandleEvent
     cycleThread = ForkThread(function()
         local options = Prefs.GetFromCurrentProfile('options')
-        local fadeTime = options.hotbuild_cycle_reset_time / 2000.0
+        local fadeTime = (options.hotbuild_cycle_reset_time or 1100) / 2000.0
         Effect.FadeOut(cycleMap, fadeTime, 0.6, 0.1)
     end)
     CommandMode.EndCommandMode(false)

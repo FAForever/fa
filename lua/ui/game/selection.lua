@@ -150,7 +150,8 @@ local function DoubleTapBehavior(name, units)
     -- time window in which we consider it to be a double tab
     local curTime = GetSystemTimeSeconds()
     local diffTime = curTime - lastSelectionTime
-    if diffTime > 0.001 * Prefs.GetFromCurrentProfile('options.selection_sets_double_tap_decay') then
+    -- a profile that never saved the option has none: use its default from options.lua
+    if diffTime > 0.001 * (Prefs.GetFromCurrentProfile('options.selection_sets_double_tap_decay') or 1000) then
         lastSelectionName = nil
     end
     lastSelectionTime = curTime
