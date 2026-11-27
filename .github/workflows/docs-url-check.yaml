@@ -23,31 +23,70 @@ name: Documentation - Verify URLs
 on:
   push:
     branches: ["develop"]
-    paths: ["docs/**"]
+    paths: ["docs/**", ".github/workflows/docs-url-check.yaml", ".github/workflows/scripts/python/check_repo_links.py", ".github/workflows/scripts/python/check_site_links.py", ".github/workflows/scripts/python/check_web_links.py", ".github/workflows/scripts/python/link_check_utils.py"]
 
-  pull_request: 
-    paths: ["docs/**"]
+  pull_request:
+    paths: ["docs/**", ".github/workflows/docs-url-check.yaml", ".github/workflows/scripts/python/check_repo_links.py", ".github/workflows/scripts/python/check_site_links.py", ".github/workflows/scripts/python/check_web_links.py", ".github/workflows/scripts/python/link_check_utils.py"]
 
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   verify:
     name: Verify URLs
     runs-on: ubuntu-latest
     steps:
+      # On a pull request this checks out the merge commit. The sparse checkout
+      # still has the trees of all folders, which is enough to look up paths.
       - name: Checkout code
         uses: actions/checkout@v6
         with:
           sparse-checkout: |
             docs
+            .github/workflows/scripts/python
 
-      - name: urlchecker-action
-        uses: urlstechie/urlchecker-action@0.0.34
+      - name: Setup python
+        uses: actions/setup-python@v6
         with:
-          subfolder: docs
-          file_types: .md
-          exclude_files: docs/README.md
+          python-version: '3.14'
 
-          # URLs are excluded because not all type of URLs are supported, see also:
+      # Used by the steps below to extract the links, so that all of them see the same URLs.
+      - name: Install urlchecker
+        run: python -m pip install urlchecker==0.0.34
+
+      # Links to files of this repository on the target branch are checked
+      # against the checked out commit instead of over HTTP, so that links to
+      # files that the pull request adds pass and links to files that do not
+      # exist after the merge fail.
+      - name: Check links to files of this repository
+        id: repo-links
+        env:
+          BRANCH: ${{ github.base_ref || github.ref_name }}
+        run: python .github/workflows/scripts/python/check_repo_links.py docs --branch "$BRANCH" --exclude docs/README.md
+
+      # Links between the pages of the documentation site, including links to
+      # headings, are resolved against the permalinks of the pages instead of
+      # over HTTP, so that links to pages that the pull request adds pass.
+      - name: Check links between pages of the documentation site
+        id: site-links
+        if: ${{ !cancelled() && steps.repo-links.outcome != 'skipped' }}
+        run: python .github/workflows/scripts/python/check_site_links.py docs --site-url https://faforever.github.io/fa --exclude docs/README.md
+
+      # The other links are checked over HTTP. Each URL is requested once,
+      # however many files link to it, and one host at a time, so that a site
+      # doesn't block a burst of requests for the same page.
+      - name: Check web links
+        # Also runs when the checks above fail, but not when an earlier step failed.
+        if: ${{ !cancelled() && steps.repo-links.outcome != 'skipped' }}
+        env:
+          # Checked by the steps above.
+          REPO_LINKS: ${{ steps.repo-links.outputs.exclude_urls }}
+          SITE_LINKS: ${{ steps.site-links.outputs.exclude_urls }}
+          # Not all types of URLs are supported, see also:
           # - https://github.com/urlstechie/urlchecker-action/issues/105
-          exclude_urls: https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf,https://github.com/FAForever/fa/deployments,https://github.com/FAForever/fa/deployments/production
+          UNSUPPORTED: https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf,https://github.com/FAForever/fa/deployments,https://github.com/FAForever/fa/deployments/production
+        run: >-
+          python .github/workflows/scripts/python/check_web_links.py docs --exclude docs/README.md
+          --exclude-urls "$REPO_LINKS" --exclude-urls "$SITE_LINKS" --exclude-urls "$UNSUPPORTED" --retry-count 2
