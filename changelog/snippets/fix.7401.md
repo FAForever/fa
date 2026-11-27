@@ -1,0 +1,2 @@
+- Fix the faf-re rejoin screen's status overlapping the loading tips: it now sits in a skinned panel above IN TRANSIT. This has no effect until the switch to the faf-re engine (#7401).
+- Fix the incorrect faction skin being used for the "IN TRANSIT" loading screen in matchmaker games (#7401).

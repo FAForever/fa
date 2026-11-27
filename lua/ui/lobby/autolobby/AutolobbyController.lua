@@ -1071,6 +1071,18 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
     GameLaunched = function(self)
         self:DebugSpew("GameLaunched")
 
+        -- Set the loading screen's faction as in lobby.lua
+        local localPlayerId = self:GetLocalPlayerID()
+        for _, playerOptions in self.PlayerOptions do
+            if playerOptions.OwnerID == localPlayerId then
+                import("/lua/user/prefs.lua").SetToCurrentProfile('LoadingFaction', playerOptions.Faction)
+                -- Save prefs to disk so that if the game crashes and
+                -- we rejoin (faf-re feature), the correct skin is used
+                SavePreferences()
+                break
+            end
+        end
+
         -- clear out the interface
         import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton():Destroy()
 
