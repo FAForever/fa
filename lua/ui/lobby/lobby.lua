@@ -5780,6 +5780,9 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         for i, v in gameInfo.PlayerOptions do
             if v.Human and v.OwnerID == player then
                 Prefs.SetToCurrentProfile('LoadingFaction', v.Faction)
+                -- Save prefs to disk so that if the game crashes and
+                -- we rejoin (faf-re feature), the correct skin is used
+                SavePreferences()
                 break
             end
         end

@@ -358,6 +358,16 @@ if rawget(_G, 'GetEngineInfo') then
         local function CreateScreen()
             local frame = GetFrame(0)
 
+            -- The current skin is the menu's skin. Switch to the faction skin of
+            -- the loading movie (LoadingFaction, saved by the lobby at launch),
+            -- so the rejoin UI matches it as it did before the game was restarted.
+            if Prefs.GetOption('skin_change_on_start') ~= 'no' then
+                local faction = import("/lua/factions.lua").Factions[Prefs.GetFromCurrentProfile('LoadingFaction')]
+                if faction and faction.DefaultSkin then
+                    UIUtil.SetCurrentSkin(faction.DefaultSkin)
+                end
+            end
+
             local cover = Bitmap(frame)
             cover.Depth:Set(frame:GetTopmostDepth() + 1)
             LayoutHelpers.FillParent(cover, frame)
