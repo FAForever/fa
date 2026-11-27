@@ -6,6 +6,13 @@
 Overview = {
     Changelogs = {
         {
+            Version = 1,
+            Name = "Upcoming changes",
+            Date = "2026-11-27",
+            URL = "http://faforever.github.io/fa/changelog/fafdevelop",
+            Path = "/lua/ui/lobby/changelog/generated/fafdevelop.lua"
+        },
+        {
             Version = 3841,
             Name = "3841 - Game Patch",
             Date = "2026-11-13",
