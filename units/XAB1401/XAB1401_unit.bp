@@ -87,8 +87,11 @@ UnitBlueprint{
         BuildTime = 325000,
         MaxEnergy = 400000,
         MaxMass = 4000,
+        ProductionPerSecondEnergy = 400000,
+        ProductionPerSecondMass = 4000,
         RebuildBonusIds = { "xab1401" },
-        StorageEnergy = 100000,
+        StorageEnergy = 12000000,
+        StorageMass = 280000
     },
     Footprint = {
         SizeX = 7,
