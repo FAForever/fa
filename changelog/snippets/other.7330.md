@@ -1,0 +1,1 @@
+- Add a texture artist skill for coding agents, with scripts to extract, inspect and preview textures and check DXT compression artifacts (#7330).
