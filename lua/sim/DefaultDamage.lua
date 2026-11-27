@@ -17,6 +17,7 @@ local VectorCache = Vector(0, 0, 0)
 local MathMod = math.mod
 local MATH_IRound = MATH_IRound
 local WaitTicks = WaitTicks
+local GetGameTick = GetGameTick
 
 local EntityBeenDestroyed = _G.moho.entity_methods.BeenDestroyed
 local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ
@@ -28,7 +29,8 @@ local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ
 ---@param pulseInterval number
 ---@param damage number
 ---@param damageType DamageType
-function UnitDoTThread(instigator, target, pulses, pulseInterval, damage, damageType)
+---@param forkTick? number # `GetGameTick()` when the thread was forked, so the first pulse is on time when forked late in a tick, such as from an impact
+function UnitDoTThread(instigator, target, pulses, pulseInterval, damage, damageType, forkTick)
     if not target or EntityBeenDestroyed(target) then return end
 
     -- localize for performance
@@ -42,6 +44,11 @@ function UnitDoTThread(instigator, target, pulses, pulseInterval, damage, damage
     pulseInterval = 10 * pulseInterval + 1
     -- accumulator to compensate for error caused by `WaitTicks` only working with integers
     local accum = 0
+    -- a thread forked after the Lua threads of a tick, such as from an impact, first runs on the next tick, so it has
+    -- already waited a tick
+    if forkTick and forkTick ~= GetGameTick() then
+        accum = -1
+    end
 
     for i = 1, pulses do
         accum = accum + pulseInterval
@@ -74,7 +81,8 @@ end
 ---@param damageType DamageType
 ---@param damageFriendly boolean
 ---@param damageSelf boolean
-function AreaDoTThread(instigator, position, pulses, pulseInterval, radius, damage, damageType, damageFriendly, damageSelf)
+---@param forkTick? number # `GetGameTick()` when the thread was forked, so the first pulse is on time when forked late in a tick, such as from an impact
+function AreaDoTThread(instigator, position, pulses, pulseInterval, radius, damage, damageType, damageFriendly, damageSelf, forkTick)
     -- localize for performance
     local DamageArea = DamageArea
     local WaitTicks = WaitTicks
@@ -84,6 +92,11 @@ function AreaDoTThread(instigator, position, pulses, pulseInterval, radius, dama
     pulseInterval = 10 * pulseInterval + 1
     -- accumulator to compensate for error caused by `WaitTicks` only working with integers
     local accum = 0
+    -- a thread forked after the Lua threads of a tick, such as from an impact, first runs on the next tick, so it has
+    -- already waited a tick
+    if forkTick and forkTick ~= GetGameTick() then
+        accum = -1
+    end
 
     for i = 1, pulses do
         accum = accum + pulseInterval
