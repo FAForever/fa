@@ -1,0 +1,1 @@
+- Add Korean (KO) localization support with approximately 8,000 translated strings covering unit names, descriptions, and various in-game UI elements, allowing Korean-speaking players to play FAF in their native language (#7348).

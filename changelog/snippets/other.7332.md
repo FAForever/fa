@@ -1,1 +1,0 @@
-- Annotate the `__fenv` global. It allows overriding the result of `getfenv` (#7332).
