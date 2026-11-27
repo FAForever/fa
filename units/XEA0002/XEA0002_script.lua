@@ -22,9 +22,9 @@ XEA0002 = ClassUnit(TAirUnit) {
 
     ---@param self XEA0002
     OnDestroy = function(self)
-        if not self.IsDying and self.Parent then
-            self.Parent.Satellite = nil
-            IssueToUnitBuildFactory(self.Parent, 'XEA0002', 1)
+        local parent = self.Parent
+        if not self.IsDying and parent then
+            parent:OnSatelliteLost(self)
         end
         TAirUnit.OnDestroy(self)
     end,
@@ -45,9 +45,9 @@ XEA0002 = ClassUnit(TAirUnit) {
 
         self.IsDying = true
 
-        if self.Parent then
-            self.Parent.Satellite = nil
-            IssueToUnitBuildFactory(self.Parent, 'XEA0002', 1)
+        local parent = self.Parent
+        if parent then
+            parent:OnSatelliteLost(self)
         end
 
         TAirUnit.OnKilled(self, instigator, type, overkillRatio)
@@ -56,7 +56,8 @@ XEA0002 = ClassUnit(TAirUnit) {
 
         -- randomize falling animation to prevent cntrl-k on nuke abuse
         -- use default animation if x or z speed > 0.1
-        if math.abs(vx) < 0.1 and math.abs(vz) < 0.1 then
+        -- A satellite that dies docked or under construction doesn't fall, so it has no collider
+        if self.colliderProj and math.abs(vx) < 0.1 and math.abs(vz) < 0.1 then
             self:AttachBoneTo(0, self.colliderProj, 'anchor')
             self.colliderProj:SetLocalAngularVelocity(0.5, 0.5, 0.5)
             local rng = Random(1, 8)

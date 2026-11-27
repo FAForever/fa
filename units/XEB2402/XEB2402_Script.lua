@@ -11,6 +11,9 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
 
     OnStopBeingBuilt = function(self)
         TAirFactoryUnit.OnStopBeingBuilt(self)
+        -- A station that was just built launches a satellite for free. `TransferSatellite` takes
+        -- this away from a station that replaces another one after a change of army.
+        self.FreeSatelliteLaunch = true
         ChangeState(self, self.OpenState)
     end,
 
@@ -55,10 +58,14 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
             if self.newSatellite then
                 self.Satellite = self.newSatellite
                 self.newSatellite = nil
-            else
+            elseif self.FreeSatelliteLaunch then
                 self.Satellite = CreateUnitHPR('XEA0002', self.Army, location[1], location[2], location[3], 0, 0, 0)
                 self.Satellite:AttachTo(self, 'Attachpoint01')
+            else
+                -- the satellite that was going to be launched died
+                return
             end
+            self.FreeSatelliteLaunch = nil
 
             -- Create warning lights and other VFX
             local army = self.Army
@@ -76,11 +83,7 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
         end,
 
         Main = function(self)
-            -- A station that was given or captured keeps its old satellite, or rebuilds it when it had none.
-            -- A satellite that it finished building since then is still launched.
-            local skipLaunch = self.SkipSatelliteLaunch and not self.newSatellite
-            self.SkipSatelliteLaunch = nil
-            if not skipLaunch and not self.Satellite then
+            if not self.Satellite and (self.newSatellite or self.FreeSatelliteLaunch) then
                 self.waitingForLaunch = true
 
                 if not self.AnimManip then
@@ -91,14 +94,22 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
                 self:Extend()
 
                 -- Release unit
-                self.Satellite:DetachFrom()
-                IssueToUnitMove(self.Satellite, self:GetRallyPoint())
-                self.Satellite:Open()
+                local satellite = self.Satellite
+                if satellite then
+                    satellite:DetachFrom()
+                    IssueToUnitMove(satellite, self:GetRallyPoint())
+                    satellite:Open()
+                end
 
                 self.waitingForLaunch = false
                 self:Retract()
 
                 IssueToUnitClearCommands(self)
+
+                -- the satellite died during the launch, and clearing the commands removed its rebuild order
+                if not self.Satellite then
+                    self:RebuildSatellite()
+                end
             end
 
             ChangeState(self, self.IdleState)
@@ -130,6 +141,7 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
         if not unitBeingBuilt:IsBeingBuilt() and not self.Satellite and not self.waitingForLaunch then
             IssueToUnitStop(self)
             self.newSatellite = unitBeingBuilt
+            unitBeingBuilt.Parent = self
             ChangeState(self, self.OpenState)
         else
             unitBeingBuilt:Destroy()
@@ -137,8 +149,10 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
-        if self.Satellite and not self.Satellite.Dead and not self.Satellite.IsDying then
-            self.Satellite:Kill()
+        local satellite = self.Satellite
+        self.Satellite = nil
+        if satellite and not satellite.Dead and not satellite.IsDying then
+            satellite:Kill()
         end
         self:DestroyNewSatellite()
 
@@ -148,15 +162,17 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
     end,
 
     OnDestroy = function(self)
-        if self.Satellite and not self.Satellite.Dead and not self.Satellite.IsDying then
-            self.Satellite:Destroy()
+        local satellite = self.Satellite
+        self.Satellite = nil
+        if satellite and not satellite.Dead and not satellite.IsDying then
+            satellite:Destroy()
         end
         self:DestroyNewSatellite()
         TAirFactoryUnit.OnDestroy(self)
     end,
 
     --- Destroys a satellite that the station finished building but hasn't launched yet, so it doesn't
-    --- survive the station without a parent.
+    --- survive the station.
     ---@param self XEB2402
     DestroyNewSatellite = function(self)
         local newSatellite = self.newSatellite
@@ -168,29 +184,31 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
         end
     end,
 
-    OnCaptured = function(self, captor)
-        if self and not self.Dead and captor and not captor.Dead and self:GetAIBrain() ~= captor:GetAIBrain() then
-            local captorArmyIndex = captor.Army
+    --- Called by a satellite of this station when it dies or is destroyed.
+    ---@param self XEB2402
+    ---@param satellite XEA0002
+    OnSatelliteLost = function(self, satellite)
+        if self.Satellite == satellite then
+            self.Satellite = nil
+        elseif self.newSatellite == satellite then
+            self.newSatellite = nil
+        else
+            -- the station already let go of this satellite
+            return
+        end
+        self:RebuildSatellite()
+    end,
 
-            -- Disable unit cap for campaigns
-            if ScenarioInfo.CampaignMode then
-                SetIgnoreArmyUnitCap(captorArmyIndex, true)
-            end
-
-            -- Shift the two units to the new army and assign relationship
-            local base = ChangeUnitArmy(self, captorArmyIndex)
-            if base then
-                self:TransferSatellite(base)
-            end
-
-            -- Reapply unit cap checks
-            local captorBrain = captor:GetAIBrain()
-            if ScenarioInfo.CampaignMode and not captorBrain.IgnoreArmyCaps then
-                SetIgnoreArmyUnitCap(captorArmyIndex, false)
-            end
+    --- Orders the station to build a new satellite. During the launch sequence, the sequence gives
+    --- the order when it ends, because a build order would restart it.
+    ---@param self XEB2402
+    RebuildSatellite = function(self)
+        if not self.waitingForLaunch then
+            IssueToUnitBuildFactory(self, 'XEA0002', 1)
         end
     end,
 
+    --- Also called for a capture, through `Unit.OnCaptured`.
     ---@param self XEB2402
     ---@param newUnit XEB2402
     OnGiven = function(self, newUnit)
@@ -207,28 +225,30 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
     ---@param newUnit XEB2402
     TransferSatellite = function(self, newUnit)
         -- `newSatellite` is a satellite that the station finished building but hasn't launched yet
+        -- `newSatellite` is a satellite that the station finished building but hasn't launched yet.
+        -- Letting go of the satellite first keeps the old one, which the change of army destroys,
+        -- from ordering the old station to rebuild it.
         local satellite = self.Satellite or self.newSatellite
         self.Satellite = nil
         self.newSatellite = nil
+        newUnit.FreeSatelliteLaunch = nil
 
         if satellite and not satellite.Dead and not IsDestroyed(satellite) then
             local docked = satellite:GetParent() == self
             local massKilled = satellite.VetExperience
 
-            -- the old satellite is destroyed by the change of army, so it shouldn't order the old station to rebuild it
-            satellite.Parent = nil
             local newSatellite = ChangeUnitArmy(satellite, newUnit.Army)
             if newSatellite then
                 if massKilled and massKilled > 0 then
                     newSatellite:CalculateVeterancyLevelAfterTransfer(massKilled, true)
                 end
 
+                newSatellite.Parent = newUnit
                 if docked then
                     -- launched by the `OpenState` of the new station
                     newSatellite:AttachTo(newUnit, 'Attachpoint01')
                     newUnit.newSatellite = newSatellite
                 else
-                    newSatellite.Parent = newUnit
                     newUnit.Satellite = newSatellite
                     newSatellite:Open()
                 end
@@ -239,12 +259,9 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
             satellite:Destroy()
         end
 
-        -- No satellite to transfer: rebuild it instead of launching a free one. A satellite that was
-        -- being built is rebuilt to its progress by `FactoryRebuildUnits` when the station is given.
-        newUnit.SkipSatelliteLaunch = true
-        if not newUnit.FacRebuild_UnitId then
-            IssueToUnitBuildFactory(newUnit, 'XEA0002', 1)
-        end
+        -- No satellite to transfer: rebuild it. When the station is given while it builds a satellite,
+        -- `FactoryRebuildUnits` replaces this order with one that keeps the progress.
+        newUnit:RebuildSatellite()
     end,
 }
 
