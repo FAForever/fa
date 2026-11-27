@@ -1,0 +1,1 @@
+- Fix the drone of the UEF SACU and the drones of the UEF ACU being duplicated when the unit is given while a drone is docked on it, and dead drones being recreated for free instead of rebuilt (#7387).
