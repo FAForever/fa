@@ -506,7 +506,9 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
             upgradeUnits[upgradeUnitCount] = newUnit
         end
 
-        if FacRebuild_UnitId then
+        -- A captured factory isn't rebuilt, so it doesn't get the data either. Otherwise the data
+        -- would stay on it and rebuild the old progress for free when it is given later.
+        if FacRebuild_UnitId and not captured then
             local newFactoryUnit = newUnit--[[@as Unit | ExternalFactoryComponent]].ExternalFactory or newUnit
             local data = factoryRebuildDataTable[FacRebuild_UnitId]
             if not data then
