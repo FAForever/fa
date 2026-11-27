@@ -191,6 +191,27 @@ local function nodata()
     noData.Depth:Set(GetFrame(0):GetTopmostDepth())
 end
 
+--- Whether an army gets its own entry in the score screen.
+--- Civilians and armies that hide their score (such as the AI armies in campaign
+--- and co-op missions) are left out.
+---@param armyInfo table
+---@param armyIndex number
+---@return boolean
+function IsScoredArmy(armyInfo, armyIndex)
+    return not armyInfo.civilian
+        and armyInfo.showScore ~= false
+        and armyInfo.nickname ~= nil
+        and scoreData.current[armyIndex] ~= nil
+end
+
+--- Name of an army in end of game score data.
+---@param armyInfo table
+---@param armyIndex number
+---@return string
+function GetArmyName(armyInfo, armyIndex)
+    return scoreData.current[armyIndex].name or armyInfo.nickname
+end
+
 -- if periode=0 or past the end of game, then return the current value
 function return_value(periode,player,path)
     local dataPoint = scoreData.history[periode];
@@ -234,14 +255,14 @@ function create_graph_bar(parent,name)
     local m=0
     for k, v in armiesInfo.armiesTable do
         m=m+1
-        if not v.civilian and v.nickname != nil then
+        if IsScoredArmy(v, m) then
             player_nbr=player_nbr+1
             player[player_nbr]={}
-            player[player_nbr].name=scoreData.history[1][player_nbr].name
+            player[player_nbr].name=GetArmyName(v, m)
             player[player_nbr].color=v.color
             player[player_nbr].index=m
             player[player_nbr].faction=v.faction
-            graphic[player_nbr]={}
+            graphic[m]={}
         end
     end
     local row_nbr=1
@@ -312,8 +333,10 @@ function create_graph_bar(parent,name)
             end
             if value[columns_num][play.index].columns_value != nil and math.floor(value[columns_num][play.index].columns_value) != 0 and value[columns_num][play.index].columns_value>=value[columns_num].max_columns_value then
                 if value[columns_num][play.index].columns_value>value[columns_num].max_columns_value then
+                    -- players later in the list have no entry yet, and start as non-winners
                     for k2, play2 in player do
-                        if value[columns_num][play2.index].winner != nil then value[columns_num][play2.index].winner=false end
+                        local entry = value[columns_num][play2.index]
+                        if entry then entry.winner=false end
                     end
                 end
                 value[columns_num].max_columns_value=value[columns_num][play.index].columns_value
@@ -658,6 +681,7 @@ end
 function clean_view()
     if noData then noData:Destroy() noData = nil end
     if create_anime_graph != nil and create_anime_graph then KillThread(create_anime_graph) end
+    if create_anime_graph2 != nil and create_anime_graph2 then KillThread(create_anime_graph2) end
     if page_active != nil and page_active then page_active:Destroy() page_active=false end
     if page_active_graph != nil and page_active_graph then page_active_graph:Destroy() page_active_graph=false end
     if page_active_graph2 != nil and page_active_graph2 then page_active_graph2:Destroy() page_active_graph2=false end
@@ -708,9 +732,9 @@ function create_graph(parent,path)
     local m=0
     for k, v in armiesInfo.armiesTable do
         m=m+1
-        if not v.civilian and v.nickname != nil then
+        if IsScoredArmy(v, m) then
             player[i]={}
-            player[i].name=scoreData.history[1][i].name
+            player[i].name=GetArmyName(v, m)
             player[i].color=v.color
             player[i].index=m
             -- Player name shadow
@@ -1098,10 +1122,9 @@ end
 -- the starting function launch by the hook
 function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standardScore)
     --LOG("called Set_graph...")
-    if showCampaign then
-        return
-    end
-    standardScore:Hide()
+    -- Campaign and co-op games get the same score screen as skirmish games,
+    -- but open on the "Standard" tab so the operation debriefing and
+    -- objectives are shown first.
     page_active=Group(dialog)
     page_active.Left:Set(0)
     page_active.Top:Set(0)
@@ -1218,10 +1241,16 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
         end
     end
 
-    -- Init graph mode
-
-    graph_btn:SetCheck(true)
-    page_graph(clientArea)
+    if showCampaign then
+        -- Init standard mode, which opens on the debriefing and objectives
+        standardBtn:SetCheck(true)
+        Title_score:SetText("")
+    else
+        -- Init graph mode
+        standardScore:Hide()
+        graph_btn:SetCheck(true)
+        page_graph(clientArea)
+    end
     local beta=Bitmap(dialog)
     beta:SetTexture(mySkinnableFile(UIUtil.UIFile('/hotstats/bt_sca.dds')))
     LayoutHelpers.AtRightTopIn(beta,GetFrame(0),99,67)
