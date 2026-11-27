@@ -1,4 +1,6 @@
-- Fix the Novax Center launching an extra satellite, or relaunching its satellite at the station, when it is given to another player or captured. The satellite now transfers to the new owner where it is, launched if not launched yet, or continued to be rebuilt if it died earlier instead of getting a free one. Capturing a Novax Center now transfers it the same way as other captured units. A satellite that is not launched yet is also no longer left behind when its station dies, and the station now rebuilds it when it is destroyed before launch (#7382).
+- Fix the Novax Center getting an extra or free satellite when it is given or captured. Its satellite now transfers with it, and a station without one keeps rebuilding it (#7382).
+
+- Fix a Novax satellite that is not launched yet surviving its station, or stopping its station from rebuilding when it dies before launch (#7382).
 
 - Fix a factory captured while it was building a unit rebuilding that unit's old progress for free when it is given to another player later (#7382).
 
