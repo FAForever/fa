@@ -174,6 +174,8 @@ Callbacks.SetOfferDraw = SimUtils.SetOfferDraw
 
 Callbacks.SetRecallVote = import("/lua/sim/recall.lua").SetRecallVote
 
+Callbacks.SetAbandonRecipient = SimUtils.SetAbandonRecipient
+
 Callbacks.SpawnPing = SimPing.SpawnPing
 
 --Nuke Ping
