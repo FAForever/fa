@@ -1,0 +1,1 @@
+- Add guides for coding agents in `agents/`, indexed by `AGENTS.md` and `CLAUDE.md` (#7318).

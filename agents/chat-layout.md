@@ -1,6 +1,6 @@
 # Chat layout — component tree and scaling
 
-Anchors-and-dependencies map of the chat UI tree, used to reason about UI-scale behaviour. Read alongside [AGENTS.md](AGENTS.md) for the chat MVC contract and [`/lua/ui/AGENTS.md`](../../AGENTS.md) §§ 4 (Layout, UI scaling) and 5 (Skinning) for the project-wide rules.
+Anchors-and-dependencies map of the chat UI tree, used to reason about UI-scale behaviour. Read alongside [chat.md](chat.md) for the chat MVC contract and [`ui.md`](ui.md) §§ 4 (Layout, UI scaling) and 5 (Skinning) for the project-wide rules.
 
 Notation throughout:
 
@@ -235,12 +235,12 @@ The fixed `Edit.Height = 19(S)` is intentional: the row appears to grow around t
 
 | Concern                                                  | File                                                                          |
 |----------------------------------------------------------|-------------------------------------------------------------------------------|
-| `DefaultRect`, drag handles, window chrome               | [`ChatInterface.lua`](ChatInterface.lua)                                      |
-| `Lines` ↔ `Edit` anchoring (window-level)                | [`ChatInterface.lua` `__post_init`](ChatInterface.lua)                        |
-| Sibling feed bound to lines rect                          | [`ChatFeedInterface.lua` `__post_init`](ChatFeedInterface.lua)                |
-| Pool / Scrollbar layout, scroll state, wrapping, filtering | [`ChatLinesInterface.lua`](ChatLinesInterface.lua)                          |
-| `ChatBubble` / `RecipientLabel` / `EditBox` / `CamCheckbox` layout | [`ChatEditInterface.lua` `__post_init`](ChatEditInterface.lua)      |
-| Row geometry (`TeamColor`, `Name`, `CamIcon`, `Text`)    | [`ChatLineInterface.lua` `__post_init`](ChatLineInterface.lua)                |
-| Faction badge composition (recipient picker, per row)    | [`ChatFactionBadge.lua`](ChatFactionBadge.lua)                                |
-| Hint popup width / height / row positioning              | [`ChatCommandHintInterface.lua`](ChatCommandHintInterface.lua)                |
-| Recipient picker entries + BG bleed                       | [`ChatListInterface.lua` `CreateEntry`](ChatListInterface.lua)               |
+| `DefaultRect`, drag handles, window chrome               | [`ChatInterface.lua`](../lua/ui/game/chat/ChatInterface.lua)                                      |
+| `Lines` ↔ `Edit` anchoring (window-level)                | [`ChatInterface.lua` `__post_init`](../lua/ui/game/chat/ChatInterface.lua)                        |
+| Sibling feed bound to lines rect                          | [`ChatFeedInterface.lua` `__post_init`](../lua/ui/game/chat/ChatFeedInterface.lua)                |
+| Pool / Scrollbar layout, scroll state, wrapping, filtering | [`ChatLinesInterface.lua`](../lua/ui/game/chat/ChatLinesInterface.lua)                          |
+| `ChatBubble` / `RecipientLabel` / `EditBox` / `CamCheckbox` layout | [`ChatEditInterface.lua` `__post_init`](../lua/ui/game/chat/ChatEditInterface.lua)      |
+| Row geometry (`TeamColor`, `Name`, `CamIcon`, `Text`)    | [`ChatLineInterface.lua` `__post_init`](../lua/ui/game/chat/ChatLineInterface.lua)                |
+| Faction badge composition (recipient picker, per row)    | [`ChatFactionBadge.lua`](../lua/ui/game/chat/ChatFactionBadge.lua)                                |
+| Hint popup width / height / row positioning              | [`ChatCommandHintInterface.lua`](../lua/ui/game/chat/ChatCommandHintInterface.lua)                |
+| Recipient picker entries + BG bleed                       | [`ChatListInterface.lua` `CreateEntry`](../lua/ui/game/chat/ChatListInterface.lua)               |

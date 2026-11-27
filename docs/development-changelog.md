@@ -36,6 +36,10 @@ The format of a snippet depends on whether it is a [balance snippet](../developm
 
 If multiple categories are fitting, use the one that appears first in this list.
 
+### Follow-up pull requests
+
+A pull request that fixes or changes an earlier pull request that is not released yet does not get its own snippet. An earlier pull request is not released yet while its snippet is still in the snippets folder. Instead, add the number of the new pull request to the snippet of the earlier one, and update its text if the change affects what players see. For example, `features.7185.md` ends with `(#7185, #7333)`.
+
 ## Sources and inspiration
 
 We did not come up with this approach ourselves. We took inspiration from similar solutions of projects that experienced similar problems:

@@ -74,10 +74,10 @@ AbstractVictoryCondition = Class(DebugComponent) {
     ---@return boolean
     UnitIsEligible = function(self, unit)
 
-        -- this can happen occasionally, note that we explicitly do **not** use the `.Dead` property! The
-        -- use of that property depends on the execution order in Lua. It is deterministic, but it will
-        -- generate strange results when for example two ACUs die in the same tick. Using `.Dead` will
-        -- re-introduce the 'draw bug' that bugged the community for years.
+        -- `GetListOfUnits` doesn't filter by state, so killed units count until the engine deletes them.
+        -- Note that we explicitly do **not** use the `.Dead` property! Its value depends on the execution
+        -- order in Lua. It is deterministic, but it gives strange results when for example two ACUs die in
+        -- the same tick. Using `.Dead` will re-introduce the 'draw bug' that bugged the community for years
 
         if IsDestroyed(unit) then
             return false

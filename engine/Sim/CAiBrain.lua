@@ -270,7 +270,7 @@ end
 --- | 'DamageStats_TotalDamageDealt'
 
 --- Return a blueprint stat filtered by category.
----@see CAiBrain:GetArmyStat(...) for army related statistics
+---@see CAiBrain.GetArmyStat # for army related statistics
 ---@param statName AIBrainBlueprintStatUnits | AIBrainBlueprintStatEnemies | AIBrainBlueprintStatEconomy | AIBrainBlueprintStatDamage
 ---@param category EntityCategory 's category, example: categories.TECH2 .
 ---@return number
@@ -290,7 +290,9 @@ end
 function CAiBrain:GetCurrentUnits(category)
 end
 
---- Returns current income per tick of the resouce.
+--- Returns the last tick's per-tick income of the resource, including what `GiveResource` added and overflow received from allies
+---@see CAiBrain.GiveResource
+---@see CAiBrain.SetResourceSharing
 ---@param resource 'ENERGY'|'MASS'
 ---@return number
 function CAiBrain:GetEconomyIncome(resource)
@@ -303,7 +305,10 @@ end
 function CAiBrain:GetEconomyRequested(resource)
 end
 
---- Return current resource amout in storage.
+--- Returns the amount of the resource in storage. It is 0 on the first ticks of a game, until storage fills on ticks 2 and 3
+---
+--- Max storage is `GetArmyStat('Economy_MaxStorage_Mass', 0).Value` (`_Energy` for energy)
+---@see CAiBrain.GetArmyStat
 ---@param resource 'ENERGY'|'MASS'
 ---@return number
 function CAiBrain:GetEconomyStored(resource)
@@ -315,14 +320,13 @@ end
 function CAiBrain:GetEconomyStoredRatio(resource)
 end
 
---- Returns the relative resource income. (production - usage)
+--- Returns the last tick's per-tick income minus usage of the resource
 ---@param resource 'ENERGY'|'MASS'
 ---@return number  (0.1 = 1)
 function CAiBrain:GetEconomyTrend(resource)
 end
 
---- Returns current resource usage.
--- When stalling, this number is same as the current income.
+--- Returns the last tick's per-tick usage of the resource. When stalling, it is the same as the income
 ---@param resource ResourceType
 ---@return number
 function CAiBrain:GetEconomyUsage(resource)
@@ -353,12 +357,30 @@ end
 function CAiBrain:GetHighestThreatPosition(ring, restriction, threatType, armyIndex)
 end
 
---- Returns a list of units that match the categories.
+--[[
+The engine checks each unit, but adds the ones that pass back into the set it reads from, which
+already holds them, so the checks have no effect
+
+local units = army:GetUnits(category)
+for _, unit in units do
+    if not (unit:IsDead() or unit:DestroyQueued())
+        and not (requireBuilt and unit:IsBeingBuilt())
+        and not (needToBeIdle and not unit:IsIdleState())
+    then
+        units:Add(unit)
+    end
+end
+return units
+]]
+
+--- Returns every unit of the army that matches the categories. Units that are killed, destroyed this
+--- tick, being built or busy are included until the engine deletes them at the end of the tick they
+--- are destroyed in.
 ---
 --- This function does **not** take into account intel.
 ---@param category EntityCategory
----@param needToBeIdle boolean
----@param requireBuilt? boolean # Appears to be not functional
+---@param needToBeIdle boolean # Not functional, due to the engine bug above
+---@param requireBuilt? boolean # Defaults to `true`. Not functional, due to the engine bug above
 ---@return Unit[]
 function CAiBrain:GetListOfUnits(category, needToBeIdle, requireBuilt)
 end
@@ -470,7 +492,12 @@ end
 function CAiBrain:GetUnitsAroundPoint(category, position, radius, alliance)
 end
 
---- Gives resources to brain. They appear in its storage and income stats on the next tick
+--- Adds the amount to this tick's income of the resource, not to storage, so `GetEconomyStored` and `GetEconomyIncome` show it on the next tick. Several gives in one tick can't read storage to see what was already given
+---
+--- Storage is capped after income is added and usage subtracted, so a negative trend leaves room for more than max minus stored. Anything above max storage is lost, or shared with allies
+---@see CAiBrain.GetEconomyStored
+---@see CAiBrain.GetEconomyIncome
+---@see CAiBrain.SetResourceSharing
 ---@param type ResourceType
 ---@param amount number
 function CAiBrain:GiveResource(type, amount)
@@ -585,7 +612,12 @@ end
 function CAiBrain:SetGreaterOf(statname, val)
 end
 
---- Set if the brain should share resources to the allies.
+--- Sets whether the brain shares its overflow with allies instead of losing it
+---
+--- Each economy tick adds income and subtracts usage, then caps storage at max storage. What is above the cap is split equally among allies with free storage. When an ally has no room for its full share, the rest is split equally among the allies after it in army order
+---
+--- An army's overflow adds up in its `Economy_Shared_Mass` / `Economy_Shared_Energy` stats, and allies see what they receive in their income. Armies tick in army order, so overflow from a later army reaches an earlier one on the next tick
+---@see CAiBrain.GetEconomyIncome
 ---@param bool boolean
 function CAiBrain:SetResourceSharing(bool)
 end
@@ -596,7 +628,7 @@ end
 function CAiBrain:SetUpAttackVectorsToArmy(category)
 end
 
---- Removes resources from brain.
+--- Takes the amount from storage right away, never more than is stored. Several takes in one tick each take from what the previous one left
 ---@param type ResourceType
 ---@param amount number # how much to take.
 ---@return number # actual amount taken
