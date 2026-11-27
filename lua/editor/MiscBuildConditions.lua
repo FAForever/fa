@@ -29,49 +29,57 @@ end
 ---@param lowerThan number
 ---@param minNumber number
 ---@param maxNumber number
----@return true | nil
+---@return boolean
 function RandomNumber(aiBrain, higherThan, lowerThan, minNumber, maxNumber)
     local num = Random(minNumber, maxNumber)
     if higherThan < num and lowerThan > num then
         return true
     end
+    return false
 end
 
 ---@param aiBrain AIBrain
 ---@param layerPref string
----@return true | nil
+---@return boolean
 function IsAIBrainLayerPref(aiBrain, layerPref)
 	return layerPref == aiBrain.LayerPref
 end
 
 ---@param aiBrain AIBrain unused
 ---@param num number
----@return true | nil
+---@return boolean
 function MissionNumber(aiBrain, num)
-	return ScenarioInfo.MissionNumber and ScenarioInfo.MissionNumber == num
+    local missionNum = ScenarioInfo.MissionNumber
+    if not missionNum then return false end
+	return missionNum == num
 end
 
 ---@param aiBrain AIBrain unused
 ---@param num number
----@return true | nil
+---@return boolean
 function MissionNumberGreaterOrEqual(aiBrain, num)
-	return ScenarioInfo.MissionNumber and ScenarioInfo.MissionNumber >= num
+    local missionNum = ScenarioInfo.MissionNumber
+    if not missionNum then return false end
+	return missionNum >= num
 end
 
 ---@param aiBrain AIBrain unused
 ---@param num number
----@return true | nil
+---@return boolean
 function MissionNumberLessOrEqual(aiBrain, num)
-	return ScenarioInfo.MissionNumber and ScenarioInfo.MissionNumber <= num
+    local missionNum = ScenarioInfo.MissionNumber
+    if not missionNum then return false end
+	return missionNum <= num
 end
 
 ---@param aiBrain AIBrain unused
 ---@param varName string
----@return true | nil
+---@return boolean
 function CheckScenarioInfoVarTable(aiBrain, varName)
     if ScenarioInfo.VarTable[varName] then
         return true
     end
+    return false
 end
 
 ---@param aiBrain AIBrain unused
@@ -83,37 +91,44 @@ end
 
 ---@param aiBrain AIBrain unused
 ---@param diffLevel number
----@return true | nil
+---@return boolean
 function DifficultyEqual(aiBrain, diffLevel)
-	return ScenarioInfo.Options.Difficulty and ScenarioInfo.Options.Difficulty == diffLevel
+    local difficulty = ScenarioInfo.Options.Difficulty
+    if not difficulty then return false end
+	return difficulty == diffLevel
 end
 
 ---@param aiBrain AIBrain unused
 ---@param diffLevel number
----@return true | nil
+---@return boolean
 function DifficultyGreaterOrEqual(aiBrain, diffLevel)
-	return ScenarioInfo.Options.Difficulty and ScenarioInfo.Options.Difficulty >= diffLevel
+    local difficulty = ScenarioInfo.Options.Difficulty
+    if not difficulty then return false end
+	return difficulty >= diffLevel
 end
 
 ---@param aiBrain AIBrain unused
 ---@param diffLevel number
----@return true | nil
+---@return boolean
 function DifficultyLessOrEqual(aiBrain, diffLevel)
-	return ScenarioInfo.Options.Difficulty and ScenarioInfo.Options.Difficulty <= diffLevel
+    local difficulty = ScenarioInfo.Options.Difficulty
+    if not difficulty then return false end
+	return difficulty <= diffLevel
 end
 
 ---@param aiBrain AIBrain unused
 ---@param chainName string
----@return true | nil
+---@return boolean
 function MarkerChainExists(aiBrain, chainName)
     if Scenario.Chains[chainName] then
         return true
     end
+    return false
 end
 
 ---@param aiBrain AIBrain
 ---@param ... number[]
----@return true | nil
+---@return boolean
 function FactionIndex(aiBrain, ...)
     local factionIndex = aiBrain:GetFactionIndex()
     for index = 1, arg.n do
@@ -121,11 +136,12 @@ function FactionIndex(aiBrain, ...)
             return true
         end
     end
+    return false
 end
 
 ---@param aiBrain AIBrain
 ---@param locType string
----@return true | nil
+---@return boolean
 function ReclaimablesInArea(aiBrain, locType)
     if aiBrain:GetEconomyStoredRatio("MASS") <= 0.7 then
         local reclaim = AIUtils.AIGetReclaimablesAroundLocation(aiBrain, locType)
@@ -133,11 +149,12 @@ function ReclaimablesInArea(aiBrain, locType)
             return true
         end
     end
+    return false
 end
 
 ---@param aiBrain AIBrain
 ---@param locType string
----@return true | nil
+---@return boolean
 function CheckAvailableGates(aiBrain, locType)
     local pos, rad
     if aiBrain.HasPlatoonList then
@@ -166,6 +183,7 @@ function CheckAvailableGates(aiBrain, locType)
             end
         end
     end
+    return false
 end
 
 ---@param aiBrain AIBrain
@@ -183,30 +201,32 @@ function LessThanMapWaterRatio(aiBrain, num)
 end
 
 ---@param aiBrain AIBrain
----@return true | nil
+---@return boolean
 function TransportRequested(aiBrain)
     if aiBrain then
         if aiBrain.TransportRequested and aiBrain:GetNoRushTicks() <= 0 then
             return true
         end
     end
+    return false
 end
 
 -- deprecated kept for compatibility
 ---@param aiBrain AIBrain
----@return true | nil
+---@return boolean
 function ArmyNeedsTransports(aiBrain)
     if aiBrain then
         if aiBrain.NeedTransports > 0 and aiBrain:GetNoRushTicks() <= 0 then
             return true
         end
     end
+    return false
 end
 
 -- deprecated kept for compatibility
 ---@param aiBrain AIBrain
 ---@param number number
----@return true | nil
+---@return boolean
 function TransportNeedGreater(aiBrain, number)
     if aiBrain then
         local needTransports = aiBrain.NeedTransports
@@ -214,37 +234,39 @@ function TransportNeedGreater(aiBrain, number)
             return true
         end
     end
+    return false
 end
 
 ---@param aiBrain AIBrain
----@return true | nil
+---@return boolean
 function ArmyWantsTransports(aiBrain)
     if aiBrain and aiBrain.WantTransports and aiBrain:GetNoRushTicks() <= 0 then
         return true
     end
+    return false
 end
 
 ---@param aiBrain AIBrain
----@return true | nil
+---@return boolean
 function CDRRunningAway(aiBrain)
     for _, unit in aiBrain:GetListOfUnits(categories.COMMAND, false) do
         if not unit.Dead and unit.Running then
             return true
         end
     end
+    return false
 end
 
 ---@param aiBrain AIBrain
 ---@param num number
----@return true | nil
+---@return boolean
 function GreaterThanGameTime(aiBrain, num)
     local time = GetGameTimeSeconds()
     if aiBrain.CheatEnabled then
         time = time * 2
     end
-    if num < time then
-        return true
-    end
+
+    return time > num
 end
 
 ---@param aiBrain AIBrain
@@ -255,17 +277,15 @@ function LessThanGameTime(aiBrain, num)
 end
 
 ---@param aiBrain AIBrain
----@return true | nil
+---@return boolean
 function PreBuiltBase(aiBrain)
-    if aiBrain.PreBuilt then
-        return true
-    end
+    return aiBrain.PreBuilt == true
 end
 
 ---@param aiBrain AIBrain
 ---@return boolean
 function NotPreBuilt(aiBrain)
-    return not aiBrain.PreBuilt
+    return aiBrain.PreBuilt ~= true
 end
 
 ---@param aiBrain AIBrain unused
@@ -281,7 +301,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param check boolean
----@return true | nil
+---@return boolean
 function IsIsland(aiBrain, check)
     if not aiBrain.islandCheck then
         local startX, startZ = aiBrain:GetArmyStartPos()
@@ -296,28 +316,31 @@ function IsIsland(aiBrain, check)
     if check == aiBrain.isIsland then
         return true
     end
+    return false
 end
 
 ---@param aiBrain AIBrain unused
 ---@param sizeX number
 ---@param sizeZ number
----@return true | nil
+---@return boolean
 function MapGreaterThan(aiBrain, sizeX, sizeZ)
     local mapSizeX, mapSizeZ = GetMapSize()
     if mapSizeX > sizeX or mapSizeZ > sizeZ then
         return true
     end
+    return false
 end
 
 ---@param aiBrain AIBrain unused
 ---@param sizeX number
 ---@param sizeZ number
----@return true | nil
+---@return boolean
 function MapLessThan(aiBrain, sizeX, sizeZ)
     local mapSizeX, mapSizeZ = GetMapSize()
     if mapSizeX < sizeX and mapSizeZ < sizeZ then
         return true
     end
+    return false
 end
 
 --- Buildcondition to check pathing to current enemy 
@@ -350,7 +373,7 @@ end
 
 ---@param aiBrain BaseAIBrain
 ---@param locationType string
----@return true | nil
+---@return boolean
 function ReclaimAvailableInGrid(aiBrain, locationType, mapSearch)
     -- this condition won't work without a reference to the reclaim grid
     local gridReclaim = aiBrain.GridReclaim
