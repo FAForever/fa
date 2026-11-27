@@ -571,7 +571,7 @@ UnitBlueprint{
             RateOfFire = 10/19, --10/integer interval in ticks
             TargetCheckInterval = 0.1,
             TargetRestrictDisallow = "UNTARGETABLE,STRATEGIC",
-            TargetRestrictOnlyAllow = "TACTICAL,MISSILE",
+            TargetRestrictOnlyAllow = "TACTICAL MISSILE",
             TargetType = "RULEWTT_Projectile",
             TurretBoneMuzzle = "Zapper_Turret",
             TurretBonePitch = "Zapper_Muzzle",

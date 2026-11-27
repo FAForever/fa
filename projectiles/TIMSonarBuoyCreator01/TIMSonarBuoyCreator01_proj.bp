@@ -5,7 +5,6 @@ ProjectileBlueprint{
         "SONAR",
         "UEF",
     },
-    Defense = { Health = 1 },
     Display = {
         MeshBlueprint = "/meshes/projectiles/torpedo_default_mesh.bp",
         StrategicIconSize = 1,

@@ -9,10 +9,6 @@ ProjectileBlueprint{
         "MISSILE",
         "PROJECTILE",
     },
-    Defense = {
-        Health = 1,
-        MaxHealth = 1,
-    },
     Display = {
         ImpactEffects = {
             Scale = 1,
