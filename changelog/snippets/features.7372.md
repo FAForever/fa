@@ -1,1 +1,0 @@
-- Add the faf-re engine's options to the options screen: Graphics API and Interface text in Video, and three replay keyframe settings in Gameplay. They show only on the faf-re engine (#7372).

@@ -1,1 +1,0 @@
-- (#6550) Add argument to choose game exe file to use in launch script.

@@ -1,0 +1,1 @@
+- Reclaiming a non-carrier transport now leaves a wreck for each unit it carries (#7377).

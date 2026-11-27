@@ -1,1 +1,0 @@
-- Remove the `SONAR` category from the UEF Spy Plane as it has no sonar (#7310).

@@ -1,1 +1,0 @@
-- Fix error with shields that have a mix of guards with and without orders queued after the assist order (#7227).
