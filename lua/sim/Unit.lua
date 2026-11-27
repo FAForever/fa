@@ -202,7 +202,8 @@ local UnitSetMaxHealth = _G.moho.unit_methods.SetMaxHealth
 ---@field ImmuneToStun? boolean
 ---@field Anims? Animator[] # Animators that get stopped when a unit is stunned. Not used in FAF.
 ---@field IsBeingTransferred? boolean
----@field OnStopBeingBuiltEnhancementsThread thread?
+---@field OnStopBeingBuiltEnhancementsThread thread? # creates the preset enhancements, or the enhancements a transferred unit had
+---@field TransferredEnhancements? table<EnhancementSlot, Enhancement> # enhancements a transferred unit had, until they are recreated
 ---@field ActiveConsumption boolean
 ---@field MaintenanceConsumption? boolean
 ---@field EnergyMaintenanceConsumptionOverride? number
