@@ -1075,13 +1075,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                 SetIgnoreArmyUnitCap(captor.Army, true)
             end
 
-            if ScenarioInfo.CampaignMode and not captorBrain.IgnoreArmyCaps then
-                SetIgnoreArmyUnitCap(captor.Army, false)
-            end
-
             -- Fix captured units not retaining their data
             self:ResetCaptors()
             local newUnits = SimUtils.TransferUnitsOwnership({self}, captor.Army, true) or {}
+
+            if ScenarioInfo.CampaignMode and not captorBrain.IgnoreArmyCaps then
+                SetIgnoreArmyUnitCap(captor.Army, false)
+            end
 
             -- The unit transfer function returns a table of units. Since we transferred 1 unit, the table contains 1 unit (The new unit).
             -- If table would have been nil (Set to {} above), was empty, or contains more than one, kill this sequence
