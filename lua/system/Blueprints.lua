@@ -950,6 +950,30 @@ end
 -- Hook for mods to manipulate the entire blueprint table
 ---@param all_bps BlueprintsTable
 function ModBlueprints(all_bps)
+    -- Sanitize default blueprint tables to prevent community mods from crashing on non-playable / dummy / coop units
+    if all_bps and all_bps.Unit then
+        for _, bp in all_bps.Unit do
+            bp.Categories = bp.Categories or {}
+            bp.Economy = bp.Economy or {}
+            bp.Defense = bp.Defense or {}
+            bp.General = bp.General or {}
+            bp.Physics = bp.Physics or {}
+            bp.Weapon = bp.Weapon or {}
+
+            -- Preserve missing Enhancements table on USEBUILDPRESETS units so PostModBlueprints can reject invalid presets
+            if not (bp.CategoriesHash and bp.CategoriesHash.USEBUILDPRESETS) then
+                bp.Enhancements = bp.Enhancements or {}
+            end
+        end
+    end
+    if all_bps and all_bps.Projectile then
+        for _, bp in all_bps.Projectile do
+            bp.Categories = bp.Categories or {}
+            bp.Economy = bp.Economy or {}
+            bp.General = bp.General or {}
+            bp.Physics = bp.Physics or {}
+        end
+    end
 end
 
 --- Reload compatibility for modding from non-hook blueprint modding
