@@ -230,17 +230,6 @@ UEL0001 = ClassUnit(ACUUnit, ConstructionPodComponent) {
     end,
 
     ---@param self UEL0001
-    ---@param name string
-    ---@param rebuildDrone? boolean
-    NotifyOfPodDeath = function(self, name, rebuildDrone)
-        ConstructionPodComponent.NotifyOfPodDeath(self, name, rebuildDrone)
-        -- the drone's enhancement stays only while the drone is rebuilt
-        if not rebuildDrone and not self.Dead and self:GetPodSlot(name).Enabled then
-            self:CreateEnhancement(name .. 'Remove')
-        end
-    end,
-
-    ---@param self UEL0001
     ---@param bone Bone
     ---@param attachee Unit
     OnTransportAttach = function(self, bone, attachee)
