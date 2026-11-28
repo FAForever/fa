@@ -1,0 +1,1 @@
+- Fix units that are given twice in the same tick losing their enhancements (#7439).
