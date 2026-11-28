@@ -219,7 +219,6 @@ local UnitSetMaxHealth = _G.moho.unit_methods.SetMaxHealth
 ---@field Anims? Animator[] # Animators that get stopped when a unit is stunned. Not used in FAF.
 ---@field IsBeingTransferred? boolean
 ---@field OnStopBeingBuiltEnhancementsThread thread?
----@field TransferredEnhancements? table<string, Enhancement> # Set by `TransferUnitsOwnership` until the unit applies its enhancements again, one tick after the transfer
 ---@field TransferCallbacks? table<string, UnitTransferCallback> # Set by `AddTransferCallback`
 ---@field ActiveConsumption boolean
 ---@field MaintenanceConsumption? boolean

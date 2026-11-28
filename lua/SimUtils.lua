@@ -374,8 +374,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         end
         local enhancements = bp.Enhancements
         if enhancements then
-            -- a unit given earlier in this tick hasn't applied its enhancements again yet
-            local unitEnh = SimUnitEnhancements[unit.EntityId] or unit.TransferredEnhancements
+            local unitEnh = SimUnitEnhancements[unit.EntityId]
             if unitEnh then
                 activeEnhancements = {}
                 for slot, enh in unitEnh do
@@ -503,10 +502,8 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
             if TableEmpty(activeEnhancements) then
                 newUnit.OnStopBeingBuiltEnhancementsThread = nil
             else
-                newUnit.TransferredEnhancements = activeEnhancements
                 newUnit.OnStopBeingBuiltEnhancementsThread = newUnit:ForkThread(function()
                     WaitTicks(1)
-                    newUnit.TransferredEnhancements = nil
                     if newUnit and not newUnit.Dead and not IsDestroyed(newUnit) then
                         for _, enh in activeEnhancements do
                             newUnit:CreateEnhancement(enh)
