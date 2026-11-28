@@ -5,31 +5,12 @@ local oldGetGuards = TConstructionUnit.GetGuards
 ---@field Pod string
 ---@field Parent? ConstructionPodUnit # Set by the `ConstructionPodComponent` of the unit that carries the drone
 ---@field guardCache table
----@field rebuildDrone boolean # If true, the parent should rebuild the pod. Caches script bit 1.
 TConstructionPodUnit = ClassUnit(TConstructionUnit) {
     Parent = nil,
 
     ---@param self TConstructionPodUnit
     OnCreate = function(self)
         TConstructionUnit.OnCreate(self)
-    end,
-
-    ---@param self TConstructionPodUnit
-    ---@param bit number
-    OnScriptBitSet = function(self, bit)
-        TConstructionUnit.OnScriptBitSet(self, bit)
-        if bit == 1 then
-            self.rebuildDrone = true
-        end
-    end,
-
-    ---@param self TConstructionPodUnit
-    ---@param bit number
-    OnScriptBitClear = function(self, bit)
-        TConstructionUnit.OnScriptBitClear(self, bit)
-        if bit == 1 then
-            self.rebuildDrone = false
-        end
     end,
 
     ---@param self TConstructionPodUnit
@@ -47,7 +28,6 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
     SetParent = function(self, parent, podName)
         self.Parent = parent
         self.Pod = podName
-        self:SetScriptBit('RULEUTC_WeaponToggle', true)
     end,
 
     ---@param self TConstructionPodUnit
@@ -172,7 +152,7 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
     OnKilled = function(self, instigator, type, overkillRatio)
         local parent = self.Parent
         if parent then
-            parent:NotifyOfPodDeath(self.Pod, self.rebuildDrone)
+            parent:NotifyOfPodDeath(self.Pod)
             self.Parent = nil
         end
         TConstructionUnit.OnKilled(self, instigator, type, overkillRatio)

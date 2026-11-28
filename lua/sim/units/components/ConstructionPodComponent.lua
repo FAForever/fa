@@ -201,14 +201,13 @@ ConstructionPodComponent = ClassSimple {
         self:RequestRefreshUI()
     end,
 
-    --- Called by the drone when it is killed. Rebuilds the drone if `rebuildDrone` is set
+    --- Called by the drone when it is killed. Rebuilds the drone
     ---@see TConstructionPodUnit.OnKilled
     ---@param self ConstructionPodUnit
     ---@param name string
-    ---@param rebuildDrone? boolean
-    NotifyOfPodDeath = function(self, name, rebuildDrone)
+    NotifyOfPodDeath = function(self, name)
         self[name] = nil
-        if rebuildDrone and not self.Dead then
+        if not self.Dead then
             self:RebuildPod(name)
         end
     end,
