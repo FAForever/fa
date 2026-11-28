@@ -23,9 +23,6 @@ end
 --- Intellisense helper class
 ---@class ConstructionPodUnit : ConstructionPodComponent, Unit
 
----@class UnitTransferData
----@field Pods? table<string, number | false> # Set by `SavePodsForTransfer`
-
 --- A drone that the unit carries. Its key in [PodDefinitions](lua://ConstructionPodComponent.PodDefinitions) is the
 --- drone's name: the unit field that holds the drone. The enhancement `<name>Remove` removes it
 ---@class ConstructionPodDefinition
@@ -41,7 +38,8 @@ end
 
 --- Gives a unit drones (`TConstructionPodUnit`) that assist it, are rebuilt when they die, and are removed with their
 --- enhancement. The unit defines [PodDefinitions](lua://ConstructionPodComponent.PodDefinitions) and calls the
---- component's functions. The component doesn't override any unit functions
+--- component's functions. The component doesn't override any unit functions, and carries the drones over a transfer
+--- with the transfer callback `ConstructionPods`
 ---@class ConstructionPodComponent
 ---@field PodDefinitions table<string, ConstructionPodDefinition>
 ---@field PodSlots? table<string, ConstructionPodSlot>
@@ -121,6 +119,9 @@ ConstructionPodComponent = ClassSimple {
     AddPod = function(self, name)
         local slot = self:GetPodSlot(name)
         slot.Enabled = true
+        if not self.TransferCallbacks.ConstructionPods then
+            self:AddTransferCallback('ConstructionPods', true, self.SavePodsForTransfer, self.RestorePodsAfterTransfer)
+        end
         -- the enhancement is applied again a tick after a transfer that already restored the drone
         if not self:GetPod(name) and not slot.RebuildThread then
             self:CreatePod(name)
@@ -224,8 +225,8 @@ ConstructionPodComponent = ClassSimple {
         end
     end,
 
-    --- Destroys the drones and returns their health. Call it from `OnBeforeTransfer`, and store the result in
-    --- `data.Pods`
+    --- Destroys the drones and returns their health. Called before a transfer by the transfer callback that `AddPod`
+    --- adds
     ---@see ConstructionPodComponent.RestorePodsAfterTransfer
     ---@param self ConstructionPodUnit
     ---@return table<string, number | false>? # Health of each enabled drone, `false` if it is dead, or `nil` if no drone is enabled
@@ -253,8 +254,8 @@ ConstructionPodComponent = ClassSimple {
         return data
     end,
 
-    --- Recreates the drones with their health, and rebuilds the dead ones. Call it from `OnAfterTransfer` with
-    --- `data.Pods`
+    --- Recreates the drones with their health, and rebuilds the dead ones. Called after a transfer by the transfer
+    --- callback that `AddPod` adds
     ---@see ConstructionPodComponent.SavePodsForTransfer
     ---@param self ConstructionPodUnit
     ---@param data? table<string, number | false> # The value returned by `SavePodsForTransfer`
