@@ -20,6 +20,21 @@ local function LeavePodRebuildQueue(unit, name)
     end
 end
 
+--- `Before` of the transfer callback that `AddPod` adds
+---@param unit ConstructionPodUnit
+---@return table<string, number | false>?
+local function SavePodsBeforeTransfer(unit)
+    return unit:SavePodsForTransfer()
+end
+
+--- `After` of the transfer callback that `AddPod` adds
+---@param unit ConstructionPodUnit
+---@param transferFailed boolean
+---@param data? table<string, number | false>
+local function RestorePodsAfterTransfer(unit, transferFailed, data)
+    unit:RestorePodsAfterTransfer(data)
+end
+
 --- Intellisense helper class
 ---@class ConstructionPodUnit : ConstructionPodComponent, Unit
 
@@ -120,7 +135,7 @@ ConstructionPodComponent = ClassSimple {
         local slot = self:GetPodSlot(name)
         slot.Enabled = true
         if not self.TransferCallbacks.ConstructionPods then
-            self:AddTransferCallback('ConstructionPods', true, self.SavePodsForTransfer, self.RestorePodsAfterTransfer)
+            self:AddTransferCallback('ConstructionPods', true, SavePodsBeforeTransfer, RestorePodsAfterTransfer)
         end
         -- the enhancement is applied again a tick after a transfer that already restored the drone
         if not self:GetPod(name) and not slot.RebuildThread then
