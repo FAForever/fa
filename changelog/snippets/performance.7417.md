@@ -1,0 +1,1 @@
+- Map ping markers, the unit view and the cursor depth indicator no longer redo their layout and work every frame when nothing changed, which lowers the interface's cost per frame (#7417).
