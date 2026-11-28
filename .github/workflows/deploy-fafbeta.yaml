@@ -33,34 +33,62 @@ on:
     - cron: "0 23 1 * *"
 
 jobs:
+  # Resolves the staging branch once, so that a stage run during this workflow
+  # does not change what is tested, deployed and reported
+  refs:
+    name: Resolve staging/fafbeta
+    runs-on: ubuntu-latest
+    outputs:
+      staging: ${{ steps.refs.outputs.staging }}
+      previous: ${{ steps.refs.outputs.previous }}
+    steps:
+      - name: Resolve references
+        id: refs
+        run: |
+          remote="https://github.com/${{ github.repository }}"
+          staging=$(git ls-remote "$remote" refs/heads/staging/fafbeta | cut -f1)
+          previous=$(git ls-remote "$remote" refs/heads/deploy/fafbeta | cut -f1)
+          test -n "$staging"
+          echo "staging=$staging" >> "$GITHUB_OUTPUT"
+          echo "previous=$previous" >> "$GITHUB_OUTPUT"
+
+  # Test what is deployed, the staging branch includes labeled pull requests
   test:
+    needs: [refs]
     uses: ./.github/workflows/tests.yaml
+    with:
+      ref: ${{ needs.refs.outputs.staging }}
 
   changelog:
     name: Create changelog of FAF Beta
+    needs: [refs]
     uses: ./.github/workflows/docs-generate-changelog.yaml
     with:
       branch: staging/fafbeta
+      ref: ${{ needs.refs.outputs.staging }}
 
   changelog-lua:
     name: Convert changelog to Lua
-    needs: [changelog]
+    needs: [refs, changelog]
     uses: ./.github/workflows/docs-convert-changelog.yaml
     with:
       branch: staging/fafbeta
+      ref: ${{ needs.refs.outputs.staging }}
       additional-changelog: fafbeta
 
   deploy:
     name: Update FAF Beta Balance
-    needs: [test, changelog-lua]
+    needs: [refs, test, changelog-lua]
     runs-on: ubuntu-latest
+    outputs:
+      deployed: ${{ steps.push.outputs.deployed }}
     steps:
       # https://github.com/actions/checkout/tree/v6/
       - name: Checkout FA repository
         uses: actions/checkout@v6
         with:
           ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
-          ref: staging/fafbeta
+          ref: ${{ needs.refs.outputs.staging }}
 
       - name: Setup Git configuration
         run: |
@@ -114,5 +142,46 @@ jobs:
       # Update the deploy/fafbeta branch, we force push here because
       # we're not interested in fixing conflicts
       - name: Update deploy/fafbeta
+        id: push
         run: |
           git push origin HEAD:deploy/fafbeta --force
+          echo "deployed=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  # Updates the status comments of the pull requests that were staged, also
+  # when the tests or the deployment failed
+  report:
+    name: Report to labeled pull requests
+    needs: [refs, test, changelog-lua, deploy]
+    if: ${{ !cancelled() && needs.refs.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      # https://github.com/actions/checkout/tree/v6/
+      - name: Checkout FA repository
+        uses: actions/checkout@v6
+        with:
+          ref: develop
+          fetch-depth: 0
+
+      - name: Setup Git configuration
+        run: |
+          # Configure git
+          git config user.email "github@faforever.com"
+          git config user.name "FAForever Machine User"
+
+      - name: Report deployment
+        env:
+          RESULT: ${{ needs.test.result == 'failure' && 'tests' || (needs.deploy.result == 'success' && 'success' || 'failed') }}
+          STAGING: ${{ needs.refs.outputs.staging }}
+          DEPLOYED: ${{ needs.deploy.outputs.deployed }}
+          PREVIOUS: ${{ needs.refs.outputs.previous }}
+          MANUAL_BY: ${{ github.event_name == 'workflow_dispatch' && github.actor || '' }}
+        run: |
+          # The staging commit may no longer be on any branch
+          git fetch --quiet origin "$STAGING"
+          python3 .github/workflows/scripts/python/staging.py deploy staging/fafbeta --result "$RESULT" --staging "$STAGING" --deployed "$DEPLOYED" --previous "$PREVIOUS" --manual-by "$MANUAL_BY"

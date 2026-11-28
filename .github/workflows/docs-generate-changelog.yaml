@@ -32,6 +32,10 @@ on:
         required: true
         type: string
         description: The branch to use to compile the changelog snippets from
+      ref:
+        required: false
+        type: string
+        description: The commit to check out instead of the branch, the branch still names the changelog
 
   pull_request:
     paths:
@@ -65,7 +69,7 @@ jobs:
           repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
           path: fa
           # Make sure that we run from the correct branch when triggered in a pull request.
-          ref: ${{ inputs.branch || github.head_ref || github.ref_name }}
+          ref: ${{ inputs.ref || inputs.branch || github.head_ref || github.ref_name }}
           sparse-checkout: |
             changelog/snippets
 

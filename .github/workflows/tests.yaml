@@ -2,6 +2,12 @@ name: Tests
 
 on:
   workflow_call:
+    inputs:
+      ref:
+        description: The branch, tag or commit to test, defaults to the ref that triggered the workflow
+        type: string
+        required: false
+        default: ""
   workflow_dispatch:
   pull_request:
   push:
@@ -11,6 +17,10 @@ on:
       - deploy/fafbeta
       - develop
       - master
+
+# The tests only read the repository
+permissions:
+  contents: read
 
 jobs:
   syntax:
@@ -23,6 +33,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
         with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             # include all shell scripts used for testing
@@ -72,6 +84,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
         with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             *.sh
@@ -90,6 +104,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
         with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             *.sh
