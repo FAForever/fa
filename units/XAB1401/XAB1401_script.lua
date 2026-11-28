@@ -37,7 +37,7 @@ XAB1401 = ClassUnit(AStructureUnit) {
             CreateAttachedEmitter(self, 'Orb', self.Army, v)
         end
 
-        ChangeState(self, self.ResourceOn)
+        -- ChangeState(self, self.ResourceOn)
     end,
 
     ResourceOn = State {
