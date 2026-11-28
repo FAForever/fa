@@ -1212,7 +1212,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     --- Adds functions that `TransferUnitsOwnership` calls around the transfer of this unit, for state that isn't part
     --- of the unit's class. Each `after` only receives the value that its own `before` returned. An error in a
-    --- callback is logged and doesn't stop the transfer, and a `before` that errors skips its `after`.
+    --- callback is logged and doesn't stop the transfer. A callback whose `before` errors is removed, so its `after`
+    --- isn't called and the new unit doesn't get it.
     ---
     --- Neither function may wait. A callback with the same key replaces the old one
     ---@see Unit.RemoveTransferCallback
