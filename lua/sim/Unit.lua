@@ -151,6 +151,18 @@ local UnitSetMaxHealth = _G.moho.unit_methods.SetMaxHealth
 ---@field Affects table<BuffAffectName, table<BuffName, BlueprintBuffAffectState>>
 ---@field BuffTable table<BuffType, table<BuffName, BuffData>>
 
+--- State that a unit carries over a transfer, one field per kind of state. Classes that add a field declare it on
+--- this class in their own file
+---@see Unit.OnBeforeTransfer
+---@class UnitTransferData
+
+--- A pair of functions that `TransferUnitsOwnership` calls around the transfer of one unit
+---@see Unit.AddTransferCallback
+---@class UnitTransferCallback
+---@field Before? fun(unit: Unit): any # Called on the old unit. Its return value is passed to `After`
+---@field After? fun(unit: Unit, data: any) # Called on the new unit, or on the old unit if the transfer failed
+---@field Persist boolean # Whether the new unit gets the callback too
+
 ---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties, CampaignAIUnitProperties, UnitBuffFields, DebugUnitComponent, FastDecayComponent
 ---@field CDRHome? LocationType
 ---@field AIManagerIdentifier? string
@@ -207,6 +219,7 @@ local UnitSetMaxHealth = _G.moho.unit_methods.SetMaxHealth
 ---@field Anims? Animator[] # Animators that get stopped when a unit is stunned. Not used in FAF.
 ---@field IsBeingTransferred? boolean
 ---@field OnStopBeingBuiltEnhancementsThread thread?
+---@field TransferCallbacks? table<string, UnitTransferCallback> # Set by `AddTransferCallback`
 ---@field ActiveConsumption boolean
 ---@field MaintenanceConsumption? boolean
 ---@field EnergyMaintenanceConsumptionOverride? number
@@ -1176,6 +1189,56 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param fn function
     AddOnGivenCallback = function(self, fn)
         self:AddUnitCallback(fn, 'OnGiven')
+    end,
+
+    --- Called by `TransferUnitsOwnership` right before the unit changes army. Returns state that the engine doesn't
+    --- transfer, for `OnAfterTransfer`.
+    ---
+    --- An override adds its state as a field of the table that the base class returns, and creates the table only
+    --- when the base class returns `nil` and the override has state to add
+    ---@see Unit.OnAfterTransfer
+    ---@param self Unit
+    ---@return UnitTransferData?
+    OnBeforeTransfer = function(self)
+    end,
+
+    --- Called by `TransferUnitsOwnership` on the new unit right after it changed army, or on the old unit if the
+    --- transfer failed (unit cap)
+    ---@see Unit.OnBeforeTransfer
+    ---@param self Unit
+    ---@param data? UnitTransferData # The value returned by `OnBeforeTransfer`
+    OnAfterTransfer = function(self, data)
+    end,
+
+    --- Adds functions that `TransferUnitsOwnership` calls around the transfer of this unit, for state that isn't part
+    --- of the unit's class. Each `after` only receives the value that its own `before` returned. An error in a
+    --- callback is logged and doesn't stop the transfer, and a `before` that errors skips its `after`.
+    ---
+    --- Neither function may wait. A callback with the same key replaces the old one
+    ---@see Unit.RemoveTransferCallback
+    ---@see Unit.OnBeforeTransfer
+    ---@param self Unit
+    ---@param key string
+    ---@param persist boolean # Whether the new unit gets the callback too. It replaces a callback with the same key that the new unit added while it was created
+    ---@param before? fun(unit: Unit): any # Called on the old unit right before it changes army
+    ---@param after? fun(unit: Unit, data: any) # Called with the value that `before` returned, on the new unit, or on the old unit if the transfer failed (unit cap)
+    AddTransferCallback = function(self, key, persist, before, after)
+        local callbacks = self.TransferCallbacks
+        if not callbacks then
+            callbacks = {}
+            self.TransferCallbacks = callbacks
+        end
+        callbacks[key] = { Before = before, After = after, Persist = persist }
+    end,
+
+    ---@see Unit.AddTransferCallback
+    ---@param self Unit
+    ---@param key string
+    RemoveTransferCallback = function(self, key)
+        local callbacks = self.TransferCallbacks
+        if callbacks then
+            callbacks[key] = nil
+        end
     end,
 
     -------------------------------------------------------------------------------------------

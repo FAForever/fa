@@ -237,6 +237,48 @@ local function TransferUnitsOwnershipComparator(a, b)
     return a.Economy.BuildCostMass > b.Economy.BuildCostMass
 end
 
+--- Calls the `Before` functions of a unit's transfer callbacks
+---@param unit Unit
+---@param callbacks table<string, UnitTransferCallback>
+---@return table<string, any>? data # The values that the `Before` functions returned, by key
+---@return table<string, true>? failed # The keys whose `Before` function errored
+local function CallBeforeTransferCallbacks(unit, callbacks)
+    local data, failed
+    for key, callback in callbacks do
+        local before = callback.Before
+        if before then
+            local ok, result = pcall(before, unit)
+            if not ok then
+                WARN(string.format("Transfer callback '%s' failed before the transfer: %s", key, tostring(result)))
+                failed = failed or {}
+                failed[key] = true
+            elseif result ~= nil then
+                data = data or {}
+                data[key] = result
+            end
+        end
+    end
+    return data, failed
+end
+
+--- Calls the `After` functions of a unit's transfer callbacks
+---@param unit Unit
+---@param callbacks table<string, UnitTransferCallback>
+---@param data? table<string, any>
+---@param failed? table<string, true>
+local function CallAfterTransferCallbacks(unit, callbacks, data, failed)
+    for key, callback in callbacks do
+        local after = callback.After
+        -- the `Before` function didn't finish, so there may be nothing to restore
+        if after and not failed[key] then
+            local ok, msg = pcall(after, unit, data[key])
+            if not ok then
+                WARN(string.format("Transfer callback '%s' failed after the transfer: %s", key, tostring(msg)))
+            end
+        end
+    end
+end
+
 local sharedUnits = {}
 
 --- Transfers units to an army, returning the new units (since changing the army
@@ -401,6 +443,13 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
             end
         end
 
+        local transferData = unit:OnBeforeTransfer()
+        local transferCallbacks = unit.TransferCallbacks
+        local callbackData, failedCallbacks
+        if transferCallbacks then
+            callbackData, failedCallbacks = CallBeforeTransferCallbacks(unit, transferCallbacks)
+        end
+
         -- changing owner
         local newUnit = ChangeUnitArmy(unit, toArmy, noRestrictions or false)
         if not newUnit then
@@ -416,7 +465,28 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
                 end
                 unit.TransferredPodHealth = nil
             end
+            -- and what `OnBeforeTransfer` and the callbacks took
+            if not unit.Dead then
+                unit:OnAfterTransfer(transferData)
+                if transferCallbacks then
+                    CallAfterTransferCallbacks(unit, transferCallbacks, callbackData, failedCallbacks)
+                end
+            end
             continue
+        end
+        newUnit:OnAfterTransfer(transferData)
+        if transferCallbacks then
+            for key, callback in transferCallbacks do
+                if callback.Persist then
+                    local newCallbacks = newUnit.TransferCallbacks
+                    if not newCallbacks then
+                        newCallbacks = {}
+                        newUnit.TransferCallbacks = newCallbacks
+                    end
+                    newCallbacks[key] = callback
+                end
+            end
+            CallAfterTransferCallbacks(newUnit, transferCallbacks, callbackData, failedCallbacks)
         end
 
         newUnitCount = newUnitCount + 1
