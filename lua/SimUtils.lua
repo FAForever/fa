@@ -374,7 +374,8 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         end
         local enhancements = bp.Enhancements
         if enhancements then
-            local unitEnh = SimUnitEnhancements[unit.EntityId]
+            -- a unit given earlier in this tick hasn't applied its enhancements again yet
+            local unitEnh = SimUnitEnhancements[unit.EntityId] or unit.TransferredEnhancements
             if unitEnh then
                 activeEnhancements = {}
                 for slot, enh in unitEnh do
@@ -388,22 +389,6 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
             -- otherwise additional dummy drone will appear after transfer
             for _, drone in unit:GetCargo() do
                 drone:Destroy()
-            end
-        end
-
-        -- UEF ACU and SACU drones are recreated by their enhancements after the transfer. A drone docked
-        -- on its parent is cargo, which the engine transfers as an extra drone without a parent, so destroy
-        -- the drones here. Remember the health of the ones that were alive so that the recreated drones keep
-        -- it, and dead drones are rebuilt instead of being recreated for free.
-        local podHealth
-        if unit.GetPods then
-            podHealth = {}
-            for _, pod in unit:GetPods() do
-                local podName = pod.Pod
-                if podName and not pod.Dead then
-                    podHealth[podName] = pod:GetHealth()
-                    pod:Destroy()
-                end
             end
         end
 
@@ -457,18 +442,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         local newUnit = ChangeUnitArmy(unit, toArmy, noRestrictions or false)
         if not newUnit then
             unit.IsBeingTransferred = nil
-            -- the transfer failed (unit cap), so give back the drones that we destroyed
-            if podHealth and not unit.Dead then
-                unit.TransferredPodHealth = podHealth
-                for podName in podHealth do
-                    local processEnhancement = unit['ProcessEnhancement' .. podName]
-                    if processEnhancement then
-                        processEnhancement(unit)
-                    end
-                end
-                unit.TransferredPodHealth = nil
-            end
-            -- and what `OnBeforeTransfer` and the callbacks took
+            -- the transfer failed (unit cap), so give back what `OnBeforeTransfer` and the callbacks took
             if not unit.Dead then
                 unit:OnAfterTransfer(true, transferData)
                 if transferCallbacks then
@@ -529,15 +503,15 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
             if TableEmpty(activeEnhancements) then
                 newUnit.OnStopBeingBuiltEnhancementsThread = nil
             else
-                newUnit.TransferredPodHealth = podHealth
+                newUnit.TransferredEnhancements = activeEnhancements
                 newUnit.OnStopBeingBuiltEnhancementsThread = newUnit:ForkThread(function()
                     WaitTicks(1)
+                    newUnit.TransferredEnhancements = nil
                     if newUnit and not newUnit.Dead and not IsDestroyed(newUnit) then
                         for _, enh in activeEnhancements do
                             newUnit:CreateEnhancement(enh)
                         end
                     end
-                    newUnit.TransferredPodHealth = nil
                     newUnit.OnStopBeingBuiltEnhancementsThread = nil
                 end)
             end
