@@ -1,0 +1,1 @@
+- Expand Notify Management with configurable text and map-overlay notifications for experimental, strategic, and HQ construction, including per-category controls and adjustable overlay font sizes (#7431).
