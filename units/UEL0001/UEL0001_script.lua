@@ -230,25 +230,6 @@ UEL0001 = ClassUnit(ACUUnit, ConstructionPodComponent) {
     end,
 
     ---@param self UEL0001
-    ---@return UnitTransferData?
-    OnBeforeTransfer = function(self)
-        local data = ACUUnit.OnBeforeTransfer(self)
-        local pods = self:SavePodsForTransfer()
-        if pods then
-            data = data or {}
-            data.Pods = pods
-        end
-        return data
-    end,
-
-    ---@param self UEL0001
-    ---@param data? UnitTransferData
-    OnAfterTransfer = function(self, data)
-        ACUUnit.OnAfterTransfer(self, data)
-        self:RestorePodsAfterTransfer(data.Pods)
-    end,
-
-    ---@param self UEL0001
     ---@param name string
     ---@param rebuildDrone? boolean
     NotifyOfPodDeath = function(self, name, rebuildDrone)
