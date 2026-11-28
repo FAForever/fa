@@ -24,22 +24,22 @@ local TIFCruiseMissileLauncher = TerranWeaponFile.TIFCruiseMissileLauncher
 local TDFOverchargeWeapon = TerranWeaponFile.TDFOverchargeWeapon
 local EffectUtil = import("/lua/effectutilities.lua")
 local Buff = import("/lua/sim/buff.lua")
-
-local podBpEco = __blueprints['uea0001']--[[@as UnitBlueprint]].Economy
+local ConstructionPodComponent = import("/lua/sim/units/components/ConstructionPodComponent.lua").ConstructionPodComponent
 
 -- weapons that fire from the gun barrel, and from the Zephyr Amplifier barrel once it is built
 local GunLabels = { 'RightZephyr', 'OverCharge', 'AutoOverCharge' }
 
----@class UEL0001 : ACUUnit
----@field LeftPod TConstructionPodUnit
----@field HasLeftPod boolean
----@field RebuildThread? thread # Rebuilds left pod
----@field RightPod TConstructionPodUnit
----@field HasRightPod boolean
----@field RebuildThread2? thread # Rebuilds right pod
----@field TransferredPodHealth? table<string, number> # Set by `TransferUnitsOwnership` while it recreates the enhancements: health of the drones that were alive before the transfer
+---@class UEL0001 : ACUUnit, ConstructionPodUnit
+---@field LeftPod? TConstructionPodUnit
+---@field RightPod? TConstructionPodUnit
 ---@field MissileHatchSlider moho.SlideManipulator
-UEL0001 = ClassUnit(ACUUnit) {
+UEL0001 = ClassUnit(ACUUnit, ConstructionPodComponent) {
+    ---@type table<string, ConstructionPodDefinition>
+    PodDefinitions = {
+        LeftPod = { UnitId = 'uea0001', Bone = 'AttachSpecial02', QueueRebuild = true },
+        RightPod = { UnitId = 'uea0001', Bone = 'AttachSpecial01', QueueRebuild = true },
+    },
+
     Weapons = {
         DeathWeapon = ClassWeapon(ACUDeathWeapon) {},
         RightZephyr = ClassWeapon(TDFZephyrCannonWeapon) {},
@@ -142,8 +142,6 @@ UEL0001 = ClassUnit(ACUUnit) {
         self:HideBone('Left_Upgrade', true)
         self:HideBone('Back_Upgrade_B01', true)
         self:SetupBuildBones()
-        self.HasLeftPod = false
-        self.HasRightPod = false
         -- Restrict what enhancements will enable later
         self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
 
@@ -232,87 +230,33 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UEL0001
-    ---@param PodNumber integer
-    RebuildPod = function(self, PodNumber)
-        if PodNumber == 1 then
-            -- Force pod rebuilds to queue up
-            if self.RebuildingPod2 ~= nil then
-                WaitFor(self.RebuildingPod2)
-            end
-            if self.HasLeftPod == true then
-                self.RebuildingPod = CreateEconomyEvent(self, podBpEco.BuildCostEnergy, podBpEco.BuildCostMass, podBpEco.BuildTime / self:GetBuildRate(), self.SetWorkProgress)
-                self:RequestRefreshUI()
-                WaitFor(self.RebuildingPod)
-                self:SetWorkProgress(0.0)
-                RemoveEconomyEvent(self, self.RebuildingPod)
-                self.RebuildingPod = nil
-                local location = self:GetPosition('AttachSpecial02')
-                ---@type UEA0001
-                ---@diagnostic disable-next-line: assign-type-mismatch
-                local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
-                pod:SetParent(self, 'LeftPod')
-                pod:SetCreator(self)
-                self.Trash:Add(pod)
-                self.LeftPod = pod
-            end
-        elseif PodNumber == 2 then
-            -- Force pod rebuilds to queue up
-            if self.RebuildingPod ~= nil then
-                WaitFor(self.RebuildingPod)
-            end
-            if self.HasRightPod == true then
-                self.RebuildingPod2 = CreateEconomyEvent(self, podBpEco.BuildCostEnergy, podBpEco.BuildCostMass, podBpEco.BuildTime / self:GetBuildRate(), self.SetWorkProgress)
-                self:RequestRefreshUI()
-                WaitFor(self.RebuildingPod2)
-                self:SetWorkProgress(0.0)
-                RemoveEconomyEvent(self, self.RebuildingPod2)
-                self.RebuildingPod2 = nil
-                local location = self:GetPosition('AttachSpecial01')
-                ---@type UEA0001
-                ---@diagnostic disable-next-line: assign-type-mismatch
-                local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
-                pod:SetParent(self, 'RightPod')
-                pod:SetCreator(self)
-                self.Trash:Add(pod)
-                self.RightPod = pod
-            end
+    ---@return UnitTransferData?
+    OnBeforeTransfer = function(self)
+        local data = ACUUnit.OnBeforeTransfer(self)
+        local pods = self:SavePodsForTransfer()
+        if pods then
+            data = data or {}
+            data.Pods = pods
         end
-        self:RequestRefreshUI()
+        return data
     end,
 
     ---@param self UEL0001
-    ---@param pod string
-    ---@param rebuildDrone boolean
-    NotifyOfPodDeath = function(self, pod, rebuildDrone)
-        if rebuildDrone == true then
-            if pod == 'LeftPod' then
-                if self.HasLeftPod == true then
-                    self.RebuildThread = self:ForkThread(self.RebuildPod, 1)
-                end
-            elseif pod == 'RightPod' then
-                if self.HasRightPod == true then
-                    self.RebuildThread2 = self:ForkThread(self.RebuildPod, 2)
-                end
-            end
-        else
-            self:CreateEnhancement(pod .. 'Remove')
-        end
-    end,
-
-    ---Calling this function will pull any pods without explicit orders to our current task
-    ---@param self UEL0001
-    RefreshPodFocus = function(self)
-        for _, pod in self:GetPods() do
-            if not pod.Dead and pod:GetCommandQueue()[1].commandType == 29 then
-                IssueToUnitClearCommands(pod)
-            end
-        end
+    ---@param data? UnitTransferData
+    OnAfterTransfer = function(self, data)
+        ACUUnit.OnAfterTransfer(self, data)
+        self:RestorePodsAfterTransfer(data.Pods)
     end,
 
     ---@param self UEL0001
-    ---@return Unit[]? pods
-    GetPods = function(self)
-        return {self.LeftPod, self.RightPod}
+    ---@param name string
+    ---@param rebuildDrone? boolean
+    NotifyOfPodDeath = function(self, name, rebuildDrone)
+        ConstructionPodComponent.NotifyOfPodDeath(self, name, rebuildDrone)
+        -- the drone's enhancement stays only while the drone is rebuilt
+        if not rebuildDrone and not self.Dead and self:GetPodSlot(name).Enabled then
+            self:CreateEnhancement(name .. 'Remove')
+        end
     end,
 
     ---@param self UEL0001
@@ -339,104 +283,28 @@ UEL0001 = ClassUnit(ACUUnit) {
     ---@param self UEL0001
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementLeftPod = function(self, bp)
-        -- After a transfer, rebuild the drone if it was dead instead of creating it for free
-        local transferredPodHealth = self.TransferredPodHealth
-        local health = transferredPodHealth and transferredPodHealth.LeftPod
-        if transferredPodHealth and not health then
-            self.HasLeftPod = true
-            self.RebuildThread = self:ForkThread(self.RebuildPod, 1)
-            return
-        end
-
-        local location = self:GetPosition('AttachSpecial02')
-        ---@type UEA0001
-        ---@diagnostic disable-next-line: assign-type-mismatch
-        local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
-        pod:SetParent(self, 'LeftPod')
-        pod:SetCreator(self)
-        self.Trash:Add(pod)
-        self.HasLeftPod = true
-        self.LeftPod = pod
-        if health then
-            pod:SetHealth(self, health)
-        end
+        self:AddPod('LeftPod')
     end,
 
     ---@param self UEL0001
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementLeftPodRemove = function(self, bp)
-        if self.HasLeftPod == true then
-            self.HasLeftPod = false
-            if self.LeftPod and not self.LeftPod.Dead then
-                self.LeftPod:Kill()
-                self.LeftPod = nil
-            end
-            if self.RebuildingPod ~= nil then
-                RemoveEconomyEvent(self, self.RebuildingPod)
-                self.RebuildingPod = nil
-            end
-        end
-        KillThread(self.RebuildThread)
+        self:RemovePod('LeftPod')
     end,
 
     ---@param self UEL0001
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementRightPod = function(self, bp)
-        -- After a transfer, rebuild the drone if it was dead instead of creating it for free
-        local transferredPodHealth = self.TransferredPodHealth
-        -- This enhancement replaces the left drone enhancement in its slot, so after a transfer it brings back the left drone too
-        if transferredPodHealth and not self.HasLeftPod then
-            self:ProcessEnhancementLeftPod(bp)
-        end
-
-        local health = transferredPodHealth and transferredPodHealth.RightPod
-        if transferredPodHealth and not health then
-            self.HasRightPod = true
-            self.RebuildThread2 = self:ForkThread(self.RebuildPod, 2)
-            return
-        end
-
-        local location = self:GetPosition('AttachSpecial01')
-        ---@type UEA0001
-        ---@diagnostic disable-next-line: assign-type-mismatch
-        local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
-        pod:SetParent(self, 'RightPod')
-        pod:SetCreator(self)
-        self.Trash:Add(pod)
-        self.HasRightPod = true
-        self.RightPod = pod
-        if health then
-            pod:SetHealth(self, health)
-        end
+        -- This enhancement replaces the left drone enhancement in its slot, so it has both drones
+        self:AddPod('LeftPod')
+        self:AddPod('RightPod')
     end,
 
     ---@param self UEL0001
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementRightPodRemove = function(self, bp)
-        if self.HasLeftPod == true then
-            self.HasLeftPod = false
-            if self.LeftPod and not self.LeftPod.Dead then
-                self.LeftPod:Kill()
-                self.LeftPod = nil
-            end
-            if self.RebuildingPod ~= nil then
-                RemoveEconomyEvent(self, self.RebuildingPod)
-                self.RebuildingPod = nil
-            end
-        end
-        if self.HasRightPod == true then
-            self.HasRightPod = false
-            if self.RightPod and not self.RightPod.Dead then
-                self.RightPod:Kill()
-                self.RightPod = nil
-            end
-            if self.RebuildingPod2 ~= nil then
-                RemoveEconomyEvent(self, self.RebuildingPod2)
-                self.RebuildingPod2 = nil
-            end
-        end
-        KillThread(self.RebuildThread)
-        KillThread(self.RebuildThread2)
+        self:RemovePod('LeftPod')
+        self:RemovePod('RightPod')
     end,
 
     -- Teleport Upgrade

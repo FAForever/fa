@@ -3,7 +3,7 @@ local oldGetGuards = TConstructionUnit.GetGuards
 
 ---@class TConstructionPodUnit : TConstructionUnit
 ---@field Pod string
----@field Parent? UEL0301 | UEL0001 # Only these two units set the parent properly
+---@field Parent? ConstructionPodUnit # Set by the `ConstructionPodComponent` of the unit that carries the drone
 ---@field guardCache table
 ---@field rebuildDrone boolean # If true, the parent should rebuild the pod. Caches script bit 1.
 TConstructionPodUnit = ClassUnit(TConstructionUnit) {
@@ -42,7 +42,7 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
     end,
 
     ---@param self TConstructionPodUnit
-    ---@param parent UEL0301 | UEL0001 # Only these two implement the function `NotifyOfPodDeath`
+    ---@param parent ConstructionPodUnit
     ---@param podName string
     SetParent = function(self, parent, podName)
         self.Parent = parent
