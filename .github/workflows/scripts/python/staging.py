@@ -56,6 +56,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import quote
@@ -73,6 +74,11 @@ LIVE = os.environ.get("GITHUB_ACTIONS") == "true"
 
 MAX_CONFLICT_LINES = 30
 MAX_LINE_LENGTH = 160
+# Seconds to wait before confirming that a status write was not overwritten by
+# a parallel run, which reads and writes the comment within a fraction of that
+CONFIRM_DELAY = float(os.environ.get("STAGING_CONFIRM_DELAY", "10"))
+# Number of write tokens kept in a status comment
+REVISIONS_KEPT = 20
 
 DATA_RE = re.compile(r"<!-- staging-data: (\{.*?\}) -->", re.S)
 STAGED_RE = re.compile(r"^Staged from \S+/pull/(\d+) at ([0-9a-f]{40})$", re.M)
@@ -302,6 +308,8 @@ class Status:
     def save(self, updates, notify=None):
         """Merges the updates into the metadata, which is read again first so
         that fields written by a parallel run are kept, and writes the comment.
+        A run that writes between that read and the write is handled by
+        `confirm_writes`.
 
         `notify` is (key, users, reason). It deletes and reposts the comment to
         mention the users, once per key. Returns the URL of the comment."""
@@ -315,6 +323,10 @@ class Status:
                 self.load()
 
         self.data.update(updates)
+        # Each write adds a token to the ones it read. A write that is missing
+        # later was overwritten by a run that read the comment before it
+        token = os.urandom(4).hex()
+        self.data["revisions"] = (self.data.get("revisions") or [])[-(REVISIONS_KEPT - 1):] + [token]
         mention = ""
         if notify and notify[0] != self.data.get("notified"):
             key, users, reason = notify
@@ -341,7 +353,37 @@ class Status:
                 self.stale.append(self.id)
             self._read(self.gh.create_comment(self.pr, body))
         self._delete_stale()
+        unconfirmed.append((self, token, dict(updates)))
         return self.url
+
+
+# Writes of this run as (status, token, updates), see confirm_writes
+unconfirmed = []
+
+
+def confirm_writes(rounds=3):
+    """Writes the updates of this run again where a parallel run overwrote them.
+
+    Two runs that read a status comment before either writes it would otherwise
+    keep only the fields of the one that writes last. Called by the record and
+    deploy commands, whose fields are not recomputed by the next check."""
+    for _ in range(rounds):
+        if not unconfirmed:
+            return
+        pending = unconfirmed[:]
+        unconfirmed.clear()
+        time.sleep(CONFIRM_DELAY)
+        for status, token, updates in pending:
+            fresh = status.gh.get_comment(status.id) if status.id else None
+            if fresh:
+                status._read(fresh)
+            else:
+                status.id, status.data = None, {}
+                status.load()
+            if token not in (status.data.get("revisions") or []):
+                print(f"A parallel run overwrote the status of #{status.pr}, writing it again")
+                status.save(updates)
+    unconfirmed.clear()
 
 
 def pr_link(pr):
@@ -964,10 +1006,12 @@ def main(argv=None):
         check(gh, cfg, event=load_event())
     elif args.command == "record":
         record(gh, cfg, *load_event())
+        confirm_writes()
     elif args.command == "deploy":
         if not args.result:
             parser.error("deploy requires --result")
         deploy(gh, cfg, args.result, args.staging, args.deployed, args.previous, args.manual_by)
+        confirm_writes()
 
 
 if __name__ == "__main__":
