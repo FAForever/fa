@@ -1,1 +1,1 @@
-- (#7385) Fix transferred ACUs announcing all of their enhancements as just completed to the player who receives them.
+- (#7385) Fix transferred ACUs posting a "done" notification in team chat for each of their enhancements, as if they had just been built.
