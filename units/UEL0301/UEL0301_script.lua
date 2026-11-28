@@ -9,18 +9,20 @@ local DefaultWep = import("/lua/sim/defaultweapons.lua")
 local DefaultUnit = import("/lua/defaultunits.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
 local TWeapons = import("/lua/terranweapons.lua")
+local ConstructionPodComponent = import("/lua/sim/units/components/ConstructionPodComponent.lua").ConstructionPodComponent
 
 local CommandUnit = DefaultUnit.CommandUnit
 local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
 local SCUDeathWeapon = DefaultWep.SCUDeathWeapon
 
----@class UEL0301 : CommandUnit
----@field HasPodEnh boolean
----@field RebuildPodThread? thread
----@field RebuildingPod? EconomyEvent
----@field Pod TConstructionPodUnit
----@field TransferredPodHealth? table<string, number> # Set by `TransferUnitsOwnership` while it recreates the enhancements: health of the drones that were alive before the transfer
-UEL0301 = ClassUnit(CommandUnit) {
+---@class UEL0301 : CommandUnit, ConstructionPodUnit
+---@field Pod? TConstructionPodUnit
+UEL0301 = ClassUnit(CommandUnit, ConstructionPodComponent) {
+    ---@type table<string, ConstructionPodDefinition>
+    PodDefinitions = {
+        Pod = { UnitId = 'uea0003', Bone = 'AttachSpecial01', RebuildTime = 10 },
+    },
+
     IntelEffects = {
         {
             Bones = {
@@ -116,52 +118,14 @@ UEL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UEL0301
-    RebuildPod = function(self)
-        if self.HasPodEnh == true then
-            self.RebuildingPod = CreateEconomyEvent(self, 1600, 160, 10, self.SetWorkProgress)
-            self:RequestRefreshUI()
-            WaitFor(self.RebuildingPod)
-            self:SetWorkProgress(0.0)
-            RemoveEconomyEvent(self, self.RebuildingPod)
-            self.RebuildingPod = nil
-            local location = self:GetPosition('AttachSpecial01')
-            ---@type UEA0003
-            ---@diagnostic disable-next-line: assign-type-mismatch
-            local pod = CreateUnitHPR('UEA0003', self.Army, location[1], location[2], location[3], 0, 0, 0)
-            pod:SetParent(self, 'Pod')
-            pod:SetCreator(self)
-            self.Trash:Add(pod)
-            self.Pod = pod
+    ---@param name string
+    ---@param rebuildDrone? boolean
+    NotifyOfPodDeath = function(self, name, rebuildDrone)
+        ConstructionPodComponent.NotifyOfPodDeath(self, name, rebuildDrone)
+        -- the drone's enhancement stays only while the drone is rebuilt
+        if not rebuildDrone and not self.Dead and self:GetPodSlot(name).Enabled then
+            self:CreateEnhancement(name .. 'Remove')
         end
-    end,
-
-    ---@param self UEL0301
-    ---@param pod TConstructionPodUnit unused
-    ---@param rebuildDrone boolean
-    NotifyOfPodDeath = function(self, pod, rebuildDrone)
-        if rebuildDrone == true then
-            if self.HasPodEnh == true then
-                self.RebuildPodThread = self:ForkThread(self.RebuildPod)
-            end
-        else
-            self:CreateEnhancement('PodRemove')
-        end
-    end,
-
-    ---Calling this function will pull any pods without explicit orders to our current task
-    ---@param self UEL0301
-    RefreshPodFocus = function(self)
-        for _, pod in self:GetPods() do
-            if not pod.Dead and pod:GetCommandQueue()[1].commandType == 29 then
-                IssueToUnitClearCommands(pod)
-            end
-        end
-    end,
-
-    ---@param self UEL0301
-    ---@return Unit[]? pods
-    GetPods = function(self)
-        return { self.Pod }
     end,
 
     ---@param self UEL0301
@@ -188,44 +152,13 @@ UEL0301 = ClassUnit(CommandUnit) {
     ---@param self UEL0301
     ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementPod = function(self, bp)
-        -- After a transfer, rebuild the drone if it was dead instead of creating it for free
-        local transferredPodHealth = self.TransferredPodHealth
-        local health = transferredPodHealth and transferredPodHealth.Pod
-        if transferredPodHealth and not health then
-            self.HasPodEnh = true
-            self.RebuildPodThread = self:ForkThread(self.RebuildPod)
-            return
-        end
-
-        local location = self:GetPosition('AttachSpecial01')
-        ---@type UEA0003
-        ---@diagnostic disable-next-line: assign-type-mismatch
-        local pod = CreateUnitHPR('UEA0003', self.Army, location[1], location[2], location[3], 0, 0, 0)
-        pod:SetParent(self, 'Pod')
-        pod:SetCreator(self)
-        self.Trash:Add(pod)
-        self.HasPodEnh = true
-        self.Pod = pod
-        if health then
-            pod:SetHealth(self, health)
-        end
+        self:AddPod('Pod')
     end,
 
     ---@param self UEL0301
     ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementPodRemove = function(self, bp)
-        if self.HasPodEnh == true then
-            self.HasPodEnh = false
-            if self.Pod and not self.Pod:BeenDestroyed() then
-                self.Pod:Kill()
-                self.Pod = nil
-            end
-            if self.RebuildingPod ~= nil then
-                RemoveEconomyEvent(self, self.RebuildingPod)
-                self.RebuildingPod = nil
-            end
-        end
-        KillThread(self.RebuildPodThread)
+        self:RemovePod('Pod')
     end,
 
     ---@param self UEL0301
