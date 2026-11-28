@@ -260,17 +260,23 @@ local function CallBeforeTransferCallbacks(unit, callbacks)
     return data
 end
 
---- Calls the `After` functions of a unit's transfer callbacks
----@param unit Unit
----@param callbacks table<string, UnitTransferCallback>
+--- Calls the `After` functions of a unit's transfer callbacks, and removes the callbacks whose `After` errors from the
+--- unit
+---@param unit Unit # The new unit, or the old unit if the transfer failed
+---@param callbacks table<string, UnitTransferCallback> # The old unit's callbacks
+---@param transferFailed boolean
 ---@param data? table<string, any>
-local function CallAfterTransferCallbacks(unit, callbacks, data)
+local function CallAfterTransferCallbacks(unit, callbacks, transferFailed, data)
     for key, callback in callbacks do
         local after = callback.After
         if after then
-            local ok, msg = pcall(after, unit, data[key])
+            local ok, msg = pcall(after, unit, transferFailed, data[key])
             if not ok then
-                WARN(string.format("Transfer callback '%s' failed after the transfer: %s", key, tostring(msg)))
+                WARN(string.format("Transfer callback '%s' failed after the transfer and is removed: %s", key, tostring(msg)))
+                local unitCallbacks = unit.TransferCallbacks
+                if unitCallbacks[key] == callback then
+                    unitCallbacks[key] = nil
+                end
             end
         end
     end
@@ -464,14 +470,14 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
             end
             -- and what `OnBeforeTransfer` and the callbacks took
             if not unit.Dead then
-                unit:OnAfterTransfer(transferData)
+                unit:OnAfterTransfer(true, transferData)
                 if transferCallbacks then
-                    CallAfterTransferCallbacks(unit, transferCallbacks, callbackData)
+                    CallAfterTransferCallbacks(unit, transferCallbacks, true, callbackData)
                 end
             end
             continue
         end
-        newUnit:OnAfterTransfer(transferData)
+        newUnit:OnAfterTransfer(false, transferData)
         if transferCallbacks then
             for key, callback in transferCallbacks do
                 if callback.Persist then
@@ -483,7 +489,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
                     newCallbacks[key] = callback
                 end
             end
-            CallAfterTransferCallbacks(newUnit, transferCallbacks, callbackData)
+            CallAfterTransferCallbacks(newUnit, transferCallbacks, false, callbackData)
         end
 
         newUnitCount = newUnitCount + 1

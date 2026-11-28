@@ -160,7 +160,7 @@ local UnitSetMaxHealth = _G.moho.unit_methods.SetMaxHealth
 ---@see Unit.AddTransferCallback
 ---@class UnitTransferCallback
 ---@field Before? fun(unit: Unit): any # Called on the old unit. Its return value is passed to `After`
----@field After? fun(unit: Unit, data: any) # Called on the new unit, or on the old unit if the transfer failed
+---@field After? fun(unit: Unit, transferFailed: boolean, data: any) # Called on the new unit, or on the old unit if the transfer failed
 ---@field Persist boolean # Whether the new unit gets the callback too
 
 ---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties, CampaignAIUnitProperties, UnitBuffFields, DebugUnitComponent, FastDecayComponent
@@ -1206,14 +1206,15 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     --- transfer failed (unit cap)
     ---@see Unit.OnBeforeTransfer
     ---@param self Unit
+    ---@param transferFailed boolean # Whether `self` is the old unit
     ---@param data? UnitTransferData # The value returned by `OnBeforeTransfer`
-    OnAfterTransfer = function(self, data)
+    OnAfterTransfer = function(self, transferFailed, data)
     end,
 
     --- Adds functions that `TransferUnitsOwnership` calls around the transfer of this unit, for state that isn't part
     --- of the unit's class. Each `after` only receives the value that its own `before` returned. An error in a
-    --- callback is logged and doesn't stop the transfer. A callback whose `before` errors is removed, so its `after`
-    --- isn't called and the new unit doesn't get it.
+    --- callback is logged, removes the callback from the unit it was called on, and doesn't stop the transfer. When
+    --- `before` errors, `after` isn't called, and the new unit doesn't get the callback.
     ---
     --- Neither function may wait. A callback with the same key replaces the old one
     ---@see Unit.RemoveTransferCallback
@@ -1222,7 +1223,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param key string
     ---@param persist boolean # Whether the new unit gets the callback too. It replaces a callback with the same key that the new unit added while it was created
     ---@param before? fun(unit: Unit): any # Called on the old unit right before it changes army
-    ---@param after? fun(unit: Unit, data: any) # Called with the value that `before` returned, on the new unit, or on the old unit if the transfer failed (unit cap)
+    ---@param after? fun(unit: Unit, transferFailed: boolean, data: any) # Called with the value that `before` returned, on the new unit, or on the old unit if the transfer failed (unit cap)
     AddTransferCallback = function(self, key, persist, before, after)
         local callbacks = self.TransferCallbacks
         if not callbacks then
