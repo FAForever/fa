@@ -144,6 +144,7 @@ SyncMeta = {
 
 local cUnit = moho.unit_methods
 local cUnitGetBuildRate = cUnit.GetBuildRate
+local cUnitSetReclaimable = cUnit.SetReclaimable
 local UnitSetMaxHealth = _G.moho.unit_methods.SetMaxHealth
 
 ---@class UnitBuffsTable
@@ -183,6 +184,7 @@ local UnitSetMaxHealth = _G.moho.unit_methods.SetMaxHealth
 ---@field SiloProjectile? ProjectileBlueprint
 ---@field ReclaimTimeMultiplier? number
 ---@field BeingReclaimedWhileBeingBuilt? table<EntityId, Unit> # Units that started reclaiming this unit while it was being built
+---@field CanBeReclaimed? boolean # The last value passed to `SetReclaimable`
 ---@field CaptureTimeMultiplier? number
 ---@field PlatoonHandle? Platoon
 ---@field tickIssuedShieldRepair number? # Used by shields to keep track of when this unit's guards were ordered to start shield repair instantly
@@ -2531,10 +2533,24 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         local reclaimers = self.BeingReclaimedWhileBeingBuilt
         if reclaimers then
             self.BeingReclaimedWhileBeingBuilt = nil
-            for _, reclaimer in reclaimers do
-                if reclaimer.EntityBeingReclaimed == self then
+            local canReissue = true
+            for id, reclaimer in reclaimers do
+                if reclaimer.EntityBeingReclaimed ~= self then
+                    reclaimers[id] = nil
+                elseif not reclaimer:CanReissueCommandQueue() then
+                    canReissue = false
+                end
+            end
+
+            if canReissue then
+                for _, reclaimer in reclaimers do
                     reclaimer:ReissueCommandQueue()
                 end
+            elseif not table.empty(reclaimers) then
+                -- the reclaim tasks drop their orders when the target is unreclaimable for a
+                -- tick, which keeps the rest of the queues but also drops reissued orders
+                cUnitSetReclaimable(self, false)
+                self:ForkThread(self.RestoreReclaimableThread)
             end
         end
 
@@ -4671,9 +4687,35 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self:UpdateShieldAssistersConsumption()
     end,
 
+    ---@param self Unit
+    ---@param reclaimable boolean
+    SetReclaimable = function(self, reclaimable)
+        self.CanBeReclaimed = reclaimable
+        cUnitSetReclaimable(self, reclaimable)
+    end,
+
+    ---@param self Unit
+    RestoreReclaimableThread = function(self)
+        WaitTicks(2)
+        cUnitSetReclaimable(self, self.CanBeReclaimed ~= false)
+    end,
+
+    --- Returns whether `ReissueCommandQueue` can issue every order in the queue again
+    ---@see Unit.ReissueCommandQueue
+    ---@param self Unit
+    ---@return boolean
+    CanReissueCommandQueue = function(self)
+        for _, order in self:GetCommandQueue() do
+            if not UnitQueueDataToCommand[order.commandType].Callback then
+                return false
+            end
+        end
+        return true
+    end,
+
     --- Clears the command queue and issues it again, which restarts the current order.
     --- Orders without a callback in `UnitQueueDataToCommand` are dropped
-    ---@see UnitQueueDataToCommand
+    ---@see Unit.CanReissueCommandQueue
     ---@param self Unit
     ReissueCommandQueue = function(self)
         local queue = self:GetCommandQueue()
